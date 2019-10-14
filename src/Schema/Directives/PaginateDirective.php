@@ -84,7 +84,7 @@ SDL;
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
 
-        if($this->directiveHasArgument('builder')) {
+        if ($this->directiveHasArgument('builder')) {
             // This is done only for validation
             $this->getResolverFromArgument('builder');
         } else {
