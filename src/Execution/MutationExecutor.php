@@ -417,7 +417,7 @@ class MutationExecutor
             );
 
         $modelInstance = $model->newQuery()->find($id);
-        if($modelInstance) {
+        if ($modelInstance) {
             return self::executeUpdateWithLoadedModel($modelInstance, $args, $parentRelation);
         }
 
