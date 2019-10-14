@@ -24,7 +24,6 @@ jobs:
       php: "7.3"
       env: LARAVEL='^6.0'
       script:
-        - composer require nunomaduro/larastan
         - composer stan
         - composer normalize --dry-run
     - stage: test
