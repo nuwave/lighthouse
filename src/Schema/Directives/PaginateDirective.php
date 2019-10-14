@@ -83,14 +83,17 @@ SDL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
-        $paginationManipulator->transformToPaginatedField(
-            $this->paginationType(),
-            $this->getModelClass(),
-            $fieldDefinition,
-            $parentType,
-            $this->directiveArgValue('defaultCount'),
-            $this->paginateMaxCount()
-        );
+        $paginationManipulator
+            ->setModelClass(
+                $this->getModelClass()
+            )
+            ->transformToPaginatedField(
+                $this->paginationType(),
+                $fieldDefinition,
+                $parentType,
+                $this->directiveArgValue('defaultCount'),
+                $this->paginateMaxCount()
+            );
     }
 
     /**

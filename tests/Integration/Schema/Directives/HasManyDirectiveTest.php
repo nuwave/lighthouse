@@ -158,6 +158,52 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
+    public function testDoesNotRequireModelClassForPaginatedHasMany(): void
+    {
+        $this->schema = '
+        type User {
+            tasks: [NotTheModelNameTask!]! @hasMany(type: "paginator")
+        }
+        
+        type NotTheModelNameTask {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL('
+        {
+            user {
+                tasks(first: 2) {
+                    paginatorInfo {
+                        count
+                        hasMorePages
+                        total
+                    }
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'paginatorInfo' => [
+                            'count' => 2,
+                            'hasMorePages' => true,
+                            'total' => 3,
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.tasks.data');
+    }
+
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
