@@ -411,8 +411,8 @@ class MutationExecutor
      */
     public static function executeUpsert(Model $model, Collection $args, ?Relation $parentRelation = null): Model
     {
-        $id = $args->pull('id')
-            ?? $args->pull(
+        $id = $args->get('id')
+            ?? $args->get(
                 $model->getKeyName()
             );
 
