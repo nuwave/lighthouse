@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
-use Nuwave\Lighthouse\Schema\Directives\BuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class ArgumentSet
