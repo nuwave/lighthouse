@@ -218,6 +218,42 @@ may fail to find the model you provided and return `null`:
 }
 ```
 
+## Upsert
+
+Use the [@upsert](../api-reference/directives.md#upsert) directive to update a model with 
+a given `id` or create it if it does not exist. 
+
+```graphql
+type Mutation {
+  upsertUser(id: ID!, name: String!, email: String): User @upsert
+}
+```
+
+Since upsert can create or update your data you must have all the minimum fields for a creation as required.
+The `id` is always required and must be marked as fillable in the model.
+
+```graphql
+mutation {
+  upsertUser(id: "123" name: "Hillary"){
+    id
+    name
+    email
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "upsertUser": {
+      "id": "123",
+      "name": "Hillary",
+      "email": null
+    }
+  }
+}
+```
+
 ## Delete
 
 Deleting models is a breeze using the [@delete](../api-reference/directives.md#delete) directive. Dangerously easy.

@@ -45,6 +45,7 @@ class UpdateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertSame('bar', Company::first()->name);
     }
 
@@ -88,6 +89,7 @@ class UpdateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertSame('bar', Company::first()->name);
     }
 
@@ -127,6 +129,7 @@ class UpdateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertSame('bar', Category::first()->name);
     }
 
@@ -186,6 +189,7 @@ class UpdateDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(1, 'errors');
+
         $this->assertSame('Original', User::first()->name);
     }
 }
