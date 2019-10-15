@@ -91,6 +91,7 @@ class ASTBuilder
             $cache = app('cache');
             $this->documentAST = $cache->remember(
                 $cacheConfig['key'],
+                // TODO remove this fallback in v5
                 $cacheConfig['ttl'] ?? null,
                 function (): DocumentAST {
                     return $this->build();
