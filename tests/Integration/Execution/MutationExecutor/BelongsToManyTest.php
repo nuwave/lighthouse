@@ -133,11 +133,11 @@ class BelongsToManyTest extends DBTestCase
                 name: "is_user"
                 users: {
                     upsert: [{
-                        id: 1
+                        id: 10
                         name: "user1"
                     },
                     {
-                        id: 2
+                        id: 20
                         name: "user2"
                     }]
                 }
@@ -157,11 +157,11 @@ class BelongsToManyTest extends DBTestCase
                     'name' => 'is_user',
                     'users' => [
                         [
-                            'id' => '1',
+                            'id' => '10',
                             'name' => 'user1',
                         ],
                         [
-                            'id' => '2',
+                            'id' => '20',
                             'name' => 'user2',
                         ],
                     ],
