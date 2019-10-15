@@ -2,13 +2,13 @@
 
 namespace Tests\Integration\Execution\DataLoader;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
-use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use GraphQL\Type\Definition\ResolveInfo;
+use Tests\Utils\BatchLoaders\UserLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class BatchLoaderTest extends DBTestCase
 {
