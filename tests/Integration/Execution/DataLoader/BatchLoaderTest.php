@@ -91,7 +91,7 @@ class BatchLoaderTest extends DBTestCase
         type Query {
             user(id: ID!): User 
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
-            manyUsers(ids: [ID!]!): User 
+            manyUsers(ids: [ID!]!): [User] 
                 @field(resolver: "'.$this->qualifyTestResolver('resolveManyUsers').'")
         }
         ';
@@ -121,9 +121,10 @@ class BatchLoaderTest extends DBTestCase
                     'ids' => [$users[1]->getKey(), $users[2]->getKey()],
                 ],
             ])
-            ->assertJsonCount(2, 'user.tasks')
-            ->assertJsonCount(3, 'manyUsers.0.data.user.tasks')
-            ->assertJsonCount(3, 'manyUsers.1.data.user.tasks');
+            ->assertJsonCount(2, 'data.manyUsers')
+            ->assertJsonCount(3, 'data.manyUsers.0.tasks')
+            ->assertJsonCount(3, 'data.manyUsers.1.tasks')
+            ->assertJsonCount(3, 'data.user.tasks');
     }
 
     public function resolveUser($root, array $args, GraphQLContext $context, ResolveInfo $info)

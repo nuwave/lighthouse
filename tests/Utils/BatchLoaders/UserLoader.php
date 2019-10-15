@@ -9,6 +9,8 @@ class UserLoader extends BatchLoader
 {
     public function resolve(): array
     {
-        return User::findMany($this->keys)->keyBy('id');
+        return User::findMany(array_keys($this->keys))
+            ->keyBy('id')
+            ->all();
     }
 }
