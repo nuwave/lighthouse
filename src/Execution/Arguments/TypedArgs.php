@@ -145,12 +145,17 @@ class TypedArgs
         if ($type instanceof ListType) {
             $typeInList = $type->type;
 
-            $values = [];
-            foreach ($valueOrValues as $singleValue) {
-                $values [] = $this->wrapWithNamedType($singleValue, $typeInList);
-            }
+            if(is_array($valueOrValues)) {
+                $values = [];
+                foreach ($valueOrValues as $singleValue) {
+                    $values [] = $this->wrapWithNamedType($singleValue, $typeInList);
+                }
 
-            return $values;
+                return $values;
+            } else {
+                // This case happens if `null` is passed
+                return $this->wrapWithNamedType($valueOrValues, $typeInList);
+            }
         } else {
             return $this->wrapWithNamedType($valueOrValues, $type);
         }
