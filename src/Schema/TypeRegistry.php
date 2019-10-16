@@ -8,7 +8,6 @@ use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\UnionType;
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Support\Pipeline;
@@ -427,8 +426,8 @@ class TypeRegistry
                 $types = [];
 
                 // Might be a NodeList, so we can not use array_map()
-                foreach($unionDefinition->types as $type) {
-                    $types[]= $this->get($type->name->value);
+                foreach ($unionDefinition->types as $type) {
+                    $types[] = $this->get($type->name->value);
                 }
 
                 return $types;
