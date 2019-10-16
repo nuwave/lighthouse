@@ -53,9 +53,6 @@ class SchemaCachingTest extends TestCase
             return new Comment([
                 'bar' => 'bar',
             ]);
-            $comment->id = 'bar';
-
-            return $comment;
         });
 
         $this->graphQL(/* @lang GraphQL */ '
