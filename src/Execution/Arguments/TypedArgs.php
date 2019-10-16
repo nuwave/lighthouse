@@ -152,13 +152,13 @@ class TypedArgs
                 }
 
                 return $values;
-            } else {
-                // This case happens if `null` is passed
-                return $this->wrapWithNamedType($valueOrValues, $typeInList);
             }
-        } else {
-            return $this->wrapWithNamedType($valueOrValues, $type);
+
+            // This case happens if `null` is passed
+            return $this->wrapWithNamedType($valueOrValues, $typeInList);
         }
+
+        return $this->wrapWithNamedType($valueOrValues, $type);
     }
 
     /**
