@@ -145,7 +145,7 @@ class TypedArgs
         if ($type instanceof ListType) {
             $typeInList = $type->type;
 
-            if(is_array($valueOrValues)) {
+            if (is_array($valueOrValues)) {
                 $values = [];
                 foreach ($valueOrValues as $singleValue) {
                     $values [] = $this->wrapWithNamedType($singleValue, $typeInList);
