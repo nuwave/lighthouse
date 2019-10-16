@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.4.2...master)
 
+### Added
+
+- Add `@upsert` directive and nested mutation operations to create or update a model
+  regardless whether it exists https://github.com/nuwave/lighthouse/pull/1005
+
 ## [4.4.2](https://github.com/nuwave/lighthouse/compare/v4.4.1...v4.4.2)
 
 ### Added
@@ -25,11 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix regression in 4.4.0 that required matching the type returned from paginated relationship
   fields with the class name of the model https://github.com/nuwave/lighthouse/pull/1011
-
-### Added
-
-- Add `@upsert` directive and nested mutation operations to create or update a model
-  regardless whether it exists https://github.com/nuwave/lighthouse/pull/1005
 
 ## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
 
