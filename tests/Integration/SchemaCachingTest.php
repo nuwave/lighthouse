@@ -2,12 +2,12 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Cache\CacheManager;
-use Illuminate\Cache\Repository;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Tests\SerializingArrayStore;
 use Tests\TestCase;
 use Tests\Utils\Models\Comment;
+use Illuminate\Cache\Repository;
+use Tests\SerializingArrayStore;
+use Illuminate\Cache\CacheManager;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 
 class SchemaCachingTest extends TestCase
 {
@@ -22,7 +22,7 @@ class SchemaCachingTest extends TestCase
 
         /** @var \Illuminate\Cache\CacheManager $cache */
         $cache = $app->make(CacheManager::class);
-        $cache->extend('serializing-array', function(){
+        $cache->extend('serializing-array', function () {
             return new Repository(
                 new SerializingArrayStore()
             );
@@ -32,7 +32,7 @@ class SchemaCachingTest extends TestCase
 
     public function testSchemaCachingWithUnionType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /* @lang GraphQL */ '
         type Query {
             foo: Foo @mock
         }
@@ -49,15 +49,16 @@ class SchemaCachingTest extends TestCase
         ';
         $this->cacheSchema();
 
-        $this->mockResolver(function() {
+        $this->mockResolver(function () {
             return new Comment([
-                'bar' => 'bar'
+                'bar' => 'bar',
             ]);
             $comment->id = 'bar';
+
             return $comment;
         });
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         {
             foo {
                 ... on Comment {
@@ -68,9 +69,9 @@ class SchemaCachingTest extends TestCase
         ')->assertExactJson([
             'data' => [
                 'foo' => [
-                    'bar' => 'bar'
-                ]
-            ]
+                    'bar' => 'bar',
+                ],
+            ],
         ]);
     }
 
