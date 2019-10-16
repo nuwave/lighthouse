@@ -4,6 +4,12 @@ namespace Tests;
 
 use Illuminate\Cache\ArrayStore;
 
+/**
+ * A cache store used for testing.
+ *
+ * Works like Laravel's usual "array" store, expect
+ * it actually serializes/unserializes the values.
+ */
 class SerializingArrayStore extends ArrayStore
 {
     /**
