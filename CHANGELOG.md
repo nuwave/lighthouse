@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `@upsert` directive and nested mutation operations to create or update a model
   regardless whether it exists https://github.com/nuwave/lighthouse/pull/1005
 
+### Fixed
+
+- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015 
+
 ## [4.4.2](https://github.com/nuwave/lighthouse/compare/v4.4.1...v4.4.2)
 
 ### Added
