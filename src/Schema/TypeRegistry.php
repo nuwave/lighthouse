@@ -271,6 +271,8 @@ class TypeRegistry
             'fields' => $this->resolveFieldsFunction($objectDefinition),
             'interfaces' => function () use ($objectDefinition): array {
                 $interfaces = [];
+
+                // Might be a NodeList, so we can not use array_map()
                 foreach ($objectDefinition->interfaces as $interface) {
                     $interfaces [] = $this->get($interface->name->value);
                 }
@@ -292,6 +294,7 @@ class TypeRegistry
             $typeValue = new TypeValue($typeDefinition);
             $fields = [];
 
+            // Might be a NodeList, so we can not use array_map()
             foreach ($typeDefinition->fields as $fieldDefinition) {
                 /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
                 $fieldFactory = app(FieldFactory::class);
@@ -421,12 +424,14 @@ class TypeRegistry
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
             'types' => function () use ($unionDefinition): array {
-                return array_map(
-                    function (NamedTypeNode $type): Type {
-                        return $this->get($type->name->value);
-                    },
-                    $unionDefinition->types
-                );
+                $types = [];
+
+                // Might be a NodeList, so we can not use array_map()
+                foreach($unionDefinition->types as $type) {
+                    $types[]= $this->get($type->name->value);
+                }
+
+                return $types;
             },
             'resolveType' => $typeResolver,
         ]);
