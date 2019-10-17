@@ -54,6 +54,7 @@ class ClientDirectiveFactory
         }
 
         $locations = [];
+        // Might be a NodeList, so we can not use array_map()
         foreach ($directive->locations as $location) {
             $locations[] = $location->value;
         }
