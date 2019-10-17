@@ -54,9 +54,10 @@ class ClientDirectiveFactory
             $arguments [] = new FieldArgument($fieldArgumentConfig);
         }
 
-        $locations = collect($directive->locations)->map(function (NameNode $location): string {
-            return $location->value;
-        });
+        $locations = [];
+        foreach ($directive->locations as $location) {
+            $locations[] = $location->value;
+        }
 
         return new Directive([
             'name' => $directive->name->value,
