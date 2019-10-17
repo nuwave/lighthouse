@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.5.1...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.5.2...master)
+
+## [4.5.2](https://github.com/nuwave/lighthouse/compare/v4.5.1...v4.5.2)
+
+### Fixed
+
+- Fix conversion of client directives after the schema was cached https://github.com/nuwave/lighthouse/pull/1019
 
 ## [4.5.1](https://github.com/nuwave/lighthouse/compare/v4.5.0...v4.5.1)
 
