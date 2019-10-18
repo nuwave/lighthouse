@@ -45,10 +45,7 @@ class SubscriptionTest extends TestCase
         ";
     }
 
-    /**
-     * @test
-     */
-    public function itSendsSubscriptionChannelInResponse(): void
+    public function testSendsSubscriptionChannelInResponse(): void
     {
         $response = $this->subscribe();
         $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
@@ -60,10 +57,7 @@ class SubscriptionTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itSendsSubscriptionChannelInBatchedResponse(): void
+    public function testSendsSubscriptionChannelInBatchedResponse(): void
     {
         $response = $this->postGraphQL([
             [
@@ -95,10 +89,7 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanBroadcastSubscriptions(): void
+    public function testCanBroadcastSubscriptions(): void
     {
         $this->subscribe();
         $this->graphQL('
@@ -118,10 +109,7 @@ class SubscriptionTest extends TestCase
         $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostCreated']);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsWithMissingOperationName(): void
+    public function testThrowsWithMissingOperationName(): void
     {
         $this->graphQL('
         subscription {

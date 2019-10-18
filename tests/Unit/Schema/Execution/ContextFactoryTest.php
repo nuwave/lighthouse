@@ -48,10 +48,7 @@ class ContextFactoryTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function itCanGenerateCustomContext(): void
+    public function testCanGenerateCustomContext(): void
     {
         $this->schema = "
         type Query {

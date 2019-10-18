@@ -3,15 +3,14 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginateDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanAliasRelayToConnection(): void
+    public function testCanAliasRelayToConnection(): void
     {
         $connection = $this->getConnectionQueryField('connection');
         $relay = $this->getConnectionQueryField('relay');
@@ -35,10 +34,7 @@ class PaginateDirectiveTest extends TestCase
             ->getField('users');
     }
 
-    /**
-     * @test
-     */
-    public function itOnlyRegistersOneTypeForMultiplePaginators(): void
+    public function testOnlyRegistersOneTypeForMultiplePaginators(): void
     {
         $schema = $this->buildSchema('
         type User {
@@ -67,10 +63,7 @@ class PaginateDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itRegistersPaginatorFromTypeExtensionField(): void
+    public function testRegistersPaginatorFromTypeExtensionField(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
@@ -96,10 +89,7 @@ class PaginateDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itHasMaxCountInGeneratedCountDescription(): void
+    public function testHasMaxCountInGeneratedCountDescription(): void
     {
         config(['lighthouse.paginate_max_count' => 5]);
 
@@ -139,7 +129,7 @@ class PaginateDirectiveTest extends TestCase
         );
     }
 
-    public function itCanChangePaginationAmountArgument(): void
+    public function testCanChangePaginationAmountArgument(): void
     {
         config(['lighthouse.pagination_amount_argument' => 'first']);
 
@@ -159,5 +149,147 @@ class PaginateDirectiveTest extends TestCase
             FieldArgument::class,
             $queryType->getField('defaultPaginated')->getArg('first')
         );
+    }
+
+    public function testIsLimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.paginate_max_count' => 5]);
+
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users1: [User!]! @paginate(maxCount: 6)
+            users2: [User!]! @paginate(maxCount: 10)
+        }
+        ';
+
+        $result = $this->graphQL('
+        {
+            users1(first: 10) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            'Maximum number of 6 requested items exceeded. Fetch smaller chunks.',
+            $result->jsonGet('errors.0.message')
+        );
+    }
+
+    public function testIsLimitedToMaxCountFromConfig(): void
+    {
+        config(['lighthouse.paginate_max_count' => 5]);
+
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users1: [User!]! @paginate
+            users2: [User!]! @paginate(type: "relay")
+        }
+        ';
+
+        $resultFromDefaultPagination = $this->graphQL('
+        {
+            users1(first: 10) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
+            $resultFromDefaultPagination->jsonGet('errors.0.message')
+        );
+
+        $resultFromRelayPagination = $this->graphQL('
+        {
+            users2(first: 10) {
+                edges {
+                    node {
+                        id
+                        name
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
+            $resultFromRelayPagination->jsonGet('errors.0.message')
+        );
+    }
+
+    public function testThrowsWhenPaginationWithCountZeroIsRequested(): void
+    {
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users: [User!] @paginate
+        }
+        ';
+
+        $this->graphQL('
+        {
+            users(first: 0) {
+                data {
+                    id
+                }
+            }
+        }
+        ')
+        ->assertJson([
+            'data' => [
+                'users' => null,
+            ],
+        ])
+        ->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+    }
+
+    public function testDoesNotRequireModelWhenUsingBuilder(): void
+    {
+        $validationErrors = $this
+            ->buildSchema('
+            type Query {
+                users: [NotAnActualModelName!] @paginate(builder: "'.$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder').'")
+            }
+            
+            type NotAnActualModelName {
+                id: ID!
+            }
+            ')
+            ->validate();
+
+        $this->assertCount(0, $validationErrors);
+    }
+
+    public function testThrowsIfBuilderIsNotPresent(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessageRegExp('/NonexistingClass/');
+        $this->buildSchema('
+        type Query {
+            users: [Query!] @paginate(builder: "NonexistingClass@notFound")
+        }
+        ');
     }
 }

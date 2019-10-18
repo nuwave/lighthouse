@@ -6,7 +6,7 @@ use Closure;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class FieldValue
 {
@@ -51,13 +51,6 @@ class FieldValue
      * @var \Closure
      */
     protected $complexity;
-
-    /**
-     * Cache key should be private.
-     *
-     * @var bool
-     */
-    protected $privateCache = false;
 
     /**
      * Create new field value instance.
@@ -119,9 +112,9 @@ class FieldValue
     public function getReturnType(): Type
     {
         if (! isset($this->returnType)) {
-            $this->returnType = app(DefinitionNodeConverter::class)->toType(
-                $this->field->type
-            );
+            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
+            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+            $this->returnType = $typeNodeConverter->convert($this->field->type);
         }
 
         return $this->returnType;

@@ -9,14 +9,11 @@ use Tests\Utils\Models\Category;
 
 class UpdateDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanUpdateFromFieldArguments(): void
+    public function testCanUpdateFromFieldArguments(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -28,7 +25,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -48,17 +45,15 @@ class UpdateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertSame('bar', Company::first()->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateFromInputObject(): void
+    public function testCanUpdateFromInputObject(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -74,7 +69,7 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -94,17 +89,15 @@ class UpdateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertSame('bar', Company::first()->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateWithCustomPrimaryKey(): void
+    public function testCanUpdateWithCustomPrimaryKey(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
-        $this->schema = '
+        $this->schema .= '
         type Category {
             category_id: ID!
             name: String!
@@ -116,7 +109,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Category @update
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -136,17 +129,15 @@ class UpdateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertSame('bar', Category::first()->name);
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotUpdateWithFailingRelationship(): void
+    public function testDoesNotUpdateWithFailingRelationship(): void
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String!
@@ -176,7 +167,7 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -198,6 +189,7 @@ class UpdateDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(1, 'errors');
+
         $this->assertSame('Original', User::first()->name);
     }
 }

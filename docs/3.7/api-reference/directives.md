@@ -164,6 +164,9 @@ class User extends Model
 ### Definition
 
 ```graphql
+"""
+Resolves a field through the Eloquent `BelongsToMany` relationship.
+"""
 directive @belongsToMany(
   """
   Specify the default quantity of elements to be returned.
@@ -831,7 +834,7 @@ directive @eq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Examples
@@ -1013,7 +1016,7 @@ type User {
 
 ## @hasOne
 
-Corresponds to [Eloquent's HasOne-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one).
+Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
 
 ```graphql
 type User {
@@ -1024,6 +1027,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
+"""
 directive @hasOne(      
   """
   Specify the relationship method name in the model class,
@@ -1103,7 +1109,7 @@ directive @inject(
   within the incoming argument.
   """
   name: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on FIELD_DEFINITION
 ```
 
 ### Examples
@@ -1194,6 +1200,29 @@ directive @interface(
   """
   resolver: String!
 ) on INTERFACE
+```
+
+## @lazyLoad
+
+```graphql
+"""
+Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
+on the relations of a list of models.
+"""
+directive @lazyLoad(
+    """
+    The names of the relationship methods to load.
+    """
+    relations: [String!]!
+) on FIELD_DEFINITION
+```
+
+This is often useful when loading relationships with the [`@hasMany`](#hasmany) directive.
+
+```graphql
+type Post {
+    comments: [Comment!]! @hasMany @lazyLoad(relations: ["replies"])
+}
 ```
 
 ## @method
@@ -1306,7 +1335,6 @@ type User @model {
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
-
 ### Definition
 
 ```graphql
@@ -1326,13 +1354,16 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Place a not equals operator `!=` on an Eloquent query.
+"""
 directive @neq(  
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema. 
   """
   key: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @node
@@ -1793,7 +1824,7 @@ directive @search(
   Specify a custom index to use for search.
   """
   within: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Examples
@@ -1929,7 +1960,7 @@ type Employee {
     employeeId: ID!
 }
 
-union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
+union Person @union(resolveType: "App\\GraphQL\\Unions\\Person@resolveType") =
       User
     | Employee
 ```
@@ -2121,7 +2152,7 @@ Verify that a column's value is between two values.
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
-directive @whereNotBetween(
+directive @whereBetween(
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema.

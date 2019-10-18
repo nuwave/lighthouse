@@ -10,8 +10,9 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class CanDirective extends BaseDirective implements FieldMiddleware
+class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * @var \Illuminate\Contracts\Auth\Access\Gate
@@ -38,6 +39,32 @@ class CanDirective extends BaseDirective implements FieldMiddleware
         return 'can';
     }
 
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+"""
+directive @can(
+  """
+  The ability to check permissions for.
+  """
+  ability: String!
+  
+  """
+  The name of the argument that is used to find a specific model
+  instance against which the permissions should be checked.
+  """
+  find: String
+  
+  """
+  Additional arguments that are passed to `Gate::check`. 
+  """
+  args: [String!]
+) on FIELD_DEFINITION
+SDL;
+    }
+
     /**
      * Ensure the user is authorized to access this field.
      *
@@ -52,10 +79,8 @@ class CanDirective extends BaseDirective implements FieldMiddleware
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    $modelClass = $this->getModelClass();
-
-                    if (isset($args['id'])) {
-                        $modelOrModels = $modelClass::findOrFail($args['id']);
+                    if ($find = $this->directiveArgValue('find')) {
+                        $modelOrModels = $this->getModelClass()::findOrFail($args[$find]);
 
                         if ($modelOrModels instanceof Model) {
                             $modelOrModels = [$modelOrModels];
@@ -66,7 +91,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                             $this->authorize($context->user(), $model);
                         }
                     } else {
-                        $this->authorize($context->user(), $modelClass);
+                        $this->authorize($context->user(), $this->getModelClass());
                     }
 
                     return call_user_func_array($previousResolver, func_get_args());
@@ -104,7 +129,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * Get additional arguments that are passed to `Gate::check`.
+     * Additional arguments that are passed to `Gate::check`.
      *
      * @return mixed[]
      */

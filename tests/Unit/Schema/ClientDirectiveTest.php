@@ -3,56 +3,53 @@
 namespace Tests\Unit\Schema;
 
 use Tests\TestCase;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\FieldNode;
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use GraphQL\Type\Definition\Directive;
 
 class ClientDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanDefineAClientDirective(): void
+    public function testReturnsDefaultDirectivesInIntrospection(): void
     {
-        $this->schema = '
-        directive @filter(key: String = "default value") on FIELD
-        
-        type Query {
-            foo: String @field(resolver: "'.$this->qualifyTestResolver().'")
-        }
-        ';
-
-        $this->graphQL('
-        {
-            foo @filter(key: "baz")
-        }
-        ')->assertJson([
-            'data' => [
-                'foo' => 'baz',
-            ],
-        ]);
+        $this->assertNotNull(
+            $this->introspectDirective(Directive::SKIP_NAME)
+        );
+        $this->assertNotNull(
+            $this->introspectDirective(Directive::INCLUDE_NAME)
+        );
     }
 
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
+    public function testCanDefineACustomClientDirective(): void
     {
-        /** @var \GraphQL\Language\AST\ArgumentNode $key */
-        $key = (new Collection($resolveInfo->fieldNodes))
-            ->flatMap(function (FieldNode $node): Collection {
-                return new Collection($node->directives);
-            })
-            ->filter(function (DirectiveNode $directive): bool {
-                return $directive->name->value === 'filter';
-            })
-            ->flatMap(function (DirectiveNode $directive): Collection {
-                return new Collection($directive->arguments);
-            })
-            ->first(function (ArgumentNode $arg): bool {
-                return $arg->name->value === 'key';
-            });
+        $this->schema .= '
+        "foo"
+        directive @bar(
+            "foobar"
+            baz: String = "barbaz"
+        ) on FIELD
+        ';
 
-        return $key->value->value;
+        $bar = $this->introspectDirective('bar');
+
+        $this->assertSame(
+            [
+                'name' => 'bar',
+                'description' => 'foo',
+                'locations' => [
+                    'FIELD',
+                ],
+                'args' => [
+                    [
+                        'name' => 'baz',
+                        'description' => 'foobar',
+                        'type' => [
+                            'kind' => 'SCALAR',
+                            'name' => 'String',
+                            'ofType' => null,
+                        ],
+                        'defaultValue' => '"barbaz"',
+                    ],
+                ],
+            ],
+            $bar
+        );
     }
 }

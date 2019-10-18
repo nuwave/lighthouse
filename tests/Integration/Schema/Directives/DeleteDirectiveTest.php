@@ -8,14 +8,11 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class DeleteDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itDeletesUserAndReturnsIt(): void
+    public function testDeletesUserAndReturnsIt(): void
     {
         factory(User::class)->create();
 
-        $this->schema = '
+        $this->schema .= '
         type User {
             id: ID!
         }
@@ -23,7 +20,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID!): User @delete
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -42,14 +39,11 @@ class DeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, User::all());
     }
 
-    /**
-     * @test
-     */
-    public function itDeletesMultipleUsersAndReturnsThem(): void
+    public function testDeletesMultipleUsersAndReturnsThem(): void
     {
         factory(User::class, 2)->create();
 
-        $this->schema = '
+        $this->schema .= '
         type User {
             id: ID!
             name: String
@@ -58,7 +52,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUsers(id: [ID!]!): [User!]! @delete
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -71,83 +65,48 @@ class DeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, User::all());
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNullableArgument(): void
+    public function testRejectsDefinitionWithNullableArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type User {
             id: ID!
             name: String
         }
         
-        type Mutation {
+        type Query {
             deleteUser(id: ID): User @delete
         }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteUser(id: 1) {
-                name
-            }
-        }
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNoArgument(): void
+    public function testRejectsDefinitionWithNoArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type User {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             deleteUser: User @delete
         }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteUser {
-                name
-            }
-        }
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithMultipleArguments(): void
+    public function testRejectsDefinitionWithMultipleArguments(): void
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type User {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             deleteUser(foo: String, bar: Int): User @delete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteUser {
-                name
-            }
         }
         ');
     }

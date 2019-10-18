@@ -8,16 +8,13 @@ use Illuminate\Support\Facades\Event;
 
 class EventDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itDispatchesAnEvent(): void
+    public function testDispatchesAnEvent(): void
     {
         Event::fake([
             CompanyWasCreatedEvent::class,
         ]);
 
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -27,7 +24,7 @@ class EventDirectiveTest extends DBTestCase
             createCompany(name: String): Company @create
                 @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\CompanyWasCreatedEvent")
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

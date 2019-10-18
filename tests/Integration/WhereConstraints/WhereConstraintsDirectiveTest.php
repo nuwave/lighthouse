@@ -18,6 +18,9 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     
     type Query {
         users(where: WhereConstraints @whereConstraints): [User!]! @all
+        whitelistedColumns(
+            where: WhereConstraints @whereConstraints(columns: ["id", "camelCase"])
+        ): [User!]! @all
     }
     
     enum Operator {
@@ -40,10 +43,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itAddsASingleWhereFilter(): void
+    public function testAddsASingleWhereFilter(): void
     {
         factory(User::class, 2)->create();
 
@@ -61,10 +61,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itOverwritesTheOperator(): void
+    public function testOverwritesTheOperator(): void
     {
         factory(User::class, 3)->create();
 
@@ -83,10 +80,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itAddsNestedAnd(): void
+    public function testAddsNestedAnd(): void
     {
         factory(User::class, 3)->create();
 
@@ -114,10 +108,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itAddsNestedOr(): void
+    public function testAddsNestedOr(): void
     {
         factory(User::class, 3)->create();
 
@@ -143,10 +134,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itAddsNestedNot(): void
+    public function testAddsNestedNot(): void
     {
         factory(User::class, 3)->create();
 
@@ -168,10 +156,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsInvalidColumnName(): void
+    public function testRejectsInvalidColumnName(): void
     {
         $this->graphQL('
         {
@@ -193,10 +178,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itQueriesEmptyStrings(): void
+    public function testQueriesEmptyStrings(): void
     {
         factory(User::class, 3)->create();
 
@@ -226,5 +208,101 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testCanQueryForNull(): void
+    {
+        factory(User::class, 3)->create();
+
+        $userNamedNull = factory(User::class)->create([
+            'name' => null,
+        ]);
+
+        $this->graphQL('
+        {
+            users(
+                where: {
+                    column: "name"
+                    value: null
+                }
+            ) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => $userNamedNull->id,
+                        'name' => $userNamedNull->name,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testRequiresAValueForAColumn(): void
+    {
+        $this->graphQL('
+        {
+            users(
+                where: {
+                    column: "no_value"
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJsonFragment([
+            'message' => WhereConstraintsDirective::missingValueForColumn('no_value'),
+        ]);
+    }
+
+    public function testOnlyAllowsWhitelistedColumns(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL('
+        {
+            whitelistedColumns(
+                where: {
+                    column: ID
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'whitelistedColumns' => [
+                    [
+
+                    'id' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $expectedEnumName = 'WhitelistedColumnsWhereColumn';
+        $enum = $this->introspectType($expectedEnumName);
+
+        $this->assertArraySubset(
+            [
+                'kind' => 'ENUM',
+                'name' => $expectedEnumName,
+                'description' => 'Allowed column names for the `where` argument on the query `whitelistedColumns`.',
+                'enumValues' => [
+                    [
+                        'name' => 'ID',
+                    ],
+                    [
+                        'name' => 'CAMEL_CASE',
+                    ],
+                ],
+            ],
+            $enum
+        );
     }
 }

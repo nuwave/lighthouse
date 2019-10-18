@@ -50,7 +50,7 @@ class Defer implements CreatesResponse
     protected $isStreaming = false;
 
     /**
-     * @var int
+     * @var float
      */
     protected $maxExecutionTime = 0;
 
@@ -85,7 +85,15 @@ class Defer implements CreatesResponse
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
-            PartialParser::directiveDefinition('directive @defer(if: Boolean) on FIELD')
+            PartialParser::directiveDefinition('
+"""
+Use this directive on expensive or slow fields to resolve them asynchronously.
+Must not be placed upon:
+- Non-Nullable fields
+- Mutation root fields
+"""
+directive @defer(if: Boolean = true) on FIELD
+')
         );
     }
 
@@ -199,8 +207,7 @@ class Defer implements CreatesResponse
                     $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
                 }
 
-                // TODO: Allow nested_levels to be set in config
-                // to break out of loop early.
+                // TODO: Allow nested_levels to be set in config to break out of loop early.
                 while (
                     count($this->deferred)
                     && ! $this->executionTimeExpired()

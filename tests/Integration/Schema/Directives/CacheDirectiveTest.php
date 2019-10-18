@@ -13,7 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class CacheDirectiveTest extends DBTestCase
 {
     /**
-     * @var \Illuminate\Cache\CacheManager|\Illuminate\Contracts\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
 
@@ -24,10 +24,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->cache = $app->make('cache');
     }
 
-    /**
-     * @test
-     */
-    public function itCanStoreResolverResultInCache(): void
+    public function testCanStoreResolverResultInCache(): void
     {
         $this->schema = "
         type User {
@@ -57,10 +54,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanPlaceCacheKeyOnAnyField(): void
+    public function testCanPlaceCacheKeyOnAnyField(): void
     {
         $this->schema = "
         type User {
@@ -91,10 +85,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:foo@bar.com:name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanStoreResolverResultInPrivateCache(): void
+    public function testCanStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
@@ -128,10 +119,71 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get($cacheKey));
     }
 
-    /**
-     * @test
-     */
-    public function itCanStorePaginateResolverInCache(): void
+    public function testCanStoreResolverResultInCacheWhenUseModelDirective(): void
+    {
+        $this->schema = "
+        type Post {
+            id: ID!
+        }
+        
+        type User @model {
+            name: String @cache
+            posts: [Post!]!
+        }
+        
+        type Query {
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+        }
+        ";
+
+        $this->graphQL('
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('user:1:name'));
+    }
+
+    public function testFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
+    {
+        $this->schema = "
+        type User {
+            id: ID!
+            name: String @cache(private: true)
+        }
+        
+        type Query {
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+        }
+        ";
+
+        $this->graphQL('
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('user:1:name'));
+    }
+
+    public function testCanStorePaginateResolverInCache(): void
     {
         factory(User::class, 5)->create();
 
@@ -148,7 +200,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 5) {
+            users(first: 5) {
                 data {
                     id
                     name
@@ -157,16 +209,13 @@ class CacheDirectiveTest extends DBTestCase
         }
         ');
 
-        $result = $this->cache->get('query:users:count:5');
+        $result = $this->cache->get('query:users:first:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCacheHasManyResolver(): void
+    public function testCanCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
 
@@ -196,7 +245,7 @@ class CacheDirectiveTest extends DBTestCase
             user(id: '.$user->getKey().') {
                 id
                 name
-                posts(count: 3) {
+                posts(first: 3) {
                     data {
                         title
                     }
@@ -207,14 +256,14 @@ class CacheDirectiveTest extends DBTestCase
 
         $dbQueryCountForPost = 0;
         DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
-            if (Str::contains($query->sql, 'select * from "posts"')) {
+            if (Str::contains($query->sql, 'select * from `posts`')) {
                 $dbQueryCountForPost++;
             }
         });
 
         $firstResponse = $this->graphQL($query);
 
-        $posts = $this->cache->get("user:{$user->getKey()}:posts:count:3");
+        $posts = $this->cache->get("user:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
@@ -227,10 +276,7 @@ class CacheDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachTagsToCache(): void
+    public function testCanAttachTagsToCache(): void
     {
         config(['lighthouse.cache.tags' => true]);
 
@@ -263,7 +309,7 @@ class CacheDirectiveTest extends DBTestCase
             user(id: '.$user->getKey().') {
                 id
                 name
-                posts(count: 3) {
+                posts(first: 3) {
                     data {
                         title
                     }
@@ -274,14 +320,14 @@ class CacheDirectiveTest extends DBTestCase
 
         $dbQueryCountForPost = 0;
         DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
-            if (Str::contains($query->sql, 'select * from "posts"')) {
+            if (Str::contains($query->sql, 'select * from `posts`')) {
                 $dbQueryCountForPost++;
             }
         });
 
         $firstResponse = $this->graphQL($query);
 
-        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
+        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 

@@ -2,12 +2,13 @@
 
 namespace Tests\Unit\Schema\Types;
 
-use Tests\DBTestCase;
+use Tests\TestCase;
 use Tests\Utils\LaravelEnums\UserType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use PHPUnit\Framework\Constraint\Callback;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
-class LaravelEnumTypeTest extends DBTestCase
+class LaravelEnumTypeTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
@@ -21,19 +22,19 @@ class LaravelEnumTypeTest extends DBTestCase
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
 
-    public function testUseLaravelEnumType(): void
+    public function testMakeEnumWithCustomName(): void
+    {
+        $customName = 'CustomName';
+        $enumType = new LaravelEnumType(UserType::class, $customName);
+
+        $this->assertSame($customName, $enumType->name);
+    }
+
+    public function testReceivesEnumInstanceInternally(): void
     {
         $this->schema = '
         type Query {
-            user(type: UserType @eq): User @find
-        }
-
-        type Mutation {
-            createUser(type: UserType): User @create
-        }
-
-        type User {
-            type: UserType
+            foo(bar: UserType): Boolean @mock
         }
         ';
 
@@ -41,24 +42,15 @@ class LaravelEnumTypeTest extends DBTestCase
             new LaravelEnumType(UserType::class)
         );
 
-        $typeAdmistrator = [
-            'type' => 'Administrator',
-        ];
-
-        $this->graphQL('
-        mutation {
-            createUser(type: Administrator) {
-                type
-            }
-        }
-        ')->assertJsonFragment($typeAdmistrator);
+        $this->mockResolver()
+            ->with(null, new Callback(function (array $args): bool {
+                return $args['bar'] instanceof UserType;
+            }));
 
         $this->graphQL('
         {
-            user(type: Administrator) {
-                type
-            }
+            foo(bar: Administrator)
         }
-        ')->assertJsonFragment($typeAdmistrator);
+        ');
     }
 }

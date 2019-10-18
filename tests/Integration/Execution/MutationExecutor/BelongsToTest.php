@@ -23,6 +23,7 @@ class BelongsToTest extends DBTestCase
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
+        upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
     
     input CreateTaskInput {
@@ -34,6 +35,7 @@ class BelongsToTest extends DBTestCase
         connect: ID
         create: CreateUserInput
         update: UpdateUserInput
+        upsert: UpsertUserInput
     }
     
     input CreateUserInput {
@@ -55,19 +57,29 @@ class BelongsToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    ';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
+    input UpsertUserInput {
+        id: ID!
+        name: String
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateAndConnectWithBelongsTo(): void
+    input UpsertTaskInput {
+        id: ID!
+        name: String
+        user: UpsertUserRelation
+    }
+
+    input UpsertUserRelation {
+        connect: ID
+        create: CreateUserInput
+        update: UpdateUserInput
+        upsert: UpsertUserInput
+        disconnect: Boolean
+        delete: Boolean
+    }
+    '.self::PLACEHOLDER_QUERY;
+
+    public function testCanCreateAndConnectWithBelongsTo(): void
     {
         factory(User::class)->create();
 
@@ -99,10 +111,40 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewBelongsTo(): void
+    public function testCanUpsertUsingCreateAndConnectWithBelongsTo(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL('
+        mutation {
+            upsertTask(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    connect: 1
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateWithNewBelongsTo(): void
     {
         $this->graphQL('
         mutation {
@@ -134,10 +176,107 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateAndUpdateBelongsTo(): void
+    public function testCanUpsertWithNewBelongsTo(): void
+    {
+        $this->graphQL('
+        mutation {
+            createTask(input: {
+                name: "foo"
+                user: {
+                    upsert: {
+                        id: 1
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanUpsertUsingCreateWithNewBelongsTo(): void
+    {
+        $this->graphQL('
+        mutation {
+            upsertTask(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    create: {
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanUpsertUsingCreateWithNewUpsertBelongsTo(): void
+    {
+        $this->graphQL('
+        mutation {
+            upsertTask(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    upsert: {
+                        id: 1
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateAndUpdateBelongsTo(): void
     {
         factory(User::class)->create([
             'name' => 'foo',
@@ -176,16 +315,145 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndDisconnectBelongsTo(): void
+    public function testCanUpsertUsingCreateAndUpdateBelongsTo(): void
     {
-        factory(Task::class)->create();
+        factory(User::class)->create([
+            'name' => 'foo',
+        ]);
 
         $this->graphQL('
         mutation {
-            updateTask(input: {
+            upsertTask(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    update: {
+                        id: 1
+                        name: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                        'name' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
+    {
+        factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+
+        $this->graphQL('
+        mutation {
+            upsertTask(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    upsert: {
+                        id: 1
+                        name: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                        'name' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function existingModelMutations()
+    {
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndDisconnectBelongsTo(string $action): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                user: {
+                    disconnect: true
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertTrue(
+            User::find(1)->exists,
+            'Must not delete the second model.'
+        );
+
+        $this->assertNull(
+            Task::find(1)->user,
+            'Must disconnect the parent relationship.'
+        );
+    }
+
+    public function testCanCreateUsingUpsertAndDisconnectBelongsTo(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL('
+        mutation {
+            upsertTask(input: {
                 id: 1
                 name: "foo"
                 user: {
@@ -201,7 +469,7 @@ class BelongsToTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'updateTask' => [
+                'upsertTask' => [
                     'id' => '1',
                     'name' => 'foo',
                     'user' => null,
@@ -221,17 +489,17 @@ class BelongsToTest extends DBTestCase
     }
 
     /**
-     * @test
+     * @dataProvider existingModelMutations
      */
-    public function itCanUpdateAndDeleteBelongsTo(): void
+    public function testCanUpdateAndDeleteBelongsTo(string $action): void
     {
         factory(Task::class)->create();
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateTask(input: {
+            ${action}Task(input: {
                 id: 1
-                name: "foo"
+                name: \"foo\"
                 user: {
                     delete: true
                 }
@@ -243,9 +511,9 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateTask' => [
+                "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'user' => null,
@@ -264,18 +532,59 @@ class BelongsToTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotDeleteOrDisconnectOnFalsyValues(): void
+    public function testCanCreateUsingUpsertAndDeleteBelongsTo(): void
     {
-        factory(Task::class)->create();
+        factory(User::class)->create();
 
         $this->graphQL('
         mutation {
-            updateTask(input: {
+            upsertTask(input: {
                 id: 1
                 name: "foo"
+                user: {
+                    delete: true
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertNotNull(
+            User::find(1),
+            'This model should NOT be deleted.'
+        );
+
+        $this->assertNull(
+            Task::find(1)->user,
+            'Must disconnect the parent relationship.'
+        );
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
                 user: {
                     delete: null
                     disconnect: false
@@ -288,9 +597,9 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateTask' => [
+                "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [

@@ -2,45 +2,58 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Utils\AST;
-use GraphQL\Type\Definition\EnumType;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class ArgumentFactory
 {
     /**
-     * Convert argument definition to type.
+     * Convert input value definitions to a executable types.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\ArgumentValue  $argumentValue
-     * @return array
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitionNodes
+     * @return mixed[]
      */
-    public function handle(ArgumentValue $argumentValue): array
+    public function toTypeMap($definitionNodes): array
     {
-        $definition = $argumentValue->getAstNode();
+        $arguments = [];
 
-        $argumentType = $argumentValue->getType();
+        foreach ($definitionNodes as $inputDefinition) {
+            $arguments[$inputDefinition->name->value] = $this->convert($inputDefinition);
+        }
 
-        $fieldArgument = [
-            'name' => $argumentValue->getName(),
-            'description' => data_get($definition->description, 'value'),
-            'type' => $argumentType,
-            'astNode' => $definition,
+        return $arguments;
+    }
+
+    /**
+     * Convert an argument definition to an executable type.
+     *
+     * The returned array will be used to construct one of:
+     * @see \GraphQL\Type\Definition\FieldArgument
+     * @see \GraphQL\Type\Definition\InputObjectField
+     *
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $definitionNode
+     * @return mixed[]
+     */
+    public function convert(InputValueDefinitionNode $definitionNode): array
+    {
+        /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $definitionNodeConverter */
+        $definitionNodeConverter = app(ExecutableTypeNodeConverter::class);
+        $type = $definitionNodeConverter->convert($definitionNode->type);
+
+        $config = [
+            'name' => $definitionNode->name->value,
+            'description' => data_get($definitionNode->description, 'value'),
+            'type' => $type,
+            'astNode' => $definitionNode,
         ];
 
-        if ($defaultValue = $definition->defaultValue) {
-            $fieldArgument += [
-                // webonyx/graphql-php expects the internal value here, whereas the
-                // SDL uses the ENUM's name, so we run the conversion here
-                'defaultValue' => $argumentType instanceof EnumType
-                    ? $argumentType->getValue($defaultValue->value)->value
-                    : AST::valueFromASTUntyped($defaultValue),
+        if ($defaultValue = $definitionNode->defaultValue) {
+            $config += [
+                'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $type),
             ];
         }
 
-        // Add any dynamically declared public properties of the FieldArgument
-        $fieldArgument += get_object_vars($argumentValue);
-
-        // Used to construct a FieldArgument class
-        return $fieldArgument;
+        return $config;
     }
 }

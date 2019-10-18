@@ -36,14 +36,32 @@ Make sure you have:
 - Node 8+
 - Yarn 
 
-Then, start Vue Press on development mode (with hot reloading).
+Then, start Vue Press in development mode (with hot reloading).
 
     cd docs/
     yarn
-    yarn docs:dev
+    yarn start
 
 > Keep a eye on the console when editing pages.
 If an error occurs, it might be necessary to restart the compilation process.
+
+If you use Docker you can start up the environment (including docs) by:
+
+```bash
+# Start a stack of PHP and Node dev containers
+docker-compose up --build --detach
+
+# Enter the node container
+docker-compose exec node bash
+
+# Install dependencies
+yarn
+
+# Start Vue Press in development mode (with hot reloading)
+yarn start
+```
+
+Finally, navigate to http://localhost:8080
 
 ## Files
 
@@ -66,7 +84,7 @@ The [@paginate](directives.md#paginate) directive is great!
 Always use relative paths according to folder structure.
 
 ```md
-See the [Tutorial](../getting-started/tutorial.md) for more info.
+See [configuration](../getting-started/configuration.md) for more info.
 ```
 
 ## Versioning
@@ -98,7 +116,7 @@ in a single PR.
 1. Enter a new version number. We only tag minor releases, so `3.1` will get separate
 docs, but `3.1.4` will not.
 
-        yarn docs:version 3.1
+        yarn bump-version 3.1
 
 This will copy the contents of `docs/master/` into `docs/<version>/`
 and place a new version number in `docs/.vuepress/versions.json`.

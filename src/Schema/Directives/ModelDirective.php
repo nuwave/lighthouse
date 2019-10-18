@@ -2,32 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use GraphQL\Language\AST\TypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
-use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
-
-class ModelDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
+class ModelDirective extends NodeDirective
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\NodeRegistry
-     */
-    protected $nodeRegistry;
-
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\NodeRegistry  $nodeRegistry
-     * @return void
-     */
-    public function __construct(NodeRegistry $nodeRegistry)
-    {
-        $this->nodeRegistry = $nodeRegistry;
-    }
-
     /**
      * Directive name.
      *
@@ -38,32 +14,15 @@ class ModelDirective extends BaseDirective implements TypeMiddleware, TypeManipu
         return 'model';
     }
 
-    /**
-     * Handle type construction.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $value
-     * @param  \Closure  $next
-     * @return \GraphQL\Type\Definition\Type
-     */
-    public function handleNode(TypeValue $value, Closure $next): Type
+    public static function definition(): string
     {
-        $this->nodeRegistry->registerModel(
-            $value->getTypeDefinitionName(),
-            $this->getModelClass('class')
-        );
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Enable fetching an Eloquent model by its global id through the `node` query.
 
-        return $next($value);
-    }
-
-    /**
-     * Apply manipulations from a type definition node.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return void
-     */
-    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
-    {
-        ASTHelper::attachNodeInterfaceToObjectType($typeDefinition);
+@deprecated(reason: "Use @node instead. This directive will be repurposed and do what @modelClass does now in v5.")
+"""
+directive @model on OBJECT
+SDL;
     }
 }

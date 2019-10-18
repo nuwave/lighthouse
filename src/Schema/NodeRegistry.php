@@ -73,6 +73,7 @@ class NodeRegistry
     /**
      * Register an Eloquent model that can be resolved as a Node.
      *
+     * @deprecated use registerNode
      * @param  string  $typeName
      * @param  string  $modelName
      * @return $this

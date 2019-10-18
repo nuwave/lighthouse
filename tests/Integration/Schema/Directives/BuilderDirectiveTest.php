@@ -7,10 +7,7 @@ use Tests\Utils\Models\User;
 
 class BuilderDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCallsCustomBuilderMethod(): void
+    public function testCallsCustomBuilderMethod(): void
     {
         $this->schema = '
         type Query {

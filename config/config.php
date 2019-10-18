@@ -33,11 +33,17 @@ return [
         'middleware' => [
             \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
         ],
+
+        /*
+         * The `prefix` and `domain` configuration options are optional.
+         */
+        //'prefix' => '',
+        //'domain' => '',
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Schema Declaration
+    | Schema Location
     |--------------------------------------------------------------------------
     |
     | This is a path that points to where your GraphQL schema is located
@@ -62,7 +68,7 @@ return [
     */
 
     'cache' => [
-        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', true),
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
     ],
@@ -72,8 +78,8 @@ return [
     | Namespaces
     |--------------------------------------------------------------------------
     |
-    | These are the default namespaces where Lighthouse looks for classes
-    | that extend functionality of the schema. You may pass either a string
+    | These are the default namespaces where Lighthouse looks for classes to
+    | extend functionality of the schema. You may pass in either a string
     | or an array, they are tried in order and the first match is used.
     |
     */
@@ -95,14 +101,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | Control how Lighthouse handles security related query validation.
-    | This configures the options from http://webonyx.github.io/graphql-php/security/
-    | A setting of "0" means that the validation rule is disabled.
+    | Read more at http://webonyx.github.io/graphql-php/security/
     |
     */
 
     'security' => [
-        'max_query_complexity' => 0,
-        'max_query_depth' => 0,
+        'max_query_complexity' => \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
+        'max_query_depth' => \GraphQL\Validator\Rules\QueryDepth::DISABLED,
         'disable_introspection' => \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
@@ -126,11 +131,12 @@ return [
     |
     | Set the name to use for the generated argument on paginated fields
     | that controls how many results are returned.
-    | This will default to "first" in v4.
+    |
+    | DEPRECATED This setting will be removed in v5.
     |
     */
 
-    'pagination_amount_argument' => 'count',
+    'pagination_amount_argument' => 'first',
 
     /*
     |--------------------------------------------------------------------------
@@ -188,8 +194,8 @@ return [
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | Sets default setting for transactional mutations.
-    | You may set this flag to have @create|@update mutations transactional or not.
+    | If set to true, mutations such as @create or @update will be
+    | wrapped in a transaction to ensure atomicity.
     |
     */
 

@@ -27,20 +27,20 @@ class SearchDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->engineManager = Mockery::mock();
-        $this->engine = Mockery::mock(NullEngine::class)->makePartial();
+        $this->engine = Mockery
+            ::mock(NullEngine::class)
+            ->makePartial();
 
         $this->app->singleton(EngineManager::class, function (): MockInterface {
             return $this->engineManager;
         });
 
-        $this->engineManager->shouldReceive('engine')
+        $this->engineManager
+            ->shouldReceive('engine')
             ->andReturn($this->engine);
     }
 
-    /**
-     * @test
-     */
-    public function canSearch(): void
+    public function testCanSearch(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -67,7 +67,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            posts(count: 10 search: "great") {
+            posts(first: 10 search: "great") {
                 data {
                     id
                     title
@@ -90,10 +90,7 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function canSearchWithCustomIndex(): void
+    public function testCanSearchWithCustomIndex(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -105,13 +102,15 @@ class SearchDirectiveTest extends DBTestCase
             'title' => 'bad title',
         ]);
 
-        $this->engine->shouldReceive('map')
+        $this->engine
+            ->shouldReceive('map')
             ->andReturn(
                 new Collection([$postA, $postB])
             )
             ->once();
 
-        $this->engine->shouldReceive('paginate')
+        $this->engine
+            ->shouldReceive('paginate')
             ->with(
                 Mockery::on(
                     function ($argument): bool {
@@ -137,7 +136,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            posts(count: 10 search: "great") {
+            posts(first: 10 search: "great") {
                 data {
                     id
                     title
@@ -160,10 +159,7 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itHandlesScoutBuilderPaginationArguments(): void
+    public function testHandlesScoutBuilderPaginationArguments(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -203,7 +199,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            posts(count: 10 search: "great") {
+            posts(first: 10 search: "great") {
                 data {
                     id
                     title

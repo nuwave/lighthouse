@@ -2,10 +2,7 @@
 - [ ] Added Docs for all relevant versions
 - [ ] Updated the changelog
 
-**Related Issue/Intent**
-
-<!-- Link to related issues this PR resolves, e.g. "Resolves #236",
-or a description of what this PR is trying to achieve. -->
+<!-- Link to related issues this PR resolves, e.g. "Resolves #236"-->
 
 **Changes**
 

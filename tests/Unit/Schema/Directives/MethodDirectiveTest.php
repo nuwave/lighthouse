@@ -17,10 +17,7 @@ class MethodDirectiveTest extends TestCase
     }
     ';
 
-    /**
-     * @test
-     */
-    public function itWillCallAMethodToResolveField(): void
+    public function testWillCallAMethodToResolveField(): void
     {
         $this->graphQL('
         {
@@ -37,10 +34,7 @@ class MethodDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itWillCallAMethodWithArgsToResolveField(): void
+    public function testWillCallAMethodWithArgsToResolveField(): void
     {
         $this->graphQL('
         {

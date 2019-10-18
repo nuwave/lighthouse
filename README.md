@@ -1,4 +1,10 @@
-<img src="logo.png" width="150" height="150">
+<div align="center">
+  <a href="https://www.lighthouse-php.com">
+    <img src="./logo.png" alt=lighthouse-logo" width="150" height="150">
+  </a>
+</div>
+
+<div align="center">
 
 # Lighthouse
 
@@ -8,9 +14,10 @@
 [![StyleCI](https://github.styleci.io/repos/59965104/shield?branch=master)](https://github.styleci.io/repos/59965104)
 [![Packagist](https://img.shields.io/packagist/dt/nuwave/lighthouse.svg)](https://packagist.org/packages/nuwave/lighthouse)
 [![GitHub license](https://img.shields.io/github/license/nuwave/lighthouse.svg)](https://github.com/nuwave/lighthouse/blob/master/LICENSE)
-[![Get on Slack](https://img.shields.io/badge/slack-join-orange.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWI1ZDQ1YWM1NmM2MmQ0NTU0NGNjZWFkMTJhY2VjMDAwZmMyZDFlZTc1Mjc3ZGY0MWM1Y2Q5MWNjYmJmYWJkYmU)
+[![Get on Slack](https://img.shields.io/badge/slack-join-orange.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
 
 **GraphQL Server for Laravel**
+</div>
 
 Lighthouse is a PHP package that allows you to serve a GraphQL endpoint from your
 Laravel application. It greatly reduces the boilerplate required to create a schema,
@@ -38,7 +45,22 @@ Check out [the docs](https://lighthouse-php.com/) to learn more.
 
 We welcome contributions of any kind.
 
-- Have a question? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWI1ZDQ1YWM1NmM2MmQ0NTU0NGNjZWFkMTJhY2VjMDAwZmMyZDFlZTc1Mjc3ZGY0MWM1Y2Q5MWNjYmJmYWJkYmU) 
+- Have a question? [Use the laravel-lighthouse tag on Stackoverflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse) 
+- Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ) 
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Need a feature? [Open a feature request](https://github.com/nuwave/lighthouse/issues/new?template=feature_request.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/.github/CONTRIBUTING.md)
+
+## Changelog
+
+All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG.md).
+
+## Contributing
+
+See how you can start [`CONTRIBUTING.md`](CONTRIBUTING.md) to this project.
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Lighthouse,
+please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
+or visit https://tidelift.com/security.

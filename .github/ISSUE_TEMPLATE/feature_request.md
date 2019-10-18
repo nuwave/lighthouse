@@ -1,11 +1,11 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Propose an idea for a feature
 
 ---
 
-<!-- If you are not sure the problem you are having is actually an issue within Lighthouse,
-you can hop into Slack first. We will help you figure out what is wrong. -->
+<!-- Please keep in mind that Lighthouse is a community project and features take effort.
+Are you willing to provide a PR for this issue or aid in developing it? -->
 
 **Is your feature request related to a problem? Please describe.**
 
@@ -18,7 +18,3 @@ you can hop into Slack first. We will help you figure out what is wrong. -->
 **Describe alternatives you've considered**
 
 <!-- A clear and concise description of any alternative solutions or features you've considered. -->
-
-**Additional context**
-
-<!-- Add any other context or screenshots about the feature request here. -->

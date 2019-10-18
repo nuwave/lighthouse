@@ -2,24 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
+class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -31,6 +29,51 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return 'paginate';
     }
 
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Query multiple entries as a paginated list.
+"""
+directive @paginate(
+  """
+  Which pagination style to use.
+  Allowed values: paginator, connection.
+  """
+  type: String = "paginator"
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+  
+  """
+  Overwrite the paginate_max_count setting value to limit the
+  amount of items that a user can request per page.
+  """
+  maxCount: Int
+
+  """
+  Use a default value for the amount of returned items
+  in case the client does not request it explicitly
+  """
+  defaultCount: Int
+) on FIELD_DEFINITION
+SDL;
+    }
+
     /**
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
@@ -39,14 +82,25 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      */
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        PaginationManipulator::transformToPaginatedField(
-            $this->paginationType(),
-            $fieldDefinition,
-            $parentType,
-            $documentAST,
-            $this->directiveArgValue('defaultCount'),
-            $this->paginateMaxCount()
-        );
+        $paginationManipulator = new PaginationManipulator($documentAST);
+
+        if ($this->directiveHasArgument('builder')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('builder');
+        } else {
+            $paginationManipulator->setModelClass(
+                $this->getModelClass()
+            );
+        }
+
+        $paginationManipulator
+            ->transformToPaginatedField(
+                $this->paginationType(),
+                $fieldDefinition,
+                $parentType,
+                $this->directiveArgValue('defaultCount'),
+                $this->paginateMaxCount()
+            );
     }
 
     /**
@@ -72,9 +126,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                         $resolveInfo
                     );
                 } else {
-                    /** @var \Illuminate\Database\Eloquent\Model $model */
-                    $model = $this->getPaginatorModel();
-                    $query = $model::query();
+                    $query = $this->getModelClass()::query();
                 }
 
                 $query = $resolveInfo
@@ -112,35 +164,5 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         return $this->directiveArgValue('maxCount')
             ?? config('lighthouse.paginate_max_count');
-    }
-
-    /**
-     * Get the model class from the `model` argument of the field.
-     *
-     * This works differently as in other directives, so we define a separate function for it.
-     *
-     * @return string
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    protected function getPaginatorModel(): string
-    {
-        $model = $this->directiveArgValue('model');
-
-        // Fallback to using information from the schema definition as the model name
-        if (! $model) {
-            $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
-
-            // Cut the added type suffix to get the base model class name
-            $model = Str::before($model, 'Paginator');
-            $model = Str::before($model, 'Connection');
-        }
-
-        if (! $model) {
-            throw new DirectiveException(
-                "A `model` argument must be assigned to the '{$this->name()}' directive on '{$this->definitionNode->name->value}"
-            );
-        }
-
-        return $this->namespaceModelClass($model);
     }
 }
