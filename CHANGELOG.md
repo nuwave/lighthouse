@@ -5,7 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.4.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.5.2...master)
+
+## [4.5.2](https://github.com/nuwave/lighthouse/compare/v4.5.1...v4.5.2)
+
+### Fixed
+
+- Fix conversion of client directives after the schema was cached https://github.com/nuwave/lighthouse/pull/1019
+
+## [4.5.1](https://github.com/nuwave/lighthouse/compare/v4.5.0...v4.5.1)
+
+### Fixed
+
+- Handle `null` being passed to a nullable argument that is a list of type https://github.com/nuwave/lighthouse/pull/1016
+
+## [4.5.0](https://github.com/nuwave/lighthouse/compare/v4.4.2...v4.5.0)
+
+### Added
+
+- Add `@upsert` directive and nested mutation operations to create or update a model
+  regardless whether it exists https://github.com/nuwave/lighthouse/pull/1005
+
+### Fixed
+
+- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015 
+
+## [4.4.2](https://github.com/nuwave/lighthouse/compare/v4.4.1...v4.4.2)
+
+### Added
+
+- Validate the correctness of the `builder` given to `@paginate` at schema
+  build time
+
+### Fixed
+
+- Do not require the type of a field matching a model class when using the
+  `builder` argument of `@paginate` https://github.com/nuwave/lighthouse/pull/1011
+
+## [4.4.1](https://github.com/nuwave/lighthouse/compare/v4.4.0...v4.4.1)
+
+### Fixed
+
+- Fix regression in 4.4.0 that required matching the type returned from paginated relationship
+  fields with the class name of the model https://github.com/nuwave/lighthouse/pull/1011
 
 ## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
 

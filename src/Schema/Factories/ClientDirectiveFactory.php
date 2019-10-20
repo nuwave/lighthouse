@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\NameNode;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\FieldArgument;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -54,15 +53,16 @@ class ClientDirectiveFactory
             $arguments [] = new FieldArgument($fieldArgumentConfig);
         }
 
+        $locations = [];
+        // Might be a NodeList, so we can not use array_map()
+        foreach ($directive->locations as $location) {
+            $locations[] = $location->value;
+        }
+
         return new Directive([
             'name' => $directive->name->value,
             'description' => data_get($directive->description, 'value'),
-            'locations' => array_map(
-                function (NameNode $location): string {
-                    return $location->value;
-                },
-                $directive->locations
-            ),
+            'locations' => $locations,
             'args' => $arguments,
             'astNode' => $directive,
         ]);
