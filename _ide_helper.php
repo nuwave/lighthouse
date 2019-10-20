@@ -30,8 +30,8 @@ namespace GraphQL\Type\Definition {
     class ResolveInfo
     {
         /**
-         * @var \Nuwave\Lighthouse\Execution\Builder
+         * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
          */
-        public $builder;
+        public $argumentSet;
     }
 }

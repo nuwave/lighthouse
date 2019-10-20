@@ -21,7 +21,7 @@ class Argument
     /**
      * A list of directives associated with that argument.
      *
-     * @var \GraphQL\Language\AST\DirectiveNode[]
+     * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public $directives;
 
