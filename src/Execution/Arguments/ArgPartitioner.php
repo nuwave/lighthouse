@@ -2,11 +2,13 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Nuwave\Lighthouse\Execution\Resolver;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use ReflectionNamedType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Nuwave\Lighthouse\Schema\Directives\ArgResolver;
+use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 
@@ -14,62 +16,57 @@ class ArgPartitioner
 {
     use HasResolverArguments;
 
-    public function partitionResolverInputs(): array
+    public function partitionResolverInputs($root, ArgumentSet $argumentSet): array
     {
-        if ($this->root instanceof Model) {
-            $model = new \ReflectionClass($this->root);
+        if ($root instanceof Model) {
+            $model = new \ReflectionClass($root);
         }
 
         $before = [];
         $regular = [];
         $after = [];
 
-        // TODO deal with @spread arguments
-        $typedArgs = new TypedArgs($this->args, $this->resolveInfo->fieldDefinition->args);
-
-        /**
-         * @var string
-         * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $typedArg
-         */
-        foreach ($typedArgs as $name => $typedArg) {
-            if ($resolver = $typedArg->resolver) {
+        foreach ($argumentSet->arguments as $name => $argument) {
+            if (
+                $resolver = $argument->directives->first(function(Directive $directive): bool {
+                    return $directive instanceof Resolver;
+                })
+            ) {
+                $argument->resolver = $resolver;
                 if ($resolver instanceof ResolveNestedBefore) {
-                    $before[$name] = $typedArg;
+                    $before[$name] = $argument;
                 } elseif ($resolver instanceof ResolveNestedAfter) {
-                    $after[$name] = $typedArg;
+                    $after[$name] = $argument;
                 }
             } elseif (isset($model)) {
                 if (! $model->hasMethod($name)) {
-                    $regular[$name] = $typedArg->value;
+                    $regular[$name] = $argument->value;
                     continue;
                 }
 
                 $relationMethodCandidate = $model->getMethod($name);
                 if (! $returnType = $relationMethodCandidate->getReturnType()) {
-                    $regular[$name] = $typedArg->value;
+                    $regular[$name] = $argument->value;
                     continue;
                 }
 
                 if (! $returnType instanceof ReflectionNamedType) {
-                    $regular[$name] = $typedArg->value;
+                    $regular[$name] = $argument->value;
                     continue;
                 }
 
-                $returnTypeName = $returnType->getName();
-                $isRelation = static function (string $class) use ($returnTypeName): bool {
-                    return is_a($returnTypeName, $class, true);
-                };
+                $isRelation = self::makeRelationTypeMatcher($returnType->getName());
 
                 if ($isRelation(MorphTo::class)) {
-                    $typedArg->resolver = new ArgResolver(new NestedMorphTo($name));
-                    $before[$name] = $typedArg;
+                    $argument->resolver = new ArgResolver(new NestedMorphTo($name));
+                    $before[$name] = $argument;
                 } elseif ($isRelation(BelongsTo::class)) {
-                    $before[$name] = $typedArg;
+                    $before[$name] = $argument;
                 } elseif ($isRelation(HasMany::class)) {
-                    $typedArg->resolver = new ArgResolver(new NestedOneToMany($name));
+                    $argument->resolver = new ArgResolver(new NestedOneToMany($name));
                 }
             } else {
-                $regular[$name] = $typedArg;
+                $regular[$name] = $argument;
             }
         }
 
@@ -80,6 +77,13 @@ class ArgPartitioner
         ];
     }
 
+    protected static function makeRelationTypeMatcher(string $returnTypeName): \Closure
+    {
+        return static function (string $class) use ($returnTypeName): bool {
+            return is_a($returnTypeName, $class, true);
+        };
+    }
+
     public function makeNestedResolvers()
     {
         [$before, $regular, $after] = $this->partitionResolverInputs();
@@ -87,7 +91,7 @@ class ArgPartitioner
         // Prepare a callback that is passed into the field resolver
         // It should be called with the new root object
         $resolveBeforeResolvers = function ($root) use ($before) {
-            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $beforeArg */
+            /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $beforeArg */
             foreach ($before as $beforeArg) {
                 // TODO we might continue to automatically wrap the types in ArgResolvers,
                 // but we would have to deal with non-null and list types
@@ -97,7 +101,7 @@ class ArgPartitioner
         };
 
         $resolveAfterResolvers = function ($root) use ($after) {
-            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $afterArg */
+            /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $afterArg */
             foreach ($after as $afterArg) {
                 ($afterArg->resolver)($root, $afterArg->value, $this->context, $this->resolveInfo);
             }

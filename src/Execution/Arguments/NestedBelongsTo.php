@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class BelongsTo implements Resolver
+class NestedBelongsTo implements Resolver
 {
     /**
      * @var string
@@ -19,11 +19,10 @@ class BelongsTo implements Resolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, $args, Context $context, ResolveInfo $resolveInfo)
+    public function __invoke($model, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
-
         /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
-        $relation = $model->{$relationName}();
+        $relation = $model->{$this->relationName}();
 
         if (isset($args['create'])) {
             $belongsToModel = self::executeCreate(

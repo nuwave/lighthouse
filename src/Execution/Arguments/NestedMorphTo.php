@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class NestedMorphTo implements Resolver
 {
@@ -18,7 +19,7 @@ class NestedMorphTo implements Resolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, $args, Context $context, ResolveInfo $resolveInfo)
+    public function __invoke($model, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $relation */
         $relation = $model->{$this->relationName}();

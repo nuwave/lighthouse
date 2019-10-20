@@ -26,6 +26,13 @@ class Argument
     public $directives;
 
     /**
+     * An argument may have a resolver that handles it's given value.
+     *
+     * @var \Nuwave\Lighthouse\Execution\Resolver|null
+     */
+    public $resolver;
+
+    /**
      * Get the plain PHP value of this argument.
      *
      * @return mixed

@@ -1,11 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 
 class ArgResolver implements Resolver
 {
@@ -26,17 +25,13 @@ class ArgResolver implements Resolver
     public function __invoke($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         $argPartitioner = new ArgPartitioner();
-        $argPartitioner->setResolverArguments($root, $args, $context, $resolveInfo);
-        [$before, $regular, $after] = $argPartitioner->partitionResolverInputs();
+        [$before, $regular, $after] = $argPartitioner->partitionResolverInputs($root, $resolveInfo->argumentSet);
 
         // Prepare a callback that is passed into the field resolver
         // It should be called with the new root object
         $resolveBeforeResolvers = function ($root) use ($before, $context, $resolveInfo) {
-            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $beforeArg */
+            /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $beforeArg */
             foreach ($before as $beforeArg) {
-                // TODO we might continue to automatically wrap the types in ArgResolvers,
-                // but we would have to deal with non-null and list types
-
                 ($beforeArg->resolver)($root, $beforeArg->value, $context, $resolveInfo);
             }
         };
@@ -44,7 +39,7 @@ class ArgResolver implements Resolver
 
         $result = ($this->previous)($root, $regular, $context, $resolveInfo);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $afterArg */
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $afterArg */
         foreach ($after as $afterArg) {
             ($afterArg->resolver)($result, $afterArg->value, $context, $resolveInfo);
         }
