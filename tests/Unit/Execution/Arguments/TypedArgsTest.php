@@ -46,7 +46,7 @@ class TypedArgsTest extends TestCase
 
         $bar = $argumentSet->arguments['bar'];
         $this->assertInstanceOf(Argument::class, $bar);
-        $this->assertSame(null, $bar->value);
+        $this->assertNull($bar->value);
     }
 
     public function testNullableInputObject(): void
@@ -69,7 +69,7 @@ class TypedArgsTest extends TestCase
 
         $bar = $argumentSet->arguments['bar'];
         $this->assertInstanceOf(Argument::class, $bar);
-        $this->assertSame(null, $bar->value);
+        $this->assertNull($bar->value);
     }
 
     protected function rootQueryArgumentSet(array $args): ArgumentSet
