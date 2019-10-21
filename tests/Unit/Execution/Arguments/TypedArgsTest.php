@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -18,21 +19,9 @@ class TypedArgsTest extends TestCase
         }
         ';
 
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
-        $astBuilder = $this->app->make(ASTBuilder::class);
-        $documentAST = $astBuilder->documentAST();
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs $typedArgs */
-        $typedArgs = $this->app->make(TypedArgs::class);
-
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types['Query'];
-
-        $argumentSet = $typedArgs->fromField(
-            [
-                'bar' => 123,
-            ],
-            ASTHelper::firstByName($queryType->fields, 'foo')
-        );
+        $argumentSet = $this->rootQueryArgumentSet([
+            'bar' => 123,
+        ]);
 
         $this->assertCount(1, $argumentSet->arguments);
 
@@ -49,6 +38,42 @@ class TypedArgsTest extends TestCase
         }
         ';
 
+        $argumentSet = $this->rootQueryArgumentSet([
+            'bar' => null,
+        ]);
+
+        $this->assertCount(1, $argumentSet->arguments);
+
+        $bar = $argumentSet->arguments['bar'];
+        $this->assertInstanceOf(Argument::class, $bar);
+        $this->assertSame(null, $bar->value);
+    }
+
+    public function testNullableInputObject(): void
+    {
+        $this->schema = '
+        type Query {
+            foo(bar: Bar): Int
+        }
+        
+        input Bar {
+            baz: ID
+        }
+        ';
+
+        $argumentSet = $this->rootQueryArgumentSet([
+            'bar' => null,
+        ]);
+
+        $this->assertCount(1, $argumentSet->arguments);
+
+        $bar = $argumentSet->arguments['bar'];
+        $this->assertInstanceOf(Argument::class, $bar);
+        $this->assertSame(null, $bar->value);
+    }
+
+    protected function rootQueryArgumentSet(array $args): ArgumentSet
+    {
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
@@ -58,17 +83,9 @@ class TypedArgsTest extends TestCase
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types['Query'];
 
-        $argumentSet = $typedArgs->fromField(
-            [
-                'bar' => null,
-            ],
+        return $typedArgs->fromField(
+            $args,
             ASTHelper::firstByName($queryType->fields, 'foo')
         );
-
-        $this->assertCount(1, $argumentSet->arguments);
-
-        $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
-        $this->assertSame(null, $bar->value);
     }
 }

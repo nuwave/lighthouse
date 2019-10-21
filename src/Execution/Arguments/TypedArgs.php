@@ -181,6 +181,11 @@ class TypedArgs
      */
     protected function wrapWithNamedType($value, NamedType $namedType)
     {
+        // As GraphQL does not allow empty input objects, we return null as is
+        if ($value === null) {
+            return $value;
+        }
+
         // This might be null if the type is
         // - created outside of the schema string
         // - one of the built in types
@@ -193,9 +198,9 @@ class TypedArgs
             $subArgumentSet->arguments = $this->wrapArgs($value, $typeDef->fields);
 
             return $subArgumentSet;
-        } else {
-            // Otherwise, we just return the value as is and are down with that subtree
-            return $value;
         }
+
+        // Otherwise, we just return the value as is and are down with that subtree
+        return $value;
     }
 }
