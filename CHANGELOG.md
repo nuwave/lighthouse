@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.5.2...master)
 
+### Fixed
+
+- Handle `null` being passed to a nullable argument that is an input object type https://github.com/nuwave/lighthouse/pull/1021
+
 ## [4.5.2](https://github.com/nuwave/lighthouse/compare/v4.5.1...v4.5.2)
 
 ### Fixed
