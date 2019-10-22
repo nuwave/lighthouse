@@ -223,8 +223,18 @@ class FieldFactory
         array $argumentPath
     ): void {
         if ($type instanceof NonNull) {
-            $type = $type->getWrappedType();
+            $this->handleArgDirectivesRecursively(
+                $type->getWrappedType(),
+                $astNode,
+                $argumentPath
+            );
+
+            return;
         }
+
+        $directives = $this->passResolverArguments(
+            $this->directiveFactory->createAssociatedDirectivesOfType($astNode, ArgDirective::class)
+        );
 
         // Handle the argument itself. At this point, it can be wrapped
         // in a list or an input object

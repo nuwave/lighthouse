@@ -2,42 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use Nuwave\Lighthouse\Execution\Resolver;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
-use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class ArgumentFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
-     */
-    protected $directiveFactory;
-
-    /**
-     * ArgumentFactory constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @return void
-     */
-    public function __construct(DirectiveFactory $directiveFactory)
-    {
-        $this->directiveFactory = $directiveFactory;
-    }
-
-    /**
      * Convert input value definitions to a executable types.
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitions
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitionNodes
      * @return mixed[]
      */
     public function toTypeMap($definitionNodes): array
     {
         $arguments = [];
 
-        /* @var InputValueDefinitionNode $inputValueDefinitionNode */
         foreach ($definitionNodes as $inputDefinition) {
             $arguments[$inputDefinition->name->value] = $this->convert($inputDefinition);
         }
@@ -73,13 +53,6 @@ class ArgumentFactory
                 'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $type),
             ];
         }
-
-        $extensions = new ArgumentExtensions();
-
-        $extensions->resolver = $this->directiveFactory->createSingleDirectiveOfType($definitionNode, Resolver::class);
-        $extensions->spread = $this->directiveFactory->createSingleDirectiveOfType($definitionNode, SpreadDirective::class);
-
-        $config['lighthouse'] = $extensions;
 
         return $config;
     }
