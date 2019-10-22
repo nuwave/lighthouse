@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.5.3...master)
 
+### Added
+
+- Add `@scope` directive for adding a scope to the query builder https://github.com/nuwave/lighthouse/pull/998
+
 ## [4.5.3](https://github.com/nuwave/lighthouse/compare/v4.5.2...v4.5.3)
 
 ### Fixed
@@ -54,9 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix regression in 4.4.0 that required matching the type returned from paginated relationship
   fields with the class name of the model https://github.com/nuwave/lighthouse/pull/1011
-
-### Added
-- Add `@scope` directive for adding a scope to the query builder https://github.com/nuwave/lighthouse/pull/998
 
 ## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
 

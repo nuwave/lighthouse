@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class ScopeDirectiveTest extends DBTestCase
 {
@@ -28,8 +28,7 @@ class ScopeDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /* @lang GraphQL */
-            '
+        $this->schema = /* @lang GraphQL */ '
         type User {
             tasks(tags: [String!] @scope(name: "whereTags")): [Task!]! @hasMany
         }
@@ -50,7 +49,7 @@ class ScopeDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */'
         {
             user {
                 tasks(tags: ["Lighthouse"]) {
@@ -73,42 +72,19 @@ class ScopeDirectiveTest extends DBTestCase
 
     public function testCanThrowExceptionOnInvalidScope(): void
     {
-        /** @var User $user */
-        $user = factory(User::class)->create();
-
-        $user->tasks()->saveMany(
-            factory(Task::class)->times(2)->create()
-        );
-
-        $this->be($user);
-
-        $this->schema = /* @lang GraphQL */
-            '
-        type User {
-            tasks(tags: [String!] @scope(name: "onlyTags")): [Task!]! @hasMany
-        }
-
-        type Task {
-            id: ID!
-            name: String!
-            tags: [Tag!]!
-        }
-
-        type Tag {
-            id: ID!
-            name: String!
-        }
-
-        type Query {
-            user: User @auth
+        $this->schema = /* @lang GraphQL */ '
+        type Quer {
+            tasks(
+                name: String @scope(name: "nonExistantScope")
+            ): [Task!]! @all
         }
         ';
 
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
         $this->graphQL(/* @lang GraphQL */ '
         {
             user {
-                tasks(tags: ["Lighthouse"]) {
+                tasks(name: "Lighthouse rocks") {
                     id
                 }
             }

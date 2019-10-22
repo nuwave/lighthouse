@@ -3,17 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use BadMethodCallException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class ScopeDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
     public function name()
     {
         return 'scope';
@@ -23,7 +18,8 @@ class ScopeDirective extends BaseDirective implements ArgBuilderDirective, Defin
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-This directive adds a scope to the builder and supplies the argument value as the argument to the scope.
+Adds a scope to the query builder.
+The scope method will receive the client-given value of the argument as the second parameter.
 """
 directive @scope(
   """
@@ -37,10 +33,11 @@ SDL;
     /**
      * Add additional constraints to the builder based on the given argument value.
      *
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param mixed $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     * @throws DirectiveException
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function handleBuilder($builder, $value)
     {
@@ -48,7 +45,7 @@ SDL;
         try {
             return $builder->{$scope}($value);
         } catch (BadMethodCallException $exception) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 $exception->getMessage()." in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
                 $exception->getCode(),
                 $exception->getPrevious()
