@@ -53,13 +53,10 @@ SDL;
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
                 return $resolveInfo
-                    ->builder
-                    ->addScopes(
-                        $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
+                    ->argumentSet
+                    ->enhanceBuilder(
                         $this->getModelClass()::query(),
-                        $args
+                        $this->directiveArgValue('scopes', [])
                     )
                     ->first();
             }

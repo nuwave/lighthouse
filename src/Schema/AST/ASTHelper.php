@@ -293,7 +293,7 @@ class ASTHelper
     /**
      * Checks the given type to see whether it implements the given interface.
      *
-     * @param  ObjectTypeDefinitionNode  $type
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $type
      * @param  string  $interfaceName
      *
      * @return bool

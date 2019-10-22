@@ -83,14 +83,24 @@ SDL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
-        $paginationManipulator->transformToPaginatedField(
-            $this->paginationType(),
-            $this->getModelClass(),
-            $fieldDefinition,
-            $parentType,
-            $this->directiveArgValue('defaultCount'),
-            $this->paginateMaxCount()
-        );
+
+        if ($this->directiveHasArgument('builder')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('builder');
+        } else {
+            $paginationManipulator->setModelClass(
+                $this->getModelClass()
+            );
+        }
+
+        $paginationManipulator
+            ->transformToPaginatedField(
+                $this->paginationType(),
+                $fieldDefinition,
+                $parentType,
+                $this->directiveArgValue('defaultCount'),
+                $this->paginateMaxCount()
+            );
     }
 
     /**
@@ -120,13 +130,10 @@ SDL;
                 }
 
                 $query = $resolveInfo
-                    ->builder
-                    ->addScopes(
-                        $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
+                    ->argumentSet
+                    ->enhanceBuilder(
                         $query,
-                        $args
+                        $this->directiveArgValue('scopes', [])
                     );
 
                 if ($query instanceof ScoutBuilder) {

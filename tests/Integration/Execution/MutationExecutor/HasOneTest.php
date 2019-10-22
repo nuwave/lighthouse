@@ -24,6 +24,7 @@ class HasOneTest extends DBTestCase
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
+        upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
     
     input CreateTaskInput {
@@ -32,7 +33,8 @@ class HasOneTest extends DBTestCase
     }
     
     input CreatePostRelation {
-        create: CreatePostInput!
+        create: CreatePostInput
+        upsert: UpsertPostInput
     }
     
     input CreatePostInput {
@@ -48,10 +50,29 @@ class HasOneTest extends DBTestCase
     input UpdatePostRelation {
         create: CreatePostInput
         update: UpdatePostInput
+        upsert: UpsertPostInput
         delete: ID
     }
     
     input UpdatePostInput {
+        id: ID!
+        title: String
+    }
+
+    input UpsertTaskInput {
+        id: ID!
+        name: String
+        post: UpsertPostRelation
+    }
+
+    input UpsertPostRelation {
+        create: CreatePostInput
+        update: UpdatePostInput
+        upsert: UpsertPostInput
+        delete: ID
+    }
+
+    input UpsertPostInput {
         id: ID!
         title: String
     }
@@ -91,59 +112,14 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateWithNewHasOne(): void
+    public function testCanUpsertWithNewHasOne(): void
     {
-        factory(Task::class)->create();
-
         $this->graphQL('
         mutation {
-            updateTask(input: {
-                id: 1
+            createTask(input: {
                 name: "foo"
                 post: {
-                    create: {
-                        title: "bar"
-                    }
-                }
-            }) {
-                id
-                name
-                post {
-                    id
-                    title
-                }
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'updateTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'post' => [
-                        'id' => '1',
-                        'title' => 'bar',
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testCanUpdateAndUpdateHasOne(): void
-    {
-        factory(Task::class)
-            ->create()
-            ->post()
-            ->save(
-                factory(Post::class)->create()
-            );
-
-        $this->graphQL('
-        mutation {
-            updateTask(input: {
-                id: 1
-                name: "foo"
-                post: {
-                    update: {
+                    upsert: {
                         id: 1
                         title: "bar"
                     }
@@ -159,7 +135,7 @@ class HasOneTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'updateTask' => [
+                'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
@@ -171,22 +147,18 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateAndDeleteHasOne(): void
+    public function testCanCreateUsingUpsertWithNewHasOne(): void
     {
-        factory(Task::class)
-            ->create()
-            ->post()
-            ->save(
-                factory(Post::class)->create()
-            );
-
         $this->graphQL('
         mutation {
-            updateTask(input: {
+            upsertTask(input: {
                 id: 1
                 name: "foo"
                 post: {
-                    delete: 1
+                    upsert: {
+                        id: 1
+                        title: "bar"
+                    }
                 }
             }) {
                 id
@@ -199,7 +171,190 @@ class HasOneTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'updateTask' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function existingModelMutations()
+    {
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateWithNewHasOne(string $action): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                post: {
+                    create: {
+                        title: \"bar\"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndUpdateHasOne(string $action): void
+    {
+        factory(Task::class)
+            ->create()
+            ->post()
+            ->save(
+                factory(Post::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                post: {
+                    update: {
+                        id: 1
+                        title: \"bar\"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndUpsertHasOne(string $action): void
+    {
+        factory(Task::class)
+            ->create()
+            ->post()
+            ->save(
+                factory(Post::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                post: {
+                    upsert: {
+                        id: 1
+                        title: \"bar\"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndDeleteHasOne(string $action): void
+    {
+        factory(Task::class)
+            ->create()
+            ->post()
+            ->save(
+                factory(Post::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                post: {
+                    delete: 1
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => null,

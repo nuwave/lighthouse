@@ -22,6 +22,7 @@ class MorphOneTest extends DBTestCase
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
+        upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
     
     input CreateTaskInput {
@@ -30,7 +31,8 @@ class MorphOneTest extends DBTestCase
     }
     
     input CreateHourRelation {
-        create: CreateHourInput!
+        create: CreateHourInput
+        upsert: UpsertHourInput
     }
     
     input CreateHourInput {
@@ -46,10 +48,29 @@ class MorphOneTest extends DBTestCase
     input UpdateHourRelation {
         create: CreateHourInput
         update: UpdateHourInput
+        upsert: UpsertHourInput
         delete: ID
     }
     
     input UpdateHourInput {
+        id: ID!
+        weekday: Int
+    }
+
+    input UpsertTaskInput {
+        id: ID!
+        name: String
+        hour: UpsertHourRelation
+    }
+
+    input UpsertHourRelation {
+        create: CreateHourInput
+        update: UpdateHourInput
+        upsert: UpsertHourInput
+        delete: ID
+    }
+
+    input UpsertHourInput {
         id: ID!
         weekday: Int
     }
@@ -87,57 +108,14 @@ class MorphOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateWithNewMorphOne(): void
+    public function testCanCreateWithUpsertMorphOne(): void
     {
-        factory(Task::class)->create();
-
         $this->graphQL('
         mutation {
-            updateTask(input: {
-                id: 1
+            createTask(input: {
                 name: "foo"
                 hour: {
-                    create: {
-                        weekday: 3
-                    }
-                }
-            }) {
-                id
-                name
-                hour {
-                    weekday
-                }
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'updateTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'hour' => [
-                        'weekday' => 3,
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testCanUpdateAndUpdateMorphOne(): void
-    {
-        factory(Task::class)
-            ->create()
-            ->hour()
-            ->save(
-                factory(Hour::class)->create()
-            );
-
-        $this->graphQL('
-        mutation {
-            updateTask(input: {
-                id: 1
-                name: "foo"
-                hour: {
-                    update: {
+                    upsert: {
                         id: 1
                         weekday: 3
                     }
@@ -152,7 +130,7 @@ class MorphOneTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'updateTask' => [
+                'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
                     'hour' => [
@@ -163,7 +141,95 @@ class MorphOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateAndDeleteMorphOne(): void
+    public function existingModelMutations()
+    {
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateWithNewMorphOne(string $action): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                hour: {
+                    create: {
+                        weekday: 3
+                    }
+                }
+            }) {
+                id
+                name
+                hour {
+                    weekday
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hour' => [
+                        'weekday' => 3,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateWithUpsertMorphOne(string $action): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                hour: {
+                    upsert: {
+                        id: 1
+                        weekday: 3
+                    }
+                }
+            }) {
+                id
+                name
+                hour {
+                    weekday
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hour' => [
+                        'weekday' => 3,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndUpdateMorphOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -172,11 +238,55 @@ class MorphOneTest extends DBTestCase
                 factory(Hour::class)->create()
             );
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateTask(input: {
+            ${action}Task(input: {
                 id: 1
-                name: "foo"
+                name: \"foo\"
+                hour: {
+                    update: {
+                        id: 1
+                        weekday: 3
+                    }
+                }
+            }) {
+                id
+                name
+                hour {
+                    weekday
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hour' => [
+                        'weekday' => 3,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndDeleteMorphOne(string $action): void
+    {
+        factory(Task::class)
+            ->create()
+            ->hour()
+            ->save(
+                factory(Hour::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
                 hour: {
                     delete: 1
                 }
@@ -188,9 +298,9 @@ class MorphOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateTask' => [
+                "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'hour' => null,
