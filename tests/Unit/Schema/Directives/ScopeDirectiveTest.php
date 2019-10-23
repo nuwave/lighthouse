@@ -73,20 +73,22 @@ class ScopeDirectiveTest extends DBTestCase
     public function testCanThrowExceptionOnInvalidScope(): void
     {
         $this->schema = /* @lang GraphQL */ '
-        type Quer {
+        type Query {
             tasks(
                 name: String @scope(name: "nonExistantScope")
             ): [Task!]! @all
+        }
+        
+        type Task {
+            id: ID
         }
         ';
 
         $this->expectException(DefinitionException::class);
         $this->graphQL(/* @lang GraphQL */ '
         {
-            user {
-                tasks(name: "Lighthouse rocks") {
-                    id
-                }
+            tasks(name: "Lighthouse rocks") {
+                id
             }
         }
         ');
