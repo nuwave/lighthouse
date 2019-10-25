@@ -56,4 +56,11 @@ class Task extends Model
     {
         return $this->morphOne(Hour::class, 'hourable');
     }
+
+    public function scopeWhereTags(Builder $query, $tags)
+    {
+        return $query->whereHas('tags', function (Builder $query) use ($tags) {
+            $query->whereIn('name', $tags);
+        });
+    }
 }

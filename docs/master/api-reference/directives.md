@@ -2173,6 +2173,31 @@ scalar DateTime
     @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
+## @scope
+
+```graphql
+"""
+Adds a scope to the query builder.
+The scope method will receive the client-given value of the argument as the second parameter.
+"""
+directive @scope(
+  """
+  The name of the scope.
+  """
+  name: String
+) on ARGUMENT_DEFINITION
+```
+
+You may use this in combination with field directives such as [`@all`](#all).
+
+```graphql
+type Query {
+    posts(
+        trending: Boolean @scope(name: "trending")
+    ): [Post!]! @all
+}
+```
+
 ## @search
 
 Perform a full-text by the given input value.
