@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -54,13 +55,11 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClass;
 
-                $executeMutation = function () use ($model, $args, $context, $resolveInfo): Model {
+                $executeMutation = function () use ($model, $resolveInfo): Model {
                     return $this
                         ->executeMutation(
                             $model,
-                            $args,
-                            $context,
-                            $resolveInfo
+                            $resolveInfo->argumentSet
                         )
                         ->refresh();
                 };
@@ -82,9 +81,9 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      *         An empty instance of the model that should be mutated.
-     * @param  \Illuminate\Support\Collection  $args
-     *         The corresponding slice of the input arguments for mutating this model.
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     *         The user given input arguments for mutating this model.
      * @return \Illuminate\Database\Eloquent\Model
      */
-    abstract protected function executeMutation(Model $model, $args, $context, ResolveInfo $resolveInfo): Model;
+    abstract protected function executeMutation(Model $model, ArgumentSet $args): Model;
 }

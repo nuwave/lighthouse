@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
@@ -37,11 +37,10 @@ directive @upsert(
 SDL;
     }
 
-    protected function executeMutation(Model $model, $args, $context, ResolveInfo $resolveInfo): Model
+    protected function executeMutation(Model $model, ArgumentSet $args): Model
     {
         $upsert = new ArgResolver(new UpsertModel(new SaveModel()));
-        $model = $upsert($model, $resolveInfo->argumentSet);
 
-        return $model;
+        return $upsert($model, $args);
     }
 }

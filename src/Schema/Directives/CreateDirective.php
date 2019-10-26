@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
 
@@ -30,11 +30,10 @@ directive @create(
 SDL;
     }
 
-    protected function executeMutation(Model $model, $args, $context, ResolveInfo $resolveInfo): Model
+    protected function executeMutation(Model $model, ArgumentSet $args): Model
     {
         $saveModel = new ArgResolver(new SaveModel());
-        $model = $saveModel($model, $resolveInfo->argumentSet);
 
-        return $model;
+        return $saveModel($model, $args);
     }
 }

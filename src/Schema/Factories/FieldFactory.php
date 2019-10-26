@@ -15,7 +15,6 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
-use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
@@ -146,10 +145,6 @@ class FieldFactory
                     : $this->providesResolver->provideResolver($fieldValue)
             );
         }
-
-//        $this->fieldValue->setResolver(
-//            new ArgResolver($this->fieldValue->getResolver())
-//        );
 
         $fieldMiddleware = $this->passResolverArguments(
             $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
