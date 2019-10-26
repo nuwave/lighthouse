@@ -27,7 +27,7 @@ class NestedManyToMany implements ArgumentResolver
             );
         }
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
+        /* @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
         if (isset($args->arguments['create'])) {
             $saveModel = new ArgResolver(new SaveModel($relation));
 

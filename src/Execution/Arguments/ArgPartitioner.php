@@ -2,17 +2,17 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ArgPartitioner
 {
