@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
-class NestedOneToMany implements ArgumentResolver
+class NestedOneToOne implements ArgumentResolver
 {
     /**
      * @var string
@@ -18,31 +18,26 @@ class NestedOneToMany implements ArgumentResolver
 
     public function __invoke($model, ArgumentSet $args)
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+        /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
         $relation = $model->{$this->relationName}();
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
         if (isset($args->arguments['create'])) {
             $saveModel = new ArgResolver(new SaveModel($relation));
 
-            foreach ($args->arguments['create']->value as $childArgs) {
-                $saveModel($relation->make(), $childArgs);
-            }
+            $saveModel($relation->make(), $args->arguments['create']->value);
         }
 
         if (isset($args->arguments['update'])) {
             $updateModel = new ArgResolver(new UpdateModel(new SaveModel($relation)));
 
-            foreach ($args->arguments['update']->value as $childArgs) {
-                $updateModel($relation->make(), $childArgs);
-            }
+            $updateModel($relation->make(), $args->arguments['update']->value);
         }
 
         if (isset($args->arguments['upsert'])) {
             $upsertModel = new ArgResolver(new UpsertModel(new SaveModel($relation)));
 
-            foreach ($args->arguments['upsert']->value as $childArgs) {
-                $upsertModel($relation->make(), $childArgs);
-            }
+            $upsertModel($relation->make(), $args->arguments['upsert']->value);
         }
 
         if (isset($args->arguments['delete'])) {

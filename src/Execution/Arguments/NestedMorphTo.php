@@ -27,11 +27,11 @@ class NestedMorphTo implements ArgumentResolver
             $connectArgs = $args->arguments['connect']->value;
 
             $morphToModel = $relation->createModelByType(
-                (string) $connectArgs->arguments['type']
+                (string) $connectArgs->arguments['type']->value
             );
             $morphToModel->setAttribute(
                 $morphToModel->getKeyName(),
-                $connectArgs->arguments['id']
+                $connectArgs->arguments['id']->value
             );
 
             $relation->associate($morphToModel);

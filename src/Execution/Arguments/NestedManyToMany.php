@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
-class NestedOneToMany implements ArgumentResolver
+class NestedManyToMany implements ArgumentResolver
 {
     /**
      * @var string
@@ -18,9 +18,16 @@ class NestedOneToMany implements ArgumentResolver
 
     public function __invoke($model, ArgumentSet $args)
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+        /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
         $relation = $model->{$this->relationName}();
 
+        if (isset($args->arguments['sync'])) {
+            $relation->sync(
+                $args->arguments['sync']->toPlain()
+            );
+        }
+
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
         if (isset($args->arguments['create'])) {
             $saveModel = new ArgResolver(new SaveModel($relation));
 
@@ -46,8 +53,21 @@ class NestedOneToMany implements ArgumentResolver
         }
 
         if (isset($args->arguments['delete'])) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain()
+            $ids = $args->arguments['delete']->toPlain();
+
+            $relation->detach($ids);
+            $relation->getRelated()::destroy($ids);
+        }
+
+        if (isset($args->arguments['connect'])) {
+            $relation->attach(
+                $args->arguments['connect']->toPlain()
+            );
+        }
+
+        if (isset($args->arguments['disconnect'])) {
+            $relation->detach(
+                $args->arguments['disconnect']->toPlain()
             );
         }
     }

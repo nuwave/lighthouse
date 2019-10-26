@@ -2,6 +2,11 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Database\Eloquent\Model;
@@ -40,8 +45,29 @@ class ArgPartitioner
                         return self::methodReturnsRelation($model, $name, $relationClass);
                     };
 
-                    if ($isRelation(HasMany::class)) {
+                    if (
+                        $isRelation(HasOne::class)
+                        || $isRelation(MorphOne::class)
+                    ) {
+                        $argument->resolver = new ArgResolver(new NestedOneToOne($name));
+
+                        return true;
+                    }
+
+                    if (
+                        $isRelation(HasMany::class)
+                        || $isRelation(MorphMany::class)
+                    ) {
                         $argument->resolver = new ArgResolver(new NestedOneToMany($name));
+
+                        return true;
+                    }
+
+                    if (
+                        $isRelation(BelongsToMany::class)
+                        || $isRelation(MorphToMany::class)
+                    ) {
+                        $argument->resolver = new ArgResolver(new NestedManyToMany($name));
 
                         return true;
                     }

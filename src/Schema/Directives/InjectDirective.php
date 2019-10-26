@@ -74,12 +74,10 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolver) {
-                    return $previousResolver(
-                        $rootValue,
-                        Arr::add($args, $argumentName, data_get($context, $contextAttributeName)),
-                        $context,
-                        $resolveInfo
-                    );
+                    $valueFromContext = data_get($context, $contextAttributeName);
+                    $args = Arr::add($args, $argumentName, $valueFromContext);
+
+                    return $previousResolver($rootValue, $args, $context, $resolveInfo);
                 }
             )
         );
