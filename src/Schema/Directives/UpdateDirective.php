@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 
 class UpdateDirective extends MutationExecutorDirective
