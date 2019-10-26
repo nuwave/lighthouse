@@ -22,35 +22,34 @@ class NestedOneToMany implements ArgumentResolver
         $relation = $model->{$this->relationName}();
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
-        if ($create = $args->arguments['create'] ?? null) {
+        if (isset($args->arguments['create'])) {
             $saveModel = new ArgResolver(new SaveModel($relation));
 
-            foreach ($create->value as $childArgs) {
+            foreach ($args->arguments['create']->value as $childArgs) {
                 $saveModel($relation->make(), $childArgs);
             }
         }
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $update */
-        if ($update = $args->arguments['update'] ?? null) {
+        if (isset($args->arguments['update'])) {
             $updateModel = new ArgResolver(new UpdateModel(new SaveModel($relation)));
 
-            foreach ($update->value as $childArgs) {
+            foreach ($args->arguments['update']->value as $childArgs) {
                 $updateModel($relation->make(), $childArgs);
             }
         }
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $upsert */
-        if ($upsert = $args->arguments['upsert'] ?? null) {
+        if (isset($args->arguments['upsert'])) {
             $upsertModel = new ArgResolver(new UpsertModel(new SaveModel($relation)));
 
-            foreach ($upsert->value as $childArgs) {
+            foreach ($args->arguments['upsert']->value as $childArgs) {
                 $upsertModel($relation->make(), $childArgs);
             }
         }
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $delete */
-        if ($delete = $args->arguments['delete'] ?? null) {
-            $relation->getRelated()::destroy($delete->toPlain());
+        if (isset($args->arguments['delete'])) {
+            $relation->getRelated()::destroy(
+                $args->arguments['delete']->toPlain()
+            );
         }
     }
 }
