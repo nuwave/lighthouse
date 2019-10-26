@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
+use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 
 class UpsertDirective extends MutationExecutorDirective

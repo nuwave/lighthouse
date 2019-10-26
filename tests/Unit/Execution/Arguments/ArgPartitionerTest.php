@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
@@ -18,13 +18,13 @@ class ArgPartitionerTest extends TestCase
 
         $nested = new Argument();
         $nested->directives = new Collection([
-            new Nested()
+            new Nested(),
         ]);
-        $argumentSet->arguments['nested']= $nested;
+        $argumentSet->arguments['nested'] = $nested;
 
         $regular = new Argument();
         $regular->directives = new Collection();
-        $argumentSet->arguments['regular']= $regular;
+        $argumentSet->arguments['regular'] = $regular;
 
         $argPartitioner = new ArgPartitioner();
         [$regularArgs, $nestedArgs] = $argPartitioner->partitionResolverInputs(null, $argumentSet);

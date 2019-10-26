@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ArgPartitioner
@@ -31,6 +31,7 @@ class ArgPartitioner
 
                 if ($resolverDirective) {
                     $argument->resolver = $resolverDirective;
+
                     return true;
                 }
 
@@ -41,6 +42,7 @@ class ArgPartitioner
 
                     if ($isRelation(HasMany::class)) {
                         $argument->resolver = new ArgResolver(new NestedOneToMany($name));
+
                         return true;
                     }
                 }
@@ -56,7 +58,7 @@ class ArgPartitioner
         $nested = new ArgumentSet();
 
         foreach ($argumentSet->arguments as $name => $argument) {
-            if($predicate($name, $argument)) {
+            if ($predicate($name, $argument)) {
                 $nested->arguments[$name] = $argument;
                 continue;
             }
@@ -116,16 +118,16 @@ class ArgPartitioner
         string $name,
         string $relationClass
     ): bool {
-        if (!$modelReflection->hasMethod($name)) {
+        if (! $modelReflection->hasMethod($name)) {
             return false;
         }
 
         $relationMethodCandidate = $modelReflection->getMethod($name);
-        if (!$returnType = $relationMethodCandidate->getReturnType()) {
+        if (! $returnType = $relationMethodCandidate->getReturnType()) {
             return false;
         }
 
-        if (!$returnType instanceof ReflectionNamedType) {
+        if (! $returnType instanceof ReflectionNamedType) {
             return false;
         }
 

@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use ReflectionClass;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
-use ReflectionClass;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SaveModel implements ArgumentResolver
 {
@@ -42,12 +42,12 @@ class SaveModel implements ArgumentResolver
         // Use all the remaining attributes and fill the model
         $model->fill($remaining->toArray());
 
-        foreach($belongsTo->arguments as $relationName => $nestedOperations) {
+        foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
             $belongsToResolver = new ArgResolver(new NestedBelongsTo($relationName));
             $belongsToResolver($model, $nestedOperations->value);
         }
 
-        foreach($morphTo->arguments as $relationName => $nestedOperations) {
+        foreach ($morphTo->arguments as $relationName => $nestedOperations) {
             $morphToResolver = new ArgResolver(new NestedMorphTo($relationName));
             $morphToResolver($model, $nestedOperations->value);
         }
