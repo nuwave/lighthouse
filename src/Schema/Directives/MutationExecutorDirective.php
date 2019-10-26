@@ -55,11 +55,13 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClass;
 
-                $executeMutation = function () use ($model, $args): Model {
+                $executeMutation = function () use ($model, $args, $context, $resolveInfo): Model {
                     return $this
                         ->executeMutation(
                             $model,
-                            new Collection($args)
+                            $args,
+                            $context,
+                            $resolveInfo
                         )
                         ->refresh();
                 };
@@ -85,5 +87,5 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      *         The corresponding slice of the input arguments for mutating this model.
      * @return \Illuminate\Database\Eloquent\Model
      */
-    abstract protected function executeMutation(Model $model, Collection $args): Model;
+    abstract protected function executeMutation(Model $model, $args, $context, ResolveInfo $resolveInfo): Model;
 }

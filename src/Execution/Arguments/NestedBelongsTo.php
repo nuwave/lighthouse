@@ -2,12 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Illuminate\Support\Collection;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Resolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
-class NestedBelongsTo implements Resolver
+class NestedBelongsTo implements ArgumentResolver
 {
     /**
      * @var string
@@ -19,40 +17,65 @@ class NestedBelongsTo implements Resolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke($model, ArgumentSet $args)
     {
         /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
         $relation = $model->{$this->relationName}();
 
-        if (isset($args['create'])) {
-            $belongsToModel = self::executeCreate(
+        if (isset($args->arguments['create'])) {
+            $saveModel = new ArgResolver(new SaveModel($relation));
+
+            $belongsToModel = $saveModel(
                 $relation->make(),
-                new Collection($args['create'])
+                $args->arguments['create']->value
             );
             $relation->associate($belongsToModel);
         }
 
-        if (isset($args['connect'])) {
-            $relation->associate($args['connect']);
+        if (isset($args->arguments['connect'])) {
+            $relation->associate($args->arguments['connect']->value);
         }
 
-        if (isset($args['update'])) {
-            $belongsToModel = self::executeUpdate(
-                $relation->getModel()->newInstance(),
-                new Collection($args['update'])
+        if (isset($args->arguments['update'])) {
+            $updateModel = new ArgResolver(new UpdateModel(new SaveModel($relation)));
+
+            $belongsToModel = $updateModel(
+                $relation->make(),
+                $args->arguments['update']->value
             );
             $relation->associate($belongsToModel);
         }
 
+        if (isset($args->arguments['upsert'])) {
+            $upsertModel = new ArgResolver(new UpsertModel(new SaveModel($relation)));
+
+            $belongsToModel = $upsertModel(
+                $relation->make(),
+                $args->arguments['upsert']->value
+            );
+            $relation->associate($belongsToModel);
+        }
+
+        self::disconnectOrDelete($relation, $args);
+    }
+
+    public static function disconnectOrDelete(BelongsTo $relation, ArgumentSet $args): void
+    {
         // We proceed with disconnecting/deleting only if the given $values is truthy.
         // There is no other information to be passed when issuing those operations,
         // but GraphQL forces us to pass some value. It would be unintuitive for
         // the end user if the given value had no effect on the execution.
-        if ($args['disconnect'] ?? false) {
+        if (
+            isset($args->arguments['disconnect'])
+            && $args->arguments['disconnect']->value
+        ) {
             $relation->dissociate();
         }
 
-        if ($args['delete'] ?? false) {
+        if (
+            isset($args->arguments['delete'])
+            && $args->arguments['delete']->value
+        ) {
             $relation->delete();
         }
     }

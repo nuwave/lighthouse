@@ -2,15 +2,13 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
 
 class ArgPartitionerTest extends TestCase
 {
@@ -18,72 +16,38 @@ class ArgPartitionerTest extends TestCase
     {
         $argumentSet = new ArgumentSet();
 
-        $before = new Argument();
-        $before->directives = new Collection([
-            new Before()
+        $nested = new Argument();
+        $nested->directives = new Collection([
+            new Nested()
         ]);
-        $argumentSet->arguments['before']= $before;
+        $argumentSet->arguments['nested']= $nested;
 
         $regular = new Argument();
         $regular->directives = new Collection();
         $argumentSet->arguments['regular']= $regular;
 
-        $after = new Argument();
-        $after->directives = new Collection([
-            new After()
-        ]);
-        $argumentSet->arguments['after']= $after;
-
         $argPartitioner = new ArgPartitioner();
-        [$beforeArgs, $regularArgs, $afterArgs] = $argPartitioner->partitionResolverInputs(null, $argumentSet);
-
-        $this->assertSame(
-            ['before' => $before],
-            $beforeArgs
-        );
+        [$regularArgs, $nestedArgs] = $argPartitioner->partitionResolverInputs(null, $argumentSet);
 
         $this->assertSame(
             ['regular' => $regular],
-            $regularArgs
+            $regularArgs->arguments
         );
 
         $this->assertSame(
-            ['after' => $after],
-            $afterArgs
+            ['nested' => $nested],
+            $nestedArgs->arguments
         );
     }
 }
 
-class Before implements ResolveNestedBefore
+class Nested implements ArgumentResolver, Directive
 {
-    public function __invoke($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke($root, ArgumentSet $args)
     {
     }
 
-    /**
-     * Name of the directive as used in the schema.
-     *
-     * @return string
-     */
     public function name()
     {
-        // TODO: Implement name() method.
-    }
-}
-
-class After implements ResolveNestedAfter
-{
-    public function __invoke($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
-    {
-    }
-
-    /**
-     * Name of the directive as used in the schema.
-     *
-     * @return string
-     */
-    public function name()
-    {
-        // TODO: Implement name() method.
     }
 }

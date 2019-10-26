@@ -33,10 +33,5 @@ namespace GraphQL\Type\Definition {
          * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
          */
         public $argumentSet;
-
-        /**
-         * @var \Closure|\Nuwave\Lighthouse\Execution\Resolver
-         */
-        public $resolveBeforeResolvers;
     }
 }

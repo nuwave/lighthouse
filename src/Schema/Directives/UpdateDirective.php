@@ -2,8 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
+use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
+use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 
 class UpdateDirective extends MutationExecutorDirective
@@ -35,8 +39,11 @@ directive @update(
 SDL;
     }
 
-    protected function executeMutation(Model $model, Collection $args): Model
+    protected function executeMutation(Model $model, $args, $context, ResolveInfo $resolveInfo): Model
     {
-        return MutationExecutor::executeUpdate($model, $args);
+        $update = new ArgResolver(new UpdateModel(new SaveModel()));
+        $model = $update($model, $resolveInfo->argumentSet);
+
+        return $model;
     }
 }

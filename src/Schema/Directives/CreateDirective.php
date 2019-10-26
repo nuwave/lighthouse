@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 
 class CreateDirective extends MutationExecutorDirective
@@ -30,11 +30,11 @@ directive @create(
 SDL;
     }
 
-    protected function executeMutation(Model $model, Collection $args): Model
+    protected function executeMutation(Model $model, $args, $context, ResolveInfo $resolveInfo): Model
     {
-        $saveModel = new SaveModel();
-        $model = $saveModel($model, $args, $context, $resolveInfo);
+        $saveModel = new ArgResolver(new SaveModel());
+        $model = $saveModel($model, $resolveInfo->argumentSet);
 
-        return $model->refresh();
+        return $model;
     }
 }

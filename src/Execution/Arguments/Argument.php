@@ -28,7 +28,7 @@ class Argument
     /**
      * An argument may have a resolver that handles it's given value.
      *
-     * @var \Nuwave\Lighthouse\Execution\Resolver|null
+     * @var \Nuwave\Lighthouse\Execution\ArgumentResolver|null
      */
     public $resolver;
 

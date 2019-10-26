@@ -34,7 +34,7 @@ class FieldValue
     /**
      * The actual field resolver.
      *
-     * @var \Closure|\Nuwave\Lighthouse\Execution\Resolver|null
+     * @var \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver|null
      */
     protected $resolver;
 
@@ -68,7 +68,7 @@ class FieldValue
     /**
      * Overwrite the current/default resolver.
      *
-     * @param  \Closure|\Nuwave\Lighthouse\Execution\Resolver  $resolver
+     * @param  \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver  $resolver
      * @return $this
      */
     public function setResolver($resolver): self
@@ -149,7 +149,7 @@ class FieldValue
     /**
      * Get field resolver.
      *
-     * @return \Closure|\Nuwave\Lighthouse\Execution\Resolver
+     * @return \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver
      */
     public function getResolver()
     {

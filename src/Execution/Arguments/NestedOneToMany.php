@@ -2,12 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Resolver;
-use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
-class NestedOneToMany implements Resolver
+class NestedOneToMany implements ArgumentResolver
 {
     /**
      * @var string
@@ -19,29 +16,41 @@ class NestedOneToMany implements Resolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke($model, ArgumentSet $args)
     {
         /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
         $relation = $model->{$this->relationName}();
 
-        if (isset($args['create'])) {
-            $saveModel = new ArgResolver(new SaveModel());
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
+        if ($create = $args->arguments['create'] ?? null) {
+            $saveModel = new ArgResolver(new SaveModel($relation));
 
-            foreach ($args['create'] as $childArgs) {
-                $saveModel($relation->make(), $childArgs, $context, $resolveInfo);
+            foreach ($create->value as $childArgs) {
+                $saveModel($relation->make(), $childArgs);
             }
         }
 
-        if (isset($args['update'])) {
-            $updateModel = new ArgResolver(new UpdateModel());
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $update */
+        if ($update = $args->arguments['update'] ?? null) {
+            $updateModel = new ArgResolver(new UpdateModel(new SaveModel($relation)));
 
-            foreach ($args['update'] as $childArgs) {
-                $updateModel($relation->make(), $childArgs, $context, $resolveInfo);
+            foreach ($update->value as $childArgs) {
+                $updateModel($relation->make(), $childArgs);
             }
         }
 
-        if (isset($args['delete'])) {
-            $relation->getRelated()::destroy($args['delete']);
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $upsert */
+        if ($upsert = $args->arguments['upsert'] ?? null) {
+            $upsertModel = new ArgResolver(new UpsertModel(new SaveModel($relation)));
+
+            foreach ($upsert->value as $childArgs) {
+                $upsertModel($relation->make(), $childArgs);
+            }
+        }
+
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $delete */
+        if ($delete = $args->arguments['delete'] ?? null) {
+            $relation->getRelated()::destroy($delete->toPlain());
         }
     }
 }

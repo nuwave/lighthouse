@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
-class UpdateModel implements ArgumentResolver
+class UpsertModel implements ArgumentResolver
 {
     /**
      * @var \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver
@@ -25,7 +25,8 @@ class UpdateModel implements ArgumentResolver
         $id = $args->arguments['id']
             ?? $args->arguments[$model->getKeyName()];
 
-        $model = $model->newQuery()->findOrFail($id->value);
+        $model = $model->newQuery()->find($id->value)
+            ?? $model->newInstance();
 
         return ($this->previous)($model, $args);
     }

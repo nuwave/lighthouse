@@ -2,12 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Schema\Context;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Resolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
-class NestedMorphTo implements Resolver
+class NestedMorphTo implements ArgumentResolver
 {
     /**
      * @var string
@@ -19,37 +16,27 @@ class NestedMorphTo implements Resolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke($model, ArgumentSet $args)
     {
         /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $relation */
         $relation = $model->{$this->relationName}();
 
         // TODO implement create and update once we figure out how to do polymorphic input types https://github.com/nuwave/lighthouse/issues/900
 
-        if (isset($args['connect'])) {
-            $connectArgs = $args['connect'];
+        if (isset($args->arguments['connect'])) {
+            $connectArgs = $args->arguments['connect']->value;
 
             $morphToModel = $relation->createModelByType(
-                (string) $connectArgs['type']
+                (string) $connectArgs->arguments['type']
             );
             $morphToModel->setAttribute(
                 $morphToModel->getKeyName(),
-                $connectArgs['id']
+                $connectArgs->arguments['id']
             );
 
             $relation->associate($morphToModel);
         }
 
-        // We proceed with disconnecting/deleting only if the given $values is truthy.
-        // There is no other information to be passed when issuing those operations,
-        // but GraphQL forces us to pass some value. It would be unintuitive for
-        // the end user if the given value had no effect on the execution.
-        if ($nestedOperations['disconnect'] ?? false) {
-            $relation->dissociate();
-        }
-
-        if ($nestedOperations['delete'] ?? false) {
-            $relation->delete();
-        }
+        NestedBelongsTo::disconnectOrDelete($relation, $args);
     }
 }

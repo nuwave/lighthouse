@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
+use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
+use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 
 class UpsertDirective extends MutationExecutorDirective
 {
@@ -35,8 +37,11 @@ directive @upsert(
 SDL;
     }
 
-    protected function executeMutation(Model $model, Collection $args): Model
+    protected function executeMutation(Model $model, $args, $context, ResolveInfo $resolveInfo): Model
     {
-        return MutationExecutor::executeUpsert($model, $args);
+        $upsert = new ArgResolver(new UpsertModel(new SaveModel()));
+        $model = $upsert($model, $resolveInfo->argumentSet);
+
+        return $model;
     }
 }

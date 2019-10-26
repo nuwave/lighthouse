@@ -147,9 +147,9 @@ class FieldFactory
             );
         }
 
-        $this->fieldValue->setResolver(
-            new ArgResolver($this->fieldValue->getResolver())
-        );
+//        $this->fieldValue->setResolver(
+//            new ArgResolver($this->fieldValue->getResolver())
+//        );
 
         $fieldMiddleware = $this->passResolverArguments(
             $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)

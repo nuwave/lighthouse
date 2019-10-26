@@ -2,46 +2,34 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Resolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
-class ArgResolver implements Resolver
+class ArgResolver implements ArgumentResolver
 {
     /**
-     * @var \Closure|\Nuwave\Lighthouse\Execution\Resolver
+     * @var \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver
      */
     private $previous;
 
     /**
      * ArgResolver constructor.
-     * @param \Closure|\Nuwave\Lighthouse\Execution\Resolver $previous
+     * @param \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver $previous
      */
     public function __construct($previous)
     {
         $this->previous = $previous;
     }
 
-    public function __invoke($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke($root, ArgumentSet $args)
     {
         $argPartitioner = new ArgPartitioner();
-        [$before, $regular, $after] = $argPartitioner->partitionResolverInputs($root, $resolveInfo->argumentSet);
+        [$regular, $nestedArgs] = $argPartitioner->partitionResolverInputs($root, $args);
 
-        // Prepare a callback that is passed into the field resolver
-        // It should be called with the new root object
-        $resolveBeforeResolvers = function ($root) use ($before, $context, $resolveInfo) {
-            /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $beforeArg */
-            foreach ($before as $beforeArg) {
-                ($beforeArg->resolver)($root, $beforeArg->value, $context, $resolveInfo);
-            }
-        };
-        $resolveInfo->resolveBeforeResolvers = $resolveBeforeResolvers;
+        $result = ($this->previous)($root, $regular);
 
-        $result = ($this->previous)($root, $regular, $context, $resolveInfo);
-
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $afterArg */
-        foreach ($after as $afterArg) {
-            ($afterArg->resolver)($result, $afterArg->value, $context, $resolveInfo);
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $nested */
+        foreach ($nestedArgs->arguments as $nested) {
+            ($nested->resolver)($result, $nested->value);
         }
 
         return $result;
