@@ -77,6 +77,8 @@ SDL;
                     $valueFromContext = data_get($context, $contextAttributeName);
                     $args = Arr::add($args, $argumentName, $valueFromContext);
 
+                    $resolveInfo->argumentSet->addValue($argumentName, $valueFromContext);
+
                     return $previousResolver($rootValue, $args, $context, $resolveInfo);
                 }
             )

@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Collection;
+
 class Argument
 {
     /**
@@ -14,7 +16,7 @@ class Argument
     /**
      * The type of the argument.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null
      */
     public $type;
 
@@ -31,6 +33,16 @@ class Argument
      * @var \Nuwave\Lighthouse\Execution\ArgumentResolver|null
      */
     public $resolver;
+
+    /**
+     * Argument constructor.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->directives = new Collection();
+    }
 
     /**
      * Get the plain PHP value of this argument.

@@ -120,4 +120,22 @@ class ArgumentSetTest extends TestCase
             $argumentSet->toArray()
         );
     }
+
+    public function testAddValueAtRootLevel(): void
+    {
+        $set = new ArgumentSet();
+        $set->addValue('foo', 42);
+
+        $this->assertSame(42, $set->arguments['foo']->value);
+    }
+
+    public function testAddValueDeep(): void
+    {
+        $set = new ArgumentSet();
+        $set->addValue('foo.bar', 42);
+
+        $foo = $set->arguments['foo']->value;
+
+        $this->assertSame(42, $foo->arguments['bar']->value);
+    }
 }
