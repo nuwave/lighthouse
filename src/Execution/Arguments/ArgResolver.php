@@ -22,10 +22,9 @@ class ArgResolver implements ArgumentResolver
 
     public function __invoke($root, ArgumentSet $args)
     {
-        $argPartitioner = new ArgPartitioner();
-        [$regular, $nestedArgs] = $argPartitioner->partitionResolverInputs($root, $args);
+        [$regularArgs, $nestedArgs] = ArgPartitioner::nestedArgumentResolvers($args, $root);
 
-        $result = ($this->previous)($root, $regular);
+        $result = ($this->previous)($root, $regularArgs);
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $nested */
         foreach ($nestedArgs->arguments as $nested) {

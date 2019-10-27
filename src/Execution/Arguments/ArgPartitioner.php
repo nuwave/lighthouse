@@ -17,17 +17,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class ArgPartitioner
 {
     /**
-     * @param  $root
+     * Partition the arguments into regular and nested.
+     *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  mixed  $root
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
-    public function partitionResolverInputs($root, ArgumentSet $argumentSet): array
+    public static function nestedArgumentResolvers(ArgumentSet $argumentSet, $root): array
     {
         $model = $root instanceof Model
             ? new \ReflectionClass($root)
             : null;
 
-        return self::partition(
+        return static::partition(
             $argumentSet,
             static function (string $name, Argument $argument) use ($model): bool {
                 $resolverDirective = $argument->directives->first(function (Directive $directive): bool {
@@ -42,7 +44,7 @@ class ArgPartitioner
 
                 if (isset($model)) {
                     $isRelation = static function (string $relationClass) use ($model, $name) {
-                        return self::methodReturnsRelation($model, $name, $relationClass);
+                        return static::methodReturnsRelation($model, $name, $relationClass);
                     };
 
                     if (
@@ -78,26 +80,6 @@ class ArgPartitioner
         );
     }
 
-    protected static function partition(ArgumentSet $argumentSet, \Closure $predicate)
-    {
-        $regular = new ArgumentSet();
-        $nested = new ArgumentSet();
-
-        foreach ($argumentSet->arguments as $name => $argument) {
-            if ($predicate($name, $argument)) {
-                $nested->arguments[$name] = $argument;
-                continue;
-            }
-
-            $regular->arguments[$name] = $argument;
-        }
-
-        return [
-            $regular,
-            $nested,
-        ];
-    }
-
     /**
      * Extract all the arguments that correspond to a relation of a certain type on the model.
      *
@@ -121,25 +103,71 @@ class ArgPartitioner
      *   ],
      * ]
      *
-     * @param  \ReflectionClass  $modelReflection
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $relationClass
-     * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  [remainingArgs, relationshipArgs]
+     * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
-    public static function partitionByRelationType(
-        ReflectionClass $modelReflection,
+    public static function relationMethods(
         ArgumentSet $argumentSet,
+        Model $model,
         string $relationClass
     ): array {
-        return self::partition(
+        $modelReflection = new ReflectionClass($model);
+
+        return static::partition(
             $argumentSet,
             static function (string $name) use ($modelReflection, $relationClass): bool {
-                return self::methodReturnsRelation($modelReflection, $name, $relationClass);
+                return static::methodReturnsRelation($modelReflection, $name, $relationClass);
             }
         );
     }
 
-    public static function methodReturnsRelation(
+    /**
+     * Partition arguments based on a predicate.
+     *
+     * The predicate will be called for each argument within the ArgumentSet
+     * with the following parameters:
+     * 1. The name of the argument
+     * 2. The argument itself
+     *
+     * Returns an array of two new ArgumentSet instances:
+     * - the first one contains all arguments for which the predicate did not match
+     * - the second one contains all arguments for which the predicate matched
+     *
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  \Closure  $predicate
+     * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
+     */
+    protected static function partition(ArgumentSet $argumentSet, \Closure $predicate)
+    {
+        $regular = new ArgumentSet();
+        $nested = new ArgumentSet();
+
+        foreach ($argumentSet->arguments as $name => $argument) {
+            if ($predicate($name, $argument)) {
+                $nested->arguments[$name] = $argument;
+                continue;
+            }
+
+            $regular->arguments[$name] = $argument;
+        }
+
+        return [
+            $regular,
+            $nested,
+        ];
+    }
+
+    /**
+     * Does a method on the model return a relation of the given class?
+     *
+     * @param  \ReflectionClass  $modelReflection
+     * @param  string  $name
+     * @param  string  $relationClass
+     * @return bool
+     */
+    protected static function methodReturnsRelation(
         ReflectionClass $modelReflection,
         string $name,
         string $relationClass

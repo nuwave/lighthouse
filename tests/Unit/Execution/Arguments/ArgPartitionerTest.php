@@ -2,32 +2,29 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Tests\TestCase;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\ArgumentResolver;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
+use Tests\Utils\Models\User;
 
 class ArgPartitionerTest extends TestCase
 {
-    public function testPartitionsArgs(): void
+    public function testPartitionArgsWithArgumentResolvers(): void
     {
         $argumentSet = new ArgumentSet();
 
-        $nested = new Argument();
-        $nested->directives = new Collection([
-            new Nested(),
-        ]);
-        $argumentSet->arguments['nested'] = $nested;
-
         $regular = new Argument();
-        $regular->directives = new Collection();
         $argumentSet->arguments['regular'] = $regular;
 
-        $argPartitioner = new ArgPartitioner();
-        [$regularArgs, $nestedArgs] = $argPartitioner->partitionResolverInputs(null, $argumentSet);
+        $nested = new Argument();
+        $nested->directives->push(new Nested());
+        $argumentSet->arguments['nested'] = $nested;
+
+        [$regularArgs, $nestedArgs] = ArgPartitioner::nestedArgumentResolvers($argumentSet, null);
 
         $this->assertSame(
             ['regular' => $regular],
@@ -37,6 +34,33 @@ class ArgPartitionerTest extends TestCase
         $this->assertSame(
             ['nested' => $nested],
             $nestedArgs->arguments
+        );
+    }
+
+    public function testPartitionArgsThatMatchRelationMethods(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        $regular = new Argument();
+        $argumentSet->arguments['regular'] = $regular;
+
+        $tasksRelation = new Argument();
+        $argumentSet->arguments['tasks'] = $tasksRelation;
+
+        [$regularArgs, $hasManyArgs] = ArgPartitioner::relationMethods(
+            $argumentSet,
+            new User(),
+            HasMany::class
+        );
+
+        $this->assertSame(
+            ['regular' => $regular],
+            $regularArgs->arguments
+        );
+
+        $this->assertSame(
+            ['tasks' => $tasksRelation],
+            $hasManyArgs->arguments
         );
     }
 }
