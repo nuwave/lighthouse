@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Tests\TestCase;
+use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Execution\ArgumentResolver;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
-use Tests\Utils\Models\User;
 
 class ArgPartitionerTest extends TestCase
 {
