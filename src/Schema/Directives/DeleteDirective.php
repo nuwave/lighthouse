@@ -2,10 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective
+class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective, ArgumentResolver, ArgManipulator
 {
     /**
      * Name of the directive.
@@ -61,5 +68,35 @@ SDL;
     protected function modifyExistence(Model $model): void
     {
         $model->delete();
+    }
+
+    /**
+     * Delete on ore more related models.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  mixed|mixed[]  $idOrIds
+     * @return void
+     */
+    public function __invoke($model, $idOrIds): void
+    {
+        $relationName = $this->directiveArgValue('relation');
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+        $relation = $model->{$relationName}();
+
+        $model = $relation->make();
+        $model::destroy($idOrIds);
+    }
+
+    public function manipulateArgDefinition(
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ) {
+        if(!$this->directiveArgValue('relation')) {
+            throw new DefinitionException(
+                'The @delete directive requires the "relation" to be set when used as an argument resolver.'
+            );
+        }
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
-use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
+use Nuwave\Lighthouse\Support\Utils;
 
 class UpsertDirective extends MutationExecutorDirective
 {
@@ -37,10 +37,31 @@ directive @upsert(
 SDL;
     }
 
-    protected function executeMutation(Model $model, ArgumentSet $args): Model
+    /**
+     * Execute a mutation on a model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     *         An empty instance of the model that should be mutated.
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $args
+     *         The user given input arguments for mutating this model.
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
+     */
+    public function __invoke($model, $args)
     {
-        $upsert = new ArgResolver(new UpsertModel(new SaveModel()));
+        $relation = null;
+        if($relationName = $this->directiveArgValue('relation')) {
+            /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+            $relation = $model->{$relationName}();
+            $model = $relation->make();
+        }
 
-        return $upsert($model, $args);
+        $upsert = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+
+        return Utils::applyEach(
+            static function (ArgumentSet $argumentSet) use ($upsert, $model) {
+                return $upsert($model, $argumentSet);
+            },
+            $args
+        );
     }
 }

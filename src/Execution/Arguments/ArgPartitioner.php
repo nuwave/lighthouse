@@ -29,7 +29,7 @@ class ArgPartitioner
             ? new \ReflectionClass($root)
             : null;
 
-        foreach ($argumentSet->arguments as $name => $argument) {
+        foreach($argumentSet->arguments as $name => $argument) {
             static::attachNestedArgumentResolver($name, $argument, $model);
         }
 
@@ -100,7 +100,6 @@ class ArgPartitioner
 
         if ($resolverDirective) {
             $argument->resolver = $resolverDirective;
-
             return;
         }
 
@@ -113,8 +112,7 @@ class ArgPartitioner
                 $isRelation(HasOne::class)
                 || $isRelation(MorphOne::class)
             ) {
-                $argument->resolver = new ArgResolver(new NestedOneToOne($name));
-
+                $argument->resolver = new ResolveNested(new NestedOneToOne($name));
                 return;
             }
 
@@ -122,8 +120,7 @@ class ArgPartitioner
                 $isRelation(HasMany::class)
                 || $isRelation(MorphMany::class)
             ) {
-                $argument->resolver = new ArgResolver(new NestedOneToMany($name));
-
+                $argument->resolver = new ResolveNested(new NestedOneToMany($name));
                 return;
             }
 
@@ -131,8 +128,7 @@ class ArgPartitioner
                 $isRelation(BelongsToMany::class)
                 || $isRelation(MorphToMany::class)
             ) {
-                $argument->resolver = new ArgResolver(new NestedManyToMany($name));
-
+                $argument->resolver = new ResolveNested(new NestedManyToMany($name));
                 return;
             }
         }

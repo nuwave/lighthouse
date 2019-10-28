@@ -16,7 +16,12 @@ class NestedMorphTo implements ArgumentResolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, ArgumentSet $args)
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @return void
+     */
+    public function __invoke($model, $args)
     {
         /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $relation */
         $relation = $model->{$this->relationName}();

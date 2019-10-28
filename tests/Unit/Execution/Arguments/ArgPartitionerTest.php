@@ -67,7 +67,7 @@ class ArgPartitionerTest extends TestCase
 
 class Nested implements ArgumentResolver, Directive
 {
-    public function __invoke($root, ArgumentSet $args)
+    public function __invoke($root, $args)
     {
     }
 

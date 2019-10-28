@@ -17,7 +17,12 @@ class NestedOneToMany implements ArgumentResolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, ArgumentSet $args)
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @return void
+     */
+    public function __invoke($model, $args)
     {
         /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
         $relation = $model->{$this->relationName}();
@@ -38,7 +43,7 @@ class NestedOneToMany implements ArgumentResolver
     public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
     {
         if (isset($args->arguments['create'])) {
-            $saveModel = new ArgResolver(new SaveModel($relation));
+            $saveModel = new ResolveNested(new SaveModel($relation));
 
             foreach ($args->arguments['create']->value as $childArgs) {
                 $saveModel($relation->make(), $childArgs);
@@ -46,7 +51,7 @@ class NestedOneToMany implements ArgumentResolver
         }
 
         if (isset($args->arguments['update'])) {
-            $updateModel = new ArgResolver(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             foreach ($args->arguments['update']->value as $childArgs) {
                 $updateModel($relation->make(), $childArgs);
@@ -54,7 +59,7 @@ class NestedOneToMany implements ArgumentResolver
         }
 
         if (isset($args->arguments['upsert'])) {
-            $upsertModel = new ArgResolver(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
                 $upsertModel($relation->make(), $childArgs);

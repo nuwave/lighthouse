@@ -304,4 +304,58 @@ class CreateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testNestedArgumentResolver(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+        
+        type Task {
+            name: String!
+        }
+        
+        type User {
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        input CreateUserInput {
+            name: String
+            newTask: CreateTaskInput @create(relation: "tasks")
+        }
+        
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                newTask: {
+                    name: "Uniq"
+                }
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'name' => 'Uniq',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

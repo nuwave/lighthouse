@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
-use Nuwave\Lighthouse\Execution\Arguments\ArgResolver;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
+use Nuwave\Lighthouse\Support\Utils;
 
 class CreateDirective extends MutationExecutorDirective
 {
@@ -30,10 +31,30 @@ directive @create(
 SDL;
     }
 
-    protected function executeMutation(Model $model, ArgumentSet $args): Model
+    /**
+     * Execute a mutation on a model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     *         An empty instance of the model that should be mutated.
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $args
+     *         The user given input arguments for mutating this model.
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
+     */
+    public function __invoke($model, $args)
     {
-        $saveModel = new ArgResolver(new SaveModel());
+        if($relationName = $this->directiveArgValue('relation')) {
+            /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+            $relation = $model->{$relationName}();
+            $model = $relation->make();
+        }
 
-        return $saveModel($model, $args);
+        $saveModel = new ResolveNested(new SaveModel());
+
+        return Utils::applyEach(
+            static function (ArgumentSet $argumentSet) use ($saveModel, $model) {
+                return $saveModel($model, $argumentSet);
+            },
+            $args
+        );
     }
 }

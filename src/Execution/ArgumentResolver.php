@@ -8,8 +8,8 @@ interface ArgumentResolver
 {
     /**
      * @param  mixed  $root
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
+     * @param  mixed|ArgumentSet|ArgumentSet[]  $value
+     * @return mixed
      */
-    public function __invoke($root, ArgumentSet $args);
+    public function __invoke($root, $value);
 }

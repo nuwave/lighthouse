@@ -3,8 +3,9 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class DeleteDirectiveTest extends DBTestCase
 {
@@ -67,9 +68,9 @@ class DeleteDirectiveTest extends DBTestCase
 
     public function testRejectsDefinitionWithNullableArgument(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
 
-        $this->buildSchema('
+        $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
             name: String
@@ -83,9 +84,9 @@ class DeleteDirectiveTest extends DBTestCase
 
     public function testRejectsDefinitionWithNoArgument(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
 
-        $this->buildSchema('
+        $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -98,9 +99,9 @@ class DeleteDirectiveTest extends DBTestCase
 
     public function testRejectsDefinitionWithMultipleArguments(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
 
-        $this->buildSchema('
+        $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -109,5 +110,68 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUser(foo: String, bar: Int): User @delete
         }
         ');
+    }
+
+    public function testRequiresRelationWhenUsingAsArgumentResolver(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            updateUser(deleteTasks: Tasks @delete): User @update
+        }
+        
+        type User {
+            id: ID!
+        }
+        ');
+    }
+
+    public function testUseNestedArgumentResolverDelete(): void
+    {
+        factory(User::class)->create();
+        factory(Task::class, 2)->create([
+            'user_id' => 1
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            updateUser(
+                id: Int
+                deleteTasks: [Int!]! @delete(relation: "tasks")
+            ): User @update
+        }
+        
+        type User {
+            id: Int!
+            tasks: [Task!]!
+        }
+        
+        type Task {
+            id: Int
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            updateUser(id: 1, deleteTasks: [2]) {
+                id
+                tasks {
+                    id
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => 1,
+                    'tasks' => [
+                        [
+                            'id' => 1,
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 }

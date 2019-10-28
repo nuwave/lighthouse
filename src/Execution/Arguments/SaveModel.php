@@ -21,7 +21,12 @@ class SaveModel implements ArgumentResolver
         $this->parentRelation = $parentRelation;
     }
 
-    public function __invoke($model, ArgumentSet $args)
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function __invoke($model, $args)
     {
         // Extract $morphTo first, as MorphTo extends BelongsTo
         [$morphTo, $remaining] = ArgPartitioner::relationMethods(
@@ -40,12 +45,12 @@ class SaveModel implements ArgumentResolver
         $model->fill($remaining->toArray());
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
-            $belongsToResolver = new ArgResolver(new NestedBelongsTo($relationName));
+            $belongsToResolver = new ResolveNested(new NestedBelongsTo($relationName));
             $belongsToResolver($model, $nestedOperations->value);
         }
 
         foreach ($morphTo->arguments as $relationName => $nestedOperations) {
-            $morphToResolver = new ArgResolver(new NestedMorphTo($relationName));
+            $morphToResolver = new ResolveNested(new NestedMorphTo($relationName));
             $morphToResolver($model, $nestedOperations->value);
         }
 

@@ -17,13 +17,18 @@ class NestedBelongsTo implements ArgumentResolver
         $this->relationName = $relationName;
     }
 
-    public function __invoke($model, ArgumentSet $args)
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @return void
+     */
+    public function __invoke($model, $args): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
         $relation = $model->{$this->relationName}();
 
         if (isset($args->arguments['create'])) {
-            $saveModel = new ArgResolver(new SaveModel($relation));
+            $saveModel = new ResolveNested(new SaveModel($relation));
 
             $belongsToModel = $saveModel(
                 $relation->make(),
@@ -37,7 +42,7 @@ class NestedBelongsTo implements ArgumentResolver
         }
 
         if (isset($args->arguments['update'])) {
-            $updateModel = new ArgResolver(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             $belongsToModel = $updateModel(
                 $relation->make(),
@@ -47,7 +52,7 @@ class NestedBelongsTo implements ArgumentResolver
         }
 
         if (isset($args->arguments['upsert'])) {
-            $upsertModel = new ArgResolver(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             $belongsToModel = $upsertModel(
                 $relation->make(),

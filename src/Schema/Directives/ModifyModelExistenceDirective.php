@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use GraphQL\Language\AST\NonNullTypeNode;
 use Illuminate\Database\Eloquent\Collection;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
@@ -106,7 +107,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * @param  ObjectTypeDefinitionNode  $parentType
      * @return void
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
@@ -115,13 +116,13 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     ): void {
         // Ensure there is only a single argument defined on the field.
         if (count($this->definitionNode->arguments) !== 1) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
             );
         }
 
         if (! $this->idArgument() instanceof NonNullTypeNode) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
             );
         }
