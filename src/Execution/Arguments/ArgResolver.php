@@ -22,7 +22,7 @@ class ArgResolver implements ArgumentResolver
 
     public function __invoke($root, ArgumentSet $args)
     {
-        [$regularArgs, $nestedArgs] = ArgPartitioner::nestedArgumentResolvers($args, $root);
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgumentResolvers($args, $root);
 
         $result = ($this->previous)($root, $regularArgs);
 

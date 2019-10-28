@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class ArgPartitioner
 {
     /**
-     * Partition the arguments into regular and nested.
+     * Partition the arguments into nested and regular.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  mixed  $root
@@ -29,53 +29,14 @@ class ArgPartitioner
             ? new \ReflectionClass($root)
             : null;
 
+        foreach($argumentSet->arguments as $name => $argument) {
+            static::attachNestedArgumentResolver($name, $argument, $model);
+        }
+
         return static::partition(
             $argumentSet,
-            static function (string $name, Argument $argument) use ($model): bool {
-                $resolverDirective = $argument->directives->first(function (Directive $directive): bool {
-                    return $directive instanceof ArgumentResolver;
-                });
-
-                if ($resolverDirective) {
-                    $argument->resolver = $resolverDirective;
-
-                    return true;
-                }
-
-                if (isset($model)) {
-                    $isRelation = static function (string $relationClass) use ($model, $name) {
-                        return static::methodReturnsRelation($model, $name, $relationClass);
-                    };
-
-                    if (
-                        $isRelation(HasOne::class)
-                        || $isRelation(MorphOne::class)
-                    ) {
-                        $argument->resolver = new ArgResolver(new NestedOneToOne($name));
-
-                        return true;
-                    }
-
-                    if (
-                        $isRelation(HasMany::class)
-                        || $isRelation(MorphMany::class)
-                    ) {
-                        $argument->resolver = new ArgResolver(new NestedOneToMany($name));
-
-                        return true;
-                    }
-
-                    if (
-                        $isRelation(BelongsToMany::class)
-                        || $isRelation(MorphToMany::class)
-                    ) {
-                        $argument->resolver = new ArgResolver(new NestedManyToMany($name));
-
-                        return true;
-                    }
-                }
-
-                return false;
+            static function (string $name, Argument $argument): bool {
+                return isset($argument->resolver);
             }
         );
     }
@@ -95,12 +56,12 @@ class ArgPartitioner
      * the result will be:
      * [
      *   [
-     *    'name' => 'Ralf',
-     *   ]
-     *   [
      *    'comments' =>
      *      ['foo' => 'Bar'],
      *   ],
+     *   [
+     *    'name' => 'Ralf',
+     *   ]
      * ]
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
@@ -124,6 +85,56 @@ class ArgPartitioner
     }
 
     /**
+     * Attach a nested argument resolver to an argument.
+     *
+     * @param  string  $name
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument  $argument
+     * @param  \ReflectionClass|null  $model
+     * @return void
+     */
+    protected static function attachNestedArgumentResolver(string $name, Argument &$argument, ?ReflectionClass $model): void
+    {
+        $resolverDirective = $argument->directives->first(function (Directive $directive): bool {
+            return $directive instanceof ArgumentResolver;
+        });
+
+        if ($resolverDirective) {
+            $argument->resolver = $resolverDirective;
+            return;
+        }
+
+        if (isset($model)) {
+            $isRelation = static function (string $relationClass) use ($model, $name) {
+                return static::methodReturnsRelation($model, $name, $relationClass);
+            };
+
+            if (
+                $isRelation(HasOne::class)
+                || $isRelation(MorphOne::class)
+            ) {
+                $argument->resolver = new ArgResolver(new NestedOneToOne($name));
+                return;
+            }
+
+            if (
+                $isRelation(HasMany::class)
+                || $isRelation(MorphMany::class)
+            ) {
+                $argument->resolver = new ArgResolver(new NestedOneToMany($name));
+                return;
+            }
+
+            if (
+                $isRelation(BelongsToMany::class)
+                || $isRelation(MorphToMany::class)
+            ) {
+                $argument->resolver = new ArgResolver(new NestedManyToMany($name));
+                return;
+            }
+        }
+    }
+
+    /**
      * Partition arguments based on a predicate.
      *
      * The predicate will be called for each argument within the ArgumentSet
@@ -132,8 +143,8 @@ class ArgPartitioner
      * 2. The argument itself
      *
      * Returns an array of two new ArgumentSet instances:
-     * - the first one contains all arguments for which the predicate did not match
-     * - the second one contains all arguments for which the predicate matched
+     * - the first one contains all arguments for which the predicate matched
+     * - the second one contains all arguments for which the predicate did not match
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  \Closure  $predicate
@@ -141,21 +152,20 @@ class ArgPartitioner
      */
     protected static function partition(ArgumentSet $argumentSet, \Closure $predicate)
     {
-        $regular = new ArgumentSet();
-        $nested = new ArgumentSet();
+        $matched = new ArgumentSet();
+        $notMatched = new ArgumentSet();
 
         foreach ($argumentSet->arguments as $name => $argument) {
             if ($predicate($name, $argument)) {
-                $nested->arguments[$name] = $argument;
-                continue;
+                $matched->arguments[$name] = $argument;
+            } else {
+                $notMatched->arguments[$name] = $argument;
             }
-
-            $regular->arguments[$name] = $argument;
         }
 
         return [
-            $regular,
-            $nested,
+            $matched,
+            $notMatched,
         ];
     }
 

@@ -24,7 +24,7 @@ class ArgPartitionerTest extends TestCase
         $nested->directives->push(new Nested());
         $argumentSet->arguments['nested'] = $nested;
 
-        [$regularArgs, $nestedArgs] = ArgPartitioner::nestedArgumentResolvers($argumentSet, null);
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgumentResolvers($argumentSet, null);
 
         $this->assertSame(
             ['regular' => $regular],
@@ -47,7 +47,7 @@ class ArgPartitionerTest extends TestCase
         $tasksRelation = new Argument();
         $argumentSet->arguments['tasks'] = $tasksRelation;
 
-        [$regularArgs, $hasManyArgs] = ArgPartitioner::relationMethods(
+        [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
             $argumentSet,
             new User(),
             HasMany::class

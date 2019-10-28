@@ -24,13 +24,13 @@ class SaveModel implements ArgumentResolver
     public function __invoke($model, ArgumentSet $args)
     {
         // Extract $morphTo first, as MorphTo extends BelongsTo
-        [$remaining, $morphTo] = ArgPartitioner::relationMethods(
+        [$morphTo, $remaining] = ArgPartitioner::relationMethods(
             $args,
             $model,
             MorphTo::class
         );
 
-        [$remaining, $belongsTo] = ArgPartitioner::relationMethods(
+        [$belongsTo, $remaining] = ArgPartitioner::relationMethods(
             $remaining,
             $model,
             BelongsTo::class
