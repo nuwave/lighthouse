@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Utils;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
-use Nuwave\Lighthouse\Support\Utils;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 
 class UpsertDirective extends MutationExecutorDirective
 {
@@ -49,7 +49,7 @@ SDL;
     public function __invoke($model, $args)
     {
         $relation = null;
-        if($relationName = $this->directiveArgValue('relation')) {
+        if ($relationName = $this->directiveArgValue('relation')) {
             /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
             $relation = $model->{$relationName}();
             $model = $relation->make();

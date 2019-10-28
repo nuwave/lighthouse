@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Support\Utils;
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 
 class CreateDirective extends MutationExecutorDirective
 {
@@ -42,7 +42,7 @@ SDL;
      */
     public function __invoke($model, $args)
     {
-        if($relationName = $this->directiveArgValue('relation')) {
+        if ($relationName = $this->directiveArgValue('relation')) {
             /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
             $relation = $model->{$relationName}();
             $model = $relation->make();

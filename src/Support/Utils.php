@@ -89,7 +89,7 @@ class Utils
      */
     public static function applyEach(\Closure $callback, $valueOrValues)
     {
-        if(! is_array($valueOrValues)) {
+        if (! is_array($valueOrValues)) {
             return $callback($valueOrValues);
         }
 

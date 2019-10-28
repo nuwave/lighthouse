@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\SoftDeletes;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class RestoreDirectiveTest extends DBTestCase
 {
@@ -80,7 +80,7 @@ class RestoreDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -95,7 +95,7 @@ class RestoreDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -110,7 +110,7 @@ class RestoreDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -125,7 +125,7 @@ class RestoreDirectiveTest extends DBTestCase
     {
         $this->expectExceptionMessage(RestoreDirective::MODEL_NOT_USING_SOFT_DELETES);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type User {
             id: ID!
         }

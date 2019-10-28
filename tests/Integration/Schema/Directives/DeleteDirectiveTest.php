@@ -70,7 +70,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type User {
             id: ID!
             name: String
@@ -86,7 +86,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -101,7 +101,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -116,7 +116,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type Query {
             updateUser(deleteTasks: Tasks @delete): User @update
         }
@@ -131,10 +131,10 @@ class DeleteDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
         factory(Task::class, 2)->create([
-            'user_id' => 1
+            'user_id' => 1,
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /* @lang GraphQL */ '
         type Query {
             updateUser(
                 id: Int
@@ -152,7 +152,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         {
             updateUser(id: 1, deleteTasks: [2]) {
                 id
@@ -168,10 +168,10 @@ class DeleteDirectiveTest extends DBTestCase
                     'tasks' => [
                         [
                             'id' => 1,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

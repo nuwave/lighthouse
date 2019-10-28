@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\SoftDeletes;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 
 class ForceDeleteDirectiveTest extends DBTestCase
@@ -102,7 +102,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -117,7 +117,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -132,7 +132,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -146,7 +146,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
     public function testRejectsUsingDirectiveWithNoSoftDeleteModels(): void
     {
         $this->expectExceptionMessage(ForceDeleteDirective::MODEL_NOT_USING_SOFT_DELETES);
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/* @lang GraphQL */ '
         type User {
             id: ID!
         }

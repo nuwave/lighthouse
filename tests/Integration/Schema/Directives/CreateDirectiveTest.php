@@ -307,7 +307,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testNestedArgumentResolver(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /* @lang GraphQL */ '
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
@@ -331,7 +331,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"

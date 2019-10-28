@@ -21,6 +21,7 @@ class ResolveNested implements ArgumentResolver
     {
         $this->previous = $previous;
     }
+
     /**
      * @param  mixed  $root
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
@@ -30,7 +31,7 @@ class ResolveNested implements ArgumentResolver
     {
         [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgumentResolvers($args, $root);
 
-        if($this->previous) {
+        if ($this->previous) {
             $root = ($this->previous)($root, $regularArgs);
         }
 
