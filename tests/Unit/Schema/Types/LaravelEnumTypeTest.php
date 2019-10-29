@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Types;
 
 use Tests\TestCase;
+use Tests\Utils\LaravelEnums\LocalizedUserType;
 use Tests\Utils\LaravelEnums\UserType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use PHPUnit\Framework\Constraint\Callback;
@@ -28,6 +29,13 @@ class LaravelEnumTypeTest extends TestCase
         $enumType = new LaravelEnumType(UserType::class, $customName);
 
         $this->assertSame($customName, $enumType->name);
+    }
+
+    public function testCustomDescription()
+    {
+        $enumType = new LaravelEnumType(LocalizedUserType::class);
+
+        $this->assertSame('Localize Moderator', $enumType->config['values']['Moderator']['description']);
     }
 
     public function testReceivesEnumInstanceInternally(): void
