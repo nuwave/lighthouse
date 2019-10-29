@@ -2,8 +2,8 @@
 
 namespace Tests\Utils\LaravelEnums;
 
-use BenSampo\Enum\Contracts\LocalizedEnum;
 use BenSampo\Enum\Enum;
+use BenSampo\Enum\Contracts\LocalizedEnum;
 
 final class LocalizedUserType extends Enum implements LocalizedEnum
 {

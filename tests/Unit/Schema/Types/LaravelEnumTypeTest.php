@@ -3,10 +3,10 @@
 namespace Tests\Unit\Schema\Types;
 
 use Tests\TestCase;
-use Tests\Utils\LaravelEnums\LocalizedUserType;
 use Tests\Utils\LaravelEnums\UserType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use PHPUnit\Framework\Constraint\Callback;
+use Tests\Utils\LaravelEnums\LocalizedUserType;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
 class LaravelEnumTypeTest extends TestCase
