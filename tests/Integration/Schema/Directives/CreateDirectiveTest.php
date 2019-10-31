@@ -304,4 +304,173 @@ class CreateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testCanCreateTwice(): void
+    {
+        $this->schema .= '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+        
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL('
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "fooTask"
+                    }]
+                }
+            }) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+
+        $this->graphQL('
+        mutation {
+            createUser(input: {
+                name: "bar"
+                tasks: {
+                    create: [{
+                        name: "barTask"
+                    }]
+                }
+            }) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateTwiceButCantFetchRelationship(): void
+    {
+        $this->schema .= '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+        
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $firstMutation = $this->graphQL('
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "fooTask"
+                    }]
+                }
+            }) {
+                tasks {
+                    name
+                }
+            }
+        }
+        ');
+        $this->assertDatabaseHas('users', ['name' => 'foo']);
+        $firstMutation->assertJson([
+            'data' => [
+                'createUser' => [
+                    'tasks' => [
+                        [
+                            'name' => 'fooTask',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        try {
+            $secondMutation = $this->graphQL('
+                mutation {
+                    createUser(input: {
+                        name: "bar"
+                        tasks: {
+                            create: [{
+                                name: "barTask"
+                            }]
+                        }
+                    }) {
+                        name
+                    }
+                }
+            ');
+            $secondMutation->assertJson([
+                'data' => [
+                    'createUser' => [
+                        'tasks' => [
+                            [
+                                'name' => 'barTask',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        } catch (\Exception $exception) {
+            dump('it fails but just the query, the user was created');
+        }
+
+        $this->assertDatabaseHas('users', ['name' => 'bar']);
+    }
 }
