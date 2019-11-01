@@ -523,6 +523,7 @@ input UpdateAuthorRelation {
   update: [UpdateAuthorInput!]
   upsert: [UpsertAuthorInput!]
   sync: [ID!]
+  syncWithoutDetaching: [ID!]
   delete: [ID!]
   disconnect: [ID!]
 }

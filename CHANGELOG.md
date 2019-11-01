@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `@scope` directive for adding a scope to the query builder https://github.com/nuwave/lighthouse/pull/998
+- Add `syncWithoutDetaching` option for BelongsToMany relationships
 
 ### Changed
 
