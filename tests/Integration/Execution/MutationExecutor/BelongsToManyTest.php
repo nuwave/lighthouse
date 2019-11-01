@@ -133,8 +133,8 @@ class BelongsToManyTest extends DBTestCase
                     'users' => [
                         [
                             'id' => '2',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 'updateRole' => [
                     'id' => '1',
@@ -144,9 +144,9 @@ class BelongsToManyTest extends DBTestCase
                         ],
                         [
                             'id' => '2',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ]);
     }
