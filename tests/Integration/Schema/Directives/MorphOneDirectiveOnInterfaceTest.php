@@ -91,6 +91,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                 name
                 creator {
                     ... on Person {
+                        __typename
                         id
                         user {
                             id
@@ -108,6 +109,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                         'id' => (string) $this->color1->id,
                         'name' => $this->color1->name,
                         'creator' => [
+                            '__typename' => 'Employee',
                             'id' => (string) $this->employee->id,
                             'user' => [
                                 'id' => (string) $this->employee->user->id,
@@ -120,6 +122,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                         'id' => (string) $this->color2->id,
                         'name' => $this->color2->name,
                         'creator' => [
+                            '__typename' => 'Contractor',
                             'id' => (string) $this->contractor->id,
                             'user' => [
                                 'id' => (string) $this->contractor->user->id,
