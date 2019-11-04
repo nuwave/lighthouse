@@ -31,7 +31,7 @@ class LaravelEnumTypeTest extends TestCase
         $this->assertSame($customName, $enumType->name);
     }
 
-    public function testCustomDescription()
+    public function testCustomDescription(): void
     {
         $enumType = new LaravelEnumType(LocalizedUserType::class);
 
