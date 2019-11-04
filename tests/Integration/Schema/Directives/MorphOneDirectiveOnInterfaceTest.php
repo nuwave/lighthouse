@@ -115,8 +115,8 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                                 'id' => (string) $this->employee->user->id,
                                 'name' => $this->employee->user->name,
                                 'email' => $this->employee->user->email,
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     [
                         'id' => (string) $this->color2->id,
@@ -128,9 +128,9 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                                 'id' => (string) $this->contractor->user->id,
                                 'name' => $this->contractor->user->name,
                                 'email' => $this->contractor->user->email,
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ]);
