@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Support\DataLoader;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderTest extends DBTestCase
 {

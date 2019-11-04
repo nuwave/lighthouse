@@ -1,9 +1,9 @@
 <?php
 
-use Tests\Utils\Models\Post;
-use Tests\Utils\Models\User;
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Post;
+use Tests\Utils\Models\User;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Comment::class, function (Faker $faker): array {

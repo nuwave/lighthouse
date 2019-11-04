@@ -2,13 +2,13 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Mockery;
-use Tests\DBTestCase;
-use Mockery\MockInterface;
-use Tests\Utils\Models\Post;
-use Laravel\Scout\EngineManager;
 use Illuminate\Support\Collection;
+use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
+use Mockery;
+use Mockery\MockInterface;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 
 class SearchDirectiveTest extends DBTestCase
 {

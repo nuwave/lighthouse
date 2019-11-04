@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
-use Tests\Utils\Middleware\CountRuns;
-use Tests\Utils\Middleware\Authenticate;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Tests\TestCase;
+use Tests\Utils\Middleware\Authenticate;
+use Tests\Utils\Middleware\CountRuns;
 
 class MiddlewareDirectiveTest extends TestCase
 {

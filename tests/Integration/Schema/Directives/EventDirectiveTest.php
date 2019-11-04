@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Support\Facades\Event;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
-use Illuminate\Support\Facades\Event;
 
 class EventDirectiveTest extends DBTestCase
 {

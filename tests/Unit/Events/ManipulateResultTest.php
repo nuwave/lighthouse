@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Events;
 
-use Tests\TestCase;
-use Tests\Utils\Queries\Foo;
 use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Events\ManipulateResult;
+use Tests\TestCase;
+use Tests\Utils\Queries\Foo;
 
 class ManipulateResultTest extends TestCase
 {

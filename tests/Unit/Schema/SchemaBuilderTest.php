@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Schema;
 
-use Tests\TestCase;
-use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
+use Tests\TestCase;
 
 class SchemaBuilderTest extends TestCase
 {

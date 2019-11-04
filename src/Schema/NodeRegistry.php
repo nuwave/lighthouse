@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use GraphQL\Error\Error;
-use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class NodeRegistry

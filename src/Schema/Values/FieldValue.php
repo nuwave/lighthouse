@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class FieldValue

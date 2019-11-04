@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema;
 
-use Tests\TestCase;
 use GraphQL\Type\Definition\Directive;
+use Tests\TestCase;
 
 class ClientDirectiveTest extends TestCase
 {

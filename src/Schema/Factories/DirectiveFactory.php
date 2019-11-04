@@ -2,15 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use GraphQL\Language\AST\Node;
-use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
-use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use GraphQL\Language\AST\Node;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class DirectiveFactory
 {

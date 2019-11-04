@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Schema;
 
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class NodeInterfaceTest extends DBTestCase
 {

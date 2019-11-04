@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Subscriptions;
 
-use Tests\TestCase;
-use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\StorageManager;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\StorageManager;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Tests\TestCase;
 
 class StorageManagerTest extends TestCase
 {

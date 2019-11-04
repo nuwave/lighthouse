@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use Illuminate\Console\Command;
 use HaydenPierce\ClassFinder\ClassFinder;
+use Illuminate\Console\Command;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class IdeHelperCommand extends Command
 {

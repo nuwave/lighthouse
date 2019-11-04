@@ -2,15 +2,15 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\GraphQL;
-use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
-use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
+use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionBroadcaster implements BroadcastsSubscriptions
 {

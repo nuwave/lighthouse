@@ -3,15 +3,15 @@
 namespace Tests\Unit\Schema;
 
 use Closure;
-use Tests\TestCase;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\UnionType;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Type\Definition\InterfaceType;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Tests\TestCase;
 
 class TypeRegistryTest extends TestCase
 {

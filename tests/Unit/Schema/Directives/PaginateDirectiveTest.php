@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Tests\TestCase;
 
 class PaginateDirectiveTest extends TestCase
 {

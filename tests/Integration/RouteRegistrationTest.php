@@ -2,8 +2,8 @@
 
 namespace Tests\Integration;
 
-use Orchestra\Testbench\TestCase;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
+use Orchestra\Testbench\TestCase;
 
 class RouteRegistrationTest extends TestCase
 {

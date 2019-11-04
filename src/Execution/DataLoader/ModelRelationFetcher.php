@@ -3,16 +3,16 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Closure;
-use ReflectionClass;
-use ReflectionMethod;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
+use ReflectionClass;
+use ReflectionMethod;
 
 class ModelRelationFetcher
 {
