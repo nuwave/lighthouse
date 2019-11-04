@@ -28,7 +28,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespaces = config('lighthouse.namespaces.' . $this->namespaceConfigKey());
+        $namespaces = config('lighthouse.namespaces.'.$this->namespaceConfigKey());
 
         return static::commonNamespace((array) $namespaces);
     }
@@ -50,11 +50,11 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     public static function commonNamespace(array $namespaces): string
     {
-        if($namespaces === []) {
+        if ($namespaces === []) {
             return '';
         }
 
-        if(count($namespaces) === 1) {
+        if (count($namespaces) === 1) {
             return reset($namespaces);
         }
 
@@ -67,18 +67,18 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         $last = explode('\\', end($namespaces));
 
         $matching = [];
-        foreach($first as $i => $part) {
+        foreach ($first as $i => $part) {
             // We ran out of elements to compare, so we reached the maximum common length
-            if(!isset($last[$i])) {
+            if (! isset($last[$i])) {
                 break;
             }
 
             // We found an element that differs
-            if($last[$i] !== $part) {
+            if ($last[$i] !== $part) {
                 break;
             }
 
-            $matching []= $part;
+            $matching [] = $part;
         }
 
         return implode('\\', $matching);
