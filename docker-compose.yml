@@ -23,4 +23,4 @@ services:
     working_dir: /app
     ports:
     - 8080:8080
-    entrypoint: /bin/bash -c "echo 'Run `docker-compose exec node bash` followed by `yarn` and `yarn start` to work on the docs.' && tail -F /dev/null"
+    command: /bin/bash -c "yarn && yarn start"
