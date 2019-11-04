@@ -83,7 +83,8 @@
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",
         "test:integration": "phpunit --colors=always --testsuite Integration",
-        "test:unit": "phpunit --colors=always --testsuite Unit"
+        "test:unit": "phpunit --colors=always --testsuite Unit",
+        "test:bug": "phpunit --colors=always tests/Integration/Schema/Directives/MorphOneDirectiveOnInterfaceTest.php"
     },
     "support": {
         "issues": "https://github.com/nuwave/lighthouse/issues",
