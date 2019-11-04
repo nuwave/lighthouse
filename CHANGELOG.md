@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class  https://github.com/nuwave/lighthouse/pull/1027
 
+### Fixed
+
+- Handle arrays of namespaces in generator commands https://github.com/nuwave/lighthouse/pull/1033
+
 ## [4.5.3](https://github.com/nuwave/lighthouse/compare/v4.5.2...v4.5.3)
 
 ### Fixed
