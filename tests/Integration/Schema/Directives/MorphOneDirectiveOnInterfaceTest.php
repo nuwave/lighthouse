@@ -84,7 +84,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL('
         {
             colors {
                 id
@@ -102,7 +102,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'colors' => [
                     [
