@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Using description of LaravelEnumType for more detail https://github.com/nuwave/lighthouse/pull/1027
+- Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class  https://github.com/nuwave/lighthouse/pull/1027
 
 ## [4.5.3](https://github.com/nuwave/lighthouse/compare/v4.5.2...v4.5.3)
 
