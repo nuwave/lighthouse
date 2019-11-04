@@ -41,7 +41,7 @@ class LaravelEnumType extends EnumType
                 function (Enum $enum): array {
                     return [
                         'name' => $enum->key,
-                        'value' => $enum->value,
+                        'value' => $enum,
                         'description' => $enum->description,
                     ];
                 },
