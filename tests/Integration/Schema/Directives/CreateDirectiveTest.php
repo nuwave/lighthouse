@@ -443,18 +443,20 @@ class CreateDirectiveTest extends DBTestCase
 
         try {
             $secondMutation = $this->graphQL('
-                mutation {
-                    createUser(input: {
-                        name: "bar"
-                        tasks: {
-                            create: [{
-                                name: "barTask"
-                            }]
-                        }
-                    }) {
+            mutation {
+                createUser(input: {
+                    name: "bar"
+                    tasks: {
+                        create: [{
+                            name: "barTask"
+                        }]
+                    }
+                }) {
+                    tasks {
                         name
                     }
                 }
+            }
             ');
             $secondMutation->assertJson([
                 'data' => [
