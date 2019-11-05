@@ -2,12 +2,12 @@
 
 namespace Tests\Integration\Subscriptions\Broadcast;
 
-use Tests\DBTestCase;
 use Mockery\MockInterface;
-use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
 
 class BroadcastDBTest extends DBTestCase
 {

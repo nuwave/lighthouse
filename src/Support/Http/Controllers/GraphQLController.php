@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use Nuwave\Lighthouse\GraphQL;
-use Illuminate\Routing\Controller;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
-use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 
 class GraphQLController extends Controller
 {

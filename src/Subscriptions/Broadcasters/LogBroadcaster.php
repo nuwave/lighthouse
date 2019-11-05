@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
-use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class LogBroadcaster implements Broadcaster
 {

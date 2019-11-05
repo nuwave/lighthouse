@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Source;
 
-use Tests\TestCase;
-use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
-use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use League\Flysystem\Filesystem;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Tests\TestCase;
 
 class SchemaSourceProviderTest extends TestCase
 {

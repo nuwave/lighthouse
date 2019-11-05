@@ -2,15 +2,15 @@
 
 namespace Tests\Unit\Subscriptions;
 
-use Tests\TestCase;
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
-use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Tests\TestCase;
 
 class BroadcastManagerTest extends TestCase
 {

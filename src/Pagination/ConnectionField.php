@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
-use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ConnectionField
 {

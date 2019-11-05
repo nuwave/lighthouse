@@ -3,19 +3,19 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Deferred;
-use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Pagination\PaginationType;
-use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Pagination\PaginationManipulator;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
+use Nuwave\Lighthouse\Pagination\PaginationType;
+use Nuwave\Lighthouse\Pagination\PaginationUtils;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 abstract class RelationDirective extends BaseDirective
 {

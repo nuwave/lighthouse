@@ -3,16 +3,16 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Language\AST\Node;
-use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Language\AST\DirectiveNode;
-use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 
 abstract class BaseDirective implements Directive
 {

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class SingleResponse implements CreatesResponse
 {

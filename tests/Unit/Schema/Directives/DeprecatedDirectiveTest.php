@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
-use Illuminate\Support\Arr;
-use Tests\Utils\Resolvers\Foo;
 use GraphQL\Type\Definition\Directive;
+use Illuminate\Support\Arr;
+use Tests\TestCase;
+use Tests\Utils\Resolvers\Foo;
 
 class DeprecatedDirectiveTest extends TestCase
 {

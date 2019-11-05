@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
-use Tests\Utils\Models\Comment;
-use Illuminate\Database\Eloquent\Builder;
 
 class PaginateDirectiveDBTest extends DBTestCase
 {

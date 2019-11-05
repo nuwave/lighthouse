@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Console;
 
-use Tests\TestCase;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
+use Tests\TestCase;
 
 class IdeHelperCommandTest extends TestCase
 {

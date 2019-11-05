@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class PaginatorField
 {

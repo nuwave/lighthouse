@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use Nuwave\Lighthouse\GraphQL;
-use Illuminate\Console\Command;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Cache\Repository;
+use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Nuwave\Lighthouse\GraphQL;
 
 class PrintSchemaCommand extends Command
 {

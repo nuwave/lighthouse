@@ -2,22 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use Carbon\Carbon;
+use Closure;
 use GraphQL\Deferred;
-use Illuminate\Cache\CacheManager;
-use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Language\AST\NonNullTypeNode;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Cache\CacheManager;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {

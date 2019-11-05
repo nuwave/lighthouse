@@ -1,7 +1,7 @@
 <?php
 
-use Tests\Utils\Models\ACL;
 use Faker\Generator as Faker;
+use Tests\Utils\Models\ACL;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(ACL::class, function (Faker $faker): array {
