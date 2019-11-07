@@ -12,14 +12,21 @@ class ResolveNested implements ArgumentResolver
     protected $previous;
 
     /**
+     * @var callable
+     */
+    protected $argPartitioner;
+
+    /**
      * ArgResolver constructor.
      *
      * @param  callable|\Nuwave\Lighthouse\Execution\ArgumentResolver|null  $previous
+     * @param  callable|null  $argPartitioner
      * @return void
      */
-    public function __construct(callable $previous = null)
+    public function __construct(callable $previous = null, callable $argPartitioner = null)
     {
         $this->previous = $previous;
+        $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'nestedArgumentResolvers'];
     }
 
     /**
@@ -29,7 +36,7 @@ class ResolveNested implements ArgumentResolver
      */
     public function __invoke($root, $args)
     {
-        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgumentResolvers($args, $root);
+        [$nestedArgs, $regularArgs] = ($this->argPartitioner)($args, $root);
 
         if ($this->previous) {
             $root = ($this->previous)($root, $regularArgs);
