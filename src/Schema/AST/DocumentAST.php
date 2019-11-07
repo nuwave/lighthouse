@@ -3,15 +3,15 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use Exception;
-use Serializable;
-use GraphQL\Language\Parser;
 use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\AST\TypeExtensionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
+use Serializable;
 
 class DocumentAST implements Serializable
 {

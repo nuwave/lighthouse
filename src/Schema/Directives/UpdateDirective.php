@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Utils;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
+use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
+use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
+use Nuwave\Lighthouse\Support\Utils;
 
 class UpdateDirective extends MutationExecutorDirective
 {

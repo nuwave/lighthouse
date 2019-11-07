@@ -2,10 +2,10 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Foundation\Testing\TestResponse;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 use Tests\Utils\Scalars\Email;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Illuminate\Foundation\Testing\TestResponse;
 
 class IntrospectionTest extends TestCase
 {

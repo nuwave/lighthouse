@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use Tests\TestCase;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Tests\TestCase;
 
 class ArgumentSetTest extends TestCase
 {

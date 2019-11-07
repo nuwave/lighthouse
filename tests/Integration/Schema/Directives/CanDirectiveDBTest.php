@@ -2,12 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 class CanDirectiveDBTest extends DBTestCase
 {

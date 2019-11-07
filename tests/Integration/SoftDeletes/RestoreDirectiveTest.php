@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\SoftDeletes;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class RestoreDirectiveTest extends DBTestCase
 {

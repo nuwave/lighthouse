@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class TestingServiceProvider extends ServiceProvider

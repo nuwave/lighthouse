@@ -2,18 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Utils\AST;
-use GraphQL\Language\Parser;
-use GraphQL\Language\AST\Node;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Language\AST\NodeList;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ValueNode;
+use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Utils\AST;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 

@@ -3,10 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
 use GraphQL\Error\Error;
-use GraphQL\Utils\Utils;
-use Illuminate\Http\UploadedFile;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Utils\Utils;
+use Illuminate\Http\UploadedFile;
 
 class Upload extends ScalarType
 {

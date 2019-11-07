@@ -2,12 +2,12 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Tests\SerializingArrayStore;
 use Tests\TestCase;
 use Tests\Utils\Models\Comment;
-use Illuminate\Cache\Repository;
-use Tests\SerializingArrayStore;
-use Illuminate\Cache\CacheManager;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 
 class SchemaCachingTest extends TestCase
 {

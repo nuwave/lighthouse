@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Console;
 
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class UnionDirective implements Directive, DefinedDirective
 {

@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Events;
 
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Tests\Integration\Events\FieldDirective as TestFieldDirective;
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Tests\Integration\Events\FieldDirective as TestFieldDirective;
 
 class RegisterDirectiveNamespacesTest extends TestCase
 {

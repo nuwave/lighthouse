@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\SoftDeletes;
 
-use Tests\DBTestCase;
-use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
 
 class ForceDeleteDirectiveTest extends DBTestCase
 {

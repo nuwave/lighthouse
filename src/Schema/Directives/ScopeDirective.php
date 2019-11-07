@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use BadMethodCallException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ScopeDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {

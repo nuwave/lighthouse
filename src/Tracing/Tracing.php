@@ -4,13 +4,13 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\Execution\ExtensionsResponse;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class Tracing
 {

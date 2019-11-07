@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\DBTestCase;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
+use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;

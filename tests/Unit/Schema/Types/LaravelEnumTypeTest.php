@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Types;
 
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\Utils\LaravelEnums\UserType;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use PHPUnit\Framework\Constraint\Callback;
-use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
 class LaravelEnumTypeTest extends TestCase
 {

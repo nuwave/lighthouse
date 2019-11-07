@@ -2,13 +2,13 @@
 
 namespace Tests\Integration\Schema\Types;
 
+use GraphQL\Type\Definition\Type;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
-use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class InterfaceTest extends DBTestCase
 {

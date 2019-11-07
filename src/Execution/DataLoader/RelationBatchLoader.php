@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Collection;
 
 class RelationBatchLoader extends BatchLoader
 {

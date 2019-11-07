@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class ScopeDirectiveTest extends DBTestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Execution\ArgumentResolver;
 
 class NestedOneToMany implements ArgumentResolver
 {

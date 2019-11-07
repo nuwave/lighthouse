@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use Tests\TestCase;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Tests\TestCase;
 
 class ASTHelperTest extends TestCase
 {

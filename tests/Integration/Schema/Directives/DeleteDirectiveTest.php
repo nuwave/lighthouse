@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class DeleteDirectiveTest extends DBTestCase
 {

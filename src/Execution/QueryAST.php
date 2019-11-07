@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use GraphQL\Language\Parser;
-use GraphQL\Language\AST\Node;
-use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\Parser;
+use Illuminate\Support\Collection;
 
 class QueryAST
 {

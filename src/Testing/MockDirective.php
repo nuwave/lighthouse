@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class MockDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {

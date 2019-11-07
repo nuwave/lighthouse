@@ -3,10 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
