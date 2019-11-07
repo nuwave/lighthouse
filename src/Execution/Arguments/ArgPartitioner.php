@@ -154,7 +154,7 @@ class ArgPartitioner
      * @param  \Closure  $predicate
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
-    protected static function partition(ArgumentSet $argumentSet, \Closure $predicate)
+    public static function partition(ArgumentSet $argumentSet, \Closure $predicate)
     {
         $matched = new ArgumentSet();
         $notMatched = new ArgumentSet();
@@ -181,7 +181,7 @@ class ArgPartitioner
      * @param  string  $relationClass
      * @return bool
      */
-    protected static function methodReturnsRelation(
+    public static function methodReturnsRelation(
         ReflectionClass $modelReflection,
         string $name,
         string $relationClass
