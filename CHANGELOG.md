@@ -5,11 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.5.3...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.6.0...master)
+
+## [4.6.0](https://github.com/nuwave/lighthouse/compare/v4.5.3...v4.6.0)
 
 ### Added
 
 - Add `@scope` directive for adding a scope to the query builder https://github.com/nuwave/lighthouse/pull/998
+
+### Changed
+
+- Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class  https://github.com/nuwave/lighthouse/pull/1027
+
+### Fixed
+
+- Handle arrays of namespaces in generator commands https://github.com/nuwave/lighthouse/pull/1033
 
 ## [4.5.3](https://github.com/nuwave/lighthouse/compare/v4.5.2...v4.5.3)
 
