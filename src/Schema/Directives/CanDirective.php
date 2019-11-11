@@ -86,7 +86,7 @@ SDL;
                             ->argumentSet
                             ->enhanceBuilder(
                                 $this->getModelClass()::query(),
-                                $this->directiveArgValue('scopes', []),
+                                [],
                                 function (Directive $directive): bool {
                                     return $directive instanceof TrashedDirective;
                                 }
