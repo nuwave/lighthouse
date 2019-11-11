@@ -82,7 +82,7 @@ SDL;
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
                     if ($find = $this->directiveArgValue('find')) {
-                    $modelOrModels = $resolveInfo
+                        $modelOrModels = $resolveInfo
                             ->argumentSet
                             ->enhanceBuilder(
                                 $this->getModelClass()::query(),
