@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.6.0...master)
 
+### Changed
+
+- Add ability to fetch soft deleted model within `@can` directive to validate permission using `@softDeletes` directive. https://github.com/nuwave/lighthouse/pull/1042
+
 ## [4.6.0](https://github.com/nuwave/lighthouse/compare/v4.5.3...v4.6.0)
 
 ### Added

@@ -481,8 +481,8 @@ directive @can(
 
 ### Examples
 
-You may specify an argument that is used to find a specific model
-instance against which the permissions should be checked.
+In `find` parameter you may specify an input argument which is used to find a specific model
+instance by primary key against which the permissions should be checked.
 
 ```graphql
 type Query {
@@ -497,6 +497,14 @@ class PostPolicy
     {
         return $user->id === $post->author_id;
     }
+}
+```
+
+It also works with soft deleted models in combination with `@softDeletes` directive.
+
+```graphql
+type Query {
+    post(id: ID @eq): Post @softDeletes @can(ability: "view", find: "id")
 }
 ```
 
