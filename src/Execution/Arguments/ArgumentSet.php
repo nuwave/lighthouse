@@ -77,12 +77,20 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  string[]  $scopes
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param string[] $scopes
+     * @param \Closure $directiveFilter
+     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function enhanceBuilder($builder, array $scopes)
+    public function enhanceBuilder($builder, array $scopes, $directiveFilter = null)
     {
+        if (empty($directiveFilter)) {
+            $directiveFilter = function (Directive $directive): bool {
+                return $directive instanceof ArgBuilderDirective;
+            };
+        }
+
         foreach ($this->arguments as $argument) {
             $value = $argument->toPlain();
 
@@ -94,9 +102,7 @@ class ArgumentSet
 
             $argument
                 ->directives
-                ->filter(function (Directive $directive): bool {
-                    return $directive instanceof ArgBuilderDirective;
-                })
+                ->filter($directiveFilter)
                 ->each(function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value) {
                     $builder = $argBuilderDirective->handleBuilder($builder, $value);
                 });
