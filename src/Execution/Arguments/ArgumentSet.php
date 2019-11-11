@@ -83,7 +83,7 @@ class ArgumentSet
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function enhanceBuilder($builder, array $scopes, $directiveFilter = null)
+    public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
         if (empty($directiveFilter)) {
             $directiveFilter = function (Directive $directive): bool {
