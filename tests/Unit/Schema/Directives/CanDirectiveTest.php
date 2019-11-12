@@ -161,8 +161,8 @@ class CanDirectiveTest extends TestCase
         $this->be(new User);
         $this->schema = '
         type Query {
-            users(key1: String, key2: String, key3: String): [User]!
-                @can(ability:"severalArgs", input: true)
+            user(foo: String): User!
+                @can(ability:"severalArgs", injectArgs: true)
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
@@ -171,24 +171,20 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $variables = [
-            'key1' => 'foo',
-            'key2' => 'foo2',
-            'key3' => 'foo3',
-        ];
 
-        $this->postGraphQL(
-            [
-                'operationName' => 'Users',
-                'query' => 'query Users($key1: String, $key2: String, $key3: String) {
-                                users(key1: $key1, key2: $key2, key3: $key3) {
-                                    name
-                                }
-                            }
-                            ',
-                'variables' => $variables,
-            ]
-        )->assertOk();
+        $this->graphQL('
+        {
+            user(foo: "bar"){
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
     }
 
     public function resolveUser(): User

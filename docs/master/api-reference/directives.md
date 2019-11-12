@@ -531,11 +531,11 @@ type Mutation {
 }
 ```
 
-You can pass the input variables as arguments to the policy setting `input` argument
+You can pass the input variables as arguments to the policy setting `injectArgs` argument
 ```graphql
 type Mutation {
     createPost(input: PostInput): Post
-        @can(ability: "create", input: "true")
+        @can(ability: "create", injectArgs: "true")
 }
 ```
 Now you will have access to `PostInput` values in the policy 

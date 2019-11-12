@@ -68,11 +68,11 @@ directive @can(
   Additional arguments that are passed to `Gate::check`. 
   """
   args: [String!]
-    """
+  """
   Send input data as arguments to the policy. 
   Set false by default
   """
-  input: Boolean!
+  injectArgs: Boolean!
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -158,8 +158,9 @@ SDL;
     protected function getAdditionalArguments(): array
     {
         $directiveArgs = (array) $this->directiveArgValue('args');
-        $inputArgs = $this->directiveArgValue('input') === true ? [$this->args] : [];
-
+        $inputArgs = $this->directiveArgValue('injectArgs') === true
+            ? [$this->args]
+            : [];
         return array_merge($directiveArgs, $inputArgs);
     }
 }

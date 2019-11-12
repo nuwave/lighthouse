@@ -35,6 +35,6 @@ class UserPolicy
 
     public function severalArgs($user, array $input): bool
     {
-        return $input['key1'] === 'foo' && $input['key2'] === 'foo2' && $input['key2'] === 'foo3';
+        return $input['foo'] === 'bar';
     }
 }
