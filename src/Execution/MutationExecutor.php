@@ -86,6 +86,10 @@ class MutationExecutor
                 $relation->sync($nestedOperations['sync']);
             }
 
+            if (isset($nestedOperations['syncWithoutDetaching'])) {
+                $relation->syncWithoutDetaching($nestedOperations['syncWithoutDetaching']);
+            }
+
             if (isset($nestedOperations['create'])) {
                 self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
@@ -242,6 +246,10 @@ class MutationExecutor
 
             if (isset($nestedOperations['sync'])) {
                 $relation->sync($nestedOperations['sync']);
+            }
+
+            if (isset($nestedOperations['syncWithoutDetaching'])) {
+                $relation->syncWithoutDetaching($nestedOperations['syncWithoutDetaching']);
             }
 
             if (isset($nestedOperations['create'])) {
