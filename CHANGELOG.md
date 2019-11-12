@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `syncWithoutDetaching` option for BelongsToMany relationships https://github.com/nuwave/lighthouse/pull/1031
+- Add `syncWithoutDetaching` option for BelongsToMany and MorphToMany relationships https://github.com/nuwave/lighthouse/pull/1031
 
 ### Changed
 
