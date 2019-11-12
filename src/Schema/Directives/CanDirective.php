@@ -159,7 +159,7 @@ SDL;
     {
         $directiveArgs = (array) $this->directiveArgValue('args');
         $inputArgs = $this->directiveArgValue('input') === true ? [$this->args] : [];
-        
+
         return array_merge($directiveArgs, $inputArgs);
     }
 }
