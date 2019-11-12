@@ -476,6 +476,10 @@ directive @can(
   Additional arguments that are passed to `Gate::check`. 
   """
   args: [String!]
+  """
+  Pass input variables as arguments that are passed to `Gate::check`. 
+  """
+  input: Boolean!
 ) on FIELD_DEFINITION
 ```
 
@@ -526,6 +530,15 @@ type Mutation {
         @can(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
+
+You can pass the input variables as arguments to the policy setting `input` argument
+```graphql
+type Mutation {
+    createPost(input: PostInput): Post
+        @can(ability: "create", input: "true")
+}
+```
+Now you will have access to `PostInput` values in the policy 
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
 Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.

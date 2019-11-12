@@ -141,7 +141,7 @@ class CanDirectiveTest extends TestCase
                 @can(ability: "dependingOnArg", args: [false])
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
-        
+
         type User {
             name: String
         }
@@ -154,6 +154,41 @@ class CanDirectiveTest extends TestCase
             }
         }
         ')->assertErrorCategory(AuthorizationException::CATEGORY);
+    }
+
+    public function testSendInputArgumentToPolicy(): void
+    {
+        $this->be(new User);
+        $this->schema = '
+        type Query {
+            users(key1: String, key2: String, key3: String): [User]!
+                @can(ability:"severalArgs", input: true)
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+        }
+        
+        type User {
+            name: String
+        }
+        ';
+
+        $variables = [
+            'key1' => 'foo',
+            'key2' => 'foo2',
+            'key3' => 'foo3',
+        ];
+
+        $this->postGraphQL(
+            [
+                'operationName' => 'Users',
+                'query' => 'query Users($key1: String, $key2: String, $key3: String) {
+                                users(key1: $key1, key2: $key2, key3: $key3) {
+                                    name
+                                }
+                            }
+                            ',
+                'variables' => $variables,
+            ]
+        )->assertOk();
     }
 
     public function resolveUser(): User

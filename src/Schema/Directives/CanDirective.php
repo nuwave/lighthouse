@@ -22,6 +22,11 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
     protected $gate;
 
     /**
+     * @var array
+     */
+    protected $args;
+
+    /**
      * CanDirective constructor.
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
@@ -63,6 +68,11 @@ directive @can(
   Additional arguments that are passed to `Gate::check`. 
   """
   args: [String!]
+    """
+  Send input data as arguments to the policy. 
+  Set false by default
+  """
+  input: Boolean!
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -81,6 +91,7 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+                    $this->args = $args;
                     if ($find = $this->directiveArgValue('find')) {
                         $modelOrModels = $resolveInfo
                             ->argumentSet
@@ -146,6 +157,9 @@ SDL;
      */
     protected function getAdditionalArguments(): array
     {
-        return (array) $this->directiveArgValue('args');
+        $directiveArgs = (array) $this->directiveArgValue('args');
+        $inputArgs = $this->directiveArgValue('input') === true ? [$this->args] : [];
+        
+        return array_merge($directiveArgs, $inputArgs);
     }
 }
