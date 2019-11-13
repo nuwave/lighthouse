@@ -46,7 +46,7 @@ class ResolverProvider implements ProvidesResolver
                 $proposedResolverClass = ucfirst($fieldName);
 
                 throw new DefinitionException(<<<MESSAGE
-Could not locate a default resolver for the {$parent}: {$fieldName}.
+Could not locate a field resolver for the {$parent}: {$fieldName}.
 
 Either add a resolver directive such as @all, @find or @create or add
 a resolver class through:
