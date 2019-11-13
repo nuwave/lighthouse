@@ -39,8 +39,22 @@ class ResolverProvider implements ProvidesResolver
             }
 
             if (! $resolverClass) {
-                throw new DefinitionException(
-                    "Could not locate a default resolver for the field {$fieldValue->getFieldName()}"
+                // Since we already know we are on the root type, this is either
+                // query, mutation or subscription
+                $parent = $fieldValue->getParentName();
+                $fieldName = $fieldValue->getFieldName();
+                $proposedResolverClass = ucfirst($fieldName);
+
+                throw new DefinitionException(<<<MESSAGE
+Could not locate a default resolver for the {$parent}: {$fieldName}.
+
+Either add a resolver directive such as @all, @find or @create or add
+a resolver class through:
+
+php artisan lighthouse:{$parent} {$proposedResolverClass}
+
+MESSAGE
+
                 );
             }
         }
