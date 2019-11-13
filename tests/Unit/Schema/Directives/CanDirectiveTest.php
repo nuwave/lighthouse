@@ -171,8 +171,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(foo: "bar"){
                 name
@@ -206,8 +205,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(foo: "dynamic"){
                 name
