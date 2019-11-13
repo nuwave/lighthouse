@@ -187,6 +187,37 @@ class CanDirectiveTest extends TestCase
         ]);
     }
 
+    public function testWithArgsAndInjectArgsTogether(): void
+    {
+        $this->be(new User);
+        $this->schema = '
+        type Query {
+            user(foo: String): User!
+                @can(ability: "argsWithInjectedArgs", args: [{ argFoo: "argBar" }], injectArgs: true)
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+        }
+        
+        type User {
+            name: String
+        }
+        ';
+
+
+        $this->graphQL('
+        {
+            user(foo: "bar"){
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
     public function resolveUser(): User
     {
         $user = new User;

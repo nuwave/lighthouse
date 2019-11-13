@@ -72,7 +72,7 @@ directive @can(
   Send input data as arguments to the policy. 
   Set false by default
   """
-  injectArgs: Boolean!
+  injectArgs: Boolean = false
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -158,9 +158,10 @@ SDL;
     protected function getAdditionalArguments(): array
     {
         $directiveArgs = (array) $this->directiveArgValue('args');
-        $inputArgs = $this->directiveArgValue('injectArgs') === true
-            ? [$this->args]
+        $injectedArgs = $this->directiveArgValue('injectArgs') === true
+            ? $this->args
             : [];
-        return array_merge($directiveArgs, $inputArgs);
+        array_unshift($directiveArgs, $injectedArgs);
+        return $directiveArgs;
     }
 }

@@ -33,8 +33,13 @@ class UserPolicy
         return $pass;
     }
 
-    public function severalArgs($user, array $input): bool
+    public function severalArgs($user, array $injectedArgs): bool
     {
-        return $input['foo'] === 'bar';
+        return $injectedArgs['foo'] === 'bar';
+    }
+
+    public function argsWithInjectedArgs($user, array $injectedArgs, array $args): bool
+    {
+        return $args['argFoo'] === 'argBar' && $injectedArgs['foo'] === 'bar';
     }
 }
