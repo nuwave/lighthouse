@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 
 if ($routeConfig = config('lighthouse.route')) {
-    /** @var \Illuminate\Contracts\Routing\Registrar $router */
+    /** @var \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router $router */
     $router = app('router');
 
     $method = 'addRoute';
@@ -14,8 +14,11 @@ if ($routeConfig = config('lighthouse.route')) {
     $actions = [
         'as' => $routeConfig['name'] ?? 'graphql',
         'uses' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class.'@query',
-        'middleware' => $routeConfig['middleware'],
     ];
+
+    if (isset($routeConfig['middleware'])) {
+        $actions['middleware'] = $routeConfig['middleware'];
+    }
 
     if (isset($routeConfig['prefix'])) {
         $actions['prefix'] = $routeConfig['prefix'];

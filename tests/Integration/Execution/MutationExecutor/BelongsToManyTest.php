@@ -24,6 +24,7 @@ class BelongsToManyTest extends DBTestCase
         createRole(input: CreateRoleInput! @spread): Role @create
         updateRole(input: UpdateRoleInput! @spread): Role @update
         upsertRole(input: UpsertRoleInput! @spread): Role @upsert
+        createUser(input: CreateUserInput! @spread): User @create
     }
 
     input CreateRoleInput {
@@ -55,6 +56,7 @@ class BelongsToManyTest extends DBTestCase
         delete: [ID!]
         connect: [ID!]
         sync: [ID!]
+        syncWithoutDetaching: [ID!]
         disconnect: [ID!]
     }
     
@@ -84,6 +86,70 @@ class BelongsToManyTest extends DBTestCase
         name: String
     }
     '.self::PLACEHOLDER_QUERY;
+
+    public function testCanSyncWithoutDetaching(): void
+    {
+        $this->graphQL('
+        mutation {
+            createUser(input: {
+                name: "user1"
+            }) {
+                id
+            }
+            createRole(input: {
+                name: "foobar"
+                users: {
+                    create: [
+                        {
+                            name: "user2"
+                        }
+                    ]
+                }
+            }) {
+                id
+                users {
+                    id
+                }
+            }
+            updateRole(input: {
+                id: 1
+                users: {
+                    syncWithoutDetaching: [1]
+                }
+            }) {
+                id
+                users {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'id' => '1',
+                ],
+                'createRole' => [
+                    'id' => '1',
+                    'users' => [
+                        [
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+                'updateRole' => [
+                    'id' => '1',
+                    'users' => [
+                        [
+                            'id' => '1',
+                        ],
+                        [
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 
     public function testCanCreateWithNewBelongsToMany(): void
     {

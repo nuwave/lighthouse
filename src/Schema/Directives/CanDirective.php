@@ -8,7 +8,9 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -80,7 +82,16 @@ SDL;
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
                     if ($find = $this->directiveArgValue('find')) {
-                        $modelOrModels = $this->getModelClass()::findOrFail($args[$find]);
+                        $modelOrModels = $resolveInfo
+                            ->argumentSet
+                            ->enhanceBuilder(
+                                $this->getModelClass()::query(),
+                                [],
+                                function (Directive $directive): bool {
+                                    return $directive instanceof TrashedDirective;
+                                }
+                            )
+                            ->findOrFail($args[$find]);
 
                         if ($modelOrModels instanceof Model) {
                             $modelOrModels = [$modelOrModels];
