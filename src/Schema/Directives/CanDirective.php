@@ -152,7 +152,7 @@ SDL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        if (!$gate->check($ability, $arguments)) {
+        if (! $gate->check($ability, $arguments)) {
             throw new AuthorizationException(
                 "You are not authorized to access {$this->definitionNode->name->value}"
             );
@@ -170,12 +170,12 @@ SDL;
         $checkArguments = [];
 
         // The injected args come before the static args
-        if($this->directiveArgValue('injectArgs')) {
-            $checkArguments []= $args;
+        if ($this->directiveArgValue('injectArgs')) {
+            $checkArguments [] = $args;
         }
 
-        if($this->directiveHasArgument('args')) {
-            $checkArguments []= $this->directiveArgValue('args');
+        if ($this->directiveHasArgument('args')) {
+            $checkArguments [] = $this->directiveArgValue('args');
         }
 
         return $checkArguments;

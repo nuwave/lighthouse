@@ -159,7 +159,7 @@ class CanDirectiveTest extends TestCase
     public function testInjectArgsPassesClientArgumentToPolicy(): void
     {
         $this->be(new User);
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /* @lang GraphQL */'
         type Query {
             user(foo: String): User!
                 @can(ability:"injectArgs", injectArgs: true)
@@ -190,7 +190,7 @@ class CanDirectiveTest extends TestCase
     public function testInjectedArgsAndStaticArgs(): void
     {
         $this->be(new User);
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /* @lang GraphQL */'
         type Query {
             user(foo: String): User!
                 @can(
