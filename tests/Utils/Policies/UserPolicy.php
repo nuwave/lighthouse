@@ -33,13 +33,14 @@ class UserPolicy
         return $pass;
     }
 
-    public function severalArgs($user, array $injectedArgs): bool
+    public function injectArgs($user, array $injectedArgs): bool
     {
-        return $injectedArgs['foo'] === 'bar';
+        return $injectedArgs === ['foo' => 'bar'];
     }
 
-    public function argsWithInjectedArgs($user, array $injectedArgs, array $args): bool
+    public function argsWithInjectedArgs($user, array $injectedArgs, array $staticArgs): bool
     {
-        return $args['argFoo'] === 'argBar' && $injectedArgs['foo'] === 'bar';
+        return $injectedArgs === ['foo' => 'dynamic']
+            && $staticArgs === ['foo' => 'static'];
     }
 }

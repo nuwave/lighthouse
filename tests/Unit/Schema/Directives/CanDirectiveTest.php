@@ -141,7 +141,7 @@ class CanDirectiveTest extends TestCase
                 @can(ability: "dependingOnArg", args: [false])
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
-
+        
         type User {
             name: String
         }
@@ -156,13 +156,13 @@ class CanDirectiveTest extends TestCase
         ')->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
-    public function testSendInputArgumentToPolicy(): void
+    public function testInjectArgsPassesClientArgumentToPolicy(): void
     {
         $this->be(new User);
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */'
         type Query {
             user(foo: String): User!
-                @can(ability:"severalArgs", injectArgs: true)
+                @can(ability:"injectArgs", injectArgs: true)
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
@@ -187,13 +187,17 @@ class CanDirectiveTest extends TestCase
         ]);
     }
 
-    public function testWithArgsAndInjectArgsTogether(): void
+    public function testInjectedArgsAndStaticArgs(): void
     {
         $this->be(new User);
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */'
         type Query {
             user(foo: String): User!
-                @can(ability: "argsWithInjectedArgs", args: [{ argFoo: "argBar" }], injectArgs: true)
+                @can(
+                    ability: "argsWithInjectedArgs"
+                    args: { foo: "static" }
+                    injectArgs: true
+                )
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
@@ -205,7 +209,7 @@ class CanDirectiveTest extends TestCase
 
         $this->graphQL('
         {
-            user(foo: "bar"){
+            user(foo: "dynamic"){
                 name
             }
         }
