@@ -479,7 +479,7 @@ directive @can(
   """
   Pass input variables as arguments that are passed to `Gate::check`. 
   """
-  input: Boolean!
+  injectArgs: Boolean!
 ) on FIELD_DEFINITION
 ```
 
