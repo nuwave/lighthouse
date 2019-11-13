@@ -32,6 +32,12 @@ class NestedManyToMany implements ArgumentResolver
             );
         }
 
+        if (isset($args->arguments['syncWithoutDetaching'])) {
+            $relation->syncWithoutDetaching(
+                $args->arguments['syncWithoutDetaching']->toPlain()
+            );
+        }
+
         NestedOneToMany::createUpdateUpsert($args, $relation);
 
         if (isset($args->arguments['delete'])) {
