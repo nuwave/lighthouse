@@ -41,7 +41,7 @@ class ResolverProvider implements ProvidesResolver
             if (! $resolverClass) {
                 // Since we already know we are on the root type, this is either
                 // query, mutation or subscription
-                $parent = $fieldValue->getParentName();
+                $parent = lcfirst($fieldValue->getParentName());
                 $fieldName = $fieldValue->getFieldName();
                 $proposedResolverClass = ucfirst($fieldName);
 
