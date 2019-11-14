@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -46,6 +47,9 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
         return /* @lang GraphQL */ <<<'SDL'
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+When `injectArgs` and `args` are used together, the client given
+arguments will be passed before the static args.
 """
 directive @can(
   """
@@ -58,11 +62,19 @@ directive @can(
   instance against which the permissions should be checked.
   """
   find: String
+
+  """
+  Pass along the client given input data as arguments to `Gate::check`. 
+  """
+  injectArgs: Boolean = false
+
+  """
+  Statically defined arguments that are passed to `Gate::check`.
   
+  You may pass pass arbitrary GraphQL literals,
+  e.g.: [1, 2, 3] or { foo: "bar" }
   """
-  Additional arguments that are passed to `Gate::check`. 
-  """
-  args: [String!]
+  args: Mixed
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -81,58 +93,66 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    if ($find = $this->directiveArgValue('find')) {
-                        $modelOrModels = $resolveInfo
-                            ->argumentSet
-                            ->enhanceBuilder(
-                                $this->getModelClass()::query(),
-                                [],
-                                function (Directive $directive): bool {
-                                    return $directive instanceof TrashedDirective;
-                                }
-                            )
-                            ->findOrFail($args[$find]);
+                    $gate = $this->gate->forUser($context->user());
+                    $ability = $this->directiveArgValue('ability');
+                    $checkArguments = $this->buildCheckArguments($args);
 
-                        if ($modelOrModels instanceof Model) {
-                            $modelOrModels = [$modelOrModels];
-                        }
-
-                        /** @var \Illuminate\Database\Eloquent\Model $model */
-                        foreach ($modelOrModels as $model) {
-                            $this->authorize($context->user(), $model);
-                        }
-                    } else {
-                        $this->authorize($context->user(), $this->getModelClass());
+                    foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
+                        $this->authorize($gate, $ability, $model, $checkArguments);
                     }
 
-                    return call_user_func_array($previousResolver, func_get_args());
+                    return $previousResolver($root, $args, $context, $resolveInfo);
                 }
             )
         );
     }
 
     /**
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  array  $args
+     * @return iterable<Model|string>
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
+    {
+        if ($find = $this->directiveArgValue('find')) {
+            $modelOrModels = $argumentSet
+                ->enhanceBuilder(
+                    $this->getModelClass()::query(),
+                    [],
+                    function (Directive $directive): bool {
+                        return $directive instanceof TrashedDirective;
+                    }
+                )
+                ->findOrFail($args[$find]);
+
+            if ($modelOrModels instanceof Model) {
+                $modelOrModels = [$modelOrModels];
+            }
+
+            return $modelOrModels;
+        }
+
+        return [$this->getModelClass()];
+    }
+
+    /**
+     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
+     * @param  string|string[]  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
+     * @param  array  $arguments
      * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
-    protected function authorize($user, $model): void
+    protected function authorize(Gate $gate, $ability, $model, array $arguments): void
     {
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
-        $arguments = $this->getAdditionalArguments();
         array_unshift($arguments, $model);
 
-        $can = $this->gate
-            ->forUser($user)
-            ->check(
-                $this->directiveArgValue('ability'),
-                $arguments
-            );
-
-        if (! $can) {
+        if (! $gate->check($ability, $arguments)) {
             throw new AuthorizationException(
                 "You are not authorized to access {$this->definitionNode->name->value}"
             );
@@ -142,10 +162,22 @@ SDL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
+     * @param  array  $args
      * @return mixed[]
      */
-    protected function getAdditionalArguments(): array
+    protected function buildCheckArguments(array $args): array
     {
-        return (array) $this->directiveArgValue('args');
+        $checkArguments = [];
+
+        // The injected args come before the static args
+        if ($this->directiveArgValue('injectArgs')) {
+            $checkArguments [] = $args;
+        }
+
+        if ($this->directiveHasArgument('args')) {
+            $checkArguments [] = $this->directiveArgValue('args');
+        }
+
+        return $checkArguments;
     }
 }
