@@ -12,9 +12,16 @@ module.exports = {
             rel: 'stylesheet',
             type: 'text/css',
             href: 'https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,800,800i,900,900i'
-        },]
+        },],
+        ['link', {
+            rel: 'stylesheet',
+            type: 'text/css',
+            href: 'https://fonts.googleapis.com/css?family=Miriam+Libre:400,700'
+        },],
     ],
+    theme: 'default-prefers-color-scheme',
     themeConfig: {
+        defaultTheme: 'light',
         logo: '/logo.svg',
         editLinks: true, //  "Edit this page" at the bottom of each page
         lastUpdated: 'Last Updated', //  "Last Updated" at the bottom of each page
