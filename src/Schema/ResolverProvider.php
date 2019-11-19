@@ -54,7 +54,6 @@ a resolver class through:
 php artisan lighthouse:{$parent} {$proposedResolverClass}
 
 MESSAGE
-
                 );
             }
         }
