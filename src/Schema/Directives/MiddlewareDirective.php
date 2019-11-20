@@ -83,7 +83,7 @@ directive @middleware(
   a middleware group - or any combination of them.
   """
   checks: [String!]
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | OBJECT
 SDL;
     }
 
