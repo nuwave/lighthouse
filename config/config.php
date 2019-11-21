@@ -203,6 +203,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Apollo federation support
+    |--------------------------------------------------------------------------
+    |
+    | Possible types are "service" and "gateway". Defaults to
+    | "service" because you may implement more services than gateways ;)
+    |
+    */
+
+    'federation' => [
+        'type'    => 'service',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
