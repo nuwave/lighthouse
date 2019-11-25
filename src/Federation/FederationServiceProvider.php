@@ -48,7 +48,6 @@ class FederationServiceProvider extends ServiceProvider
     public function addFederationAdjustments(ManipulateAST $manipulateAST): void
     {
         if (config('lighthouse.federation.type') === 'service') {
-
             $this->addDirectives($manipulateAST);
             $this->addScalars($manipulateAST);
             $this->addEntityUnion($manipulateAST);
