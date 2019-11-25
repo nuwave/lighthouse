@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 class ExternalDirective extends BaseDirective
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'external';
-    }
-
-    /**
      * @return string
      * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
      */
@@ -31,5 +21,15 @@ directives need to have corresponding @external fields in the same service.
 """
 directive @external on FIELD_DEFINITION
 SDL;
+    }
+
+    /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'external';
     }
 }

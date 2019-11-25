@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 class KeyDirective extends BaseDirective
 {
     /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'key';
-    }
-
-    /**
      * @return string
      * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
      */
@@ -37,5 +27,15 @@ directive @key(
     fields: _FieldSet!
 ) on OBJECT | INTERFACE
 SDL;
+    }
+
+    /**
+     * Directive name.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'key';
     }
 }

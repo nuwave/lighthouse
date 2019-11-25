@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 class ExtendsDirective extends BaseDirective
 {
     /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'extends';
-    }
-
-    /**
      * @return string
      * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
      */
@@ -36,5 +26,15 @@ instead of:
 """
 directive @extends on OBJECT | INTERFACE
 SDL;
+    }
+
+    /**
+     * Directive name.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'extends';
     }
 }

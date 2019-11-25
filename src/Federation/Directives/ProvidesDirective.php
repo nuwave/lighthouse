@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 class ProvidesDirective extends BaseDirective
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'provides';
-    }
-
-    /**
      * @return string
      * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
      */
@@ -45,5 +35,15 @@ directive @provides(
     fields: _FieldSet!
 ) on FIELD_DEFINITION
 SDL;
+    }
+
+    /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'provides';
     }
 }

@@ -4,8 +4,6 @@ namespace Nuwave\Lighthouse\Federation\Resolvers;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Schema;
-use GraphQL\Type\SchemaConfig;
 use GraphQL\Utils\SchemaPrinter;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -29,14 +27,14 @@ class Service
 
         $queryFields = [];
         foreach ($schema->getQueryType()->getFields() as $field) {
-            if (!in_array($field->name, static::FEDERATION_QUERY_FIELDS)) {
+            if (! in_array($field->name, static::FEDERATION_QUERY_FIELDS)) {
                 $queryFields[] = $field;
             }
         }
 
         $directives = [];
         foreach ($schema->getDirectives() as $directive) {
-            if (!in_array($directive->name, static::FEDERATION_DIRECTIVES)) {
+            if (! in_array($directive->name, static::FEDERATION_DIRECTIVES)) {
                 $directives[] = $directive;
             }
         }

@@ -115,7 +115,7 @@ class FederationServiceProvider extends ServiceProvider
 
     /**
      * Retrieve all object types from AST which uses the @key directive (no matter if native or extended type) and
-     * combine those types into the _Entity union
+     * combine those types into the _Entity union.
      *
      * @param ManipulateAST $manipulateAST
      *
