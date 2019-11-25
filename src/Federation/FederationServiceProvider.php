@@ -35,7 +35,7 @@ class FederationServiceProvider extends ServiceProvider
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
             function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
-                return __NAMESPACE__ . '\\Directives';
+                return sprintf('%s%s', __NAMESPACE__, '\\Directives');
             }
         );
     }
@@ -77,7 +77,7 @@ class FederationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Add federation specific directives to the AST
+     * Add federation specific directives to the AST.
      *
      * @param ManipulateAST $manipulateAST
      */
@@ -91,7 +91,7 @@ class FederationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Add federation specific scalars to the AST
+     * Add federation specific scalars to the AST.
      *
      * @param ManipulateAST $manipulateAST
      *
@@ -128,7 +128,7 @@ class FederationServiceProvider extends ServiceProvider
         // We just care about object types ... but we don't care about global object types ... and we just want the
         // types which make use of the @key directive
         foreach ($manipulateAST->documentAST->types as $type) {
-            if (!($type instanceof ObjectTypeDefinitionNode)
+            if (! ($type instanceof ObjectTypeDefinitionNode)
                 || in_array($type->name->value, ['Query', 'Mutation', 'Subscription'])
                 || (count($type->directives) === 0)) {
                 continue;

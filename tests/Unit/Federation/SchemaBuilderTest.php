@@ -9,11 +9,6 @@ use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
-/**
- * Class SchemaBuilderTest
- *
- * @package Tests\Unit\Federation
- */
 class SchemaBuilderTest extends TestCase
 {
     /**
@@ -29,7 +24,7 @@ class SchemaBuilderTest extends TestCase
 
     protected function buildSchemaWithPlaceholderTypeAndQuery(string $schema): Schema
     {
-        return $this->buildSchema(/* @lang GraphQL */ <<<'GQL'
+        return $this->buildSchema(/* @lang GraphQL */<<<'GQL'
 type Foo @key(fields: "id") {
     id: ID!
     foo: String!
@@ -38,7 +33,7 @@ type Query {
     foo: Int
 }
 GQL
-);
+        );
     }
 
     public function testGeneratesValidSchema(): void

@@ -20,8 +20,6 @@ class BuildSchemaString
     public $userSchema;
 
     /**
-     * BuildSchemaString constructor.
-     *
      * @param  string  $userSchema
      * @return void
      */

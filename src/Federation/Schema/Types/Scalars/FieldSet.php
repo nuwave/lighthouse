@@ -2,14 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation\Schema\Types\Scalars;
 
-use Carbon\Carbon;
-use Exception;
-use GraphQL\Error\Error;
-use GraphQL\Error\InvariantViolation;
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Utils\Utils;
 
 class FieldSet extends ScalarType
 {

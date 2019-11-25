@@ -38,7 +38,7 @@ class FederationSchemaTest extends DBTestCase
             ->assertJson([
                 'data' => [
                     '_service' => [
-                        'sdl' => $this->schema
+                        'sdl' => $this->schema,
                     ],
                 ],
             ]);
