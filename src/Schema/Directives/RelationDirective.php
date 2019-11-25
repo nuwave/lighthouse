@@ -27,7 +27,7 @@ abstract class RelationDirective extends BaseDirective
      */
     public function resolveField(FieldValue $value): FieldValue
     {
-        if(config('lighthouse.batchload_relations')) {
+        if (config('lighthouse.batchload_relations')) {
             $value->setResolver(
                 function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                     $constructorArgs = [
