@@ -1966,6 +1966,9 @@ directive @paginate(
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
 
+> Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
+> Under the hood, the "cursor" is decoded into a page offset.
+
 ```graphql
 type Query {
     posts: [Post!]! @paginate(type: "connection")
