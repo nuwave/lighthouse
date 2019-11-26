@@ -28,7 +28,7 @@ directive @rename(
   value can be retrieved from.
   """
   attribute: String!
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -42,6 +42,24 @@ SDL;
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
+        $attribute = $this->getAttribute();
+
+        return $fieldValue->setResolver(
+            function ($rootValue) use ($attribute) {
+                return data_get($rootValue, $attribute);
+            }
+        );
+    }
+
+    /**
+     * Retrieves the attribute argument for the directive
+     *
+     * @return string
+     *
+     * @throws DirectiveException
+     */
+    public function getAttribute(): string
+    {
         $attribute = $this->directiveArgValue('attribute');
 
         if (! $attribute) {
@@ -50,10 +68,6 @@ SDL;
             );
         }
 
-        return $fieldValue->setResolver(
-            function ($rootValue) use ($attribute) {
-                return data_get($rootValue, $attribute);
-            }
-        );
+        return $attribute;
     }
 }
