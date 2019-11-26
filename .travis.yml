@@ -12,7 +12,6 @@ before_install:
 install:
   - if [[ $LARAVEL = '5.5.*' ]]; then composer remove --dev nunomaduro/larastan --no-update; fi
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --prefer-dist --no-interaction --no-suggest
-  - composer update
 
 script: vendor/bin/phpunit --colors=always --verbose
 
