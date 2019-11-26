@@ -52,7 +52,7 @@ SDL;
     }
 
     /**
-     * Retrieves the attribute argument for the directive
+     * Retrieves the attribute argument for the directive.
      *
      * @return string
      *

@@ -83,7 +83,7 @@ class ArgumentSet
      */
     public function rename(): self
     {
-        $argumentSet             = new self();
+        $argumentSet = new self();
         $argumentSet->directives = $this->directives;
 
         foreach ($this->arguments as $name => $argument) {
