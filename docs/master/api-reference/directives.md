@@ -2052,6 +2052,10 @@ Rename a field on the server side, e.g. convert from snake_case to camelCase.
 type User {
     createdAt: String! @rename(attribute: "created_at")
 }
+
+input UserInput {
+    firstName: String! @rename(attribute: "first_name")
+}
 ```
 
 ### Definition
