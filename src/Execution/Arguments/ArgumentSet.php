@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
+use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -70,6 +71,31 @@ class ArgumentSet
             }
 
             $argumentSet->arguments[$name] = $argument;
+        }
+
+        return $argumentSet;
+    }
+
+    /**
+     * Check for the @rename directive on any of the fields and rename them accordingly.
+     *
+     * @return $this
+     */
+    public function rename(): self
+    {
+        $argumentSet             = new self();
+        $argumentSet->directives = $this->directives;
+
+        foreach ($this->arguments as $name => $argument) {
+            $renameDirective = $argument->directives->first(function ($directive) {
+                return $directive instanceof RenameDirective;
+            });
+
+            if ($renameDirective) {
+                $argumentSet->arguments[$renameDirective->getAttribute()] = $argument;
+            } else {
+                $argumentSet->arguments[$name] = $argument;
+            }
         }
 
         return $argumentSet;

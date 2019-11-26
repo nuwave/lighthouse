@@ -184,7 +184,7 @@ class FieldFactory
                 $this->flushValidationErrorBuffer();
 
                 $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
-                $spreadArguments = $argumentSet->spread();
+                $spreadArguments = $argumentSet->spread()->rename();
                 $this->resolveInfo->argumentSet = $spreadArguments;
 
                 return $resolverWithMiddleware($this->root, $spreadArguments->toArray(), $this->context, $this->resolveInfo);
