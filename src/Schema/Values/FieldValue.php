@@ -81,7 +81,7 @@ class FieldValue
     }
 
     /**
-     * Use the default resolver
+     * Use the default resolver.
      *
      * @return $this
      */

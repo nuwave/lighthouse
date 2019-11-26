@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 
 class RelationBatchLoaderTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected $schema = /* @lang GraphQL */ '
     type Task {
         name: String
     }
@@ -44,7 +44,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
     public function testCanResolveBatchedFieldsFromBatchedRequests(): void
     {
-        $query = /** @lang GraphQL */ '
+        $query = /* @lang GraphQL */ '
         query User($id: ID!) {
             user(id: $id) {
                 email
@@ -91,7 +91,7 @@ class RelationBatchLoaderTest extends DBTestCase
         });
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/* @lang GraphQL */ '
             {
                 users {
                     email
@@ -112,7 +112,7 @@ class RelationBatchLoaderTest extends DBTestCase
     {
         return [
             [true, 2],
-            [false, 3]
+            [false, 3],
         ];
     }
 }
