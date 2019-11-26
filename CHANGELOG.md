@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `syncWithoutDetaching` option for BelongsToMany and MorphToMany relationships https://github.com/nuwave/lighthouse/pull/1031
 - Add `injectArgs` option to `@can` directive to pass along client defined
   arguments to the policy check https://github.com/nuwave/lighthouse/pull/1043
+- Allow globally turning off relation batch loading through the
+  config option `batchload_relations` https://github.com/nuwave/lighthouse/pull/1059
 
 ### Changed
 

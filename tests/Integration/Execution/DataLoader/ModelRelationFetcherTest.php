@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Support\DataLoader;
+namespace Tests\Integration\Execution\DataLoader;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
@@ -8,7 +8,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class ModelRelationLoaderTest extends DBTestCase
+class ModelRelationFetcherTest extends DBTestCase
 {
     protected function setUp(): void
     {

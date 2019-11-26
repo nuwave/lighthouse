@@ -60,6 +60,8 @@ abstract class RelationDirective extends BaseDirective
                         );
                 }
             );
+        } else {
+            $value->useDefaultResolver();
         }
 
         return $value;
