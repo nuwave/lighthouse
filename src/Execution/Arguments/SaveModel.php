@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
-class SaveModel implements ArgumentResolver
+class SaveModel implements ArgResolver
 {
     /**
      * @var \Illuminate\Database\Eloquent\Relations\Relation|null

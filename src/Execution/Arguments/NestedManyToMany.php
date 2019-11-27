@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
-class NestedManyToMany implements ArgumentResolver
+class NestedManyToMany implements ArgResolver
 {
     /**
      * @var string

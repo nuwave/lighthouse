@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution;
+namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 
-interface ArgumentResolver
+interface ArgResolver
 {
     /**
      * @param  mixed  $root  The result of the parent resolver.

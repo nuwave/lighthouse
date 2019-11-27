@@ -5,14 +5,14 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective, ArgumentResolver
+abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective, ArgResolver
 {
     /**
      * The database manager.

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use ReflectionClass;
 use ReflectionNamedType;
@@ -23,14 +23,14 @@ class ArgPartitioner
      * @param  mixed  $root
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
-    public static function nestedArgumentResolvers(ArgumentSet $argumentSet, $root): array
+    public static function nestedArgResolvers(ArgumentSet $argumentSet, $root): array
     {
         $model = $root instanceof Model
             ? new \ReflectionClass($root)
             : null;
 
         foreach ($argumentSet->arguments as $name => $argument) {
-            static::attachNestedArgumentResolver($name, $argument, $model);
+            static::attachNestedArgResolver($name, $argument, $model);
         }
 
         return static::partition(
@@ -92,10 +92,10 @@ class ArgPartitioner
      * @param  \ReflectionClass|null  $model
      * @return void
      */
-    protected static function attachNestedArgumentResolver(string $name, Argument &$argument, ?ReflectionClass $model): void
+    protected static function attachNestedArgResolver(string $name, Argument &$argument, ?ReflectionClass $model): void
     {
         $resolverDirective = $argument->directives->first(function (Directive $directive): bool {
-            return $directive instanceof ArgumentResolver;
+            return $directive instanceof ArgResolver;
         });
 
         if ($resolverDirective) {

@@ -2,18 +2,18 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
-class UpdateModel implements ArgumentResolver
+class UpdateModel implements ArgResolver
 {
     /**
-     * @var \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver
+     * @var \Closure|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
      */
     private $previous;
 
     /**
      * ArgResolver constructor.
-     * @param \Closure|\Nuwave\Lighthouse\Execution\ArgumentResolver $previous
+     * @param \Closure|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous
      */
     public function __construct($previous)
     {

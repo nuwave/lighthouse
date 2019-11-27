@@ -3,7 +3,7 @@
 namespace Tests\Unit\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -13,7 +13,7 @@ use Tests\Utils\Models\User;
 
 class ArgPartitionerTest extends TestCase
 {
-    public function testPartitionArgsWithArgumentResolvers(): void
+    public function testPartitionArgsWithArResolvers(): void
     {
         $argumentSet = new ArgumentSet();
 
@@ -24,7 +24,7 @@ class ArgPartitionerTest extends TestCase
         $nested->directives->push(new Nested());
         $argumentSet->arguments['nested'] = $nested;
 
-        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgumentResolvers($argumentSet, null);
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolvers($argumentSet, null);
 
         $this->assertSame(
             ['regular' => $regular],
@@ -65,7 +65,7 @@ class ArgPartitionerTest extends TestCase
     }
 }
 
-class Nested implements ArgumentResolver, Directive
+class Nested implements ArgResolver, Directive
 {
     public function __invoke($root, $args)
     {

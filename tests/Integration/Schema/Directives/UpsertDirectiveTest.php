@@ -8,7 +8,7 @@ use Tests\Utils\Models\User;
 
 class UpsertDirectiveTest extends DBTestCase
 {
-    public function testNestedArgumentResolver(): void
+    public function testNestedArgResolver(): void
     {
         factory(User::class)->create();
         factory(Task::class)->create([

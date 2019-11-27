@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
-class ResolveNested implements ArgumentResolver
+class ResolveNested implements ArgResolver
 {
     /**
-     * @var callable|\Nuwave\Lighthouse\Execution\ArgumentResolver|null
+     * @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver|null
      */
     protected $previous;
 
@@ -19,14 +19,14 @@ class ResolveNested implements ArgumentResolver
     /**
      * ArgResolver constructor.
      *
-     * @param  callable|\Nuwave\Lighthouse\Execution\ArgumentResolver|null  $previous
+     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver|null  $previous
      * @param  callable|null  $argPartitioner
      * @return void
      */
     public function __construct(callable $previous = null, callable $argPartitioner = null)
     {
         $this->previous = $previous;
-        $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'nestedArgumentResolvers'];
+        $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'nestedArgResolvers'];
     }
 
     /**

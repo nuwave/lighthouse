@@ -7,12 +7,12 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective, ArgumentResolver, ArgManipulator
+class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective, ArgResolver, ArgManipulator
 {
     /**
      * Name of the directive.

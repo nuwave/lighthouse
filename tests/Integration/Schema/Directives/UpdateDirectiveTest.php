@@ -194,7 +194,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('Original', User::first()->name);
     }
 
-    public function testNestedArgumentResolver(): void
+    public function testNestedArgResolver(): void
     {
         factory(User::class)->create();
         factory(Task::class)->create([

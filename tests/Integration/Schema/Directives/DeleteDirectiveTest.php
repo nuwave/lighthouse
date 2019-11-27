@@ -112,7 +112,7 @@ class DeleteDirectiveTest extends DBTestCase
         ');
     }
 
-    public function testRequiresRelationWhenUsingAsArgumentResolver(): void
+    public function testRequiresRelationWhenUsingAsArgResolver(): void
     {
         $this->expectException(DefinitionException::class);
 
@@ -127,7 +127,7 @@ class DeleteDirectiveTest extends DBTestCase
         ');
     }
 
-    public function testUseNestedArgumentResolverDelete(): void
+    public function testUseNestedArgResolverDelete(): void
     {
         factory(User::class)->create();
         factory(Task::class, 2)->create([

@@ -20,13 +20,13 @@ class CreateDirective extends MutationExecutorDirective
 """
 Create a new Eloquent model with the given arguments.
 """
-directive @create(  
+directive @create(
   """
   Specify the class name of the model to use.
   This is only needed when the default model resolution does not work.
   """
   model: String
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 

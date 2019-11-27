@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
-class NestedOneToMany implements ArgumentResolver
+class NestedOneToMany implements ArgResolver
 {
     /**
      * @var string

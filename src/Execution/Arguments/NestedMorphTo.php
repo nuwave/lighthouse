@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\ArgumentResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
-class NestedMorphTo implements ArgumentResolver
+class NestedMorphTo implements ArgResolver
 {
     /**
      * @var string

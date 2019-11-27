@@ -30,7 +30,7 @@ class Argument
     /**
      * An argument may have a resolver that handles it's given value.
      *
-     * @var \Nuwave\Lighthouse\Execution\ArgumentResolver|null
+     * @var \Nuwave\Lighthouse\Support\Contracts\ArgResolver|null
      */
     public $resolver;
 
