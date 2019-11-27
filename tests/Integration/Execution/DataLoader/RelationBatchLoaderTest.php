@@ -147,7 +147,7 @@ class RelationBatchLoaderTest extends DBTestCase
             'many'
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /* @lang GraphQL */ '
         type Task {
             name: String
         }
@@ -163,7 +163,7 @@ class RelationBatchLoaderTest extends DBTestCase
         }
         ';
 
-        $query = /** @lang GraphQL */ '
+        $query = /* @lang GraphQL */ '
         query User($id: ID!, $ids: [ID!]!) {
             user(id: $id) {
                 email

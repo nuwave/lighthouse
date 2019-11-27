@@ -2,8 +2,8 @@
 
 namespace Tests\Utils\BatchLoaders;
 
-use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Tests\Utils\Models\User;
 
 class UserLoader extends BatchLoader
 {
