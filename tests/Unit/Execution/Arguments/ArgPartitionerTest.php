@@ -3,10 +3,10 @@
 namespace Tests\Unit\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
