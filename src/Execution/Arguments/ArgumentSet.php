@@ -137,7 +137,7 @@ class ArgumentSet
                     return $directive instanceof ArgBuilderDirective;
                 });
 
-            if (!empty($directiveFilter)) {
+            if (! empty($directiveFilter)) {
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }
 

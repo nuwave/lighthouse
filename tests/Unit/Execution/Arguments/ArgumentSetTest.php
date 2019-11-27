@@ -138,10 +138,10 @@ class ArgumentSetTest extends TestCase
                     'arguments' => [
                         new ArgumentNode([
                             'name' => new NameNode(['value' => 'attribute']),
-                            'value' => new StringValueNode(['value' => $newName])
-                        ])
-                    ]
-                ])
+                            'value' => new StringValueNode(['value' => $newName]),
+                        ]),
+                    ],
+                ]),
             ];
 
             $rename = new RenameDirective();
@@ -171,7 +171,7 @@ class ArgumentSetTest extends TestCase
         $userSet->arguments = [
             'firstName' => $firstName,
             'lastName' => $lastName,
-            'post' => $postArg
+            'post' => $postArg,
         ];
 
         $renamedSet = $userSet->rename();
@@ -179,11 +179,11 @@ class ArgumentSetTest extends TestCase
         $this->assertSame([
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'post' => $postArg
+            'post' => $postArg,
         ], $renamedSet->arguments);
 
         $this->assertSame([
-            'title' => $postName
+            'title' => $postName,
         ], $renamedSet->arguments['post']->value->arguments);
     }
 }
