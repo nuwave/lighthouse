@@ -92,6 +92,11 @@ class ArgumentSet
                 $argument->value = $argument->value->rename();
             }
 
+            if (empty($argument->directives)) {
+                $argumentSet->arguments[$name] = $argument;
+                continue;
+            }
+
             $renameDirective = $argument->directives->first(function ($directive) {
                 return $directive instanceof RenameDirective;
             });
@@ -109,9 +114,9 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  string[]  $scopes
-     * @param  \Closure  $directiveFilter
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param string[] $scopes
+     * @param \Closure $directiveFilter
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
@@ -132,7 +137,7 @@ class ArgumentSet
                     return $directive instanceof ArgBuilderDirective;
                 });
 
-            if (! empty($directiveFilter)) {
+            if (!empty($directiveFilter)) {
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }
 
