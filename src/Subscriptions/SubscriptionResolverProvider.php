@@ -3,17 +3,17 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Closure;
-use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Directives\SubscriptionDirective;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Subscriptions\Exceptions\UnauthorizedSubscriber;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use Nuwave\Lighthouse\Support\Utils;
 
 class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
 {
@@ -34,7 +34,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     }
 
     /**
-     * Provide a field resolver in case no resolver directive is defined for a field.
+     * Provide a resolver for a subscription field in case no resolver directive is defined.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @return \Closure

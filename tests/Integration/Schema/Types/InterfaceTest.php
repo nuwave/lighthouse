@@ -2,20 +2,17 @@
 
 namespace Tests\Integration\Schema\Types;
 
+use GraphQL\Type\Definition\Type;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
-use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class InterfaceTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanResolveInterfaceTypes(): void
+    public function testCanResolveInterfaceTypes(): void
     {
         // This creates one team with it
         factory(User::class)->create();
@@ -65,10 +62,7 @@ class InterfaceTest extends DBTestCase
         $this->assertArrayNotHasKey('id', $result->jsonGet('data.namedThings.1'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanUseCustomTypeResolver(): void
+    public function testCanUseCustomTypeResolver(): void
     {
         $this->schema = '
         interface Nameable @interface(resolveType: "'.$this->qualifyTestResolver('resolveType').'"){
@@ -101,10 +95,7 @@ class InterfaceTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanListPossibleTypes(): void
+    public function testCanListPossibleTypes(): void
     {
         // This creates one team with it
         factory(User::class)->create();

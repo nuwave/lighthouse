@@ -3,15 +3,15 @@
 namespace Tests\Unit\Schema\Factories;
 
 use Closure;
-use Tests\TestCase;
-use ReflectionProperty;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use ReflectionProperty;
+use Tests\TestCase;
 
 class DirectiveFactoryTest extends TestCase
 {
@@ -27,10 +27,7 @@ class DirectiveFactoryTest extends TestCase
         parent::getEnvironmentSetUp($app);
     }
 
-    /**
-     * @test
-     */
-    public function itRegistersLighthouseDirectives(): void
+    public function testRegistersLighthouseDirectives(): void
     {
         $this->assertInstanceOf(
             FieldDirective::class,
@@ -38,10 +35,7 @@ class DirectiveFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itHydratesBaseDirectives(): void
+    public function testHydratesBaseDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String
@@ -58,10 +52,7 @@ class DirectiveFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itSkipsHydrationForNonBaseDirectives(): void
+    public function testSkipsHydrationForNonBaseDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String
@@ -85,33 +76,24 @@ class DirectiveFactoryTest extends TestCase
         $this->assertObjectNotHasAttribute('definitionNode', $directive);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfDirectiveNameCanNotBeResolved(): void
+    public function testThrowsIfDirectiveNameCanNotBeResolved(): void
     {
         $this->expectException(DirectiveException::class);
 
         $this->directiveFactory->create('bar');
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateFieldResolverDirective(): void
+    public function testCanCreateSingleDirective(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: [Foo!]! @hasMany
         ');
 
-        $resolver = $this->directiveFactory->createFieldResolver($fieldDefinition);
+        $resolver = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
         $this->assertInstanceOf(FieldResolver::class, $resolver);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsExceptionWhenMultipleFieldResolverDirectives(): void
+    public function testThrowsExceptionWhenMultipleFieldResolverDirectives(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -119,19 +101,16 @@ class DirectiveFactoryTest extends TestCase
             bar: [Bar!]! @hasMany @belongsTo
         ');
 
-        $this->directiveFactory->createFieldResolver($fieldDefinition);
+        $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateCollectionOfFieldMiddleware(): void
+    public function testCanCreateMultipleDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             bar: String @can(if: ["viewBar"]) @event
         ');
 
-        $middleware = $this->directiveFactory->createFieldMiddleware($fieldDefinition);
+        $middleware = $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinition, FieldMiddleware::class);
         $this->assertCount(2, $middleware);
     }
 }

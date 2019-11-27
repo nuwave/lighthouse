@@ -3,20 +3,33 @@
 namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
+use GraphQL\Error\Error;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Language\AST\NonNullTypeNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Exceptions\ParseClientException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class DeferrableDirective extends BaseDirective implements Directive, FieldMiddleware
+class DeferrableDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
 {
     const NAME = 'deferrable';
+    const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
+    const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Do not use this directive directly, it is automatically added to the schema
+when using the defer extension.
+"""
+directive @deferrable on FIELD_DEFINITION
+SDL;
+    }
 
     /**
      * @var \Nuwave\Lighthouse\Defer\Defer
@@ -81,19 +94,18 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return bool
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\ParseClientException
+     * @throws \GraphQL\Error\Error
      */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $resolveInfo): bool
     {
-        if (strtolower($resolveInfo->operation->operation) === 'mutation') {
-            return false;
-        }
-
         foreach ($resolveInfo->fieldNodes as $fieldNode) {
             $deferDirective = ASTHelper::directiveDefinition($fieldNode, 'defer');
-
             if (! $deferDirective) {
                 return false;
+            }
+
+            if ($resolveInfo->parentType->name === 'Mutation') {
+                throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
 
             if (! ASTHelper::directiveArgValue($deferDirective, 'if', true)) {
@@ -101,22 +113,24 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
             }
 
             $skipDirective = ASTHelper::directiveDefinition($fieldNode, 'skip');
+            if (
+                $skipDirective
+                && ASTHelper::directiveArgValue($skipDirective, 'if') === true
+            ) {
+                return false;
+            }
+
             $includeDirective = ASTHelper::directiveDefinition($fieldNode, 'include');
-
-            $shouldSkip = $skipDirective
-                ? ASTHelper::directiveArgValue($skipDirective, 'if', false)
-                : false;
-            $shouldInclude = $includeDirective
-                ? ASTHelper::directiveArgValue($includeDirective, 'if', false)
-                : false;
-
-            if ($shouldSkip || $shouldInclude) {
+            if (
+                $includeDirective
+                && ASTHelper::directiveArgValue($includeDirective, 'if') === false
+            ) {
                 return false;
             }
         }
 
         if ($fieldType instanceof NonNullTypeNode) {
-            throw new ParseClientException('The @defer directive cannot be placed on a Non-Nullable field.');
+            throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
         }
 
         return true;

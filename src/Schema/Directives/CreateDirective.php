@@ -2,61 +2,35 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\DatabaseManager;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class CreateDirective extends BaseDirective implements FieldResolver
+class CreateDirective extends MutationExecutorDirective
 {
-    /**
-     * @var \Illuminate\Database\DatabaseManager
-     */
-    protected $databaseManager;
-
-    /**
-     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
-     * @return void
-     */
-    public function __construct(DatabaseManager $databaseManager)
-    {
-        $this->databaseManager = $databaseManager;
-    }
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
     public function name(): string
     {
         return 'create';
     }
 
-    /**
-     * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public static function definition(): string
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args): Model {
-                $modelClassName = $this->getModelClass();
-                /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClassName;
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Create a new Eloquent model with the given arguments.
+"""
+directive @create(  
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+SDL;
+    }
 
-                $executeMutation = function () use ($model, $args): Model {
-                    return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
-                };
-
-                return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection($model->getConnectionName())->transaction($executeMutation)
-                    : $executeMutation();
-            }
-        );
+    protected function executeMutation(Model $model, Collection $args): Model
+    {
+        return MutationExecutor::executeCreate($model, $args);
     }
 }

@@ -2,16 +2,13 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class FieldDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itAssignsResolverFromCombinedDefinition(): void
+    public function testAssignsResolverFromCombinedDefinition(): void
     {
         $this->schema = '
         type Query {
@@ -30,10 +27,26 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveFieldWithMergedArgs(): void
+    public function testAssignsResolverWithInvokableClass(): void
+    {
+        $this->schema = '
+        type Query {
+            baz: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo")
+        }
+        ';
+
+        $this->graphQL('
+        {
+            baz
+        }
+        ')->assertJson([
+            'data' => [
+                'baz' => 'foo.baz',
+            ],
+        ]);
+    }
+
+    public function testCanResolveFieldWithMergedArgs(): void
     {
         $this->schema = '
         type Query {
@@ -52,10 +65,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itUsesDefaultFieldNamespace(): void
+    public function testUsesDefaultFieldNamespace(): void
     {
         $this->schema = '
         type Query {
@@ -74,12 +84,29 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsAnErrorOnlyOnePartIsDefined(): void
+    public function testUsesDefaultFieldNamespaceForInvokableClass(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->schema = '
+        type Query {
+            baz: String! @field(resolver: "FooBar")
+        }
+        ';
+
+        $this->graphQL('
+        {
+            baz
+        }
+        ')->assertJson([
+            'data' => [
+                'baz' => FooBar::INVOKE_RESULT,
+            ],
+        ]);
+    }
+
+    public function testThrowsAnErrorWhenNoClassFound(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("No class 'bar' was found for directive 'field'");
 
         $this->schema = '
         type Query {
@@ -91,6 +118,24 @@ class FieldDirectiveTest extends TestCase
         {
             bar
         }        
+        ');
+    }
+
+    public function testThrowsAnErrorWhenClassIsntInvokable(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\Foo'");
+
+        $this->schema = '
+        type Query {
+            bar: String! @field(resolver: "Foo")
+        }
+        ';
+
+        $this->graphQL('
+        {
+            bar
+        }
         ');
     }
 }

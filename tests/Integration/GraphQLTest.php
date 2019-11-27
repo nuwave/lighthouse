@@ -2,10 +2,10 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Http\UploadedFile;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Http\UploadedFile;
 
 class GraphQLTest extends DBTestCase
 {
@@ -64,10 +64,7 @@ class GraphQLTest extends DBTestCase
         $this->be($this->user);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesQueryViaPostRequest(): void
+    public function testResolvesQueryViaPostRequest(): void
     {
         $this->graphQL('
         query UserWithTasks {
@@ -94,10 +91,7 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesQueryViaGetRequest(): void
+    public function testResolvesQueryViaGetRequest(): void
     {
         $this->getJson(
             'graphql?'
@@ -128,10 +122,7 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveBatchedQueries(): void
+    public function testCanResolveBatchedQueries(): void
     {
         $this->postGraphQL([
             [
@@ -170,10 +161,7 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesNamedOperation(): void
+    public function testResolvesNamedOperation(): void
     {
         $this->postGraphQL([
             'query' => '
@@ -198,10 +186,41 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsInvalidQuery(): void
+    public function testRejectsEmptyRequest(): void
+    {
+        $this->postGraphQL([])
+             ->assertStatus(200)
+             ->assertJson([
+                 [
+                     'errors' => [
+                         [
+                             'message' => 'Syntax Error: Unexpected <EOF>',
+                             'extensions' => [
+                                 'category' => 'graphql',
+                             ],
+                         ],
+                     ],
+                 ],
+             ]);
+    }
+
+    public function testRejectsEmptyQuery(): void
+    {
+        $this->graphQL('')
+             ->assertStatus(200)
+             ->assertJson([
+                 'errors' => [
+                     [
+                         'message' => 'Syntax Error: Unexpected <EOF>',
+                         'extensions' => [
+                             'category' => 'graphql',
+                         ],
+                     ],
+                 ],
+             ]);
+    }
+
+    public function testRejectsInvalidQuery(): void
     {
         $result = $this->graphQL('
         {
@@ -220,10 +239,7 @@ class GraphQLTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itIgnoresInvalidJSONVariables(): void
+    public function testIgnoresInvalidJSONVariables(): void
     {
         $result = $this->postGraphQL([
             'query' => '{}',
@@ -233,10 +249,7 @@ class GraphQLTest extends DBTestCase
         $result->assertStatus(200);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesQueryViaMultipartRequest(): void
+    public function testResolvesQueryViaMultipartRequest(): void
     {
         $this->multipartGraphQL(
             [
@@ -261,10 +274,9 @@ class GraphQLTest extends DBTestCase
     }
 
     /**
-     * @test
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
      */
-    public function itResolvesUploadViaMultipartRequest(): void
+    public function testResolvesUploadViaMultipartRequest(): void
     {
         $this->multipartGraphQL(
             [
@@ -295,10 +307,9 @@ class GraphQLTest extends DBTestCase
     }
 
     /**
-     * @test
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching.
      */
-    public function itResolvesUploadViaBatchedMultipartRequest(): void
+    public function testResolvesUploadViaBatchedMultipartRequest(): void
     {
         $this->multipartGraphQL(
             [

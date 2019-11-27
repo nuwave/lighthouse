@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateTestbenchHoursTable extends Migration
 {
@@ -13,8 +13,8 @@ class CreateTestbenchHoursTable extends Migration
     {
         Schema::create('hours', function (Blueprint $table): void {
             $table->increments('id');
-            $table->string('hourable_type', 15);
-            $table->unsignedInteger('hourable_id');
+            $table->string('hourable_type')->nullable();
+            $table->unsignedInteger('hourable_id')->nullable();
             $table->string('from', 5)->nullable();
             $table->string('to', 5)->nullable();
             $table->unsignedTinyInteger('weekday')->nullable();

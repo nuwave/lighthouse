@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface ArgManipulator extends Directive
 {
@@ -16,7 +16,7 @@ interface ArgManipulator extends Directive
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,

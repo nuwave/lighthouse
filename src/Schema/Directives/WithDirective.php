@@ -4,15 +4,16 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Deferred;
-use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class WithDirective extends RelationDirective implements FieldMiddleware
+class WithDirective extends RelationDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -22,6 +23,27 @@ class WithDirective extends RelationDirective implements FieldMiddleware
     public function name(): string
     {
         return 'with';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Eager-load an Eloquent relation.
+"""
+directive @with(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

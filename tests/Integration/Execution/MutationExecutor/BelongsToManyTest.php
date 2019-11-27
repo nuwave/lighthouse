@@ -23,6 +23,8 @@ class BelongsToManyTest extends DBTestCase
     type Mutation {
         createRole(input: CreateRoleInput! @spread): Role @create
         updateRole(input: UpdateRoleInput! @spread): Role @update
+        upsertRole(input: UpsertRoleInput! @spread): Role @upsert
+        createUser(input: CreateUserInput! @spread): User @create
     }
 
     input CreateRoleInput {
@@ -32,6 +34,7 @@ class BelongsToManyTest extends DBTestCase
     
     input CreateUserRelation {
         create: [CreateUserInput!]
+        upsert: [UpsertUserInput!]
         connect: [ID!]
         sync: [ID!]
     }
@@ -49,9 +52,11 @@ class BelongsToManyTest extends DBTestCase
     input UpdateUserRelation {
         create: [CreateUserInput!]
         update: [UpdateUserInput!]
+        upsert: [UpsertUserInput!]
         delete: [ID!]
         connect: [ID!]
         sync: [ID!]
+        syncWithoutDetaching: [ID!]
         disconnect: [ID!]
     }
     
@@ -59,19 +64,94 @@ class BelongsToManyTest extends DBTestCase
         id: ID!
         name: String
     }
-    ';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
+    input UpsertRoleInput {
+        id: ID!
+        name: String
+        users: UpsertUserRelation
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewBelongsToMany(): void
+    input UpsertUserRelation {
+        create: [CreateUserInput!]
+        update: [UpdateUserInput!]
+        upsert: [UpsertUserInput!]
+        delete: [ID!]
+        connect: [ID!]
+        sync: [ID!]
+        disconnect: [ID!]
+    }
+
+    input UpsertUserInput {
+        id: ID!
+        name: String
+    }
+    '.self::PLACEHOLDER_QUERY;
+
+    public function testCanSyncWithoutDetaching(): void
+    {
+        $this->graphQL('
+        mutation {
+            createUser(input: {
+                name: "user1"
+            }) {
+                id
+            }
+            createRole(input: {
+                name: "foobar"
+                users: {
+                    create: [
+                        {
+                            name: "user2"
+                        }
+                    ]
+                }
+            }) {
+                id
+                users {
+                    id
+                }
+            }
+            updateRole(input: {
+                id: 1
+                users: {
+                    syncWithoutDetaching: [1]
+                }
+            }) {
+                id
+                users {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'id' => '1',
+                ],
+                'createRole' => [
+                    'id' => '1',
+                    'users' => [
+                        [
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+                'updateRole' => [
+                    'id' => '1',
+                    'users' => [
+                        [
+                            'id' => '1',
+                        ],
+                        [
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateWithNewBelongsToMany(): void
     {
         $this->graphQL('
         mutation {
@@ -110,10 +190,58 @@ class BelongsToManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateAndConnectWithBelongsToMany(): void
+    public function testCanUpsertWithBelongsToManyOnNonExistentData(): void
+    {
+        $this->graphQL('
+        mutation {
+            upsertRole(input: {
+                id: 1
+                name: "is_user"
+                users: {
+                    upsert: [{
+                        id: 10
+                        name: "user1"
+                    },
+                    {
+                        id: 20
+                        name: "user2"
+                    }]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertRole' => [
+                    'id' => '1',
+                    'name' => 'is_user',
+                    'users' => [
+                        [
+                            'id' => '10',
+                            'name' => 'user1',
+                        ],
+                        [
+                            'id' => '20',
+                            'name' => 'user2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        /** @var Role $role */
+        $role = Role::first();
+        $this->assertCount(2, $role->users()->get());
+        $this->assertSame('is_user', $role->name);
+    }
+
+    public function testCanCreateAndConnectWithBelongsToMany(): void
     {
         factory(User::class)->create(['name' => 'user_one']);
         factory(User::class)->create(['name' => 'user_two']);
@@ -156,10 +284,51 @@ class BelongsToManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithBelongsToMany(): void
+    public function testCanUpsertUsingCreationAndConnectWithBelongsToMany(): void
+    {
+        factory(User::class)->create(['name' => 'user_one']);
+        factory(User::class)->create(['name' => 'user_two']);
+
+        $this->graphQL('
+        mutation {
+            upsertRole(input: {
+                id: 1
+                name: "foobar"
+                users: {
+                    connect: [
+                        1,2
+                    ]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertRole' => [
+                    'id' => '1',
+                    'name' => 'foobar',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'user_one',
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'user_two',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateWithBelongsToMany(): void
     {
         factory(Role::class)->create([
             'name' => 'is_admin',
@@ -212,19 +381,11 @@ class BelongsToManyTest extends DBTestCase
         $this->assertSame('is_user', $role->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateWithBelongsToMany(): void
+    public function testCanUpsertUsingCreationWithBelongsToMany(): void
     {
-        factory(Role::class)
-            ->create([
-                'name' => 'is_admin',
-            ])
-            ->users()
-            ->attach(
-                factory(User::class, 2)->create()
-            );
+        factory(Role::class)->create([
+            'name' => 'is_admin',
+        ]);
 
         $this->graphQL('
         mutation {
@@ -232,7 +393,7 @@ class BelongsToManyTest extends DBTestCase
                 id: 1
                 name: "is_user"
                 users: {
-                    update: [{
+                    upsert: [{
                         id: 1
                         name: "user1"
                     },
@@ -269,16 +430,24 @@ class BelongsToManyTest extends DBTestCase
             ],
         ]);
 
-        /** @var Role $role */
+        /** @var \Tests\Utils\Models\Role $role */
         $role = Role::first();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
 
+    public function existingModelMutations()
+    {
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
+    }
+
     /**
-     * @test
+     * @dataProvider existingModelMutations
      */
-    public function itCanDeleteWithBelongsToMany(): void
+    public function testCanUpdateWithBelongsToMany(string $action): void
     {
         factory(Role::class)
             ->create([
@@ -289,11 +458,74 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateRole(input: {
+            ${action}Role(input: {
                 id: 1
-                name: "is_user"
+                name: \"is_user\"
+                users: {
+                    ${action}: [{
+                        id: 1
+                        name: \"user1\"
+                    },
+                    {
+                        id: 2
+                        name: \"user2\"
+                    }]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Role" => [
+                    'id' => '1',
+                    'name' => 'is_user',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'user1',
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'user2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        /** @var Role $role */
+        $role = Role::first();
+        $this->assertCount(2, $role->users()->get());
+        $this->assertSame('is_user', $role->name);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanDeleteWithBelongsToMany(string $action): void
+    {
+        factory(Role::class)
+            ->create([
+                'name' => 'is_admin',
+            ])
+            ->users()
+            ->attach(
+                factory(User::class, 2)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}Role(input: {
+                id: 1
+                name: \"is_user\"
                 users: {
                     delete: [1]
                 }
@@ -305,9 +537,9 @@ class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateRole' => [
+                "${action}Role" => [
                     'id' => '1',
                     'name' => 'is_user',
                     'users' => [
@@ -329,9 +561,9 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @test
+     * @dataProvider existingModelMutations
      */
-    public function itCanConnectWithBelongsToMany(): void
+    public function testCanConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
         factory(Role::class)
@@ -341,9 +573,9 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateRole(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     connect: [1]
@@ -356,16 +588,16 @@ class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateRole' => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
-                            'id' => '2',
+                            'id' => '1',
                         ],
                         [
-                            'id' => '1',
+                            'id' => '2',
                         ],
                     ],
                 ],
@@ -378,9 +610,9 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @test
+     * @dataProvider existingModelMutations
      */
-    public function itCanSyncWithBelongsToMany(): void
+    public function testCanSyncWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
         factory(Role::class)
@@ -390,9 +622,9 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateRole(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     sync: [1,2]
@@ -405,16 +637,16 @@ class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateRole' => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
-                            'id' => '2',
+                            'id' => '1',
                         ],
                         [
-                            'id' => '1',
+                            'id' => '2',
                         ],
                     ],
                 ],
@@ -427,9 +659,9 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @test
+     * @dataProvider existingModelMutations
      */
-    public function itCanDisconnectWithBelongsToMany(): void
+    public function testCanDisconnectWithBelongsToMany(string $action): void
     {
         factory(Role::class)
             ->create()
@@ -438,9 +670,9 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateRole(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     disconnect: [1]
@@ -452,9 +684,9 @@ class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateRole' => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
@@ -473,10 +705,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertNotNull(User::find(2));
     }
 
-    /**
-     * @test
-     */
-    public function itCanSyncExistingUsersDuringCreateToABelongsToManyRelation(): void
+    public function testCanSyncExistingUsersDuringCreateToABelongsToManyRelation(): void
     {
         factory(User::class, 2)->create();
 
@@ -515,10 +744,50 @@ class BelongsToManyTest extends DBTestCase
         ]);
     }
 
+    public function testCanSyncExistingUsersDuringCreateUsingUpsertToABelongsToManyRelation(): void
+    {
+        factory(User::class, 2)->create();
+
+        $this->graphQL('
+        mutation {
+            upsertRole(input: {
+                id: 1
+                name: "foobar"
+                users: {
+                    sync: [
+                        1,2
+                    ]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertRole' => [
+                    'id' => '1',
+                    'name' => 'foobar',
+                    'users' => [
+                        [
+                            'id' => '1',
+                        ],
+                        [
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     /**
-     * @test
+     * @dataProvider existingModelMutations
      */
-    public function itCanDisconnectAllRelatedModelsOnEmptySync(): void
+    public function testCanDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         /** @var User $user */
         $user = factory(User::class)->create();
@@ -529,9 +798,9 @@ class BelongsToManyTest extends DBTestCase
 
         $this->assertCount(1, $role->users);
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateRole(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     sync: []
@@ -544,9 +813,9 @@ class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateRole' => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [],
                 ],

@@ -1,15 +1,15 @@
 {
     "name": "nuwave/lighthouse",
-    "description": "Lighthouse is a schema first GraphQL package for Laravel applications.",
     "type": "library",
+    "description": "Lighthouse is a schema first GraphQL package for Laravel applications.",
     "keywords": [
         "api",
         "graphql",
         "laravel",
         "laravel-graphql"
     ],
-    "license": "MIT",
     "homepage": "https://lighthouse-php.com",
+    "license": "MIT",
     "authors": [
         {
             "name": "Christopher Moore",
@@ -22,37 +22,51 @@
             "homepage": "https://franke.tech"
         }
     ],
-    "support": {
-        "issues": "https://github.com/nuwave/lighthouse/issues",
-        "source": "https://github.com/nuwave/lighthouse"
-    },
     "require": {
         "php": ">= 7.1",
         "ext-json": "*",
-        "illuminate/contracts": "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/http": "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/pagination": "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/routing": "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/validation": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/contracts": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "illuminate/http": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "illuminate/pagination": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "illuminate/routing": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "illuminate/support": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "illuminate/validation": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
         "webonyx/graphql-php": "^0.13.2"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "^1.19",
-        "laravel/lumen-framework": "5.5.*|5.6.*|5.7.*|5.8.*",
-        "laravel/scout": "^4.0",
+        "bensampo/laravel-enum": "^1.22",
+        "haydenpierce/class-finder": "^0.4.0",
+        "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "laravel/scout": "^4.0 || ^5.0 || ^6.0 || ^7.0",
+        "localheinz/composer-normalize": "^1.3",
         "mll-lab/graphql-php-scalars": "^2.1",
         "mockery/mockery": "^1.0",
-        "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.*",
-        "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*",
+        "nunomaduro/larastan": "^0.4.1",
+        "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0",
+        "orchestra/testbench": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0",
         "phpbench/phpbench": "@dev",
+        "phpunit/phpunit": "^6.5 || ^7.5 || ^8.4",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
+        "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",
         "laravel/scout": "Required for the @search directive",
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConstraints",
-        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel",
-        "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema"
+        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nuwave\\Lighthouse\\LighthouseServiceProvider",
+                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider"
+            ],
+            "aliases": {
+                "graphql": "Nuwave\\Lighthouse\\GraphQL"
+            }
+        }
     },
     "autoload": {
         "psr-4": {
@@ -66,23 +80,14 @@
         }
     },
     "scripts": {
-        "test": "phpunit --colors=always",
-        "test:unit": "phpunit --colors=always --testsuite Unit",
-        "test:integration": "phpunit --colors=always --testsuite Integration",
+        "bench": "phpbench run",
         "stan": "phpstan analyse --memory-limit 2048M",
-        "bench": "phpbench run"
+        "test": "phpunit --colors=always",
+        "test:integration": "phpunit --colors=always --testsuite Integration",
+        "test:unit": "phpunit --colors=always --testsuite Unit"
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Nuwave\\Lighthouse\\LighthouseServiceProvider"
-            ],
-            "aliases": {
-                "graphql": "Nuwave\\Lighthouse\\GraphQL"
-            }
-        }
-    },
-    "config": {
-        "sort-packages": true
+    "support": {
+        "issues": "https://github.com/nuwave/lighthouse/issues",
+        "source": "https://github.com/nuwave/lighthouse"
     }
 }

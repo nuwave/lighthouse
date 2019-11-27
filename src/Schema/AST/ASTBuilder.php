@@ -2,15 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Illuminate\Support\Arr;
-use GraphQL\Language\AST\NamedTypeNode;
-use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Events\BuildSchemaString;
-use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Events\BuildSchemaString;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
 class ASTBuilder
 {
@@ -22,13 +26,6 @@ class ASTBuilder
     protected $directiveFactory;
 
     /**
-     * The event dispatcher.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventDispatcher;
-
-    /**
      * The schema source provider.
      *
      * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
@@ -36,9 +33,23 @@ class ASTBuilder
     protected $schemaSourceProvider;
 
     /**
+     * The event dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
+     * The config repository.
+     *
+     * @var ConfigRepository
+     */
+    protected $configRepository;
+
+    /**
      * The document AST.
      *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST|null
      */
     protected $documentAST;
 
@@ -46,18 +57,21 @@ class ASTBuilder
      * ASTBuilder constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
      * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
+     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
      * @return void
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
+        SchemaSourceProvider $schemaSourceProvider,
         EventDispatcher $eventDispatcher,
-        SchemaSourceProvider $schemaSourceProvider
+        ConfigRepository $configRepository
     ) {
         $this->directiveFactory = $directiveFactory;
-        $this->eventDispatcher = $eventDispatcher;
         $this->schemaSourceProvider = $schemaSourceProvider;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->configRepository = $configRepository;
     }
 
     /**
@@ -65,7 +79,32 @@ class ASTBuilder
      *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public function build(): DocumentAST
+    public function documentAST(): DocumentAST
+    {
+        if (isset($this->documentAST)) {
+            return $this->documentAST;
+        }
+
+        $cacheConfig = $this->configRepository->get('lighthouse.cache');
+        if ($cacheConfig['enable']) {
+            /** @var \Illuminate\Contracts\Cache\Repository $cache */
+            $cache = app('cache');
+            $this->documentAST = $cache->remember(
+                $cacheConfig['key'],
+                // TODO remove this fallback in v5
+                $cacheConfig['ttl'] ?? null,
+                function (): DocumentAST {
+                    return $this->build();
+                }
+            );
+        } else {
+            $this->documentAST = $this->build();
+        }
+
+        return $this->documentAST;
+    }
+
+    protected function build(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
@@ -89,6 +128,7 @@ class ASTBuilder
         $this->applyFieldManipulators();
         $this->applyArgManipulators();
 
+        // TODO seperate out into modules
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
         $this->addOrderByTypes();
@@ -113,7 +153,7 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
-                $this->directiveFactory->createTypeManipulators($typeDefinition)
+                $this->directiveFactory->createAssociatedDirectivesOfType($typeDefinition, TypeManipulator::class)
                 as $typeDefinitionManipulator
             ) {
                 $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -133,7 +173,7 @@ class ASTBuilder
             foreach ($typeExtensionsList as $typeExtension) {
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
-                    $this->directiveFactory->createTypeExtensionManipulators($typeExtension)
+                    $this->directiveFactory->createAssociatedDirectivesOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
                     $typeExtensionManipulator->manipulatetypeExtension($this->documentAST, $typeExtension);
@@ -165,7 +205,7 @@ class ASTBuilder
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
-                        $this->directiveFactory->createFieldManipulators($fieldDefinition)
+                        $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -188,7 +228,7 @@ class ASTBuilder
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
-                            $this->directiveFactory->createArgManipulators($argumentDefinition)
+                            $this->directiveFactory->createAssociatedDirectivesOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
                             $argManipulator->manipulateArgDefinition(
@@ -273,29 +313,35 @@ class ASTBuilder
     }
 
     /**
+     * Returns whether or not the given interface is used within the defined types.
+     *
+     * @param  string  $interfaceName
+     *
+     * @return bool
+     */
+    protected function hasTypeImplementingInterface(string $interfaceName): bool
+    {
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                if (ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Inject the Node interface and a node field into the Query type.
      *
      * @return void
      */
     protected function addNodeSupport(): void
     {
-        $hasTypeImplementingNode = false;
-
-        foreach ($this->documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                /** @var NamedTypeNode $interface */
-                foreach ($typeDefinition->interfaces as $interface) {
-                    if ($interface->name->value === 'Node') {
-                        $hasTypeImplementingNode = true;
-                        break 2;
-                    }
-                }
-            }
-        }
-
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if (! $hasTypeImplementingNode) {
+        if (! $this->hasTypeImplementingInterface('Node')) {
             return;
         }
 

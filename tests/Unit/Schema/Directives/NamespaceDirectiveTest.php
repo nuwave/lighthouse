@@ -6,10 +6,7 @@ use Tests\TestCase;
 
 class NamespaceDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanSetNamespaceOnField(): void
+    public function testCanSetNamespaceOnField(): void
     {
         $this->schema = '
         type Query {
@@ -28,10 +25,7 @@ class NamespaceDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanSetNamespaceFromType(): void
+    public function testCanSetNamespaceFromType(): void
     {
         $this->schema = '
         type Query @namespace(field: "Tests\\\Utils\\\QueriesSecondary") {
@@ -50,10 +44,7 @@ class NamespaceDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itPrefersFieldNamespaceOverTypeNamespace(): void
+    public function testPrefersFieldNamespaceOverTypeNamespace(): void
     {
         $this->schema = '
         type Query @namespace(field: "Tests\\\Utils\\\QueriesSecondary") {

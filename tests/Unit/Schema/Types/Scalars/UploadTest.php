@@ -2,48 +2,36 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Tests\TestCase;
 use GraphQL\Error\Error;
-use Illuminate\Http\UploadedFile;
 use GraphQL\Error\InvariantViolation;
+use Illuminate\Http\UploadedFile;
 use Nuwave\Lighthouse\Schema\Types\Scalars\Upload;
+use Tests\TestCase;
 
 class UploadTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itThrowsIfSerializing(): void
+    public function testThrowsIfSerializing(): void
     {
         $this->expectException(InvariantViolation::class);
 
         (new Upload)->serialize('');
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfParsingLiteral(): void
+    public function testThrowsIfParsingLiteral(): void
     {
         $this->expectException(Error::class);
 
         (new Upload)->parseLiteral('');
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfParsingValueNotFile(): void
+    public function testThrowsIfParsingValueNotFile(): void
     {
         $this->expectException(Error::class);
 
         (new Upload)->parseValue('not a file');
     }
 
-    /**
-     * @test
-     */
-    public function itParsesValidFiles(): void
+    public function testParsesValidFiles(): void
     {
         $value = UploadedFile::fake()
             ->create('my-file.jpg', 500);

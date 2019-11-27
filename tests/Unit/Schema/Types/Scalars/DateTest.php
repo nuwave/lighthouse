@@ -3,23 +3,22 @@
 namespace Tests\Unit\Schema\Types\Scalars;
 
 use Carbon\Carbon;
-use Tests\TestCase;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
 use Nuwave\Lighthouse\Schema\Types\Scalars\Date;
+use Tests\TestCase;
 
 class DateTest extends TestCase
 {
     /**
-     * @test
      * @dataProvider invalidDateValues
      *
      * @param  mixed  $value
      * @return void
      */
-    public function itThrowsIfSerializingNonString($value): void
+    public function testThrowsIfSerializingNonString($value): void
     {
         $this->expectException(InvariantViolation::class);
 
@@ -27,13 +26,12 @@ class DateTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider invalidDateValues
      *
      * @param  mixed  $value
      * @return void
      */
-    public function itThrowsIfParseValueNonString($value): void
+    public function testThrowsIfParseValueNonString($value): void
     {
         $this->expectException(Error::class);
 
@@ -58,10 +56,7 @@ class DateTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
-    public function itParsesValueString(): void
+    public function testParsesValueString(): void
     {
         $date = '2018-10-01';
         $this->assertEquals(
@@ -70,10 +65,7 @@ class DateTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itParsesLiteral(): void
+    public function testParsesLiteral(): void
     {
         $dateLiteral = new StringValueNode(
             ['value' => '2018-10-01']
@@ -86,10 +78,7 @@ class DateTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfParseLiteralNonString(): void
+    public function testThrowsIfParseLiteralNonString(): void
     {
         $this->expectException(Error::class);
 
@@ -98,10 +87,7 @@ class DateTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itSerializesCarbonInstance(): void
+    public function testSerializesCarbonInstance(): void
     {
         $now = now();
         $result = (new Date)->serialize($now);
@@ -112,10 +98,7 @@ class DateTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itSerializesValidDateString(): void
+    public function testSerializesValidDateString(): void
     {
         $date = '2018-10-01';
         $result = (new Date)->serialize($date);

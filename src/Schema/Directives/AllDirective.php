@@ -5,10 +5,11 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class AllDirective extends BaseDirective implements FieldResolver
+class AllDirective extends BaseDirective implements DefinedDirective, FieldResolver
 {
     /**
      * Name of the directive.
@@ -18,6 +19,24 @@ class AllDirective extends BaseDirective implements FieldResolver
     public function name(): string
     {
         return 'all';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+directive @all(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**
@@ -30,17 +49,11 @@ class AllDirective extends BaseDirective implements FieldResolver
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
-                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
-                $modelClass = $this->getModelClass();
-
                 return $resolveInfo
-                    ->builder
-                    ->addScopes(
+                    ->argumentSet
+                    ->enhanceBuilder(
+                        $this->getModelClass()::query(),
                         $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
-                        $modelClass::query(),
-                        $args
                     )
                     ->get();
             }

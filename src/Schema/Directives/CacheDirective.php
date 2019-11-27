@@ -2,24 +2,39 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use Carbon\Carbon;
+use Closure;
 use GraphQL\Deferred;
-use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Cache\CacheManager;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CacheDirective extends BaseDirective implements FieldMiddleware
+class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
+    /**
+     * @var \Illuminate\Cache\CacheManager|\Illuminate\Cache\Repository
+     */
+    protected $cacheManager;
+
+    /**
+     * @param  \Illuminate\Cache\CacheManager  $cacheManager
+     * @return void
+     */
+    public function __construct(CacheManager $cacheManager)
+    {
+        $this->cacheManager = $cacheManager;
+    }
+
     /**
      * Name of the directive.
      *
@@ -28,6 +43,29 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     public function name(): string
     {
         return 'cache';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Cache the result of a resolver.
+"""
+directive @cache(
+  """
+  Set the duration it takes for the cache to expire in seconds.
+  If not given, the result will be stored forever.
+  """
+  maxAge: Int
+
+  """
+  Limit access to cached data to the currently authenticated user.
+  When the field is accessible by guest users, this will not have
+  any effect, they will access a shared cache.
+  """
+  private: Boolean = false
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**
@@ -39,95 +77,72 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $this->setNodeKey(
+        $this->setCacheKeyOnParent(
             $fieldValue->getParent()
         );
 
+        // Ensure we run this after all other field middleware
         $fieldValue = $next($fieldValue);
-        $resolver = $fieldValue->getResolver();
-        $maxAge = $this->directiveArgValue('maxAge');
-        $privateCache = $this->directiveArgValue('private', false);
 
-        return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $privateCache) {
+        $resolver = $fieldValue->getResolver();
+
+        $maxAge = $this->directiveArgValue('maxAge');
+        $isPrivate = $this->directiveArgValue('private', false);
+
+        return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
             $cacheValue = new CacheValue([
                 'field_value' => $fieldValue,
                 'root' => $root,
                 'args' => $args,
                 'context' => $context,
                 'resolve_info' => $resolveInfo,
-                'private_cache' => $privateCache,
+                'is_private' => $isPrivate,
             ]);
 
             $cacheKey = $cacheValue->getKey();
-            $cacheTags = $cacheValue->getTags();
 
-            /** @var \Illuminate\Cache\CacheManager $cache */
-            $cache = app('cache');
-            $useTags = $this->useTags($cache);
+            /** @var \Illuminate\Cache\Repository|\Illuminate\Cache\TaggedCache $cache */
+            $cache = $this->shouldUseTags()
+                ? $this->cacheManager->tags($cacheValue->getTags())
+                : $this->cacheManager;
 
-            $cacheHas = $useTags
-                ? $cache->tags($cacheTags)->has($cacheKey)
-                : $cache->has($cacheKey);
+            $cacheHasKey = $cache->has($cacheKey);
 
-            if ($cacheHas) {
-                return $useTags
-                    ? $cache->tags($cacheTags)->get($cacheKey)
-                    : $cache->get($cacheKey);
+            // We found a matching value in the cache, so we can just return early
+            // without actually running the query
+            if ($cacheHasKey) {
+                return $cache->get($cacheKey);
             }
 
             $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
 
-            $cacheExp = $maxAge
-                ? Carbon::now()->addSeconds($maxAge)
-                : null;
+            $storeInCache = $maxAge
+                ? function ($value) use ($cacheKey, $maxAge, $cache) {
+                    $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
+                }
+            : function ($value) use ($cacheKey, $cache) {
+                $cache->forever($cacheKey, $value);
+            };
 
             ($resolvedValue instanceof Deferred)
-                ? $resolvedValue->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags): void {
-                    $this->store($cache, $cacheKey, $result, $cacheExp, $cacheTags);
+                ? $resolvedValue->then(function ($result) use ($storeInCache): void {
+                    $storeInCache($result);
                 })
-                : $this->store($cache, $cacheKey, $resolvedValue, $cacheExp, $cacheTags);
+                : $storeInCache($resolvedValue);
 
             return $resolvedValue;
         });
     }
 
     /**
-     * Store value in cache.
+     * Check if tags should be used and are available.
      *
-     * @param  \Illuminate\Cache\CacheManager  $cache
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  \Carbon\Carbon|null  $expiration
-     * @param  mixed[]  $tags
-     * @return void
-     */
-    protected function store(CacheManager $cache, string $key, $value, ?Carbon $expiration, array $tags): void
-    {
-        $supportsTags = $this->useTags($cache);
-
-        if ($expiration) {
-            $supportsTags
-                ? $cache->tags($tags)->put($key, $value, $expiration)
-                : $cache->put($key, $value, $expiration);
-
-            return;
-        }
-
-        $supportsTags
-            ? $cache->tags($tags)->forever($key, $value)
-            : $cache->forever($key, $value);
-    }
-
-    /**
-     * Check if tags should be used.
-     *
-     * @param  \Illuminate\Cache\CacheManager  $cache
      * @return bool
      */
-    protected function useTags(CacheManager $cache): bool
+    protected function shouldUseTags(): bool
     {
         return config('lighthouse.cache.tags', false)
-            && method_exists($cache->store(), 'tags');
+            && method_exists($this->cacheManager->store(), 'tags');
     }
 
     /**
@@ -138,48 +153,46 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    protected function setNodeKey(TypeValue $typeValue): void
+    protected function setCacheKeyOnParent(TypeValue $typeValue): void
     {
-        if ($typeValue->getCacheKey()) {
+        if (
+            // The cache key was already set, so we do not have to look again
+            $typeValue->getCacheKey()
+            // The Query type is exempt from requiring a cache key
+            || $typeValue->getTypeDefinitionName() === 'Query'
+        ) {
             return;
         }
 
-        $fields = data_get($typeValue->getTypeDefinition(), 'fields', []);
-        $nodeKey = (new Collection($fields))->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
-            if ($key) {
-                return $key;
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $typeDefinition */
+        $typeDefinition = $typeValue->getTypeDefinition();
+
+        // First priority: Look for a field with the @cacheKey directive
+        /** @var FieldDefinitionNode $field */
+        foreach ($typeDefinition->fields as $field) {
+            if (ASTHelper::hasDirective($field, 'cacheKey')) {
+                $typeValue->setCacheKey($field->name->value);
+
+                return;
             }
-
-            $hasCacheKey = (new Collection($field->directives))
-                ->contains(function (DirectiveNode $directive): bool {
-                    return $directive->name->value === 'cacheKey';
-                });
-
-            return $hasCacheKey
-                ? $field->name->value
-                : $key;
-        });
-
-        if (! $nodeKey) {
-            $nodeKey = (new Collection($fields))->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
-                if ($key) {
-                    return $key;
-                }
-
-                $typeName = ASTHelper::getUnderlyingTypeName($field);
-
-                return $typeName === 'ID'
-                    ? $field->name->value
-                    : $key;
-            });
         }
 
-        if (! $nodeKey && $typeValue->getTypeDefinitionName() !== 'Query') {
-            throw new DirectiveException(
-                "No @cacheKey or ID field defined on {$typeValue->getTypeDefinitionName()}"
-            );
+        // Second priority: Look for a Non-Null field with the ID type
+        /** @var FieldDefinitionNode $field */
+        foreach ($typeDefinition->fields as $field) {
+            if (
+                $field->type instanceof NonNullTypeNode
+                && $field->type->type instanceof NamedTypeNode
+                && $field->type->type->name->value === 'ID'
+            ) {
+                $typeValue->setCacheKey($field->name->value);
+
+                return;
+            }
         }
 
-        $typeValue->setCacheKey($nodeKey);
+        throw new DirectiveException(
+            "No @cacheKey or ID field defined on {$typeValue->getTypeDefinitionName()}"
+        );
     }
 }

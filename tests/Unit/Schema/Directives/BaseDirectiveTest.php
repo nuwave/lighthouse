@@ -2,15 +2,16 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
-use Tests\Utils\Models\User;
-use Tests\Utils\Models\Closure;
-use Tests\Utils\Models\Category;
-use Tests\Utils\ModelsSecondary\OnlyHere;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Tests\TestCase;
+use Tests\Utils\Models\Category;
+use Tests\Utils\Models\Closure;
+use Tests\Utils\Models\Team;
+use Tests\Utils\Models\User;
 use Tests\Utils\ModelsSecondary\Category as CategorySecondary;
+use Tests\Utils\ModelsSecondary\OnlyHere;
 
 /**
  * This class does test the internal behaviour of the BaseDirective class.
@@ -22,11 +23,30 @@ use Tests\Utils\ModelsSecondary\Category as CategorySecondary;
  */
 class BaseDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itDefaultsToFieldTypeForTheModelClass(): void
+    public function testGetsModelClassFromDirective(): void
     {
+        $this->schema .= '
+        type User @modelClass(class: "Team") {
+            id: ID
+        }
+        ';
+
+        $directive = $this->constructFieldDirective('foo: User @dummy');
+
+        $this->assertSame(
+            Team::class,
+            $directive->getModelClass()
+        );
+    }
+
+    public function testDefaultsToFieldTypeForTheModelClass(): void
+    {
+        $this->schema .= '
+        type User {
+            id: ID
+        }
+        ';
+
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
         $this->assertSame(
@@ -35,22 +55,36 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfTheClassIsNotAModel(): void
+    public function testThrowsIfTheClassIsNotInTheSchema(): void
     {
-        $directive = $this->constructFieldDirective('foo: Exception @dummy');
+        $directive = $this->constructFieldDirective('foo: UnknownType @dummy');
 
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
         $directive->getModelClass();
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesAModelThatIsNamedLikeABaseClass(): void
+    public function testThrowsIfTheClassIsNotAModel(): void
     {
+        $this->schema .= '
+        type Exception {
+            id: ID
+        }
+        ';
+
+        $directive = $this->constructFieldDirective('foo: Exception @dummy');
+
+        $this->expectException(DefinitionException::class);
+        $directive->getModelClass();
+    }
+
+    public function testResolvesAModelThatIsNamedLikeABaseClass(): void
+    {
+        $this->schema .= '
+        type Closure {
+            id: ID
+        }
+        ';
+
         $directive = $this->constructFieldDirective('foo: Closure @dummy');
 
         $this->assertSame(
@@ -59,11 +93,14 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itPrefersThePrimaryModelNamespace(): void
+    public function testPrefersThePrimaryModelNamespace(): void
     {
+        $this->schema .= '
+        type Category {
+            id: ID
+        }
+        ';
+
         $directive = $this->constructFieldDirective('foo: Category @dummy');
 
         $this->assertSame(
@@ -72,11 +109,14 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itAllowsOverwritingTheDefaultModel(): void
+    public function testAllowsOverwritingTheDefaultModel(): void
     {
+        $this->schema .= '
+        type OnlyHere {
+            id: ID
+        }
+        ';
+
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy(model: "Tests\\\Utils\\\ModelsSecondary\\\Category")');
 
         $this->assertSame(
@@ -85,11 +125,14 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesFromTheSecondaryModelNamespace(): void
+    public function testResolvesFromTheSecondaryModelNamespace(): void
     {
+        $this->schema .= '
+        type OnlyHere {
+            id: ID
+        }
+        ';
+
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy');
 
         $this->assertSame(

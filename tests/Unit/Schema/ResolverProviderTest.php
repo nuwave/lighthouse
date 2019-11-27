@@ -3,12 +3,13 @@
 namespace Tests\Unit\Schema;
 
 use Closure;
-use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\ResolverProvider;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\ResolverProvider;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Tests\TestCase;
+use Tests\Utils\Queries\FooBar;
 
 class ResolverProviderTest extends TestCase
 {
@@ -24,10 +25,7 @@ class ResolverProviderTest extends TestCase
         $this->resolverProvider = new ResolverProvider;
     }
 
-    /**
-     * @test
-     */
-    public function itGetsTheWebonyxDefaultResolverForNonRootFields(): void
+    public function testGetsTheWebonyxDefaultResolverForNonRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
 
@@ -37,10 +35,7 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itGetsTheConventionBasedDefaultResolverForRootFields(): void
+    public function testGetsTheConventionBasedDefaultResolverForRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('foo: Int');
 
@@ -50,10 +45,36 @@ class ResolverProviderTest extends TestCase
         );
     }
 
+    public function testGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
+    {
+        $fieldValue = $this->constructFieldValue('fooInvoke: Int');
+
+        $this->assertInstanceOf(
+            Closure::class,
+            $this->resolverProvider->provideResolver($fieldValue)
+        );
+    }
+
     /**
-     * @test
+     * @deprecated will be changed in v5
      */
-    public function itLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
+    public function testGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
+    {
+        $fieldValue = $this->constructFieldValue('fooBar: String');
+
+        $resolver = $this->resolverProvider->provideResolver($fieldValue);
+        $this->assertInstanceOf(
+            Closure::class,
+            $resolver
+        );
+
+        $this->assertSame(
+            FooBar::RESOLVE_RESULT,
+            $resolver()
+        );
+    }
+
+    public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
 
@@ -63,10 +84,7 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfRootFieldHasNoResolver(): void
+    public function testThrowsIfRootFieldHasNoResolver(): void
     {
         $this->expectException(DefinitionException::class);
 

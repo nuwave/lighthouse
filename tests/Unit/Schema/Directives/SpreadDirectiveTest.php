@@ -2,82 +2,42 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\DBTestCase;
-use Tests\Utils\Models\User;
+use Tests\TestCase;
 
-class SpreadDirectiveTest extends DBTestCase
+class SpreadDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itSpreadsTheInputIntoTheQuery(): void
+    public function testNestedSpread(): void
     {
-        factory(User::class, 2)->create();
+        $this->mockResolver()
+            ->with(null, [
+                'foo' => 1,
+                'baz' => 2,
+            ]);
 
         $this->schema = '
         type Query {
-            user(input: UserInput @spread): User @first
+            foo(input: Foo @spread): Int @mock
         }
-
-        type User {
-            id: ID
+        
+        input Foo {
+            foo: Int
+            bar: Bar @spread
         }
-
-        input UserInput {
-            id: ID @eq
+        
+        input Bar {
+            baz: Int
         }
         ';
 
         $this->graphQL('
         {
-            user(input: {
-                id: 2
-            }) {
-                id
-            }
+            foo(input: {
+                foo: 1
+                bar: {
+                    baz: 2
+                }
+            })
         }
-        ')->assertJson([
-            'data' => [
-                'user' => [
-                    'id' => 2,
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @test
-     */
-    public function itIgnoresSpreadedInputIfNotGiven(): void
-    {
-        factory(User::class)->create();
-
-        $this->schema = '
-        type Query {
-            user(input: UserInput @spread): User @first
-        }
-
-        type User {
-            id: ID
-        }
-
-        input UserInput {
-            id: ID @eq
-        }
-        ';
-
-        $this->graphQL('
-        {
-            user{
-                id
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'user' => [
-                    'id' => 1,
-                ],
-            ],
-        ]);
+        ');
     }
 }

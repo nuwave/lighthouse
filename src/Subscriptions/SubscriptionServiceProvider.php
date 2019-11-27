@@ -2,22 +2,22 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\ServiceProvider;
-use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
-use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
-use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionListener;
-use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
+use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {

@@ -6,6 +6,9 @@ Relay requires a particular kind of pagination which is the [Cursor Connection](
 To get a relay-compatible connection on a root query field, use the [@paginate](../api-reference/directives.md#paginate)
 directive with the pagination type `connection`.
 
+> Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
+> Under the hood, the "cursor" is decoded into a page offset.
+
 ```graphql
 type Query {
     users: [User!]! @paginate(type: "connection")
@@ -32,7 +35,7 @@ own mechanism of encoding/decoding global ids.
 
 [Global Object Identification](https://facebook.github.io/relay/graphql/objectidentification.htm)
 
-[@model](../api-reference/directives.md#model)
+[@node](../api-reference/directives.md#node)
 
 [@globalId](../api-reference/directives.md#globalid)
 

@@ -4,13 +4,13 @@ namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class Defer implements CreatesResponse
 {
@@ -50,7 +50,7 @@ class Defer implements CreatesResponse
     protected $isStreaming = false;
 
     /**
-     * @var int
+     * @var float
      */
     protected $maxExecutionTime = 0;
 
@@ -85,7 +85,15 @@ class Defer implements CreatesResponse
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
-            PartialParser::directiveDefinition('directive @defer(if: Boolean) on FIELD')
+            PartialParser::directiveDefinition('
+"""
+Use this directive on expensive or slow fields to resolve them asynchronously.
+Must not be placed upon:
+- Non-Nullable fields
+- Mutation root fields
+"""
+directive @defer(if: Boolean = true) on FIELD
+')
         );
     }
 
@@ -199,8 +207,7 @@ class Defer implements CreatesResponse
                     $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
                 }
 
-                // TODO: Allow nested_levels to be set in config
-                // to break out of loop early.
+                // TODO: Allow nested_levels to be set in config to break out of loop early.
                 while (
                     count($this->deferred)
                     && ! $this->executionTimeExpired()

@@ -2,14 +2,14 @@
 
 namespace Tests\Integration\Defer;
 
-use Tests\DBTestCase;
-use Illuminate\Support\Arr;
-use Tests\Utils\Models\User;
-use Tests\Utils\Models\Company;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
-use Nuwave\Lighthouse\Defer\DeferServiceProvider;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\DB;
+use Nuwave\Lighthouse\Defer\DeferServiceProvider;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Company;
+use Tests\Utils\Models\User;
 
 class DeferDBTest extends DBTestCase
 {
@@ -35,10 +35,7 @@ class DeferDBTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferBelongsToFields(): void
+    public function testCanDeferBelongsToFields(): void
     {
         $company = factory(Company::class)->create();
         $user = factory(User::class)->create([
@@ -93,10 +90,7 @@ class DeferDBTest extends DBTestCase
         $this->assertSame($company->name, Arr::get($deferredCompany['user.company']['data'], 'name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferNestedRelationshipFields(): void
+    public function testCanDeferNestedRelationshipFields(): void
     {
         $company = factory(Company::class)->create();
         $users = factory(User::class, 5)->create([
@@ -170,10 +164,7 @@ class DeferDBTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferNestedListFields(): void
+    public function testCanDeferNestedListFields(): void
     {
         /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Company> $companies */
         $companies = factory(Company::class, 2)

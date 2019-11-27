@@ -5,11 +5,185 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.7.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.6.0...master)
+
+### Added
+
+- Add `syncWithoutDetaching` option for BelongsToMany and MorphToMany relationships https://github.com/nuwave/lighthouse/pull/1031
+- Add `injectArgs` option to `@can` directive to pass along client defined
+  arguments to the policy check https://github.com/nuwave/lighthouse/pull/1043
+- Allow globally turning off relation batch loading through the
+  config option `batchload_relations` https://github.com/nuwave/lighthouse/pull/1059
+
+### Changed
+
+- Add ability to fetch soft deleted model within `@can` directive to validate permissions
+  using `@softDeletes` directive. https://github.com/nuwave/lighthouse/pull/1042
+- Improve the error message for missing field resolvers by offering a solution https://github.com/nuwave/lighthouse/pull/1045
+
+## [4.6.0](https://github.com/nuwave/lighthouse/compare/v4.5.3...v4.6.0)
+
+### Added
+
+- Add `@scope` directive for adding a scope to the query builder https://github.com/nuwave/lighthouse/pull/998
+
+### Changed
+
+- Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class  https://github.com/nuwave/lighthouse/pull/1027
+
+### Fixed
+
+- Handle arrays of namespaces in generator commands https://github.com/nuwave/lighthouse/pull/1033
+
+## [4.5.3](https://github.com/nuwave/lighthouse/compare/v4.5.2...v4.5.3)
+
+### Fixed
+
+- Handle `null` being passed to a nullable argument that is an input object type https://github.com/nuwave/lighthouse/pull/1021
+
+## [4.5.2](https://github.com/nuwave/lighthouse/compare/v4.5.1...v4.5.2)
+
+### Fixed
+
+- Fix conversion of client directives after the schema was cached https://github.com/nuwave/lighthouse/pull/1019
+
+## [4.5.1](https://github.com/nuwave/lighthouse/compare/v4.5.0...v4.5.1)
+
+### Fixed
+
+- Handle `null` being passed to a nullable argument that is a list of type https://github.com/nuwave/lighthouse/pull/1016
+
+## [4.5.0](https://github.com/nuwave/lighthouse/compare/v4.4.2...v4.5.0)
+
+### Added
+
+- Add `@upsert` directive and nested mutation operations to create or update a model
+  regardless whether it exists https://github.com/nuwave/lighthouse/pull/1005
+
+### Fixed
+
+- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015 
+
+## [4.4.2](https://github.com/nuwave/lighthouse/compare/v4.4.1...v4.4.2)
+
+### Added
+
+- Validate the correctness of the `builder` given to `@paginate` at schema
+  build time
+
+### Fixed
+
+- Do not require the type of a field matching a model class when using the
+  `builder` argument of `@paginate` https://github.com/nuwave/lighthouse/pull/1011
+
+## [4.4.1](https://github.com/nuwave/lighthouse/compare/v4.4.0...v4.4.1)
+
+### Fixed
+
+- Fix regression in 4.4.0 that required matching the type returned from paginated relationship
+  fields with the class name of the model https://github.com/nuwave/lighthouse/pull/1011
+
+## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
+
+### Added
+
+- Add `@count` directive for counting a relationship https://github.com/nuwave/lighthouse/pull/984
+- Allow overwriting the name of Enum types created through `LaravelEnumType` https://github.com/nuwave/lighthouse/pull/968
+- Resolve models through Relay's global identification using `@node` https://github.com/nuwave/lighthouse/pull/974
+- Add experimental `@modelClass` directive to map types to models. It will be renamed
+  to `@model` in v5 https://github.com/nuwave/lighthouse/pull/974
+
+### Fixed
+
+- Remove the extra new line from the returned value when using `@globalId(decode: "ID")` https://github.com/nuwave/lighthouse/pull/982
+- Throw a syntax error instead of an exception when performing an
+  empty request or a request with an empty query https://github.com/nuwave/lighthouse/pull/989
+- Properly apply `@spread` when used within a nested input object https://github.com/nuwave/lighthouse/pull/992
+
+### Changed
+
+- Allow additional route configurations `prefix` and `domain` https://github.com/nuwave/lighthouse/pull/951
+- Enable schema cache only when `APP_ENV` != 'local' https://github.com/nuwave/lighthouse/pull/957
+
+### Fixed
+
+- Fix default model detection when using other directives combination with `@paginate` https://github.com/nuwave/lighthouse/pull/974
+
+### Deprecated
+
+- Use the `RegisterDirectiveNamespaces` event instead of `DirectiveFactory#addResolved()` https://github.com/nuwave/lighthouse/pull/950
+- Use `@node` instead of `@model` to resolve models through Relay's global identification https://github.com/nuwave/lighthouse/pull/974
+
+## [4.3.0](https://github.com/nuwave/lighthouse/compare/v4.2.1...v4.3.0)
+
+### Added
+
+- Add `@restore` and `@forceDelete` directives, similar to `@delete` https://github.com/nuwave/lighthouse/pull/941
+- Add `@softDeletes` and `@trashed` directives to enable
+  filtering soft deleted models https://github.com/nuwave/lighthouse/pull/937
+
+### Fixed
+
+- Prevent throwing in `lighthouse:ide-helper` when no custom directives are defined https://github.com/nuwave/lighthouse/pull/948
+
+### Changed
+
+- Validate requirements for argument definitions of `@delete`, `@forceDelete` and `@restore`
+  during schema build time https://github.com/nuwave/lighthouse/pull/941
+
+## [4.2.1](https://github.com/nuwave/lighthouse/compare/v4.2.0...v4.2.1)
+
+### Fixed
+
+- Actually use the specified `edgeType` in Relay style connections https://github.com/nuwave/lighthouse/pull/939
+
+## [4.2.0](https://github.com/nuwave/lighthouse/compare/v4.1.1...v4.2.0)
+
+### Added
+
+- Add `@morphOne` directive for polymorphic one-to-one relationships https://github.com/nuwave/lighthouse/pull/944
+- Add `@morphTo` directive for polymorphic one-to-one relationships https://github.com/nuwave/lighthouse/pull/921
+- Add `@morphMany` directive for polymorphic one-to-many relationships https://github.com/nuwave/lighthouse/pull/944
+- Support Laravel `^6.0` https://github.com/nuwave/lighthouse/pull/926
+- Add command `lighthouse:ide-helper` for generating a definition file with all schema directives https://github.com/nuwave/lighthouse/pull/933
+
+## [4.1.1](https://github.com/nuwave/lighthouse/compare/v4.1.0...v4.1.1)
+
+### Fixed
+
+- Unbox laravel-enum inputs when using the builder directives https://github.com/nuwave/lighthouse/pull/927
+
+## [4.1.0](https://github.com/nuwave/lighthouse/compare/v4.0.0...v4.1.0)
+
+### Added
+
+- Add the `@whereJsonContains` directive to an input value as
+  a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses) https://github.com/nuwave/lighthouse/pull/919
+- Allow using callable classes with `__invoke` when referencing methods in directives
+  and when looking for default resolvers or type resolvers https://github.com/nuwave/lighthouse/issues/882
+- Allow to restrict column names to a well-defined list in `@whereContraints`
+  and generate definitions for an `Enum` type and an `Input` type
+  that are restricted to the defined columns https://github.com/nuwave/lighthouse/pull/916
+- Add test helpers for introspection queries to `MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/916
+
+### Deprecated
+
+- The default name of resolver and type resolver methods will be `__invoke` in v5 https://github.com/nuwave/lighthouse/issues/882
+
+### Fixed
+
+- Fixed the `ValidationDirective` not setting the mutation or query arguments to itself https://github.com/nuwave/lighthouse/pull/915
+
+## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
 ### Added
 
 - Add the `@namespace` directive as a replacement for the removed `@group` directive https://github.com/nuwave/lighthouse/pull/768
+- The `@defer` extension now supports deferring nested fields of mutations https://github.com/nuwave/lighthouse/pull/855
+- Add a simple way to define complex validation directives by
+  extending `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective` https://github.com/nuwave/lighthouse/pull/846
+- Extend the `@belongsToMany` directive to support pivot data on a custom Relay style Edge type https://github.com/nuwave/lighthouse/pull/871
+- Implement `connect`, `disconnect` and `delete` operations for nested mutations upon MorphTo relationships https://github.com/nuwave/lighthouse/pull/879
 
 ### Fixed
 
@@ -17,18 +191,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make nested mutations work with subclassed relationship types https://github.com/nuwave/lighthouse/pull/825
 - Allow empty arrays and other falsy values as input for nested mutation operations like "sync" https://github.com/nuwave/lighthouse/pull/830
 - Use `Illuminate\Contracts\Config\Repository` instead of `Illuminate\Config\Repository` https://github.com/nuwave/lighthouse/issues/832
+- Allow checking the abilities with `@can` when issuing mass updates on multiple models https://github.com/nuwave/lighthouse/pull/838
+- Allow use of `private` in `@cache` directive even when the user is not authenticated https://github.com/nuwave/lighthouse/pull/843
+- Fix Lumen route registration https://github.com/nuwave/lighthouse/pull/853
+- Fix handling of `@include` directive, it is semantically opposite to `@skip`, when using it with `@defer` https://github.com/nuwave/lighthouse/pull/855
+- Allow querying for null values using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/872
+- Fix issue when using the `@model` directive in a type that has a list field https://github.com/nuwave/lighthouse/pull/883
+- Make the `@include` and `@skip` directives that are part of the GraphQL spec show up in introspection
+  and fix handling of default values in custom client directives https://github.com/nuwave/lighthouse/pull/892
 
 ### Changed
 
 - Bumped the requirement on `webonyx/graphql-php` to `^0.13.2` https://github.com/nuwave/lighthouse/pull/768
 - Rename directive interfaces dealing with types from `Node*` to `Type*` https://github.com/nuwave/lighthouse/pull/768
-- Change the signature of the AST manipulating directive interfaces: `TypeManipulator`, `FieldManipulator` and `ArgManipulator` https://github.com/nuwave/lighthouse/pull/768
+- Change the signature of the AST manipulating directive interfaces:
+  `TypeManipulator`, `FieldManipulator` and `ArgManipulator` https://github.com/nuwave/lighthouse/pull/768
 - Change the API of the `DocumentAST` class to enable a more performant implementation https://github.com/nuwave/lighthouse/pull/768
 - Enable the schema caching option `lighthouse.cache.enable` by default https://github.com/nuwave/lighthouse/pull/768 
 - Lazily load types from the schema. Directives defined on parts of the schema that are not used within the current
   query are no longer run on every request https://github.com/nuwave/lighthouse/pull/768
-- Simplify the default route configuration https://github.com/nuwave/lighthouse/pull/820
+- Simplify the default route configuration.
+  Make sure to review your `config/lighthouse.php` and bring it up to date
+  with the latest changes in the base configuration file https://github.com/nuwave/lighthouse/pull/820
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
+- The pagination field argument that controls the amount of results
+  now default tos `first` instead of `count`. The config `pagination_amount_argument`
+  can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
+- Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
+- Make the argument used for finding a model to check `@can` against configurable.
+  The previous behaviour of implicitly using the `id` argument for finding a specific
+  model to authorize against now no longer works. https://github.com/nuwave/lighthouse/pull/856
+- Change the `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` wrapper to map
+  to Enum instances internally https://github.com/nuwave/lighthouse/pull/908
 
 ### Removed
 
@@ -38,6 +232,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use the `@spread` directive instead of the `flatten` argument of `@create`/`@update` https://github.com/nuwave/lighthouse/pull/822
 - Remove `dispatch` aliases `fire` and `class` for dispatching through `@event` https://github.com/nuwave/lighthouse/pull/823
 - Remove the `GraphQL` facade and the container alias `graphql` https://github.com/nuwave/lighthouse/pull/824
+- Remove the alias `if` for specifying the `ability` that has to be met in `@can` https://github.com/nuwave/lighthouse/pull/838
+
+### Deprecated
+
+- The configuration option `pagination_amount_argument` will be removed in v5
 
 ## [3.7.0](https://github.com/nuwave/lighthouse/compare/v3.6.1...v3.7.0)
 
@@ -52,7 +251,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix querying for falsy values through `@whereConstraints` https://github.com/nuwave/lighthouse/pull/800
-- Use `Illuminate\Contracts\Events\Dispatcher` instead of concrete implementation in SubscriptionBroadcaster https://github.com/nuwave/lighthouse/pull/805
+- Use `Illuminate\Contracts\Events\Dispatcher` instead of concrete implementation
+  in SubscriptionBroadcaster https://github.com/nuwave/lighthouse/pull/805
 
 ### Deprecated
 
@@ -173,7 +373,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support Subscriptions https://github.com/nuwave/lighthouse/pull/337
 - Support `@defer` client directive https://github.com/nuwave/lighthouse/pull/422
 - Define validation for list arguments themselves through `@rulesForArray` https://github.com/nuwave/lighthouse/pull/427
-- The `@hasMany` and `@paginator` directives now support an additional argument `defaultCount` that sets a default value for the generated field argument `count` https://github.com/nuwave/lighthouse/pull/428
+- The `@hasMany` and `@paginator` directives now support an additional argument `defaultCount`
+  that sets a default value for the generated field argument `count` https://github.com/nuwave/lighthouse/pull/428
 - Allow user to be guest when using the `@can` directive https://github.com/nuwave/lighthouse/pull/431
 - Add shortcut to get NodeValue type definition fields https://github.com/nuwave/lighthouse/pull/432
 - Use `@inject` with dot notation to set nested value https://github.com/nuwave/lighthouse/pull/511 
@@ -196,7 +397,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The methods called with `@method` now receive the same 4 resolver arguments that all
   other resolvers do https://github.com/nuwave/lighthouse/pull/486
 - Handle mutating directives transactional by default https://github.com/nuwave/lighthouse/pull/512
-- Nested mutations for BelongsTo require wrapping the ID in a `connect` argument https://github.com/nuwave/lighthouse/pull/514 https://github.com/nuwave/lighthouse/pull/549
+- Nested mutations for BelongsTo require wrapping the ID in a
+  `connect` argument https://github.com/nuwave/lighthouse/pull/514 https://github.com/nuwave/lighthouse/pull/549
 - Make the error messages returned by `@can` more friendly https://github.com/nuwave/lighthouse/pull/515
 - Bump requirements for `webonyx/graphql-php` to `^0.13` and PHP to `>= 7.1` https://github.com/nuwave/lighthouse/pull/517
 - Replace `DirectiveRegistry` with `DirectiveFactory` to lazy load directives https://github.com/nuwave/lighthouse/pull/520

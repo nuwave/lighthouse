@@ -2,17 +2,14 @@
 
 namespace Tests\Unit\Schema;
 
-use Tests\TestCase;
-use GraphQL\Validator\Rules\QueryDepth;
-use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
+use Tests\TestCase;
 
 class SecurityTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanSetMaxComplexityThroughConfig(): void
+    public function testCanSetMaxComplexityThroughConfig(): void
     {
         config(['lighthouse.security.max_query_complexity' => 1]);
 
@@ -29,10 +26,7 @@ class SecurityTest extends TestCase
         $this->assertMaxQueryComplexityIs1();
     }
 
-    /**
-     * @test
-     */
-    public function itCanSetMaxDepthThroughConfig(): void
+    public function testCanSetMaxDepthThroughConfig(): void
     {
         config(['lighthouse.security.max_query_depth' => 1]);
 
@@ -50,14 +44,9 @@ class SecurityTest extends TestCase
         $this->assertMaxQueryDepthIs1();
     }
 
-    /**
-     * @test
-     */
-    public function itCanDisableIntrospectionThroughConfig(): void
+    public function testCanDisableIntrospectionThroughConfig(): void
     {
         config(['lighthouse.security.disable_introspection' => true]);
-
-        $this->schema = $this->placeholderQuery();
 
         $this->assertIntrospectionIsDisabled();
     }

@@ -2,29 +2,45 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\DB;
+
 abstract class DBTestCase extends TestCase
 {
+    protected static $migrated = false;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
-        $this->withFactories(__DIR__.'/database/factories');
+        if (! static::$migrated) {
+            // We have to use this instead of --realpath as long as Laravel 5.5 is supported
+            $this->app->setBasePath(__DIR__);
+            $this->artisan('migrate:fresh', [
+                '--path' => 'database/migrations',
+            ]);
 
-        // This takes care of refreshing the database between tests
-        // as we are using the in-memory SQLite db we do not need RefreshDatabase
-        $this->artisan('migrate');
+            static::$migrated = true;
+        }
+
+        // Ensure we start from a clean slate each time
+        // We cannot use transactions, as they do not reset autoincrement
+        foreach (DB::select('SHOW TABLES') as $table) {
+            DB::table($table->Tables_in_test)->truncate();
+        }
+
+        $this->withFactories(__DIR__.'/database/factories');
     }
 
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('database.default', 'sqlite');
-        $app['config']->set('database.connections.sqlite', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('database.connections.mysql', [
+            'driver' => 'mysql',
+            'database' => 'test',
+            'host' => env('TRAVIS') ? '127.0.0.1' : 'mysql',
+            'username' => 'root',
         ]);
     }
 }

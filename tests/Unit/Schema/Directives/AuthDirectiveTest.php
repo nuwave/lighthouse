@@ -7,10 +7,7 @@ use Tests\Utils\Models\User;
 
 class AuthDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanResolveAuthenticatedUser(): void
+    public function testCanResolveAuthenticatedUser(): void
     {
         $user = new User(['foo' => 'bar']);
         $this->be($user);
@@ -40,10 +37,7 @@ class AuthDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveAuthenticatedUserWithGuardArgument(): void
+    public function testCanResolveAuthenticatedUserWithGuardArgument(): void
     {
         $user = new User(['foo' => 'bar']);
 

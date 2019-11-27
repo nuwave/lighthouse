@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class RenameDirective extends BaseDirective implements FieldResolver
+class RenameDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -16,6 +17,19 @@ class RenameDirective extends BaseDirective implements FieldResolver
     public function name(): string
     {
         return 'rename';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+directive @rename(
+  """
+  Specify the original name of the property/key that the field
+  value can be retrieved from.
+  """
+  attribute: String!
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

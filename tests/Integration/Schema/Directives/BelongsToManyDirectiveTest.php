@@ -2,8 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\DBTestCase;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
@@ -37,15 +38,15 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
         $this->user
             ->roles()
-            ->attach($this->roles);
+            ->attach(
+                $this->roles,
+                ['meta' => 'new']
+            );
 
         $this->be($this->user);
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyRelationship(): void
+    public function testCanQueryBelongsToManyRelationship(): void
     {
         $this->schema = '
         type User {
@@ -73,10 +74,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJsonCount($this->rolesCount, 'data.user.roles');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyPaginator(): void
+    public function testCanQueryBelongsToManyPaginator(): void
     {
         $this->schema = '
         type User {
@@ -96,7 +94,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->graphQL('
         {
             user {
-                roles(count: 2) {
+                roles(first: 2) {
                     paginatorInfo {
                         count
                         hasMorePages
@@ -123,10 +121,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.data');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyRelayConnection(): void
+    public function testCanQueryBelongsToManyRelayConnection(): void
     {
         $this->schema = '
         type User {
@@ -171,10 +166,147 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyNestedRelationships(): void
+    public function testCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type CustomRoleEdge {
+            node: Role
+            cursor: String!
+            meta: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'edges' => [
+                            [
+                                'meta' => 'new',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
+    public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->expectException(DirectiveException::class);
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ');
+    }
+
+    public function testCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type RoleEdge {
+            node: Role
+            cursor: String!
+            meta: String
+            nofield: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        nofield
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'edges' => [
+                            [
+                                'meta' => 'new',
+                                'nofield' => null,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
+    public function testCanQueryBelongsToManyNestedRelationships(): void
     {
         $this->schema = '
         type User {
@@ -245,10 +377,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->assertSame(Arr::get($userRolesEdges, 'node.1.acl.id'), Arr::get($nestedUserRolesEdges, 'node.1.acl.id'));
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsErrorWithUnknownTypeArg(): void
+    public function testThrowsErrorWithUnknownTypeArg(): void
     {
         $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 

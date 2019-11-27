@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use Illuminate\Support\ServiceProvider;
-use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class TracingServiceProvider extends ServiceProvider
 {
@@ -21,9 +22,11 @@ class TracingServiceProvider extends ServiceProvider
      */
     public function boot(DirectiveFactory $directiveFactory, EventsDispatcher $eventsDispatcher): void
     {
-        $directiveFactory->addResolved(
-            TracingDirective::NAME,
-            TracingDirective::class
+        $eventsDispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+                return __NAMESPACE__;
+            }
         );
 
         $eventsDispatcher->listen(

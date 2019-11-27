@@ -2,15 +2,12 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Tests\TestCase;
 
 class RenameDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanRenameAField(): void
+    public function testCanRenameAField(): void
     {
         $this->schema = "
         type Query {
@@ -42,10 +39,7 @@ class RenameDirectiveTest extends TestCase
         return new Bar;
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsAnExceptionIfNoAttributeDefined(): void
+    public function testThrowsAnExceptionIfNoAttributeDefined(): void
     {
         $this->expectException(DirectiveException::class);
 

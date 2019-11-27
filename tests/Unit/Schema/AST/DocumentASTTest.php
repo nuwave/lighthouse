@@ -2,20 +2,17 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use Tests\TestCase;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Exceptions\ParseException;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Tests\TestCase;
 
 class DocumentASTTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itParsesSimpleSchema(): void
+    public function testParsesSimpleSchema(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -29,10 +26,7 @@ class DocumentASTTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsOnInvalidSchema(): void
+    public function testThrowsOnInvalidSchema(): void
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessageRegExp('/^Syntax Error/');
@@ -40,10 +34,7 @@ class DocumentASTTest extends TestCase
         DocumentAST::fromSource('foo');
     }
 
-    /**
-     * @test
-     */
-    public function itOverwritesDefinitionWithSameName(): void
+    public function testOverwritesDefinitionWithSameName(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -65,10 +56,7 @@ class DocumentASTTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanBeSerialized(): void
+    public function testCanBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {

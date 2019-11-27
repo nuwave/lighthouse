@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateTestbenchRoleUserTable extends Migration
 {
@@ -15,6 +15,7 @@ class CreateTestbenchRoleUserTable extends Migration
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('role_id');
             $table->primary(['user_id', 'role_id']);
+            $table->string('meta')->nullable();
         });
     }
 

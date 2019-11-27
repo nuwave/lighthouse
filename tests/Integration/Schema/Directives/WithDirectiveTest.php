@@ -34,10 +34,7 @@ class WithDirectiveTest extends DBTestCase
         $this->be($this->user);
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryARelationship(): void
+    public function testCanQueryARelationship(): void
     {
         $this->schema = '
         type User {

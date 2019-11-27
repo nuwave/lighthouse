@@ -20,10 +20,7 @@ class BuilderTest extends DBTestCase
         ';
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachEqFilterToQuery(): void
+    public function testCanAttachEqFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -41,10 +38,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachEqFilterFromInputObject(): void
+    public function testCanAttachEqFilterFromInputObject(): void
     {
         $this->schema .= '
         type Query {
@@ -70,10 +64,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachNeqFilterToQuery(): void
+    public function testCanAttachNeqFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -91,10 +82,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachInFilterToQuery(): void
+    public function testCanAttachInFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -114,10 +102,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachNotInFilterToQuery(): void
+    public function testCanAttachNotInFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -137,10 +122,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(3, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachWhereFilterToQuery(): void
+    public function testCanAttachWhereFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -160,10 +142,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
+    public function testCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -186,10 +165,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(3, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachWhereBetweenFilterToQuery(): void
+    public function testCanAttachWhereBetweenFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -218,10 +194,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanUseInputObjectsForWhereBetweenFilter(): void
+    public function testCanUseInputObjectsForWhereBetweenFilter(): void
     {
         $this->schema .= '
         type Query {
@@ -258,10 +231,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachWhereNotBetweenFilterToQuery(): void
+    public function testCanAttachWhereNotBetweenFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -290,10 +260,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachWhereClauseFilterToQuery(): void
+    public function testCanAttachWhereClauseFilterToQuery(): void
     {
         $this->schema .= '
         type Query {
@@ -319,10 +286,7 @@ class BuilderTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itOnlyProcessesFilledArguments(): void
+    public function testOnlyProcessesFilledArguments(): void
     {
         $this->schema .= '
         type Query {

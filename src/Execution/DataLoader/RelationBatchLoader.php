@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Collection;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -103,9 +103,8 @@ class RelationBatchLoader extends BatchLoader
             $this->getParentModels(),
             [$this->relationName => function ($query) {
                 return $this->resolveInfo
-                    ->builder
-                    ->addScopes($this->scopes)
-                    ->apply($query, $this->args);
+                    ->argumentSet
+                    ->enhanceBuilder($query, $this->scopes);
             }]
         );
     }

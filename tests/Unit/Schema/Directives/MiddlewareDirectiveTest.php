@@ -2,23 +2,22 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
-use Tests\Utils\Middleware\CountRuns;
-use Tests\Utils\Middleware\Authenticate;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Tests\TestCase;
+use Tests\Utils\Middleware\Authenticate;
+use Tests\Utils\Middleware\CountRuns;
 
 class MiddlewareDirectiveTest extends TestCase
 {
     /**
-     * @test
      * @dataProvider fooMiddlewareQueries
      *
      * @param  string  $query
      * @return void
      */
-    public function itCallsFooMiddleware(string $query): void
+    public function testCallsFooMiddleware(string $query): void
     {
         $this->schema = '
         type Query {
@@ -58,10 +57,7 @@ class MiddlewareDirectiveTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
-    public function itWrapsExceptionFromMiddlewareInResponse(): void
+    public function testWrapsExceptionFromMiddlewareInResponse(): void
     {
         $this->schema = '
         type Query {
@@ -82,10 +78,7 @@ class MiddlewareDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itRunsAliasedMiddleware(): void
+    public function testRunsAliasedMiddleware(): void
     {
         /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
@@ -110,10 +103,7 @@ class MiddlewareDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itRunsMiddlewareGroup(): void
+    public function testRunsMiddlewareGroup(): void
     {
         /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
@@ -139,10 +129,7 @@ class MiddlewareDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itPassesOneFieldButThrowsInAnother(): void
+    public function testPassesOneFieldButThrowsInAnother(): void
     {
         $this->schema = '
         type Query {
@@ -175,10 +162,7 @@ class MiddlewareDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsWhenDefiningMiddlewareOnInvalidTypes(): void
+    public function testThrowsWhenDefiningMiddlewareOnInvalidTypes(): void
     {
         $this->expectException(DirectiveException::class);
         $this->buildSchemaWithPlaceholderQuery('
@@ -186,10 +170,7 @@ class MiddlewareDirectiveTest extends TestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itAddsMiddlewareDirectiveToFields(): void
+    public function testAddsMiddlewareDirectiveToFields(): void
     {
         $this->schema = '
         type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {
@@ -199,7 +180,7 @@ class MiddlewareDirectiveTest extends TestCase
 
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = app(ASTBuilder::class);
-        $document = $astBuilder->build();
+        $document = $astBuilder->documentAST();
 
         $queryType = $document->types['Query'];
 
@@ -216,10 +197,7 @@ class MiddlewareDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itPrefersFieldMiddlewareOverTypeMiddleware(): void
+    public function testPrefersFieldMiddlewareOverTypeMiddleware(): void
     {
         $this->schema = '
         type Query @middleware(checks: ["auth"]) {
@@ -229,7 +207,7 @@ class MiddlewareDirectiveTest extends TestCase
 
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = app(ASTBuilder::class);
-        $document = $astBuilder->build();
+        $document = $astBuilder->documentAST();
 
         $queryType = $document->types['Query'];
 

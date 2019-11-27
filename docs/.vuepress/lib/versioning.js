@@ -7,8 +7,9 @@ const path = process.cwd()
 
 module.exports = {
   versions: {
+    // latest stable release
     get latest () {
-      return versions[0]
+      return versions[1]
     },
     get all () {
       return versions
@@ -26,7 +27,7 @@ module.exports = {
 
     return sidebars
   },
-  // Build dropdown items for each version  
+  // Build dropdown items for each version
   linksFor (url) {
     let links = []
 
@@ -47,7 +48,7 @@ module.exports = {
     }
 
     if (typeof version === 'undefined') {
-      this.error('No version number specified! \nPass the version you wish to create as an argument.\nEx: 1.0.0')
+      this.error('No version number specified! \nPass the version you wish to create as an argument.\nEx: 4.4')
     }
 
     if (versions.includes(version)) {
@@ -59,8 +60,14 @@ module.exports = {
     try {
       fse.copySync(`${path}/master`, `${path}/${version}`)
 
-      // update versions.json file
+      // remove 'master' from the top of list
+      versions.shift()
+      // add new generated version on top of list
       versions.unshift(version)
+      // add 'master' again on top of list
+      versions.unshift('master')
+
+      // write to versions.json
 
       fs.writeFileSync(
         `${path}/.vuepress/versions.json`,

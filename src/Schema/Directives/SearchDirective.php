@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class SearchDirective extends BaseDirective implements ArgBuilderDirective
+class SearchDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -16,6 +17,21 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
         return 'search';
     }
 
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Perform a full-text by the given input value.
+"""
+directive @search(
+  """
+  Specify a custom index to use for search.
+  """
+  within: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
     /**
      * Apply a scout search to the builder.
      *
@@ -25,12 +41,8 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function handleBuilder($builder, $value)
     {
-        /** @var \Illuminate\Database\Eloquent\Model $modelClass */
-        $modelClass = get_class(
-            $builder->getModel()
-        );
-
-        /** @var \Laravel\Scout\Builder $builder */
+        /** @var \Laravel\Scout\Searchable $modelClass */
+        $modelClass = get_class($builder->getModel());
         $builder = $modelClass::search($value);
 
         if ($within = $this->directiveArgValue('within')) {

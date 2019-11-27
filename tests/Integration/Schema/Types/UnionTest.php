@@ -2,21 +2,20 @@
 
 namespace Tests\Integration\Schema\Types;
 
+use Illuminate\Support\Collection;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
-use Illuminate\Support\Collection;
 
 class UnionTest extends DBTestCase
 {
     /**
-     * @test
      * @dataProvider withAndWithoutCustomTypeResolver
      * @param  string  $schema
      * @param  string  $query
      * @return void
      */
-    public function itCanResolveUnionTypes(string $schema, string $query): void
+    public function testCanResolveUnionTypes(string $schema, string $query): void
     {
         // This creates a user with it
         factory(Post::class)->create(

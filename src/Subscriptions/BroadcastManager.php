@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Pusher\Pusher;
-use RuntimeException;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Support\DriverManager;
-use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
+use Nuwave\Lighthouse\Support\DriverManager;
+use Pusher\Pusher;
+use RuntimeException;
 
 /**
  * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)

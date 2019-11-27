@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator
+class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -15,5 +16,51 @@ class BelongsToManyDirective extends RelationDirective implements FieldResolver,
     public function name(): string
     {
         return 'belongsToMany';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Resolves a field through the Eloquent `BelongsToMany` relationship.
+"""
+directive @belongsToMany(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
+  ALlows to resolve the relation as a paginated list.
+  Allowed values: paginator, connection.
+  """
+  type: String
+
+  """
+  Specify the default quantity of elements to be returned.
+  Only applies when using pagination.
+  """
+  defaultCount: Int
+  
+  """
+  Specify the maximum quantity of elements to be returned.
+  Only applies when using pagination.
+  """
+  maxCount: Int
+  
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
+) on FIELD_DEFINITION
+SDL;
     }
 }

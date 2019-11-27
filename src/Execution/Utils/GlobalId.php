@@ -51,7 +51,7 @@ class GlobalId implements GlobalIdContract
     {
         [$type, $id] = self::decode($globalID);
 
-        return $id;
+        return trim($id);
     }
 
     /**
@@ -64,6 +64,6 @@ class GlobalId implements GlobalIdContract
     {
         [$type, $id] = self::decode($globalID);
 
-        return $type;
+        return trim($type);
     }
 }

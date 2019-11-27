@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Serializable;
-use GraphQL\Utils\AST;
-use Illuminate\Support\Str;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Utils\AST;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\SubscriptionException;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Serializable;
 
 class Subscriber implements Serializable
 {

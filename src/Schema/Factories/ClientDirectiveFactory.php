@@ -2,25 +2,25 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\NameNode;
-use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\FieldArgument;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class ClientDirectiveFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     * @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter
      */
     protected $definitionNodeConverter;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter  $definitionNodeConverter
+     * @param  \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter  $definitionNodeConverter
      * @return void
      */
-    public function __construct(DefinitionNodeConverter $definitionNodeConverter)
+    public function __construct(ExecutableTypeNodeConverter $definitionNodeConverter)
     {
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
@@ -36,30 +36,33 @@ class ClientDirectiveFactory
         $arguments = [];
         /** @var InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
+            $argumentType = $this->definitionNodeConverter->convert($argument->type);
+
             $fieldArgumentConfig = [
                 'name' => $argument->name->value,
                 'description' => data_get($argument->description, 'value'),
-                'type' => $this->definitionNodeConverter->toType($argument->type),
+                'type' => $argumentType,
             ];
 
             if ($defaultValue = $argument->defaultValue) {
                 $fieldArgumentConfig += [
-                    'defaultValue' => $defaultValue,
+                    'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $argumentType),
                 ];
             }
 
             $arguments [] = new FieldArgument($fieldArgumentConfig);
         }
 
+        $locations = [];
+        // Might be a NodeList, so we can not use array_map()
+        foreach ($directive->locations as $location) {
+            $locations[] = $location->value;
+        }
+
         return new Directive([
             'name' => $directive->name->value,
             'description' => data_get($directive->description, 'value'),
-            'locations' => array_map(
-                function (NameNode $location): string {
-                    return $location->value;
-                },
-                $directive->locations
-            ),
+            'locations' => $locations,
             'args' => $arguments,
             'astNode' => $directive,
         ]);

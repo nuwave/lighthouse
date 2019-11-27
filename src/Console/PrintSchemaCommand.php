@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use Nuwave\Lighthouse\GraphQL;
-use Illuminate\Console\Command;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Cache\Repository;
+use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Nuwave\Lighthouse\GraphQL;
 
 class PrintSchemaCommand extends Command
 {
@@ -45,8 +45,8 @@ class PrintSchemaCommand extends Command
         );
 
         if ($this->option('write')) {
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
             $storage->put('lighthouse-schema.graphql', $schema);
+            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
         } else {
             $this->info($schema);
         }

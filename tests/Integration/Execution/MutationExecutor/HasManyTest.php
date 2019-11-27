@@ -23,6 +23,7 @@ class HasManyTest extends DBTestCase
     type Mutation {
         createUser(input: CreateUserInput! @spread): User @create
         updateUser(input: UpdateUserInput! @spread): User @update
+        upsertUser(input: UpsertUserInput! @spread): User @upsert
     }
     
     input CreateUserInput {
@@ -32,6 +33,7 @@ class HasManyTest extends DBTestCase
     
     input CreateTaskRelation {
         create: [CreateTaskInput!]
+        upsert: [UpsertTaskInput!]
     }
     
     input CreateTaskInput {
@@ -47,6 +49,7 @@ class HasManyTest extends DBTestCase
     input UpdateTaskRelation {
         create: [CreateTaskInput!]
         update: [UpdateTaskInput!]
+        upsert: [UpsertTaskInput!]
         delete: [ID!]
     }
     
@@ -54,19 +57,27 @@ class HasManyTest extends DBTestCase
         id: ID!
         name: String
     }
-    ';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
+    input UpsertUserInput {
+        id: ID!
+        name: String
+        tasks: UpsertTaskRelation
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewHasMany(): void
+    input UpsertTaskRelation {
+        create: [CreateTaskInput!]
+        update: [UpdateTaskInput!]
+        upsert: [UpsertTaskInput!]
+        delete: [ID!]
+    }
+
+    input UpsertTaskInput {
+        id: ID!
+        name: String
+    }
+    '.self::PLACEHOLDER_QUERY;
+
+    public function testCanCreateWithNewHasMany(): void
     {
         $this->graphQL('
         mutation {
@@ -102,67 +113,14 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateHasMany(): void
+    public function testCanUpsertWithNewHasMany(): void
     {
-        factory(User::class)->create();
-
         $this->graphQL('
         mutation {
-            updateUser(input: {
-                id: 1
+            createUser(input: {
                 name: "foo"
                 tasks: {
-                    create: [{
-                        name: "bar"
-                    }]
-                }
-            }) {
-                id
-                name
-                tasks {
-                    id
-                    name
-                }
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'updateUser' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'tasks' => [
-                        [
-                            'id' => '1',
-                            'name' => 'bar',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanUpdateHasMany(): void
-    {
-        factory(User::class)
-            ->create()
-            ->tasks()
-            ->save(
-                factory(Task::class)->create()
-            );
-
-        $this->graphQL('
-        mutation {
-            updateUser(input: {
-                id: 1
-                name: "foo"
-                tasks: {
-                    update: [{
+                    upsert: [{
                         id: 1
                         name: "bar"
                     }]
@@ -178,7 +136,95 @@ class HasManyTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'updateUser' => [
+                'createUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateUsingUpsertWithNewHasMany(): void
+    {
+        $this->graphQL('
+        mutation {
+            upsertUser(input: {
+                id: 1
+                name: "foo"
+                tasks: {
+                    upsert: [{
+                        id: 1
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function existingModelMutations()
+    {
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanCreateHasMany(string $action): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}User(input: {
+                id: 1
+                name: \"foo\"
+                tasks: {
+                    create: [{
+                        name: \"bar\"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}User" => [
                     'id' => '1',
                     'name' => 'foo',
                     'tasks' => [
@@ -193,9 +239,9 @@ class HasManyTest extends DBTestCase
     }
 
     /**
-     * @test
+     * @dataProvider existingModelMutations
      */
-    public function itCanDeleteHasMany(): void
+    public function testCanUpdateHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -204,11 +250,107 @@ class HasManyTest extends DBTestCase
                 factory(Task::class)->create()
             );
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateUser(input: {
+            ${action}User(input: {
                 id: 1
-                name: "foo"
+                name: \"foo\"
+                tasks: {
+                    update: [{
+                        id: 1
+                        name: \"bar\"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}User" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpsertHasMany(string $action): void
+    {
+        factory(User::class)
+            ->create()
+            ->tasks()
+            ->save(
+                factory(Task::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}User(input: {
+                id: 1
+                name: \"foo\"
+                tasks: {
+                    upsert: [{
+                        id: 1
+                        name: \"bar\"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}User" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanDeleteHasMany(string $action): void
+    {
+        factory(User::class)
+            ->create()
+            ->tasks()
+            ->save(
+                factory(Task::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}User(input: {
+                id: 1
+                name: \"foo\"
                 tasks: {
                     delete: [1]
                 }
@@ -221,9 +363,9 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateUser' => [
+                "${action}User" => [
                     'id' => '1',
                     'name' => 'foo',
                     'tasks' => [],

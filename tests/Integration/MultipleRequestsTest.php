@@ -6,10 +6,7 @@ use Tests\TestCase;
 
 class MultipleRequestsTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanFireMultipleRequestsInOneTest(): void
+    public function testCanFireMultipleRequestsInOneTest(): void
     {
         $this->schema = '
         type Query {

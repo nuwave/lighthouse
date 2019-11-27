@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use BenSampo\Enum\Enum;
-use InvalidArgumentException;
 use GraphQL\Type\Definition\EnumType;
+use InvalidArgumentException;
 
 /**
  * A convenience wrapper for registering enums programmatically.
@@ -22,9 +22,10 @@ class LaravelEnumType extends EnumType
      * Create a GraphQL enum from a Laravel enum type.
      *
      * @param  string|\BenSampo\Enum\Enum  $enumClass
+     * @param  string|null  $name  The name the enum will have in the schema, defaults to the basename of the given class
      * @return void
      */
-    public function __construct(string $enumClass)
+    public function __construct(string $enumClass, ?string $name = null)
     {
         if (! is_subclass_of($enumClass, Enum::class)) {
             throw new InvalidArgumentException(
@@ -35,13 +36,13 @@ class LaravelEnumType extends EnumType
         $this->enumClass = $enumClass;
 
         parent::__construct([
-            'name' => class_basename($enumClass),
+            'name' => $name ?? class_basename($enumClass),
             'values' => array_map(
                 function (Enum $enum): array {
                     return [
                         'name' => $enum->key,
-                        'value' => $enum->value,
-                        'description' => "$enum->value",
+                        'value' => $enum,
+                        'description' => $enum->description,
                     ];
                 },
                 $enumClass::getInstances()

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Execution\Utils;
 
-use Tests\TestCase;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
+use Tests\TestCase;
 
 class GlobalIdTest extends TestCase
 {
@@ -19,10 +19,7 @@ class GlobalIdTest extends TestCase
         $this->globalIdResolver = new GlobalId;
     }
 
-    /**
-     * @test
-     */
-    public function itCanHandleGlobalIds(): void
+    public function testCanHandleGlobalIds(): void
     {
         $globalId = $this->globalIdResolver->encode('User', 'asdf');
         $idParts = $this->globalIdResolver->decode($globalId);
@@ -30,20 +27,14 @@ class GlobalIdTest extends TestCase
         $this->assertSame(['User', 'asdf'], $idParts);
     }
 
-    /**
-     * @test
-     */
-    public function itCanDecodeJustTheId(): void
+    public function testCanDecodeJustTheId(): void
     {
         $globalId = $this->globalIdResolver->encode('User', 123);
 
         $this->assertSame('123', $this->globalIdResolver->decodeID($globalId));
     }
 
-    /**
-     * @test
-     */
-    public function itCanDecodeJustTheType(): void
+    public function testCanDecodeJustTheType(): void
     {
         $globalId = $this->globalIdResolver->encode('User', 123);
 

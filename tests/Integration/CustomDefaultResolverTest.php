@@ -2,8 +2,8 @@
 
 namespace Tests\Integration;
 
-use Tests\TestCase;
 use GraphQL\Executor\Executor;
+use Tests\TestCase;
 
 class CustomDefaultResolverTest extends TestCase
 {
@@ -26,10 +26,7 @@ class CustomDefaultResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
-    public function itCanSpecifyACustomDefaultResolver(): void
+    public function testCanSpecifyACustomDefaultResolver(): void
     {
         $previous = Executor::getDefaultFieldResolver();
 
