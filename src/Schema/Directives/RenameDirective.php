@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -38,7 +38,7 @@ SDL;
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -56,14 +56,14 @@ SDL;
      *
      * @return string
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function getAttribute(): string
     {
         $attribute = $this->directiveArgValue('attribute');
 
         if (! $attribute) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 "The [{$this->name()}] directive requires an `attribute` argument."
             );
         }
