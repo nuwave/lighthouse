@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   arguments to the policy check https://github.com/nuwave/lighthouse/pull/1043
 - Allow globally turning off relation batch loading through the
   config option `batchload_relations` https://github.com/nuwave/lighthouse/pull/1059
+- Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader#loadMany()` function https://github.com/nuwave/lighthouse/pull/973
 
 ### Changed
 

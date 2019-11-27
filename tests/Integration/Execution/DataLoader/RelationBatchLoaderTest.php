@@ -2,8 +2,12 @@
 
 namespace Tests\Integration\Execution\DataLoader;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\DB;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
+use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -114,5 +118,79 @@ class RelationBatchLoaderTest extends DBTestCase
             [true, 2],
             [false, 3],
         ];
+    }
+
+    public function testCanResolveFieldsByCustomBatchLoader(): void
+    {
+        $users = factory(User::class, 3)
+            ->create()
+            ->each(function (User $user): void {
+                factory(Task::class, 3)->create([
+                    'user_id' => $user->getKey(),
+                ]);
+            });
+
+        $this->mockResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
+                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+
+                return $loader->load($args['id']);
+            },
+            'one'
+        );
+        $this->mockResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
+                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+
+                return $loader->loadMany($args['ids']);
+            },
+            'many'
+        );
+
+        $this->schema = /** @lang GraphQL */ '
+        type Task {
+            name: String
+        }
+        type User {
+            name: String
+            email: String
+            tasks: [Task] @hasMany
+        }
+
+        type Query {
+            user(id: ID!): User @mock(key: "one")
+            manyUsers(ids: [ID!]!): [User!]! @mock(key: "many")
+        }
+        ';
+
+        $query = /** @lang GraphQL */ '
+        query User($id: ID!, $ids: [ID!]!) {
+            user(id: $id) {
+                email
+                tasks {
+                    name
+                }
+            }
+            manyUsers(ids: $ids) {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+
+        $this
+            ->postGraphQL([
+                'query' => $query,
+                'variables' => [
+                    'id' => $users[0]->getKey(),
+                    'ids' => [$users[1]->getKey(), $users[2]->getKey()],
+                ],
+            ])
+            ->assertJsonCount(2, 'data.manyUsers')
+            ->assertJsonCount(3, 'data.manyUsers.0.tasks')
+            ->assertJsonCount(3, 'data.manyUsers.1.tasks')
+            ->assertJsonCount(3, 'data.user.tasks');
     }
 }

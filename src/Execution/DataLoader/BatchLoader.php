@@ -125,9 +125,12 @@ abstract class BatchLoader
      */
     public function loadMany(array $keys, array $metaInfo = []): array
     {
-        return array_map(function ($key) use ($metaInfo) {
-            return $this->load($key, $metaInfo);
-        }, $keys);
+        return array_map(
+            function ($key) use ($metaInfo): Deferred {
+                return $this->load($key, $metaInfo);
+            },
+            $keys
+        );
     }
 
     /**
