@@ -2,8 +2,14 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\StringValueNode;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Tests\TestCase;
 
@@ -119,5 +125,65 @@ class ArgumentSetTest extends TestCase
             ],
             $argumentSet->toArray()
         );
+    }
+
+    public function testRenameInput(): void
+    {
+        $generateRenameDirective = function ($newName) {
+            $node = new DirectiveDefinitionNode([]);
+
+            $node->directives = [
+                new DirectiveNode([
+                    'name' => new NameNode(['value' => 'rename']),
+                    'arguments' => [
+                        new ArgumentNode([
+                            'name' => new NameNode(['value' => 'attribute']),
+                            'value' => new StringValueNode(['value' => $newName])
+                        ])
+                    ]
+                ])
+            ];
+
+            $rename = new RenameDirective();
+
+            return $rename->hydrate($node);
+        };
+
+        $firstName = new Argument();
+        $firstName->value = 'Michael';
+        $firstName->directives = collect([$generateRenameDirective('first_name')]);
+
+        $lastName = new Argument();
+        $lastName->value = 'Jordan';
+        $lastName->directives = collect([$generateRenameDirective('last_name')]);
+
+        $postName = new Argument();
+        $postName->value = 'Hello World';
+        $postName->directives = collect([$generateRenameDirective('title')]);
+
+        $postSet = new ArgumentSet();
+        $postSet->arguments['post_title'] = $postName;
+
+        $postArg = new Argument();
+        $postArg->value = $postSet;
+
+        $userSet = new ArgumentSet();
+        $userSet->arguments = [
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'post' => $postArg
+        ];
+
+        $renamedSet = $userSet->rename();
+
+        $this->assertSame([
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'post' => $postArg
+        ], $renamedSet->arguments);
+
+        $this->assertSame([
+            'title' => $postName
+        ], $renamedSet->arguments['post']->value->arguments);
     }
 }
