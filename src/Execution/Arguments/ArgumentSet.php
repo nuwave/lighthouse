@@ -87,6 +87,11 @@ class ArgumentSet
         $argumentSet->directives = $this->directives;
 
         foreach ($this->arguments as $name => $argument) {
+            if ($argument->value instanceof self) {
+                // recurse to nested inputs
+                $argument->value = $argument->value->rename();
+            }
+
             $renameDirective = $argument->directives->first(function ($directive) {
                 return $directive instanceof RenameDirective;
             });
