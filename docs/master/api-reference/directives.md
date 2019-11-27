@@ -1742,6 +1742,44 @@ directive @neq(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
+## @nest
+
+```graphql
+"""
+A no-op nested arg resolver that delegates all calls
+to the ArgResolver directives attached to the children.
+"""
+directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This may be useful to logically group arg resolvers.
+
+```graphql
+type Mutation {
+    createUser(
+        name: String
+        tasks: UserTasksOperations @nest
+    ): User @create
+}
+
+input UserTasksOperations {
+    newTask: CreateTaskInput @create(relation: "tasks")
+}
+
+input CreateTaskInput {
+    name: String
+}
+
+type Task {
+    name: String!
+}
+
+type User {
+    name: String
+    tasks: [Task!]! @hasMany
+}
+```
+
 ## @node
 
 ```graphql
