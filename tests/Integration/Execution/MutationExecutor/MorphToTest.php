@@ -22,6 +22,7 @@ class MorphToTest extends DBTestCase
     type Mutation {
         createHour(input: CreateHourInput! @spread): Hour @create
         updateHour(input: UpdateHourInput! @spread): Hour @update
+        upsertHour(input: UpsertHourInput! @spread): Hour @upsert
     }
     
     input CreateHourInput {
@@ -31,6 +32,15 @@ class MorphToTest extends DBTestCase
         hourable: CreateHourableOperations
     }
     
+    input CreateHourableOperations {
+        connect: ConnectHourableInput
+    }
+
+    input ConnectHourableInput {
+        type: String!
+        id: ID!
+    }
+
     input UpdateHourInput {
         id: ID!
         from: String
@@ -39,19 +49,24 @@ class MorphToTest extends DBTestCase
         hourable: UpdateHourableOperations
     }
     
-    input CreateHourableOperations {
-        connect: ConnectHourableInput
-    }
-    
     input UpdateHourableOperations {
         connect: ConnectHourableInput
         disconnect: Boolean
         delete: Boolean
     }
     
-    input ConnectHourableInput {
-        type: String!
+    input UpsertHourInput {
         id: ID!
+        from: String
+        to: String
+        weekday: Int
+        hourable: UpsertHourableOperations
+    }
+
+    input UpsertHourableOperations {
+        connect: ConnectHourableInput
+        disconnect: Boolean
+        delete: Boolean
     }
     '.self::PLACEHOLDER_QUERY;
 
@@ -92,7 +107,56 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    public function testDisconnectsMorphTo(): void
+    public function testConnectsMorphToWithUpsert(): void
+    {
+        factory(Task::class)->create(['name' => 'first_task']);
+
+        $this->graphQL('
+        mutation {
+            upsertHour(input: {
+                id: 1
+                weekday: 2
+                hourable: {
+                    connect: {
+                        type: "Tests\\\Utils\\\Models\\\Task"
+                        id: 1
+                    }
+                }
+            }) {
+                id
+                weekday
+                hourable {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertHour' => [
+                    'id' => '1',
+                    'weekday' => 2,
+                    'hourable' => [
+                        'id' => '1',
+                        'name' => 'first_task',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function existingModelMutations()
+    {
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testDisconnectsMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
@@ -100,9 +164,9 @@ class MorphToTest extends DBTestCase
             'weekday' => 1,
         ]);
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateHour(input: {
+            ${action}Hour(input: {
                 id: 1
                 weekday: 2
                 hourable: {
@@ -116,9 +180,9 @@ class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateHour' => [
+                "${action}Hour" => [
                     'weekday' => 2,
                     'hourable' => null,
                 ],
@@ -126,7 +190,10 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    public function testDeletesMorphTo(): void
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testDeletesMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
@@ -134,9 +201,9 @@ class MorphToTest extends DBTestCase
             'weekday' => 1,
         ]);
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateHour(input: {
+            ${action}Hour(input: {
                 id: 1
                 weekday: 2
                 hourable: {
@@ -150,9 +217,9 @@ class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateHour' => [
+                "${action}Hour" => [
                     'weekday' => 2,
                     'hourable' => null,
                 ],

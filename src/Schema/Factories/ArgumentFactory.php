@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class ArgumentFactory
 {
@@ -37,9 +37,9 @@ class ArgumentFactory
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
-        /** @var \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter $definitionNodeConverter */
-        $definitionNodeConverter = app(DefinitionNodeConverter::class);
-        $type = $definitionNodeConverter->toType($definitionNode->type);
+        /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $definitionNodeConverter */
+        $definitionNodeConverter = app(ExecutableTypeNodeConverter::class);
+        $type = $definitionNodeConverter->convert($definitionNode->type);
 
         $config = [
             'name' => $definitionNode->name->value,

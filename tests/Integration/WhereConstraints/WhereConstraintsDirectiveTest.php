@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\WhereConstraints;
 
-use Tests\DBTestCase;
-use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
+use Tests\DBTestCase;
+use Tests\Utils\Models\User;
 
 class WhereConstraintsDirectiveTest extends DBTestCase
 {

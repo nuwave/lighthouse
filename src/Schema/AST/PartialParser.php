@@ -2,25 +2,25 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\Parser;
+use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\FieldNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\FieldNode;
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 
 class PartialParser
 {

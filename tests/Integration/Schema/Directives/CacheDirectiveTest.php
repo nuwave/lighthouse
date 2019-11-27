@@ -2,13 +2,13 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\DBTestCase;
-use Illuminate\Support\Str;
-use Tests\Utils\Models\Post;
-use Tests\Utils\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
+use Tests\Utils\Models\User;
 
 class CacheDirectiveTest extends DBTestCase
 {

@@ -5,20 +5,20 @@ namespace Tests;
 use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\GraphQL;
-use Tests\Utils\Middleware\CountRuns;
-use Laravel\Scout\ScoutServiceProvider;
-use Nuwave\Lighthouse\Testing\MocksResolvers;
-use Tests\Utils\Policies\AuthServiceProvider;
-use Orchestra\Database\ConsoleServiceProvider;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Testing\TestResponse;
+use Laravel\Scout\ScoutServiceProvider;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
-use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
-use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
+use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
+use Nuwave\Lighthouse\Testing\MocksResolvers;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
+use Orchestra\Database\ConsoleServiceProvider;
+use Orchestra\Testbench\TestCase as BaseTestCase;
+use Tests\Utils\Middleware\CountRuns;
+use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {

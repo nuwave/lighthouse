@@ -32,4 +32,15 @@ class UserPolicy
     {
         return $pass;
     }
+
+    public function injectArgs($user, array $injectedArgs): bool
+    {
+        return $injectedArgs === ['foo' => 'bar'];
+    }
+
+    public function argsWithInjectedArgs($user, array $injectedArgs, array $staticArgs): bool
+    {
+        return $injectedArgs === ['foo' => 'dynamic']
+            && $staticArgs === ['foo' => 'static'];
+    }
 }

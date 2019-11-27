@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Exception;
 use Carbon\Carbon;
+use Exception;
 use GraphQL\Error\Error;
-use GraphQL\Utils\Utils;
 use GraphQL\Error\InvariantViolation;
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Utils\Utils;
 
 class DateTime extends ScalarType
 {

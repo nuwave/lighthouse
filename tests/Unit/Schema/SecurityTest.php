@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema;
 
-use Tests\TestCase;
-use GraphQL\Validator\Rules\QueryDepth;
-use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
+use Tests\TestCase;
 
 class SecurityTest extends TestCase
 {

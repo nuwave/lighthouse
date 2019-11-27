@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
 use Illuminate\Support\Arr;
+use Tests\TestCase;
 
 class MethodDirectiveTest extends TestCase
 {

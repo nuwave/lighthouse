@@ -2,20 +2,20 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Laravel\Scout\Builder as ScoutBuilder;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Pagination\PaginationUtils;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Pagination\PaginationManipulator;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
@@ -83,14 +83,24 @@ SDL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
-        $paginationManipulator->transformToPaginatedField(
-            $this->paginationType(),
-            $this->getModelClass(),
-            $fieldDefinition,
-            $parentType,
-            $this->directiveArgValue('defaultCount'),
-            $this->paginateMaxCount()
-        );
+
+        if ($this->directiveHasArgument('builder')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('builder');
+        } else {
+            $paginationManipulator->setModelClass(
+                $this->getModelClass()
+            );
+        }
+
+        $paginationManipulator
+            ->transformToPaginatedField(
+                $this->paginationType(),
+                $fieldDefinition,
+                $parentType,
+                $this->directiveArgValue('defaultCount'),
+                $this->paginateMaxCount()
+            );
     }
 
     /**
@@ -120,13 +130,10 @@ SDL;
                 }
 
                 $query = $resolveInfo
-                    ->builder
-                    ->addScopes(
-                        $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
+                    ->argumentSet
+                    ->enhanceBuilder(
                         $query,
-                        $args
+                        $this->directiveArgValue('scopes', [])
                     );
 
                 if ($query instanceof ScoutBuilder) {

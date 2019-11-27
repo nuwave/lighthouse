@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema\Execution;
 
-use Tests\TestCase;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Tests\TestCase;
 
 class ContextFactoryTest extends TestCase
 {

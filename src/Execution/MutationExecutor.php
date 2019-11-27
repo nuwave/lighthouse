@@ -2,20 +2,20 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionNamedType;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class MutationExecutor
 {
@@ -55,6 +55,10 @@ class MutationExecutor
             if (isset($nestedOperations['create'])) {
                 self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
+            }
         };
         $hasMany->each($createOneToMany);
         $morphMany->each($createOneToMany);
@@ -65,6 +69,10 @@ class MutationExecutor
 
             if (isset($nestedOperations['create'])) {
                 self::handleSingleRelationCreate(new Collection($nestedOperations['create']), $relation);
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::handleSingleRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
         };
         $hasOne->each($createOneToOne);
@@ -78,18 +86,20 @@ class MutationExecutor
                 $relation->sync($nestedOperations['sync']);
             }
 
+            if (isset($nestedOperations['syncWithoutDetaching'])) {
+                $relation->syncWithoutDetaching($nestedOperations['syncWithoutDetaching']);
+            }
+
             if (isset($nestedOperations['create'])) {
                 self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
 
             if (isset($nestedOperations['update'])) {
-                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpdate(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpdate(new Collection($nestedOperations['update']), $relation);
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
 
             if (isset($nestedOperations['connect'])) {
@@ -100,6 +110,227 @@ class MutationExecutor
         $morphToMany->each($createManyToMany);
 
         return $model;
+    }
+
+    /**
+     * Execute an update mutation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     *         An empty instance of the model that should be updated
+     * @param  \Illuminate\Support\Collection  $args
+     *         The corresponding slice of the input arguments for updating this model
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     *         If we are in a nested update, we can use this to associate the new model to its parent
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public static function executeUpdate(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    {
+        // Remove the ID from the arguments, as we do not need to set it
+        $id = $args->pull('id')
+            ?? $args->pull(
+                $model->getKeyName()
+            );
+
+        $model = $model->newQuery()->findOrFail($id);
+
+        return self::executeUpdateWithLoadedModel($model, $args, $parentRelation);
+    }
+
+    /**
+     * Execute an upsert mutation.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *         An empty instance of the model that should be created or updated
+     * @param \Illuminate\Support\Collection $args
+     *         The corresponding slice of the input arguments for creating or updating this model
+     * @param \Illuminate\Database\Eloquent\Relations\Relation|null $parentRelation
+     *         If we are in a nested upsert, we can use this to associate the new model to its parent
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public static function executeUpsert(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    {
+        $id = $args->get('id')
+            // We keep
+            ?? $args->get(
+                $model->getKeyName()
+            );
+
+        $modelInstance = $model->newQuery()->find($id);
+        if ($modelInstance) {
+            return self::executeUpdateWithLoadedModel($modelInstance, $args, $parentRelation);
+        }
+
+        return self::executeCreate($model, $args, $parentRelation);
+    }
+
+    /**
+     * Execute an update mutation over a loaded model.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *         An empty instance of the model that should be updated
+     * @param \Illuminate\Support\Collection $args
+     *         The corresponding slice of the input arguments for updating this model
+     * @param \Illuminate\Database\Eloquent\Relations\Relation|null $parentRelation
+     *         If we are in a nested update, we can use this to associate the new model to its parent
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected static function executeUpdateWithLoadedModel(Model $model, Collection $args, ?Relation $parentRelation): Model
+    {
+        $reflection = new ReflectionClass($model);
+
+        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
+
+        [$morphMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
+
+        [$hasOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
+
+        [$morphOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
+
+        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
+
+        [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
+
+        $model = self::saveModelWithPotentialParent($model, $remaining, $parentRelation);
+
+        $updateOneToMany = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+            $relation = $model->{$relationName}();
+
+            if (isset($nestedOperations['create'])) {
+                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
+            }
+
+            if (isset($nestedOperations['update'])) {
+                self::handleMultiRelationUpdate(new Collection($nestedOperations['update']), $relation);
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
+            }
+
+            if (isset($nestedOperations['delete'])) {
+                $relation->getModel()::destroy($nestedOperations['delete']);
+            }
+        };
+        $hasMany->each($updateOneToMany);
+        $morphMany->each($updateOneToMany);
+
+        $updateOneToOne = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
+            $relation = $model->{$relationName}();
+
+            if (isset($nestedOperations['create'])) {
+                self::handleSingleRelationCreate(new Collection($nestedOperations['create']), $relation);
+            }
+
+            if (isset($nestedOperations['update'])) {
+                self::handleSingleRelationUpdate(new Collection($nestedOperations['update']), $relation);
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::handleSingleRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
+            }
+
+            if (isset($nestedOperations['delete'])) {
+                $relation->getModel()::destroy($nestedOperations['delete']);
+            }
+        };
+        $hasOne->each($updateOneToOne);
+        $morphOne->each($updateOneToOne);
+
+        $updateManyToMany = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
+            $relation = $model->{$relationName}();
+
+            if (isset($nestedOperations['sync'])) {
+                $relation->sync($nestedOperations['sync']);
+            }
+
+            if (isset($nestedOperations['syncWithoutDetaching'])) {
+                $relation->syncWithoutDetaching($nestedOperations['syncWithoutDetaching']);
+            }
+
+            if (isset($nestedOperations['create'])) {
+                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
+            }
+
+            if (isset($nestedOperations['update'])) {
+                self::handleMultiRelationUpdate(new Collection($nestedOperations['update']), $relation);
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
+            }
+
+            if (isset($nestedOperations['delete'])) {
+                $relation->detach($nestedOperations['delete']);
+                $relation->getModel()::destroy($nestedOperations['delete']);
+            }
+
+            if (isset($nestedOperations['connect'])) {
+                $relation->attach($nestedOperations['connect']);
+            }
+
+            if (isset($nestedOperations['disconnect'])) {
+                $relation->detach($nestedOperations['disconnect']);
+            }
+        };
+        $belongsToMany->each($updateManyToMany);
+        $morphToMany->each($updateManyToMany);
+
+        return $model;
+    }
+
+    /**
+     * Extract all the arguments that correspond to a relation of a certain type on the model.
+     *
+     * For example, if the args input looks like this:
+     *
+     * [
+     *  'comments' =>
+     *    ['foo' => 'Bar'],
+     *  'name' => 'Ralf',
+     * ]
+     *
+     * and the model has a method "comments" that returns a HasMany relationship,
+     * the result will be:
+     * [
+     *   [
+     *    'comments' =>
+     *      ['foo' => 'Bar'],
+     *   ],
+     *   [
+     *    'name' => 'Ralf',
+     *   ]
+     * ]
+     *
+     * @param  \ReflectionClass  $modelReflection
+     * @param  \Illuminate\Support\Collection  $args
+     * @param  string  $relationClass
+     * @return \Illuminate\Support\Collection  [relationshipArgs, remainingArgs]
+     */
+    protected static function partitionArgsByRelationType(ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
+    {
+        return $args->partition(
+            function ($value, string $key) use ($modelReflection, $relationClass): bool {
+                if (! $modelReflection->hasMethod($key)) {
+                    return false;
+                }
+
+                $relationMethodCandidate = $modelReflection->getMethod($key);
+                if (! $returnType = $relationMethodCandidate->getReturnType()) {
+                    return false;
+                }
+
+                if (! $returnType instanceof ReflectionNamedType) {
+                    return false;
+                }
+
+                return is_a($returnType->getName(), $relationClass, true);
+            }
+        );
     }
 
     /**
@@ -140,6 +371,14 @@ class MutationExecutor
                 $belongsToModel = self::executeCreate(
                     $relation->getModel()->newInstance(),
                     new Collection($nestedOperations['create'])
+                );
+                $relation->associate($belongsToModel);
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                $belongsToModel = self::executeUpsert(
+                    $relation->getModel()->newInstance(),
+                    new Collection($nestedOperations['upsert'])
                 );
                 $relation->associate($belongsToModel);
             }
@@ -251,177 +490,62 @@ class MutationExecutor
     }
 
     /**
-     * Execute an update mutation.
+     * Handle the update with multiple relations.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     *         An empty instance of the model that should be updated
-     * @param  \Illuminate\Support\Collection  $args
-     *         The corresponding slice of the input arguments for updating this model
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
-     *         If we are in a nested update, we can use this to associate the new model to its parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Support\Collection  $multiValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
      */
-    public static function executeUpdate(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    protected static function handleMultiRelationUpdate(Collection $multiValues, $relation): void
     {
-        $id = $args->pull('id')
-            ?? $args->pull(
-                $model->getKeyName()
-            );
-
-        $model = $model->newQuery()->findOrFail($id);
-
-        $reflection = new ReflectionClass($model);
-
-        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
-
-        [$morphMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
-
-        [$hasOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
-
-        [$morphOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
-
-        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
-
-        [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
-
-        $model = self::saveModelWithPotentialParent($model, $remaining, $parentRelation);
-
-        $updateOneToMany = function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
-            $relation = $model->{$relationName}();
-
-            if (isset($nestedOperations['create'])) {
-                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
-            }
-
-            if (isset($nestedOperations['update'])) {
-                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpdate(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
-            }
-
-            if (isset($nestedOperations['delete'])) {
-                $relation->getModel()::destroy($nestedOperations['delete']);
-            }
-        };
-        $hasMany->each($updateOneToMany);
-        $morphMany->each($updateOneToMany);
-
-        $updateOneToOne = function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
-            $relation = $model->{$relationName}();
-
-            if (isset($nestedOperations['create'])) {
-                self::handleSingleRelationCreate(new Collection($nestedOperations['create']), $relation);
-            }
-
-            if (isset($nestedOperations['update'])) {
-                self::executeUpdate(
-                    $relation->getModel()->newInstance(),
-                    new Collection($nestedOperations['update']),
-                    $relation
-                );
-            }
-
-            if (isset($nestedOperations['delete'])) {
-                $relation->getModel()::destroy($nestedOperations['delete']);
-            }
-        };
-        $hasOne->each($updateOneToOne);
-        $morphOne->each($updateOneToOne);
-
-        $updateManyToMany = function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
-            $relation = $model->{$relationName}();
-
-            if (isset($nestedOperations['sync'])) {
-                $relation->sync($nestedOperations['sync']);
-            }
-
-            if (isset($nestedOperations['create'])) {
-                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
-            }
-
-            if (isset($nestedOperations['update'])) {
-                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpdate(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
-            }
-
-            if (isset($nestedOperations['delete'])) {
-                $relation->detach($nestedOperations['delete']);
-                $relation->getModel()::destroy($nestedOperations['delete']);
-            }
-
-            if (isset($nestedOperations['connect'])) {
-                $relation->attach($nestedOperations['connect']);
-            }
-
-            if (isset($nestedOperations['disconnect'])) {
-                $relation->detach($nestedOperations['disconnect']);
-            }
-        };
-        $belongsToMany->each($updateManyToMany);
-        $morphToMany->each($updateManyToMany);
-
-        return $model;
+        $multiValues->each(function ($singleValues) use ($relation): void {
+            self::handleSingleRelationUpdate(new Collection($singleValues), $relation);
+        });
     }
 
     /**
-     * Extract all the arguments that correspond to a relation of a certain type on the model.
+     * Handle the update with a single relation.
      *
-     * For example, if the args input looks like this:
-     *
-     * [
-     *  'comments' =>
-     *    ['foo' => 'Bar'],
-     *  'name' => 'Ralf',
-     * ]
-     *
-     * and the model has a method "comments" that returns a HasMany relationship,
-     * the result will be:
-     * [
-     *   [
-     *    'comments' =>
-     *      ['foo' => 'Bar'],
-     *   ],
-     *   [
-     *    'name' => 'Ralf',
-     *   ]
-     * ]
-     *
-     * @param  \ReflectionClass  $modelReflection
-     * @param  \Illuminate\Support\Collection  $args
-     * @param  string  $relationClass
-     * @return \Illuminate\Support\Collection  [relationshipArgs, remainingArgs]
+     * @param  \Illuminate\Support\Collection  $singleValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
      */
-    protected static function partitionArgsByRelationType(ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
+    protected static function handleSingleRelationUpdate(Collection $singleValues, Relation $relation): void
     {
-        return $args->partition(
-            function ($value, string $key) use ($modelReflection, $relationClass): bool {
-                if (! $modelReflection->hasMethod($key)) {
-                    return false;
-                }
+        self::executeUpdate(
+            $relation->getModel()->newInstance(),
+            new Collection($singleValues),
+            $relation
+        );
+    }
 
-                $relationMethodCandidate = $modelReflection->getMethod($key);
-                if (! $returnType = $relationMethodCandidate->getReturnType()) {
-                    return false;
-                }
+    /**
+     * Handle the upsert with multiple relations.
+     *
+     * @param  \Illuminate\Support\Collection  $multiValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
+     */
+    protected static function handleMultiRelationUpsert(Collection $multiValues, $relation): void
+    {
+        $multiValues->each(function ($singleValues) use ($relation): void {
+            self::handleSingleRelationUpsert(new Collection($singleValues), $relation);
+        });
+    }
 
-                if (! $returnType instanceof ReflectionNamedType) {
-                    return false;
-                }
-
-                return is_a($returnType->getName(), $relationClass, true);
-            }
+    /**
+     * Handle the upsert with a single relation.
+     *
+     * @param  \Illuminate\Support\Collection  $singleValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
+     */
+    protected static function handleSingleRelationUpsert(Collection $singleValues, Relation $relation): void
+    {
+        self::executeUpsert(
+            $relation->getModel()->newInstance(),
+            new Collection($singleValues),
+            $relation
         );
     }
 }

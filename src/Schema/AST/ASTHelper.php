@@ -2,20 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Utils\AST;
-use GraphQL\Language\Parser;
-use GraphQL\Language\AST\Node;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Language\AST\NodeList;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ValueNode;
+use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Utils\AST;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
@@ -45,12 +43,12 @@ class ASTHelper
     }
 
     /**
-     * This function will merge two lists uniquely by name.
+     * Merge two lists of AST nodes.
      *
      * @param  \GraphQL\Language\AST\NodeList|array  $original
      * @param  \GraphQL\Language\AST\NodeList|array  $addition
-     * @param  bool  $overwriteDuplicates  By default this throws if a collision occurs. If
-     *                                            this is set to true, the fields of the original list will be overwritten.
+     * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
+     *                                     If set to true, the fields of the original list will be overwritten.
      * @return \GraphQL\Language\AST\NodeList
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
@@ -63,10 +61,7 @@ class ASTHelper
         $remainingDefinitions = (new Collection($original))
             ->reject(function ($definition) use ($newNames, $overwriteDuplicates): bool {
                 $oldName = $definition->name->value;
-                $collisionOccurred = in_array(
-                    $oldName,
-                    $newNames
-                );
+                $collisionOccurred = in_array($oldName, $newNames);
 
                 if ($collisionOccurred && ! $overwriteDuplicates) {
                     throw new DefinitionException(
@@ -83,20 +78,21 @@ class ASTHelper
     }
 
     /**
+     * Unwrap lists and non-nulls and get the name of the contained type.
+     *
      * @param  \GraphQL\Language\AST\Node  $definition
      * @return string
      */
     public static function getUnderlyingTypeName(Node $definition): string
     {
-        $type = $definition->type;
-        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode) {
-            $type = self::getUnderlyingNamedTypeNode($type);
-        }
+        $namedType = self::getUnderlyingNamedTypeNode($definition);
 
-        return $type->name->value;
+        return $namedType->name->value;
     }
 
     /**
+     * Unwrap lists and non-nulls and get the named type within.
+     *
      * @param  \GraphQL\Language\AST\Node  $node
      * @return \GraphQL\Language\AST\NamedTypeNode
      *
@@ -128,24 +124,20 @@ class ASTHelper
      */
     public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
     {
-        return (new Collection($directiveDefinition->arguments))
-            ->contains(function (ArgumentNode $argumentNode) use ($name): bool {
-                return $argumentNode->name->value === $name;
-            });
+        return self::firstByName($directiveDefinition->arguments, $name) !== null;
     }
 
     /**
+     * Extract a named argument from a given directive node.
+     *
      * @param  \GraphQL\Language\AST\DirectiveNode  $directive
      * @param  string  $name
-     * @param  mixed|null  $default
-     * @return mixed|null
+     * @param  mixed  $default
+     * @return mixed
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
-        $arg = (new Collection($directive->arguments))
-            ->first(function (ArgumentNode $argumentNode) use ($name): bool {
-                return $argumentNode->name->value === $name;
-            });
+        $arg = self::firstByName($directive->arguments, $name);
 
         return $arg
             ? self::argValue($arg, $default)
@@ -153,7 +145,7 @@ class ASTHelper
     }
 
     /**
-     * Get argument's value.
+     * Get the value of an argument node.
      *
      * @param  \GraphQL\Language\AST\ArgumentNode  $arg
      * @param  mixed  $default
@@ -183,9 +175,7 @@ class ASTHelper
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
             return $argumentType
-                ->getValue(
-                    $defaultValue->value
-                )
+                ->getValue($defaultValue->value)
                 ->value;
         }
 
@@ -193,7 +183,9 @@ class ASTHelper
     }
 
     /**
-     * This can be at most one directive, since directives can only be used once per location.
+     * Get a directive with the given name if it is defined upon the node.
+     *
+     * As of now, directives may only be used once per location.
      *
      * @param  \GraphQL\Language\AST\Node  $definitionNode
      * @param  string  $name
@@ -201,10 +193,38 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        return (new Collection($definitionNode->directives))
-            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
-                return $directiveDefinitionNode->name->value === $name;
-            });
+        return self::firstByName($definitionNode->directives, $name);
+    }
+
+    /**
+     * Check if a node has a directive with the given name on it.
+     *
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
+     * @param  string  $name
+     * @return \GraphQL\Language\AST\DirectiveNode|null
+     */
+    public static function hasDirective(Node $definitionNode, string $name): bool
+    {
+        return self::directiveDefinition($definitionNode, $name) !== null;
+    }
+
+    /**
+     * Out of a list of nodes, get the first that matches the given name.
+     *
+     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\Node[] $nodes
+     * @param  string  $name
+     * @return \GraphQL\Language\AST\Node|null
+     */
+    public static function firstByName($nodes, string $name): ?Node
+    {
+        /** @var \GraphQL\Language\AST\Node $node */
+        foreach ($nodes as $node) {
+            if ($node->name->value === $name) {
+                return $node;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -216,10 +236,7 @@ class ASTHelper
      */
     public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
     {
-        $namespaceDirective = static::directiveDefinition(
-            $definitionNode,
-            NamespaceDirective::NAME
-        );
+        $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
         return $namespaceDirective
             // The namespace directive can contain an argument with the name of the
@@ -276,19 +293,13 @@ class ASTHelper
     /**
      * Checks the given type to see whether it implements the given interface.
      *
-     * @param  ObjectTypeDefinitionNode  $type
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $type
      * @param  string  $interfaceName
      *
      * @return bool
      */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        foreach ($type->interfaces as $interface) {
-            if ($interface->name->value === $interfaceName) {
-                return true;
-            }
-        }
-
-        return false;
+        return self::firstByName($type->interfaces, $interfaceName) !== null;
     }
 }

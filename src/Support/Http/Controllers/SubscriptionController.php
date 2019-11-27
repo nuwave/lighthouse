@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionController extends Controller
 {

@@ -2,16 +2,16 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Tests\TestCase;
+use Tests\Utils\Models\Category;
+use Tests\Utils\Models\Closure;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
-use Tests\Utils\Models\Closure;
-use Tests\Utils\Models\Category;
-use Tests\Utils\ModelsSecondary\OnlyHere;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Tests\Utils\ModelsSecondary\Category as CategorySecondary;
+use Tests\Utils\ModelsSecondary\OnlyHere;
 
 /**
  * This class does test the internal behaviour of the BaseDirective class.

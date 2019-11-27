@@ -1109,7 +1109,7 @@ directive @inject(
   within the incoming argument.
   """
   name: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on FIELD_DEFINITION
 ```
 
 ### Examples

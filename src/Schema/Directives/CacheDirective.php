@@ -2,27 +2,28 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use Carbon\Carbon;
+use Closure;
 use GraphQL\Deferred;
-use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Cache\CacheManager;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /** @var \Illuminate\Cache\CacheManager|\Illuminate\Cache\Repository */
+    /**
+     * @var \Illuminate\Cache\CacheManager|\Illuminate\Cache\Repository
+     */
     protected $cacheManager;
 
     /**
@@ -169,15 +170,8 @@ SDL;
         // First priority: Look for a field with the @cacheKey directive
         /** @var FieldDefinitionNode $field */
         foreach ($typeDefinition->fields as $field) {
-            $hasCacheKey = (new Collection($field->directives))
-                ->contains(function (DirectiveNode $directive): bool {
-                    return $directive->name->value === 'cacheKey';
-                });
-
-            if ($hasCacheKey) {
-                $typeValue->setCacheKey(
-                    $field->name->value
-                );
+            if (ASTHelper::hasDirective($field, 'cacheKey')) {
+                $typeValue->setCacheKey($field->name->value);
 
                 return;
             }
@@ -191,9 +185,7 @@ SDL;
                 && $field->type->type instanceof NamedTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {
-                $typeValue->setCacheKey(
-                    $field->name->value
-                );
+                $typeValue->setCacheKey($field->name->value);
 
                 return;
             }

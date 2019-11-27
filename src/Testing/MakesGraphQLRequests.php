@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Illuminate\Support\Arr;
 use GraphQL\Type\Introspection;
 use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Support\Arr;
 
 /**
  * Useful helpers for PHPUnit testing.

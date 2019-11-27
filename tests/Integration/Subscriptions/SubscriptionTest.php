@@ -2,13 +2,13 @@
 
 namespace Tests\Integration\Subscriptions;
 
-use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Illuminate\Foundation\Testing\TestResponse;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\StorageManager;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\StorageManager;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {

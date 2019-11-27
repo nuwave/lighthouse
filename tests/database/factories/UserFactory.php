@@ -1,9 +1,9 @@
 <?php
 
-use Tests\Utils\Models\Team;
-use Tests\Utils\Models\User;
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Team;
+use Tests\Utils\Models\User;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(User::class, function (Faker $faker): array {

@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class PaginationManipulator
 {
@@ -15,9 +15,33 @@ class PaginationManipulator
      */
     protected $documentAST;
 
+    /**
+     * The class name of the model that is returned from the field.
+     *
+     * Might not be present if we are creating a paginated field
+     * for a relation, as the model is not required for resolving
+     * that directive and the user may choose a different type.
+     *
+     * @var string|null
+     */
+    protected $modelClass;
+
     public function __construct(DocumentAST $documentAST)
     {
         $this->documentAST = $documentAST;
+    }
+
+    /**
+     * Set the model class to use for code generation.
+     *
+     * @param  string  $modelClass
+     * @return $this
+     */
+    public function setModelClass(string $modelClass): self
+    {
+        $this->modelClass = $modelClass;
+
+        return $this;
     }
 
     /**
@@ -27,7 +51,6 @@ class PaginationManipulator
      * The types in between are automatically generated and applied to the schema.
      *
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
-     * @param  string  $modelClass
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  int|null  $defaultCount
@@ -37,26 +60,22 @@ class PaginationManipulator
      */
     public function transformToPaginatedField(
         PaginationType $paginationType,
-        string $modelClass,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
     ): void {
-        $modelClassDirective = '@modelClass(class: "'.addslashes($modelClass).'")';
-
         if ($paginationType->isConnection()) {
-            $this->registerConnection($modelClassDirective, $fieldDefinition, $parentType, $defaultCount, $maxCount, $edgeType);
+            $this->registerConnection($fieldDefinition, $parentType, $defaultCount, $maxCount, $edgeType);
         } else {
-            $this->registerPaginator($modelClassDirective, $fieldDefinition, $parentType, $defaultCount, $maxCount);
+            $this->registerPaginator($fieldDefinition, $parentType, $defaultCount, $maxCount);
         }
     }
 
     /**
      * Register connection with schema.
      *
-     * @param  string  $modelClassDirective
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  int|null  $defaultCount
@@ -65,7 +84,6 @@ class PaginationManipulator
      * @return  void
      */
     protected function registerConnection(
-        string $modelClassDirective,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
         ?int $defaultCount = null,
@@ -85,7 +103,7 @@ class PaginationManipulator
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = PartialParser::objectTypeDefinition("
-            type $connectionTypeName $modelClassDirective {
+            type $connectionTypeName {$this->modelClassDirective()} {
                 pageInfo: PageInfo! @field(resolver: \"{$connectionFieldName}@pageInfoResolver\")
                 edges: [$connectionEdgeName] @field(resolver: \"{$connectionFieldName}@edgeResolver\")
             }
@@ -118,7 +136,6 @@ class PaginationManipulator
     /**
      * Register paginator with schema.
      *
-     * @param  string  $modelClassDirective
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  int|null  $defaultCount
@@ -126,7 +143,6 @@ class PaginationManipulator
      * @return void
      */
     protected function registerPaginator(
-        string $modelClassDirective,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
         ?int $defaultCount = null,
@@ -137,7 +153,7 @@ class PaginationManipulator
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = PartialParser::objectTypeDefinition("
-            type $paginatorTypeName $modelClassDirective {
+            type $paginatorTypeName {$this->modelClassDirective()} {
                 paginatorInfo: PaginatorInfo! @field(resolver: \"{$paginatorFieldClassName}@paginatorInfoResolver\")
                 data: [$fieldTypeName!]! @field(resolver: \"{$paginatorFieldClassName}@dataResolver\")
             }
@@ -180,5 +196,19 @@ class PaginationManipulator
             );
 
         return $description.$definition;
+    }
+
+    /**
+     * Get the definition for the @modelClass directive if needed.
+     *
+     * This will be empty when not applicable.
+     *
+     * @return string
+     */
+    protected function modelClassDirective(): string
+    {
+        return $this->modelClass
+            ? '@modelClass(class: "'.addslashes($this->modelClass).'")'
+            : '';
     }
 }

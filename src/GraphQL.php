@@ -3,24 +3,24 @@
 namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
-use GraphQL\Type\Schema;
-use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
-use GraphQL\Validator\Rules\QueryDepth;
-use Nuwave\Lighthouse\Support\Pipeline;
+use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Events\ManipulateResult;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Nuwave\Lighthouse\Support\Pipeline;
 
 class GraphQL
 {

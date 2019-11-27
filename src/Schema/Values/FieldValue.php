@@ -3,10 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldValue
 {
@@ -79,6 +81,20 @@ class FieldValue
     }
 
     /**
+     * Use the default resolver.
+     *
+     * @return $this
+     */
+    public function useDefaultResolver(): self
+    {
+        $this->resolver = $this->getParentName() === 'Subscription'
+            ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
+            : app(ProvidesResolver::class)->provideResolver($this);
+
+        return $this;
+    }
+
+    /**
      * Define a closure that is used to determine the complexity of the field.
      *
      * @param  \Closure  $complexity
@@ -112,9 +128,9 @@ class FieldValue
     public function getReturnType(): Type
     {
         if (! isset($this->returnType)) {
-            $this->returnType = app(DefinitionNodeConverter::class)->toType(
-                $this->field->type
-            );
+            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
+            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+            $this->returnType = $typeNodeConverter->convert($this->field->type);
         }
 
         return $this->returnType;

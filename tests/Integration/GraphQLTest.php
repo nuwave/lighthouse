@@ -2,10 +2,10 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Http\UploadedFile;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Http\UploadedFile;
 
 class GraphQLTest extends DBTestCase
 {
