@@ -3,24 +3,24 @@
 namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
-use GraphQL\Type\Schema;
-use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
-use GraphQL\Validator\Rules\QueryDepth;
-use Nuwave\Lighthouse\Support\Pipeline;
+use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Events\ManipulateResult;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Nuwave\Lighthouse\Support\Pipeline;
 
 class GraphQL
 {
@@ -30,13 +30,6 @@ class GraphQL
      * @var \GraphQL\Type\Schema
      */
     protected $executableSchema;
-
-    /**
-     * The parsed schema AST.
-     *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
 
     /**
      * The schema builder.
@@ -225,7 +218,7 @@ class GraphQL
     {
         if (empty($this->executableSchema)) {
             $this->executableSchema = $this->schemaBuilder->build(
-                $this->documentAST()
+                $this->astBuilder->documentAST()
             );
         }
 
@@ -249,23 +242,11 @@ class GraphQL
     /**
      * Get instance of DocumentAST.
      *
+     * @deprecated use ASTBuilder instead
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function documentAST(): DocumentAST
     {
-        if (empty($this->documentAST)) {
-            $this->documentAST = config('lighthouse.cache.enable')
-                ? app('cache')
-                    ->remember(
-                        config('lighthouse.cache.key'),
-                        config('lighthouse.cache.ttl'),
-                        function (): DocumentAST {
-                            return $this->astBuilder->build();
-                        }
-                    )
-                : $this->astBuilder->build();
-        }
-
-        return $this->documentAST;
+        return $this->astBuilder->documentAST();
     }
 }

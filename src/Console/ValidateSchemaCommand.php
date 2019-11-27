@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository;
+use Nuwave\Lighthouse\GraphQL;
 
 class ValidateSchemaCommand extends Command
 {

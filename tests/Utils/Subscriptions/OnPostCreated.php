@@ -3,8 +3,8 @@
 namespace Tests\Utils\Subscriptions;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class OnPostCreated extends GraphQLSubscription
 {

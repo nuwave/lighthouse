@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Schema;
 
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class NodeInterfaceTest extends DBTestCase
 {
@@ -36,11 +36,11 @@ class NodeInterfaceTest extends DBTestCase
 
     public function testCanResolveNodes(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
-        '.$this->placeholderQuery();
+        ';
 
         $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[2]['id']);
@@ -83,13 +83,17 @@ class NodeInterfaceTest extends DBTestCase
         return $this->testTuples[$id];
     }
 
-    public function testCanResolveModelsNodes(): void
+    /**
+     * @dataProvider modelNodeDirectiveStyles
+     * @param  string  $directiveDefinition
+     */
+    public function testCanResolveModelsNodes(string $directiveDefinition): void
     {
-        $this->schema = '
-        type User @model {
+        $this->schema .= "
+        type User $directiveDefinition {
             name: String!
         }
-        '.$this->placeholderQuery();
+        ";
 
         $user = factory(User::class)->create([
             'name' => 'Sepp',
@@ -113,5 +117,20 @@ class NodeInterfaceTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function modelNodeDirectiveStyles(): array
+    {
+        return [
+            /*
+             * @deprecated @model will be repurposed in v5
+             */
+            ['@model'],
+            ['@node'],
+            ['@node(model: "User")'],
+        ];
     }
 }

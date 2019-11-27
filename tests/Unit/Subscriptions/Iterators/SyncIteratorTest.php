@@ -3,9 +3,9 @@
 namespace Tests\Unit\Subscriptions\Iterators;
 
 use Exception;
-use Tests\TestCase;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
+use Tests\TestCase;
 
 class SyncIteratorTest extends TestCase
 {

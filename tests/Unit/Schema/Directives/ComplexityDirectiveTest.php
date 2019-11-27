@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Tests\TestCase;
 use Illuminate\Support\Arr;
+use Tests\TestCase;
 
 class ComplexityDirectiveTest extends TestCase
 {
@@ -19,7 +19,9 @@ class ComplexityDirectiveTest extends TestCase
         }
         ');
 
-        $complexityFn = $schema->getType('User')
+        /** @var \GraphQL\Type\Definition\ObjectType $user */
+        $user = $schema->getType('User');
+        $complexityFn = $user
             ->getField('posts')
             ->getComplexityFn();
 
@@ -41,7 +43,9 @@ class ComplexityDirectiveTest extends TestCase
         }
         ');
 
-        $complexityFn = $schema->getType('User')
+        /** @var \GraphQL\Type\Definition\ObjectType $user */
+        $user = $schema->getType('User');
+        $complexityFn = $user
             ->getField('posts')
             ->getComplexityFn();
 

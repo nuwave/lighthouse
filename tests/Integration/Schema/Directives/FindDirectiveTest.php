@@ -3,8 +3,8 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\User;
 
 class FindDirectiveTest extends DBTestCase
 {
@@ -156,5 +156,44 @@ class FindDirectiveTest extends DBTestCase
                 'user' => null,
             ],
         ])->assertStatus(200);
+    }
+
+    public function testReturnsCustomAttributes(): void
+    {
+        $company = factory(Company::class)->create();
+        $user = factory(User::class)->create([
+            'name' => 'A',
+            'company_id' => $company->id,
+        ]);
+
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+            companyName: String!
+        }
+        
+        type Query {
+            user(id: ID @eq): User @find(model: "User")
+        }
+        ';
+
+        $this->graphQL("
+        {
+            user(id: {$user->id}) {
+                id
+                name
+                companyName
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => (string) $user->id,
+                    'name' => $user->name,
+                    'companyName' => $company->name,
+                ],
+            ],
+        ]);
     }
 }

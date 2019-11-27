@@ -25,15 +25,9 @@ class InterfaceCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Interface';
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace): string
+    protected function namespaceConfigKey(): string
     {
-        return config('lighthouse.namespaces.interfaces');
+        return 'interfaces';
     }
 
     /**

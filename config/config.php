@@ -17,7 +17,7 @@ return [
         /*
          * The URI the endpoint responds to, e.g. mydomain.com/graphql.
          */
-        'uri' => 'graphql',
+        'uri' => '/graphql',
 
         /*
          * Lighthouse creates a named route for convenient URL generation and redirects.
@@ -43,7 +43,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Schema Declaration
+    | Schema Location
     |--------------------------------------------------------------------------
     |
     | This is a path that points to where your GraphQL schema is located
@@ -78,8 +78,8 @@ return [
     | Namespaces
     |--------------------------------------------------------------------------
     |
-    | These are the default namespaces where Lighthouse looks for classes
-    | that extend functionality of the schema. You may pass either a string
+    | These are the default namespaces where Lighthouse looks for classes to
+    | extend functionality of the schema. You may pass in either a string
     | or an array, they are tried in order and the first match is used.
     |
     */
@@ -101,7 +101,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Control how Lighthouse handles security related query validation.
-    | This configures the options from http://webonyx.github.io/graphql-php/security/
+    | Read more at http://webonyx.github.io/graphql-php/security/
     |
     */
 
@@ -131,7 +131,8 @@ return [
     |
     | Set the name to use for the generated argument on paginated fields
     | that controls how many results are returned.
-    | This setting will be removed in v5.
+    |
+    | DEPRECATED This setting will be removed in v5.
     |
     */
 
@@ -193,12 +194,24 @@ return [
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | Sets default setting for transactional mutations.
-    | You may set this flag to have @create|@update mutations transactional or not.
+    | If set to true, mutations such as @create or @update will be
+    | wrapped in a transaction to ensure atomicity.
     |
     */
 
     'transactional_mutations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Batchload Relations
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, relations marked with directives like @hasMany or @belongsTo
+    | will be optimized by combining the queries through the BatchLoader.
+    |
+    */
+
+    'batchload_relations' => true,
 
     /*
     |--------------------------------------------------------------------------

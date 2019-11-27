@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\SoftDeletes;
 
-use Tests\DBTestCase;
-use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
 
 class ForceDeleteDirectiveTest extends DBTestCase
 {
@@ -13,7 +13,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
         }
@@ -21,7 +21,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         type Mutation {
             forceDeleteTask(id: ID!): Task @forceDelete
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -45,7 +45,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $task = factory(Task::class)->create();
         $task->delete();
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
         }
@@ -53,7 +53,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         type Mutation {
             forceDeleteTask(id: ID!): Task @forceDelete
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -76,7 +76,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         factory(Task::class, 2)->create();
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String
@@ -85,7 +85,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         type Mutation {
             forceDeleteTasks(id: [ID!]!): [Task!]! @forceDelete
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

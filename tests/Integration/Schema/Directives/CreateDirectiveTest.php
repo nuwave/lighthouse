@@ -11,7 +11,7 @@ class CreateDirectiveTest extends DBTestCase
 {
     public function testCanCreateFromFieldArguments(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -20,7 +20,7 @@ class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -41,7 +41,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateFromInputObject(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -54,7 +54,7 @@ class CreateDirectiveTest extends DBTestCase
         input CreateCompanyInput {
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -77,7 +77,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Mutation {
             createTag(name: String): Tag @create
         }
@@ -86,7 +86,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String!
             default_string: String!
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -111,7 +111,7 @@ class CreateDirectiveTest extends DBTestCase
 
         $this->app['config']->set('app.debug', false);
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String!
@@ -140,7 +140,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -178,7 +178,7 @@ class CreateDirectiveTest extends DBTestCase
         $this->app['config']->set('app.debug', false);
         config(['lighthouse.transactional_mutations' => false]);
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String!
@@ -207,7 +207,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -244,7 +244,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String!
@@ -274,7 +274,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             guard: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

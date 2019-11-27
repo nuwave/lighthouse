@@ -2,13 +2,13 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Mockery;
-use Tests\DBTestCase;
-use Mockery\MockInterface;
-use Tests\Utils\Models\Post;
-use Laravel\Scout\EngineManager;
 use Illuminate\Support\Collection;
+use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
+use Mockery;
+use Mockery\MockInterface;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 
 class SearchDirectiveTest extends DBTestCase
 {
@@ -27,13 +27,16 @@ class SearchDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->engineManager = Mockery::mock();
-        $this->engine = Mockery::mock(NullEngine::class)->makePartial();
+        $this->engine = Mockery
+            ::mock(NullEngine::class)
+            ->makePartial();
 
         $this->app->singleton(EngineManager::class, function (): MockInterface {
             return $this->engineManager;
         });
 
-        $this->engineManager->shouldReceive('engine')
+        $this->engineManager
+            ->shouldReceive('engine')
             ->andReturn($this->engine);
     }
 
@@ -99,13 +102,15 @@ class SearchDirectiveTest extends DBTestCase
             'title' => 'bad title',
         ]);
 
-        $this->engine->shouldReceive('map')
+        $this->engine
+            ->shouldReceive('map')
             ->andReturn(
                 new Collection([$postA, $postB])
             )
             ->once();
 
-        $this->engine->shouldReceive('paginate')
+        $this->engine
+            ->shouldReceive('paginate')
             ->with(
                 Mockery::on(
                     function ($argument): bool {

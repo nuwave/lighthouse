@@ -2,10 +2,10 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Http\UploadedFile;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Http\UploadedFile;
 
 class GraphQLTest extends DBTestCase
 {
@@ -184,6 +184,40 @@ class GraphQLTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testRejectsEmptyRequest(): void
+    {
+        $this->postGraphQL([])
+             ->assertStatus(200)
+             ->assertJson([
+                 [
+                     'errors' => [
+                         [
+                             'message' => 'Syntax Error: Unexpected <EOF>',
+                             'extensions' => [
+                                 'category' => 'graphql',
+                             ],
+                         ],
+                     ],
+                 ],
+             ]);
+    }
+
+    public function testRejectsEmptyQuery(): void
+    {
+        $this->graphQL('')
+             ->assertStatus(200)
+             ->assertJson([
+                 'errors' => [
+                     [
+                         'message' => 'Syntax Error: Unexpected <EOF>',
+                         'extensions' => [
+                             'category' => 'graphql',
+                         ],
+                     ],
+                 ],
+             ]);
     }
 
     public function testRejectsInvalidQuery(): void

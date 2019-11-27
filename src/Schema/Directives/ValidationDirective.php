@@ -4,13 +4,13 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\ValidationException;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
+use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 
 abstract class ValidationDirective extends BaseDirective implements FieldMiddleware, ProvidesRules
 {

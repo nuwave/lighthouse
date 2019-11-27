@@ -2,13 +2,13 @@
 
 namespace Tests\Integration;
 
-use Tests\DBTestCase;
+use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Tests\DBTestCase;
+use Tests\Utils\Directives\ComplexValidationDirective;
 use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
-use Illuminate\Foundation\Testing\TestResponse;
-use Tests\Utils\Directives\ComplexValidationDirective;
 
 class ValidationTest extends DBTestCase
 {
@@ -351,7 +351,7 @@ class ValidationTest extends DBTestCase
 
     public function testSetsArgumentsOnCustomValidationDirective(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Mutation {
             updateUser(
                 input: UpdateUserInput @spread
@@ -369,7 +369,7 @@ class ValidationTest extends DBTestCase
             id: ID
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         factory(User::class)->create([
             'name' => 'foo',
@@ -404,7 +404,7 @@ class ValidationTest extends DBTestCase
 
     public function testIgnoresTheUserWeAreUpdating(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Mutation {
             updateUser(
                 input: UpdateUserInput @spread
@@ -422,7 +422,7 @@ class ValidationTest extends DBTestCase
             id: ID
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         factory(User::class)->create(['name' => 'bar']);
 
@@ -453,7 +453,7 @@ class ValidationTest extends DBTestCase
     {
         $this->markTestSkipped('Not implemented as of now as it would require a larger redo.');
 
-        $this->schema = '
+        $this->schema .= '
         type Mutation {
             createUser(
                 foo: String @rules(apply: ["max:5"])
@@ -466,7 +466,7 @@ class ValidationTest extends DBTestCase
             id: ID
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         $result = $this->graphQL('
         mutation {
@@ -492,7 +492,7 @@ class ValidationTest extends DBTestCase
         and Lighthouse uses those of the first directive.
         ');
 
-        $this->schema = '
+        $this->schema .= '
         type Mutation {
             createUser(
                 foo: String @rules(apply: ["max:5"]) @trim @rules(apply: ["min:4"])
@@ -504,7 +504,7 @@ class ValidationTest extends DBTestCase
             id: ID
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         $result = $this->graphQL('
         mutation {

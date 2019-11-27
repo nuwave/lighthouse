@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\SoftDeletes;
 
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class RestoreDirectiveTest extends DBTestCase
 {
@@ -17,7 +17,7 @@ class RestoreDirectiveTest extends DBTestCase
         $this->assertCount(1, Task::withTrashed()->get());
         $this->assertCount(0, Task::withoutTrashed()->get());
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
         }
@@ -25,7 +25,7 @@ class RestoreDirectiveTest extends DBTestCase
         type Mutation {
             restoreTask(id: ID!): Task @restore
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -54,7 +54,7 @@ class RestoreDirectiveTest extends DBTestCase
         $this->assertCount(2, Task::withTrashed()->get());
         $this->assertCount(0, Task::withoutTrashed()->get());
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String
@@ -63,7 +63,7 @@ class RestoreDirectiveTest extends DBTestCase
         type Mutation {
             restoreTasks(id: [ID!]!): [Task!]! @restore
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

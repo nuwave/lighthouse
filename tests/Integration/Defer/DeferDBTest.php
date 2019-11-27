@@ -2,14 +2,14 @@
 
 namespace Tests\Integration\Defer;
 
-use Tests\DBTestCase;
-use Illuminate\Support\Arr;
-use Tests\Utils\Models\User;
-use Tests\Utils\Models\Company;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
-use Nuwave\Lighthouse\Defer\DeferServiceProvider;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\DB;
+use Nuwave\Lighthouse\Defer\DeferServiceProvider;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Company;
+use Tests\Utils\Models\User;
 
 class DeferDBTest extends DBTestCase
 {

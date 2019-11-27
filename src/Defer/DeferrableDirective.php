@@ -4,15 +4,15 @@ namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Language\AST\NonNullTypeNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeferrableDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
 {

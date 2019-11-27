@@ -2,16 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use GraphQL\Language\AST\Node;
-use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
-use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use GraphQL\Language\AST\Node;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class DirectiveFactory
 {
@@ -150,6 +149,7 @@ class DirectiveFactory
     }
 
     /**
+     * @deprecated
      * @return $this
      */
     public function clearResolved(): self
@@ -178,16 +178,28 @@ class DirectiveFactory
      *
      * @param  \GraphQL\Language\AST\Node  $node
      * @param  string  $directiveClass
-     * @return \Illuminate\Support\Collection <$directiveClass>
+     * @return \Illuminate\Support\Collection of type <$directiveClass>
      */
     public function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
+    {
+        return $this
+            ->createAssociatedDirectives($node)
+            ->filter(function (Directive $directive) use ($directiveClass): bool {
+                return $directive instanceof $directiveClass;
+            });
+    }
+
+    /**
+     * Get all directives that are associated with an AST node.
+     *
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @return \Illuminate\Support\Collection of type <$directiveClass>
+     */
+    public function createAssociatedDirectives(Node $node): Collection
     {
         return (new Collection($node->directives))
             ->map(function (DirectiveNode $directive) use ($node): Directive {
                 return $this->create($directive->name->value, $node);
-            })
-            ->filter(function (Directive $directive) use ($directiveClass): bool {
-                return $directive instanceof $directiveClass;
             });
     }
 

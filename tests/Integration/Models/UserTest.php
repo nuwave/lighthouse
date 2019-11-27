@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Models;
 
+use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class UserTest extends DBTestCase
 {
