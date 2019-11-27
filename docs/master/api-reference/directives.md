@@ -2067,7 +2067,7 @@ directive @rename(
   value can be retrieved from.
   """
   attribute: String!
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @restore
