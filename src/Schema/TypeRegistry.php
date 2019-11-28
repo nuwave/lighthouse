@@ -99,7 +99,7 @@ class TypeRegistry
     {
         if (! isset($this->types[$name])) {
             $typeDefinition = $this->documentAST->types[$name] ?? null;
-            if(!$typeDefinition) {
+            if (! $typeDefinition) {
                 throw new DefinitionException(<<<EOL
 Lighthouse failed while trying to load a type: $name
 
