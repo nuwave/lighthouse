@@ -307,7 +307,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwice(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -337,7 +337,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -358,7 +358,7 @@ class CreateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */'
         mutation {
             createUser(input: {
                 name: "bar"
@@ -382,7 +382,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwiceButCantFetchRelationship(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -412,37 +412,38 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $firstMutation = $this->graphQL('
-        mutation {
-            createUser(input: {
-                name: "foo"
-                tasks: {
-                    create: [{
-                        name: "fooTask"
-                    }]
-                }
-            }) {
-                tasks {
-                    name
+        $this
+            ->graphQL(/** @lang GraphQL */'
+            mutation {
+                createUser(input: {
+                    name: "foo"
+                    tasks: {
+                        create: [{
+                            name: "fooTask"
+                        }]
+                    }
+                }) {
+                    tasks {
+                        name
+                    }
                 }
             }
-        }
-        ');
-        $this->assertDatabaseHas('users', ['name' => 'foo']);
-        $firstMutation->assertJson([
-            'data' => [
-                'createUser' => [
-                    'tasks' => [
-                        [
-                            'name' => 'fooTask',
+            ')
+            ->assertJson([
+                'data' => [
+                    'createUser' => [
+                        'tasks' => [
+                            [
+                                'name' => 'fooTask',
+                            ],
                         ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
+        $this->assertDatabaseHas('users', ['name' => 'foo']);
 
-        try {
-            $secondMutation = $this->graphQL('
+        $this
+            ->graphQL(/** @lang GraphQL */'
             mutation {
                 createUser(input: {
                     name: "bar"
@@ -457,8 +458,8 @@ class CreateDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ');
-            $secondMutation->assertJson([
+            ')
+            ->assertJson([
                 'data' => [
                     'createUser' => [
                         'tasks' => [
@@ -469,10 +470,6 @@ class CreateDirectiveTest extends DBTestCase
                     ],
                 ],
             ]);
-        } catch (\Exception $exception) {
-            dump('it fails but just the query, the user was created');
-        }
-
         $this->assertDatabaseHas('users', ['name' => 'bar']);
     }
 }
