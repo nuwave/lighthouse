@@ -156,6 +156,70 @@ class CanDirectiveTest extends TestCase
         ')->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
+    public function testInjectArgsPassesClientArgumentToPolicy(): void
+    {
+        $this->be(new User);
+        $this->schema = /* @lang GraphQL */'
+        type Query {
+            user(foo: String): User!
+                @can(ability:"injectArgs", injectArgs: true)
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+        }
+        
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            user(foo: "bar"){
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    public function testInjectedArgsAndStaticArgs(): void
+    {
+        $this->be(new User);
+        $this->schema = /* @lang GraphQL */'
+        type Query {
+            user(foo: String): User!
+                @can(
+                    ability: "argsWithInjectedArgs"
+                    args: { foo: "static" }
+                    injectArgs: true
+                )
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+        }
+        
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            user(foo: "dynamic"){
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
     public function resolveUser(): User
     {
         $user = new User;

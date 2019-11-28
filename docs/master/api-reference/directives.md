@@ -459,6 +459,9 @@ class PostPolicy
 ```graphql
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+When `injectArgs` and `args` are used together, the client given
+arguments will be passed before the static args.
 """
 directive @can(
   """
@@ -471,18 +474,26 @@ directive @can(
   instance against which the permissions should be checked.
   """
   find: String
+
+  """
+  Pass along the client given input data as arguments to `Gate::check`. 
+  """
+  injectArgs: Boolean = false
+
+  """
+  Statically defined arguments that are passed to `Gate::check`.
   
+  You may pass pass arbitrary GraphQL literals,
+  e.g.: [1, 2, 3] or { foo: "bar" }
   """
-  Additional arguments that are passed to `Gate::check`. 
-  """
-  args: [String!]
+  args: Mixed
 ) on FIELD_DEFINITION
 ```
 
 ### Examples
 
-You may specify an argument that is used to find a specific model
-instance against which the permissions should be checked.
+In `find` parameter you may specify an input argument which is used to find a specific model
+instance by primary key against which the permissions should be checked:
 
 ```graphql
 type Query {
@@ -500,6 +511,14 @@ class PostPolicy
 }
 ```
 
+It also works with soft deleted models in combination with `@softDeletes` directive:
+
+```graphql
+type Query {
+    post(id: ID @eq): Post @softDeletes @can(ability: "view", find: "id")
+}
+```
+
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
 passing the `model` argument.
 
@@ -510,7 +529,7 @@ type Mutation {
 }
 ```
 
-You can pass additional arguments to the policy checks by specifying them as `args`.
+You can pass additional arguments to the policy checks by specifying them as `args`:
 
 ```graphql
 type Mutation {
@@ -518,6 +537,18 @@ type Mutation {
         @can(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
+
+You can pass along the client given input data as arguments to the policy checks
+with the `injectArgs` argument:
+
+```graphql
+type Mutation {
+    createPost(input: PostInput): Post
+        @can(ability: "create", injectArgs: "true")
+}
+```
+
+Now you will have access to `PostInput` values in the policy. 
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
 Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
@@ -1934,6 +1965,9 @@ directive @paginate(
 
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
+
+> Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
+> Under the hood, the "cursor" is decoded into a page offset.
 
 ```graphql
 type Query {

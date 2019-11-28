@@ -108,11 +108,11 @@ abstract class BaseDirective implements Directive
 
         // Fallback to using information from the schema definition as the model name
         if (! $model) {
-            /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
-            $documentAST = app(ASTBuilder::class)->documentAST();
-
             if ($this->definitionNode instanceof FieldDefinitionNode) {
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
+
+                /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
+                $documentAST = app(ASTBuilder::class)->documentAST();
 
                 if (! isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(

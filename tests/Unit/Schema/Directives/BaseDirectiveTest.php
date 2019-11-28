@@ -19,7 +19,7 @@ use Tests\Utils\ModelsSecondary\OnlyHere;
  * While typically considered an anti-pattern, the BaseDirective is meant
  * to be extended by other directives and offers basic utilities that
  * are commonly used in directives. As users may also extend it to create
- * custom directives, its behaviour should be pretty stable and well defined.
+ * custom directives, its behaviour should be stable and well-defined.
  */
 class BaseDirectiveTest extends TestCase
 {
@@ -149,9 +149,7 @@ class BaseDirectiveTest extends TestCase
     }
 
     /**
-     * Get a testable instance of the BaseDirective.
-     *
-     * Calls to non-public methods are piped through by the
+     * Get a testable instance of the BaseDirective that allows calling protected methods.
      *
      * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
      * @return \Nuwave\Lighthouse\Schema\Directives\BaseDirective
@@ -176,7 +174,7 @@ class BaseDirectiveTest extends TestCase
              * @param  mixed[]  $args
              * @return mixed
              */
-            public function __call(string $method, $args)
+            public function __call(string $method, array $args)
             {
                 return call_user_func_array([$this, $method], $args);
             }
