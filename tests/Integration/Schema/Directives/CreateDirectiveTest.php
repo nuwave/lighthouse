@@ -307,7 +307,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwice(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /* @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -337,7 +337,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */'
+        $this->graphQL(/* @lang GraphQL */'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -358,7 +358,7 @@ class CreateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */'
+        $this->graphQL(/* @lang GraphQL */'
         mutation {
             createUser(input: {
                 name: "bar"
@@ -382,7 +382,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwiceButCantFetchRelationship(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -413,7 +413,7 @@ class CreateDirectiveTest extends DBTestCase
         ';
 
         $this
-            ->graphQL(/** @lang GraphQL */'
+            ->graphQL(/* @lang GraphQL */'
             mutation {
                 createUser(input: {
                     name: "foo"
@@ -443,7 +443,7 @@ class CreateDirectiveTest extends DBTestCase
         $this->assertDatabaseHas('users', ['name' => 'foo']);
 
         $this
-            ->graphQL(/** @lang GraphQL */'
+            ->graphQL(/* @lang GraphQL */'
             mutation {
                 createUser(input: {
                     name: "bar"
