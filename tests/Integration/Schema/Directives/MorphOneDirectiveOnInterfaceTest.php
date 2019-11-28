@@ -64,7 +64,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
         type Employee implements Person {
             id: ID!
             position: String!
-            customUser: User! @morphOne(relation: "user")
+            user: User! @morphOne
         }
 
         type Contractor implements Person {
@@ -90,16 +90,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                 id
                 name
                 creator {
-                    ... on Employee {
-                        __typename
-                        id
-                        customUser {
-                            id
-                            name
-                            email
-                        }
-                    }
-                    ... on Contractor {
+                    ... on Person {
                         __typename
                         id
                         user {
@@ -120,7 +111,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
                         'creator' => [
                             '__typename' => 'Employee',
                             'id' => (string) $this->employee->id,
-                            'customUser' => [
+                            'user' => [
                                 'id' => (string) $this->employee->user->id,
                                 'name' => $this->employee->user->name,
                                 'email' => $this->employee->user->email,
