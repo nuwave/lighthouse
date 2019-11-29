@@ -22,6 +22,15 @@ class Product extends Model
         return $this->belongsTo(Color::class);
     }
 
+    public function brand() : BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function getPreferredSupplierAttribute(): Supplier{
+        return  $this->brand->suppliers->fistWhere('pivot.is_preferred_supplier', '=', 1);
+    }
+
     // By default Laravel does not support composite keys
     // So, you will need to override some getKey() method
     // Usually this is placed on traits

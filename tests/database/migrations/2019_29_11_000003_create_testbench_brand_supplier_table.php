@@ -4,20 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchProductsTable extends Migration
+class CreateTestbenchBrandSupplierTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table): void {
-            $table->string('barcode');
-            $table->string('uuid');
+        Schema::create('brand_supplier', function (Blueprint $table): void {
             $table->unsignedInteger('brand_id');
-            $table->string('name');
-            $table->unsignedInteger('color_id');
-            $table->timestamps();
+            $table->unsignedInteger('supplier_id');
+            $table->boolean('is_preferred_supplier');
         });
     }
 
@@ -26,6 +23,6 @@ class CreateTestbenchProductsTable extends Migration
      */
     public function down(): void
     {
-        Schema::drop('products');
+        Schema::drop('brand_supplier');
     }
 }

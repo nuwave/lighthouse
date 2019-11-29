@@ -3,6 +3,9 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Brand;
+use Tests\Utils\Models\Product;
+use Tests\Utils\Models\Supplier;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -42,7 +45,7 @@ class WithDirectiveTest extends DBTestCase
                 @with(relation: "tasks")
                 @method(name: "getTaskCountAsString")
         }
-        
+
         type Query {
             user: User @auth
         }
@@ -69,5 +72,68 @@ class WithDirectiveTest extends DBTestCase
             3,
             $user->tasks
         );
+    }
+
+    public function testCanQueryANestedRelationship(){
+        $this->schema = '
+        type Brand {
+            id: Int!
+            name: String
+            suppliers: [Supplier]
+        }
+
+        type Supplier {
+            id: Int!
+            name: String
+            Brand: Brand!
+        }
+
+        type Product {
+            id: Int!
+            preferredSupplier: Supplier! @with(relation: "brand.suppliers")
+        }
+
+        type Query {
+            products: [Product] @paginate
+        }
+        ';
+        /** @var Brand $brand */
+        $brand = factory(Brand::class)->create();
+        $supplier1 = factory(Supplier::class)->create();
+        $supplier2 = factory(Supplier::class)->create();
+
+        $brand->suppliers()->sync([
+            $supplier1->id => ['is_preferred_supplier' => false],
+            $supplier2->id => ['is_preferred_supplier' => true]
+        ]);
+
+        $product = factory(Product::class)->create(['brand_id' => $brand->id]);
+
+        $this->assertFalse(
+            $product->relationLoaded('brand.suppliers')
+        );
+
+        $response = $this->graphQL('{
+            products(first: 1) {
+                data {
+                    preferredSupplier {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+
+        $response->assertJson([
+            'data' => [
+                'products' => [
+                    'data' => [
+                        'preferredSupplier' => [
+                            'id' => $supplier2->id
+                        ]
+                    ]
+                ]
+            ]
+      ]);
     }
 }
