@@ -153,37 +153,15 @@ class ArgumentSetTest extends TestCase
         $firstName->value = 'Michael';
         $firstName->directives = collect([$generateRenameDirective('first_name')]);
 
-        $lastName = new Argument();
-        $lastName->value = 'Jordan';
-        $lastName->directives = collect([$generateRenameDirective('last_name')]);
-
-        $postName = new Argument();
-        $postName->value = 'Hello World';
-        $postName->directives = collect([$generateRenameDirective('title')]);
-
-        $postSet = new ArgumentSet();
-        $postSet->arguments['post_title'] = $postName;
-
-        $postArg = new Argument();
-        $postArg->value = $postSet;
-
         $userSet = new ArgumentSet();
         $userSet->arguments = [
             'firstName' => $firstName,
-            'lastName' => $lastName,
-            'post' => $postArg,
         ];
 
         $renamedSet = $userSet->rename();
 
         $this->assertSame([
             'first_name' => $firstName,
-            'last_name' => $lastName,
-            'post' => $postArg,
         ], $renamedSet->arguments);
-
-        $this->assertSame([
-            'title' => $postName,
-        ], $renamedSet->arguments['post']->value->arguments);
     }
 }
