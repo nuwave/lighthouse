@@ -1513,7 +1513,7 @@ type Query {
 """
 Sort a result list by one or more given fields.
 """
-directive @orderBy on ARGUMENT_DEFINITION
+directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 The `OrderByClause` input is automatically added to the schema,
@@ -1549,6 +1549,38 @@ Querying a field that has an `orderBy` argument looks like this:
 ```
 
 You may pass more than one sorting option to add a secondary ordering.
+
+### Input Definition Example
+
+The `@orderBy` directive can also be applied inside an input field definition when used in conjunction with the [`@spread`](#spread) directive. See below for example: 
+
+```graphql
+type Query{
+    posts(filter: PostFilterInput @spread): Posts
+}
+
+input PostFilterInput {
+    orderBy: [OrderByClause!] @orderBy
+}
+```
+
+And usage example:
+
+```graphql
+{
+    posts(filter: {
+        orderBy: [
+            {
+                field: "postedAt"
+                order: ASC
+            }    
+        ]       
+    }) {
+        title
+    }
+}
+```
+
 
 ## @paginate
 
