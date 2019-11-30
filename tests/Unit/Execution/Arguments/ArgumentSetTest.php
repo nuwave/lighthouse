@@ -2,15 +2,11 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\NameNode;
-use GraphQL\Language\AST\StringValueNode;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Tests\TestCase;
 
 class ArgumentSetTest extends TestCase
@@ -129,36 +125,23 @@ class ArgumentSetTest extends TestCase
 
     public function testRenameInput(): void
     {
-        $generateRenameDirective = function ($newName) {
-            $node = new DirectiveDefinitionNode([]);
+        /** @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory $directiveFactory */
+        $directiveFactory = app(DirectiveFactory::class);
 
-            $node->directives = [
-                new DirectiveNode([
-                    'name' => new NameNode(['value' => 'rename']),
-                    'arguments' => [
-                        new ArgumentNode([
-                            'name' => new NameNode(['value' => 'attribute']),
-                            'value' => new StringValueNode(['value' => $newName]),
-                        ]),
-                    ],
-                ]),
-            ];
-
-            $rename = new RenameDirective();
-
-            return $rename->hydrate($node);
-        };
+        $renameDirective = PartialParser::directive('@rename');
+        $renameDirective->directives = collect([PartialParser::directive('@rename(attribute: "first_name")')]);
+        $renameDirective = $directiveFactory->create('rename', $renameDirective);
 
         $firstName = new Argument();
         $firstName->value = 'Michael';
-        $firstName->directives = collect([$generateRenameDirective('first_name')]);
+        $firstName->directives = collect([$renameDirective]);
 
-        $userSet = new ArgumentSet();
-        $userSet->arguments = [
+        $argumentSet = new ArgumentSet();
+        $argumentSet->arguments = [
             'firstName' => $firstName,
         ];
 
-        $renamedSet = $userSet->rename();
+        $renamedSet = $argumentSet->rename();
 
         $this->assertSame([
             'first_name' => $firstName,
