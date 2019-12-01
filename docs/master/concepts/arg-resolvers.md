@@ -20,7 +20,25 @@ dynamic nature. The input given by a client might be nested arbitrarily deep
 and come in many different variations.
 
 The following example shows an example mutation that is actually composed out of multiple
-distinct operations. In a single request, we can pass all data relating to a task,
+distinct operations.
+
+```graphql
+type Mutation {
+  createTask(input: CreateTaskInput): Task!
+}
+
+input CreateTaskInput {
+  name: String!
+  notes: [CreateNoteInput!]
+}
+
+input CreateNoteInput {
+  content: String!
+  link: String
+}
+```
+
+In a single request, we can pass all data relating to a task,
 including related entities such as notes.
 
 ```graphql
@@ -43,27 +61,70 @@ mutation CreateTaskWithNotes {
 }
 ```
 
+We might resolve that mutation by writing a resolver function that handles all input at once.
+
+```php
+function createTaskWithNotes($root, array $args): \App\Models\Task {
+    // Pull and remove notes from the args array
+    $notes = \Illuminate\Support\Arr::pull($args, 'notes');
+
+    // Create the new task with the remaining args
+    $task = \App\Models\Task::create($args);
+
+    // If the client actually passed notes, create and attach them
+    if($notes) {
+        foreach($notes as $note) {
+            $task->notes()->create($note);
+        }
+    }
+
+    return $task;
+}
+```
+
+In this contrived example, the function is still pretty simple. However, separation of concerns
+is already violated: A single function is responsible for creating both tasks and notes.
+
+We might want to extend our schema to support more operations in the future, such as updating
+a task and creating, updating or deleting notes or other, more deeply nested relations.
+Such changes would force us to duplicate code and increase the complexity of our single function.
+
+## Solution
+
 Ideally, we would want to write small and focused functions that each deal with just
 a part of the given input arguments. The execution engine should traverse the given
 input and take care of calling the appropriate functions with their respective arguments.
 
-## Solution
+```php
+function createTask($root, array $args): \App\Models\Task {
+    return \App\Models\Task::create($args);
+}
+
+function createTaskNotes(\App\Models\Task $root, array $args): void {
+    foreach($args as $note) {
+        $root->notes()->create($note);
+    }
+}
+```
 
 Lighthouse allows you to attach resolver functions to arguments.
 Complex inputs are automatically split into smaller pieces and passed off to the responsible function.
+
 
 As Lighthouse uses the SDL as the primary building block, arg resolvers are implemented as a
 kind of directive: [`ArgResolver`](../custom-directives/argument-directives.md#argresolver).
 Here is how we can define a schema that enables sending a nested mutation as in the example above.
 
-```graphql
+```diff
 type Mutation {
-  createTask(input: CreateTaskInput): Task! @create
+- createTask(input: CreateTaskInput): Task!
++ createTask(input: CreateTaskInput): Task! @create
 }
 
 input CreateTaskInput {
   name: String!
-  notes: [CreateNoteInput!] @create
+- notes: [CreateNoteInput!]
++ notes: [CreateNoteInput!] @create
 }
 
 input CreateNoteInput {
