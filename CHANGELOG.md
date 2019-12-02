@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow globally turning off relation batch loading through the
   config option `batchload_relations` https://github.com/nuwave/lighthouse/pull/1059
 - Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader#loadMany()` function https://github.com/nuwave/lighthouse/pull/973
+- Extend `@rename` directive to work with arguments and input fields https://github.com/nuwave/lighthouse/issues/521
 
 ### Changed
 

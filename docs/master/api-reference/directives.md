@@ -2046,24 +2046,30 @@ class Blog
 
 ## @rename
 
-Rename a field on the server side, e.g. convert from snake_case to camelCase.
+```graphql
+"""
+Change the internally used name of a field or argument.
+This does not change the schema from a client perspective.
+"""
+directive @rename(
+  """
+  The internal name of an attribute/property/key.
+  """
+  attribute: String!
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This can often be useful to ensure consistent naming of your schema
+without having to change the underlying models.
 
 ```graphql
 type User {
     createdAt: String! @rename(attribute: "created_at")
 }
-```
 
-### Definition
-
-```graphql
-directive @rename(
-  """
-  Specify the original name of the property/key that the field
-  value can be retrieved from.
-  """
-  attribute: String!
-) on FIELD_DEFINITION
+input UserInput {
+    firstName: String! @rename(attribute: "first_name")
+}
 ```
 
 ## @restore
