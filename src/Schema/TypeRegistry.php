@@ -92,13 +92,24 @@ class TypeRegistry
      *
      * @param  string  $name
      * @return \GraphQL\Type\Definition\Type
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function get(string $name): Type
     {
         if (! isset($this->types[$name])) {
-            $this->types[$name] = $this->handle(
-                $this->documentAST->types[$name]
-            );
+            $typeDefinition = $this->documentAST->types[$name] ?? null;
+            if (! $typeDefinition) {
+                throw new DefinitionException(<<<EOL
+Lighthouse failed while trying to load a type: $name
+
+Make sure the type is present in your schema definition.
+
+EOL
+                );
+            }
+
+            $this->types[$name] = $this->handle($typeDefinition);
         }
 
         return $this->types[$name];

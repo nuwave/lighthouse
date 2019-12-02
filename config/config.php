@@ -203,6 +203,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Batchload Relations
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, relations marked with directives like @hasMany or @belongsTo
+    | will be optimized by combining the queries through the BatchLoader.
+    |
+    */
+
+    'batchload_relations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |

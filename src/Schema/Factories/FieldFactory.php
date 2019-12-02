@@ -21,9 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 
@@ -42,19 +40,9 @@ class FieldFactory
     protected $argumentFactory;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver
-     */
-    protected $providesResolver;
-
-    /**
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
-
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver
-     */
-    protected $providesSubscriptionResolver;
 
     /**
      * @var \Illuminate\Contracts\Validation\Factory
@@ -100,8 +88,6 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver  $providesResolver
-     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver  $providesSubscriptionResolver
      * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
      * @param  \Nuwave\Lighthouse\Execution\Arguments\TypedArgs  $typedArgs
      * @return void
@@ -110,16 +96,12 @@ class FieldFactory
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
-        ProvidesResolver $providesResolver,
-        ProvidesSubscriptionResolver $providesSubscriptionResolver,
         ValidationFactory $validationFactory,
         TypedArgs $typedArgs
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
-        $this->providesResolver = $providesResolver;
-        $this->providesSubscriptionResolver = $providesSubscriptionResolver;
         $this->validationFactory = $validationFactory;
         $this->typedArgs = $typedArgs;
     }
@@ -139,11 +121,7 @@ class FieldFactory
         if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
             $this->fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
-            $this->fieldValue = $fieldValue->setResolver(
-                $fieldValue->getParentName() === 'Subscription'
-                    ? $this->providesSubscriptionResolver->provideSubscriptionResolver($fieldValue)
-                    : $this->providesResolver->provideResolver($fieldValue)
-            );
+            $this->fieldValue = $fieldValue->useDefaultResolver();
         }
 
         $fieldMiddleware = $this->passResolverArguments(
