@@ -5,8 +5,8 @@ namespace Tests\Unit\Execution\Arguments;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Tests\TestCase;
 
 class ArgumentSetTest extends TestCase
@@ -17,13 +17,13 @@ class ArgumentSetTest extends TestCase
         $directiveCollection = collect([$spreadDirective]);
 
         // Those are the leave values we want in the spread result
-        $bazValue = 2;
-        $baz = new Argument();
-        $baz->value = $bazValue;
-
         $foo = new Argument();
         $fooValue = 1;
         $foo->value = $fooValue;
+
+        $baz = new Argument();
+        $bazValue = 2;
+        $baz->value = $bazValue;
 
         $barInput = new ArgumentSet();
         $barInput->arguments['baz'] = $baz;
@@ -125,16 +125,9 @@ class ArgumentSetTest extends TestCase
 
     public function testRenameInput(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory $directiveFactory */
-        $directiveFactory = app(DirectiveFactory::class);
-
-        $renameDirective = PartialParser::directive('@rename');
-        $renameDirective->directives = collect([PartialParser::directive('@rename(attribute: "first_name")')]);
-        $renameDirective = $directiveFactory->create('rename', $renameDirective);
-
         $firstName = new Argument();
         $firstName->value = 'Michael';
-        $firstName->directives = collect([$renameDirective]);
+        $firstName->directives = collect([$this->makeRenameDirective('first_name')]);
 
         $argumentSet = new ArgumentSet();
         $argumentSet->arguments = [
@@ -143,8 +136,56 @@ class ArgumentSetTest extends TestCase
 
         $renamedSet = $argumentSet->rename();
 
-        $this->assertSame([
-            'first_name' => $firstName,
-        ], $renamedSet->arguments);
+        $this->assertSame(
+            [
+                'first_name' => $firstName,
+            ],
+            $renamedSet->arguments
+        );
+    }
+
+    public function testRenameNested(): void
+    {
+        $secondLevelArg = new Argument();
+        $secondLevelArg->value = 'Michael';
+        $secondLevelArg->directives = collect([$this->makeRenameDirective('second_internal')]);
+
+        $secondLevelSet = new ArgumentSet();
+        $secondLevelSet->arguments = [
+            'secondExternal' => $secondLevelArg,
+        ];
+
+        $firstLevelArg = new Argument();
+        $firstLevelArg->value = $secondLevelSet;
+        $firstLevelArg->directives = collect([$this->makeRenameDirective('first_internal')]);
+
+        $firstLevelSet = new ArgumentSet();
+        $firstLevelSet->arguments = [
+            'firstExternal' => $firstLevelArg,
+        ];
+
+        $renamedFirstLevel = $firstLevelSet->rename();
+
+        $renamedSecondLevel = $renamedFirstLevel->arguments['first_internal']->value;
+        $this->assertSame(
+            [
+                'second_internal' => $secondLevelArg,
+            ],
+            $renamedSecondLevel->arguments
+        );
+    }
+
+    protected function makeRenameDirective(string $attribute): RenameDirective
+    {
+        $renameDirective = new RenameDirective();
+        $renameDirective->hydrate(
+            // We require some placeholder for the directive definition to sit on
+            PartialParser::fieldDefinition(/** @lang GraphQL */ <<<GRAPHQL
+firstName: ID @rename(attribute: "$attribute")
+GRAPHQL
+            )
+        );
+
+        return $renameDirective;
     }
 }

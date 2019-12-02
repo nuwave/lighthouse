@@ -22,13 +22,16 @@ class RenameDirective extends BaseDirective implements FieldResolver, DefinedDir
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
+"""
+Change the internally used name of a field or argument.
+This does not change the schema from a client perspective.
+"""
 directive @rename(
   """
-  Specify the original name of the property/key that the field
-  value can be retrieved from.
+  The internal name of an attribute/property/key.
   """
   attribute: String!
-) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -37,12 +40,10 @@ SDL;
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $attribute = $this->getAttribute();
+        $attribute = $this->attributeArgValue();
 
         return $fieldValue->setResolver(
             function ($rootValue) use ($attribute) {
@@ -58,7 +59,7 @@ SDL;
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public function getAttribute(): string
+    public function attributeArgValue(): string
     {
         $attribute = $this->directiveArgValue('attribute');
 

@@ -44,7 +44,7 @@ class ArgumentSet
     }
 
     /**
-     * Apply the @spread directive and return a new instance.
+     * Apply the @spread directive and return a new, modified instance.
      *
      * @return self
      */
@@ -77,9 +77,9 @@ class ArgumentSet
     }
 
     /**
-     * Check for the @rename directive on any of the fields and rename them accordingly.
+     * Apply the @rename directive and return a new, modified instance.
      *
-     * @return $this
+     * @return self
      */
     public function rename(): self
     {
@@ -87,22 +87,18 @@ class ArgumentSet
         $argumentSet->directives = $this->directives;
 
         foreach ($this->arguments as $name => $argument) {
+            // Recursively apply the renaming to nested inputs
             if ($argument->value instanceof self) {
-                // recurse to nested inputs
                 $argument->value = $argument->value->rename();
             }
 
-            if (empty($argument->directives)) {
-                $argumentSet->arguments[$name] = $argument;
-                continue;
-            }
-
+            /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
             $renameDirective = $argument->directives->first(function ($directive) {
                 return $directive instanceof RenameDirective;
             });
 
             if ($renameDirective) {
-                $argumentSet->arguments[$renameDirective->getAttribute()] = $argument;
+                $argumentSet->arguments[$renameDirective->attributeArgValue()] = $argument;
             } else {
                 $argumentSet->arguments[$name] = $argument;
             }
@@ -114,9 +110,9 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param string[] $scopes
-     * @param \Closure $directiveFilter
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  string[]  $scopes
+     * @param  \Closure  $directiveFilter
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
