@@ -26,7 +26,7 @@ directive @scope(
   The name of the scope.
   """
   name: String
-) on ARGUMENT_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
