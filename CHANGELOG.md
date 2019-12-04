@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   using `@softDeletes` directive. https://github.com/nuwave/lighthouse/pull/1042
 - Improve the error message for missing field resolvers by offering a solution https://github.com/nuwave/lighthouse/pull/1045
 - Throw `DefinitionException` when missing a type in the type registry https://github.com/nuwave/lighthouse/pull/1066
+- Add `INPUT_FIELD_DEFINITION` to `orderBy` directive location https://github.com/nuwave/lighthouse/pull/1069
 
 ## [4.6.0](https://github.com/nuwave/lighthouse/compare/v4.5.3...v4.6.0)
 

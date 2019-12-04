@@ -31,7 +31,7 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
 """
 Sort a result list by one or more given fields.
 """
-directive @orderBy on ARGUMENT_DEFINITION
+directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
