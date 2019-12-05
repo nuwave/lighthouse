@@ -1413,18 +1413,11 @@ directive @method(
 
 ## @middleware
 
-Run Laravel middleware for a specific field. This can be handy to reuse existing
-middleware.
-
 ```graphql
-type Query {
-    users: [User!]! @middleware(checks: ["auth:api"]) @all
-}
-```
-
-### Definition
-
-```graphql
+"""
+Run Laravel middleware for a specific field or group of fields.
+This can be handy to reuse existing HTTP middleware.
+"""
 directive @middleware(      
   """
   Specify which middleware to run. 
@@ -1432,10 +1425,8 @@ directive @middleware(
   a middleware group - or any combination of them.
   """
   checks: [String!]
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | OBJECT
 ```
-
-### Examples
 
 You can define middleware just like you would in Laravel. Pass in either a fully qualified
 class name, an alias or a middleware group - or any combination of them.
