@@ -82,6 +82,13 @@ module.exports = [
         ]
     },
     {
+        title: 'Concepts',
+        children: [
+            'concepts/field-resolvers',
+            'concepts/arg-resolvers',
+        ]
+    },
+    {
         title: 'API Reference',
         children: [
             'api-reference/directives',
