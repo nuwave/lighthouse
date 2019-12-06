@@ -53,7 +53,7 @@ abstract class BatchLoader
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
 
-        if(isset(self::$instances[$instanceName])) {
+        if (isset(self::$instances[$instanceName])) {
             return self::$instances[$instanceName];
         }
 
@@ -77,7 +77,7 @@ abstract class BatchLoader
             })
             ->implode('.');
 
-        return 'nuwave/lighthouse/batchloader/' . $pathIgnoringLists;
+        return 'nuwave/lighthouse/batchloader/'.$pathIgnoringLists;
     }
 
     /**
