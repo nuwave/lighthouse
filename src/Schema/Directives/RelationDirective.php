@@ -27,38 +27,44 @@ abstract class RelationDirective extends BaseDirective
      */
     public function resolveField(FieldValue $value): FieldValue
     {
-        return $value->setResolver(
-            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
-                $constructorArgs = [
-                    'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
-                    'args' => $args,
-                    'scopes' => $this->directiveArgValue('scopes', []),
-                    'resolveInfo' => $resolveInfo,
-                ];
-
-                if ($paginationType = $this->paginationType()) {
-                    /** @var int $first */
-                    /** @var int $page */
-                    [$first, $page] = PaginationUtils::extractArgs($args, $paginationType, $this->paginateMaxCount());
-
-                    $constructorArgs += [
-                        'first' => $first,
-                        'page' => $page,
+        if (config('lighthouse.batchload_relations')) {
+            $value->setResolver(
+                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
+                    $constructorArgs = [
+                        'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
+                        'args' => $args,
+                        'scopes' => $this->directiveArgValue('scopes', []),
+                        'resolveInfo' => $resolveInfo,
                     ];
-                }
 
-                return BatchLoader
-                    ::instance(
-                        RelationBatchLoader::class,
-                        $resolveInfo->path,
-                        $constructorArgs
-                    )
-                    ->load(
-                        $parent->getKey(),
-                        ['parent' => $parent]
-                    );
-            }
-        );
+                    if ($paginationType = $this->paginationType()) {
+                        /** @var int $first */
+                        /** @var int $page */
+                        [$first, $page] = PaginationUtils::extractArgs($args, $paginationType, $this->paginateMaxCount());
+
+                        $constructorArgs += [
+                            'first' => $first,
+                            'page' => $page,
+                        ];
+                    }
+
+                    return BatchLoader
+                        ::instance(
+                            RelationBatchLoader::class,
+                            $resolveInfo->path,
+                            $constructorArgs
+                        )
+                        ->load(
+                            $parent->getKey(),
+                            ['parent' => $parent]
+                        );
+                }
+            );
+        } else {
+            $value->useDefaultResolver();
+        }
+
+        return $value;
     }
 
     /**

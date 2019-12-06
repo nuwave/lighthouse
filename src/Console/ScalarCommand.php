@@ -25,15 +25,9 @@ class ScalarCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Scalar';
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace): string
+    protected function namespaceConfigKey(): string
     {
-        return config('lighthouse.namespaces.scalars');
+        return 'scalars';
     }
 
     /**
