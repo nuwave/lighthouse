@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.6.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.7.1...master)
+
+## [4.7.1](https://github.com/nuwave/lighthouse/compare/v4.7.0...v4.7.1)
+
+### Changed
+
+- Add `INPUT_FIELD_DEFINITION` to allowed locations for the `@builder` directive https://github.com/nuwave/lighthouse/pull/1074
+
+### Fixed
+
+- Define `@enum` as a directive class so it shows up in `schema-directives.graphql`
+  and can potentially be overwritten https://github.com/nuwave/lighthouse/pull/1078
+
+## [4.7.0](https://github.com/nuwave/lighthouse/compare/v4.6.0...v4.7.0)
 
 ### Added
 
@@ -15,12 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow globally turning off relation batch loading through the
   config option `batchload_relations` https://github.com/nuwave/lighthouse/pull/1059
 - Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader#loadMany()` function https://github.com/nuwave/lighthouse/pull/973
+- Extend `@rename` directive to work with arguments and input fields https://github.com/nuwave/lighthouse/issues/521
 
 ### Changed
 
 - Add ability to fetch soft deleted model within `@can` directive to validate permissions
   using `@softDeletes` directive. https://github.com/nuwave/lighthouse/pull/1042
 - Improve the error message for missing field resolvers by offering a solution https://github.com/nuwave/lighthouse/pull/1045
+- Throw `DefinitionException` when missing a type in the type registry https://github.com/nuwave/lighthouse/pull/1066
+- Add `INPUT_FIELD_DEFINITION` to `orderBy` directive location https://github.com/nuwave/lighthouse/pull/1069
 
 ## [4.6.0](https://github.com/nuwave/lighthouse/compare/v4.5.3...v4.6.0)
 

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
+use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -43,7 +44,7 @@ class ArgumentSet
     }
 
     /**
-     * Apply the @spread directive and return a new instance.
+     * Apply the @spread directive and return a new, modified instance.
      *
      * @return self
      */
@@ -70,6 +71,37 @@ class ArgumentSet
             }
 
             $argumentSet->arguments[$name] = $argument;
+        }
+
+        return $argumentSet;
+    }
+
+    /**
+     * Apply the @rename directive and return a new, modified instance.
+     *
+     * @return self
+     */
+    public function rename(): self
+    {
+        $argumentSet = new self();
+        $argumentSet->directives = $this->directives;
+
+        foreach ($this->arguments as $name => $argument) {
+            // Recursively apply the renaming to nested inputs
+            if ($argument->value instanceof self) {
+                $argument->value = $argument->value->rename();
+            }
+
+            /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
+            $renameDirective = $argument->directives->first(function ($directive) {
+                return $directive instanceof RenameDirective;
+            });
+
+            if ($renameDirective) {
+                $argumentSet->arguments[$renameDirective->attributeArgValue()] = $argument;
+            } else {
+                $argumentSet->arguments[$name] = $argument;
+            }
         }
 
         return $argumentSet;
