@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 

@@ -3,10 +3,10 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
-use ReflectionClass;
-use InvalidArgumentException;
 use Illuminate\Container\Container as Application;
+use InvalidArgumentException;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
+use ReflectionClass;
 
 /**
  * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager. Purpose is

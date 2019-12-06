@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\Schema\Types;
 
+use Illuminate\Support\Collection;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
-use Illuminate\Support\Collection;
 
 class UnionTest extends DBTestCase
 {

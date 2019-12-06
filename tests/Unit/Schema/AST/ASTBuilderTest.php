@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Tests\TestCase;
 
 class ASTBuilderTest extends TestCase
 {
@@ -35,7 +35,7 @@ class ASTBuilderTest extends TestCase
             baz: Boolean
         }
         ';
-        $documentAST = $this->astBuilder->build();
+        $documentAST = $this->astBuilder->documentAST();
 
         $this->assertCount(
             3,
@@ -56,6 +56,6 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
-        $this->astBuilder->build();
+        $this->astBuilder->documentAST();
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Throwable;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
+use Throwable;
 
 class ExceptionHandler implements SubscriptionExceptionHandler
 {

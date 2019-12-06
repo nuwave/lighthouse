@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
-use Illuminate\Support\Collection;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
+use Illuminate\Support\Collection;
 
 class Pipeline extends BasePipeline
 {

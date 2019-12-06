@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
 use GraphQL\Error\InvariantViolation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class MultipartFormRequest extends BaseRequest
 {

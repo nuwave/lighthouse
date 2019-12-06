@@ -47,7 +47,7 @@ abstract class BaseRequest implements GraphQLRequest
      */
     public function query(): string
     {
-        return $this->fieldValue('query');
+        return $this->fieldValue('query') ?? '';
     }
 
     /**

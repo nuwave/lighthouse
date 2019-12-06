@@ -2,23 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class ArgumentFactory
 {
     /**
      * Convert input value definitions to a executable types.
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitions
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitionNodes
      * @return mixed[]
      */
     public function toTypeMap($definitionNodes): array
     {
         $arguments = [];
 
-        /* @var InputValueDefinitionNode $inputValueDefinitionNode */
         foreach ($definitionNodes as $inputDefinition) {
             $arguments[$inputDefinition->name->value] = $this->convert($inputDefinition);
         }
@@ -38,8 +37,9 @@ class ArgumentFactory
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
-        $definitionNodeConverter = app(DefinitionNodeConverter::class);
-        $type = $definitionNodeConverter->toType($definitionNode->type);
+        /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $definitionNodeConverter */
+        $definitionNodeConverter = app(ExecutableTypeNodeConverter::class);
+        $type = $definitionNodeConverter->convert($definitionNode->type);
 
         $config = [
             'name' => $definitionNode->name->value,

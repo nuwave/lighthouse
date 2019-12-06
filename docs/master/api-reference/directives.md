@@ -348,11 +348,11 @@ Use an argument to modify the query builder for a field.
 directive @builder(
   """
   Reference a method that is passed the query builder.
-  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  Consists of two parts: a class name and a method name, separated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @cache
@@ -459,6 +459,9 @@ class PostPolicy
 ```graphql
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+When `injectArgs` and `args` are used together, the client given
+arguments will be passed before the static args.
 """
 directive @can(
   """
@@ -471,18 +474,26 @@ directive @can(
   instance against which the permissions should be checked.
   """
   find: String
+
+  """
+  Pass along the client given input data as arguments to `Gate::check`. 
+  """
+  injectArgs: Boolean = false
+
+  """
+  Statically defined arguments that are passed to `Gate::check`.
   
+  You may pass pass arbitrary GraphQL literals,
+  e.g.: [1, 2, 3] or { foo: "bar" }
   """
-  Additional arguments that are passed to `Gate::check`. 
-  """
-  args: [String!]
+  args: Mixed
 ) on FIELD_DEFINITION
 ```
 
 ### Examples
 
-You may specify an argument that is used to find a specific model
-instance against which the permissions should be checked.
+In `find` parameter you may specify an input argument which is used to find a specific model
+instance by primary key against which the permissions should be checked:
 
 ```graphql
 type Query {
@@ -500,6 +511,14 @@ class PostPolicy
 }
 ```
 
+It also works with soft deleted models in combination with `@softDeletes` directive:
+
+```graphql
+type Query {
+    post(id: ID @eq): Post @softDeletes @can(ability: "view", find: "id")
+}
+```
+
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
 passing the `model` argument.
 
@@ -510,7 +529,7 @@ type Mutation {
 }
 ```
 
-You can pass additional arguments to the policy checks by specifying them as `args`.
+You can pass additional arguments to the policy checks by specifying them as `args`:
 
 ```graphql
 type Mutation {
@@ -518,6 +537,18 @@ type Mutation {
         @can(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
+
+You can pass along the client given input data as arguments to the policy checks
+with the `injectArgs` argument:
+
+```graphql
+type Mutation {
+    createPost(input: PostInput): Post
+        @can(ability: "create", injectArgs: "true")
+}
+```
+
+Now you will have access to `PostInput` values in the policy. 
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
 Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
@@ -577,6 +608,42 @@ class ComplexityAnalyzer {
 
         return $childrenComplexity * $postComplexity;
     }
+```
+
+## @count
+
+Returns the count of a given relationship or model.
+
+```graphql
+type User  {
+    id: ID!
+    likes: Int! @count(relation: "likes")
+}
+```
+
+```graphql
+type Query {
+    categories: Int! @count(model: "Category")
+}
+```
+
+### Definition
+
+```graphql
+"""
+Returns the count of a given relationship or model.
+"""
+directive @count(
+  """
+  The relationship which you want to run the count on.
+  """
+  relation: String
+  
+  """
+  The model to run the count on.
+  """
+  model: String
+) on FIELD_DEFINITION
 ```
 
 ## @create
@@ -896,8 +963,20 @@ Works very similar to the [`@delete`](#delete) directive.
 
 ## @enum
 
-Assign an internal value to an enum key. When dealing with the Enum type in your code,
+```graphql
+"""
+Assign an internal value to an enum key.
+When dealing with the Enum type in your code,
 you will receive the defined value instead of the string key.
+"""
+directive @enum(
+  """
+  The internal value of the enum key.
+  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+  """
+  value: Mixed
+) on ENUM_VALUE
+```
 
 ```graphql
 enum Role {
@@ -908,21 +987,6 @@ enum Role {
 
 You do not need this directive if the internal value of each enum key
 is an identical string. [Read more about enum types](../the-basics/types.md#enum)
-
-### Definition
-
-```graphql
-"""
-Assign an internal value to an enum key.
-"""
-directive @enum(
-  """
-  The internal value of the enum key.
-  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-  """
-  value: Mixed
-) on ENUM_VALUE
-```
 
 ## @eq
 
@@ -1227,7 +1291,7 @@ directive @inject(
   within the incoming argument.
   """
   name: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on FIELD_DEFINITION
 ```
 
 ### Examples
@@ -1377,18 +1441,11 @@ directive @method(
 
 ## @middleware
 
-Run Laravel middleware for a specific field. This can be handy to reuse existing
-middleware.
-
 ```graphql
-type Query {
-    users: [User!]! @middleware(checks: ["auth:api"]) @all
-}
-```
-
-### Definition
-
-```graphql
+"""
+Run Laravel middleware for a specific field or group of fields.
+This can be handy to reuse existing HTTP middleware.
+"""
 directive @middleware(      
   """
   Specify which middleware to run. 
@@ -1396,10 +1453,8 @@ directive @middleware(
   a middleware group - or any combination of them.
   """
   checks: [String!]
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | OBJECT
 ```
-
-### Examples
 
 You can define middleware just like you would in Laravel. Pass in either a fully qualified
 class name, an alias or a middleware group - or any combination of them.
@@ -1446,27 +1501,42 @@ it is often more suitable to define a custom field directive.
 
 ## @model
 
-Enable fetching an Eloquent model by its global id through the `node` query.
-
-```graphql
-type User @model {
-    id: ID! @globalId
-}
-```
-
-Behind the scenes, Lighthouse will decode the global id sent from the client
-to find the model by it's primary id in the database.
-
-You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
-own mechanism of encoding/decoding global ids.
-
-### Definition
-
 ```graphql
 """
 Enable fetching an Eloquent model by its global id through the `node` query.
+
+@deprecated(reason: "Use @node instead. This directive will be repurposed and do what @modelClass does now in v5.")
 """
 directive @model on OBJECT
+```
+
+**Deprecated** Use [`@node`](#node) for Relay global object identification.
+
+## @modelClass
+
+```graphql
+"""
+Map a model class to an object type.
+This can be used when the name of the model differs from the name of the type.
+
+**This directive will be renamed to @model in v5.**
+"""
+directive @modelClass(
+    """
+    The class name of the corresponding model.
+    """
+    class: String!
+) on OBJECT
+```
+
+**Attention** This directive will be renamed to `@model` in v5.
+
+Lighthouse will respect the overwritten model name in it's directives.
+
+```graphql
+type Post @modelClass(class: "\\App\\BlogPost") {
+    title: String!
+}
 ```
 
 ## @morphMany
@@ -1662,10 +1732,41 @@ directive @neq(
 
 ## @node
 
-Register a type for relay global object identification.
+```graphql
+"""
+Register a type for Relay's global object identification.
+When used without any arguments, Lighthouse will attempt
+to resolve the type through a model with the same name.
+"""
+directive @node(
+  """
+  Reference to a function that receives the decoded `id` and returns a result.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+```
+
+Lighthouse defaults to resolving types through the underlying model,
+for example by calling `User::find($id)`.
 
 ```graphql
-type User @node(resolver: "App\\GraphQL\\NodeResolver@resolveUser") {
+type User @node {
+    id: ID! @globalId
+}
+```
+
+You can also use a custom resolver function to resolve any kind of data.
+
+```graphql
+type Country @node(resolver: "App\\Countries@byId") {
     name: String!
 }
 ```
@@ -1674,26 +1775,20 @@ The `resolver` argument has to specify a function which will be passed the
 decoded `id` and resolves to a result.
 
 ```php
-function resolveUser($id): \App\User
+public function byId($id): array {
+    return [
+        'DE' => ['name' => 'Germany'],
+        'MY' => ['name' => 'Malaysia'],
+    ][$id];
+}
 ```
 
-Note: if you plan on resolving using an Eloquent Model, be sure to check out the [`@model`](#model) directive.
+[Read more](../digging-deeper/relay.md#global-object-identification).
 
 ### Definition
 
-```graphql
-"""
-Register a type for relay global object identification.
-"""
-directive @node(
-  """
-  Reference to resolver function.
-  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name, the method name defaults to `__invoke`.
-  """
-  resolver: String!
-) on FIELD_DEFINITION
-```
+Behind the scenes, Lighthouse will decode the global id sent from the client
+to find the model by it's primary id in the database.
 
 ## @notIn
 
@@ -1733,7 +1828,7 @@ type Query {
 ### Definition
 
 ```graphql
-directive @orderBy on ARGUMENT_DEFINITION
+directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 The `OrderByClause` input is automatically added to the schema,
@@ -1769,6 +1864,37 @@ Querying a field that has an `orderBy` argument looks like this:
 ```
 
 You may pass more than one sorting option to add a secondary ordering.
+
+### Input Definition Example
+
+The `@orderBy` directive can also be applied inside an input field definition when used in conjunction with the [`@spread`](#spread) directive. See below for example: 
+
+```graphql
+type Query{
+    posts(filter: PostFilterInput @spread): Posts
+}
+
+input PostFilterInput {
+    orderBy: [OrderByClause!] @orderBy
+}
+```
+
+And usage example:
+
+```graphql
+{
+    posts(filter: {
+        orderBy: [
+            {
+                field: "postedAt"
+                order: ASC
+            }    
+        ]       
+    }) {
+        title
+    }
+}
+```
 
 ## @paginate
 
@@ -1859,6 +1985,9 @@ directive @paginate(
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
 
+> Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
+> Under the hood, the "cursor" is decoded into a page offset.
+
 ```graphql
 type Query {
     posts: [Post!]! @paginate(type: "connection")
@@ -1936,24 +2065,30 @@ class Blog
 
 ## @rename
 
-Rename a field on the server side, e.g. convert from snake_case to camelCase.
+```graphql
+"""
+Change the internally used name of a field or argument.
+This does not change the schema from a client perspective.
+"""
+directive @rename(
+  """
+  The internal name of an attribute/property/key.
+  """
+  attribute: String!
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This can often be useful to ensure consistent naming of your schema
+without having to change the underlying models.
 
 ```graphql
 type User {
     createdAt: String! @rename(attribute: "created_at")
 }
-```
 
-### Definition
-
-```graphql
-directive @rename(
-  """
-  Specify the original name of the property/key that the field
-  value can be retrieved from.
-  """
-  attribute: String!
-) on FIELD_DEFINITION
+input UserInput {
+    firstName: String! @rename(attribute: "first_name")
+}
 ```
 
 ## @restore
@@ -2097,6 +2232,31 @@ scalar DateTime
     @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
+## @scope
+
+```graphql
+"""
+Adds a scope to the query builder.
+The scope method will receive the client-given value of the argument as the second parameter.
+"""
+directive @scope(
+  """
+  The name of the scope.
+  """
+  name: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+You may use this in combination with field directives such as [`@all`](#all).
+
+```graphql
+type Query {
+    posts(
+        trending: Boolean @scope(name: "trending")
+    ): [Post!]! @all
+}
+```
+
 ## @search
 
 Perform a full-text by the given input value.
@@ -2201,7 +2361,15 @@ Find out how the added filter works: [`@trashed`](#trashed)
 
 ## @spread
 
-Spread out the nested values of an argument of type input object into it's parent.
+```graphql
+"""
+Merge the fields of a nested input object into the arguments of its parent
+when processing the field arguments given by a client.
+"""
+directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+You may use `@spread` on field arguments or on input object fields:
 
 ```graphql
 type Mutation {
@@ -2213,11 +2381,15 @@ type Mutation {
 
 input PostInput {
     title: String!
-    body: String
+    content: PostContent @spread
+}
+
+input PostContent {
+    imageUrl: String
 }
 ```
 
-The schema does not change, client side usage works the same:
+The schema does not change, client side usage works as if `@spread` was not there:
 
 ```graphql
 mutation {
@@ -2225,11 +2397,14 @@ mutation {
         id: 12 
         input: {
             title: "My awesome title"
+            content: {
+                imageUrl: "http://some.site/image.jpg"
+            }
         }
     ) {
         id
     }
-}   
+}
 ```
 
 Internally, the arguments will be transformed into a flat structure before
@@ -2237,22 +2412,14 @@ they are passed along to the resolver:
 
 ```php
 [
-    'id' => 12
-    'title' = 'My awesome title'
+    'id' => 12,
+    'title' => 'My awesome title',
+    'imageUrl' = 'http://some.site/image.jpg',
 ]
 ```
 
-Note that Lighthouse spreads out the arguments **after** all other `ArgDirectives` have
-been applied, e.g. validation, transformation.
-
-### Definition
-
-```graphql
-"""
-Spread out the nested values of an argument of type input object into it's parent.
-"""
-directive @spread on ARGUMENT_DEFINITION
-```
+Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/argument-directives.md)
+have been applied, e.g. validation, transformation.
 
 ## @subscription
 
@@ -2462,6 +2629,49 @@ or is located in a non-default namespace, set it with the `model` argument.
 ```graphql
 type Mutation {
     updateAuthor(id: ID!, name: String): Author @update(model: "App\\User")
+}
+```
+
+## @upsert
+
+Create or update an Eloquent model with the input values of the field.
+
+```graphql
+type Mutation {
+    upsertPost(id: ID!, content: String): Post @upsert
+}
+```
+
+### Definition
+
+```graphql
+"""
+Create or update an Eloquent model with the input values of the field.
+"""
+directive @upsert(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION
+```
+
+### Examples
+
+
+Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
+If the model doesn't exist, it will be created using the given `id`.
+
+```graphql
+type Mutation {
+    upsertPost(post_id: ID!, content: String): Post @upsert
 }
 ```
 

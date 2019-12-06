@@ -4,13 +4,13 @@ namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class Defer implements CreatesResponse
 {
@@ -50,7 +50,7 @@ class Defer implements CreatesResponse
     protected $isStreaming = false;
 
     /**
-     * @var int
+     * @var float
      */
     protected $maxExecutionTime = 0;
 

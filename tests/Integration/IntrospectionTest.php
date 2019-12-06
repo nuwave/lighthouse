@@ -2,10 +2,10 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Foundation\Testing\TestResponse;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 use Tests\Utils\Scalars\Email;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Illuminate\Foundation\Testing\TestResponse;
 
 class IntrospectionTest extends TestCase
 {
@@ -28,11 +28,11 @@ class IntrospectionTest extends TestCase
 
     public function testFindsTypesFromSchema(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Foo {
             bar: Int
         }        
-        '.$this->placeholderQuery();
+        ';
 
         $this->assertNotNull(
             $this->introspectType('Foo')
@@ -48,7 +48,6 @@ class IntrospectionTest extends TestCase
 
     public function testFindsManuallyRegisteredTypes(): void
     {
-        $this->schema = $this->placeholderQuery();
         $this->typeRegistry->register(
             new Email()
         );

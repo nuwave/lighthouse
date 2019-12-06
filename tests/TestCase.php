@@ -5,22 +5,31 @@ namespace Tests;
 use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\GraphQL;
-use Tests\Utils\Middleware\CountRuns;
-use Laravel\Scout\ScoutServiceProvider;
-use Tests\Utils\Policies\AuthServiceProvider;
-use Orchestra\Database\ConsoleServiceProvider;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Testing\TestResponse;
+use Laravel\Scout\ScoutServiceProvider;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
-use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
+use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
+use Nuwave\Lighthouse\Testing\MocksResolvers;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
+use Orchestra\Database\ConsoleServiceProvider;
+use Orchestra\Testbench\TestCase as BaseTestCase;
+use Tests\Utils\Middleware\CountRuns;
+use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
     use MakesGraphQLRequests;
+    use MocksResolvers;
+
+    const PLACEHOLDER_QUERY = '
+    type Query {
+        foo: Int
+    }
+    ';
 
     /**
      * This variable is injected the main GraphQL class
@@ -29,7 +38,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @var string
      */
-    protected $schema = '';
+    protected $schema = self::PLACEHOLDER_QUERY;
 
     /**
      * Get package providers.
@@ -44,6 +53,7 @@ abstract class TestCase extends BaseTestCase
             AuthServiceProvider::class,
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            TestingServiceProvider::class,
             ConsoleServiceProvider::class,
         ];
     }
@@ -115,29 +125,7 @@ abstract class TestCase extends BaseTestCase
 
         $config->set('app.debug', true);
 
-        TestResponse::macro(
-            'assertErrorCategory',
-            function (string $category): TestResponse {
-                $this->assertJson([
-                    'errors' => [
-                        [
-                            'extensions' => [
-                                'category' => $category,
-                            ],
-                        ],
-                    ],
-                ]);
-
-                return $this;
-            }
-        );
-
-        TestResponse::macro(
-            'jsonGet',
-            function (string $key = null) {
-                return data_get($this->decodeResponseJson(), $key);
-            }
-        );
+        TestResponse::mixin(new TestResponseMixin());
     }
 
     /**
@@ -153,47 +141,21 @@ abstract class TestCase extends BaseTestCase
     {
         $app->singleton(ExceptionHandler::class, function () {
             return new class implements ExceptionHandler {
-                /**
-                 * Report or log an exception.
-                 *
-                 * @param  \Exception  $e
-                 * @return void
-                 */
                 public function report(Exception $e)
                 {
                     //
                 }
 
-                /**
-                 * Render an exception into an HTTP response.
-                 *
-                 * @param  \Illuminate\Http\Request  $request
-                 * @param  \Exception  $e
-                 * @return void
-                 */
-                public function render($request, Exception $e): void
+                public function render($request, Exception $e)
                 {
                     throw $e;
                 }
 
-                /**
-                 * Render an exception to the console.
-                 *
-                 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-                 * @param  \Exception  $e
-                 * @return void
-                 */
                 public function renderForConsole($output, Exception $e)
                 {
                     //
                 }
 
-                /**
-                 * Determine if the exception should be reported.
-                 *
-                 * @param  \Exception  $e
-                 * @return bool
-                 */
                 public function shouldReport(Exception $e)
                 {
                     return false;
@@ -218,7 +180,7 @@ abstract class TestCase extends BaseTestCase
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema.$this->placeholderQuery()
+            $schema.self::PLACEHOLDER_QUERY
         );
     }
 
@@ -235,21 +197,6 @@ abstract class TestCase extends BaseTestCase
         return $this->app
             ->make(GraphQL::class)
             ->prepSchema();
-    }
-
-    /**
-     * Convenience method to get a default Query, sometimes needed
-     * because the Schema is invalid without it.
-     *
-     * @return string
-     */
-    protected function placeholderQuery(): string
-    {
-        return '
-        type Query {
-            foo: Int
-        }
-        ';
     }
 
     /**

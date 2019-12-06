@@ -3,12 +3,12 @@
 namespace Tests\Unit\Schema\Types\Scalars;
 
 use Carbon\Carbon;
-use Tests\TestCase;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
 use Nuwave\Lighthouse\Schema\Types\Scalars\Date;
+use Tests\TestCase;
 
 class DateTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class SearchDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
@@ -41,12 +41,8 @@ SDL;
      */
     public function handleBuilder($builder, $value)
     {
-        /** @var \Illuminate\Database\Eloquent\Model $modelClass */
-        $modelClass = get_class(
-            $builder->getModel()
-        );
-
-        /** @var \Laravel\Scout\Builder $builder */
+        /** @var \Laravel\Scout\Searchable $modelClass */
+        $modelClass = get_class($builder->getModel());
         $builder = $modelClass::search($value);
 
         if ($within = $this->directiveArgValue('within')) {

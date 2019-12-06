@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Support\Arr;
-use GraphQL\Language\AST\Node;
-use Nuwave\Lighthouse\GraphQL;
-use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
-use Nuwave\Lighthouse\Events\StartExecution;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
@@ -130,7 +130,7 @@ class SubscriptionRegistry
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {
-        // A subscription can be fired w/out a request so we must make
+        // A subscription can be fired without a request so we must make
         // sure the schema has been generated.
         $this->graphQL->prepSchema();
 

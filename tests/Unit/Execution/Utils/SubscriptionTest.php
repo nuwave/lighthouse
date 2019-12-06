@@ -2,17 +2,17 @@
 
 namespace Tests\Unit\Execution\Utils;
 
-use Tests\TestCase;
-use Prophecy\Argument;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Prophecy\Argument;
+use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {

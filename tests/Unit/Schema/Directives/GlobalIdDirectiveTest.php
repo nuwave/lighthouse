@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class GlobalIdDirectiveTest extends TestCase
 {

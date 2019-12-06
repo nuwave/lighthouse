@@ -348,11 +348,11 @@ Use an argument to modify the query builder for a field.
 directive @builder(
   """
   Reference a method that is passed the query builder.
-  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  Consists of two parts: a class name and a method name, separated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @cache
@@ -896,8 +896,20 @@ Works very similar to the [`@delete`](#delete) directive.
 
 ## @enum
 
-Assign an internal value to an enum key. When dealing with the Enum type in your code,
+```graphql
+"""
+Assign an internal value to an enum key.
+When dealing with the Enum type in your code,
 you will receive the defined value instead of the string key.
+"""
+directive @enum(
+  """
+  The internal value of the enum key.
+  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+  """
+  value: Mixed
+) on ENUM_VALUE
+```
 
 ```graphql
 enum Role {
@@ -908,21 +920,6 @@ enum Role {
 
 You do not need this directive if the internal value of each enum key
 is an identical string. [Read more about enum types](../the-basics/types.md#enum)
-
-### Definition
-
-```graphql
-"""
-Assign an internal value to an enum key.
-"""
-directive @enum(
-  """
-  The internal value of the enum key.
-  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-  """
-  value: Mixed
-) on ENUM_VALUE
-```
 
 ## @eq
 
@@ -1227,7 +1224,7 @@ directive @inject(
   within the incoming argument.
   """
   name: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on FIELD_DEFINITION
 ```
 
 ### Examples
@@ -1377,18 +1374,11 @@ directive @method(
 
 ## @middleware
 
-Run Laravel middleware for a specific field. This can be handy to reuse existing
-middleware.
-
 ```graphql
-type Query {
-    users: [User!]! @middleware(checks: ["auth:api"]) @all
-}
-```
-
-### Definition
-
-```graphql
+"""
+Run Laravel middleware for a specific field or group of fields.
+This can be handy to reuse existing HTTP middleware.
+"""
 directive @middleware(      
   """
   Specify which middleware to run. 
@@ -1396,10 +1386,8 @@ directive @middleware(
   a middleware group - or any combination of them.
   """
   checks: [String!]
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | OBJECT
 ```
-
-### Examples
 
 You can define middleware just like you would in Laravel. Pass in either a fully qualified
 class name, an alias or a middleware group - or any combination of them.
@@ -1733,7 +1721,7 @@ type Query {
 ### Definition
 
 ```graphql
-directive @orderBy on ARGUMENT_DEFINITION
+directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 The `OrderByClause` input is automatically added to the schema,
@@ -1769,6 +1757,38 @@ Querying a field that has an `orderBy` argument looks like this:
 ```
 
 You may pass more than one sorting option to add a secondary ordering.
+
+### Input Definition Example
+
+The `@orderBy` directive can also be applied inside an input field definition when used in conjunction with the [`@spread`](#spread) directive. See below for example: 
+
+```graphql
+type Query{
+    posts(filter: PostFilterInput @spread): Posts
+}
+
+input PostFilterInput {
+    orderBy: [OrderByClause!] @orderBy
+}
+```
+
+And usage example:
+
+```graphql
+{
+    posts(filter: {
+        orderBy: [
+            {
+                field: "postedAt"
+                order: ASC
+            }    
+        ]       
+    }) {
+        title
+    }
+}
+```
+
 
 ## @paginate
 

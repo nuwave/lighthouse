@@ -9,14 +9,8 @@ class BcryptDirectiveTest extends TestCase
     public function testCanBcryptAnArgument(): void
     {
         $this->schema = '
-        type Mutation {
-            foo(bar: String @bcrypt): Foo
-                @field(resolver: "'.$this->qualifyTestResolver().'")
-        }
-        
         type Query {
-            foo(bar: String @bcrypt): Foo
-                @field(resolver: "'.$this->qualifyTestResolver().'")
+            foo(bar: String @bcrypt): Foo @mock
         }
         
         type Foo {
@@ -24,35 +18,27 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $passwordFromMutation = $this->graphQL('
-        mutation {
+        $this->mockResolver(function ($root, $args) {
+            return $args;
+        });
+
+        $password = $this->graphQL('
+        {
             foo(bar: "password"){
                 bar
             }
         }
         ')->jsonGet('data.foo.bar');
 
-        $this->assertNotSame('password', $passwordFromMutation);
-        $this->assertTrue(password_verify('password', $passwordFromMutation));
-
-        $passwordFromQuery = $this->graphQL('
-        {
-            foo(bar: "123"){
-                bar
-            }
-        }
-        ')->jsonGet('data.foo.bar');
-
-        $this->assertNotSame('123', $passwordFromQuery);
-        $this->assertTrue(password_verify('123', $passwordFromQuery));
+        $this->assertNotSame('password', $password);
+        $this->assertTrue(password_verify('password', $password));
     }
 
     public function testCanBcryptAnArgumentInInputObjectAndArray(): void
     {
         $this->schema = '
         type Query {
-            user(input: UserInput): User
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+            user(input: UserInput): User @mock
         }
         
         type User {
@@ -67,6 +53,10 @@ class BcryptDirectiveTest extends TestCase
             friends: [UserInput]
         }
         ';
+
+        $this->mockResolver(function ($root, array $args) {
+            return $args['input'];
+        });
 
         $result = $this->graphQL('
         query {
@@ -125,25 +115,5 @@ class BcryptDirectiveTest extends TestCase
         $friendPasswordFour = $result->jsonGet('data.user.friends.2.friends.0.password');
         $this->assertNotSame('friend_password_4', $friendPasswordFour);
         $this->assertTrue(password_verify('friend_password_4', $friendPasswordFour));
-    }
-
-    /**
-     * @param  mixed  $root
-     * @param  mixed[]  $args
-     * @return mixed[]
-     */
-    public function resolve($root, array $args): array
-    {
-        return $args;
-    }
-
-    /**
-     * @param  mixed  $root
-     * @param  mixed[]  $args
-     * @return mixed[]
-     */
-    public function resolveUser($root, array $args): array
-    {
-        return $args['input'];
     }
 }

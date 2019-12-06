@@ -3,12 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
-use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class FindDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
@@ -51,19 +51,13 @@ SDL;
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        /** @var \Illuminate\Database\Eloquent\Model $model */
-        $model = $this->getModelClass();
-
         return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model): ?Model {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
                 $results = $resolveInfo
-                    ->builder
-                    ->addScopes(
+                    ->argumentSet
+                    ->enhanceBuilder(
+                        $this->getModelClass()::query(),
                         $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
-                        $model::query(),
-                        $args
                     )
                     ->get();
 

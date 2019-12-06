@@ -2,23 +2,20 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Str;
-use GraphQL\Type\Definition\ResolveInfo;
-use Laravel\Scout\Builder as ScoutBuilder;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Pagination\PaginationUtils;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Pagination\PaginationManipulator;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
@@ -85,14 +82,25 @@ SDL;
      */
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        PaginationManipulator::transformToPaginatedField(
-            $this->paginationType(),
-            $fieldDefinition,
-            $parentType,
-            $documentAST,
-            $this->directiveArgValue('defaultCount'),
-            $this->paginateMaxCount()
-        );
+        $paginationManipulator = new PaginationManipulator($documentAST);
+
+        if ($this->directiveHasArgument('builder')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('builder');
+        } else {
+            $paginationManipulator->setModelClass(
+                $this->getModelClass()
+            );
+        }
+
+        $paginationManipulator
+            ->transformToPaginatedField(
+                $this->paginationType(),
+                $fieldDefinition,
+                $parentType,
+                $this->directiveArgValue('defaultCount'),
+                $this->paginateMaxCount()
+            );
     }
 
     /**
@@ -118,19 +126,14 @@ SDL;
                         $resolveInfo
                     );
                 } else {
-                    /** @var \Illuminate\Database\Eloquent\Model $model */
-                    $model = $this->getPaginatorModel();
-                    $query = $model::query();
+                    $query = $this->getModelClass()::query();
                 }
 
                 $query = $resolveInfo
-                    ->builder
-                    ->addScopes(
-                        $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
+                    ->argumentSet
+                    ->enhanceBuilder(
                         $query,
-                        $args
+                        $this->directiveArgValue('scopes', [])
                     );
 
                 if ($query instanceof ScoutBuilder) {
@@ -158,35 +161,5 @@ SDL;
     {
         return $this->directiveArgValue('maxCount')
             ?? config('lighthouse.paginate_max_count');
-    }
-
-    /**
-     * Get the model class from the `model` argument of the field.
-     *
-     * This works differently as in other directives, so we define a separate function for it.
-     *
-     * @return string
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    protected function getPaginatorModel(): string
-    {
-        $model = $this->directiveArgValue('model');
-
-        // Fallback to using information from the schema definition as the model name
-        if (! $model) {
-            $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
-
-            // Cut the added type suffix to get the base model class name
-            $model = Str::before($model, 'Paginator');
-            $model = Str::before($model, 'Connection');
-        }
-
-        if (! $model) {
-            throw new DirectiveException(
-                "A `model` argument must be assigned to the '{$this->name()}' directive on '{$this->definitionNode->name->value}"
-            );
-        }
-
-        return $this->namespaceModelClass($model);
     }
 }

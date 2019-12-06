@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class AllDirective extends BaseDirective implements DefinedDirective, FieldResolver
 {
@@ -49,17 +49,11 @@ SDL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
-                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
-                $modelClass = $this->getModelClass();
-
                 return $resolveInfo
-                    ->builder
-                    ->addScopes(
+                    ->argumentSet
+                    ->enhanceBuilder(
+                        $this->getModelClass()::query(),
                         $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
-                        $modelClass::query(),
-                        $args
                     )
                     ->get();
             }

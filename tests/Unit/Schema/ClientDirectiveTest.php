@@ -2,15 +2,13 @@
 
 namespace Tests\Unit\Schema;
 
-use Tests\TestCase;
 use GraphQL\Type\Definition\Directive;
+use Tests\TestCase;
 
 class ClientDirectiveTest extends TestCase
 {
     public function testReturnsDefaultDirectivesInIntrospection(): void
     {
-        $this->schema = $this->placeholderQuery();
-
         $this->assertNotNull(
             $this->introspectDirective(Directive::SKIP_NAME)
         );
@@ -21,13 +19,13 @@ class ClientDirectiveTest extends TestCase
 
     public function testCanDefineACustomClientDirective(): void
     {
-        $this->schema = '
+        $this->schema .= '
         "foo"
         directive @bar(
             "foobar"
             baz: String = "barbaz"
         ) on FIELD
-        '.$this->placeholderQuery();
+        ';
 
         $bar = $this->introspectDirective('bar');
 

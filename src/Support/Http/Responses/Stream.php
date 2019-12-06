@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 abstract class Stream
 {

@@ -3,17 +3,17 @@
 namespace Nuwave\Lighthouse\WhereConstraints;
 
 use GraphQL\Error\Error;
-use Illuminate\Support\Str;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
@@ -122,17 +122,17 @@ SDL;
     /**
      * Manipulate the AST.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode $argDefinition
-     * @param \GraphQL\Language\AST\FieldDefinitionNode $parentField
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @return void
      */
-    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType): void
     {
         $allowedColumns = $this->directiveArgValue('columns');
         if (! $allowedColumns) {
-            return $documentAST;
+            return;
         }
 
         $restrictedWhereConstraintsName = $this->restrictedWhereConstraintsName($argDefinition, $parentField);
@@ -141,7 +141,7 @@ SDL;
 
         $allowedColumnsEnumName = $this->allowedColumnsEnumName($argDefinition, $parentField);
 
-        return $documentAST
+        $documentAST
             ->setTypeDefinition(
                 WhereConstraintsServiceProvider::createWhereConstraintsInputType(
                     $restrictedWhereConstraintsName,

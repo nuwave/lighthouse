@@ -4,50 +4,51 @@ namespace Nuwave\Lighthouse;
 
 use Closure;
 use Exception;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Routing\Router;
-use Illuminate\Validation\Validator;
-use Illuminate\Support\ServiceProvider;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Console\QueryCommand;
-use Nuwave\Lighthouse\Console\UnionCommand;
-use Nuwave\Lighthouse\Console\ScalarCommand;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
-use Nuwave\Lighthouse\Console\MutationCommand;
-use Nuwave\Lighthouse\Schema\ResolverProvider;
+use Illuminate\Foundation\Application as LaravelApplication;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Arr;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Factory as ValidationFactory;
+use Illuminate\Validation\Validator;
+use Laravel\Lumen\Application as LumenApplication;
+use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
+use Nuwave\Lighthouse\Console\MutationCommand;
+use Nuwave\Lighthouse\Console\PrintSchemaCommand;
+use Nuwave\Lighthouse\Console\QueryCommand;
+use Nuwave\Lighthouse\Console\ScalarCommand;
+use Nuwave\Lighthouse\Console\SubscriptionCommand;
+use Nuwave\Lighthouse\Console\UnionCommand;
+use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
+use Nuwave\Lighthouse\Execution\GraphQLValidator;
+use Nuwave\Lighthouse\Execution\LighthouseRequest;
+use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Console\ClearCacheCommand;
-use Nuwave\Lighthouse\Console\PrintSchemaCommand;
-use Nuwave\Lighthouse\Execution\GraphQLValidator;
-use Laravel\Lumen\Application as LumenApplication;
-use Nuwave\Lighthouse\Console\SubscriptionCommand;
-use Nuwave\Lighthouse\Execution\LighthouseRequest;
-use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
-use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
-use Nuwave\Lighthouse\Execution\MultipartFormRequest;
-use Illuminate\Validation\Factory as ValidationFactory;
-use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use Illuminate\Foundation\Application as LaravelApplication;
-use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
+use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareAdapter;
+use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
+use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -61,7 +62,7 @@ class LighthouseServiceProvider extends ServiceProvider
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__.'/../config/config.php' => $this->app->make('path.config').DIRECTORY_SEPARATOR.'lighthouse.php',
+            __DIR__.'/../config/config.php' => $this->app->make('path.config').'/lighthouse.php',
         ], 'config');
 
         $this->publishes([
@@ -107,7 +108,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
-
+        $this->app->singleton(ASTBuilder::class);
         $this->app->singleton(DirectiveFactory::class);
         $this->app->singleton(NodeRegistry::class);
         $this->app->singleton(TypeRegistry::class);
@@ -122,10 +123,12 @@ class LighthouseServiceProvider extends ServiceProvider
             /** @var \Illuminate\Http\Request $request */
             $request = $app->make('request');
 
-            return Str::startsWith(
+            $isMultipartFormRequest = Str::startsWith(
                 $request->header('Content-Type'),
                 'multipart/form-data'
-            )
+            );
+
+            return $isMultipartFormRequest
                 ? new MultipartFormRequest($request)
                 : new LighthouseRequest($request);
         });

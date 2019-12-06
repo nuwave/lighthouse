@@ -10,6 +10,7 @@ before_install:
   - mysql -e 'CREATE DATABASE test;'
 
 install:
+  - if [[ $LARAVEL = '5.5.*' ]]; then composer remove --dev nunomaduro/larastan --no-update; fi
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --prefer-dist --no-interaction --no-suggest
 
 script: vendor/bin/phpunit --colors=always --verbose
@@ -24,8 +25,8 @@ jobs:
       php: "7.3"
       env: LARAVEL='^6.0'
       script:
-        - composer require nunomaduro/larastan
         - composer stan
+        - composer normalize --dry-run
     - stage: test
       php: "7.1"
       env: LARAVEL='5.5.*'

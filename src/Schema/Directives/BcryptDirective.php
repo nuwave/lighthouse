@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class BcryptDirective implements ArgTransformerDirective, DefinedDirective
 {
@@ -33,7 +33,7 @@ SDL;
      * Useful for hashing passwords before inserting them into the database.
      *
      * @param  string  $argumentValue
-     * @return mixed
+     * @return string
      */
     public function transform($argumentValue): string
     {

@@ -2,15 +2,14 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Illuminate\Support\Arr;
 use GraphQL\Type\Introspection;
 use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Support\Arr;
 
 /**
  * Useful helpers for PHPUnit testing.
  *
- * It depends upon methods defined in
- * @see \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
+ * @mixin \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
  */
 trait MakesGraphQLRequests
 {
@@ -23,38 +22,6 @@ trait MakesGraphQLRequests
      * @var \Illuminate\Foundation\Testing\TestResponse|null
      */
     protected $introspectionResult;
-
-    /**
-     * Visit the given URI with a POST request, expecting a JSON response.
-     *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse
-     */
-    abstract public function postJson($uri, array $data = [], array $headers = []);
-
-    /**
-     * Call the given URI and return the Response.
-     *
-     * @param  string  $method
-     * @param  string  $uri
-     * @param  array  $parameters
-     * @param  array  $cookies
-     * @param  array  $files
-     * @param  array  $server
-     * @param  string  $content
-     * @return \Illuminate\Foundation\Testing\TestResponse
-     */
-    abstract public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null);
-
-    /**
-     * Transform headers array to array of $_SERVER vars with HTTP_* format.
-     *
-     * @param  array  $headers
-     * @return array
-     */
-    abstract protected function transformHeadersToServerVars(array $headers);
 
     /**
      * Execute a query as if it was sent as a request to the server.

@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
-use Nuwave\Lighthouse\Events\ManipulateAST;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class SoftDeletesServiceProvider extends ServiceProvider
 {

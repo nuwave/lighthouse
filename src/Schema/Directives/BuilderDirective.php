@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class BuilderDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
@@ -26,11 +26,11 @@ Use an argument to modify the query builder for a field.
 directive @builder(
   """
   Reference a method that is passed the query builder.
-  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  Consists of two parts: a class name and a method name, separated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 

@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use Tests\TestCase;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Adapter\Local;
-use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Tests\TestCase;
 
 class SchemaStitcherTest extends TestCase
 {

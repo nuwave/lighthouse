@@ -2,10 +2,10 @@
 
 namespace Tests\Utils\Interfaces;
 
-use Tests\Utils\Models\Team;
-use Tests\Utils\Models\User;
 use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Tests\Utils\Models\Team;
+use Tests\Utils\Models\User;
 
 class Nameable
 {

@@ -2,16 +2,16 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Http\UploadedFile;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Http\UploadedFile;
 
 class GraphQLTest extends DBTestCase
 {
     protected $schema = '
     scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
     type User {
         id: ID!
         name: String!
@@ -20,7 +20,7 @@ class GraphQLTest extends DBTestCase
         updated_at: String!
         tasks: [Task!]! @hasMany
     }
-    
+
     type Task {
         id: ID!
         name: String!
@@ -28,11 +28,11 @@ class GraphQLTest extends DBTestCase
         updated_at: String!
         user: User! @belongsTo
     }
-    
+
     type Query {
         user: User @auth
     }
-    
+
     type Mutation {
         upload(file: Upload!): Boolean
     }

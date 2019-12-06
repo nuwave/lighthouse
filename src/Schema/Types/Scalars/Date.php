@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Exception;
 use Carbon\Carbon;
+use Exception;
 use GraphQL\Error\Error;
-use GraphQL\Utils\Utils;
 use GraphQL\Error\InvariantViolation;
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Utils\Utils;
 
 class Date extends ScalarType
 {
@@ -64,7 +64,7 @@ class Date extends ScalarType
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
      * @param  string  $value
-     * @param  string  $exceptionClass
+     * @param  string|\Exception  $exceptionClass
      * @return \Carbon\Carbon
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error

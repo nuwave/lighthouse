@@ -10,5 +10,11 @@ parameters:
   excludes_analyse:
   - %rootDir%/../../../tests/database/*
   ignoreErrors:
-  - '#Call to an undefined method Tests\\TestCase::decodeResponseJson().#'
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched().#'
+
+  # Defined mixins
+  - '#Call to an undefined method Illuminate\\Foundation\\Testing\\TestResponse::assertErrorCategory().#'
+  - '#Call to an undefined method Illuminate\\Foundation\\Testing\\TestResponse::jsonGet().#'
+
+  # We are monkeypatching that to pass around the query builder
+  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder.#'
