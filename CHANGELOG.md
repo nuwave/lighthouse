@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Enable multiple queries in a single request by clearing `BatchLoader` instances
-  after executing each query https://github.com/nuwave/lighthouse/pull/1068
+  after executing each query https://github.com/nuwave/lighthouse/pull/1030
 
 ## [4.7.1](https://github.com/nuwave/lighthouse/compare/v4.7.0...v4.7.1)
 
