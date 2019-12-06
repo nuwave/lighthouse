@@ -5,12 +5,16 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective, ArgResolver
 {
@@ -57,7 +61,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
                 $executeMutation = function () use ($model, $resolveInfo): Model {
                     return $this
-                        ->__invoke(
+                        ->executeMutation(
                             $model,
                             $resolveInfo->argumentSet
                         )
@@ -75,4 +79,43 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
             }
         );
     }
+
+    public function __invoke($model, $args)
+    {
+        $relationName = $this->directiveArgValue('relation')
+            // Use the name of the argument if no explicit relation name is given
+            ?? $this->definitionNode->name->value;
+
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+        $relation = $model->{$relationName}();
+        $model = $relation->make();
+
+        return $this->executeMutation($model, $args, $relation);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
+     */
+    protected function executeMutation(Model $model, $args, ?Relation $parentRelation = null)
+    {
+        $update = new ResolveNested($this->makeExecutionFunction($parentRelation));
+
+        return Utils::applyEach(
+            static function (ArgumentSet $argumentSet) use ($update, $model) {
+                return $update($model, $argumentSet);
+            },
+            $args
+        );
+    }
+
+    /**
+     * Prepare the execution function for a mutation on a model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return callable
+     */
+    abstract protected function makeExecutionFunction(?Relation $parentRelation = null): callable;
 }
