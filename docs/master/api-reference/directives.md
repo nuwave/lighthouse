@@ -963,8 +963,20 @@ Works very similar to the [`@delete`](#delete) directive.
 
 ## @enum
 
-Assign an internal value to an enum key. When dealing with the Enum type in your code,
+```graphql
+"""
+Assign an internal value to an enum key.
+When dealing with the Enum type in your code,
 you will receive the defined value instead of the string key.
+"""
+directive @enum(
+  """
+  The internal value of the enum key.
+  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+  """
+  value: Mixed
+) on ENUM_VALUE
+```
 
 ```graphql
 enum Role {
@@ -975,21 +987,6 @@ enum Role {
 
 You do not need this directive if the internal value of each enum key
 is an identical string. [Read more about enum types](../the-basics/types.md#enum)
-
-### Definition
-
-```graphql
-"""
-Assign an internal value to an enum key.
-"""
-directive @enum(
-  """
-  The internal value of the enum key.
-  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-  """
-  value: Mixed
-) on ENUM_VALUE
-```
 
 ## @eq
 

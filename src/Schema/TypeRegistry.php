@@ -21,6 +21,7 @@ use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\EnumDirective;
 use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
 use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
@@ -215,12 +216,13 @@ EOL
     {
         $values = [];
         foreach ($enumDefinition->values as $enumValue) {
-            $directive = ASTHelper::directiveDefinition($enumValue, 'enum');
+            /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
+            $enumDirective = $this->directiveFactory->createSingleDirectiveOfType($enumValue, EnumDirective::class);
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value
-                'value' => $directive
-                    ? ASTHelper::directiveArgValue($directive, 'value')
+                'value' => $enumDirective
+                    ? $enumDirective->value()
                     : $enumValue->name->value,
                 'description' => data_get($enumValue->description, 'value'),
             ];

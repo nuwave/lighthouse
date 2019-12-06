@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Add `INPUT_FIELD_DEFINITION` to allowed locations for the `@builder` directive https://github.com/nuwave/lighthouse/pull/1074
+- Define `@enum` as a directive class so it shows up in `schema-directives.graphql`
+  and can potentially be overwritten
 
 ## [4.7.0](https://github.com/nuwave/lighthouse/compare/v4.6.0...v4.7.0)
 
