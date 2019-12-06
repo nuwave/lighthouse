@@ -1,14 +1,12 @@
 <?php
 
-
 namespace Tests\Utils\Models;
-
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * Class Supplier
+ * Class Supplier.
  */
 class Supplier extends Model
 {

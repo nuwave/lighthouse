@@ -10,7 +10,7 @@ $factory->define(Product::class, function (Faker $faker): array {
     return [
         'barcode' => $faker->ean13,
         'uuid' => $faker->uuid,
-        'brand_id' => function(){
+        'brand_id' => function () {
             return factory(Brand::class)->create()->getKey();
         },
         'color_id' => function () {

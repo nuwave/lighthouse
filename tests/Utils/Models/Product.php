@@ -27,7 +27,8 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function getPreferredSupplierAttribute(): Supplier{
+    public function getPreferredSupplierAttribute(): Supplier
+    {
         return  $this->brand->suppliers->fistWhere('pivot.is_preferred_supplier', '=', 1);
     }
 

@@ -74,7 +74,8 @@ class WithDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanQueryANestedRelationship(){
+    public function testCanQueryANestedRelationship()
+    {
         $this->schema = '
         type Brand {
             id: Int!
@@ -104,7 +105,7 @@ class WithDirectiveTest extends DBTestCase
 
         $brand->suppliers()->sync([
             $supplier1->id => ['is_preferred_supplier' => false],
-            $supplier2->id => ['is_preferred_supplier' => true]
+            $supplier2->id => ['is_preferred_supplier' => true],
         ]);
 
         $product = factory(Product::class)->create(['brand_id' => $brand->id]);
@@ -129,11 +130,11 @@ class WithDirectiveTest extends DBTestCase
                 'products' => [
                     'data' => [
                         'preferredSupplier' => [
-                            'id' => $supplier2->id
-                        ]
-                    ]
-                ]
-            ]
+                            'id' => $supplier2->id,
+                        ],
+                    ],
+                ],
+            ],
       ]);
     }
 }
