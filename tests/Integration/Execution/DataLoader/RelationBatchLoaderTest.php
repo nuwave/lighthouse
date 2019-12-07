@@ -15,6 +15,7 @@ class RelationBatchLoaderTest extends DBTestCase
 {
     protected $schema = /* @lang GraphQL */ '
     type Task {
+        id: ID
         name: String
     }
 
@@ -192,5 +193,64 @@ class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount(3, 'data.manyUsers.0.tasks')
             ->assertJsonCount(3, 'data.manyUsers.1.tasks')
             ->assertJsonCount(3, 'data.user.tasks');
+    }
+
+    public function testTwoBatchloadedQueriesWithDifferentResults(): void
+    {
+        $this
+            ->graphQL(/* @lang GraphQL */'
+            {
+                user(id: 1) {
+                    tasks {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'user' => [
+                        'tasks' => [
+                            [
+                                'id' => '1',
+                            ],
+                            [
+                                'id' => '2',
+                            ],
+                            [
+                                'id' => '3',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+
+        $this
+            ->graphQL(/* @lang GraphQL */'
+            {
+                user(id: 2) {
+                    tasks {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'user' => [
+                        'tasks' => [
+                            [
+                                'id' => '4',
+                            ],
+                            [
+                                'id' => '5',
+                            ],
+                            [
+                                'id' => '6',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 }

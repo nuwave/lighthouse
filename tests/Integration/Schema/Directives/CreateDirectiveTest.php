@@ -16,7 +16,7 @@ class CreateDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Mutation {
             createCompany(name: String): Company @create
         }
@@ -46,11 +46,11 @@ class CreateDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Mutation {
             createCompany(input: CreateCompanyInput! @spread): Company @create
         }
-        
+
         input CreateCompanyInput {
             name: String
         }
@@ -81,7 +81,7 @@ class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createTag(name: String): Tag @create
         }
-        
+
         type Tag {
             name: String!
             default_string: String!
@@ -116,26 +116,26 @@ class CreateDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type User {
             id: ID!
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
-        
+
         input CreateUserInput {
             name: String
             tasks: CreateTaskRelation
         }
-        
+
         input CreateTaskRelation {
             create: [CreateTaskInput!]
         }
-        
+
         input CreateTaskInput {
             name: String
             user: ID
@@ -183,26 +183,26 @@ class CreateDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type User {
             id: ID!
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
-        
+
         input CreateUserInput {
             name: String
             tasks: CreateTaskRelation
         }
-        
+
         input CreateTaskRelation {
             create: [CreateTaskInput!]
         }
-        
+
         input CreateTaskInput {
             name: String
             user: ID
@@ -250,26 +250,26 @@ class CreateDirectiveTest extends DBTestCase
             name: String!
             guard: String
         }
-        
+
         type User {
             id: ID!
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
-        
+
         input CreateUserInput {
             name: String
             tasks: CreateTaskRelation
         }
-        
+
         input CreateTaskRelation {
             create: [CreateTaskInput!]
         }
-        
+
         input CreateTaskInput {
             name: String
             guard: String
@@ -300,6 +300,81 @@ class CreateDirectiveTest extends DBTestCase
                             'guard' => 'api',
                         ],
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateTwice(): void
+    {
+        $this->schema .= /* @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */'
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "fooTask"
+                    }]
+                }
+            }) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/* @lang GraphQL */'
+        mutation {
+            createUser(input: {
+                name: "bar"
+                tasks: {
+                    create: [{
+                        name: "barTask"
+                    }]
+                }
+            }) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'bar',
                 ],
             ],
         ]);
