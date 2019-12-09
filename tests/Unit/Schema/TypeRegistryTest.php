@@ -3,15 +3,16 @@
 namespace Tests\Unit\Schema;
 
 use Closure;
-use Tests\TestCase;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\UnionType;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Type\Definition\InterfaceType;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\UnionType;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Tests\TestCase;
 
 class TypeRegistryTest extends TestCase
 {
@@ -179,5 +180,11 @@ class TypeRegistryTest extends TestCase
         $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
         $this->assertSame('UserInput', $inputObjectType->name);
         $this->assertArrayHasKey('foo', $inputObjectType->getFields());
+    }
+
+    public function testThrowsWhenMissingType(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->typeRegistry->get('ThisTypeDoesNotExist');
     }
 }

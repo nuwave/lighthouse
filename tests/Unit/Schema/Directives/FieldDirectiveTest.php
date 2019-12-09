@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class FieldDirectiveTest extends TestCase
 {

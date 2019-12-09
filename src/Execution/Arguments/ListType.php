@@ -24,7 +24,7 @@ class ListType
      * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
      * @return void
      */
-    public function __construct(\Nuwave\Lighthouse\Execution\Arguments\NamedType $type)
+    public function __construct(NamedType $type)
     {
         $this->type = $type;
     }

@@ -2,65 +2,83 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class RenameDirectiveTest extends TestCase
 {
-    public function testCanRenameAField(): void
+    public function testRenameField(): void
     {
-        $this->schema = "
-        type Query {
-            bar: Bar @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        
-        type Bar {
-            bar: String! @rename(attribute: \"baz\")
-        }
-        ";
+        $this->mockResolver(function () {
+            return [
+                'baz' => 'asdf',
+            ];
+        });
 
-        $this->graphQL('
+        $this->schema = /* @lang GraphQL */ '
+        type Query {
+            foo: Foo @mock
+        }
+
+        type Foo {
+            bar: String! @rename(attribute: "baz")
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */ '
         {
-            bar {
+            foo {
                 bar
             }
         }
         ')->assertJson([
             'data' => [
-                'bar' => [
+                'foo' => [
                     'bar' => 'asdf',
                 ],
             ],
         ]);
     }
 
-    public function resolve(): Bar
-    {
-        return new Bar;
-    }
-
     public function testThrowsAnExceptionIfNoAttributeDefined(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
 
-        $this->schema = '
+        $this->schema = /* @lang GraphQL */ '
         type Query {
             foo: String! @rename
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             fooBar
         }
         ');
     }
-}
 
-class Bar
-{
-    /**
-     * @var string
-     */
-    public $baz = 'asdf';
+    public function testRenameArgument(): void
+    {
+        $this->mockResolver(function ($root, array $args) {
+            return $args === ['bar' => 'something'];
+        });
+
+        $this->schema = /* @lang GraphQL */ '
+        type Query {
+            foo(
+                baz: String @rename(attribute: "bar")
+            ): Boolean @mock
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            foo(baz: "something")
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => true,
+            ],
+        ]);
+    }
 }

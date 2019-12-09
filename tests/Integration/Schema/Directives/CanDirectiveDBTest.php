@@ -2,12 +2,13 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\DBTestCase;
-use Tests\Utils\Models\Post;
-use Tests\Utils\Models\User;
-use Tests\Utils\Policies\UserPolicy;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
+use Tests\Utils\Policies\UserPolicy;
 
 class CanDirectiveDBTest extends DBTestCase
 {
@@ -163,6 +164,45 @@ class CanDirectiveDBTest extends DBTestCase
                     [
                         'title' => 'Harry Potter and the Chamber of Secrets',
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWorksWithSoftDeletes(): void
+    {
+        $this->be(
+            new User([
+                'name' => UserPolicy::ADMIN,
+            ])
+        );
+
+        $task = factory(Task::class)->create();
+        $task->delete();
+
+        $this->schema = '
+        type Query {
+            task(id: ID @eq): Task
+                @can(ability: "adminOnly", find: "id")
+                @softDeletes
+                @find
+        }
+        
+        type Task {
+            name: String!
+        }
+        ';
+
+        $this->graphQL("
+        {
+            task(id: {$task->getKey()}, trashed: WITH) {
+                name
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'task' => [
+                    'name' => $task->name,
                 ],
             ],
         ]);

@@ -2,14 +2,14 @@
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
@@ -55,5 +55,12 @@ class Task extends Model
     public function hour(): MorphOne
     {
         return $this->morphOne(Hour::class, 'hourable');
+    }
+
+    public function scopeWhereTags(Builder $query, $tags)
+    {
+        return $query->whereHas('tags', function (Builder $query) use ($tags) {
+            $query->whereIn('name', $tags);
+        });
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Source;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class SchemaStitcher implements SchemaSourceProvider
 {

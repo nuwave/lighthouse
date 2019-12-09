@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Integration\Support\DataLoader;
+namespace Tests\Integration\Execution\DataLoader;
 
+use Illuminate\Support\Facades\DB;
+use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
-use Illuminate\Support\Facades\DB;
-use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
-class ModelRelationLoaderPolymorphicTest extends DBTestCase
+class ModelRelationLoaderFetcherTest extends DBTestCase
 {
     protected function setUp(): void
     {

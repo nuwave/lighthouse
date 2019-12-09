@@ -1,6 +1,6 @@
 - [ ] Added or updated tests
 - [ ] Added Docs for all relevant versions
-- [ ] Updated the changelog
+- [ ] Updated CHANGELOG.md
 
 <!-- Link to related issues this PR resolves, e.g. "Resolves #236"-->
 
@@ -10,4 +10,5 @@
 
 **Breaking changes**
 
-<!-- If there are any breaking changes, list them here. -->
+<!-- If there are any breaking changes, list them here.
+Make sure to mention them in UPGRADE.md. -->

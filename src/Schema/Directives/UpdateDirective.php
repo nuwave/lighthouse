@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 
 class UpdateDirective extends MutationExecutorDirective

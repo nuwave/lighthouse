@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Tests\TestCase;
 
 class ASTBuilderTest extends TestCase
 {

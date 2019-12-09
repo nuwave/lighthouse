@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Events;
 
-use Tests\TestCase;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
+use Tests\TestCase;
 
 class BuildSchemaStringTest extends TestCase
 {

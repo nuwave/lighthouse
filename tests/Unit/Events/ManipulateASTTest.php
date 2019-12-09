@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Events;
 
-use Tests\TestCase;
 use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Tests\TestCase;
 
 class ManipulateASTTest extends TestCase
 {

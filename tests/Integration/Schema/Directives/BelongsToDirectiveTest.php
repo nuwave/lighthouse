@@ -3,10 +3,10 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Team;
-use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Product;
+use Tests\Utils\Models\Team;
+use Tests\Utils\Models\User;
 
 class BelongsToDirectiveTest extends DBTestCase
 {

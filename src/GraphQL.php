@@ -3,24 +3,25 @@
 namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
-use GraphQL\Type\Schema;
-use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
-use GraphQL\Validator\Rules\QueryDepth;
-use Nuwave\Lighthouse\Support\Pipeline;
+use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Events\ManipulateResult;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Nuwave\Lighthouse\Support\Pipeline;
 
 class GraphQL
 {
@@ -206,6 +207,8 @@ class GraphQL
             new ManipulateResult($result)
         );
 
+        $this->cleanUp();
+
         return $result;
     }
 
@@ -237,6 +240,16 @@ class GraphQL
             QueryDepth::class => new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
             DisableIntrospection::class => new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
         ];
+    }
+
+    /**
+     * Clean up after executing a query.
+     *
+     * @return void
+     */
+    protected function cleanUp(): void
+    {
+        BatchLoader::forgetInstances();
     }
 
     /**

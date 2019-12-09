@@ -3,35 +3,36 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\UnionType;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\ScalarType;
-use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Type\Definition\InterfaceType;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use GraphQL\Language\AST\TypeDefinitionNode;
-use GraphQL\Type\Definition\InputObjectType;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\EnumDirective;
+use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
 use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
-use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
+use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
+use Nuwave\Lighthouse\Support\Pipeline;
+use Nuwave\Lighthouse\Support\Utils;
 
 class TypeRegistry
 {
@@ -92,13 +93,24 @@ class TypeRegistry
      *
      * @param  string  $name
      * @return \GraphQL\Type\Definition\Type
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function get(string $name): Type
     {
         if (! isset($this->types[$name])) {
-            $this->types[$name] = $this->handle(
-                $this->documentAST->types[$name]
-            );
+            $typeDefinition = $this->documentAST->types[$name] ?? null;
+            if (! $typeDefinition) {
+                throw new DefinitionException(<<<EOL
+Lighthouse failed while trying to load a type: $name
+
+Make sure the type is present in your schema definition.
+
+EOL
+                );
+            }
+
+            $this->types[$name] = $this->handle($typeDefinition);
         }
 
         return $this->types[$name];
@@ -204,12 +216,13 @@ class TypeRegistry
     {
         $values = [];
         foreach ($enumDefinition->values as $enumValue) {
-            $directive = ASTHelper::directiveDefinition($enumValue, 'enum');
+            /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
+            $enumDirective = $this->directiveFactory->createSingleDirectiveOfType($enumValue, EnumDirective::class);
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value
-                'value' => $directive
-                    ? ASTHelper::directiveArgValue($directive, 'value')
+                'value' => $enumDirective
+                    ? $enumDirective->value()
                     : $enumValue->name->value,
                 'description' => data_get($enumValue->description, 'value'),
             ];

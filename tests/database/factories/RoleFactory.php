@@ -1,8 +1,8 @@
 <?php
 
+use Faker\Generator as Faker;
 use Tests\Utils\Models\ACL;
 use Tests\Utils\Models\Role;
-use Faker\Generator as Faker;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Role::class, function (Faker $faker): array {

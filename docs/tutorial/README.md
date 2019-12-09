@@ -40,7 +40,7 @@ type User {
 
 type Post {
   title: String!
-  author: Person!
+  author: User!
 }
 ```
 

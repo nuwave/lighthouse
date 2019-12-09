@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\DBTestCase;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class BelongsToManyDirectiveTest extends DBTestCase
 {
