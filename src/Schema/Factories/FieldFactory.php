@@ -299,31 +299,38 @@ class FieldFactory
             }
         });
 
-        // Remove the directive from the list to avoid evaluating the same directive twice
-        while ($directive = $directives->shift()) {
-            // Pause the iteration once we hit any directive that has to do
-            // with validation. We will resume running through the remaining
-            // directives later, after we completed validation
-            if ($directive instanceof ProvidesRules) {
-                // We gather the rules from all arguments and then run validation in one full swoop
-                $this->rules = array_merge($this->rules, $directive->rules());
-                $this->messages = array_merge($this->messages, $directive->messages());
+        /** @var Collection $validationDirectives */
+        /** @var Collection $otherDirectives */
+        [$validationDirectives, $otherDirectives] = $directives->partition(function($directive) {
+            return $directive instanceof ProvidesRules;
+        });
 
-                break;
+        // First, handle all validation directives.
+        if ($validationDirectives->count() > 0) {
+            // We gather the rules from all arguments and then run validation in one full swoop
+            while ($directive = $validationDirectives->shift()) {
+                $this->rules = array_merge_recursive($this->rules, $directive->rules());
+                $this->messages = array_merge_recursive($this->messages, $directive->messages());
             }
 
+            // If directives remain, snapshot the state that we are in now
+            // to allow resuming after validation has run
+            if ($otherDirectives->count() > 0) {
+                $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
+            }
+
+            return;
+        }
+
+        // If there aren't any validation directives present anymore,
+        // we can continue with the other directives.
+        while ($directive = $otherDirectives->shift()) {
             if ($directive instanceof ArgTransformerDirective && $this->argValueExists($argumentPath)) {
                 $this->setArgValue(
                     $argumentPath,
                     $directive->transform($this->argValue($argumentPath))
                 );
             }
-        }
-
-        // If directives remain, snapshot the state that we are in now
-        // to allow resuming after validation has run
-        if ($directives->isNotEmpty()) {
-            $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
         }
     }
 
