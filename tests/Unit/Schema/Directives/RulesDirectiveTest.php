@@ -34,7 +34,6 @@ class RulesDirectiveTest extends TestCase
                 rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
             ): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
-            withMergedRules(bar: String @rules(apply: [\"min:40\"]) @customRules(apply: [\"bool\"])): User @create
         }
 
         type User {

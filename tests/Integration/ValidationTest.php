@@ -526,7 +526,7 @@ class ValidationTest extends DBTestCase
     {
         $this->schema .= '
         type Mutation {
-            withMergedRules(bar: String @rules(apply: ["min:40"]) @customRules(apply: ["bool"])): User @create
+            withMergedRules(bar: String @rules(apply: ["min:40"]) @rules(apply: ["bool"])): User @create
         }
 
         type User {
