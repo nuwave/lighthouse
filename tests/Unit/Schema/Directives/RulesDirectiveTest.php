@@ -320,17 +320,6 @@ class RulesDirectiveTest extends TestCase
         ]);
     }
 
-    public function testCanMergeMultipleRuleInstances(): void
-    {
-        $this->graphQL('
-        mutation {
-            withMergedRules(bar: "abcdefghijk") {
-                first_name
-            }
-        }
-        ')->assertJsonCount(2, 'errors.0.extensions.validation.bar');
-    }
-
     public function resolve(): array
     {
         return [

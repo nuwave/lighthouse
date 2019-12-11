@@ -23,7 +23,7 @@ class ValidationTest extends DBTestCase
                 @rules(apply: ["required", "email"])
                 @rulesForArray(apply: ["max:2"])
         ): Int
-        
+
         password(
             id: String
             password: String
@@ -44,14 +44,14 @@ class ValidationTest extends DBTestCase
         emailAddress: String! @rules(apply: ["email"])
         business: Boolean @rules(apply: ["required"])
     }
-    
+
     input Bar {
         foobar: Int @rules(apply: ["integer", "max:10"])
         self: Bar
         withRequired: Baz
         optional: String
     }
-    
+
     input Baz {
         barbaz: Int
         invalidDefault: String = "invalid-mail" @rules(apply: ["email"])
@@ -143,7 +143,7 @@ class ValidationTest extends DBTestCase
                         withRequired: {
                             barbaz: 23
                         }
-                    }    
+                    }
                 ]
             )
         }
@@ -359,12 +359,12 @@ class ValidationTest extends DBTestCase
                 @complexValidation
                 @update
         }
-        
+
         input UpdateUserInput {
             id: ID
             name: String
         }
-        
+
         type User {
             id: ID
             name: String
@@ -389,7 +389,7 @@ class ValidationTest extends DBTestCase
             ) {
                 id
             }
-        } 
+        }
         ');
 
         $this->assertSame(
@@ -412,12 +412,12 @@ class ValidationTest extends DBTestCase
                 @complexValidation
                 @update
         }
-        
+
         input UpdateUserInput {
             id: ID
             name: String
         }
-        
+
         type User {
             id: ID
             name: String
@@ -437,7 +437,7 @@ class ValidationTest extends DBTestCase
                 id
                 name
             }
-        } 
+        }
         ');
         $updateSelf->assertJson([
             'data' => [
@@ -461,7 +461,7 @@ class ValidationTest extends DBTestCase
                 @fooValidation
                 @create
         }
-        
+
         type User {
             id: ID
             name: String
@@ -475,7 +475,7 @@ class ValidationTest extends DBTestCase
             ) {
                 id
             }
-        } 
+        }
         ');
 
         $this->assertCount(
@@ -499,7 +499,7 @@ class ValidationTest extends DBTestCase
             ): User
                 @create
         }
-        
+
         type User {
             id: ID
             name: String
@@ -513,13 +513,34 @@ class ValidationTest extends DBTestCase
             ) {
                 id
             }
-        } 
+        }
         ');
 
         $this->assertCount(
             2,
             $result->jsonGet('errors.0.extensions.validation.foo')
         );
+    }
+
+    public function testCombinesArgumentValidationWhenGrouped(): void
+    {
+        $this->schema .= '
+        type Mutation {
+            withMergedRules(bar: String @rules(apply: ["min:40"]) @customRules(apply: ["bool"])): User @create
+        }
+
+        type User {
+            id: ID
+            name: String
+        }
+        ';
+        $this->graphQL('
+        mutation {
+            withMergedRules(bar: "abcdefghijk") {
+                name
+            }
+        }
+        ')->assertJsonCount(2, 'errors.0.extensions.validation.bar');
     }
 
     /**
