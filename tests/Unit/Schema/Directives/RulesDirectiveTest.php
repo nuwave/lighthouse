@@ -26,14 +26,15 @@ class RulesDirectiveTest extends TestCase
         }
 
         type Mutation {
-            foo(bar: String @rules(apply: [\"required\"])): User 
+            foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
-            
+
             withCustomRuleClass(
                 rules: String @rules(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
-                rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"]) 
+                rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
             ): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
+            withMergedRules(bar: String @rules(apply: [\"min:40\"]) @customRules(apply: [\"bool\"])): User @create
         }
 
         type User {
@@ -317,6 +318,17 @@ class RulesDirectiveTest extends TestCase
                 FooBarRule::MESSAGE,
             ],
         ]);
+    }
+
+    public function testCanMergeMultipleRuleInstances(): void
+    {
+        $this->graphQL('
+        mutation {
+            withMergedRules(bar: "abcdefghijk") {
+                first_name
+            }
+        }
+        ')->assertJsonCount(2, 'errors.0.extensions.validation.bar');
     }
 
     public function resolve(): array
