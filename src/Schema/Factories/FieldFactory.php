@@ -307,7 +307,7 @@ class FieldFactory
             if ($directive instanceof ProvidesRules) {
                 $validators = $this->gatherValidationDirectives($directives);
 
-                $validators->add($directive);
+                $validators->push($directive);
                 foreach ($validators as $validator) {
                     // We gather the rules from all arguments and then run validation in one full swoop
                     $this->rules = array_merge_recursive($this->rules, $validator->rules());
@@ -337,7 +337,7 @@ class FieldFactory
         $validators = collect();
         while ($directive = $directives->first()) {
             if ($directive instanceof ProvidesRules) {
-                $validators->add($directives->shift());
+                $validators->push($directives->shift());
             } else {
                 return $validators;
             }
