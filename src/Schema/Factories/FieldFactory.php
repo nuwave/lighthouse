@@ -308,10 +308,10 @@ class FieldFactory
                 $validators = $this->gatherValidationDirectives($directives);
 
                 $validators->add($directive);
-                foreach($validators as $d) {
+                foreach ($validators as $validator) {
                     // We gather the rules from all arguments and then run validation in one full swoop
-                    $this->rules = array_merge_recursive($this->rules, $d->rules());
-                    $this->messages = array_merge_recursive($this->messages, $d->messages());
+                    $this->rules = array_merge_recursive($this->rules, $validator->rules());
+                    $this->messages = array_merge_recursive($this->messages, $validator->messages());
                 }
 
                 break;
