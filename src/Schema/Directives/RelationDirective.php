@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -36,7 +35,7 @@ abstract class RelationDirective extends BaseDirective
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationName = $this->directiveArgValue('relation', $this->definitionNode->name->value);
 
-                $decorateBuilder = function($builder) use ($resolveInfo) {
+                $decorateBuilder = function ($builder) use ($resolveInfo) {
                     $resolveInfo
                         ->argumentSet
                         ->enhanceBuilder($builder, $this->directiveArgValue('scopes', []));

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Closure;
 use Illuminate\Support\Collection;
 
 class RelationBatchLoader extends BatchLoader
