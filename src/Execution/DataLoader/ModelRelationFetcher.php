@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 use ReflectionClass;
 use ReflectionMethod;
@@ -111,14 +112,13 @@ class ModelRelationFetcher
     /**
      * Load all relations for the model, but constrain the query to the current page.
      *
-     * @param  int  $perPage
-     * @param  int  $page
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      * @return $this
      */
-    public function loadRelationsForPage(int $perPage, int $page = 1): self
+    public function loadRelationsForPage(PaginationArgs $paginationArgs): self
     {
         foreach ($this->relations as $name => $constraints) {
-            $this->loadRelationForPage($perPage, $page, $name, $constraints);
+            $this->loadRelationForPage($paginationArgs, $name, $constraints);
         }
 
         return $this;
@@ -129,13 +129,12 @@ class ModelRelationFetcher
      *
      * The relation will be converted to a `Paginator` instance.
      *
-     * @param  int  $first
-     * @param  int  $page
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      * @param  string  $relationName
-     * @param  \Closure  $relationConstraints
+     * @param  callable  $relationConstraints
      * @return $this
      */
-    public function loadRelationForPage(int $first, int $page, string $relationName, Closure $relationConstraints): self
+    public function loadRelationForPage(PaginationArgs $paginationArgs, string $relationName, callable $relationConstraints): self
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,
@@ -145,8 +144,8 @@ class ModelRelationFetcher
         $relations = $this
             ->buildRelationsFromModels($relationName, $relationConstraints)
             ->map(
-                function (Relation $relation) use ($first, $page) {
-                    return $relation->forPage($page, $first);
+                function (Relation $relation) use ($paginationArgs) {
+                    return $relation->forPage($paginationArgs->page, $paginationArgs->first);
                 }
             );
 
@@ -161,7 +160,7 @@ class ModelRelationFetcher
 
         $this->associateRelationModels($relationName, $relationModels);
 
-        $this->convertRelationToPaginator($first, $page, $relationName);
+        $this->convertRelationToPaginator($paginationArgs, $relationName);
 
         return $this;
     }
@@ -213,10 +212,10 @@ class ModelRelationFetcher
      * Get queries to fetch relationships.
      *
      * @param  string  $relationName
-     * @param  \Closure  $relationConstraints
+     * @param  callable  $relationConstraints
      * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Relations\Relation>
      */
-    protected function buildRelationsFromModels(string $relationName, Closure $relationConstraints): Collection
+    protected function buildRelationsFromModels(string $relationName, callable $relationConstraints): Collection
     {
         return $this->models->toBase()->map(
             function (Model $model) use ($relationName, $relationConstraints): Relation {
@@ -326,14 +325,13 @@ class ModelRelationFetcher
     }
 
     /**
-     * @param  int  $first
-     * @param  int  $page
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      * @param  string  $relationName
      * @return $this
      */
-    protected function convertRelationToPaginator(int $first, int $page, string $relationName): self
+    protected function convertRelationToPaginator(PaginationArgs $paginationArgs, string $relationName): self
     {
-        $this->models->each(function (Model $model) use ($page, $first, $relationName): void {
+        $this->models->each(function (Model $model) use ($paginationArgs, $relationName): void {
             $total = $model->getAttribute(
                 $this->getRelationCountName($relationName)
             );
@@ -343,8 +341,8 @@ class ModelRelationFetcher
                 [
                     'items' => $model->getRelation($relationName),
                     'total' => $total,
-                    'perPage' => $first,
-                    'currentPage' => $page,
+                    'perPage' => $paginationArgs->first,
+                    'currentPage' => $paginationArgs->page,
                     'options' => [],
                 ]
             );

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -15,63 +15,32 @@ class RelationBatchLoader extends BatchLoader
     protected $relationName;
 
     /**
-     * The arguments that were passed to the field.
+     * This function is called with the relation query builder and may modify it.
      *
-     * @var mixed[]
+     * @var callable
      */
-    protected $args;
+    protected $decorateBuilder;
 
     /**
-     * Names of the scopes that have to be called for the query.
+     * Optionally, a relation may be paginated.
      *
-     * @var string[]
+     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs
      */
-    protected $scopes;
-
-    /**
-     * The ResolveInfo of the currently executing field.
-     *
-     * @var \GraphQL\Type\Definition\ResolveInfo
-     */
-    protected $resolveInfo;
-
-    /**
-     * Present when using pagination, the amount of rows to be fetched.
-     *
-     * @var int|null
-     */
-    protected $first;
-
-    /**
-     * Present when using pagination, the page to be fetched.
-     *
-     * @var int|null
-     */
-    protected $page;
+    protected $paginationArgs;
 
     /**
      * @param  string  $relationName
-     * @param  mixed[]  $args
-     * @param  string[]  $scopes
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @param  int|null  $first
-     * @param  int|null  $page
-     * @return void
+     * @param  callable  $decorateBuilder
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      */
     public function __construct(
         string $relationName,
-        array $args,
-        array $scopes,
-        ResolveInfo $resolveInfo,
-        ?int $first = null,
-        ?int $page = null
+        callable $decorateBuilder,
+        ?PaginationArgs $paginationArgs
     ) {
         $this->relationName = $relationName;
-        $this->args = $args;
-        $this->scopes = $scopes;
-        $this->resolveInfo = $resolveInfo;
-        $this->first = $first;
-        $this->page = $page;
+        $this->decorateBuilder = $decorateBuilder;
+        $this->paginationArgs = $paginationArgs;
     }
 
     /**
@@ -83,8 +52,8 @@ class RelationBatchLoader extends BatchLoader
     {
         $modelRelationFetcher = $this->getRelationFetcher();
 
-        if ($this->first !== null) {
-            $modelRelationFetcher->loadRelationsForPage($this->first, $this->page);
+        if ($this->paginationArgs !== null) {
+            $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
             $modelRelationFetcher->loadRelations();
         }
@@ -101,11 +70,7 @@ class RelationBatchLoader extends BatchLoader
     {
         return new ModelRelationFetcher(
             $this->getParentModels(),
-            [$this->relationName => function ($query) {
-                return $this->resolveInfo
-                    ->argumentSet
-                    ->enhanceBuilder($query, $this->scopes);
-            }]
+            [$this->relationName => $this->decorateBuilder]
         );
     }
 
