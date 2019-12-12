@@ -13,94 +13,87 @@ use Tests\Utils\Models\User;
 
 class ModelRelationFetcherTest extends DBTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $count = 4;
-        $users = factory(User::class, 3)->create();
-        $users->each(function (User $user) use (&$count): void {
-            factory(Task::class, $count)->create([
-                'user_id' => $user->getKey(),
-            ]);
-            $count++;
-        });
-    }
-
     public function testCanLoadRelationshipsWithLimitsOnCollection(): void
     {
-        $first = 3;
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = factory(User::class)->create();
+        $user1->tasks()->saveMany(
+            factory(Task::class, 5)->make()
+        );
+
+        /** @var \Tests\Utils\Models\User $user2 */
+        $user2 = factory(User::class)->create();
+        $user2->tasks()->saveMany(
+            factory(Task::class, 2)->make()
+        );
+
+        $pageSize = 3;
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage($this->makePaginationArgs($first))
+            ->loadRelationsForPage($this->makePaginationArgs($pageSize))
             ->models();
 
-        $this->assertCount($first, $users[0]->tasks->getCollection());
-        $this->assertCount($first, $users[1]->tasks->getCollection());
-        $this->assertCount($first, $users[2]->tasks->getCollection());
-        $this->assertEquals($users[0]->getKey(), $users[0]->tasks[0]->user_id);
-        $this->assertEquals($users[1]->getKey(), $users[1]->tasks[0]->user_id);
-        $this->assertEquals($users[2]->getKey(), $users[2]->tasks[0]->user_id);
+        $firstResult = $users[0];
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $tasksPaginator */
+        $tasksPaginator = $firstResult->tasks;
+        $this->assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
+        $this->assertSame($pageSize, $tasksPaginator->count());
+        $this->assertEquals($firstResult->getKey(), $tasksPaginator[0]->user_id);
+
+        $secondResult = $users[1];
+        $this->assertSame(2, $secondResult->tasks->count());
+        $this->assertEquals($secondResult->getKey(), $secondResult->tasks[0]->user_id);
     }
 
     public function testCanLoadCountOnCollection(): void
     {
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = factory(User::class)->create();
+        $user1->tasks()->saveMany(
+            factory(Task::class, 4)->make()
+        );
+
+        /** @var \Tests\Utils\Models\User $user2 */
+        $user2 = factory(User::class)->create();
+        $user2->tasks()->saveMany(
+            factory(Task::class, 5)->make()
+        );
+
+
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->reloadModelsWithRelationCount()
             ->models();
 
-        $this->assertEquals($users[0]->tasks_count, 4);
+        $this->assertEquals($users[0]->tasks()->count(), 4);
         $this->assertEquals($users[1]->tasks_count, 5);
-        $this->assertEquals($users[2]->tasks_count, 6);
-    }
-
-    public function testCanPaginateRelationshipOnCollection(): void
-    {
-        $first = 2;
-        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage($this->makePaginationArgs($first))
-            ->models();
-
-        $this->assertInstanceOf(LengthAwarePaginator::class, $users[0]->tasks);
-        $this->assertInstanceOf(LengthAwarePaginator::class, $users[1]->tasks);
-        $this->assertInstanceOf(LengthAwarePaginator::class, $users[2]->tasks);
-        $this->assertCount($first, $users[0]->tasks);
-        $this->assertCount($first, $users[1]->tasks);
-        $this->assertCount($first, $users[2]->tasks);
-        $this->assertEquals($users[0]->getKey(), $users[0]->tasks[0]->user_id);
-        $this->assertEquals($users[1]->getKey(), $users[1]->tasks[0]->user_id);
-        $this->assertEquals($users[2]->getKey(), $users[2]->tasks[0]->user_id);
     }
 
     public function testCanHandleSoftDeletes(): void
     {
-        $user = User::first();
-        $count = $user->tasks->count();
-        $task = $user->tasks->last();
-        $task->delete();
+        $initialCount = 4;
+
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user = factory(User::class)->create();
+        $user->tasks()->saveMany(
+            factory(Task::class, $initialCount)->make()
+        );
+
+        Task::first()->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage($this->makePaginationArgs($count))
+            ->loadRelationsForPage($this->makePaginationArgs(4))
             ->models();
 
-        $expectedCount = $count - 1;
-        $this->assertCount($expectedCount, $users[0]->tasks);
+        $this->assertCount($initialCount - 1, $users[0]->tasks);
     }
 
     public function testGetsPolymorphicRelationship(): void
     {
+        /** @var Task $task */
         $task = factory(Task::class)->create();
-        $tags = factory(Tag::class, 3)->create();
+        $task->tags()->saveMany(
+            factory(Tag::class, 3)->make()
+        );
 
-        $tags->each(function (Tag $tag) use ($task): void {
-            DB::table('taggables')->insert([
-                'tag_id' => $tag->id,
-                'taggable_id' => $task->id,
-                'taggable_type' => get_class($task),
-            ]);
-        });
-
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = Task::first();
         $this->assertCount(3, $task->tags);
 
         $first = 2;

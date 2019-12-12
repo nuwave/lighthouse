@@ -111,7 +111,7 @@ class CreateDirectiveTest extends DBTestCase
 
         $this->app['config']->set('app.debug', false);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -142,7 +142,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -168,17 +168,17 @@ class CreateDirectiveTest extends DBTestCase
             ])
             ->assertJsonCount(1, 'errors');
 
-        $this->assertCount(1, User::all());
+        $this->assertCount(0, User::all());
     }
 
-    public function testDoesCreateWithFailingRelationshipAndTransactionParam(): void
+    public function testCreatesOnPartialFailureWithTransactionsDisabled(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
         $this->app['config']->set('app.debug', false);
         config(['lighthouse.transactional_mutations' => false]);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -209,7 +209,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -239,7 +239,7 @@ class CreateDirectiveTest extends DBTestCase
 //            ])
             ->assertJsonCount(1, 'errors');
 
-        $this->assertCount(2, User::all());
+        $this->assertCount(1, User::all());
     }
 
     public function testDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
