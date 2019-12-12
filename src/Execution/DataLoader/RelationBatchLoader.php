@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Closure;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Pagination\PaginationArgs;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -17,7 +17,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * This function is called with the relation query builder and may modify it.
      *
-     * @var callable
+     * @var \Closure
      */
     protected $decorateBuilder;
 
@@ -30,13 +30,13 @@ class RelationBatchLoader extends BatchLoader
 
     /**
      * @param  string  $relationName
-     * @param  callable  $decorateBuilder
+     * @param  \Closure  $decorateBuilder
      * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      */
     public function __construct(
         string $relationName,
-        callable $decorateBuilder,
-        ?PaginationArgs $paginationArgs
+        $decorateBuilder,
+        $paginationArgs = null
     ) {
         $this->relationName = $relationName;
         $this->decorateBuilder = $decorateBuilder;

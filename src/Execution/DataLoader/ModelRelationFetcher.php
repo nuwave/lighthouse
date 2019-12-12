@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -130,10 +131,10 @@ class ModelRelationFetcher
      *
      * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      * @param  string  $relationName
-     * @param  callable  $relationConstraints
+     * @param  \Closure  $relationConstraints
      * @return $this
      */
-    public function loadRelationForPage(PaginationArgs $paginationArgs, string $relationName, callable $relationConstraints): self
+    public function loadRelationForPage(PaginationArgs $paginationArgs, string $relationName, Closure $relationConstraints): self
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,
@@ -211,10 +212,10 @@ class ModelRelationFetcher
      * Get queries to fetch relationships.
      *
      * @param  string  $relationName
-     * @param  callable  $relationConstraints
+     * @param  \Closure  $relationConstraints
      * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Relations\Relation>
      */
-    protected function buildRelationsFromModels(string $relationName, callable $relationConstraints): Collection
+    protected function buildRelationsFromModels(string $relationName, Closure $relationConstraints): Collection
     {
         return $this->models->toBase()->map(
             function (Model $model) use ($relationName, $relationConstraints): Relation {

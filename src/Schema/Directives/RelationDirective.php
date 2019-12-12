@@ -33,9 +33,14 @@ abstract class RelationDirective extends BaseDirective
     public function resolveField(FieldValue $value): FieldValue
     {
         $value->setResolver(
-            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
-                $this->resolveInfo = $resolveInfo;
+            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationName = $this->directiveArgValue('relation', $this->definitionNode->name->value);
+
+                $decorateBuilder = function($builder) use ($resolveInfo) {
+                    $resolveInfo
+                        ->argumentSet
+                        ->enhanceBuilder($builder, $this->directiveArgValue('scopes', []));
+                };
 
                 /** @var \Nuwave\Lighthouse\Pagination\PaginationArgs|null $paginationArgs */
                 $paginationArgs = null;
@@ -46,7 +51,7 @@ abstract class RelationDirective extends BaseDirective
                 if (config('lighthouse.batchload_relations')) {
                     $constructorArgs = [
                         'relationName' => $relationName,
-                        'decorateBuilder' => [$this, 'decorateBuilder'],
+                        'decorateBuilder' => $decorateBuilder,
                     ];
 
                     if ($paginationArgs) {
@@ -69,7 +74,8 @@ abstract class RelationDirective extends BaseDirective
                     /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
                     $relation = $parent->{$relationName}();
 
-                    $this->decorateBuilder($relation);
+                    $decorateBuilder($relation);
+
                     if ($paginationArgs) {
                         $relation = $paginationArgs->applyToBuilder($relation);
                     }
@@ -80,16 +86,6 @@ abstract class RelationDirective extends BaseDirective
         );
 
         return $value;
-    }
-
-    /**
-     * @param \Illuminate\Database\Query\Builder $builder
-     */
-    public function decorateBuilder($builder)
-    {
-        $this->resolveInfo
-            ->argumentSet
-            ->enhanceBuilder($builder, $this->directiveArgValue('scopes', []));
     }
 
     /**
