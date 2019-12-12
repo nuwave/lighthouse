@@ -28,8 +28,7 @@ class ModelRelationFetcherTest extends DBTestCase
 
         $pageSize = 3;
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage($this->makePaginationArgs($pageSize))
-            ->models();
+            ->loadRelationsForPage($this->makePaginationArgs($pageSize));
 
         $firstResult = $users[0];
         /** @var \Illuminate\Pagination\LengthAwarePaginator $tasksPaginator */
@@ -58,8 +57,7 @@ class ModelRelationFetcherTest extends DBTestCase
         );
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->reloadModelsWithRelationCount()
-            ->models();
+            ->reloadModelsWithRelationCount();
 
         $this->assertEquals($users[0]->tasks()->count(), 4);
         $this->assertEquals($users[1]->tasks_count, 5);
@@ -78,8 +76,7 @@ class ModelRelationFetcherTest extends DBTestCase
         Task::first()->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage($this->makePaginationArgs(4))
-            ->models();
+            ->loadRelationsForPage($this->makePaginationArgs(4));
 
         $this->assertCount($initialCount - 1, $users[0]->tasks);
     }
@@ -96,8 +93,7 @@ class ModelRelationFetcherTest extends DBTestCase
 
         $first = 2;
         $tasks = (new ModelRelationFetcher(Task::all(), ['tags']))
-            ->loadRelationsForPage($this->makePaginationArgs($first))
-            ->models();
+            ->loadRelationsForPage($this->makePaginationArgs($first));
 
         $this->assertCount($first, $tasks->first()->tags);
     }

@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class RelationBatchLoader extends BatchLoader
@@ -49,37 +51,36 @@ class RelationBatchLoader extends BatchLoader
      */
     public function resolve(): array
     {
-        $modelRelationFetcher = $this->getRelationFetcher();
+        $relation = [$this->relationName => $this->decorateBuilder];
 
         if ($this->paginationArgs !== null) {
-            $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
+            $modelRelationFetcher = new ModelRelationFetcher(
+                $this->getParentModels(),
+                $relation
+            );
+            $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
-            $modelRelationFetcher->loadRelations();
+            $models = $this->getParentModels()->load($relation);
         }
 
-        return $modelRelationFetcher->getRelationDictionary($this->relationName);
-    }
-
-    /**
-     * Construct a new instance of a relation fetcher.
-     *
-     * @return \Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher
-     */
-    protected function getRelationFetcher(): ModelRelationFetcher
-    {
-        return new ModelRelationFetcher(
-            $this->getParentModels(),
-            [$this->relationName => $this->decorateBuilder]
-        );
+        return $models
+            ->mapWithKeys(
+                function (Model $model): array {
+                    return [$this->buildKey($model->getKey()) => $model->getRelation($this->relationName)];
+                }
+            )
+            ->all();
     }
 
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Model>
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getParentModels(): Collection
+    protected function getParentModels(): EloquentCollection
     {
-        return (new Collection($this->keys))->pluck('parent');
+        return new EloquentCollection(
+            (new Collection($this->keys))->pluck('parent')
+        );
     }
 }

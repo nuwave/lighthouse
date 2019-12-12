@@ -11,14 +11,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
-use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 use ReflectionClass;
 use ReflectionMethod;
 
 class ModelRelationFetcher
 {
-    use HandlesCompositeKey;
-
     /**
      * The parent models that relations should be loaded for.
      *
@@ -34,94 +31,59 @@ class ModelRelationFetcher
     protected $relations;
 
     /**
-     * @param  mixed  $models The parent models that relations should be loaded for
+     * @param  \Illuminate\Database\Eloquent\Collection  $models  The parent models that relations should be loaded for
      * @param  mixed[]  $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
      * @return void
      */
-    public function __construct($models, array $relations)
+    public function __construct(EloquentCollection $models, array $relations)
     {
-        $this->setModels($models);
-        $this->setRelations($relations);
-    }
-
-    /**
-     * Set the relations to be loaded.
-     *
-     * @param  array  $relations
-     * @return $this
-     */
-    public function setRelations(array $relations): self
-    {
+        $this->models = $models;
         // Parse and set the relations.
         $this->relations = $this->newModelQuery()
             ->with($relations)
             ->getEagerLoads();
-
-        return $this;
-    }
-
-    /**
-     * Return a fresh instance of a query builder for the underlying model.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function newModelQuery(): EloquentBuilder
-    {
-        return $this->models()
-            ->first()
-            ->newModelQuery();
-    }
-
-    /**
-     * Get all the underlying models.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
-     */
-    public function models(): EloquentCollection
-    {
-        return $this->models;
-    }
-
-    /**
-     * Set one or more Model instances as an EloquentCollection.
-     *
-     * @param  mixed  $models
-     * @return $this
-     */
-    protected function setModels($models): self
-    {
-        $this->models = $models instanceof EloquentCollection
-            ? $models
-            : new EloquentCollection($models);
-
-        return $this;
-    }
-
-    /**
-     * Load all the relations of all the models.
-     *
-     * @return $this
-     */
-    public function loadRelations(): self
-    {
-        $this->models->load($this->relations);
-
-        return $this;
     }
 
     /**
      * Load all relations for the model, but constrain the query to the current page.
      *
      * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function loadRelationsForPage(PaginationArgs $paginationArgs): self
+    public function loadRelationsForPage(PaginationArgs $paginationArgs): EloquentCollection
     {
         foreach ($this->relations as $name => $constraints) {
             $this->loadRelationForPage($paginationArgs, $name, $constraints);
         }
 
-        return $this;
+        return $this->models;
+    }
+
+    /**
+     * Reload the models to get the `{relation}_count` attributes of models set.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function reloadModelsWithRelationCount(): EloquentCollection
+    {
+        $ids = $this->models->modelKeys();
+
+        $this->models = $this
+            ->newModelQuery()
+            ->withCount($this->relations)
+            ->whereKey($ids)
+            ->get()
+            ->filter(function (Model $model) use ($ids): bool {
+                // We might have gotten some models that we did not have before
+                // so we filter them out
+                return in_array(
+                    $model->getKey(),
+                    $ids,
+                    true
+                );
+            });
+
+        return $this->models;
     }
 
     /**
@@ -132,9 +94,9 @@ class ModelRelationFetcher
      * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      * @param  string  $relationName
      * @param  \Closure  $relationConstraints
-     * @return $this
+     * @return void
      */
-    public function loadRelationForPage(PaginationArgs $paginationArgs, string $relationName, Closure $relationConstraints): self
+    protected function loadRelationForPage(PaginationArgs $paginationArgs, string $relationName, Closure $relationConstraints): void
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,
@@ -161,51 +123,18 @@ class ModelRelationFetcher
         $this->associateRelationModels($relationName, $relationModels);
 
         $this->convertRelationToPaginator($paginationArgs, $relationName);
-
-        return $this;
     }
 
     /**
-     * Reload the models to get the `{relation}_count` attributes of models set.
+     * Return a fresh instance of a query builder for the underlying model.
      *
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function reloadModelsWithRelationCount(): self
-    {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = $this->models()
-            ->first()
-            ->newQuery()
-            ->withCount($this->relations);
-
-        $ids = $this->getModelIds();
-
-        $reloadedModels = $query
-            ->whereKey($ids)
-            ->get()
-            ->filter(function (Model $model) use ($ids): bool {
-                return in_array(
-                    $model->getKey(),
-                    $ids,
-                    true
-                );
-            });
-
-        return $this->setModels($reloadedModels);
-    }
-
-    /**
-     * Extract the primary keys from the underlying models.
-     *
-     * @return mixed[]
-     */
-    protected function getModelIds(): array
+    protected function newModelQuery(): EloquentBuilder
     {
         return $this->models
-            ->map(function (Model $model) {
-                return $model->getKey();
-            })
-            ->all();
+            ->first()
+            ->newModelQuery();
     }
 
     /**
@@ -283,25 +212,9 @@ class ModelRelationFetcher
      * @param  string  $relationName
      * @return string
      */
-    public function getRelationCountName(string $relationName): string
+    protected function getRelationCountName(string $relationName): string
     {
         return Str::snake("{$relationName}_count");
-    }
-
-    /**
-     * Get an associative array of relations, keyed by the models primary key.
-     *
-     * @param  string  $relationName
-     * @return mixed[]
-     */
-    public function getRelationDictionary(string $relationName): array
-    {
-        return $this->models
-            ->mapWithKeys(
-                function (Model $model) use ($relationName): array {
-                    return [$this->buildKey($model->getKey()) => $model->getRelation($relationName)];
-                }
-            )->all();
     }
 
     /**
