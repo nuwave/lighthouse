@@ -3,7 +3,6 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
@@ -57,7 +56,6 @@ class ModelRelationFetcherTest extends DBTestCase
         $user2->tasks()->saveMany(
             factory(Task::class, 5)->make()
         );
-
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->reloadModelsWithRelationCount()

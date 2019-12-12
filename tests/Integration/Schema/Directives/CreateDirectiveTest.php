@@ -111,7 +111,7 @@ class CreateDirectiveTest extends DBTestCase
 
         $this->app['config']->set('app.debug', false);
 
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -142,7 +142,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -178,7 +178,7 @@ class CreateDirectiveTest extends DBTestCase
         $this->app['config']->set('app.debug', false);
         config(['lighthouse.transactional_mutations' => false]);
 
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -209,7 +209,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
