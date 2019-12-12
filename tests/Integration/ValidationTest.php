@@ -534,6 +534,7 @@ class ValidationTest extends DBTestCase
             name: String
         }
         ';
+
         $this->graphQL('
         mutation {
             withMergedRules(bar: "abcdefghijk") {
