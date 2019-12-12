@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
-use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -107,7 +107,7 @@ abstract class RelationDirective extends BaseDirective
 
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
-        if (!$paginationType) {
+        if (! $paginationType) {
             return;
         }
 
@@ -140,7 +140,7 @@ abstract class RelationDirective extends BaseDirective
     protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
     {
         if ($edgeType = $this->directiveArgValue('edgeType')) {
-            if (!isset($documentAST->types[$edgeType])) {
+            if (! isset($documentAST->types[$edgeType])) {
                 throw new DirectiveException(
                     'The edgeType argument on '.$this->definitionNode->name->value.' must reference an existing type definition'
                 );

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
