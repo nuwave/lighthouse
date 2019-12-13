@@ -181,7 +181,7 @@ SDL;
     public function handleBuilder($builder, $value)
     {
         return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }

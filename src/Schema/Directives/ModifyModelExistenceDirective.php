@@ -91,13 +91,16 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * Get the type of the id argument.
      *
      * Not using an actual type hint, as the manipulateFieldDefinition function
-     * validates the type during schema build time.f
+     * validates the type during schema build time.
      *
      * @return \GraphQL\Language\AST\NonNullTypeNode
      */
     protected function idArgument()
     {
-        return $this->definitionNode->arguments[0]->type;
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldNode */
+        $fieldNode = $this->definitionNode;
+
+        return $fieldNode->arguments[0]->type;
     }
 
     /**
@@ -116,13 +119,13 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         // Ensure there is only a single argument defined on the field.
         if (count($this->definitionNode->arguments) !== 1) {
             throw new DefinitionException(
-                'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
+                'The @'.static::name()." directive requires the field {$this->nodeName()} to only contain a single argument."
             );
         }
 
         if (! $this->idArgument() instanceof NonNullTypeNode) {
             throw new DefinitionException(
-                'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
+                'The @'.static::name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
             );
         }
     }

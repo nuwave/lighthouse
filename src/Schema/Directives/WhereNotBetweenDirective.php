@@ -29,7 +29,7 @@ an `input` object with two fields.
 """
 directive @whereNotBetween(
   """
-  Specify the database column to compare. 
+  Specify the database column to compare.
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
@@ -47,7 +47,7 @@ SDL;
     public function handleBuilder($builder, $values)
     {
         return $builder->whereNotBetween(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $values
         );
     }

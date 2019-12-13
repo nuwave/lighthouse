@@ -64,7 +64,7 @@ SDL;
                         RelationBatchLoader::class,
                         $resolveInfo->path,
                         [
-                            'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
+                            'relationName' => $this->directiveArgValue('relation', $this->nodeName()),
                             'decorateBuilder' => function ($query) use ($resolveInfo) {
                                 $resolveInfo
                                     ->argumentSet
