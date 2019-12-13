@@ -4,12 +4,9 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
 {
-    use HandlesCompositeKey;
-
     /**
      * Active BatchLoader instances.
      *
@@ -140,4 +137,19 @@ abstract class BatchLoader
      * @return array<mixed, mixed>
      */
     abstract public function resolve(): array;
+
+    /**
+     * Build a key out of one or more given keys, supporting composite keys.
+     *
+     * E.g.: $primaryKey = ['key1', 'key2'];.
+     *
+     * @param  mixed  $key
+     * @return string
+     */
+    protected function buildKey($key): string
+    {
+        return is_array($key)
+            ? implode('___', $key)
+            : $key;
+    }
 }

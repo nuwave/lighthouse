@@ -65,9 +65,11 @@ SDL;
                         $resolveInfo->path,
                         [
                             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
-                            'args' => $args,
-                            'scopes' => $this->directiveArgValue('scopes', []),
-                            'resolveInfo' => $resolveInfo,
+                            'decorateBuilder' => function ($query) use ($resolveInfo) {
+                                $resolveInfo
+                                    ->argumentSet
+                                    ->enhanceBuilder($query, $this->directiveArgValue('scopes', []));
+                            },
                         ]
                     );
 

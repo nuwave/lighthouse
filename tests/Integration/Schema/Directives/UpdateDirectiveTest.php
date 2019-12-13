@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\QueryException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
 use Tests\Utils\Models\Company;
@@ -19,7 +20,7 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Mutation {
             updateCompany(
                 id: ID!
@@ -59,13 +60,13 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Mutation {
             updateCompany(
                 input: UpdateCompanyInput @spread
             ): Company @update
         }
-        
+
         input UpdateCompanyInput {
             id: ID!
             name: String
@@ -103,7 +104,7 @@ class UpdateDirectiveTest extends DBTestCase
             category_id: ID!
             name: String!
         }
-        
+
         type Mutation {
             updateCategory(
                 category_id: ID!
@@ -138,46 +139,46 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $this->schema .= '
+        $this->schema .= /* @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type User {
             id: ID!
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
-        
+
         input UpdateUserInput {
             id: ID!
             name: String
             tasks: CreateTaskRelation
         }
-        
+
         input CreateTaskRelation {
             create: [CreateTaskInput!]
         }
-        
+
         input CreateTaskInput {
-            name: String
-            user: ID
+            thisFieldDoesNotExist: String
         }
         ';
 
-        $this->graphQL('
+        $this->expectException(QueryException::class);
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             updateUser(input: {
                 id: 1
                 name: "Changed"
                 tasks: {
-                    corruptField: [{
-                        name: "bar"
+                    create: [{
+                        thisFieldDoesNotExist: "bar"
                     }]
                 }
             }) {
@@ -189,7 +190,7 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(1, 'errors');
+        ');
 
         $this->assertSame('Original', User::first()->name);
     }
