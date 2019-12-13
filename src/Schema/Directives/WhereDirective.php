@@ -30,7 +30,7 @@ directive @where(
   operator: String = "="
 
   """
-  Specify the database column to compare. 
+  Specify the database column to compare.
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
@@ -56,7 +56,7 @@ SDL;
         $clause = $this->directiveArgValue('clause', 'where');
 
         return $builder->{$clause}(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $operator = $this->directiveArgValue('operator', '='),
             $value
         );

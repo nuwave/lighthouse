@@ -33,7 +33,7 @@ abstract class RelationDirective extends BaseDirective
     {
         $value->setResolver(
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                $relationName = $this->directiveArgValue('relation', $this->definitionNode->name->value);
+                $relationName = $this->directiveArgValue('relation', $this->nodeName());
 
                 $decorateBuilder = function ($builder) use ($resolveInfo) {
                     $resolveInfo
@@ -137,7 +137,7 @@ abstract class RelationDirective extends BaseDirective
         if ($edgeType = $this->directiveArgValue('edgeType')) {
             if (! isset($documentAST->types[$edgeType])) {
                 throw new DirectiveException(
-                    'The edgeType argument on '.$this->definitionNode->name->value.' must reference an existing type definition'
+                    'The edgeType argument on '.$this->nodeName().' must reference an existing type definition'
                 );
             }
 

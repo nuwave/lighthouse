@@ -63,7 +63,7 @@ SDL;
                 }
 
                 throw new DirectiveException(
-                    "A `model` or `relation argument must be assigned to the '{$this->name()}' directive on '{$this->definitionNode->name->value}"
+                    "A `model` or `relation argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}"
                 );
             }
         );
