@@ -89,7 +89,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     {
         $relationName = $this->directiveArgValue('relation')
             // Use the name of the argument if no explicit relation name is given
-            ?? $this->definitionNode->name->value;
+            ?? $this->nodeName();
 
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
         $relation = $parent->{$relationName}();
