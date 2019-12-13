@@ -30,11 +30,11 @@ class NestedBelongsTo implements ArgResolver
         if (isset($args->arguments['create'])) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 
-            $belongsToModel = $saveModel(
+            $related = $saveModel(
                 $relation->make(),
                 $args->arguments['create']->value
             );
-            $relation->associate($belongsToModel);
+            $relation->associate($related);
         }
 
         if (isset($args->arguments['connect'])) {
@@ -44,21 +44,21 @@ class NestedBelongsTo implements ArgResolver
         if (isset($args->arguments['update'])) {
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
-            $belongsToModel = $updateModel(
+            $related = $updateModel(
                 $relation->make(),
                 $args->arguments['update']->value
             );
-            $relation->associate($belongsToModel);
+            $relation->associate($related);
         }
 
         if (isset($args->arguments['upsert'])) {
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
-            $belongsToModel = $upsertModel(
+            $related = $upsertModel(
                 $relation->make(),
                 $args->arguments['upsert']->value
             );
-            $relation->associate($belongsToModel);
+            $relation->associate($related);
         }
 
         self::disconnectOrDelete($relation, $args);

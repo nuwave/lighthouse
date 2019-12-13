@@ -65,6 +65,12 @@ class SaveModel implements ArgResolver
 
         $model->save();
 
+        if ($this->parentRelation instanceof BelongsTo) {
+            $this->parentRelation
+                ->associate($model)
+                ->save();
+        }
+
         if ($this->parentRelation instanceof BelongsToMany) {
             $this->parentRelation->syncWithoutDetaching($model);
         }

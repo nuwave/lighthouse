@@ -282,7 +282,7 @@ class BelongsToTest extends DBTestCase
             'name' => 'foo',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
@@ -321,7 +321,7 @@ class BelongsToTest extends DBTestCase
             'name' => 'foo',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
