@@ -25,7 +25,7 @@ Use an input value as a [whereJsonContains filter](https://laravel.com/docs/quer
 """
 directive @whereJsonContains(
   """
-  Specify the database column and path inside the JSON to compare. 
+  Specify the database column and path inside the JSON to compare.
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
@@ -43,7 +43,7 @@ SDL;
     public function handleBuilder($builder, $value)
     {
         return $builder->whereJsonContains(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }
