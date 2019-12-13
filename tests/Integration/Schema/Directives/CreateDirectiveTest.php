@@ -11,7 +11,7 @@ class CreateDirectiveTest extends DBTestCase
 {
     public function testCanCreateFromFieldArguments(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */'
         type Company {
             id: ID!
             name: String!
@@ -22,7 +22,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createCompany(name: "foo") {
                 id
@@ -41,7 +41,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateFromInputObject(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */'
         type Company {
             id: ID!
             name: String!
@@ -56,7 +56,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createCompany(input: {
                 name: "foo"
@@ -77,7 +77,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */'
         type Mutation {
             createTag(name: String): Tag @create
         }
@@ -88,7 +88,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createTag(name: "foobar"){
                 name
@@ -244,7 +244,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -276,7 +276,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
