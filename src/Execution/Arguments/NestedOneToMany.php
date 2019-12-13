@@ -18,14 +18,14 @@ class NestedOneToMany implements ArgResolver
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      * @return void
      */
-    public function __invoke($model, $args)
+    public function __invoke($parent, $args)
     {
         /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
-        $relation = $model->{$this->relationName}();
+        $relation = $parent->{$this->relationName}();
 
         static::createUpdateUpsert($args, $relation);
 

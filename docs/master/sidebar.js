@@ -84,7 +84,6 @@ module.exports = [
     {
         title: 'Concepts',
         children: [
-            'concepts/field-resolvers',
             'concepts/arg-resolvers',
         ]
     },

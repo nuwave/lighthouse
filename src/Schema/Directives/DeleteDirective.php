@@ -43,7 +43,14 @@ directive @delete(
   This is only needed when the default model resolution does not work.
   """
   model: String
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -73,18 +80,18 @@ SDL;
     /**
      * Delete on ore more related models.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  mixed|mixed[]  $idOrIds
      * @return void
      */
-    public function __invoke($model, $idOrIds): void
+    public function __invoke($parent, $idOrIds): void
     {
         $relationName = $this->directiveArgValue('relation');
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-        $relation = $model->{$relationName}();
+        $relation = $parent->{$relationName}();
 
-        $model = $relation->make();
-        $model::destroy($idOrIds);
+        $related = $relation->make();
+        $related::destroy($idOrIds);
     }
 
     public function manipulateArgDefinition(

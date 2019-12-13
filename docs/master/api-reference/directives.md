@@ -648,30 +648,33 @@ directive @count(
 
 ## @create
 
+```graphql
+"""
 Create a new Eloquent model with the given arguments.
+"""
+directive @create(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
     createPost(title: String!): Post @create
 }
 ```
-
-### Definition
-
-```graphql
-"""
-Create a new Eloquent model with the given arguments.
-"""
-directive @create(  
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
-  """
-  model: String
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 If you are using a single input object as an argument, you must tell Lighthouse
 to spread out the nested values before applying it to the resolver.
@@ -695,6 +698,8 @@ type Mutation {
 }
 ```
 
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
 ## @delete
 
 ```graphql
@@ -714,7 +719,14 @@ directive @delete(
   This is only needed when the default model resolution does not work.
   """
   model: String
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 Use it on a root mutation field that returns an instance of the Model.
@@ -724,8 +736,6 @@ type Mutation {
     deletePost(id: ID!): Post @delete
 }
 ```
-
-### Examples
 
 If you use global ids, you can set the `globalId` argument to `true`.
 Lighthouse will decode the id for you automatically.
@@ -756,6 +766,8 @@ type Mutation {
     deletePost(id: ID!): Post @delete(model: "Bar\\Baz\\MyPost")
 }
 ```
+
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
 
 ## @deprecated
 
@@ -2615,16 +2627,6 @@ directive @union(
 
 ## @update
 
-Update an Eloquent model with the input values of the field.
-
-```graphql
-type Mutation {
-    updatePost(id: ID!, content: String): Post @update
-}
-```
-
-### Definition
-
 ```graphql
 """
 Update an Eloquent model with the input values of the field.
@@ -2641,10 +2643,23 @@ directive @update(
   If set to `false`, regular non-global ids are used.
   """
   globalId: Boolean = false
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-### Examples
+Use it on a root mutation field that returns an instance of the Model.
+
+```graphql
+type Mutation {
+    updatePost(id: ID!, content: String): Post @update
+}
+```
 
 Lighthouse uses the argument `id` to fetch the model by its primary key.
 This will work even if your model has a differently named primary key,
@@ -2670,17 +2685,9 @@ type Mutation {
 }
 ```
 
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
 ## @upsert
-
-Create or update an Eloquent model with the input values of the field.
-
-```graphql
-type Mutation {
-    upsertPost(id: ID!, content: String): Post @upsert
-}
-```
-
-### Definition
 
 ```graphql
 """
@@ -2698,11 +2705,15 @@ directive @upsert(
   If set to `false`, regular non-global ids are used.
   """
   globalId: Boolean = false
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
-
-### Examples
-
 
 Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
 If the model doesn't exist, it will be created using the given `id`.
@@ -2712,6 +2723,8 @@ type Mutation {
     upsertPost(post_id: ID!, content: String): Post @upsert
 }
 ```
+
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
 
 ## @where
 

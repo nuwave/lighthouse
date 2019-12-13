@@ -80,17 +80,22 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
         );
     }
 
-    public function __invoke($model, $args)
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $args
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
+     */
+    public function __invoke($parent, $args)
     {
         $relationName = $this->directiveArgValue('relation')
             // Use the name of the argument if no explicit relation name is given
             ?? $this->definitionNode->name->value;
 
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-        $relation = $model->{$relationName}();
-        $model = $relation->make();
+        $relation = $parent->{$relationName}();
+        $related = $relation->make();
 
-        return $this->executeMutation($model, $args, $relation);
+        return $this->executeMutation($related, $args, $relation);
     }
 
     /**
