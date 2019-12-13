@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Enable multiple queries in a single request by clearing `BatchLoader` instances
   after executing each query https://github.com/nuwave/lighthouse/pull/1030
+- Keep the query and pagination capabilities of relation directives when disabling batch loading https://github.com/nuwave/lighthouse/pull/1083
 
 ## [4.7.1](https://github.com/nuwave/lighthouse/compare/v4.7.0...v4.7.1)
 

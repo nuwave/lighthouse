@@ -5,6 +5,7 @@ namespace Tests\Integration\SoftDeletes;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
 class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 {
@@ -19,7 +20,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             tasks: [Task!]! @all @softDeletes
         }
@@ -81,7 +82,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             task(id: ID! @eq): Task @find @softDeletes
         }
@@ -157,7 +158,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             tasks: [Task!]! @paginate @softDeletes
         }
@@ -221,21 +222,30 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
     public function testCanBeUsedNested(): void
     {
-        $taskToRemove = factory(Task::class)->create();
-        factory(Task::class, 2)->create(['user_id' => $taskToRemove->user->id]);
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        /** @var \Tests\Utils\Models\Task $taskToRemove */
+        $taskToRemove = $user->tasks()->save(
+            factory(Task::class)->make()
+        );
         $taskToRemove->delete();
 
-        $this->schema = '
+        $user->tasks()->saveMany(
+            factory(Task::class, 2)->make()
+        );
+
+        $this->schema = /* @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type User {
             id: ID!
             tasks: [Task!]! @hasMany @softDeletes
         }
-        
+
         type Query {
             users: [User!]! @all
             usersPaginated: [User!]! @paginate
@@ -243,7 +253,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             users {
                 tasks(trashed: ONLY) {
@@ -267,7 +277,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             usersPaginated(first: 10) {
                 data {
@@ -295,7 +305,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             user(id: 1) {
                 tasks(trashed: ONLY) {
@@ -317,7 +327,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             users {
                 tasksWith: tasks(trashed: WITH) {
@@ -357,7 +367,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
              ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksWithout')
              ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksSimple');
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             user(id: 1) {
                 tasksWith: tasks(trashed: WITH) {
@@ -379,18 +389,18 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
     public function testThrowsIfModelDoesNotSupportSoftDeletesTrashed(): void
     {
-        $this->schema = '
+        $this->schema = /* @lang GraphQL */'
         type Query {
             trashed(trashed: Trashed @trashed): [User!]! @all
         }
-        
+
         type User {
             id: ID
         }
         ';
 
         $this->expectExceptionMessage(TrashedDirective::MODEL_MUST_USE_SOFT_DELETES);
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             trashed(trashed: WITH) {
                 id
@@ -401,18 +411,18 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
     public function testThrowsIfModelDoesNotSupportSoftDeletes(): void
     {
-        $this->schema = '
+        $this->schema = /* @lang GraphQL */'
         type Query {
             softDeletes: [User!]! @all @softDeletes
         }
-        
+
         type User {
             id: ID
         }
         ';
 
         $this->expectExceptionMessage(TrashedDirective::MODEL_MUST_USE_SOFT_DELETES);
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             softDeletes(trashed: WITH) {
                 id
