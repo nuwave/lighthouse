@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.7.2...master)
 
+### Added
+
+- Compose complex input arguments through nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
 ### Fixed
