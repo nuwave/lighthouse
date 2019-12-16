@@ -15,14 +15,14 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         name: String
         email: String
     }
-    
+
     type Query {
         users(where: WhereConstraints @whereConstraints): [User!]! @all
         whitelistedColumns(
             where: WhereConstraints @whereConstraints(columns: ["id", "camelCase"])
         ): [User!]! @all
     }
-    
+
     enum Operator {
         EQ @enum(value: "=")
         NEQ @enum(value: "!=")
@@ -263,7 +263,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             whitelistedColumns(
                 where: {

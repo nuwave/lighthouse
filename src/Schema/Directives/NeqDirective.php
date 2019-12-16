@@ -23,10 +23,10 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective, Defined
 """
 Place a not equals operator `!=` on an Eloquent query.
 """
-directive @neq(  
+directive @neq(
   """
-  Specify the database column to compare. 
-  Only required if database column has a different name than the attribute in your schema. 
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
   """
   key: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -43,7 +43,7 @@ SDL;
     public function handleBuilder($builder, $value)
     {
         return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             '<>',
             $value
         );

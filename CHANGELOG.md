@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.7.1...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.7.2...master)
+
+## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
+
+### Fixed
+
+- Enable multiple queries in a single request by clearing `BatchLoader` instances
+  after executing each query https://github.com/nuwave/lighthouse/pull/1030
+- Keep the query and pagination capabilities of relation directives when disabling batch loading https://github.com/nuwave/lighthouse/pull/1083
 
 ## [4.7.1](https://github.com/nuwave/lighthouse/compare/v4.7.0...v4.7.1)
 

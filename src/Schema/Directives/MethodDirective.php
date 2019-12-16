@@ -27,7 +27,7 @@ class MethodDirective extends BaseDirective implements FieldResolver, DefinedDir
 Call a method with a given `name` on the class that represents a type to resolve a field.
 Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
 """
-directive @method(      
+directive @method(
   """
   Specify the method of which to fetch the data from.
   """
@@ -47,7 +47,7 @@ SDL;
         /** @var string $method */
         $method = $this->directiveArgValue(
             'name',
-            $this->definitionNode->name->value
+            $this->nodeName()
         );
 
         return $fieldValue->setResolver(

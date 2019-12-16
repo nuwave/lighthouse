@@ -23,7 +23,7 @@ class NotInDirective extends BaseDirective implements ArgBuilderDirective, Defin
 """
 Filter a column by an array using a `whereNotIn` clause.
 """
-directive @notIn(      
+directive @notIn(
   """
   Specify the name of the column.
   Only required if it differs from the name of the argument.
@@ -43,7 +43,7 @@ SDL;
     public function handleBuilder($builder, $values)
     {
         return $builder->whereNotIn(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $values
         );
     }
