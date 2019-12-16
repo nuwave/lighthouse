@@ -26,14 +26,12 @@ class LighthouseController
         $operationParams = $this->parseRequest($request);
     }
 
-
     /**
      * Converts an incoming HTTP request to one or more OperationParams.
      *
      * @return OperationParams[]|OperationParams
      *
      * @throws RequestError
-     *
      */
     protected function parseRequest(Request $request)
     {
@@ -48,7 +46,7 @@ class LighthouseController
 
             if ($contentType === 'application/graphql') {
                 $bodyParams = ['query' => $request->getContent()];
-            } elseif($contentType === 'multipart/form-data') {
+            } elseif ($contentType === 'multipart/form-data') {
                 $bodyParams = $this->inlineFiles($request);
             } else {
                 // In all other cases, we assume we are given JSON encoded input
@@ -73,7 +71,7 @@ class LighthouseController
     {
         $jsonInput = \Safe\json_decode($request->getContent(), true);
 
-        if(!isset($jsonInput['map'])) {
+        if (! isset($jsonInput['map'])) {
             throw new InvariantViolation(
                 'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
@@ -82,7 +80,7 @@ class LighthouseController
         $bodyParams = $jsonInput['operations'];
 
         /**
-         * @var string $fileKey
+         * @var string
          * @var string[] $operationsPaths
          */
         foreach ($jsonInput['map'] as $fileKey => $operationsPaths) {
