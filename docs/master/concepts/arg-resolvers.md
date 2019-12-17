@@ -110,9 +110,7 @@ function createTaskNotes(\App\Models\Task $root, array $args): void {
 Lighthouse allows you to attach resolver functions to arguments.
 Complex inputs are automatically split into smaller pieces and passed off to the responsible function.
 
-
-As Lighthouse uses the SDL as the primary building block, arg resolvers are implemented as a
-kind of directive: [`ArgResolver`](../custom-directives/argument-directives.md#argresolver).
+As Lighthouse uses the SDL as the primary building block, arg resolvers are implemented as directives.
 Here is how we can define a schema that enables sending a nested mutation as in the example above.
 
 ```diff
@@ -133,4 +131,98 @@ input CreateNoteInput {
 }
 ```
 
-// TODO elaborate on how the input is split and in what order the resolver are called, with what
+The `@create` directive will behave differently, based on the context where it is used.
+
+On the `createTask` field, it will create a `Task` model with the given `name`, save it
+to the database and return that instance to Lighthouse.
+
+A simplified, generic implementation of an appropriate field resolver would look something like this:
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Schema\Directives;
+
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class CreateDirective extends BaseDirective implements FieldResolver
+{
+    public function name(): string
+    {
+        return 'create';
+    }
+
+    public function resolveField(FieldValue $fieldValue)
+    {
+        return $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+                // Wrap the operation and let Lighthouse take care of splitting the input
+                $nestedSave = new ResolveNested(function($model, $args) {
+                    $model->fill($args->toArray());
+                    $model->save();
+                });
+                
+                $modelClass = $this->getModelClass();
+                /** @var \Illuminate\Database\Eloquent\Model $model */
+                $model = new $modelClass;
+
+                return $nestedSave($model, $resolveInfo->argumentSet);
+            }
+        );
+    }
+}
+```
+
+The arguments that are nested within `notes` will be handled as a nested argument resolver.
+For each `CreateNoteInput`, the resolver will be called with the previously created `Task`
+and create and attach a related `Note` model.
+
+We can extend our previous implementation of `@create` by allowing it to be used as an `ArgResolver`:
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Schema\Directives;
+
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
+{
+    public function name(): string { ... }
+
+    public function resolveField(FieldValue $fieldValue) { ... }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $argsList
+     * @return \Illuminate\Database\Eloquent\Model[]
+     */
+    public function __invoke($parent, $argsList)
+    {
+        $relationName = $this->getRelationName();
+
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+        $relation = $parent->{$relationName}();
+        $related = $relation->make();
+
+        return array_map(
+            function ($args) use ($related) {
+                $related->fill($args->toArray());
+                $related->save();
+            },
+            $argsList
+        );
+    }
+}
+```
+
+You may define your own nested arg resolver directives by implementing [`ArgResolver`](../custom-directives/argument-directives.md#argresolver).
