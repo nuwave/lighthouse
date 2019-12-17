@@ -15,11 +15,6 @@ class DeferDBTest extends DBTestCase
 {
     use SetUpDefer;
 
-    /**
-     * @var \Closure
-     */
-    protected static $resolver;
-
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
@@ -42,12 +37,11 @@ class DeferDBTest extends DBTestCase
             'company_id' => $company->getKey(),
         ]);
 
-        $resolver = $this->qualifyTestResolver();
-        self::$resolver = function () use ($user): User {
+        $this->mockResolver(function () use ($user): User {
             return $user;
-        };
+        });
 
-        $this->schema = "
+        $this->schema = /* @lang GraphQL */'
         type Company {
             name: String!
         }
@@ -58,16 +52,16 @@ class DeferDBTest extends DBTestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @mock
         }
-        ";
+        ';
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks('
+        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
         {
             user {
                 email
@@ -98,12 +92,11 @@ class DeferDBTest extends DBTestCase
         ]);
         $user = $users[0];
 
-        $resolver = $this->qualifyTestResolver();
-        self::$resolver = function () use ($user): User {
+        $this->mockResolver(function () use ($user): User {
             return $user;
-        };
+        });
 
-        $this->schema = "
+        $this->schema = /* @lang GraphQL */'
         type Company {
             name: String!
             users: [User] @hasMany
@@ -115,16 +108,16 @@ class DeferDBTest extends DBTestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @mock
         }
-        ";
+        ';
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks('
+        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
         {
             user {
                 email
@@ -175,12 +168,11 @@ class DeferDBTest extends DBTestCase
                 ]);
             });
 
-        $resolver = $this->qualifyTestResolver();
-        self::$resolver = function () use ($companies): Collection {
+        $this->mockResolver(function () use ($companies): Collection {
             return $companies;
-        };
+        });
 
-        $this->schema = "
+        $this->schema = /* @lang GraphQL */ '
         type Company {
             name: String!
             users: [User] @hasMany
@@ -192,16 +184,16 @@ class DeferDBTest extends DBTestCase
         }
 
         type Query {
-            companies: [Company] @field(resolver: \"{$resolver}\")
+            companies: [Company] @mock
         }
-        ";
+        ';
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks('
+        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
         {
             companies {
                 name
@@ -257,12 +249,5 @@ class DeferDBTest extends DBTestCase
                 )
             );
         });
-    }
-
-    public function resolve()
-    {
-        $resolver = self::$resolver;
-
-        return $resolver();
     }
 }
