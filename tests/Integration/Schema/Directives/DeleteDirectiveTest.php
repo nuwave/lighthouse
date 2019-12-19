@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -17,7 +18,7 @@ class DeleteDirectiveTest extends DBTestCase
         type User {
             id: ID!
         }
-        
+
         type Mutation {
             deleteUser(id: ID!): User @delete
         }
@@ -49,7 +50,7 @@ class DeleteDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        
+
         type Mutation {
             deleteUsers(id: [ID!]!): [User!]! @delete
         }
@@ -75,7 +76,7 @@ class DeleteDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        
+
         type Query {
             deleteUser(id: ID): User @delete
         }
@@ -90,7 +91,7 @@ class DeleteDirectiveTest extends DBTestCase
         type User {
             id: ID!
         }
-        
+
         type Query {
             deleteUser: User @delete
         }
@@ -105,7 +106,7 @@ class DeleteDirectiveTest extends DBTestCase
         type User {
             id: ID!
         }
-        
+
         type Query {
             deleteUser(foo: String, bar: Int): User @delete
         }
@@ -120,7 +121,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Query {
             updateUser(deleteTasks: Tasks @delete): User @update
         }
-        
+
         type User {
             id: ID!
         }
@@ -141,12 +142,12 @@ class DeleteDirectiveTest extends DBTestCase
                 deleteTasks: [Int!]! @delete(relation: "tasks")
             ): User @update
         }
-        
+
         type User {
             id: Int!
             tasks: [Task!]!
         }
-        
+
         type Task {
             id: Int
         }
@@ -173,5 +174,120 @@ class DeleteDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testDeleteHasOneThroughNestedArgResolver(): void
+    {
+        /** @var \Tests\Utils\Models\Task $task */
+        $task = factory(Task::class)->create();
+        $task->post()->save(
+            factory(Post::class)->make()
+        );
+
+        $this->schema = /* @lang GraphQL */ '
+        type Query {
+            updateTask(
+                id: Int
+                deletePost: Boolean @delete(relation: "post")
+            ): Task @update
+        }
+
+        type Task {
+            id: Int!
+            post: Post
+        }
+
+        type Post {
+            id: Int!
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            updateTask(id: 1, deletePost: false) {
+                id
+                post {
+                    id
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => 1,
+                    'post' => [
+                        'id' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            updateTask(id: 1, deletePost: true) {
+                id
+                post {
+                    id
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => 1,
+                    'post' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertNull(Post::find(1));
+    }
+
+    public function testDeleteBelongsToThroughNestedArgResolver(): void
+    {
+        factory(User::class)->create();
+        $task = factory(Task::class)->create([
+            'user_id' => 1,
+        ]);
+
+        $this->schema = /* @lang GraphQL */ '
+        type Query {
+            updateTask(
+                id: Int
+                deleteUser: Boolean @delete(relation: "user")
+            ): Task @update
+        }
+
+        type Task {
+            id: Int!
+            user: User
+        }
+
+        type User {
+            id: Int!
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            updateTask(id: 1, deleteUser: true) {
+                id
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => 1,
+                    'user' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertNull(
+            $task->refresh()->user_id
+        );
     }
 }

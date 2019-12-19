@@ -6,6 +6,10 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -90,8 +94,27 @@ SDL;
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
         $relation = $parent->{$relationName}();
 
-        $related = $relation->make();
-        $related::destroy($idOrIds);
+        // Those types of relations may only have one related model attached to
+        // it, so we don't need to use an ID to know which model to delete.
+        $relationIsHasOneLike = $relation instanceof HasOne || $relation instanceof MorphOne;
+        $relationIsBelongsToLike = $relation instanceof BelongsTo || $relation instanceof MorphTo;
+
+        if($relationIsHasOneLike || $relationIsBelongsToLike) {
+            // Only delete if the given value is truthy, since
+            // the client might use a variable and always pass the argument.
+            // Deleting when `false` is given seems wrong.
+            if($idOrIds) {
+                if($relationIsBelongsToLike) {
+                    $relation->dissociate();
+                    $relation->getParent()->save();
+                }
+
+                $relation->delete();
+            }
+        } else {
+            $related = $relation->make();
+            $related::destroy($idOrIds);
+        }
     }
 
     public function manipulateArgDefinition(

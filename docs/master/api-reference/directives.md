@@ -769,6 +769,28 @@ type Mutation {
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
 
+```graphql
+type Mutation {
+    updateUser(
+        id: Int
+        deleteTasks: [Int!]! @delete(relation: "tasks")
+    ): User @update
+}
+```
+
+If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or
+`MorphTo` relationship, you can just pass a Boolean instead of an ID, as there is only one
+possible model that can be deleted.
+
+```graphql
+type Mutation {
+    updateTask(
+        id: Int
+        deleteUser: Boolean @delete(relation: "user")
+    ): Task @update
+}
+```
+
 ## @deprecated
 
 You can mark fields as deprecated by adding the `@deprecated` directive and providing a
