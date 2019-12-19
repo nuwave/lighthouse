@@ -8,7 +8,7 @@ use Tests\Utils\Models\Task;
 
 class HasOneTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected $schema = /* @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
@@ -367,7 +367,7 @@ class HasOneTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             updateTask(input: {
                 id: 1
@@ -393,13 +393,13 @@ class HasOneTest extends DBTestCase
                     'name' => 'foo',
                     'post' => [
                         'id' => '1',
-                        'title' => 'bar'
+                        'title' => 'bar',
                     ],
                 ],
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         mutation {
             updateTask(input: {
                 id: 1
@@ -425,7 +425,7 @@ class HasOneTest extends DBTestCase
                     'name' => 'foobar',
                     'post' => [
                         'id' => '1',
-                        'title' => 'baz'
+                        'title' => 'baz',
                     ],
                 ],
             ],

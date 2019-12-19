@@ -99,12 +99,12 @@ SDL;
         $relationIsHasOneLike = $relation instanceof HasOne || $relation instanceof MorphOne;
         $relationIsBelongsToLike = $relation instanceof BelongsTo || $relation instanceof MorphTo;
 
-        if($relationIsHasOneLike || $relationIsBelongsToLike) {
+        if ($relationIsHasOneLike || $relationIsBelongsToLike) {
             // Only delete if the given value is truthy, since
             // the client might use a variable and always pass the argument.
             // Deleting when `false` is given seems wrong.
-            if($idOrIds) {
-                if($relationIsBelongsToLike) {
+            if ($idOrIds) {
+                if ($relationIsBelongsToLike) {
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
