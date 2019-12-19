@@ -90,7 +90,9 @@ SDL;
      */
     public function __invoke($parent, $idOrIds): void
     {
-        $relationName = $this->directiveArgValue('relation');
+        $relationName = $this->directiveArgValue('relation')
+            // Use the name of the argument if no explicit relation name is given
+            ?? $this->nodeName();
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
         $relation = $parent->{$relationName}();
 
