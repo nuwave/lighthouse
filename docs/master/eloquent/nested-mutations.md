@@ -1,7 +1,7 @@
 # Nested Mutations
 
 Lighthouse allows you to create, update or delete models and their associated relationships
-all in one single mutation.
+all in one single mutation. This is enabled by the [nested arg resolvers mechanism](../concepts/arg-resolvers.md).
 
 ## Return Types Required
 
@@ -51,30 +51,35 @@ the Post you want to create.
 ```graphql
 input CreatePostInput {
   title: String!
-  author: CreateAuthorRelation
+  author: CreateUserBelongsTo
 }
 ```
 
 The first argument `title` is a value of the `Post` itself and corresponds
 to a column in the database.
 
-The second argument `author`, exposes operations on the related `User` model.
-It has to be named just like the relationship method that is defined on the `Post` model.
+The second argument `author` is named just like the relationship method that is defined on the `Post` model.
+A nested `BelongsTo` relationship exposes the following operations:
+
+- `connect` it to an existing model
+- `create` a new related model and attach it
+- `update` an existing model and attach it
+- `upsert` a new or an existing model and attach it
+- `diconnect` the related model
+- `delete` the related model and the association to it
+
+Both `disconnect` and `delete` don't make much sense in the context of an update.
+You can control what operations are possible by defining just what you need in the `input`.
+We choose to expose the following operations on the related `User` model:
 
 ```graphql
-input CreateAuthorRelation {
+input CreateUserBelongsTo {
   connect: ID
   create: CreateUserInput
   update: UpdateUserInput
   upsert: UpsertUserInput
 }
 ```
-
-You can expose the following operations on a `BelongsTo` relationship when creating:
-- `connect` it to an existing model
-- `create` a new related model and attach it
-- `update` an existing model and attach it
-- `upsert` a new or an existing model and attach it
 
 Finally, you need to define the input that allows you to create a new `User`.
 
@@ -164,13 +169,14 @@ type Mutation {
 input UpdatePostInput {
   id: ID!
   title: String
-  author: UpdateAuthorRelation
+  author: UpdateUserBelongsTo
 }
 
-input UpdateAuthorRelation {
+input UpdateUserBelongsTo {
   connect: ID
   create: CreateUserInput
   update: UpdateUserInput
+  upsert: UpdateUserInput
   disconnect: Boolean
   delete: Boolean
 }
@@ -248,7 +254,7 @@ mutation UpdatePost($disconnectAuthor: Boolean){
 ## Has Many
 
 The counterpart to a `BelongsTo` relationship is `HasMany`. We will start
-of by defining a mutation to create an `User`.
+off by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
@@ -262,15 +268,15 @@ of the `User` itself and its associated `Post` models.
 ```graphql
 input CreateUserInput {
   name: String!
-  posts: CreatePostsRelation
+  posts: CreatePostsHasMany
 }
 ```
 
-Now, we can an operation that allows us to directly create new posts
+Now, we can expose an operation that allows us to directly create new posts
 right when we create the `User`.
 
 ```graphql
-input CreatePostsRelation {
+input CreatePostsHasMany {
   create: [CreatePostInput!]!
 }
 
@@ -279,7 +285,7 @@ input CreatePostInput {
 }
 ```
 
-You can now create a `User` and some posts with it in one request.
+We can now create a `User` and some posts with it in one request.
 
 ```graphql
 mutation {
@@ -335,10 +341,10 @@ type Mutation {
 input UpdateUserInput {
   id: ID!
   name: String
-  posts: UpdatePostsRelation
+  posts: UpdatePostsHasMany
 }
 
-input UpdatePostsRelation {
+input UpdatePostsHasMany {
   create: [CreatePostInput!]
   update: [UpdatePostInput!]
   upsert: [UpsertPostInput!]
@@ -405,10 +411,10 @@ type Mutation {
 
 input CreatePostInput {
   title: String!
-  authors: CreateAuthorRelation
+  authors: CreateAuthorBelongsToMany
 }
 
-input CreateAuthorRelation {
+input CreateAuthorBelongsToMany {
   create: [CreateAuthorInput!]
   upsert: [UpsertAuthorInput!]
   connect: [ID!]
@@ -504,20 +510,10 @@ mutation {
 }
 ```
 
-Updates on `BelongsToMany` relations may expose the following nested operations:
+Updates on `BelongsToMany` relations may expose additional nested operations:
 
 ```graphql
-type Mutation {
-  updatePost(input: UpdatePostInput! @spread): Post @update
-}
-
-input UpdatePostInput {
-  id: ID!
-  title: String
-  authors: UpdateAuthorRelation
-}
-
-input UpdateAuthorRelation {
+input UpdateAuthorBelongsToMany {
   create: [CreateAuthorInput!]
   connect: [ID!]
   update: [UpdateAuthorInput!]
@@ -526,20 +522,6 @@ input UpdateAuthorRelation {
   syncWithoutDetaching: [ID!]
   delete: [ID!]
   disconnect: [ID!]
-}
-
-input CreateAuthorInput {
-  name: String!
-}
-
-input UpdateAuthorInput {
-  id: ID!
-  name: String!
-}
-
-input UpsertAuthorInput {
-  id: ID!
-  name: String!
 }
 ```
 
@@ -571,7 +553,7 @@ input CreateHourInput {
   from: String
   to: String
   weekday: Int
-  hourable: CreateHourableOperations
+  hourable: CreateHourableMorphTo
 }
 
 input UpdateHourInput {
@@ -579,7 +561,7 @@ input UpdateHourInput {
   from: String
   to: String
   weekday: Int
-  hourable: UpdateHourableOperations
+  hourable: UpdateHourableMorphTo
 }
 
 input UpsertHourInput {
@@ -587,20 +569,20 @@ input UpsertHourInput {
   from: String
   to: String
   weekday: Int
-  hourable: UpsertHourableOperations
+  hourable: UpsertHourableMorphTo
 }
 
-input CreateHourableOperations {
+input CreateHourableMorphTo {
   connect: ConnectHourableInput
 }
 
-input UpdateHourableOperations {
+input UpdateHourableMorphTo {
   connect: ConnectHourableInput
   disconnect: Boolean
   delete: Boolean
 }
 
-input UpsertHourableOperations {
+input UpsertHourableMorphTo {
   connect: ConnectHourableInput
   disconnect: Boolean
   delete: Boolean
@@ -687,10 +669,10 @@ type Mutation {
 
 input CreateTaskInput {
   name: String!
-  tags: CreateTagRelation
+  tags: CreateTagMorphToMany
 }
 
-input CreateTagRelation {
+input CreateTagMorphToMany {
   create: [CreateTagInput!]
   upsert: [UpsertTagInput!]
   sync: [ID!]

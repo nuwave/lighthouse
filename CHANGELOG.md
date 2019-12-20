@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.7.2...master)
 
+### Added
+
+- Compose complex input arguments through nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+- Add `\Nuwave\Lighthouse\Support\Contracts\ArgResolver` directive interface https://github.com/nuwave/lighthouse/pull/899
+- Allow existing mutation directives `@create`, `@update`, `@upsert` and `@delete` to function
+  as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+
+### Changed
+
+- Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favour of modular nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
 ### Fixed
