@@ -28,7 +28,7 @@ class RulesDirectiveTest extends TestCase
             ];
         });
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /* @lang GraphQL */'
         type Query {
             foo(bar: String @rules(apply: ["required"])): User @mock
         }
@@ -82,7 +82,7 @@ class RulesDirectiveTest extends TestCase
     public function testCanValidateQueryRootFieldArguments(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 {
     foo {
         first_name
@@ -116,7 +116,7 @@ GRAPHQL)
             ])
             ->assertJson(
                 $this
-                    ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+                    ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 mutation {
     foo {
         first_name
@@ -130,7 +130,7 @@ GRAPHQL)
     public function testCanReturnValidFieldsAndErrorMessagesForInvalidFields(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "foo") {
         first_name
@@ -163,7 +163,7 @@ GRAPHQL)
             ])
             ->assertJson(
                 $this
-                    ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+                    ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "foo") {
         first_name
@@ -179,7 +179,7 @@ GRAPHQL)
     public function testCanValidateRootMutationFieldArgs(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 mutation {
     foo {
         first_name
@@ -196,7 +196,7 @@ GRAPHQL)
             ->assertJsonCount(1, 'errors')
             ->assertJson(
                 $this
-                    ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+                    ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 {
     foo {
         first_name
@@ -212,7 +212,7 @@ GRAPHQL)
     public function testCanValidateArrayType(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "got it") {
         input_object(
@@ -275,7 +275,7 @@ GRAPHQL)
     public function testCanReturnCorrectValidationForInputObjects(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "got it") {
         input_object(
@@ -326,7 +326,7 @@ GRAPHQL)
     public function testUsesCustomRuleClass(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
 mutation {
     withCustomRuleClass(
         rules: "baz"
