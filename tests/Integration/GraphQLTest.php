@@ -9,9 +9,9 @@ use Tests\Utils\Models\User;
 
 class GraphQLTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */'
     scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
     type User {
         id: ID!
         name: String!
@@ -20,7 +20,7 @@ class GraphQLTest extends DBTestCase
         updated_at: String!
         tasks: [Task!]! @hasMany
     }
-    
+
     type Task {
         id: ID!
         name: String!
@@ -28,11 +28,11 @@ class GraphQLTest extends DBTestCase
         updated_at: String!
         user: User! @belongsTo
     }
-    
+
     type Query {
         user: User @auth
     }
-    
+
     type Mutation {
         upload(file: Upload!): Boolean
     }
@@ -66,7 +66,7 @@ class GraphQLTest extends DBTestCase
 
     public function testResolvesQueryViaPostRequest(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         query UserWithTasks {
             user {
                 email
@@ -96,7 +96,7 @@ class GraphQLTest extends DBTestCase
         $this->getJson(
             'graphql?'
             .http_build_query(
-                ['query' => '
+                ['query' => /** @lang GraphQL */ '
                     query UserWithTasks {
                         user {
                             email
@@ -126,7 +126,7 @@ class GraphQLTest extends DBTestCase
     {
         $this->postGraphQL([
             [
-                'query' => '
+                'query' => /** @lang GraphQL */ '
                     {
                         user {
                             email
@@ -135,7 +135,7 @@ class GraphQLTest extends DBTestCase
                     ',
             ],
             [
-                'query' => '
+                'query' => /** @lang GraphQL */ '
                     {
                         user {
                             name
@@ -164,7 +164,7 @@ class GraphQLTest extends DBTestCase
     public function testResolvesNamedOperation(): void
     {
         $this->postGraphQL([
-            'query' => '
+            'query' => /** @lang GraphQL */ '
                 query User {
                     user {
                         email
@@ -206,7 +206,7 @@ class GraphQLTest extends DBTestCase
 
     public function testRejectsEmptyQuery(): void
     {
-        $this->graphQL('')
+        $this->graphQL(/** @lang GraphQL */ '')
              ->assertStatus(200)
              ->assertJson([
                  'errors' => [
@@ -222,7 +222,7 @@ class GraphQLTest extends DBTestCase
 
     public function testRejectsInvalidQuery(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             nonExistingField
         }
@@ -242,8 +242,8 @@ class GraphQLTest extends DBTestCase
     public function testIgnoresInvalidJSONVariables(): void
     {
         $result = $this->postGraphQL([
-            'query' => '{}',
-            'variables' => '{}',
+            'query' => /** @lang GraphQL */ '{}',
+            'variables' => /** @lang JSON */ '{}',
         ]);
 
         $result->assertStatus(200);
@@ -253,15 +253,13 @@ class GraphQLTest extends DBTestCase
     {
         $this->multipartGraphQL(
             [
-                'operations' => /* @lang JSON */
-                    '
+                'operations' => /* @lang JSON */ '
                     {
                         "query": "{ user { email } }",
                         "variables": {}
                     }
                 ',
-                'map' => /* @lang JSON */
-                    '{}',
+                'map' => /* @lang JSON */'{}',
             ],
             []
         )->assertJson([
@@ -280,8 +278,7 @@ class GraphQLTest extends DBTestCase
     {
         $this->multipartGraphQL(
             [
-                'operations' => /* @lang JSON */
-                    '
+                'operations' => /* @lang JSON */'
                     {
                         "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
                         "variables": {
@@ -289,8 +286,7 @@ class GraphQLTest extends DBTestCase
                         }
                     }
                 ',
-                'map' => /* @lang JSON */
-                    '
+                'map' => /* @lang JSON */'
                     {
                         "0": ["variables.file"]
                     }
@@ -313,8 +309,7 @@ class GraphQLTest extends DBTestCase
     {
         $this->multipartGraphQL(
             [
-                'operations' => /* @lang JSON */
-                    '
+                'operations' => /* @lang JSON */'
                     [
                         {
                             "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
@@ -330,8 +325,7 @@ class GraphQLTest extends DBTestCase
                         }
                     ]
                 ',
-                'map' => /* @lang JSON */
-                    '
+                'map' => /* @lang JSON */'
                     {
                         "0": ["0.variables.file"],
                         "1": ["1.variables.file"]
