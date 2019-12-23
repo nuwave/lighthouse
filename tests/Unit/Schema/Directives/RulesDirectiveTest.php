@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Rules\FooBarRule;
 
@@ -344,5 +345,15 @@ GRAPHQL)
                     FooBarRule::MESSAGE,
                 ],
             ]);
+    }
+
+    public function testRulesHaveToBeArray(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->buildSchema(/** @lang GraphQL */'
+        type Query {
+            foo(bar: ID @rules(apply: 123)): ID
+        }
+        ');
     }
 }
