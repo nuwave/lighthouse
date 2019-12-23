@@ -26,12 +26,12 @@ class RulesDirectiveTest extends TestCase
         }
 
         type Mutation {
-            foo(bar: String @rules(apply: [\"required\"])): User 
+            foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
-            
+
             withCustomRuleClass(
                 rules: String @rules(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
-                rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"]) 
+                rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
             ): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
         }

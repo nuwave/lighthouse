@@ -404,7 +404,7 @@ class ValidationTest extends DBTestCase
 
     public function testIgnoresTheUserWeAreUpdating(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */ '
         type Mutation {
             updateUser(
                 input: UpdateUserInput @spread
@@ -453,7 +453,7 @@ class ValidationTest extends DBTestCase
     {
         $this->markTestSkipped('Not implemented as of now as it would require a larger redo.');
 
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */ '
         type Mutation {
             createUser(
                 foo: String @rules(apply: ["max:5"])
@@ -492,7 +492,7 @@ class ValidationTest extends DBTestCase
         and Lighthouse uses those of the first directive.
         ');
 
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /* @lang GraphQL */ '
         type Mutation {
             createUser(
                 foo: String @rules(apply: ["max:5"]) @trim @rules(apply: ["min:4"])
@@ -520,6 +520,30 @@ class ValidationTest extends DBTestCase
             2,
             $result->jsonGet('errors.0.extensions.validation.foo')
         );
+    }
+
+    public function testCombinesArgumentValidationWhenGrouped(): void
+    {
+        $this->schema .= /* @lang GraphQL */ '
+        type Mutation {
+            withMergedRules(
+                bar: String @rules(apply: ["min:40"]) @customRules(apply: ["bool"])
+            ): User @create
+        }
+
+        type User {
+            id: ID
+            name: String
+        }
+        ';
+
+        $this->graphQL('
+        mutation {
+            withMergedRules(bar: "abcdefghijk") {
+                name
+            }
+        }
+        ')->assertJsonCount(2, 'errors.0.extensions.validation.bar');
     }
 
     /**
