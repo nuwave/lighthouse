@@ -89,7 +89,8 @@ class RulesDirectiveTest extends TestCase
         first_name
     }
 }
-GRAPHQL)
+GRAPHQL
+            )
             ->assertJson([
                 'errors' => [
                     [
@@ -123,7 +124,8 @@ mutation {
         first_name
     }
 }
-GRAPHQL)
+GRAPHQL
+                    )
                     ->jsonGet()
             );
     }
@@ -139,7 +141,8 @@ GRAPHQL)
         full_name
     }
 }
-GRAPHQL)
+GRAPHQL
+            )
             ->assertJson([
                 'data' => [
                     'foo' => [
@@ -172,7 +175,8 @@ GRAPHQL)
         full_name
     }
 }
-GRAPHQL)
+GRAPHQL
+                    )
                     ->jsonGet()
             );
     }
@@ -188,7 +192,8 @@ mutation {
         full_name
     }
 }
-GRAPHQL)
+GRAPHQL
+            )
             ->assertJson([
                 'data' => [
                     'foo' => null,
@@ -205,7 +210,8 @@ GRAPHQL)
         full_name
     }
 }
-GRAPHQL)
+GRAPHQL
+                    )
                     ->jsonGet()
             );
     }
@@ -233,7 +239,8 @@ GRAPHQL)
         first_name
     }
 }
-GRAPHQL)
+GRAPHQL
+            )
             ->assertJson([
                 'data' => [
                     'foo' => [
@@ -296,7 +303,8 @@ GRAPHQL)
         first_name
     }
 }
-GRAPHQL)
+GRAPHQL
+            )
             ->assertJson([
                 'data' => [
                     'foo' => [
@@ -336,7 +344,8 @@ mutation {
         first_name
     }
 }
-GRAPHQL)
+GRAPHQL
+            )
             ->assertJsonFragment([
                 'rules' => [
                     FooBarRule::MESSAGE,
