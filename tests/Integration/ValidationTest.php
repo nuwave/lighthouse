@@ -12,7 +12,7 @@ use Tests\Utils\Queries\Foo;
 
 class ValidationTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /* @lang GraphQL */'
     type Query {
         foo(
             email: String = "hans@peter.rudolf" @rules(apply: ["email"])
@@ -85,7 +85,7 @@ class ValidationTest extends DBTestCase
     public function testRunsValidationBeforeCallingTheResolver(): void
     {
         $shouldNotBeCalled = '@field(resolver: "'.$this->qualifyTestResolver('resolveDoNotCall').'")';
-        $this->schema = '
+        $this->schema = /* @lang GraphQL */'
         type Query {
             ensureThisWorks: String '.$shouldNotBeCalled.'
         }
@@ -100,14 +100,14 @@ class ValidationTest extends DBTestCase
         $this->assertSame(0, self::$callCount);
 
         // Sanity check to ensure the test works
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             ensureThisWorks
         }
         ');
         $this->assertSame(1, self::$callCount);
 
-        $response = $this->graphQL('
+        $response = $this->graphQL(/* @lang GraphQL */ '
         mutation {
             resolveDoNotCall
         }
@@ -127,7 +127,7 @@ class ValidationTest extends DBTestCase
 
     public function testValidatesDifferentPathsIndividually(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/* @lang GraphQL */ '
         {
             foo(
                 input: [
@@ -160,7 +160,7 @@ class ValidationTest extends DBTestCase
 
     public function testValidatesList(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/* @lang GraphQL */ '
         {
             foo(
                 list: [
@@ -182,7 +182,7 @@ class ValidationTest extends DBTestCase
 
     public function testValidatesInputCount(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/* @lang GraphQL */ '
         {
             foo(
                 stringList: [
@@ -220,7 +220,7 @@ class ValidationTest extends DBTestCase
 
     public function testPassesIfNothingRequiredIsMissing(): void
     {
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             foo(required: "foo")
         }
@@ -233,7 +233,7 @@ class ValidationTest extends DBTestCase
 
     public function testEvaluatesArgDirectivesInDefinitionOrder(): void
     {
-        $validPasswordResult = $this->graphQL('
+        $validPasswordResult = $this->graphQL(/* @lang GraphQL */ '
         {
             password(password: " 1234567 ")
         }
@@ -243,7 +243,7 @@ class ValidationTest extends DBTestCase
         $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
 
-        $invalidPasswordResult = $this->graphQL('
+        $invalidPasswordResult = $this->graphQL(/* @lang GraphQL */ '
         {
             password(password: " 1234 ")
         }
@@ -258,7 +258,7 @@ class ValidationTest extends DBTestCase
 
     public function testEvaluatesConditionalValidation(): void
     {
-        $validPasswordResult = $this->graphQL('
+        $validPasswordResult = $this->graphQL(/* @lang GraphQL */ '
         {
             password
         }
@@ -266,7 +266,7 @@ class ValidationTest extends DBTestCase
 
         $this->assertSame('no-password', $validPasswordResult->jsonGet('data.password'));
 
-        $invalidPasswordResult = $this->graphQL('
+        $invalidPasswordResult = $this->graphQL(/* @lang GraphQL */ '
         {
             password(id: "foo")
         }
@@ -281,7 +281,7 @@ class ValidationTest extends DBTestCase
 
     public function testEvaluatesInputArgValidation(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/* @lang GraphQL */ '
         {
             password(id: "bar", password: "123456")
         }
@@ -296,7 +296,7 @@ class ValidationTest extends DBTestCase
 
     public function testEvaluatesNonNullInputArgValidation(): void
     {
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             email(
                 userId: 1
@@ -312,7 +312,7 @@ class ValidationTest extends DBTestCase
             ],
         ]);
 
-        $invalidEmailResult = $this->graphQL('
+        $invalidEmailResult = $this->graphQL(/* @lang GraphQL */ '
         {
             email(
                 userId: 1
@@ -334,7 +334,7 @@ class ValidationTest extends DBTestCase
 
     public function testErrorsIfSomethingRequiredIsMissing(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/* @lang GraphQL */ '
         {
             foo
         }
@@ -379,7 +379,7 @@ class ValidationTest extends DBTestCase
             'name' => 'bar',
         ]);
 
-        $duplicateName = $this->graphQL('
+        $duplicateName = $this->graphQL(/* @lang GraphQL */ '
         mutation {
             updateUser(
                 input: {
@@ -426,7 +426,7 @@ class ValidationTest extends DBTestCase
 
         factory(User::class)->create(['name' => 'bar']);
 
-        $updateSelf = $this->graphQL('
+        $updateSelf = $this->graphQL(/* @lang GraphQL */ '
         mutation {
             updateUser(
                 input: {
@@ -506,7 +506,7 @@ class ValidationTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL('
+        $result = $this->graphQL(/* @lang GraphQL */ '
         mutation {
             createUser(
                 foo: "  ?!?  "

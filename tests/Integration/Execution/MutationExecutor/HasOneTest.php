@@ -8,52 +8,52 @@ use Tests\Utils\Models\Task;
 
 class HasOneTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /* @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
         post: Post @hasOne
     }
-    
+
     type Post {
         id: ID!
         title: String!
         body: String!
     }
-    
+
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
         upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
-    
+
     input CreateTaskInput {
         name: String!
         post: CreatePostRelation
     }
-    
+
     input CreatePostRelation {
         create: CreatePostInput
         upsert: UpsertPostInput
     }
-    
+
     input CreatePostInput {
         title: String!
     }
-    
+
     input UpdateTaskInput {
         id: ID!
         name: String
-        post: UpdatePostRelation
+        post: UpdatePostHasOne
     }
-    
-    input UpdatePostRelation {
+
+    input UpdatePostHasOne {
         create: CreatePostInput
         update: UpdatePostInput
         upsert: UpsertPostInput
         delete: ID
     }
-    
+
     input UpdatePostInput {
         id: ID!
         title: String
@@ -62,10 +62,10 @@ class HasOneTest extends DBTestCase
     input UpsertTaskInput {
         id: ID!
         name: String
-        post: UpsertPostRelation
+        post: UpsertPostHasOne
     }
 
-    input UpsertPostRelation {
+    input UpsertPostHasOne {
         create: CreatePostInput
         update: UpdatePostInput
         upsert: UpsertPostInput

@@ -8,27 +8,27 @@ class MultipleRequestsTest extends TestCase
 {
     public function testCanFireMultipleRequestsInOneTest(): void
     {
-        $this->schema = '
+        $this->schema = /* @lang GraphQL */'
         type Query {
             return(this: String!): String @field(resolver:"'.$this->qualifyTestResolver().'")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             return(this: "foo")
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'return' => 'foo',
             ],
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             return(this: "bar")
         }
-        ')->assertJson([
+        ')->assertExactJson([
            'data' => [
                'return' => 'bar',
            ],

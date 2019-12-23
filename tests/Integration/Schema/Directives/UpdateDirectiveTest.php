@@ -6,6 +6,7 @@ use Illuminate\Database\QueryException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class UpdateDirectiveTest extends DBTestCase
@@ -192,5 +193,71 @@ class UpdateDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame('Original', User::first()->name);
+    }
+
+    public function testNestedArgResolver(): void
+    {
+        factory(User::class)->create();
+        factory(Task::class)->create([
+            'id' => 3,
+        ]);
+
+        $this->schema .= /* @lang GraphQL */ '
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+        
+        type Task {
+            id: Int
+            name: String!
+        }
+        
+        type User {
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        input UpdateUserInput {
+            id: Int
+            name: String
+            updateTask: UpdateTaskInput @update(relation: "tasks")
+        }
+        
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        ';
+
+        $this->graphQL(/* @lang GraphQL */ '
+        mutation {
+            updateUser(input: {
+                id: 1
+                name: "foo"
+                updateTask: {
+                    id: 3
+                    name: "Uniq"
+                }
+            }) {
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => 3,
+                            'name' => 'Uniq',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

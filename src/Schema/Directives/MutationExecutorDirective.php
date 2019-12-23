@@ -5,14 +5,18 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
-abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective
+abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective, ArgResolver
 {
     /**
      * The database manager.
@@ -55,11 +59,11 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClass;
 
-                $executeMutation = function () use ($model, $args): Model {
+                $executeMutation = function () use ($model, $resolveInfo): Model {
                     return $this
                         ->executeMutation(
                             $model,
-                            new Collection($args)
+                            $resolveInfo->argumentSet
                         )
                         ->refresh();
                 };
@@ -77,13 +81,46 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     }
 
     /**
-     * Execute a mutation on a model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     *         An empty instance of the model that should be mutated.
-     * @param  \Illuminate\Support\Collection  $args
-     *         The corresponding slice of the input arguments for mutating this model.
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $args
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
      */
-    abstract protected function executeMutation(Model $model, Collection $args): Model;
+    public function __invoke($parent, $args)
+    {
+        $relationName = $this->directiveArgValue('relation')
+            // Use the name of the argument if no explicit relation name is given
+            ?? $this->nodeName();
+
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+        $relation = $parent->{$relationName}();
+        $related = $relation->make();
+
+        return $this->executeMutation($related, $args, $relation);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
+     */
+    protected function executeMutation(Model $model, $args, ?Relation $parentRelation = null)
+    {
+        $update = new ResolveNested($this->makeExecutionFunction($parentRelation));
+
+        return Utils::applyEach(
+            static function (ArgumentSet $argumentSet) use ($update, $model) {
+                return $update($model, $argumentSet);
+            },
+            $args
+        );
+    }
+
+    /**
+     * Prepare the execution function for a mutation on a model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return callable
+     */
+    abstract protected function makeExecutionFunction(?Relation $parentRelation = null): callable;
 }
