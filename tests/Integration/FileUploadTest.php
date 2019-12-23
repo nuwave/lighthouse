@@ -4,6 +4,7 @@ namespace Tests\Integration;
 
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
+use Tests\Utils\Queries\Foo;
 
 class FileUploadTest extends TestCase
 {
@@ -90,6 +91,26 @@ class FileUploadTest extends TestCase
                 'data' => [
                     'upload' => true,
                 ],
+            ],
+        ]);
+    }
+
+    public function testResolvesQueryViaMultipartRequest(): void
+    {
+        $this->multipartGraphQL(
+            [
+                'operations' => /* @lang JSON */ '
+                    {
+                        "query": "{ foo }",
+                        "variables": {}
+                    }
+                ',
+                'map' => /* @lang JSON */'{}',
+            ],
+            []
+        )->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
             ],
         ]);
     }
