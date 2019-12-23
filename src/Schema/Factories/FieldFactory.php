@@ -332,12 +332,12 @@ class FieldFactory
         }
     }
 
-    protected function gatherValidationDirectives(Collection $directives)
+    protected function gatherValidationDirectives(Collection &$directives): Collection
     {
         // We only get the validator directives that are directly following on the latest validator
         // directive. If we'd get all validator directives and merge them together, it wouldn't
         // be possible anymore to mutate the input with argument transformer directives.
-        $validators = collect();
+        $validators = new Collection();
         while ($directive = $directives->first()) {
             if ($directive instanceof ProvidesRules) {
                 $validators->push($directives->shift());
