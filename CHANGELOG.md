@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Nuwave\Lighthouse\Support\Contracts\ArgResolver` directive interface https://github.com/nuwave/lighthouse/pull/899
 - Allow existing mutation directives `@create`, `@update`, `@upsert` and `@delete` to function
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+- Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
 
 ### Changed
 
