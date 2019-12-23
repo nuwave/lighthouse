@@ -7,13 +7,13 @@ use Tests\TestCase;
 
 class FileUploadTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */'
+    protected $schema = /* @lang GraphQL */'
     scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
 
     type Mutation {
         upload(file: Upload!): Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     /**
      * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
