@@ -94,7 +94,7 @@ SDL;
     ) {
         $rules = $this->directiveArgValue('apply');
 
-        if(!is_array($rules)) {
+        if (! is_array($rules)) {
             throw new DefinitionException("The apply argument of @rules on has to be an array, got: {$rules}");
         }
     }
