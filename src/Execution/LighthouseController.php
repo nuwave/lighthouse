@@ -2,96 +2,88 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use GraphQL\Error\InvariantViolation;
-use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
-use GraphQL\Server\RequestError;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
+use Laragraph\LaravelGraphQLUtils\RequestParser;
+use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Nuwave\Lighthouse\Support\Utils;
 
 class LighthouseController
 {
     /**
-     * @var \GraphQL\Server\Helper
+     * @var \Nuwave\Lighthouse\GraphQL
      */
-    protected $helper;
+    protected $graphQL;
 
-    public function __construct()
-    {
-        $this->helper = new Helper();
+    /**
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $eventsDispatcher;
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesResponse
+     */
+    protected $createsResponse;
+
+    /**
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
+    /**
+     * @var \Laragraph\LaravelGraphQLUtils\RequestParser
+     */
+    protected $requestParser;
+
+    /**
+     * Inject middleware into request.
+     *
+     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesResponse  $createsResponse
+     * @param  \Illuminate\Container\Container  $container
+     * @param  \Laragraph\LaravelGraphQLUtils\RequestParser  $requestParser
+     */
+    public function __construct(
+        GraphQL $graphQL,
+        EventsDispatcher $eventsDispatcher,
+        CreatesResponse $createsResponse,
+        Container $container,
+        RequestParser $requestParser
+    ) {
+        $this->graphQL = $graphQL;
+        $this->eventsDispatcher = $eventsDispatcher;
+        $this->createsResponse = $createsResponse;
+        $this->container = $container;
+        $this->requestParser = $requestParser;
     }
 
     public function __invoke(Request $request)
     {
+        $operationParams = $this->requestParser->parseRequest($request);
+
+        $result = Utils::applyEach(
+            function (OperationParams $operationParams) {
+                return $this->graphQL->executeOperation($operationParams);
+            },
+            $operationParams
+        );
+
+        $response = $this->createsResponse->createResponse($result);
+
+        // When handling multiple requests during the application lifetime,
+        // for example in tests, we need a new GraphQLRequest instance
+        // for each HTTP request, so we forget the singleton here.
+        $this->container->forgetInstance(GraphQLRequest::class);
+
+        return $response;
+
         $operationParams = $this->parseRequest($request);
     }
 
-    /**
-     * Converts an incoming HTTP request to one or more OperationParams.
-     *
-     * @return OperationParams[]|OperationParams
-     *
-     * @throws RequestError
-     */
-    protected function parseRequest(Request $request)
-    {
-        if ($request->isMethod('GET')) {
-            $bodyParams = [];
-        } else {
-            $contentType = $request->header('content-type');
 
-            if (empty($contentType)) {
-                throw new RequestError('Missing "Content-Type" header.');
-            }
-
-            if ($contentType === 'application/graphql') {
-                $bodyParams = ['query' => $request->getContent()];
-            } elseif ($contentType === 'multipart/form-data') {
-                $bodyParams = $this->inlineFiles($request);
-            } else {
-                // In all other cases, we assume we are given JSON encoded input
-                $bodyParams = \Safe\json_decode($request->getContent(), true);
-            }
-        }
-
-        return $this->helper->parseRequestParams(
-            $request->getMethod(),
-            $bodyParams,
-            $request->query()
-        );
-    }
-
-    /**
-     * Inline file uploads given through a multipart request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed[]
-     */
-    protected function inlineFiles(Request $request): array
-    {
-        $jsonInput = \Safe\json_decode($request->getContent(), true);
-
-        if (! isset($jsonInput['map'])) {
-            throw new InvariantViolation(
-                'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
-            );
-        }
-
-        $bodyParams = $jsonInput['operations'];
-
-        /**
-         * @var string
-         * @var string[] $operationsPaths
-         */
-        foreach ($jsonInput['map'] as $fileKey => $operationsPaths) {
-            $file = $request->file($fileKey);
-
-            /** @var string $operationsPath */
-            foreach ($operationsPaths as $operationsPath) {
-                Arr::set($operations, $operationsPath, $file);
-            }
-        }
-
-        return $bodyParams;
-    }
 }
