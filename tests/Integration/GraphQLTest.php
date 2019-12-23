@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 
 class GraphQLTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */'
+    protected $schema = /* @lang GraphQL */'
     scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
 
     type User {
@@ -66,7 +66,7 @@ class GraphQLTest extends DBTestCase
 
     public function testResolvesQueryViaPostRequest(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/* @lang GraphQL */ '
         query UserWithTasks {
             user {
                 email
@@ -96,7 +96,7 @@ class GraphQLTest extends DBTestCase
         $this->getJson(
             'graphql?'
             .http_build_query(
-                ['query' => /** @lang GraphQL */ '
+                ['query' => /* @lang GraphQL */ '
                     query UserWithTasks {
                         user {
                             email
@@ -126,7 +126,7 @@ class GraphQLTest extends DBTestCase
     {
         $this->postGraphQL([
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /* @lang GraphQL */ '
                     {
                         user {
                             email
@@ -135,7 +135,7 @@ class GraphQLTest extends DBTestCase
                     ',
             ],
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /* @lang GraphQL */ '
                     {
                         user {
                             name
@@ -164,7 +164,7 @@ class GraphQLTest extends DBTestCase
     public function testResolvesNamedOperation(): void
     {
         $this->postGraphQL([
-            'query' => /** @lang GraphQL */ '
+            'query' => /* @lang GraphQL */ '
                 query User {
                     user {
                         email
@@ -206,7 +206,7 @@ class GraphQLTest extends DBTestCase
 
     public function testRejectsEmptyQuery(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '')
+        $this->graphQL(/* @lang GraphQL */ '')
              ->assertStatus(200)
              ->assertJson([
                  'errors' => [
@@ -222,7 +222,7 @@ class GraphQLTest extends DBTestCase
 
     public function testRejectsInvalidQuery(): void
     {
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/* @lang GraphQL */ '
         {
             nonExistingField
         }
@@ -242,8 +242,8 @@ class GraphQLTest extends DBTestCase
     public function testIgnoresInvalidJSONVariables(): void
     {
         $result = $this->postGraphQL([
-            'query' => /** @lang GraphQL */ '{}',
-            'variables' => /** @lang JSON */ '{}',
+            'query' => /* @lang GraphQL */ '{}',
+            'variables' => /* @lang JSON */ '{}',
         ]);
 
         $result->assertStatus(200);
