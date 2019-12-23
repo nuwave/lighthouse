@@ -10,8 +10,6 @@ use Tests\Utils\Models\User;
 class GraphQLTest extends DBTestCase
 {
     protected $schema = /* @lang GraphQL */'
-    scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-
     type User {
         id: ID!
         name: String!
@@ -31,10 +29,6 @@ class GraphQLTest extends DBTestCase
 
     type Query {
         user: User @auth
-    }
-
-    type Mutation {
-        upload(file: Upload!): Boolean
     }
     ';
 
@@ -266,85 +260,6 @@ class GraphQLTest extends DBTestCase
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
-     */
-    public function testResolvesUploadViaMultipartRequest(): void
-    {
-        $this->multipartGraphQL(
-            [
-                'operations' => /* @lang JSON */'
-                    {
-                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
-                        "variables": {
-                            "file": null
-                        }
-                    }
-                ',
-                'map' => /* @lang JSON */'
-                    {
-                        "0": ["variables.file"]
-                    }
-                ',
-            ],
-            [
-                '0' => UploadedFile::fake()->create('image.jpg', 500),
-            ]
-        )->assertJson([
-            'data' => [
-                'upload' => true,
-            ],
-        ]);
-    }
-
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching.
-     */
-    public function testResolvesUploadViaBatchedMultipartRequest(): void
-    {
-        $this->multipartGraphQL(
-            [
-                'operations' => /* @lang JSON */'
-                    [
-                        {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
-                            "variables": {
-                                "file": null
-                            }
-                        },
-                        {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file)} ",
-                            "variables": {
-                                "file": null
-                            }
-                        }
-                    ]
-                ',
-                'map' => /* @lang JSON */'
-                    {
-                        "0": ["0.variables.file"],
-                        "1": ["1.variables.file"]
-                    }
-                ',
-            ],
-            [
-                '0' => UploadedFile::fake()->create('image.jpg', 500),
-                '1' => UploadedFile::fake()->create('image.jpg', 500),
-            ]
-        )->assertJson([
-            [
-                'data' => [
-                    'upload' => true,
-                ],
-            ],
-            [
-                'data' => [
-                    'upload' => true,
                 ],
             ],
         ]);
