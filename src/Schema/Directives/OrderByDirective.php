@@ -77,8 +77,9 @@ SDL;
                 .'.type'
                 // input objects
                 .'.type.name.value'
-                // that are exactly of type
-            ) !== 'OrderByClause'
+            )
+            // that are exactly of type
+            !== 'OrderByClause'
         ) {
             throw new DefinitionException(
               "Must define the argument type of {$argDefinition->name->value} on field {$parentField->name->value} as [OrderByClause!]."
