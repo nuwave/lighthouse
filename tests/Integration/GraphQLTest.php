@@ -129,11 +129,11 @@ class GraphQLTest extends TestCase
     public function testHandlesErrorInResolver(): void
     {
         $message = 'foo';
-        $this->mockResolver(function() use ($message) {
+        $this->mockResolver(function () use ($message) {
             throw new Error($message);
         });
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /* @lang GraphQL */'
         type Query {
             foo: ID @mock
         }
@@ -152,10 +152,9 @@ class GraphQLTest extends TestCase
                 'errors' => [
                     [
                         'message' => $message,
-                    ]
-                ]
-            ])
-        ;
+                    ],
+                ],
+            ]);
     }
 
     public function testIgnoresInvalidJSONVariables(): void
