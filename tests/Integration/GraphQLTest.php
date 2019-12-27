@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use GraphQL\Error\Error;
 use Tests\TestCase;
 use Tests\Utils\Queries\Bar;
 use Tests\Utils\Queries\Foo;
@@ -107,11 +108,12 @@ class GraphQLTest extends TestCase
 
     public function testRejectsInvalidQuery(): void
     {
-        $result = $this->graphQL(/* @lang GraphQL */ '
-        {
-            nonExistingField
-        }
-        ');
+        $result = $this
+            ->graphQL(/* @lang GraphQL */ '
+            {
+                nonExistingField
+            }
+            ');
 
         // TODO remove as we stop supporting Laravel 5.5/PHPUnit 6
         $assertContains = method_exists($this, 'assertStringContainsString')
@@ -122,6 +124,38 @@ class GraphQLTest extends TestCase
             'nonExistingField',
             $result->jsonGet('errors.0.message')
         );
+    }
+
+    public function testHandlesErrorInResolver(): void
+    {
+        $message = 'foo';
+        $this->mockResolver(function() use ($message) {
+            throw new Error($message);
+        });
+
+        $this->schema = /** @lang GraphQL */'
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/* @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => null,
+                ],
+                'errors' => [
+                    [
+                        'message' => $message,
+                    ]
+                ]
+            ])
+        ;
     }
 
     public function testIgnoresInvalidJSONVariables(): void
