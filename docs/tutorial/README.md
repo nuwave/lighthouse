@@ -190,7 +190,7 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('author_id');
             $table->string('title');
             $table->string('content');
             $table->timestamps();
@@ -278,7 +278,7 @@ class User extends Authenticatable
 
     public function posts(): HasMany
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(Post::class, 'author_id');
     }
 }
 ```
