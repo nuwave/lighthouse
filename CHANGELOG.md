@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favour of modular nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+- Implement the `name()` function generically in the BaseDirective class https://github.com/nuwave/lighthouse/pull/1098
 
 ### Fixed
 
