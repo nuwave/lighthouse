@@ -2786,6 +2786,12 @@ enum Operator {
     LTE @enum(value: "<=")
     LIKE @enum(value: "LIKE")
     NOT_LIKE @enum(value: "NOT_LIKE")
+    IN @enum(value: "In")
+    NOT_IN @enum(value: "NotIn")
+    BETWEEN @enum(value: "Between")
+    NOT_BETWEEN @enum(value: "NotBetween")
+    NOT_NULL @enum(value: "NotNull")
+    IS_NULL @enum(value: "Null")
 }
 ```
 
@@ -2814,8 +2820,14 @@ that gets actors over age 37 who either have red hair or are at least 150cm.
             {
               OR: [
                 { column: HAIRCOLOUR, value: "red" }
-                { column: HEIGHT, operator: GTE, value: 150 }
-              ]
+                { column: HEIGHT, operator: GTE, value: 150 },
+              ],
+              OR: [
+                { column: HAIRCOLOUR, operator: IS_NULL,  value: "" }
+              ],
+              AND: [
+                { column: EYES, operator: IN,  value: ["blue", "brown", "aqua"] }
+              ],
             }
           ]
         }

@@ -8,6 +8,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Str;
+use MLL\GraphQLScalars\Mixed;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -104,14 +105,78 @@ SDL;
                 ? 'orWhere'
                 : 'where';
 
-            $builder->{$where}(
-                $column,
-                $whereConstraints['operator'],
-                $whereConstraints['value']
-            );
+            $args[] = $whereConstraints['column'];
+            $arity = $this->getOperatorArity($whereConstraints['operator']);
+            if($arity <= 2) {
+                $where .= $whereConstraints['operator'];
+            }
+            else {
+                $args[] = $whereConstraints['operator'];
+            }
+
+            if($arity > 1) {
+                $whereConstraints = $this->parseValues($whereConstraints);
+                $args[] = $whereConstraints['value'];
+            }
+
+            return call_user_func_array([$builder, $where], $args);
         }
 
         return $builder;
+    }
+
+    protected function getOperatorArity(string $operator): string
+    {
+        if(in_array($operator, ['In', 'NotIn', 'Null', 'NotNull', 'Between', 'NotBetween'])) {
+            return \Safe\preg_match('/Null/', $operator)
+                ? 1
+                : 2;
+        }
+
+        return 3;
+    }
+
+    protected function parseValues(array $whereConstraints): array
+    {
+        $whereConstraints['value'] = $this->sanitize($whereConstraints['value']);
+
+        if(in_array($whereConstraints['operator'], ['In', 'NotIn', 'Between', 'NotBetween']) &&
+            !is_array($whereConstraints['value'])
+        ) {
+            throw new Error(
+                sprintf("The value for %s is wrong!", strtoupper($whereConstraints['operator']))
+            );
+        }
+
+        return $whereConstraints;
+    }
+
+    protected function sanitize($data)
+    {
+        if (is_object($data)) {
+            $data = (array) $data;
+        }
+
+        if (is_array($data)) {
+            foreach ($data as $k => $item) {
+                if (is_array($item)) {
+                    $data[$k] = $this->sanitize($item);
+                }
+                elseif (is_object($item)) {
+
+                    $data[$k] = $this->sanitize($item);
+                }
+                elseif(is_string($item)) {
+                    $data[$k] = htmlspecialchars(trim($item), ENT_QUOTES);
+                }
+            }
+        }
+
+        if(is_string($data)) {
+            $data = htmlspecialchars($data, ENT_QUOTES);
+        }
+
+        return $data;
     }
 
     public static function missingValueForColumn(string $column): string
