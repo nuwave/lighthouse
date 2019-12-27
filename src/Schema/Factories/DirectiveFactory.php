@@ -208,7 +208,7 @@ class DirectiveFactory
             ->map(function (DirectiveNode $directiveNode) use ($node): Directive {
                 $directive = $this->create($directiveNode->name->value);
 
-                if($directive instanceof BaseDirective) {
+                if ($directive instanceof BaseDirective) {
                     $directive->hydrate($directiveNode, $node);
                 }
 
