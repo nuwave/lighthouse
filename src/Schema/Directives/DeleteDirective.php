@@ -18,16 +18,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective, ArgResolver, ArgManipulator
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'delete';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

@@ -17,18 +17,7 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
-    const NAME = 'whereConstraints';
     const INVALID_COLUMN_MESSAGE = 'Column names may contain only alphanumerics or underscores, and may not begin with a digit.';
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
 
     public static function definition(): string
     {

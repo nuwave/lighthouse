@@ -26,16 +26,6 @@ class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDi
         $this->eventsDispatcher = $eventsDispatcher;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'event';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
@@ -44,7 +34,7 @@ Fire an event after a mutation has taken place.
 It requires the `dispatch` argument that should be
 the class name of the event you want to fire.
 """
-directive @event(  
+directive @event(
   """
   Specify the fully qualified class name (FQCN) of the event to dispatch.
   """

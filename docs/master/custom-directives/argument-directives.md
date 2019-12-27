@@ -27,18 +27,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective implements ArgTransformerDirective, DefinedDirective
+class TrimDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
 {
-    /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'trim';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
@@ -148,16 +138,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'eq';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
@@ -245,16 +225,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ModelArgsDirective extends BaseDirective implements ArgManipulator, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'typeToInput';
-    }
-
     /**
      * SDL definition of the directive.
      *

@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class BuilderDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'builder';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

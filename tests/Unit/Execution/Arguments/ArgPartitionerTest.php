@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
@@ -65,13 +66,9 @@ class ArgPartitionerTest extends TestCase
     }
 }
 
-class Nested implements ArgResolver, Directive
+class Nested extends BaseDirective implements ArgResolver, Directive
 {
     public function __invoke($root, $args)
-    {
-    }
-
-    public function name()
     {
     }
 }

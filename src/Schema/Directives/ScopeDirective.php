@@ -9,11 +9,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ScopeDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    public function name()
-    {
-        return 'scope';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

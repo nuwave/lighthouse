@@ -38,7 +38,7 @@ class DirectiveFactory
     protected $directiveNamespaces;
 
     /**
-     * @var DirectiveNamespacer
+     * @var \Nuwave\Lighthouse\Schema\DirectiveNamespacer
      */
     protected $directiveNamespacer;
 
@@ -57,17 +57,12 @@ class DirectiveFactory
      * Create a directive by the given directive name.
      *
      * @param  string  $directiveName
-     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode|null  $definitionNode
      * @return \Nuwave\Lighthouse\Support\Contracts\Directive
      */
-    public function create(string $directiveName, $definitionNode = null): Directive
+    public function create(string $directiveName): Directive
     {
-        $directive = $this->resolve($directiveName)
+        return $this->resolve($directiveName)
             ?? $this->createOrFail($directiveName);
-
-        return $definitionNode
-            ? $this->hydrate($directive, $definitionNode)
-            : $directive;
     }
 
     /**
@@ -98,7 +93,7 @@ class DirectiveFactory
         }
 
         foreach ($this->directiveNamespaces as $baseNamespace) {
-            $className = $baseNamespace.'\\'.Str::studly($directiveName).'Directive';
+            $className = $baseNamespace.'\\'.static::className($directiveName);
             if (class_exists($className)) {
                 $directive = app($className);
 
@@ -116,7 +111,33 @@ class DirectiveFactory
     }
 
     /**
-     * @deprecated use the RegisterDirectiveNamespaces instead, will be removed as of v5
+     * Returns the expected class name for a directive name.
+     *
+     * @param  string  $directiveName
+     * @return string
+     */
+    protected static function className(string $directiveName): string
+    {
+        return Str::studly($directiveName).'Directive';
+    }
+
+    /**
+     * Returns the expected directive name for a class name.
+     *
+     * @param  string  $className
+     * @return string
+     */
+    public static function directiveName(string $className): string
+    {
+        $baseName = basename(str_replace('\\', '/', $className));
+
+        return lcfirst(
+            Str::before($baseName, 'Directive')
+        );
+    }
+
+    /**
+     * @deprecated use the RegisterDirectiveNamespaces event instead, this method will be removed as of v5
      * @see \Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces
      *
      * @param  string  $directiveName
@@ -149,7 +170,7 @@ class DirectiveFactory
     }
 
     /**
-     * @deprecated
+     * @deprecated will be removed as of v5
      * @return $this
      */
     public function clearResolved(): self
@@ -157,20 +178,6 @@ class DirectiveFactory
         $this->resolvedClassnames = [];
 
         return $this;
-    }
-
-    /**
-     * Set the given definition on the directive.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\Directive  $directive
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive
-     */
-    protected function hydrate(Directive $directive, Node $node): Directive
-    {
-        return $directive instanceof BaseDirective
-            ? $directive->hydrate($node)
-            : $directive;
     }
 
     /**
@@ -198,8 +205,14 @@ class DirectiveFactory
     public function createAssociatedDirectives(Node $node): Collection
     {
         return (new Collection($node->directives))
-            ->map(function (DirectiveNode $directive) use ($node): Directive {
-                return $this->create($directive->name->value, $node);
+            ->map(function (DirectiveNode $directiveNode) use ($node): Directive {
+                $directive = $this->create($directiveNode->name->value);
+
+                if($directive instanceof BaseDirective) {
+                    $directive->hydrate($directiveNode, $node);
+                }
+
+                return $directive;
             });
     }
 

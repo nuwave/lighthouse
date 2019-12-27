@@ -25,7 +25,7 @@ class BaseDirectiveTest extends TestCase
 {
     public function testGetsModelClassFromDirective(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type User @modelClass(class: "Team") {
             id: ID
         }
@@ -39,9 +39,19 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
+    public function testGetsNameFromDirective(): void
+    {
+        $directive = $this->constructFieldDirective('foo: ID @dummy');
+
+        $this->assertSame(
+            'dummy',
+            $directive->name()
+        );
+    }
+
     public function testDefaultsToFieldTypeForTheModelClass(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type User {
             id: ID
         }
@@ -65,7 +75,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testThrowsIfTheClassIsNotAModel(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Exception {
             id: ID
         }
@@ -79,7 +89,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testResolvesAModelThatIsNamedLikeABaseClass(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Closure {
             id: ID
         }
@@ -95,7 +105,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testPrefersThePrimaryModelNamespace(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Category {
             id: ID
         }
@@ -111,7 +121,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testAllowsOverwritingTheDefaultModel(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type OnlyHere {
             id: ID
         }
@@ -127,7 +137,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testResolvesFromTheSecondaryModelNamespace(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type OnlyHere {
             id: ID
         }
@@ -158,16 +168,6 @@ class BaseDirectiveTest extends TestCase
     {
         $directive = new class extends BaseDirective {
             /**
-             * Name of the directive.
-             *
-             * @return string
-             */
-            public function name(): string
-            {
-                return 'dummy';
-            }
-
-            /**
              * Allow to call protected methods from the test.
              *
              * @param  string  $method
@@ -180,7 +180,10 @@ class BaseDirectiveTest extends TestCase
             }
         };
 
-        $directive->hydrate($definitionNode);
+        $directive->hydrate(
+            $definitionNode->directives[0],
+            $definitionNode
+        );
 
         return $directive;
     }

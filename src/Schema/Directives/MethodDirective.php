@@ -10,16 +10,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MethodDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'method';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

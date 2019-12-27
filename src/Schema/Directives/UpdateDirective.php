@@ -8,11 +8,6 @@ use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 
 class UpdateDirective extends MutationExecutorDirective
 {
-    public function name(): string
-    {
-        return 'update';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

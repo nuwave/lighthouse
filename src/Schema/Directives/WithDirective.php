@@ -15,16 +15,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class WithDirective extends RelationDirective implements FieldMiddleware, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'with';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

@@ -134,16 +134,6 @@ use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
 class UpdateUserValidationDirective extends ValidationDirective
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'updateUserValidation';
-    }
-
-    /**
      * @return mixed[]
      */
     public function rules(): array
