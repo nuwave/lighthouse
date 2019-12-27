@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
+class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
 {
     public static function definition(): string
     {
