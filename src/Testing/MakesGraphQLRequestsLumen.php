@@ -18,7 +18,7 @@ trait MakesGraphQLRequestsLumen
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var $this|null
+     * @var|null
      */
     protected $introspectionResult;
 
