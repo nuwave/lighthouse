@@ -5,6 +5,6 @@ This document provides guidance for upgrading between major versions of Lighthou
 ## General tips
 
 The configuration options often change between major versions.
-Compare your `lighthouse.php` against the latest [default configuration](config/config.php).
+Compare your `lighthouse.php` against the latest [default configuration](src/lighthouse.php).
 
 ## v4 to v5
