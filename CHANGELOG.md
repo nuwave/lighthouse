@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Nuwave\Lighthouse\Support\Contracts\ArgResolver` directive interface https://github.com/nuwave/lighthouse/pull/899
 - Allow existing mutation directives `@create`, `@update`, `@upsert` and `@delete` to function
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+- Add `@guard` directive to handle authentication
 
 ### Changed
 
@@ -21,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Enable chained rule provider directives (`ProvidesRules`) to merge the rules before validating https://github.com/nuwave/lighthouse/pull/1082
+
+### Deprecated
+
+- Deprecated the `@middleware` directive, as it violates the boundary between HTTP and GraphQL
+  request handling. Use `@guard` or other field middleware directives instead.
 
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
