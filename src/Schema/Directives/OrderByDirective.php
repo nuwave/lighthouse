@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
+class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -31,7 +31,13 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
 """
 Sort a result list by one or more given fields.
 """
-directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @orderBy(
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    """
+    columns: [String!]
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -94,5 +100,9 @@ SDL;
               "Must define the argument type of {$argDefinition->name->value} on field {$parentField->name->value} as [OrderByClause!]."
             );
         }
+
+        $allowedColumns = $this->directiveArgValue('columns');
+
+
     }
 }

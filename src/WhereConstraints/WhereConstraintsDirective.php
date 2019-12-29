@@ -140,7 +140,6 @@ SDL;
         }
 
         $restrictedWhereConstraintsName = $this->restrictedWhereConstraintsName($argDefinition, $parentField);
-
         $argDefinition->type = PartialParser::namedType($restrictedWhereConstraintsName);
 
         $allowedColumnsEnumName = $this->allowedColumnsEnumName($argDefinition, $parentField);
@@ -159,22 +158,6 @@ SDL;
     }
 
     /**
-     * Create the name for the Enum that holds the allowed columns.
-     *
-     * @example FieldNameArgNameColumn
-     *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @return string
-     */
-    protected function allowedColumnsEnumName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
-    {
-        return Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value)
-            .'Column';
-    }
-
-    /**
      * Create the name for the restricted WhereConstraints input.
      *
      * @example FieldNameArgNameWhereConstraints
@@ -188,6 +171,22 @@ SDL;
         return Str::studly($parentField->name->value)
             .Str::studly($argDefinition->name->value)
             .'WhereConstraints';
+    }
+
+    /**
+     * Create the name for the Enum that holds the allowed columns.
+     *
+     * @example FieldNameArgNameColumn
+     *
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
+     * @return string
+     */
+    protected function allowedColumnsEnumName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
+    {
+        return Str::studly($parentField->name->value)
+            .Str::studly($argDefinition->name->value)
+            .'Column';
     }
 
     /**
