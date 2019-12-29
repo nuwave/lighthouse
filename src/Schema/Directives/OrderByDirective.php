@@ -102,7 +102,5 @@ SDL;
         }
 
         $allowedColumns = $this->directiveArgValue('columns');
-
-
     }
 }

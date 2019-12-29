@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
-class WhereConstraintsServiceProvider extends ServiceProvider
+class OrderByServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
