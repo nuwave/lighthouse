@@ -37,3 +37,102 @@ You may overwrite this by passing a `callable` to `\GraphQL\Executor\Executor::s
 
 When the field is defined on the root `Subscription` type, the [`\Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesSubscriptionResolver.php)
 interface is used instead.
+
+## Use a custom `GraphQLContext`
+
+The context is the third argument of any resolver function.
+
+You may replace the default `\Nuwave\Lighthouse\Schema\Context` with your own
+implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+The following example is just a starting point of what you can do:
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Schema;
+
+use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class MyContext implements GraphQLContext
+{
+    /**
+     * An instance of the incoming HTTP request.
+     *
+     * @var \Illuminate\Http\Request
+     */
+    public $request;
+
+    /**
+     * Create new context.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * Get instance of request.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
+    }
+
+    /**
+     * Get instance of authenticated user.
+     *
+     * May be null since some fields may be accessible without authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    public function user()
+    {
+        // TODO implement yourself
+    }
+}
+```
+
+You need a factory that creates an instance of `\Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+This factory class needs to implement `\Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
+
+```php
+<?php
+
+namespace App;
+
+use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class MyContextFactory implements CreatesContext
+{
+    /**
+     * Generate GraphQL context.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
+     */
+    public function generate(Request $request): GraphQLContext
+    {
+        return new MyContext($request);
+    }
+}
+```
+
+Rebind the interface in a service provider (e.g. your `AppServiceProvider` or a new `GraphQLServiceProvider`):
+
+```php
+public function register()
+{
+    $this->app->bind(
+        \Nuwave\Lighthouse\Support\Contracts\CreatesContext::class,
+        \App\MyContextFactory::class
+    );
+}
+```
