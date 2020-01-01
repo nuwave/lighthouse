@@ -188,7 +188,7 @@ class HasOneTest extends DBTestCase
 
     public function testCanCreateAndConnectHasOne(): void
     {
-        factory(Post::class)->create(['title' => 'bar'])->save();
+        factory(Post::class)->create(['title' => 'bar']);
 
         $this->graphQL('
         mutation {
@@ -405,7 +405,7 @@ class HasOneTest extends DBTestCase
      */
     public function testCanUpdateAndConnectHasOne(string $action): void
     {
-        factory(Post::class)->create();
+        factory(Post::class)->create(['title' => 'bar']);
 
         $this->graphQL("
         mutation {
