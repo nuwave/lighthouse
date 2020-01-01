@@ -4,7 +4,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\Task;
+use Tests\Utils\Models\Task ;
 
 class HasOneTest extends DBTestCase
 {
@@ -35,6 +35,7 @@ class HasOneTest extends DBTestCase
     input CreatePostRelation {
         create: CreatePostInput
         upsert: UpsertPostInput
+        connect: ID
     }
 
     input CreatePostInput {
@@ -52,6 +53,7 @@ class HasOneTest extends DBTestCase
         update: UpdatePostInput
         upsert: UpsertPostInput
         delete: ID
+        connect: ID
     }
 
     input UpdatePostInput {
@@ -70,6 +72,7 @@ class HasOneTest extends DBTestCase
         update: UpdatePostInput
         upsert: UpsertPostInput
         delete: ID
+        connect: ID
     }
 
     input UpsertPostInput {
@@ -172,6 +175,40 @@ class HasOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateAndConnectHasOne(): void
+    {
+        factory(Post::class)->create(['title' => 'bar'])->save();
+
+        $this->graphQL('
+        mutation {
+            createTask(input: {
+                name: "foo"
+                post: {
+                    connect: 1
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
@@ -358,6 +395,44 @@ class HasOneTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'post' => null,
+                ],
+            ],
+        ]);
+    }
+    
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndConnectHasOne(string $action): void
+    {
+        factory(Post::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                post: {
+                    connect: 1
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
                 ],
             ],
         ]);
