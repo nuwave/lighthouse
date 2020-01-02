@@ -188,7 +188,7 @@ class HasOneTest extends DBTestCase
 
     public function testCanCreateAndConnectHasOne(): void
     {
-        factory(Post::class)->create(['title' => 'bar']);
+        factory(Post::class)->create(['title' => 'bar']); // create a Post and a Task
 
         $this->graphQL('
         mutation {
@@ -209,7 +209,7 @@ class HasOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id' => '2',
                     'name' => 'foo',
                     'post' => [
                         'id' => '1',
@@ -405,12 +405,18 @@ class HasOneTest extends DBTestCase
      */
     public function testCanUpdateAndConnectHasOne(string $action): void
     {
-        factory(Post::class)->create(['title' => 'bar']);
+        $post = factory(Post::class)->create(['title' => 'bar']); // create a Post and a Task
+        $task = factory(Task::class) // create another Post and Task
+            ->create()
+            ->post()
+            ->save(
+                factory(Post::class)->create(['title' => 'baz'])
+            );
 
         $this->graphQL("
         mutation {
             ${action}Task(input: {
-                id: 1
+                id: 2
                 name: \"foo\"
                 post: {
                     connect: 1
@@ -427,7 +433,7 @@ class HasOneTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
+                    'id' => '2',
                     'name' => 'foo',
                     'post' => [
                         'id' => '1',

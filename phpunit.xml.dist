@@ -17,6 +17,9 @@
         <testsuite name="Integration">
             <directory>./tests/Integration/</directory>
         </testsuite>
+        <testsuite name="Mutation">
+            <directory>./tests/Integration/Execution/MutationExecutor/</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>
