@@ -73,7 +73,7 @@ class NestedManyToMany implements ArgResolver
             return [];
         }
 
-        if (!is_array($values[0])) {
+        if (! is_array($values[0])) {
             // first values isn't array. Assume values are simply IDs, and return them (old behaviour)
             return $values;
         } else {
@@ -82,7 +82,7 @@ class NestedManyToMany implements ArgResolver
             foreach ($values as $value) {
                 $id = $value['id'];
                 unset($value['id']);
-                $relationArray[ $id ] = $value;
+                $relationArray[$id] = $value;
             }
 
             return $relationArray;

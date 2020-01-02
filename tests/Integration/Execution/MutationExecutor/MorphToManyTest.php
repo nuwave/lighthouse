@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
-use Tests\DBTestCase;
 use Faker\Provider\Lorem;
+use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\User;
@@ -269,8 +269,8 @@ class MorphToManyTest extends DBTestCase
                         ],
                         [
                             'pivot' => [
-                                'meta' => null
-                            ]
+                                'meta' => null,
+                            ],
                         ],
                     ],
                 ],

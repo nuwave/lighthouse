@@ -279,7 +279,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                 'whitelistedColumns' => [
                     [
 
-                    'id' => 1,
+                        'id' => 1,
                     ],
                 ],
             ],
