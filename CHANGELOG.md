@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow existing mutation directives `@create`, `@update`, `@upsert` and `@delete` to function
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
+- Add ability to define pivot data on nested mutations within `sync`, `syncWithoutDetach` and `connect` https://github.com/nuwave/lighthouse/pull/1110
 
 ### Changed
 
