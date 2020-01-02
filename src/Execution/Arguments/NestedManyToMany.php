@@ -28,13 +28,13 @@ class NestedManyToMany implements ArgResolver
 
         if (isset($args->arguments['sync'])) {
             $relation->sync(
-                $args->arguments['sync']->toPlain()
+                $this->generateRelationArray($args->arguments['sync'])
             );
         }
 
         if (isset($args->arguments['syncWithoutDetaching'])) {
             $relation->syncWithoutDetaching(
-                $args->arguments['syncWithoutDetaching']->toPlain()
+                $this->generateRelationArray($args->arguments['syncWithoutDetaching'])
             );
         }
 
@@ -49,7 +49,7 @@ class NestedManyToMany implements ArgResolver
 
         if (isset($args->arguments['connect'])) {
             $relation->attach(
-                $args->arguments['connect']->toPlain()
+                $this->generateRelationArray($args->arguments['connect'])
             );
         }
 
@@ -57,6 +57,35 @@ class NestedManyToMany implements ArgResolver
             $relation->detach(
                 $args->arguments['disconnect']->toPlain()
             );
+        }
+    }
+
+    /**
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
+     *
+     * @return array
+     */
+    private function generateRelationArray(Argument $args)
+    {
+        $values = $args->toPlain();
+
+        if (empty($values)) {
+            return [];
+        }
+
+        if (!is_array($values[0])) {
+            // first values isn't array. Assume values are simply IDs, and return them (old behaviour)
+            return $values;
+        } else {
+            // assume values are arrays and contains pivot information
+            $relationArray = [];
+            foreach ($values as $value) {
+                $id = $value['id'];
+                unset($value['id']);
+                $relationArray[ $id ] = $value;
+            }
+
+            return $relationArray;
         }
     }
 }
