@@ -931,8 +931,8 @@ class BelongsToManyTest extends DBTestCase
                         ],
                         [
                             'pivot' => [
-                                'meta' => null
-                            ]
+                                'meta' => null,
+                            ],
                         ],
                     ],
                 ],
