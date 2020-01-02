@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Faker\Provider\Lorem;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -13,42 +14,49 @@ class BelongsToManyTest extends DBTestCase
         id: ID!
         name: String
         users: [User!] @belongsToMany
+        pivot: UserRolePivot
     }
-    
+
     type User {
         id: ID!
         name: String
+        roles: [Role!] @belongsToMany
     }
-    
+
+    type UserRolePivot {
+        meta: String
+    }
+
     type Mutation {
         createRole(input: CreateRoleInput! @spread): Role @create
         updateRole(input: UpdateRoleInput! @spread): Role @update
         upsertRole(input: UpsertRoleInput! @spread): Role @upsert
         createUser(input: CreateUserInput! @spread): User @create
+        pivotsUpdateUser(input: UpsertUserInput! @spread): User @update
     }
 
     input CreateRoleInput {
         name: String
         users: CreateUserRelation
     }
-    
+
     input CreateUserRelation {
         create: [CreateUserInput!]
         upsert: [UpsertUserInput!]
         connect: [ID!]
         sync: [ID!]
     }
-    
+
     input CreateUserInput {
         name: String
     }
-    
+
     input UpdateRoleInput {
         id: ID!
         name: String
         users: UpdateUserRelation
     }
-    
+
     input UpdateUserRelation {
         create: [CreateUserInput!]
         update: [UpdateUserInput!]
@@ -59,7 +67,7 @@ class BelongsToManyTest extends DBTestCase
         syncWithoutDetaching: [ID!]
         disconnect: [ID!]
     }
-    
+
     input UpdateUserInput {
         id: ID!
         name: String
@@ -84,6 +92,18 @@ class BelongsToManyTest extends DBTestCase
     input UpsertUserInput {
         id: ID!
         name: String
+        roles: UpdateRoleRelation
+    }
+
+    input UpdateRoleRelation {
+        sync: [UpdateUserRolePivot!]
+        syncWithoutDetaching: [UpdateUserRolePivot!]
+        connect: [UpdateUserRolePivot!]
+    }
+
+    input UpdateUserRolePivot {
+        id: ID! # role ID
+        meta: String
     }
     '.self::PLACEHOLDER_QUERY;
 
@@ -825,5 +845,140 @@ class BelongsToManyTest extends DBTestCase
         $role->refresh();
 
         $this->assertCount(0, $role->users);
+    }
+
+    public function testCanConnectUserWithRoleAndPivotMetaByUsingSync(): void
+    {
+        $user = factory(User::class)->create();
+        $role = factory(Role::class)->create();
+        $role2 = factory(Role::class)->create();
+        $user->roles()->attach($role2);
+
+        $metaText = Lorem::sentence();
+
+        $this->graphQL('
+        mutation {
+            pivotsUpdateUser(input: {
+                id: 1,
+                roles: {
+                    sync: [
+                        {
+                            id: 1,
+                            meta: "'.$metaText.'"
+                        }
+                    ]
+                },
+            }) {
+                roles {
+                    pivot {
+                        meta
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'pivotsUpdateUser' => [
+                    'roles' => [
+                        [
+                            'pivot' => [
+                                'meta' => $metaText,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanConnectUserWithRoleAndPivotMetaByUsingSyncWithoutDetach(): void
+    {
+        $user = factory(User::class)->create();
+        $role = factory(Role::class)->create();
+        $role2 = factory(Role::class)->create();
+        $user->roles()->attach($role2);
+
+        $metaText = Lorem::sentence();
+
+        $this->graphQL('
+        mutation {
+            pivotsUpdateUser(input: {
+                id: 1,
+                roles: {
+                    syncWithoutDetaching: [
+                        {
+                            id: 1,
+                            meta: "'.$metaText.'"
+                        }
+                    ]
+                },
+            }) {
+                roles {
+                    pivot {
+                        meta
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'pivotsUpdateUser' => [
+                    'roles' => [
+                        [
+                            'pivot' => [
+                                'meta' => $metaText,
+                            ],
+                        ],
+                        [
+                            'pivot' => [
+                                'meta' => null
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanConnectUserWithRoleAndPivotMetaByUsingConnect(): void
+    {
+        $user = factory(User::class)->create();
+        $role = factory(Role::class)->create();
+
+        $metaText = Lorem::sentence();
+
+        $this->graphQL('
+        mutation {
+            pivotsUpdateUser(input: {
+                id: 1,
+                roles: {
+                    connect: [
+                        {
+                            id: 1,
+                            meta: "'.$metaText.'"
+                        }
+                    ]
+                },
+            }) {
+                roles {
+                    pivot {
+                        meta
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'pivotsUpdateUser' => [
+                    'roles' => [
+                        [
+                            'pivot' => [
+                                'meta' => $metaText,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }
