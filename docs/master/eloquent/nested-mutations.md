@@ -525,6 +525,8 @@ input UpdateAuthorBelongsToMany {
 }
 ```
 
+**NOTE**: It is also possible to store pivot data on `sync`, `syncWithoutDetach` and `connect`. Read more in the [storing pivot data section](#storing-pivot-data)
+
 ## MorphTo
 
 __The GraphQL Specification does not support Input Union types,
@@ -744,3 +746,92 @@ mutation {
   }
 }
 ```
+
+
+## Storing Pivot Data
+
+It is common that many-to-many relations store some extra data in pivot tables. In Laravel you can use `sync`, `syncWithoutDetach` or `connect` and pass an array, where keys are IDs of related models and values are pivot data.
+In lighthouse it is also possible to use same approach. Simply define your pivot data as input type. `id` field of this type will be used as related model ID. All other fields will be filled into pivot table.
+
+
+```graphql
+type Role {
+    id: ID!
+    pivot: UserRolePivot
+}
+
+type User {
+    id: ID!
+    roles: [Role!] @belongsToMany
+}
+
+type UserRolePivot {
+    meta: String # pivot data
+}
+
+type Mutation {
+    updateUser(input: UpdateUserInput! @spread): User @update
+}
+
+input UpdateUserInput {
+    id: ID!
+    roles: UpdateRoleRelation
+}
+
+input UpdateRoleRelation {
+    connect: [UpdateUserRolePivot!]
+}
+
+input UpdateUserRolePivot {
+    id: ID! # role ID
+    meta: String # pivot data
+}
+```
+
+For example you want to connect user with role and define `meta` column on pivot table. Simply call this:
+
+```graphql
+mutation {
+  updateUser(input: {
+    id: 1,
+    roles: {
+      connect: [
+        {
+          id: 6,
+          meta: "This is stored in pivot table!"
+        }
+      ]
+    },
+  }) {
+    id
+    roles {
+      id
+      pivot {
+        meta
+      }
+    }
+  }
+}
+```
+
+And you will get following response: 
+
+```json
+{
+  "data": {
+    "updateUser": {
+      "id": 1,
+      "roles": [
+        {
+          "id": 6,
+          "pivot": {
+            "meta": "This is stored in pivot table!"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+It is also possible to use the `sync` and `syncWithoutDetach` operations.
