@@ -84,7 +84,6 @@
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",
         "test:integration": "phpunit --colors=always --testsuite Integration",
-        "test:mutation": "phpunit --colors=always --testsuite Mutation",
         "test:unit": "phpunit --colors=always --testsuite Unit"
     },
     "support": {

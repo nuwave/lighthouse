@@ -4,7 +4,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\Task ;
+use Tests\Utils\Models\Task;
 
 class HasOneTest extends DBTestCase
 {
