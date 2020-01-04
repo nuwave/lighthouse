@@ -115,19 +115,19 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => "2"
+                        'id' => '2',
                     ],
                     [
-                        'id' => "4"
+                        'id' => '4',
                     ],
                     [
-                        'id' => "5"
+                        'id' => '5',
                     ],
                     [
-                        'id' => "9"
+                        'id' => '9',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -135,7 +135,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         $post = factory(Post::class)->create();
         factory(Post::class, 2)->create([
-            'parent_id' => $post->id
+            'parent_id' => $post->id,
         ]);
 
         $this->graphQL('
@@ -154,10 +154,10 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'data' => [
                 'posts' => [
                     [
-                        'id' => "1"
+                        'id' => '1',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -181,13 +181,13 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => "1"
+                        'id' => '1',
                     ],
                     [
-                        'id' => "6"
+                        'id' => '6',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 

@@ -107,14 +107,13 @@ SDL;
 
             $args[] = $whereConstraints['column'];
             $arity = $this->getOperatorArity($whereConstraints['operator']);
-            if($arity <= 2) {
+            if ($arity <= 2) {
                 $where .= $whereConstraints['operator'];
-            }
-            else {
+            } else {
                 $args[] = $whereConstraints['operator'];
             }
 
-            if($arity > 1) {
+            if ($arity > 1) {
                 $whereConstraints = $this->parseValues($whereConstraints);
                 $args[] = $whereConstraints['value'];
             }
@@ -127,7 +126,7 @@ SDL;
 
     protected function getOperatorArity(string $operator): string
     {
-        if(in_array($operator, ['In', 'NotIn', 'Null', 'NotNull', 'Between', 'NotBetween'])) {
+        if (in_array($operator, ['In', 'NotIn', 'Null', 'NotNull', 'Between', 'NotBetween'])) {
             return \Safe\preg_match('/Null/', $operator)
                 ? 1
                 : 2;
@@ -140,11 +139,11 @@ SDL;
     {
         $whereConstraints['value'] = $this->sanitize($whereConstraints['value']);
 
-        if(in_array($whereConstraints['operator'], ['In', 'NotIn', 'Between', 'NotBetween']) &&
-            !is_array($whereConstraints['value'])
+        if (in_array($whereConstraints['operator'], ['In', 'NotIn', 'Between', 'NotBetween']) &&
+            ! is_array($whereConstraints['value'])
         ) {
             throw new Error(
-                sprintf("The value for %s is wrong!", strtoupper($whereConstraints['operator']))
+                sprintf('The value for %s is wrong!', strtoupper($whereConstraints['operator']))
             );
         }
 
@@ -161,18 +160,15 @@ SDL;
             foreach ($data as $k => $item) {
                 if (is_array($item)) {
                     $data[$k] = $this->sanitize($item);
-                }
-                elseif (is_object($item)) {
-
+                } elseif (is_object($item)) {
                     $data[$k] = $this->sanitize($item);
-                }
-                elseif(is_string($item)) {
+                } elseif (is_string($item)) {
                     $data[$k] = htmlspecialchars(trim($item), ENT_QUOTES);
                 }
             }
         }
 
-        if(is_string($data)) {
+        if (is_string($data)) {
             $data = htmlspecialchars($data, ENT_QUOTES);
         }
 
