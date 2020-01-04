@@ -9,11 +9,11 @@ class CustomDefaultResolverTest extends TestCase
 {
     const CUSTOM_RESOLVER_RESULT = 123;
 
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */'
     type Query {
         foo: Foo @field(resolver: "Tests\\\\Integration\\\\CustomDefaultResolverTest@resolve")
     }
-    
+
     type Foo {
         bar: Int
     }

@@ -31,7 +31,7 @@ class IntrospectionTest extends TestCase
         $this->schema .= '
         type Foo {
             bar: Int
-        }        
+        }
         ';
 
         $this->assertNotNull(

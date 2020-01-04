@@ -28,13 +28,13 @@ class MorphOneDirective extends RelationDirective implements FieldResolver, Defi
 """
 Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @morphOne(      
+directive @morphOne(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
   """
   relation: String
-  
+
   """
   Apply scopes to the underlying query.
   """
