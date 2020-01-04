@@ -4,9 +4,16 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -19,7 +26,11 @@ abstract class BaseDirective implements Directive
     /**
      * The node the directive is defined on.
      *
-     * @var \GraphQL\Language\AST\Node
+     * @see \GraphQL\Language\DirectiveLocation
+     *
+     * Intentionally leaving out the request definitions and the 'SCHEMA' location.
+     *
+     * @var ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode
      */
     protected $definitionNode;
 
@@ -34,6 +45,45 @@ abstract class BaseDirective implements Directive
         $this->definitionNode = $definitionNode;
 
         return $this;
+    }
+
+    /**
+     * Get a Closure that is defined through an argument on the directive.
+     *
+     * @param  string  $argumentName
+     * @return \Closure
+     */
+    public function getResolverFromArgument(string $argumentName): Closure
+    {
+        [$className, $methodName] = $this->getMethodArgumentParts($argumentName);
+
+        $namespacedClassName = $this->namespaceClassName($className);
+
+        return Utils::constructResolver($namespacedClassName, $methodName);
+    }
+
+    /**
+     * Does the current directive have an argument with the given name?
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function directiveHasArgument(string $name): bool
+    {
+        return ASTHelper::directiveHasArgument(
+            $this->directiveDefinition(),
+            $name
+        );
+    }
+
+    /**
+     * The name of the node the directive is defined upon.
+     *
+     * @return string
+     */
+    protected function nodeName(): string
+    {
+        return $this->definitionNode->name->value;
     }
 
     /**
@@ -66,35 +116,6 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Does the current directive have an argument with the given name?
-     *
-     * @param  string  $name
-     * @return bool
-     */
-    public function directiveHasArgument(string $name): bool
-    {
-        return ASTHelper::directiveHasArgument(
-            $this->directiveDefinition(),
-            $name
-        );
-    }
-
-    /**
-     * Get a Closure that is defined through an argument on the directive.
-     *
-     * @param  string  $argumentName
-     * @return \Closure
-     */
-    public function getResolverFromArgument(string $argumentName): Closure
-    {
-        [$className, $methodName] = $this->getMethodArgumentParts($argumentName);
-
-        $namespacedClassName = $this->namespaceClassName($className);
-
-        return Utils::constructResolver($namespacedClassName, $methodName);
-    }
-
-    /**
      * Get the model class from the `model` argument of the field.
      *
      * @param  string  $argumentName The default argument name "model" may be overwritten
@@ -116,7 +137,7 @@ abstract class BaseDirective implements Directive
 
                 if (! isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(
-                        "Type '$returnTypeName' on '{$this->definitionNode->name->value}' can not be found in the schema.'"
+                        "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
                     );
                 }
                 $type = $documentAST->types[$returnTypeName];
@@ -127,13 +148,13 @@ abstract class BaseDirective implements Directive
                     $model = $returnTypeName;
                 }
             } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
-                $model = $this->definitionNode->name->value;
+                $model = $this->nodeName();
             }
         }
 
         if (! $model) {
             throw new DefinitionException(
-                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
             );
         }
 
@@ -141,6 +162,8 @@ abstract class BaseDirective implements Directive
     }
 
     /**
+     * Find a class name in a set of given namespaces.
+     *
      * @param  string  $classCandidate
      * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch

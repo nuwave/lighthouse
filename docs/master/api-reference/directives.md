@@ -352,7 +352,7 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on ARGUMENT_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @cache
@@ -648,30 +648,33 @@ directive @count(
 
 ## @create
 
+```graphql
+"""
 Create a new Eloquent model with the given arguments.
+"""
+directive @create(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
     createPost(title: String!): Post @create
 }
 ```
-
-### Definition
-
-```graphql
-"""
-Create a new Eloquent model with the given arguments.
-"""
-directive @create(  
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
-  """
-  model: String
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 If you are using a single input object as an argument, you must tell Lighthouse
 to spread out the nested values before applying it to the resolver.
@@ -695,6 +698,8 @@ type Mutation {
 }
 ```
 
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
 ## @delete
 
 ```graphql
@@ -714,7 +719,14 @@ directive @delete(
   This is only needed when the default model resolution does not work.
   """
   model: String
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 Use it on a root mutation field that returns an instance of the Model.
@@ -724,8 +736,6 @@ type Mutation {
     deletePost(id: ID!): Post @delete
 }
 ```
-
-### Examples
 
 If you use global ids, you can set the `globalId` argument to `true`.
 Lighthouse will decode the id for you automatically.
@@ -754,6 +764,30 @@ or is located in a non-default namespace, set it with the `model` argument.
 ```graphql
 type Mutation {
     deletePost(id: ID!): Post @delete(model: "Bar\\Baz\\MyPost")
+}
+```
+
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+```graphql
+type Mutation {
+    updateUser(
+        id: Int
+        deleteTasks: [Int!]! @delete(relation: "tasks")
+    ): User @update
+}
+```
+
+If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or
+`MorphTo` relationship, you can just pass a Boolean instead of an ID, as there is only one
+possible model that can be deleted.
+
+```graphql
+type Mutation {
+    updateTask(
+        id: Int
+        deleteUser: Boolean @delete(relation: "user")
+    ): Task @update
 }
 ```
 
@@ -963,8 +997,20 @@ Works very similar to the [`@delete`](#delete) directive.
 
 ## @enum
 
-Assign an internal value to an enum key. When dealing with the Enum type in your code,
+```graphql
+"""
+Assign an internal value to an enum key.
+When dealing with the Enum type in your code,
 you will receive the defined value instead of the string key.
+"""
+directive @enum(
+  """
+  The internal value of the enum key.
+  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+  """
+  value: Mixed
+) on ENUM_VALUE
+```
 
 ```graphql
 enum Role {
@@ -975,21 +1021,6 @@ enum Role {
 
 You do not need this directive if the internal value of each enum key
 is an identical string. [Read more about enum types](../the-basics/types.md#enum)
-
-### Definition
-
-```graphql
-"""
-Assign an internal value to an enum key.
-"""
-directive @enum(
-  """
-  The internal value of the enum key.
-  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-  """
-  value: Mixed
-) on ENUM_VALUE
-```
 
 ## @eq
 
@@ -1183,7 +1214,7 @@ type User {
 """
 Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
 """
-directive @hasOne(      
+directive @hasOne(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
@@ -1221,7 +1252,7 @@ type Query {
 ### Definition
 
 ```graphql
-directive @in(      
+directive @in(
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema.
@@ -1280,7 +1311,7 @@ automatically used for creating new models and can not be manipulated.
 ### Definition
 
 ```graphql
-directive @inject(      
+directive @inject(
   """
   A path to the property of the context that will be injected.
   If the value is nested within the context, you may use dot notation
@@ -1378,7 +1409,7 @@ class Commentable
 """
 Use a custom resolver to determine the concrete type of an interface.
 """
-directive @interface(      
+directive @interface(
   """
   Reference to a custom type-resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
@@ -1434,7 +1465,7 @@ so the method can be `public static` if needed.
 Call a method with a given `name` on the class that represents a type to resolve a field.
 Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
 """
-directive @method(      
+directive @method(
   """
   Specify the method of which to fetch the data from.
   """
@@ -1444,29 +1475,20 @@ directive @method(
 
 ## @middleware
 
-Run Laravel middleware for a specific field. This can be handy to reuse existing
-middleware.
-
 ```graphql
-type Query {
-    users: [User!]! @middleware(checks: ["auth:api"]) @all
-}
-```
-
-### Definition
-
-```graphql
-directive @middleware(      
+"""
+Run Laravel middleware for a specific field or group of fields.
+This can be handy to reuse existing HTTP middleware.
+"""
+directive @middleware(
   """
   Specify which middleware to run. 
   Pass in either a fully qualified class name, an alias or
   a middleware group - or any combination of them.
   """
   checks: [String!]
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | OBJECT
 ```
-
-### Examples
 
 You can define middleware just like you would in Laravel. Pass in either a fully qualified
 class name, an alias or a middleware group - or any combination of them.
@@ -1634,7 +1656,7 @@ union Imageable = Post | User
 """
 Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @morphOne(      
+directive @morphOne(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
@@ -1666,7 +1688,7 @@ union Imageable = Post | User
 """
 Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @morphTo(      
+directive @morphTo(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
@@ -1740,6 +1762,44 @@ directive @neq(
   """
   key: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+## @nest
+
+```graphql
+"""
+A no-op nested arg resolver that delegates all calls
+to the ArgResolver directives attached to the children.
+"""
+directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This may be useful to logically group arg resolvers.
+
+```graphql
+type Mutation {
+    createUser(
+        name: String
+        tasks: UserTasksOperations @nest
+    ): User @create
+}
+
+input UserTasksOperations {
+    newTask: CreateTaskInput @create(relation: "tasks")
+}
+
+input CreateTaskInput {
+    name: String
+}
+
+type Task {
+    name: String!
+}
+
+type User {
+    name: String
+    tasks: [Task!]! @hasMany
+}
 ```
 
 ## @node
@@ -1818,7 +1878,7 @@ type Query {
 """
 Filter a column by an array using a `whereNotIn` clause.
 """
-directive @notIn(      
+directive @notIn(
   """
   Specify the name of the column.
   Only required if it differs from the name of the argument.
@@ -1840,7 +1900,7 @@ type Query {
 ### Definition
 
 ```graphql
-directive @orderBy on ARGUMENT_DEFINITION
+directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 The `OrderByClause` input is automatically added to the schema,
@@ -1876,6 +1936,37 @@ Querying a field that has an `orderBy` argument looks like this:
 ```
 
 You may pass more than one sorting option to add a secondary ordering.
+
+### Input Definition Example
+
+The `@orderBy` directive can also be applied inside an input field definition when used in conjunction with the [`@spread`](#spread) directive. See below for example: 
+
+```graphql
+type Query{
+    posts(filter: PostFilterInput @spread): Posts
+}
+
+input PostFilterInput {
+    orderBy: [OrderByClause!] @orderBy
+}
+```
+
+And usage example:
+
+```graphql
+{
+    posts(filter: {
+        orderBy: [
+            {
+                field: "postedAt"
+                order: ASC
+            }
+        ]
+    }) {
+        title
+    }
+}
+```
 
 ## @paginate
 
@@ -1966,6 +2057,9 @@ directive @paginate(
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
 
+> Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
+> Under the hood, the "cursor" is decoded into a page offset.
+
 ```graphql
 type Query {
     posts: [Post!]! @paginate(type: "connection")
@@ -2043,24 +2137,30 @@ class Blog
 
 ## @rename
 
-Rename a field on the server side, e.g. convert from snake_case to camelCase.
+```graphql
+"""
+Change the internally used name of a field or argument.
+This does not change the schema from a client perspective.
+"""
+directive @rename(
+  """
+  The internal name of an attribute/property/key.
+  """
+  attribute: String!
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This can often be useful to ensure consistent naming of your schema
+without having to change the underlying models.
 
 ```graphql
 type User {
     createdAt: String! @rename(attribute: "created_at")
 }
-```
 
-### Definition
-
-```graphql
-directive @rename(
-  """
-  Specify the original name of the property/key that the field
-  value can be retrieved from.
-  """
-  attribute: String!
-) on FIELD_DEFINITION
+input UserInput {
+    firstName: String! @rename(attribute: "first_name")
+}
 ```
 
 ## @restore
@@ -2216,7 +2316,7 @@ directive @scope(
   The name of the scope.
   """
   name: String
-) on ARGUMENT_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 You may use this in combination with field directives such as [`@all`](#all).
@@ -2549,16 +2649,6 @@ directive @union(
 
 ## @update
 
-Update an Eloquent model with the input values of the field.
-
-```graphql
-type Mutation {
-    updatePost(id: ID!, content: String): Post @update
-}
-```
-
-### Definition
-
 ```graphql
 """
 Update an Eloquent model with the input values of the field.
@@ -2575,10 +2665,23 @@ directive @update(
   If set to `false`, regular non-global ids are used.
   """
   globalId: Boolean = false
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-### Examples
+Use it on a root mutation field that returns an instance of the Model.
+
+```graphql
+type Mutation {
+    updatePost(id: ID!, content: String): Post @update
+}
+```
 
 Lighthouse uses the argument `id` to fetch the model by its primary key.
 This will work even if your model has a differently named primary key,
@@ -2604,17 +2707,9 @@ type Mutation {
 }
 ```
 
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
 ## @upsert
-
-Create or update an Eloquent model with the input values of the field.
-
-```graphql
-type Mutation {
-    upsertPost(id: ID!, content: String): Post @upsert
-}
-```
-
-### Definition
 
 ```graphql
 """
@@ -2632,11 +2727,15 @@ directive @upsert(
   If set to `false`, regular non-global ids are used.
   """
   globalId: Boolean = false
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
-
-### Examples
-
 
 Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
 If the model doesn't exist, it will be created using the given `id`.
@@ -2646,6 +2745,8 @@ type Mutation {
     upsertPost(post_id: ID!, content: String): Post @upsert
 }
 ```
+
+This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
 
 ## @where
 

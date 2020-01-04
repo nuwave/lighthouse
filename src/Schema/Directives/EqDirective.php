@@ -20,9 +20,9 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedD
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
-directive @eq(  
+directive @eq(
   """
-  Specify the database column to compare. 
+  Specify the database column to compare.
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
@@ -40,7 +40,7 @@ SDL;
     public function handleBuilder($builder, $value)
     {
         return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }

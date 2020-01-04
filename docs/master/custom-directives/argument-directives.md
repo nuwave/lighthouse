@@ -25,8 +25,9 @@ Let's take a look at the built-in `@trim` directive.
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective implements ArgTransformerDirective
+class TrimDirective implements ArgTransformerDirective, DefinedDirective
 {
     /**
      * Directive name.
@@ -38,11 +39,21 @@ class TrimDirective implements ArgTransformerDirective
         return 'trim';
     }
 
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Run the `trim` function on an input value.
+"""
+directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
     /**
      * Remove whitespace from the beginning and end of a given input.
      *
      * @param  string  $argumentValue
-     * @return mixed
+     * @return string
      */
     public function transform($argumentValue): string
     {
@@ -133,8 +144,9 @@ So let's take a look at the built-in `@eq` directive.
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -146,17 +158,30 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
         return 'eq';
     }
 
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+directive @eq(  
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
     /**
-     * Apply a simple "WHERE = $value" clause.
+     * Apply a "WHERE = $value" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param  mixed $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)
     {
         return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }
@@ -187,7 +212,96 @@ input DateRange {
 }
 ```
 
+## ArgResolver
+
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php)
+directive allows you to compose resolvers for complex nested inputs, similar to the way
+that field resolvers are composed together.
+
+For an in-depth explanation of the concept of composing arg resolvers,
+read the [explanation of arg resolvers](../concepts/arg-resolvers.md).
+
 ## ArgManipulator
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)	
 directive can be used to manipulate the schema AST. 
+
+For example, you might want to add a directive that automagically derives the arguments
+for a field based on an object type. A skeleton for this directive might look something like this:
+
+```php
+<?php
+
+namespace App\GraphQL\Directives;
+
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+
+class ModelArgsDirective extends BaseDirective implements ArgManipulator, DefinedDirective
+{
+    /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'typeToInput';
+    }
+
+    /**
+     * SDL definition of the directive.
+     *
+     * @return string
+     */
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Automatically generates an input argument based on a type.
+"""
+directive @typeToInput(
+    """
+    The name of the type to use as the basis for the input type.
+    """
+    name: String!
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
+    /**
+     * Manipulate the AST.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @return void
+     */
+    public function manipulateArgDefinition(
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): void {
+        $typeName = $this->directiveArgValue('name');
+        $type = $documentAST->types[$typeName];
+
+        $input = $this->generateInputFromType($type);
+        $argDefinition->name->value = $input->value->name;
+
+        $documentAST->setTypeDefinition($input);
+    }
+
+    protected function generateInputFromType(ObjectTypeDefinitionNode $type): InputObjectTypeDefinitionNode
+    {
+        // TODO generate this type based on rules and conventions that work for you
+    }
+}
+```

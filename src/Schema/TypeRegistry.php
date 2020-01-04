@@ -21,6 +21,7 @@ use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\EnumDirective;
 use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
 use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
@@ -92,13 +93,24 @@ class TypeRegistry
      *
      * @param  string  $name
      * @return \GraphQL\Type\Definition\Type
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function get(string $name): Type
     {
         if (! isset($this->types[$name])) {
-            $this->types[$name] = $this->handle(
-                $this->documentAST->types[$name]
-            );
+            $typeDefinition = $this->documentAST->types[$name] ?? null;
+            if (! $typeDefinition) {
+                throw new DefinitionException(<<<EOL
+Lighthouse failed while trying to load a type: $name
+
+Make sure the type is present in your schema definition.
+
+EOL
+                );
+            }
+
+            $this->types[$name] = $this->handle($typeDefinition);
         }
 
         return $this->types[$name];
@@ -204,12 +216,13 @@ class TypeRegistry
     {
         $values = [];
         foreach ($enumDefinition->values as $enumValue) {
-            $directive = ASTHelper::directiveDefinition($enumValue, 'enum');
+            /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
+            $enumDirective = $this->directiveFactory->createSingleDirectiveOfType($enumValue, EnumDirective::class);
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value
-                'value' => $directive
-                    ? ASTHelper::directiveArgValue($directive, 'value')
+                'value' => $enumDirective
+                    ? $enumDirective->value()
                     : $enumValue->name->value,
                 'description' => data_get($enumValue->description, 'value'),
             ];

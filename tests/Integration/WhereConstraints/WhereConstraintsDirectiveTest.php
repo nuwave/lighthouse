@@ -374,7 +374,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL('
+        $this->graphQL(/* @lang GraphQL */ '
         {
             whitelistedColumns(
                 where: {

@@ -13,17 +13,18 @@ trait MocksResolvers
      * Create and register a PHPUnit mock to be called through the @mock directive.
      *
      * @param  callable|null  $resolver
+     * @param  string  $key
      * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
      */
-    protected function mockResolver(callable $resolver = null): InvocationMocker
+    protected function mockResolver(callable $resolver = null, string $key = 'default'): InvocationMocker
     {
         $mock = $this->getMockBuilder(MockResolver::class)
             ->getMock();
 
-        $this->registerMockResolver($mock);
+        $this->registerMockResolver($mock, $key);
 
         $method = $mock
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('__invoke');
 
         if ($resolver) {
@@ -37,12 +38,13 @@ trait MocksResolvers
      * Register a mock resolver that will be called through the @mock directive.
      *
      * @param  callable  $mock
+     * @param  string  $key
      * @return void
      */
-    protected function registerMockResolver(callable $mock): void
+    protected function registerMockResolver(callable $mock, string $key): void
     {
         /** @var \Nuwave\Lighthouse\Testing\MockDirective $mockDirective */
         $mockDirective = app(MockDirective::class);
-        $mockDirective->register($mock);
+        $mockDirective->register($mock, $key);
     }
 }

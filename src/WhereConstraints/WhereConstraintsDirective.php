@@ -193,8 +193,12 @@ SDL;
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @return void
      */
-    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType): void
-    {
+    public function manipulateArgDefinition(
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): void {
         $allowedColumns = $this->directiveArgValue('columns');
         if (! $allowedColumns) {
             return;

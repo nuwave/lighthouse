@@ -19,7 +19,7 @@ class Post extends Model
     {
         return $this->hasMany(Comment::class);
     }
-    
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -47,7 +47,12 @@ This means the relationship data is not actually loaded until you first access t
 This leads to a common performance pitfall that comes with the nested nature of GraphQL queries:
 the so-called N+1 query problem. [Learn more](../performance/n-plus-one.md).
 
-Lighthouse has got you covered with specialized directives that optimize the Queries for you.
+When you decorate your relationship fields with Lighthouse's built-in relationship
+directives, queries are automatically combined through a technique called *batch loading*.
+That means you get fewer database requests and better performance without doing much work.
+
+> Batch loading might not provide ideal performance for all use cases. You can turn
+> it off by setting the config option `batchload_relations` to `false`.
 
 ## One To One
 

@@ -252,29 +252,29 @@ class ASTBuilder
     protected function addPaginationInfoTypes(): void
     {
         $this->documentAST->setTypeDefinition(
-            PartialParser::objectTypeDefinition('
+            PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
                 type PaginatorInfo {
                   "Total count of available items in the page."
                   count: Int!
-                
+
                   "Current pagination page."
                   currentPage: Int!
-                
+
                   "Index of first item in the current page."
                   firstItem: Int
-                
+
                   "If collection has more pages."
                   hasMorePages: Boolean!
-                
+
                   "Index of last item in the current page."
                   lastItem: Int
-                
+
                   "Last page number of the collection."
                   lastPage: Int!
-                
+
                   "Number of items per page in the collection."
                   perPage: Int!
-                
+
                   "Total items available in the collection."
                   total: Int!
                 }
@@ -282,29 +282,29 @@ class ASTBuilder
         );
 
         $this->documentAST->setTypeDefinition(
-            PartialParser::objectTypeDefinition('
+            PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
                 type PageInfo {
                   "When paginating forwards, are there more items?"
                   hasNextPage: Boolean!
-                
+
                   "When paginating backwards, are there more items?"
                   hasPreviousPage: Boolean!
-                
+
                   "When paginating backwards, the cursor to continue."
                   startCursor: String
-                
+
                   "When paginating forwards, the cursor to continue."
                   endCursor: String
-                
+
                   "Total number of node in connection."
                   total: Int
-                
+
                   "Count of nodes in current request."
                   count: Int
-                
+
                   "Current page of request."
                   currentPage: Int
-                
+
                   "Last page in connection."
                   lastPage: Int
                 }
@@ -349,11 +349,11 @@ class ASTBuilder
         // Double slashes to escape the slashes in the namespace.
         $this->documentAST->setTypeDefinition(
             PartialParser::interfaceTypeDefinition(<<<GRAPHQL
-"Node global interface"	
-interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {	
+"Node global interface"
+interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {
 "Global identifier that can be used to resolve any Node implementation."
-$globalId: ID!	
-}	
+$globalId: ID!
+}
 GRAPHQL
             )
         );

@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 
 class CreateDirective extends MutationExecutorDirective
 {
@@ -19,18 +18,25 @@ class CreateDirective extends MutationExecutorDirective
 """
 Create a new Eloquent model with the given arguments.
 """
-directive @create(  
+directive @create(
   """
   Specify the class name of the model to use.
   This is only needed when the default model resolution does not work.
   """
   model: String
-) on FIELD_DEFINITION
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
-    protected function executeMutation(Model $model, Collection $args): Model
+    protected function makeExecutionFunction(?Relation $parentRelation = null): callable
     {
-        return MutationExecutor::executeCreate($model, $args);
+        return new SaveModel($parentRelation);
     }
 }

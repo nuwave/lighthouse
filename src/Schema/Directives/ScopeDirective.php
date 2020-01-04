@@ -26,7 +26,7 @@ directive @scope(
   The name of the scope.
   """
   name: String
-) on ARGUMENT_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -46,7 +46,7 @@ SDL;
             return $builder->{$scope}($value);
         } catch (BadMethodCallException $exception) {
             throw new DefinitionException(
-                $exception->getMessage()." in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
+                $exception->getMessage()." in {$this->name()} directive on {$this->nodeName()} argument.",
                 $exception->getCode(),
                 $exception->getPrevious()
             );

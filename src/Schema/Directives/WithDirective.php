@@ -64,10 +64,12 @@ SDL;
                         RelationBatchLoader::class,
                         $resolveInfo->path,
                         [
-                            'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
-                            'args' => $args,
-                            'scopes' => $this->directiveArgValue('scopes', []),
-                            'resolveInfo' => $resolveInfo,
+                            'relationName' => $this->directiveArgValue('relation', $this->nodeName()),
+                            'decorateBuilder' => function ($query) use ($resolveInfo) {
+                                $resolveInfo
+                                    ->argumentSet
+                                    ->enhanceBuilder($query, $this->directiveArgValue('scopes', []));
+                            },
                         ]
                     );
 
