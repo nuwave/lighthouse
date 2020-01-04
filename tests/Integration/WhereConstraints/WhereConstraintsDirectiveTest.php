@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 class WhereConstraintsDirectiveTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */'
     type User {
         id: ID!
         name: String
@@ -62,7 +62,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -80,7 +80,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -99,7 +99,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 10)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -138,7 +138,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'parent_id' => $post->id,
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts(
                 where: {
@@ -165,7 +165,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 6)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -195,7 +195,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -223,7 +223,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -249,7 +249,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -269,7 +269,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
 
     public function testRejectsInvalidColumnName(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -297,7 +297,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'name' => '',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -329,7 +329,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'name' => null,
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -355,7 +355,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
 
     public function testRequiresAValueForAColumn(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
