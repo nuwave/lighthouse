@@ -2906,30 +2906,40 @@ type Query {
 }
 ```
 
-This is how you can use it to construct a complex query
-that gets actors over age 37 who either have red hair or are at least 150cm.
+This is how you can use it to construct some complex queries.
 
 ```graphql
+# Actors over age 37 who either have red hair or are at least 150cm.
 {
   people(
-    filter: {
-      where: [
+    where: {
+      AND: [
+        { column: AGE, operator: GT value: 37 }
+        { column: TYPE, value: "Actor" }
         {
-          AND: [
-            { column: AGE, operator: GT value: 37 }
-            { column: TYPE, value: "Actor" }
-            {
-              OR: [
-                { column: HAIRCOLOUR, value: "red" }
-                { column: HEIGHT, operator: GTE, value: 150 },
-              ],
-              OR: [
-                { column: HAIRCOLOUR, operator: IS_NULL,  value: "" }
-              ],
-              AND: [
-                { column: EYES, operator: IN,  value: ["blue", "brown", "aqua"] }
-              ],
-            }
+          OR: [
+            { column: HAIRCOLOUR, value: "red" }
+            { column: HEIGHT, operator: GTE, value: 150 }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
+
+```graphql
+# Politicians that have no hair and not blue-ish eyes
+{
+  people(
+    where: {
+      AND: [
+        { column: HAIRCOLOUR, operator: IS_NULL }
+        {
+          NOT: [
+            { column: EYES, operator: IN,  value: ["blue", "aqua", "turquoise"] }
           ]
         }
       ]
