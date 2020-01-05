@@ -60,7 +60,7 @@ class HasOneTest extends DBTestCase
     }
 
     input UpsertTaskInput {
-        id: ID!
+        id: ID
         name: String
         post: UpsertPostHasOne
     }
@@ -73,7 +73,7 @@ class HasOneTest extends DBTestCase
     }
 
     input UpsertPostInput {
-        id: ID!
+        id: ID
         title: String
     }
     '.self::PLACEHOLDER_QUERY;
@@ -152,11 +152,9 @@ class HasOneTest extends DBTestCase
         $this->graphQL('
         mutation {
             upsertTask(input: {
-                id: 1
                 name: "foo"
                 post: {
                     upsert: {
-                        id: 1
                         title: "bar"
                     }
                 }
