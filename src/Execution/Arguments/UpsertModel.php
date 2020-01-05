@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class UpsertModel implements ArgResolver
@@ -27,10 +28,9 @@ class UpsertModel implements ArgResolver
      */
     public function __invoke($model, $args)
     {
-        $id = $args->arguments['id']
-            ?? $args->arguments[$model->getKeyName()];
+        $id = Arr::get($args->arguments, 'id', Arr::get($args->arguments, $model->getKeyName()));
 
-        $model = $model->newQuery()->find($id->value)
+        $model = $model->newQuery()->find(optional($id)->value)
             ?? $model->newInstance();
 
         return ($this->previous)($model, $args);
