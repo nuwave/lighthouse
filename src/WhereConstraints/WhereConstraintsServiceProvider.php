@@ -77,7 +77,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
             )
             ->name
             ->value;
-        $operatorDefault= $operator->default();
+        $operatorDefault = $operator->default();
 
         return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ "
             \"$description\"

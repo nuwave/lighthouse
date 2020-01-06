@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\WhereConstraints;
 
-use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\WhereConstraints\SQLOperator;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
@@ -116,7 +115,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'body' => null,
         ]);
         factory(Post::class)->create([
-            'body' => 'foobar'
+            'body' => 'foobar',
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '

@@ -13,7 +13,7 @@ class SQLOperator implements Operator
 
     public function enumDefinition(): string
     {
-        return /** @lang GraphQL */ <<<GRAPHQL
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 enum SQLOperator {
     EQ @enum(value: "=")
     NEQ @enum(value: "!=")
@@ -89,7 +89,7 @@ GRAPHQL;
 
     protected function operatorArity(string $operator): int
     {
-        if(in_array($operator, ['Null', 'NotNull'])) {
+        if (in_array($operator, ['Null', 'NotNull'])) {
             return 1;
         }
 
