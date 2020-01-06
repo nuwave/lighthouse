@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\WhereConstraints;
 
+use Illuminate\Database\Query\Builder;
+use Nuwave\Lighthouse\WhereConstraints\SQLOperator;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
 use Tests\DBTestCase;
@@ -31,23 +33,6 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             where: WhereConstraints @whereConstraints(columns: ["id", "camelCase"])
         ): [User!]! @all
     }
-
-    enum Operator {
-        EQ @enum(value: "=")
-        NEQ @enum(value: "!=")
-        GT @enum(value: ">")
-        GTE @enum(value: ">=")
-        LT @enum(value: "<")
-        LTE @enum(value: "<=")
-        LIKE @enum(value: "LIKE")
-        NOT_LIKE @enum(value: "NOT_LIKE")
-        IN @enum(value: "In")
-        NOT_IN @enum(value: "NotIn")
-        BETWEEN @enum(value: "Between")
-        NOT_BETWEEN @enum(value: "NotBetween")
-        NOT_NULL @enum(value: "NotNull")
-        IS_NULL @enum(value: "Null")
-    }
     ';
 
     protected function getPackageProviders($app)
@@ -58,7 +43,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         );
     }
 
-    public function testAddsASingleWhereFilter(): void
+    public function testDefaultsToWhereEqual(): void
     {
         factory(User::class, 2)->create();
 
@@ -97,7 +82,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
 
     public function testOperatorIn(): void
     {
-        factory(User::class, 10)->create();
+        factory(User::class, 5)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -105,7 +90,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                 where: {
                     column: "id",
                     operator: IN
-                    value: [2, 4, 5, 9]
+                    value: [2, 5]
                 }
             ) {
                 id
@@ -118,13 +103,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                         'id' => '2',
                     ],
                     [
-                        'id' => '4',
-                    ],
-                    [
                         'id' => '5',
-                    ],
-                    [
-                        'id' => '9',
                     ],
                 ],
             ],
@@ -133,18 +112,19 @@ class WhereConstraintsDirectiveTest extends DBTestCase
 
     public function testOperatorIsNull(): void
     {
-        $post = factory(Post::class)->create();
-        factory(Post::class, 2)->create([
-            'parent_id' => $post->id,
+        factory(Post::class)->create([
+            'body' => null,
+        ]);
+        factory(Post::class)->create([
+            'body' => 'foobar'
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             posts(
                 where: {
-                    column: "parent_id",
+                    column: "body",
                     operator: IS_NULL
-                    value: ""
                 }
             ) {
                 id
@@ -161,9 +141,40 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testOperatorNotNull(): void
+    {
+        factory(Post::class)->create([
+            'body' => null,
+        ]);
+        factory(Post::class)->create([
+            'body' => 'foobar',
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts(
+                where: {
+                    column: "body",
+                    operator: IS_NOT_NULL
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testOperatorNotBetween(): void
     {
-        factory(User::class, 6)->create();
+        factory(User::class, 5)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -171,7 +182,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                 where: {
                     column: "id",
                     operator: NOT_BETWEEN
-                    value: [2, 5]
+                    value: [2, 4]
                 }
             ) {
                 id
@@ -184,7 +195,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                         'id' => '1',
                     ],
                     [
-                        'id' => '6',
+                        'id' => '5',
                     ],
                 ],
             ],
@@ -221,7 +232,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
 
     public function testAddsNestedOr(): void
     {
-        factory(User::class, 3)->create();
+        factory(User::class, 5)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -234,7 +245,16 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                         }
                         {
                             column: "id"
-                            value: 2
+                            value: 3
+                        }
+                        {
+                            OR: [
+                                {
+                                    column: "id"
+                                    value: 5
+                                }
+                            ]
+
                         }
                     ]
                 }
@@ -242,7 +262,21 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                    [
+                        'id' => '3',
+                    ],
+                    [
+                        'id' => '5',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testAddsNestedNot(): void
@@ -285,7 +319,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonFragment([
-            'message' => WhereConstraintsDirective::INVALID_COLUMN_MESSAGE,
+            'message' => WhereConstraintsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
         ]);
     }
 
@@ -366,7 +400,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonFragment([
-            'message' => WhereConstraintsDirective::missingValueForColumn('no_value'),
+            'message' => SQLOperator::missingValueForColumn('no_value'),
         ]);
     }
 

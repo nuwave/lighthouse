@@ -8,7 +8,6 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Str;
-use MLL\GraphQLScalars\Mixed;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -19,7 +18,22 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
     const NAME = 'whereConstraints';
-    const INVALID_COLUMN_MESSAGE = 'Column names may contain only alphanumerics or underscores, and may not begin with a digit.';
+
+    /**
+     * @var \Nuwave\Lighthouse\WhereConstraints\Operator
+     */
+    protected $operator;
+
+    /**
+     * WhereConstraintsDirective constructor.
+     *
+     * @param  \Nuwave\Lighthouse\WhereConstraints\Operator  $operator
+     * @return void
+     */
+    public function __construct(Operator $operator)
+    {
+        $this->operator = $operator;
+    }
 
     /**
      * Name of the directive.
@@ -51,11 +65,11 @@ SDL;
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $whereConstraints
-     * @param  bool  $nestedOr
+     * @param  array  $whereConstraints
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $whereConstraints, bool $nestedOr = false)
+    public function handleBuilder($builder, $whereConstraints, string $boolean = 'and')
     {
         if ($andConnectedConstraints = $whereConstraints['AND'] ?? null) {
             $builder->whereNested(
@@ -71,9 +85,10 @@ SDL;
             $builder->whereNested(
                 function ($builder) use ($orConnectedConstraints): void {
                     foreach ($orConnectedConstraints as $constraint) {
-                        $this->handleBuilder($builder, $constraint, true);
+                        $this->handleBuilder($builder, $constraint, 'or');
                     }
-                }
+                },
+                'or'
             );
         }
 
@@ -89,95 +104,17 @@ SDL;
         }
 
         if ($column = $whereConstraints['column'] ?? null) {
-            if (! array_key_exists('value', $whereConstraints)) {
-                throw new Error(
-                    self::missingValueForColumn($column)
-                );
-            }
+            static::assertValidColumnName($column);
 
-            if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
-                throw new Error(
-                    self::INVALID_COLUMN_MESSAGE
-                );
-            }
-
-            $where = $nestedOr
-                ? 'orWhere'
-                : 'where';
-
-            $args[] = $whereConstraints['column'];
-            $arity = $this->getOperatorArity($whereConstraints['operator']);
-            if ($arity <= 2) {
-                $where .= $whereConstraints['operator'];
-            } else {
-                $args[] = $whereConstraints['operator'];
-            }
-
-            if ($arity > 1) {
-                $whereConstraints = $this->parseValues($whereConstraints);
-                $args[] = $whereConstraints['value'];
-            }
-
-            return call_user_func_array([$builder, $where], $args);
+            return $this->operator->applyConstraints($builder, $whereConstraints, $boolean);
         }
 
         return $builder;
     }
 
-    protected function getOperatorArity(string $operator): string
+    public static function invalidColumnName(string $column): string
     {
-        if (in_array($operator, ['In', 'NotIn', 'Null', 'NotNull', 'Between', 'NotBetween'])) {
-            return \Safe\preg_match('/Null/', $operator)
-                ? 1
-                : 2;
-        }
-
-        return 3;
-    }
-
-    protected function parseValues(array $whereConstraints): array
-    {
-        $whereConstraints['value'] = $this->sanitize($whereConstraints['value']);
-
-        if (in_array($whereConstraints['operator'], ['In', 'NotIn', 'Between', 'NotBetween']) &&
-            ! is_array($whereConstraints['value'])
-        ) {
-            throw new Error(
-                sprintf('The value for %s is wrong!', strtoupper($whereConstraints['operator']))
-            );
-        }
-
-        return $whereConstraints;
-    }
-
-    protected function sanitize($data)
-    {
-        if (is_object($data)) {
-            $data = (array) $data;
-        }
-
-        if (is_array($data)) {
-            foreach ($data as $k => $item) {
-                if (is_array($item)) {
-                    $data[$k] = $this->sanitize($item);
-                } elseif (is_object($item)) {
-                    $data[$k] = $this->sanitize($item);
-                } elseif (is_string($item)) {
-                    $data[$k] = htmlspecialchars(trim($item), ENT_QUOTES);
-                }
-            }
-        }
-
-        if (is_string($data)) {
-            $data = htmlspecialchars($data, ENT_QUOTES);
-        }
-
-        return $data;
-    }
-
-    public static function missingValueForColumn(string $column): string
-    {
-        return "Did not receive a value to match the WhereConstraints for column {$column}.";
+        return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: $column";
     }
 
     /**
@@ -260,7 +197,7 @@ SDL;
      * @param  string  $allowedColumnsEnumName
      * @return \GraphQL\Language\AST\EnumTypeDefinitionNode
      */
-    public function createAllowedColumnsEnum(
+    protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
         array $allowedColumns,
@@ -285,5 +222,22 @@ SDL;
         $enumDefinition .= '}';
 
         return PartialParser::enumTypeDefinition($enumDefinition);
+    }
+
+    /**
+     * Ensure the column name is well formed and prevent SQL injection.
+     *
+     * @param  string  $column
+     * @return void
+     *
+     * @throws \GraphQL\Error\Error
+     */
+    protected static function assertValidColumnName(string $column): void
+    {
+        if (!\Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
+            throw new Error(
+                self::invalidColumnName($column)
+            );
+        }
     }
 }
