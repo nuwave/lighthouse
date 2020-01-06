@@ -2892,32 +2892,49 @@ enum Operator {
 
 ### Usage
 
+The most basic way to use this directive is with the dynamic `WhereConstraints` input and the `@whereConstraints` directive with no arguments.
+
 ```graphql
+type Person {
+    id: ID!
+    age: Int!
+    height: Int!
+    type: String!
+    hair_color: String!
+}
+
 type Query {
     people(
-        where: WhereConstraints @whereConstraints(columns: ["age", "type", "haircolour", "height"])
+        where: WhereConstraints @whereConstraints
     ): [Person!]!
 }
 ```
 
-This is how you can use it to construct a complex query
-that gets actors over age 37 who either have red hair or are at least 150cm.
+The client can then build arbitrarily filtered queries. This will get people who are older than 37:
 
 ```graphql
 {
   people(
-    filter: {
-      where: [
+    where: { column: "age", operator: GT, value: 37 }
+  ) {
+    name
+  }
+}
+```
+
+This will get actors over the age of 37 who either have red hair or are at least 150cm:
+
+```graphql
+{
+  people(
+    where: {
+      AND: [
+        { column: "age", operator: GT, value: 37 }
+        { column: "type", value: "Actor" }
         {
-          AND: [
-            { column: AGE, operator: GT value: 37 }
-            { column: TYPE, value: "Actor" }
-            {
-              OR: [
-                { column: HAIRCOLOUR, value: "red" }
-                { column: HEIGHT, operator: GTE, value: 150 }
-              ]
-            }
+          OR: [
+            { column: "hair_color", value: "red" }
+            { column: "height", operator: GTE, value: 150 }
           ]
         }
       ]
@@ -2928,31 +2945,67 @@ that gets actors over age 37 who either have red hair or are at least 150cm.
 }
 ```
 
-Lighthouse generates definitions for an `Enum` type and an `Input` type
-that are restricted to the defined columns.
+By default, the `@whereConstraints` directive allows for filtering on all fields. To restrict the allowed fields, you can pass in an array of field names to the `columns` parameter:
 
 ```graphql
-"Dynamic WHERE constraints for the `where` argument on the query `people`.
-input PeopleWhereWhereConstraints {
+type Query {
+    people(
+        where: WhereConstraints @whereConstraints(columns: ["age", "height"])
+    ): [Person!]!
+}
+```
+
+When using the default `WhereConstraints` input, Lighthouse allows for filtering on any of the fields in the model, specified as strings in the request. To customize this behavior, you can define your own input and enum:
+
+```graphql
+"Dynamic WHERE constraints for the `where` argument on the query `people`."
+input PeopleWhereConstraints {
     column: PeopleWhereColumn
-    operator: String = EQ
+    operator: Operator = EQ
     value: Mixed
-    AND: [PeopleWhereWhereConstraints!]
-    OR: [PeopleWhereWhereConstraints!]
-    NOT: [PeopleWhereWhereConstraints!]
+    AND: [PeopleWhereConstraints!]
+    OR: [PeopleWhereConstraints!]
+    NOT: [PeopleWhereConstraints!]
 }
 
 "Allowed column names for the `where` argument on the query `people`."
 enum PeopleWhereColumn {
     AGE @enum(value: "age")
     TYPE @enum(value: "type")
-    HAIRCOLOUR @enum(value: "haircolour")
+    HAIRCOLOUR @enum(value: "hair_colour")
     HEIGHT @enum(value: "height")
+}
+
+type Query {
+    people(
+        # Be sue to change to your newly-defined input.
+        where: PeopleWhereConstraints @whereConstraints
+    ): [Person!]!
 }
 ```
 
-When you are not specifying `columns` to allow, a generic input with dynamic
-column names will be used instead.
+The client would then be restricted to your defined columns:
+
+```graphql
+{
+  people(
+    where: {
+      AND: [
+        { column: AGE, operator: GT, value: 37 }
+        { column: TYPE, value: "Actor" }
+        {
+          OR: [
+            { column: HAIRCOLOUR, value: "red" }
+            { column: HEIGHT, operator: GTE, value: 150 }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
 
 ## @whereJsonContains
 
