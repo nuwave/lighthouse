@@ -2900,7 +2900,7 @@ type Person {
     age: Int!
     height: Int!
     type: String!
-    hair_color: String!
+    hair_colour: String!
 }
 
 type Query {
