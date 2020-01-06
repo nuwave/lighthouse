@@ -160,7 +160,7 @@ Use it in your schema upon the field you want to validate.
 
 ```graphql
 type Mutation {
-  updateUser(id: ID, name: String): User @updateUserValidation
+  updateUser(id: ID, name: String): User @update @updateUserValidation
 }
 ```
 

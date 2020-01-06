@@ -26,7 +26,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware, DefinedD
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
-directive @inject(      
+directive @inject(
   """
   A path to the property of the context that will be injected.
   If the value is nested within the context, you may use dot notation
