@@ -2883,7 +2883,7 @@ type Query {
 ```
 
 Lighthouse generates definitions for an `Enum` type and an `Input` type
-that are restricted to the defined columns.
+that are restricted to the defined columns:
 
 ```graphql
 "Dynamic WHERE constraints for the `where` argument on the query `people`."
