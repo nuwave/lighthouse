@@ -2906,7 +2906,7 @@ type Person {
 type Query {
     people(
         where: WhereConstraints @whereConstraints
-    ): [Person!]!
+    ): [Person!]! @all
 }
 ```
 
@@ -2951,7 +2951,7 @@ By default, the `@whereConstraints` directive allows for filtering on all fields
 type Query {
     people(
         where: WhereConstraints @whereConstraints(columns: ["age", "height"])
-    ): [Person!]!
+    ): [Person!]! @all
 }
 ```
 
@@ -2980,7 +2980,7 @@ type Query {
     people(
         # Be sue to change to your newly-defined input.
         where: PeopleWhereConstraints @whereConstraints
-    ): [Person!]!
+    ): [Person!]! @all
 }
 ```
 
