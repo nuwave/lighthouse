@@ -39,7 +39,7 @@ To make use of the amazing tooling around GraphQL, we recommend
 installing [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground)
 
 ```bash
-composer require mll-lab/laravel-graphql-playground
+composer require --dev mll-lab/laravel-graphql-playground
 ```
 
 You can use any GraphQL client with Lighthouse, make sure to point it to the URL defined in
