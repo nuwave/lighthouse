@@ -2882,8 +2882,9 @@ type Query {
 }
 ```
 
-Lighthouse generates definitions for an `Enum` type and an `Input` type
-that are restricted to the defined columns:
+Lighthouse automatically generates definitions for an `Enum` type and an `Input` type
+that are restricted to the defined columns, so you do not have to specify them by hand.
+Here are the types that will be included in the compiled schema:
 
 ```graphql
 "Dynamic WHERE constraints for the `where` argument on the query `people`."
@@ -2905,8 +2906,8 @@ enum PeopleWhereColumn {
 }
 ```
 
-When you are not specifying `columns` to allow, a generic input with dynamic
-column names will be used instead. This approach should by taken with care, as it carries
+When you are not specifying `columns` to allow, clients can specify arbitrary
+column names as a `String`. This approach should by taken with care, as it carries
 potential performance and security risks and offers little type safety.
 
 A simple query for a person who is exactly 42 years old would look like this:
