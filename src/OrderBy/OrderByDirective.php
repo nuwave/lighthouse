@@ -1,17 +1,23 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\OrderBy;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Type\Definition\ListOfType;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\Codegen;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
 
 class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
 {
@@ -29,7 +35,7 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Sort a result list by one or more given fields.
+Sort a result list by one or more given columns.
 """
 directive @orderBy(
     """
@@ -45,14 +51,15 @@ SDL;
      * Apply an "ORDER BY" clause.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
+     * @param  string[]  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)
     {
         foreach ($value as $orderByClause) {
             $builder->orderBy(
-                $orderByClause['field'],
+                // TODO deprecated in v5
+                $orderByClause[config('lighthouse.orderBy')],
                 $orderByClause['order']
             );
         }
@@ -77,30 +84,41 @@ SDL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        // Users may define this as NonNull if they want
-        // Because we need to validate the structure regardless,
-        // we unwrap it by one level if it is
-        $expectedOrderByClause = $argDefinition->type instanceof NonNullTypeNode
-            ? $argDefinition->type
-            : $argDefinition;
+        if ($allowedColumns = $this->directiveArgValue('columns')) {
+            $restrictedOrderByName = $this->restrictedOrderByName($argDefinition, $parentField);
+            $argDefinition->type = PartialParser::listType("[$restrictedOrderByName!]");
 
-        if (
-            data_get(
-                $expectedOrderByClause,
-                // Must be a list
-                'type'
-                // of non-nullable
-                .'.type'
-                // input objects
-                .'.type.name.value'
-                // that are exactly of type
-            ) !== 'OrderByClause'
-        ) {
-            throw new DefinitionException(
-              "Must define the argument type of {$argDefinition->name->value} on field {$parentField->name->value} as [OrderByClause!]."
-            );
+            $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
+
+            $documentAST
+                ->setTypeDefinition(
+                    OrderByServiceProvider::createOrderByClauseInput(
+                        $restrictedOrderByName,
+                        "Order by clause for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                        $allowedColumnsEnumName
+                    )
+                )
+                ->setTypeDefinition(
+                    Codegen::createAllowedColumnsEnum($argDefinition, $parentField, $allowedColumns, $allowedColumnsEnumName)
+                );
+        } else {
+            $argDefinition->type = PartialParser::listType('[' . OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE . '!]');
         }
+    }
 
-        $allowedColumns = $this->directiveArgValue('columns');
+    /**
+     * Create the name for the restricted OrderByClause input.
+     *
+     * @example FieldNameArgNameOrderByClause
+     *
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
+     * @return string
+     */
+    protected function restrictedOrderByName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
+    {
+        return Str::studly($parentField->name->value)
+            .Str::studly($argDefinition->name->value)
+            .'OrderByClause';
     }
 }

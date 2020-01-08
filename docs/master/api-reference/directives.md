@@ -1889,27 +1889,41 @@ directive @notIn(
 
 ## @orderBy
 
-Sort a result list by one or more given fields.
+```graphql
+"""
+Sort a result list by one or more given columns.
+"""
+directive @orderBy(
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    If not given, the column names can be passed as a String by clients.
+    """
+    columns: [String!]
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+Use it on a field argument of an Eloquent query. The type of the argument
+can be left blank as `_` , as it will be automatically generated.
 
 ```graphql
 type Query {
-    posts(orderBy: [OrderByClause!] @orderBy): [Post!]!
+    posts(orderBy: _ @orderBy(columns: ["posted_at", "title"])): [Post!]! @all
 }
 ```
 
-### Definition
+Lighthouse will automatically generate an input that takes enumerated column names,
+together with the `SortOrder` enum, and add that to your schema. Here is how it looks:
 
 ```graphql
-directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
-The `OrderByClause` input is automatically added to the schema,
-together with the `SortOrder` enum.
-
-```graphql
-input OrderByClause{
-    field: String!
+input PostsOrderByOrderByClause {
+    column: PostsOrderByColumn!
     order: SortOrder!
+}
+
+enum PostsOrderByColumn {
+    POSTED_AT @enum(value: "posted_at")
+    TITLE @enum(value: "title")
 }
 
 enum SortOrder {
@@ -1925,7 +1939,7 @@ Querying a field that has an `orderBy` argument looks like this:
     posts (
         orderBy: [
             {
-                field: "postedAt"
+                column: POSTED_AT
                 order: ASC
             }
         ]
@@ -2877,13 +2891,14 @@ type Person {
 
 type Query {
     people(
-        where: WhereConstraints @whereConstraints(columns: ["age", "type", "haircolour", "height"])
+        where: _ @whereConstraints(columns: ["age", "type", "haircolour", "height"])
     ): [Person!]! @all
 }
 ```
 
 Lighthouse automatically generates definitions for an `Enum` type and an `Input` type
 that are restricted to the defined columns, so you do not have to specify them by hand.
+The blank type named `_` will be changed to the actual type.
 Here are the types that will be included in the compiled schema:
 
 ```graphql

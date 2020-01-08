@@ -12,6 +12,8 @@ use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class WhereConstraintsServiceProvider extends ServiceProvider
 {
+    const DEFAULT_WHERE_CONSTRAINTS = 'WhereConstraints';
+
     /**
      * Register any application services.
      *
@@ -47,7 +49,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
                         static::createWhereConstraintsInputType(
-                            'WhereConstraints',
+                            static::DEFAULT_WHERE_CONSTRAINTS,
                             'Dynamic WHERE constraints for queries.',
                             'String'
                         )
