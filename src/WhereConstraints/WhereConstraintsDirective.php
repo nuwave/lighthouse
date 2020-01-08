@@ -92,17 +92,6 @@ SDL;
             );
         }
 
-        if ($notConnectedConstraints = $whereConstraints['NOT'] ?? null) {
-            $builder->whereNested(
-                function ($builder) use ($notConnectedConstraints): void {
-                    foreach ($notConnectedConstraints as $constraint) {
-                        $this->handleBuilder($builder, $constraint);
-                    }
-                },
-                'not'
-            );
-        }
-
         if ($column = $whereConstraints['column'] ?? null) {
             static::assertValidColumnName($column);
 

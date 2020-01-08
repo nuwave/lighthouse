@@ -352,7 +352,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         {
             users(
                 where: {
-                    NOT: [
+                    AND: [
                         {
                             column: "Robert\'); DROP TABLE Students;--"
                             value: "https://xkcd.com/327/"
