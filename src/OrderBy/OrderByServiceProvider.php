@@ -9,7 +9,6 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
-
 class OrderByServiceProvider extends ServiceProvider
 {
     const DEFAULT_ORDER_BY_CLAUSE = 'OrderByClause';

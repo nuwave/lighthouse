@@ -2,28 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\Parser;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Utils\AST;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
 class Codegen
 {
-
     /**
      * Create the name for the Enum that holds the allowed columns.
      *

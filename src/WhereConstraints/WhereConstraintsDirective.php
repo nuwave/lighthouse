@@ -132,7 +132,7 @@ SDL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        if($allowedColumns = $this->directiveArgValue('columns')) {
+        if ($allowedColumns = $this->directiveArgValue('columns')) {
             $restrictedWhereConstraintsName = $this->restrictedWhereConstraintsName($argDefinition, $parentField);
             $argDefinition->type = PartialParser::namedType($restrictedWhereConstraintsName);
 
