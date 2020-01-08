@@ -8,18 +8,18 @@ use Tests\Utils\Models\User;
 
 class BelongsToManyTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */'
     type Role {
         id: ID!
         name: String
         users: [User!] @belongsToMany
     }
-    
+
     type User {
         id: ID!
         name: String
     }
-    
+
     type Mutation {
         createRole(input: CreateRoleInput! @spread): Role @create
         updateRole(input: UpdateRoleInput! @spread): Role @update
@@ -31,24 +31,24 @@ class BelongsToManyTest extends DBTestCase
         name: String
         users: CreateUserRelation
     }
-    
+
     input CreateUserRelation {
         create: [CreateUserInput!]
         upsert: [UpsertUserInput!]
         connect: [ID!]
         sync: [ID!]
     }
-    
+
     input CreateUserInput {
         name: String
     }
-    
+
     input UpdateRoleInput {
         id: ID!
         name: String
         users: UpdateUserRelation
     }
-    
+
     input UpdateUserRelation {
         create: [CreateUserInput!]
         update: [UpdateUserInput!]
@@ -59,7 +59,7 @@ class BelongsToManyTest extends DBTestCase
         syncWithoutDetaching: [ID!]
         disconnect: [ID!]
     }
-    
+
     input UpdateUserInput {
         id: ID!
         name: String
@@ -89,7 +89,7 @@ class BelongsToManyTest extends DBTestCase
 
     public function testCanSyncWithoutDetaching(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "user1"
@@ -153,7 +153,7 @@ class BelongsToManyTest extends DBTestCase
 
     public function testCanCreateWithNewBelongsToMany(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -192,7 +192,7 @@ class BelongsToManyTest extends DBTestCase
 
     public function testCanUpsertWithBelongsToManyOnNonExistentData(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertRole(input: {
                 id: 1
@@ -246,7 +246,7 @@ class BelongsToManyTest extends DBTestCase
         factory(User::class)->create(['name' => 'user_one']);
         factory(User::class)->create(['name' => 'user_two']);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -289,7 +289,7 @@ class BelongsToManyTest extends DBTestCase
         factory(User::class)->create(['name' => 'user_one']);
         factory(User::class)->create(['name' => 'user_two']);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertRole(input: {
                 id: 1
@@ -334,7 +334,7 @@ class BelongsToManyTest extends DBTestCase
             'name' => 'is_admin',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateRole(input: {
                 id: 1
@@ -387,7 +387,7 @@ class BelongsToManyTest extends DBTestCase
             'name' => 'is_admin',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateRole(input: {
                 id: 1
@@ -458,7 +458,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Role(input: {
                 id: 1
@@ -521,7 +521,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Role(input: {
                 id: 1
@@ -573,7 +573,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Role(input: {
                 id: 1
@@ -622,7 +622,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Role(input: {
                 id: 1
@@ -670,7 +670,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Role(input: {
                 id: 1
@@ -709,7 +709,7 @@ class BelongsToManyTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -748,7 +748,7 @@ class BelongsToManyTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertRole(input: {
                 id: 1
@@ -798,7 +798,7 @@ class BelongsToManyTest extends DBTestCase
 
         $this->assertCount(1, $role->users);
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Role(input: {
                 id: 1

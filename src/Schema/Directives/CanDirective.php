@@ -67,7 +67,6 @@ directive @can(
   Pass along the client given input data as arguments to `Gate::check`.
   """
   injectArgs: Boolean = false
-
   """
   Statically defined arguments that are passed to `Gate::check`.
 

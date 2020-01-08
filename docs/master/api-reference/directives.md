@@ -2832,10 +2832,6 @@ directive @whereBetween(
 
 ## @whereConstraints
 
-Add a dynamically client-controlled WHERE constraint to a fields query.
-
-### Definition
-
 ```graphql
 """
 Add a dynamically client-controlled WHERE constraint to a fields query.
@@ -2846,6 +2842,7 @@ directive @whereConstraints(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
+    By default, clients are allowed to use arbitrary columns.
     """
     columns: [String!]
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -2867,75 +2864,33 @@ Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/
 
     composer require mll-lab/graphql-php-scalars
 
-It contains the scalar type `Mixed`, which enables the dynamic query capabilities.
-
-```graphql
-scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
-```
-
-Add an enum type `Operator` to your schema. Depending on your
-database, you may want to allow different internal values. This default
-should work for most databases:
-
-```graphql
-enum Operator {
-    EQ @enum(value: "=")
-    NEQ @enum(value: "!=")
-    GT @enum(value: ">")
-    GTE @enum(value: ">=")
-    LT @enum(value: "<")
-    LTE @enum(value: "<=")
-    LIKE @enum(value: "LIKE")
-    NOT_LIKE @enum(value: "NOT_LIKE")
-}
-```
-
 ### Usage
 
 ```graphql
+type Person {
+    id: ID!
+    age: Int!
+    height: Int!
+    type: String!
+    hair_colour: String!
+}
+
 type Query {
     people(
         where: WhereConstraints @whereConstraints(columns: ["age", "type", "haircolour", "height"])
-    ): [Person!]!
+    ): [Person!]! @all
 }
 ```
 
-This is how you can use it to construct a complex query
-that gets actors over age 37 who either have red hair or are at least 150cm.
+Lighthouse automatically generates definitions for an `Enum` type and an `Input` type
+that are restricted to the defined columns, so you do not have to specify them by hand.
+Here are the types that will be included in the compiled schema:
 
 ```graphql
-{
-  people(
-    filter: {
-      where: [
-        {
-          AND: [
-            { column: AGE, operator: GT value: 37 }
-            { column: TYPE, value: "Actor" }
-            {
-              OR: [
-                { column: HAIRCOLOUR, value: "red" }
-                { column: HEIGHT, operator: GTE, value: 150 }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ) {
-    name
-  }
-}
-```
-
-Lighthouse generates definitions for an `Enum` type and an `Input` type
-that are restricted to the defined columns.
-
-```graphql
-"Dynamic WHERE constraints for the `where` argument on the query `people`.
+"Dynamic WHERE constraints for the `where` argument on the query `people`."
 input PeopleWhereWhereConstraints {
     column: PeopleWhereColumn
-    operator: String = EQ
+    operator: SQLOperator = EQ
     value: Mixed
     AND: [PeopleWhereWhereConstraints!]
     OR: [PeopleWhereWhereConstraints!]
@@ -2951,8 +2906,75 @@ enum PeopleWhereColumn {
 }
 ```
 
-When you are not specifying `columns` to allow, a generic input with dynamic
-column names will be used instead.
+When you are not specifying `columns` to allow, clients can specify arbitrary
+column names as a `String`. This approach should by taken with care, as it carries
+potential performance and security risks and offers little type safety.
+
+A simple query for a person who is exactly 42 years old would look like this:
+
+```graphql
+{
+  people(
+    where: { column: AGE, operator: EQ, value: 42 }
+  ) {
+    name
+  }
+}
+```
+
+Note that the operator defaults to `EQ`/`=` if not given, so you could
+also omit it from the previous example and get the same result.
+
+The following query gets actors over age 37 who either have red hair or are at least 150cm:
+
+```graphql
+{
+  people(
+    where: {
+      AND: [
+        { column: AGE, operator: GT, value: 37 }
+        { column: TYPE, value: "Actor" }
+        {
+          OR: [
+            { column: HAIRCOLOUR, value: "red" }
+            { column: HEIGHT, operator: GTE, value: 150 }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
+
+Some operators require passing lists of values - or no value at all. The following
+query gets people that have no hair and do not have blue-ish eyes:
+
+```graphql
+{
+  people(
+    where: {
+      AND: [
+        { column: HAIRCOLOUR, operator: IS_NULL }
+        {
+          NOT: [
+            { column: EYES, operator: IN, value: ["blue", "aqua", "turquoise"] }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
+
+### Custom operator
+
+You may register a custom `\Nuwave\Lighthouse\WhereConstraints\Operator` through a service provider.
+This may be necessary if your database uses different SQL operators then Lighthouse's default or you
+want to extend/restrict the allowed operators. 
 
 ## @whereJsonContains
 
