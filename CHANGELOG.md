@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable chained rule provider directives (`ProvidesRules`) to merge the rules before validating https://github.com/nuwave/lighthouse/pull/1082
 - Apply nested `OR` conditions in `@whereConstraints` correctly https://github.com/nuwave/lighthouse/pull/1099
 
+### Removed
+
+- Remove broken `NOT` conditional when using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/1125
+
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
 ### Fixed
