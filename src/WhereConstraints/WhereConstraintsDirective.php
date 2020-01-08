@@ -18,7 +18,22 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
     const NAME = 'whereConstraints';
-    const INVALID_COLUMN_MESSAGE = 'Column names may contain only alphanumerics or underscores, and may not begin with a digit.';
+
+    /**
+     * @var \Nuwave\Lighthouse\WhereConstraints\Operator
+     */
+    protected $operator;
+
+    /**
+     * WhereConstraintsDirective constructor.
+     *
+     * @param  \Nuwave\Lighthouse\WhereConstraints\Operator  $operator
+     * @return void
+     */
+    public function __construct(Operator $operator)
+    {
+        $this->operator = $operator;
+    }
 
     /**
      * Name of the directive.
@@ -50,11 +65,11 @@ SDL;
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $whereConstraints
-     * @param  bool  $nestedOr
+     * @param  mixed[]  $whereConstraints
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $whereConstraints, bool $nestedOr = false)
+    public function handleBuilder($builder, $whereConstraints, string $boolean = 'and')
     {
         if ($andConnectedConstraints = $whereConstraints['AND'] ?? null) {
             $builder->whereNested(
@@ -70,9 +85,10 @@ SDL;
             $builder->whereNested(
                 function ($builder) use ($orConnectedConstraints): void {
                     foreach ($orConnectedConstraints as $constraint) {
-                        $this->handleBuilder($builder, $constraint, true);
+                        $this->handleBuilder($builder, $constraint, 'or');
                     }
-                }
+                },
+                'or'
             );
         }
 
@@ -88,35 +104,17 @@ SDL;
         }
 
         if ($column = $whereConstraints['column'] ?? null) {
-            if (! array_key_exists('value', $whereConstraints)) {
-                throw new Error(
-                    self::missingValueForColumn($column)
-                );
-            }
+            static::assertValidColumnName($column);
 
-            if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
-                throw new Error(
-                    self::INVALID_COLUMN_MESSAGE
-                );
-            }
-
-            $where = $nestedOr
-                ? 'orWhere'
-                : 'where';
-
-            $builder->{$where}(
-                $column,
-                $whereConstraints['operator'],
-                $whereConstraints['value']
-            );
+            return $this->operator->applyConstraints($builder, $whereConstraints, $boolean);
         }
 
         return $builder;
     }
 
-    public static function missingValueForColumn(string $column): string
+    public static function invalidColumnName(string $column): string
     {
-        return "Did not receive a value to match the WhereConstraints for column {$column}.";
+        return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: $column";
     }
 
     /**
@@ -198,7 +196,7 @@ SDL;
      * @param  string  $allowedColumnsEnumName
      * @return \GraphQL\Language\AST\EnumTypeDefinitionNode
      */
-    public function createAllowedColumnsEnum(
+    protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
         array $allowedColumns,
@@ -223,5 +221,22 @@ SDL;
         $enumDefinition .= '}';
 
         return PartialParser::enumTypeDefinition($enumDefinition);
+    }
+
+    /**
+     * Ensure the column name is well formed and prevent SQL injection.
+     *
+     * @param  string  $column
+     * @return void
+     *
+     * @throws \GraphQL\Error\Error
+     */
+    protected static function assertValidColumnName(string $column): void
+    {
+        if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
+            throw new Error(
+                self::invalidColumnName($column)
+            );
+        }
     }
 }

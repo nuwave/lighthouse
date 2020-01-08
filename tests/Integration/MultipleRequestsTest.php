@@ -29,9 +29,9 @@ class MultipleRequestsTest extends TestCase
             return(this: "bar")
         }
         ')->assertExactJson([
-           'data' => [
-               'return' => 'bar',
-           ],
+            'data' => [
+                'return' => 'bar',
+            ],
         ]);
     }
 

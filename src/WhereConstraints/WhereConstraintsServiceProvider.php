@@ -13,6 +13,16 @@ use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 class WhereConstraintsServiceProvider extends ServiceProvider
 {
     /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        $this->app->bind(Operator::class, SQLOperator::class);
+    }
+
+    /**
      * Bootstrap any application services.
      *
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
@@ -31,6 +41,9 @@ class WhereConstraintsServiceProvider extends ServiceProvider
         $dispatcher->listen(
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
+                /** @var \Nuwave\Lighthouse\WhereConstraints\Operator $operator */
+                $operator = $this->app->make(Operator::class);
+
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
                         static::createWhereConstraintsInputType(
@@ -40,7 +53,12 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                         )
                     )
                     ->setTypeDefinition(
-                        PartialParser::scalarTypeDefinition('
+                        PartialParser::enumTypeDefinition(
+                            $operator->enumDefinition()
+                        )
+                    )
+                    ->setTypeDefinition(
+                        PartialParser::scalarTypeDefinition(/** @lang GraphQL */ '
                             scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
                         ')
                     );
@@ -50,11 +68,22 @@ class WhereConstraintsServiceProvider extends ServiceProvider
 
     public static function createWhereConstraintsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
-        return PartialParser::inputObjectTypeDefinition("
+        /** @var \Nuwave\Lighthouse\WhereConstraints\Operator $operator */
+        $operator = app(Operator::class);
+
+        $operatorName = PartialParser
+            ::enumTypeDefinition(
+                $operator->enumDefinition()
+            )
+            ->name
+            ->value;
+        $operatorDefault = $operator->default();
+
+        return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ "
             \"$description\"
             input $name {
                 column: $columnType
-                operator: Operator = EQ
+                operator: $operatorName = $operatorDefault
                 value: Mixed
                 AND: [$name!]
                 OR: [$name!]

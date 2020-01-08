@@ -28,13 +28,13 @@ class MorphToDirective extends RelationDirective implements FieldResolver, Defin
 """
 Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @morphTo(      
+directive @morphTo(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
   """
   relation: String
-  
+
   """
   Apply scopes to the underlying query.
   """
