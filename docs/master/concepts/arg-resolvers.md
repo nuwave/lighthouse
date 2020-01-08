@@ -165,7 +165,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
                     $model->fill($args->toArray());
                     $model->save();
                 });
-                
+
                 $modelClass = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClass;

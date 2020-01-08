@@ -4,7 +4,7 @@ Lighthouse offers various extension points which can be utilized by package deve
 as well as end users.
 
 ## The Event System
-   
+
 Lighthouse offers a unified way of hooking into the complete execution lifecycle
 through [Laravel's event system](https://laravel.com/docs/events).
 You may use any Service Provider to register listeners.
@@ -12,7 +12,7 @@ You may use any Service Provider to register listeners.
 You can find a complete list of all dispatched events [in the events API reference](../api-reference/events.md).
 
 ## Adding Directives
-   
+
 You can add your custom directives to Lighthouse by listening for the
 [`RegisterDirectiveNamespaces`](../api-reference/events.md#registerdirectivenamespaces) event.
 
