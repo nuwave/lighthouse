@@ -218,17 +218,17 @@ class HasOneTest extends DBTestCase
         }
 GRAPHQL
             )->assertJson([
-            'data' => [
-                "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'post' => [
+                'data' => [
+                    "${action}Task" => [
                         'id' => '1',
-                        'title' => 'bar',
+                        'name' => 'foo',
+                        'post' => [
+                            'id' => '1',
+                            'title' => 'bar',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
     }
 
     /**

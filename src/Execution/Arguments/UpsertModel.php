@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class UpsertModel implements ArgResolver
@@ -33,7 +32,7 @@ class UpsertModel implements ArgResolver
             ?? $args->arguments[$model->getKeyName()]
             ?? null;
 
-        if($id) {
+        if ($id) {
             $model = $model->newQuery()->find($id->value)
                 ?? $model->newInstance();
         } else {
