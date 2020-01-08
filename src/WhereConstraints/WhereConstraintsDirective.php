@@ -65,7 +65,7 @@ SDL;
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array  $whereConstraints
+     * @param  mixed[]  $whereConstraints
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */

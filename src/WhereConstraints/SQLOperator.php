@@ -50,8 +50,8 @@ GRAPHQL;
     {
         $column = $whereConstraints['column'];
 
-        // Laravel's conditions always start off with one of those prefixes
-        $where = 'where';
+        // Laravel's conditions always start off with this prefix
+        $method = 'where';
 
         // The first argument to conditions methods is always the column name
         $args[] = $column;
@@ -67,11 +67,11 @@ GRAPHQL;
         } else {
             // We utilize the fact that the operators are named after Laravel's condition
             // methods so we can simply append the name, e.g. whereNull, whereNotBetween
-            $where .= $operator;
+            $method .= $operator;
         }
 
         if ($arity > 1) {
-            // The constraints with arity 1 require no args apart from the column name.
+            // The conditions with arity 1 require no args apart from the column name.
             // All other arities take a value to query against.
             if (! array_key_exists('value', $whereConstraints)) {
                 throw new Error(
@@ -82,9 +82,10 @@ GRAPHQL;
             $args[] = $whereConstraints['value'];
         }
 
+        // The condition methods always have the `$boolean` arg after the value
         $args[] = $boolean;
 
-        return call_user_func_array([$builder, $where], $args);
+        return call_user_func_array([$builder, $method], $args);
     }
 
     protected function operatorArity(string $operator): int
