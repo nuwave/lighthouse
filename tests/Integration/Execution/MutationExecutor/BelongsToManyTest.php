@@ -856,7 +856,7 @@ class BelongsToManyTest extends DBTestCase
 
         $metaText = Lorem::sentence();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -865,11 +865,15 @@ class BelongsToManyTest extends DBTestCase
                         {
                             id: 1,
                             meta: "'.$metaText.'"
+                        },
+                        {
+                            id: 2
                         }
                     ]
                 },
             }) {
                 roles {
+                    id
                     pivot {
                         meta
                     }
@@ -881,10 +885,17 @@ class BelongsToManyTest extends DBTestCase
                 'pivotsUpdateUser' => [
                     'roles' => [
                         [
+                            'id' => 1,
                             'pivot' => [
                                 'meta' => $metaText,
                             ],
                         ],
+                        [
+                            'id' => 2,
+                            'pivot' => [
+                                'meta' => null,
+                            ],
+                        ]
                     ],
                 ],
             ],
@@ -900,7 +911,7 @@ class BelongsToManyTest extends DBTestCase
 
         $metaText = Lorem::sentence();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -947,7 +958,7 @@ class BelongsToManyTest extends DBTestCase
 
         $metaText = Lorem::sentence();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             pivotsUpdateUser(input: {
                 id: 1,
