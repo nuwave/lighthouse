@@ -61,11 +61,12 @@ class NestedManyToMany implements ArgResolver
     }
 
     /**
+     * Generate an array for passing into sync, syncWithoutDetaching or connect method
      * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
      *
      * @return array
      */
-    private function generateRelationArray(Argument $args)
+    private function generateRelationArray(Argument $args): array
     {
         $values = $args->toPlain();
 
