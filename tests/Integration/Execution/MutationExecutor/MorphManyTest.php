@@ -16,6 +16,7 @@ class MorphManyTest extends DBTestCase
     }
     
     type Hour {
+        id: ID!
         weekday: Int
     }
     
@@ -40,7 +41,7 @@ class MorphManyTest extends DBTestCase
     }
     
     input UpdateTaskInput {
-        id: ID!
+        id: ID
         name: String
         hours: UpdateHourRelation
     }
@@ -71,7 +72,7 @@ class MorphManyTest extends DBTestCase
     }
 
     input UpsertHourInput {
-        id: ID!
+        id: ID
         weekday: Int
     }
     '.self::PLACEHOLDER_QUERY;
@@ -137,6 +138,43 @@ class MorphManyTest extends DBTestCase
                     'name' => 'foo',
                     'hours' => [
                         [
+                            'weekday' => 3,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertMorphManyWithoutId(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                hours: {
+                    upsert: [{
+                        weekday: 3
+                    }]
+                }
+            }) {
+                id
+                name
+                hours {
+                    id
+                    weekday
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hours' => [
+                        [
+                            'id' => 1,
                             'weekday' => 3,
                         ],
                     ],

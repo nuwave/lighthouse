@@ -59,7 +59,7 @@ class HasManyTest extends DBTestCase
     }
 
     input UpsertUserInput {
-        id: ID!
+        id: ID
         name: String
         tasks: UpsertTaskRelation
     }
@@ -72,7 +72,7 @@ class HasManyTest extends DBTestCase
     }
 
     input UpsertTaskInput {
-        id: ID!
+        id: ID
         name: String
     }
     '.self::PLACEHOLDER_QUERY;
@@ -137,6 +137,43 @@ class HasManyTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertHasManyWithoutId(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            upsertUser(input: {
+                name: "foo"
+                tasks: {
+                    upsert: [{
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'upsertUser' => [
                     'id' => '1',
                     'name' => 'foo',
                     'tasks' => [
