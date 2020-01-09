@@ -152,7 +152,7 @@ class HasManyTest extends DBTestCase
 
     public function testUpsertHasManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(input: {
                 name: "foo"
