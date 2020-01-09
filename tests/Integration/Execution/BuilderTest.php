@@ -42,7 +42,7 @@ class BuilderTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey()
+                'id' => $this->users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -71,7 +71,7 @@ class BuilderTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey()
+                'id' => $this->users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -92,7 +92,7 @@ class BuilderTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey()
+                'id' => $this->users->first()->getKey(),
             ])
             ->assertJsonCount(4, 'data.users');
     }
@@ -115,8 +115,8 @@ class BuilderTest extends DBTestCase
             ', [
                 'ids' => [
                     $this->users->first()->getKey(),
-                    $this->users->last()->getKey()
-                ]
+                    $this->users->last()->getKey(),
+                ],
             ])
             ->assertJsonCount(2, 'data.users');
     }
