@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
 - Add support in `@whereConstraints` for IN, IS NULL and BETWEEN operators https://github.com/nuwave/lighthouse/pull/1099
+- Allow passing variables in `->graphQL()` test helper https://github.com/nuwave/lighthouse/pull/1127
 
 ### Changed
 
