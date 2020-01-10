@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class NotInDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'notIn';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

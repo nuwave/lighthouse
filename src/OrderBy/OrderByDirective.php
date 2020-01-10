@@ -17,16 +17,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'orderBy';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

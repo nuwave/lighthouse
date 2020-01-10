@@ -6,6 +6,7 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
@@ -87,9 +88,7 @@ SDL;
                     continue;
                 }
 
-                /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $instance */
-                $instance = app($class);
-                $name = $instance->name();
+                $name = DirectiveFactory::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
                 if (isset($directives[$name])) {

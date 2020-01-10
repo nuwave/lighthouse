@@ -35,16 +35,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDi
         $this->cacheManager = $cacheManager;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'cache';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

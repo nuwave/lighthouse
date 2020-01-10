@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   overwriting it through a service provider https://github.com/nuwave/lighthouse/pull/1099
 - Always automatically set the correct argument type when using `@whereConstraints` or `@orderBy`
   directives https://github.com/nuwave/lighthouse/pull/1118
+- Implement the `name()` function generically in the BaseDirective class https://github.com/nuwave/lighthouse/pull/1098
 
 ### Fixed
 

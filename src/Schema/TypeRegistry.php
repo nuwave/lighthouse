@@ -342,8 +342,8 @@ EOL
     {
         $nodeName = $interfaceDefinition->name->value;
 
-        if (ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
-            $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
+        if ($directiveNode = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
+            $interfaceDirective = (new InterfaceDirective)->hydrate($directiveNode, $interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
@@ -419,8 +419,8 @@ EOL
     {
         $nodeName = $unionDefinition->name->value;
 
-        if ($directive = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
-            $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
+        if ($directiveNode = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
+            $unionDirective = (new UnionDirective)->hydrate($directiveNode, $unionDefinition);
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {

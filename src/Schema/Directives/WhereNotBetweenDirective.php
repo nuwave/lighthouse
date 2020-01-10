@@ -7,18 +7,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    const NAME = 'whereNotBetween';
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
