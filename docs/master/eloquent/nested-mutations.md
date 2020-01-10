@@ -463,7 +463,7 @@ mutation {
 }
 ```
 
-Lighthouse will detect the relationship and attach/update/create it.
+Lighthouse will detect the relationship and attach, update or create it.
 
 ```json
 {
@@ -524,6 +524,114 @@ input UpdateAuthorBelongsToMany {
   disconnect: [ID!]
 }
 ```
+
+### Storing Pivot Data
+
+It is common that many-to-many relations store some extra data in pivot tables.
+Suppose we want to track what movies a user has seen. In addition to connecting
+the two entities, we want to store how well they liked it:
+
+```graphql
+type User {
+    id: ID!
+    seenMovies: [Movie!] @belongsToMany
+}
+
+type Movie {
+    id: ID!
+    pivot: UserMoviePivot
+}
+
+type UserMoviePivot {
+    "How well did the user like the movie?"
+    rating: String
+}
+```
+
+Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass
+an array where the keys are IDs of related models and the values are pivot data.
+
+Lighthouse exposes this capability through the nested operations on many-to-many relations.
+Instead of passing just a list of ids, you can define an `input` type that also contains pivot data.
+It must contain a field called `id` to contain the ID of the related model,
+all other fields will be inserted into the pivot table.
+
+```graphql
+type Mutation {
+    updateUser(input: UpdateUserInput! @spread): User @update
+}
+
+input UpdateUserInput {
+    id: ID!
+    seenMovies: UpdateUserSeenMovies
+}
+
+input UpdateUserSeenMovies {
+    connect: [ConnectUserSeenMovie!]
+}
+
+input ConnectUserSeenMovie {
+    id: ID!
+    rating: String
+}
+```
+
+You can now pass along pivot data when connecting users to movies:
+
+```graphql
+mutation {
+  updateUser(input: {
+    id: 1
+    seenMovies: {
+      connect: [
+        {
+          id: 6
+          rating: "A perfect 5/7"
+        }
+        {
+          id: 23
+        }
+      ]
+    },
+  }) {
+    id
+    seenMovies {
+      id
+      pivot {
+        rating
+      }
+    }
+  }
+}
+```
+
+And you will get the following response: 
+
+```json
+{
+  "data": {
+    "updateUser": {
+      "id": 1,
+      "seenMovies": [
+        {
+          "id": 6,
+          "pivot": {
+            "rating": "A perfect 5/7"
+          }
+        },
+        {
+          "id": 20,
+          "pivot": {
+            "rating": null
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+It is also possible to use the `sync` and `syncWithoutDetach` operations.
 
 ## MorphTo
 

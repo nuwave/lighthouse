@@ -12,19 +12,19 @@ class MorphToManyTest extends DBTestCase
         createTask(input: CreateTaskInput! @spread): Task @create
         upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
-    
+
     input CreateTaskInput {
         name: String!
         tags: CreateTagRelation
     }
-    
+
     input CreateTagRelation {
         create: [CreateTagInput!]
         upsert: [UpsertTagInput!]
         sync: [ID!]
         connect: [ID!]
     }
-    
+
     input CreateTagInput {
         name: String!
     }
@@ -52,7 +52,7 @@ class MorphToManyTest extends DBTestCase
         name: String!
         tags: [Tag!]!
     }
-    
+
     type Tag {
         id: ID!
         name: String!
