@@ -89,7 +89,6 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                 value: Mixed
                 AND: [$name!]
                 OR: [$name!]
-                NOT: [$name!]
             }
         ");
     }

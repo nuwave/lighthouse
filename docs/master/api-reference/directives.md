@@ -2910,7 +2910,6 @@ input PeopleWhereWhereConstraints {
     value: Mixed
     AND: [PeopleWhereWhereConstraints!]
     OR: [PeopleWhereWhereConstraints!]
-    NOT: [PeopleWhereWhereConstraints!]
 }
 
 "Allowed column names for the `where` argument on the query `people`."
@@ -2965,7 +2964,7 @@ The following query gets actors over age 37 who either have red hair or are at l
 ```
 
 Some operators require passing lists of values - or no value at all. The following
-query gets people that have no hair and do not have blue-ish eyes:
+query gets people that have no hair and blue-ish eyes:
 
 ```graphql
 {
@@ -2973,11 +2972,7 @@ query gets people that have no hair and do not have blue-ish eyes:
     where: {
       AND: [
         { column: HAIRCOLOUR, operator: IS_NULL }
-        {
-          NOT: [
-            { column: EYES, operator: IN, value: ["blue", "aqua", "turquoise"] }
-          ]
-        }
+        { column: EYES, operator: IN, value: ["blue", "aqua", "turquoise"] }
       ]
     }
   ) {

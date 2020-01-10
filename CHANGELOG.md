@@ -40,6 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The argument `field` within the `OrderByClause` used for `@orderBy` will be renamed to `column`
   in v5 https://github.com/nuwave/lighthouse/pull/1118
 
+### Removed
+
+- Remove broken `NOT` conditional when using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/1125
+
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
 ### Fixed
