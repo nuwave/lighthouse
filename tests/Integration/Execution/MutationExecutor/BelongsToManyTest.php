@@ -74,7 +74,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     input UpsertRoleInput {
-        id: ID!
+        id: ID
         name: String
         users: UpsertUserRelation
     }
@@ -90,7 +90,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     input UpsertUserInput {
-        id: ID!
+        id: ID
         name: String
         roles: UpdateRoleRelation
     }
@@ -248,6 +248,55 @@ class BelongsToManyTest extends DBTestCase
                         ],
                         [
                             'id' => '20',
+                            'name' => 'user2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        /** @var Role $role */
+        $role = Role::first();
+        $this->assertCount(2, $role->users()->get());
+        $this->assertSame('is_user', $role->name);
+    }
+
+    public function testUpsertBelongsToManyWithoutId(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertRole(input: {
+                name: "is_user"
+                users: {
+                    upsert: [{
+                        name: "user1"
+                    },
+                    {
+                        name: "user2"
+                    }]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'upsertRole' => [
+                    'id' => '1',
+                    'name' => 'is_user',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'user1',
+                        ],
+                        [
+                            'id' => '2',
                             'name' => 'user2',
                         ],
                     ],
