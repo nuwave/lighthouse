@@ -209,6 +209,9 @@ jobs:
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
+      - name: "Set up the database"
+        run: "mysql --user=root --password=root --execute='CREATE DATABASE test;'"
+
       - name: "Collect code coverage with pcov and phpunit/phpunit"
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
 
