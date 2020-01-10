@@ -108,6 +108,8 @@ jobs:
         exclude:
           - php-version: "7.1"
             laravel-version: "^6.0"
+          - php-version: "7.4"
+            laravel-version: "^5.5.*"
 
     steps:
       - name: "Checkout"
