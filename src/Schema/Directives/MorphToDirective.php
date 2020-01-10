@@ -8,16 +8,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class MorphToDirective extends RelationDirective implements FieldResolver, DefinedDirective
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'morphTo';
-    }
-
-    /**
      * SDL definition of the directive.
      *
      * @return string

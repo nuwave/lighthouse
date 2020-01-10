@@ -19,16 +19,6 @@ class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRule
 {
     use HasArgumentPathTrait;
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'rules';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

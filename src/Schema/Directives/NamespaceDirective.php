@@ -23,16 +23,6 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
 {
     const NAME = 'namespace';
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
@@ -50,15 +40,10 @@ SDL;
      */
     protected function addNamespacesToFields(&$objectType): void
     {
-        $namespaceDirective = $this->directiveDefinition();
+        $namespaceDirective = $this->directiveNode->cloneDeep();
 
         foreach ($objectType->fields as $fieldDefinition) {
-            if (
-                $existingNamespaces = ASTHelper::directiveDefinition(
-                    $fieldDefinition,
-                    self::NAME
-                )
-            ) {
+            if ($existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 

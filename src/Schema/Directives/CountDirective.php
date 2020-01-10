@@ -10,16 +10,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class CountDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
-    /**
-     * Name of the directive as used in the schema.
-     *
-     * @return string
-     */
-    public function name()
-    {
-        return 'count';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

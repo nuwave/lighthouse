@@ -6,16 +6,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ScalarDirective extends BaseDirective implements DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'scalar';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

@@ -18,16 +18,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'paginate';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

@@ -59,12 +59,12 @@ class BelongsToTest extends DBTestCase
     }
 
     input UpsertUserInput {
-        id: ID!
+        id: ID
         name: String
     }
 
     input UpsertTaskInput {
-        id: ID!
+        id: ID
         name: String
         user: UpsertUserRelation
     }
@@ -199,6 +199,39 @@ class BelongsToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertBelongsToWithoutId()
+    {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                user: {
+                    upsert: {
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'upsertTask' => [
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [

@@ -9,16 +9,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class MorphManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'morphMany';
-    }
-
-    /**
      * SDL definition of the directive.
      *
      * @return string
@@ -35,7 +25,7 @@ directive @morphMany(
   if it is named different from the field in the schema.
   """
   relation: String
-  
+
   """
   Apply scopes to the underlying query.
   """
@@ -52,13 +42,13 @@ directive @morphMany(
   Only applies when using pagination.
   """
   defaultCount: Int
-  
+
   """
   Specify the maximum quantity of elements to be returned.
   Only applies when using pagination.
   """
   maxCount: Int
-  
+
   """
   Specify a custom type that implements the Edge interface
   to extend edge object.

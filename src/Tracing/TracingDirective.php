@@ -13,8 +13,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class TracingDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    const NAME = 'tracing';
-
     /**
      * @var \Nuwave\Lighthouse\Tracing\Tracing
      */
@@ -29,16 +27,6 @@ class TracingDirective extends BaseDirective implements FieldMiddleware, Defined
     public function __construct(Tracing $tracing)
     {
         $this->tracing = $tracing;
-    }
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
     }
 
     public static function definition(): string
