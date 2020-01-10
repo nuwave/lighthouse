@@ -20,10 +20,9 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - "7.2"
-
-        dependencies:
-          - "locked"
+          - "7.4"
+        laravel-version:
+          - "^6.0"
 
     steps:
       - name: "Checkout"
@@ -36,27 +35,15 @@ jobs:
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
-      - name: "Validate composer.json and composer.lock"
-        run: "composer validate --strict"
-
       - name: "Cache dependencies installed with composer"
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Install lowest dependencies with composer"
-        if: "matrix.dependencies == 'lowest'"
-        run: "composer update --no-interaction --no-progress --no-suggest --prefer-lowest"
-
-      - name: "Install locked dependencies with composer"
-        if: "matrix.dependencies == 'locked'"
-        run: "composer install --no-interaction --no-progress --no-suggest"
-
-      - name: "Install highest dependencies with composer"
-        if: "matrix.dependencies == 'highest'"
-        run: "composer update --no-interaction --no-progress --no-suggest"
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Run ergebnis/composer-normalize"
         run: "composer normalize --dry-run"
@@ -70,9 +57,8 @@ jobs:
       matrix:
         php-version:
           - "7.4"
-
-        dependencies:
-          - "locked"
+        laravel-version:
+          - "^6.0"
 
     steps:
       - name: "Checkout"
@@ -89,20 +75,11 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Install lowest dependencies with composer"
-        if: "matrix.dependencies == 'lowest'"
-        run: "composer update --no-interaction --no-progress --no-suggest --prefer-lowest"
-
-      - name: "Install locked dependencies with composer"
-        if: "matrix.dependencies == 'locked'"
-        run: "composer install --no-interaction --no-progress --no-suggest"
-
-      - name: "Install highest dependencies with composer"
-        if: "matrix.dependencies == 'highest'"
-        run: "composer update --no-interaction --no-progress --no-suggest"
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Run maglnet/composer-require-checker"
         uses: "docker://webfactory/composer-require-checker:2.0.0"
@@ -116,9 +93,8 @@ jobs:
       matrix:
         php-version:
           - "7.4"
-
-        dependencies:
-          - "locked"
+        laravel-version:
+          - "^6.0"
 
     steps:
       - name: "Checkout"
@@ -135,20 +111,11 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "${{ matrix.php-version }}-composer-locked-${{ hashFiles('**/composer.lock') }}"
-          restore-keys: "${{ matrix.php-version }}-composer-locked-"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Install lowest dependencies with composer"
-        if: "matrix.dependencies == 'lowest'"
-        run: "composer update --no-interaction --no-progress --no-suggest --prefer-lowest"
-
-      - name: "Install locked dependencies with composer"
-        if: "matrix.dependencies == 'locked'"
-        run: "composer install --no-interaction --no-progress --no-suggest"
-
-      - name: "Install highest dependencies with composer"
-        if: "matrix.dependencies == 'highest'"
-        run: "composer update --no-interaction --no-progress --no-suggest"
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Create cache directory for phpstan/phpstan"
         run: "mkdir -p .build/phpstan"
