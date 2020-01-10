@@ -9,7 +9,7 @@ on:
       - "master"
 
 env:
-  REQUIRED_PHP_EXTENSIONS: "mbstring"
+  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
 
 jobs:
   coding-standards:
