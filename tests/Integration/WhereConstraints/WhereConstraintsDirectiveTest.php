@@ -26,10 +26,10 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     }
 
     type Query {
-        posts(where: WhereConstraints @whereConstraints): [Post!]! @all
-        users(where: WhereConstraints @whereConstraints): [User!]! @all
+        posts(where: _ @whereConstraints): [Post!]! @all
+        users(where: _ @whereConstraints): [User!]! @all
         whitelistedColumns(
-            where: WhereConstraints @whereConstraints(columns: ["id", "camelCase"])
+            where: _ @whereConstraints(columns: ["id", "camelCase"])
         ): [User!]! @all
     }
     ';

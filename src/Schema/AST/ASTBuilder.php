@@ -131,7 +131,6 @@ class ASTBuilder
         // TODO seperate out into modules
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
-        $this->addOrderByTypes();
 
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
@@ -367,35 +366,6 @@ GRAPHQL
                     node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
                 '),
             ]
-        );
-    }
-
-    /**
-     * Add types that are used for the @orderBy directive.
-     *
-     * @see \Nuwave\Lighthouse\Schema\Directives\OrderByDirective
-     *
-     * @return void
-     */
-    protected function addOrderByTypes(): void
-    {
-        $this->documentAST->setTypeDefinition(
-            PartialParser::enumTypeDefinition('
-                enum SortOrder {
-                    ASC
-                    DESC
-                }
-            '
-            )
-        );
-
-        $this->documentAST->setTypeDefinition(
-            PartialParser::inputObjectTypeDefinition('
-                input OrderByClause {
-                   field: String!
-                   order: SortOrder!
-                }
-            ')
         );
     }
 }
