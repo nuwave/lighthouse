@@ -1,30 +1,32 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\OrderBy;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
 class OrderByDirectiveDBTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Query {
-        users(orderBy: [OrderByClause!] @orderBy): [User!]! @all
+        users(
+            orderBy: _ @orderBy
+            orderByRestricted: _ @orderBy(columns: ["name"])
+        ): [User!]! @all
     }
 
     type User {
         name: String
         team_id: Int
-    }    
+    }
     ';
 
-    public function testCanOrderByTheGivenFieldAndSortOrderASC(): void
+    public function testCanOrderByTheGivenColumnAndSortOrderASC(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 orderBy: [
@@ -56,7 +58,7 @@ class OrderByDirectiveDBTest extends DBTestCase
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 orderBy: [
@@ -83,13 +85,13 @@ class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanOrderByMultipleFields(): void
+    public function testCanOrderByMultipleColumns(): void
     {
         factory(User::class)->create(['name' => 'B', 'team_id' => 2]);
         factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
         factory(User::class)->create(['name' => 'C', 'team_id' => 2]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 orderBy: [
@@ -127,14 +129,73 @@ class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testThrowsOnInvalidDefinition(): void
+    public function testCanOrderWithRestrictedColumns(): void
     {
-        $this->expectException(DefinitionException::class);
+        factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
 
-        $this->buildSchema('
-        type Query {
-            foo(bar: Int @orderBy): Int
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderByRestricted: [
+                    {
+                        field: NAME
+                        order: ASC
+                    }
+                ]
+            ) {
+                name
+            }
         }
-        ');
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'name' => 'A',
+                    ],
+                    [
+                        'name' => 'B',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @deprecated will be removed in v5
+     * @return void
+     */
+    public function testConfigureColumnArg(): void
+    {
+        config(['lighthouse.orderBy' => 'column']);
+
+        factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderBy: [
+                    {
+                        column: "name"
+                        order: ASC
+                    }
+                ]
+            ) {
+                name
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'name' => 'A',
+                    ],
+                    [
+                        'name' => 'B',
+                    ],
+                ],
+            ],
+        ]);
     }
 }

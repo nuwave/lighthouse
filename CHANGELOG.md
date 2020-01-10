@@ -15,17 +15,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
 - Add support in `@whereConstraints` for IN, IS NULL and BETWEEN operators https://github.com/nuwave/lighthouse/pull/1099
+- Allow restricting the columns for `@orderBy` to a given whitelist and generate
+  an `enum` definition for it https://github.com/nuwave/lighthouse/pull/1118
 
 ### Changed
 
 - Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favour of modular nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Register the operator enum for `@whereConstraints` programmatically and allow
   overwriting it through a service provider https://github.com/nuwave/lighthouse/pull/1099
+- Always automatically set the correct argument type when using `@whereConstraints` or `@orderBy`
+  directives https://github.com/nuwave/lighthouse/pull/1118
 
 ### Fixed
 
 - Enable chained rule provider directives (`ProvidesRules`) to merge the rules before validating https://github.com/nuwave/lighthouse/pull/1082
 - Apply nested `OR` conditions in `@whereConstraints` correctly https://github.com/nuwave/lighthouse/pull/1099
+
+### Deprecated
+
+- The argument `field` within the `OrderByClause` used for `@orderBy` will be renamed to `column`
+  in v5 https://github.com/nuwave/lighthouse/pull/1118
 
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
