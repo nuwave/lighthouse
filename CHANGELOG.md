@@ -14,15 +14,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow existing mutation directives `@create`, `@update`, `@upsert` and `@delete` to function
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
+- Add support in `@whereConstraints` for IN, IS NULL and BETWEEN operators https://github.com/nuwave/lighthouse/pull/1099
+- Add ability to define pivot data on nested mutations within `sync`, `syncWithoutDetach` and `connect` https://github.com/nuwave/lighthouse/pull/1110
+- Allow restricting the columns for `@orderBy` to a given whitelist and generate
+  an `enum` definition for it https://github.com/nuwave/lighthouse/pull/1118
+- Allow passing variables in `->graphQL()` test helper https://github.com/nuwave/lighthouse/pull/1127
 
 ### Changed
 
 - Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favour of modular nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+- Register the operator enum for `@whereConstraints` programmatically and allow
+  overwriting it through a service provider https://github.com/nuwave/lighthouse/pull/1099
+- Always automatically set the correct argument type when using `@whereConstraints` or `@orderBy`
+  directives https://github.com/nuwave/lighthouse/pull/1118
 - Implement the `name()` function generically in the BaseDirective class https://github.com/nuwave/lighthouse/pull/1098
 
 ### Fixed
 
 - Enable chained rule provider directives (`ProvidesRules`) to merge the rules before validating https://github.com/nuwave/lighthouse/pull/1082
+- Apply nested `OR` conditions in `@whereConstraints` correctly https://github.com/nuwave/lighthouse/pull/1099
+- Allow passing `null` or simply no `id` when using `@upsert` https://github.com/nuwave/lighthouse/pull/1114
+
+### Deprecated
+
+- The argument `field` within the `OrderByClause` used for `@orderBy` will be renamed to `column`
+  in v5 https://github.com/nuwave/lighthouse/pull/1118
 
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 

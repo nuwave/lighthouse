@@ -160,7 +160,7 @@ SDL;
         }
 
         $middlewareArgValue = (new Collection($this->directiveArgValue('checks')))
-            ->map(function (string $middleware) : string {
+            ->map(function (string $middleware): string {
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
             })

@@ -60,7 +60,7 @@ class HasOneTest extends DBTestCase
     }
 
     input UpsertTaskInput {
-        id: ID!
+        id: ID
         name: String
         post: UpsertPostHasOne
     }
@@ -73,14 +73,14 @@ class HasOneTest extends DBTestCase
     }
 
     input UpsertPostInput {
-        id: ID!
+        id: ID
         title: String
     }
     '.self::PLACEHOLDER_QUERY;
 
     public function testCanCreateWithNewHasOne(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
@@ -114,7 +114,7 @@ class HasOneTest extends DBTestCase
 
     public function testCanUpsertWithNewHasOne(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
@@ -149,14 +149,48 @@ class HasOneTest extends DBTestCase
 
     public function testCanCreateUsingUpsertWithNewHasOne(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
-                id: 1
+                id: 2
                 name: "foo"
                 post: {
                     upsert: {
-                        id: 1
+                        id: 3
+                        title: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '2',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '3',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertHasOneWithoutId(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                post: {
+                    upsert: {
                         title: "bar"
                     }
                 }
@@ -183,7 +217,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function existingModelMutations()
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -198,14 +232,14 @@ class HasOneTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 post: {
                     create: {
-                        title: \"bar\"
+                        title: "bar"
                     }
                 }
             }) {
@@ -217,18 +251,19 @@ class HasOneTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
-            'data' => [
-                "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'post' => [
+GRAPHQL
+            )->assertJson([
+                'data' => [
+                    "${action}Task" => [
                         'id' => '1',
-                        'title' => 'bar',
+                        'name' => 'foo',
+                        'post' => [
+                            'id' => '1',
+                            'title' => 'bar',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
     }
 
     /**
@@ -243,15 +278,15 @@ class HasOneTest extends DBTestCase
                 factory(Post::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 post: {
                     update: {
                         id: 1
-                        title: \"bar\"
+                        title: "bar"
                     }
                 }
             }) {
@@ -263,7 +298,8 @@ class HasOneTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Task" => [
                     'id' => '1',
@@ -289,15 +325,15 @@ class HasOneTest extends DBTestCase
                 factory(Post::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 post: {
                     upsert: {
                         id: 1
-                        title: \"bar\"
+                        title: "bar"
                     }
                 }
             }) {
@@ -309,7 +345,8 @@ class HasOneTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Task" => [
                     'id' => '1',
@@ -335,11 +372,11 @@ class HasOneTest extends DBTestCase
                 factory(Post::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 post: {
                     delete: 1
                 }
@@ -352,7 +389,9 @@ class HasOneTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Task" => [
                     'id' => '1',

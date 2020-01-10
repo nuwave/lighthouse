@@ -32,7 +32,7 @@ The `graphQL` test helper runs a query on your GraphQL endpoint and returns a `T
 public function testQueriesPosts(): void
 {
     /** @var \Illuminate\Foundation\Testing\TestResponse $response */
-    $response = $this->graphQL('
+    $response = $this->graphQL(/** @lang GraphQL */ '
     {
         posts {
             id
@@ -43,23 +43,20 @@ public function testQueriesPosts(): void
 }
 ```
 
-If you want to use variables within your query, you can use the `postGraphQL` function instead.
+If you want to use variables within your query, pass an associative array as the second argument:
 
 ```php
 public function testCreatePost(): void
 {
     /** @var \Illuminate\Foundation\Testing\TestResponse $response */
-    $response = $this->postGraphQL([
-        'query' => '
-            mutation CreatePost($title: String!) {
-                createPost(title: $title) {
-                    id
-                }
+    $response = $this->graphQL(/** @lang GraphQL */ '
+        mutation CreatePost($title: String!) {
+            createPost(title: $title) {
+                id
             }
-        ',
-        'variables' => [
-            'title' => 'Automatic testing proven to reduce stress levels in developers'
-        ],
+        }
+    ', [
+        'title' => 'Automatic testing proven to reduce stress levels in developers'
     ]);
 }
 ```
@@ -79,7 +76,7 @@ public function testQueriesPosts(): void
 {
     $post = factory(Post::class)->create();
 
-    $this->graphQL('
+    $this->graphQL(/** @lang GraphQL */ '
     {
         posts {
             id
@@ -108,7 +105,7 @@ public function testOrdersUsersByName(): void
     factory(User::class)->create(['name' => 'Chris']);
     factory(User::class)->create(['name' => 'Benedikt']);
 
-    $response = $this->graphQL('
+    $response = $this->graphQL(/** @lang GraphQL */ '
     {
         users(orderBy: "name") {
             name

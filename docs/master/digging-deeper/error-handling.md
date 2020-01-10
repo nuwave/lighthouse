@@ -107,7 +107,7 @@ class SomeField
 {
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
-        if ($this->errorConditionIsMet()) {   
+        if ($this->errorConditionIsMet()) {
             throw new CustomException(
                 'This is the error message',
                 'The reason why this error was thrown, is rendered in the extension output.'
