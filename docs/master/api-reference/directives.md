@@ -2738,7 +2738,7 @@ directive @upsert(
 ```
 
 Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
-If the model doesn't exist, it will be created using the given `id`.
+If the model doesn't exist, it will be created using the given `id` or an auto-assigned `id` if no one was passed.
 
 ```graphql
 type Mutation {
