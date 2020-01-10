@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Enable chained rule provider directives (`ProvidesRules`) to merge the rules before validating https://github.com/nuwave/lighthouse/pull/1082
 - Apply nested `OR` conditions in `@whereConstraints` correctly https://github.com/nuwave/lighthouse/pull/1099
+- Allow passing `null` or simply no `id` when using `@upsert` https://github.com/nuwave/lighthouse/pull/1114
 
 ### Deprecated
 
