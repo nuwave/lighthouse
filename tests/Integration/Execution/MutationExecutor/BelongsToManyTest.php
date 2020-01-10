@@ -243,7 +243,7 @@ class BelongsToManyTest extends DBTestCase
 
     public function testUpsertBelongsToManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertRole(input: {
                 name: "is_user"

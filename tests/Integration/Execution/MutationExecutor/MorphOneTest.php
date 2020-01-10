@@ -144,7 +144,7 @@ class MorphOneTest extends DBTestCase
 
     public function testUpsertMorphOneWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertTask(input: {
                 name: "foo"

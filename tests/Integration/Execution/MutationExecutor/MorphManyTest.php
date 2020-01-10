@@ -148,7 +148,7 @@ class MorphManyTest extends DBTestCase
 
     public function testUpsertMorphManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertTask(input: {
                 name: "foo"

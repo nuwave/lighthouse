@@ -211,7 +211,7 @@ class BelongsToTest extends DBTestCase
 
     public function testUpsertBelongsToWithoutId()
     {
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertTask(input: {
                 name: "foo"
