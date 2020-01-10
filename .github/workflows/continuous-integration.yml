@@ -48,42 +48,6 @@ jobs:
       - name: "Run ergebnis/composer-normalize"
         run: "composer normalize --dry-run"
 
-  dependency-analysis:
-    name: "Dependency Analysis"
-
-    runs-on: "ubuntu-latest"
-
-    strategy:
-      matrix:
-        php-version:
-          - "7.4"
-        laravel-version:
-          - "^6.0"
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
-
-      - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@1.7.2"
-        with:
-          coverage: "none"
-          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
-          php-version: "${{ matrix.php-version }}"
-
-      - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
-        with:
-          path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
-
-      - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Run maglnet/composer-require-checker"
-        uses: "docker://webfactory/composer-require-checker:2.0.0"
-
   static-code-analysis:
     name: "Static Code Analysis"
 
