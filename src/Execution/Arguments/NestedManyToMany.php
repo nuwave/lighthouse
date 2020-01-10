@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedManyToMany implements ArgResolver
@@ -62,9 +63,13 @@ class NestedManyToMany implements ArgResolver
 
     /**
      * Generate an array for passing into sync, syncWithoutDetaching or connect method.
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
      *
-     * @return array
+     * Those functions natively have the capability of passing additional
+     * data to store in the pivot table. That array expects passing the id's
+     * as keys, so we transform the passed arguments to match that.
+     *
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
+     * @return mixed[]
      */
     private function generateRelationArray(Argument $args): array
     {
@@ -74,19 +79,21 @@ class NestedManyToMany implements ArgResolver
             return [];
         }
 
-        if (! is_array($values[0])) {
-            // first values isn't array. Assume values are simply IDs, and return them (old behaviour)
-            return $values;
-        } else {
-            // assume values are arrays and contains pivot information
+        // Since GraphQL inputs are monomorphic, we can just look at the first
+        // given value and can deduce the value of all given args.
+        $exemplaryValue = $values[0];
+
+        // We assume that the values contain pivot information
+        if (is_array($exemplaryValue)) {
             $relationArray = [];
             foreach ($values as $value) {
-                $id = $value['id'];
-                unset($value['id']);
+                $id = Arr::pull($value, 'id');
                 $relationArray[$id] = $value;
             }
 
             return $relationArray;
         }
+
+        return $values;
     }
 }
