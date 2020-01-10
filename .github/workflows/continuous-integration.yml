@@ -161,7 +161,7 @@ jobs:
       - name: "Install PHP with extensions"
         uses: "shivammathur/setup-php@1.7.2"
         with:
-          coverage: "none"
+          coverage: "pcov"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
