@@ -39,7 +39,7 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Install dependencies with composer"
@@ -75,7 +75,7 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Install dependencies with composer"
@@ -111,7 +111,7 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Install dependencies with composer"
@@ -160,7 +160,7 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Remove larastan for Laravel 5.5"
@@ -203,7 +203,7 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Install dependencies with composer"
@@ -244,7 +244,7 @@ jobs:
         uses: "actions/cache@v1.0.3"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-${{ hashFiles('**/composer.lock') }}"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Install dependencies with composer"
