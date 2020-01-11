@@ -102,29 +102,31 @@ class PaginationManipulator
 
         $connectionFieldName = addslashes(ConnectionField::class);
 
-        $connectionType = PartialParser::objectTypeDefinition("
-            \"A paginated list of $fieldTypeName edges.\"
+        $connectionType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            "A paginated list of $fieldTypeName edges."
             type $connectionTypeName {$this->modelClassDirective()} {
-                \"Pagination information about the list of edges.\"
-                pageInfo: PageInfo! @field(resolver: \"{$connectionFieldName}@pageInfoResolver\")
+                "Pagination information about the list of edges."
+                pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
-                \"A list of $fieldTypeName edges.\"
-                edges: [$connectionEdgeName] @field(resolver: \"{$connectionFieldName}@edgeResolver\")
+                "A list of $fieldTypeName edges."
+                edges: [$connectionEdgeName] @field(resolver: "{$connectionFieldName}@edgeResolver")
             }
-        ");
+GRAPHQL
+        );
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
-            ?? PartialParser::objectTypeDefinition("
-                \"An edge that contains a node of type $fieldTypeName and a cursor.\"
+            ?? PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+                "An edge that contains a node of type $fieldTypeName and a cursor."
                 type $connectionEdgeName {
-                    \"The $fieldTypeName node.\"
+                    "The $fieldTypeName node."
                     node: $fieldTypeName
 
-                    \"A unique cursor that can be used for pagination.\"
+                    "A unique cursor that can be used for pagination."
                     cursor: String!
                 }
-            ");
+GRAPHQL
+            );
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),
@@ -160,16 +162,17 @@ class PaginationManipulator
         $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
-        $paginatorType = PartialParser::objectTypeDefinition("
-            \"A paginated list of $fieldTypeName items.\"
+        $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            "A paginated list of $fieldTypeName items."
             type $paginatorTypeName {$this->modelClassDirective()} {
-                \"Pagination information about the list of items.\"
-                paginatorInfo: PaginatorInfo! @field(resolver: \"{$paginatorFieldClassName}@paginatorInfoResolver\")
+                "Pagination information about the list of items."
+                paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
-                \"A list of $fieldTypeName items.\"
-                data: [$fieldTypeName!]! @field(resolver: \"{$paginatorFieldClassName}@dataResolver\")
+                "A list of $fieldTypeName items."
+                data: [$fieldTypeName!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
             }
-        ");
+GRAPHQL
+        );
 
         $inputValueDefinitions = [
             self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
