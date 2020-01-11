@@ -116,7 +116,7 @@ class PaginationManipulator
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
             ?? PartialParser::objectTypeDefinition("
-                \"A $fieldTypeName node that contains the node itself and a cursor.\"
+                \"An edge that contains a node of type $fieldTypeName and a cursor.\"
                 type $connectionEdgeName {
                     \"The $fieldTypeName node.\"
                     node: $fieldTypeName
