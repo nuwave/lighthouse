@@ -37,7 +37,7 @@ to get up and running is a few steps:
 
 1. Install via `composer require nuwave/lighthouse`
 2. Publish the default schema `php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema`
-3. Use something like [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground) to explore your GraphQL endpoint
+3. Use something like [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground) or[Altair GraphQL Client](https://github.com/XKojiMedia/laravel-altair-graphql) to explore your GraphQL endpoint.
 
 Check out [the docs](https://lighthouse-php.com/) to learn more.
 
