@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow restricting the columns for `@orderBy` to a given whitelist and generate
   an `enum` definition for it https://github.com/nuwave/lighthouse/pull/1118
 - Allow passing variables in `->graphQL()` test helper https://github.com/nuwave/lighthouse/pull/1127
+- Add missing schema descriptions to some inputs, types, and enums https://github.com/nuwave/lighthouse/pull/1131
 
 ### Changed
 
