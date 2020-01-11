@@ -1916,18 +1916,27 @@ Lighthouse will automatically generate an input that takes enumerated column nam
 together with the `SortOrder` enum, and add that to your schema. Here is how it looks:
 
 ```graphql
+"Allows ordering a list of records."
 input PostsOrderByOrderByClause {
+    "The column that is used for ordering."
     column: PostsOrderByColumn!
+
+    "The direction that is used for ordering."
     order: SortOrder!
 }
 
+"Order by clause for the `orderBy` argument on the query `posts`."
 enum PostsOrderByColumn {
     POSTED_AT @enum(value: "posted_at")
     TITLE @enum(value: "title")
 }
 
+"The available directions for ordering a list of records."
 enum SortOrder {
+    "Sort records in ascending order."
     ASC
+
+    "Sort records in descending order."
     DESC
 }
 ```
@@ -1999,8 +2008,12 @@ type Query {
     posts(first: Int!, page: Int): PostPaginator
 }
 
+"A paginated list of Post items."
 type PostPaginator {
+    "A list of Post items."
     data: [Post!]!
+
+    "Pagination information about the list of items."
     paginatorInfo: PaginatorInfo!
 }
 ```
@@ -2905,10 +2918,19 @@ Here are the types that will be included in the compiled schema:
 ```graphql
 "Dynamic WHERE constraints for the `where` argument on the query `people`."
 input PeopleWhereWhereConstraints {
+    "The column that is used for the constraint."
     column: PeopleWhereColumn
+
+    "The operator that is used for the constraint."
     operator: SQLOperator = EQ
+
+    "The value that is used for the constraint."
     value: Mixed
+
+    "A set of constraints that requires all constraints to match."
     AND: [PeopleWhereWhereConstraints!]
+
+    "A set of constraints that requires at least one constraint to match."
     OR: [PeopleWhereWhereConstraints!]
 }
 
