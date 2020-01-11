@@ -65,10 +65,10 @@ class OrderByServiceProvider extends ServiceProvider
             "$description"
             input $name {
                 "The column that is used for ordering."
-               $columnName: $columnType!
+                $columnName: $columnType!
 
-               "The direction that is used for ordering."
-               order: SortOrder!
+                "The direction that is used for ordering."
+                order: SortOrder!
             }
 GRAPHQL
         );
