@@ -16,46 +16,46 @@ class SQLOperator implements Operator
         return /** @lang GraphQL */ <<<'GRAPHQL'
 "The available SQL operators that are used to filter query results."
 enum SQLOperator {
-    "Equal operator (=)"
+    "Equal operator (`=`)"
     EQ @enum(value: "=")
 
-    "Not equal operator (!=)"
+    "Not equal operator (`!=`)"
     NEQ @enum(value: "!=")
 
-    "Greater than operator (>)"
+    "Greater than operator (`>`)"
     GT @enum(value: ">")
 
-    "Greater than or equal operator (>=)"
+    "Greater than or equal operator (`>=`)"
     GTE @enum(value: ">=")
 
-    "Less than operator (<)"
+    "Less than operator (`<`)"
     LT @enum(value: "<")
 
-    "Less than or equal operator (<=)"
+    "Less than or equal operator (`<=`)"
     LTE @enum(value: "<=")
 
-    "Simple pattern matching (LIKE)"
+    "Simple pattern matching (`LIKE`)"
     LIKE @enum(value: "LIKE")
 
-    "Negation of simple pattern matching (NOT LIKE)"
+    "Negation of simple pattern matching (`NOT LIKE`)"
     NOT_LIKE @enum(value: "NOT_LIKE")
 
-    "Whether a value is within a set of values (IN)"
+    "Whether a value is within a set of values (`IN`)"
     IN @enum(value: "In")
 
-    "Whether a value is not within a set of values (NOT IN)"
+    "Whether a value is not within a set of values (`NOT IN`)"
     NOT_IN @enum(value: "NotIn")
 
-    "Whether a value is within a range of values (BETWEEN)"
+    "Whether a value is within a range of values (`BETWEEN`)"
     BETWEEN @enum(value: "Between")
 
-    "Whether a value is not within a range of values (NOT BETWEEN)"
+    "Whether a value is not within a range of values (`NOT BETWEEN`)"
     NOT_BETWEEN @enum(value: "NotBetween")
 
-    "NULL value test (NULL)"
+    "Whether a value is null (`IS NULL`)"
     IS_NULL @enum(value: "Null")
 
-    "NOT NULL value test (NOT NULL)"
+    "Whether a value is not null (`IS NOT NULL`)"
     IS_NOT_NULL @enum(value: "NotNull")
 }
 GRAPHQL;
