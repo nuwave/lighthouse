@@ -103,8 +103,12 @@ class PaginationManipulator
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = PartialParser::objectTypeDefinition("
+            \"A paginated list of $fieldTypeName edges.\"
             type $connectionTypeName {$this->modelClassDirective()} {
+                \"Pagination information about the list of edges.\"
                 pageInfo: PageInfo! @field(resolver: \"{$connectionFieldName}@pageInfoResolver\")
+
+                \"A list of $fieldTypeName edges.\"
                 edges: [$connectionEdgeName] @field(resolver: \"{$connectionFieldName}@edgeResolver\")
             }
         ");
@@ -112,8 +116,12 @@ class PaginationManipulator
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
             ?? PartialParser::objectTypeDefinition("
+                \"A $fieldTypeName node that contains the node itself and a cursor.\"
                 type $connectionEdgeName {
+                    \"The $fieldTypeName node.\"
                     node: $fieldTypeName
+
+                    \"A unique cursor that can be used for pagination.\"
                     cursor: String!
                 }
             ");
@@ -153,8 +161,12 @@ class PaginationManipulator
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = PartialParser::objectTypeDefinition("
+            \"A paginated list of $fieldTypeName items.\"
             type $paginatorTypeName {$this->modelClassDirective()} {
+                \"Pagination information about the list of items.\"
                 paginatorInfo: PaginatorInfo! @field(resolver: \"{$paginatorFieldClassName}@paginatorInfoResolver\")
+
+                \"A list of $fieldTypeName items.\"
                 data: [$fieldTypeName!]! @field(resolver: \"{$paginatorFieldClassName}@dataResolver\")
             }
         ");

@@ -34,8 +34,12 @@ class OrderByServiceProvider extends ServiceProvider
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
                         PartialParser::enumTypeDefinition(/** @lang GraphQL */ '
+                            "The available directions for ordering a list of records."
                             enum SortOrder {
+                                "Sort records in ascending order."
                                 ASC
+
+                                "Sort records in descending order."
                                 DESC
                             }
                         '
@@ -60,7 +64,10 @@ class OrderByServiceProvider extends ServiceProvider
         return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
+                "The column that is used for ordering."
                $columnName: $columnType!
+
+               "The direction that is used for ordering."
                order: SortOrder!
             }
 GRAPHQL
