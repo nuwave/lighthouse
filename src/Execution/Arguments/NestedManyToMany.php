@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedManyToMany implements ArgResolver
@@ -28,13 +29,13 @@ class NestedManyToMany implements ArgResolver
 
         if (isset($args->arguments['sync'])) {
             $relation->sync(
-                $args->arguments['sync']->toPlain()
+                $this->generateRelationArray($args->arguments['sync'])
             );
         }
 
         if (isset($args->arguments['syncWithoutDetaching'])) {
             $relation->syncWithoutDetaching(
-                $args->arguments['syncWithoutDetaching']->toPlain()
+                $this->generateRelationArray($args->arguments['syncWithoutDetaching'])
             );
         }
 
@@ -49,7 +50,7 @@ class NestedManyToMany implements ArgResolver
 
         if (isset($args->arguments['connect'])) {
             $relation->attach(
-                $args->arguments['connect']->toPlain()
+                $this->generateRelationArray($args->arguments['connect'])
             );
         }
 
@@ -58,5 +59,42 @@ class NestedManyToMany implements ArgResolver
                 $args->arguments['disconnect']->toPlain()
             );
         }
+    }
+
+    /**
+     * Generate an array for passing into sync, syncWithoutDetaching or connect method.
+     *
+     * Those functions natively have the capability of passing additional
+     * data to store in the pivot table. That array expects passing the id's
+     * as keys, so we transform the passed arguments to match that.
+     *
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
+     * @return mixed[]
+     */
+    private function generateRelationArray(Argument $args): array
+    {
+        $values = $args->toPlain();
+
+        if (empty($values)) {
+            return [];
+        }
+
+        // Since GraphQL inputs are monomorphic, we can just look at the first
+        // given value and can deduce the value of all given args.
+        $exemplaryValue = $values[0];
+
+        // We assume that the values contain pivot information
+        if (is_array($exemplaryValue)) {
+            $relationArray = [];
+            foreach ($values as $value) {
+                $id = Arr::pull($value, 'id');
+                $relationArray[$id] = $value;
+            }
+
+            return $relationArray;
+        }
+
+        // The default case is simply a flat array of IDs which we don't have to transform
+        return $values;
     }
 }

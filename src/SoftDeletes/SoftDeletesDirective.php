@@ -13,16 +13,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class SoftDeletesDirective extends BaseDirective implements FieldManipulator, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'softDeletes';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

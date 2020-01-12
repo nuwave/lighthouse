@@ -12,21 +12,11 @@ class ForceDeleteDirective extends ModifyModelExistenceDirective
 {
     const MODEL_NOT_USING_SOFT_DELETES = 'Use the @forceDelete directive only for Model classes that use the SoftDeletes trait.';
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'forceDelete';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Permanently remove one or more soft deleted models by their ID. 
+Permanently remove one or more soft deleted models by their ID.
 The field must have a single non-null argument that may be a list.
 """
 directive @forceDelete(

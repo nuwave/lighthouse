@@ -11,16 +11,6 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class ComplexityDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'complexity';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

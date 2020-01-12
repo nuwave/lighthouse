@@ -4,16 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 class ModelDirective extends NodeDirective
 {
-    /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'model';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

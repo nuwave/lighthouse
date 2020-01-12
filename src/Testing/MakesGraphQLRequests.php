@@ -27,15 +27,21 @@ trait MakesGraphQLRequests
      * Execute a query as if it was sent as a request to the server.
      *
      * @param  string  $query
+     * @param  array|null  $variables
+     * @param  array  $extraParams
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    protected function graphQL(string $query): TestResponse
+    protected function graphQL(string $query, array $variables = null, array $extraParams = []): TestResponse
     {
-        return $this->postGraphQL(
-            [
-                'query' => $query,
-            ]
-        );
+        $params = ['query' => $query];
+
+        if ($variables) {
+            $params += ['variables' => $variables];
+        }
+
+        $params += $extraParams;
+
+        return $this->postGraphQL($params);
     }
 
     /**

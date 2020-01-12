@@ -57,16 +57,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
         $this->middlewareAdapter = $middlewareAdapter;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'middleware';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
@@ -155,7 +145,7 @@ SDL;
     protected function addMiddlewareDirectiveToFields(&$objectType): void
     {
         $middlewareArgValue = (new Collection($this->directiveArgValue('checks')))
-            ->map(function (string $middleware) : string {
+            ->map(function (string $middleware): string {
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
             })

@@ -151,11 +151,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CreateDirective extends BaseDirective implements FieldResolver
 {
-    public function name(): string
-    {
-        return 'create';
-    }
-
     public function resolveField(FieldValue $fieldValue)
     {
         return $fieldValue->setResolver(
@@ -165,7 +160,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
                     $model->fill($args->toArray());
                     $model->save();
                 });
-                
+
                 $modelClass = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClass;
@@ -197,8 +192,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
-    public function name(): string { ... }
-
     public function resolveField(FieldValue $fieldValue) { ... }
 
     /**

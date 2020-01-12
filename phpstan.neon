@@ -5,7 +5,6 @@ parameters:
   level: 1
   paths:
   - benchmarks
-  - config
   - src
   - tests
   excludes_analyse:

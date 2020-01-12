@@ -137,7 +137,7 @@ const createHandler = options => {
 
           channel.bind(`lighthouse-subscription`, payload => {
             const result = payload.result
-            
+
             if (result && result.errors) {
               sink.error(result.errors)
             } else if (result) {

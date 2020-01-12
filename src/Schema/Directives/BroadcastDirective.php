@@ -11,16 +11,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class BroadcastDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'broadcast';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

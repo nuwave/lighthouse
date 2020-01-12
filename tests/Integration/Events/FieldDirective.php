@@ -2,17 +2,8 @@
 
 namespace Tests\Integration\Events;
 
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class FieldDirective implements Directive
+class FieldDirective extends BaseDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'field';
-    }
 }

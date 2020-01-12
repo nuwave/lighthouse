@@ -5,20 +5,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class SpreadDirective implements ArgDirective, DefinedDirective
+class SpreadDirective extends BaseDirective implements ArgDirective, DefinedDirective
 {
-    const NAME = 'spread';
-
-    /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

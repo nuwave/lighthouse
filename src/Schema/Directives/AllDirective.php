@@ -11,16 +11,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class AllDirective extends BaseDirective implements DefinedDirective, FieldResolver
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'all';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

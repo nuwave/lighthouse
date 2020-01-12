@@ -8,11 +8,6 @@ use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 
 class UpsertDirective extends MutationExecutorDirective
 {
-    public function name(): string
-    {
-        return 'upsert';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

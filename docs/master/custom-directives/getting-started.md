@@ -14,33 +14,18 @@ The class name of a directive must follow the following pattern:
     <DirectiveName>Directive
 
 Let's implement a simple `@upperCase` directive as a part of this introduction.
-We will put it in a class called `UpperCaseDirective`.
+We will put it in a class called `UpperCaseDirective` and extend the
+abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
 <?php
 
-class UpperCaseDirective {}
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+
+class UpperCaseDirective extends BaseDirective {}
 ```
 
 ## Directive Interfaces
-
-Every directive must implement the interface [`\Nuwave\Lighthouse\Support\Contracts\Directive`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/Directive.php).
-
-It contains a single function `name` to specify the name the directive has in the schema.
-
-```php
-<?php
-
-use Nuwave\Lighthouse\Support\Contracts\Directive;
-
-class UpperCaseDirective implements Directive
-{
-    public function name(): string
-    {
-        return 'upperCase';
-    }
-}
-```
 
 At this point, the directive does not do anything.
 Depending on what your directive should do, you can pick one or more of the provided
@@ -57,23 +42,13 @@ namespace App\GraphQL\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class UpperCaseDirective implements Directive, FieldMiddleware
+class UpperCaseDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * Name of the directive as used in the schema.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'upperCase';
-    }
-
     /**
      * Wrap around the final field resolver.
      *

@@ -14,16 +14,6 @@ class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArr
 {
     use HasArgumentPathTrait;
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'rulesForArray';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
