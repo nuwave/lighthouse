@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   an `enum` definition for it https://github.com/nuwave/lighthouse/pull/1118
 - Allow passing variables in `->graphQL()` test helper https://github.com/nuwave/lighthouse/pull/1127
 - Add missing schema descriptions to some inputs, types, and enums https://github.com/nuwave/lighthouse/pull/1131
-- Add `@guard` directive to handle authentication
+- Add `@guard` directive to handle authentication https://github.com/nuwave/lighthouse/pull/1135
 
 ### Changed
 
@@ -41,15 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The argument `field` within the `OrderByClause` used for `@orderBy` will be renamed to `column`
   in v5 https://github.com/nuwave/lighthouse/pull/1118
+- Deprecated the `@middleware` directive, as it violates the boundary between HTTP and GraphQL
+  request handling. Use `@guard` or other field middleware directives instead https://github.com/nuwave/lighthouse/pull/1135
 
 ### Removed
 
 - Remove broken `NOT` conditional when using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/1125
-
-### Deprecated
-
-- Deprecated the `@middleware` directive, as it violates the boundary between HTTP and GraphQL
-  request handling. Use `@guard` or other field middleware directives instead.
 
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
