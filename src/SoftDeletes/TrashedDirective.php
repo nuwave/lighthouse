@@ -14,16 +14,6 @@ class TrashedDirective extends BaseDirective implements ArgBuilderDirective, Def
 {
     const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'trashed';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

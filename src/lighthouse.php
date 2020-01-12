@@ -140,6 +140,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | @orderBy input name
+    |--------------------------------------------------------------------------
+    |
+    | Set the name to use for the generated argument on the
+    | OrderByClause used for the @orderBy directive.
+    |
+    | DEPRECATED This setting will be removed in v5.
+    |
+    */
+
+    'orderBy' => 'field',
+
+    /*
+    |--------------------------------------------------------------------------
     | Debug
     |--------------------------------------------------------------------------
     |

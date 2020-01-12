@@ -24,6 +24,13 @@ use Nuwave\Lighthouse\Support\Utils;
 abstract class BaseDirective implements Directive
 {
     /**
+     * The AST node of the directive.
+     *
+     * @var \GraphQL\Language\AST\DirectiveNode
+     */
+    protected $directiveNode;
+
+    /**
      * The node the directive is defined on.
      *
      * @see \GraphQL\Language\DirectiveLocation
@@ -35,13 +42,27 @@ abstract class BaseDirective implements Directive
     protected $definitionNode;
 
     /**
+     * Returns the name of the used directive.
+     *
+     * TODO: Change to a strongly typed hint in v5
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return $this->directiveNode->name->value;
+    }
+
+    /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directiveNode
      * @param  \GraphQL\Language\AST\Node  $definitionNode
      * @return $this
      */
-    public function hydrate(Node $definitionNode): self
+    public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
+        $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
 
         return $this;
@@ -70,10 +91,7 @@ abstract class BaseDirective implements Directive
      */
     public function directiveHasArgument(string $name): bool
     {
-        return ASTHelper::directiveHasArgument(
-            $this->directiveDefinition(),
-            $name
-        );
+        return ASTHelper::directiveHasArgument($this->directiveNode, $name);
     }
 
     /**
@@ -87,20 +105,18 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the directive definition associated with the current directive.
+     * Get the AST definition node associated with the current directive.
      *
+     * @deprecated in favour of the plain property
      * @return \GraphQL\Language\AST\DirectiveNode
      */
     protected function directiveDefinition(): DirectiveNode
     {
-        return ASTHelper::directiveDefinition(
-            $this->definitionNode,
-            static::name()
-        );
+        return $this->directiveNode;
     }
 
     /**
-     * Get directive argument value.
+     * Get the value of an argument on the directive.
      *
      * @param  string  $name
      * @param  mixed|null  $default
@@ -108,11 +124,7 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, $default = null)
     {
-        return ASTHelper::directiveArgValue(
-            $this->directiveDefinition(),
-            $name,
-            $default
-        );
+        return ASTHelper::directiveArgValue($this->directiveNode, $name, $default);
     }
 
     /**
@@ -178,7 +190,7 @@ abstract class BaseDirective implements Directive
             $namespacesToTry,
             ASTHelper::getNamespaceForDirective(
                 $this->definitionNode,
-                static::name()
+                $this->name()
             )
         );
 

@@ -134,16 +134,6 @@ use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
 class UpdateUserValidationDirective extends ValidationDirective
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'updateUserValidation';
-    }
-
-    /**
      * @return mixed[]
      */
     public function rules(): array
@@ -160,7 +150,7 @@ Use it in your schema upon the field you want to validate.
 
 ```graphql
 type Mutation {
-  updateUser(id: ID, name: String): User @updateUserValidation
+  updateUser(id: ID, name: String): User @update @updateUserValidation
 }
 ```
 

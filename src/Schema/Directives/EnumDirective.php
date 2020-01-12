@@ -6,11 +6,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class EnumDirective extends BaseDirective implements DefinedDirective
 {
-    public function name(): string
-    {
-        return 'enum';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

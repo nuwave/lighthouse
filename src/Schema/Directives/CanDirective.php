@@ -32,16 +32,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
         $this->gate = $gate;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'can';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
@@ -67,7 +57,6 @@ directive @can(
   Pass along the client given input data as arguments to `Gate::check`.
   """
   injectArgs: Boolean = false
-
   """
   Statically defined arguments that are passed to `Gate::check`.
 

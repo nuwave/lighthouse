@@ -1,7 +1,7 @@
 # Nested Mutations
 
 Lighthouse allows you to create, update or delete models and their associated relationships
-all in one single mutation.
+all in one single mutation. This is enabled by the [nested arg resolvers mechanism](../concepts/arg-resolvers.md).
 
 ## Return Types Required
 
@@ -22,7 +22,7 @@ class Post extends Model
     // DOES NOT WORK
     public function comments()
     {
-        return $this->hasMany(Comment::class);        
+        return $this->hasMany(Comment::class);
     }
 }
 ```
@@ -51,30 +51,35 @@ the Post you want to create.
 ```graphql
 input CreatePostInput {
   title: String!
-  author: CreateAuthorRelation
+  author: CreateUserBelongsTo
 }
 ```
 
 The first argument `title` is a value of the `Post` itself and corresponds
 to a column in the database.
 
-The second argument `author`, exposes operations on the related `User` model.
-It has to be named just like the relationship method that is defined on the `Post` model.
+The second argument `author` is named just like the relationship method that is defined on the `Post` model.
+A nested `BelongsTo` relationship exposes the following operations:
+
+- `connect` it to an existing model
+- `create` a new related model and attach it
+- `update` an existing model and attach it
+- `upsert` a new or an existing model and attach it
+- `diconnect` the related model
+- `delete` the related model and the association to it
+
+Both `disconnect` and `delete` don't make much sense in the context of an update.
+You can control what operations are possible by defining just what you need in the `input`.
+We choose to expose the following operations on the related `User` model:
 
 ```graphql
-input CreateAuthorRelation {
+input CreateUserBelongsTo {
   connect: ID
   create: CreateUserInput
   update: UpdateUserInput
   upsert: UpsertUserInput
 }
 ```
-
-You can expose the following operations on a `BelongsTo` relationship when creating:
-- `connect` it to an existing model
-- `create` a new related model and attach it
-- `update` an existing model and attach it
-- `upsert` a new or an existing model and attach it
 
 Finally, you need to define the input that allows you to create a new `User`.
 
@@ -164,13 +169,14 @@ type Mutation {
 input UpdatePostInput {
   id: ID!
   title: String
-  author: UpdateAuthorRelation
+  author: UpdateUserBelongsTo
 }
 
-input UpdateAuthorRelation {
+input UpdateUserBelongsTo {
   connect: ID
   create: CreateUserInput
   update: UpdateUserInput
+  upsert: UpdateUserInput
   disconnect: Boolean
   delete: Boolean
 }
@@ -248,7 +254,7 @@ mutation UpdatePost($disconnectAuthor: Boolean){
 ## Has Many
 
 The counterpart to a `BelongsTo` relationship is `HasMany`. We will start
-of by defining a mutation to create an `User`.
+off by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
@@ -262,15 +268,15 @@ of the `User` itself and its associated `Post` models.
 ```graphql
 input CreateUserInput {
   name: String!
-  posts: CreatePostsRelation
+  posts: CreatePostsHasMany
 }
 ```
 
-Now, we can an operation that allows us to directly create new posts
+Now, we can expose an operation that allows us to directly create new posts
 right when we create the `User`.
 
 ```graphql
-input CreatePostsRelation {
+input CreatePostsHasMany {
   create: [CreatePostInput!]!
 }
 
@@ -279,7 +285,7 @@ input CreatePostInput {
 }
 ```
 
-You can now create a `User` and some posts with it in one request.
+We can now create a `User` and some posts with it in one request.
 
 ```graphql
 mutation {
@@ -335,10 +341,10 @@ type Mutation {
 input UpdateUserInput {
   id: ID!
   name: String
-  posts: UpdatePostsRelation
+  posts: UpdatePostsHasMany
 }
 
-input UpdatePostsRelation {
+input UpdatePostsHasMany {
   create: [CreatePostInput!]
   update: [UpdatePostInput!]
   upsert: [UpsertPostInput!]
@@ -405,10 +411,10 @@ type Mutation {
 
 input CreatePostInput {
   title: String!
-  authors: CreateAuthorRelation
+  authors: CreateAuthorBelongsToMany
 }
 
-input CreateAuthorRelation {
+input CreateAuthorBelongsToMany {
   create: [CreateAuthorInput!]
   upsert: [UpsertAuthorInput!]
   connect: [ID!]
@@ -457,7 +463,7 @@ mutation {
 }
 ```
 
-Lighthouse will detect the relationship and attach/update/create it.
+Lighthouse will detect the relationship and attach, update or create it.
 
 ```json
 {
@@ -504,20 +510,10 @@ mutation {
 }
 ```
 
-Updates on `BelongsToMany` relations may expose the following nested operations:
+Updates on `BelongsToMany` relations may expose additional nested operations:
 
 ```graphql
-type Mutation {
-  updatePost(input: UpdatePostInput! @spread): Post @update
-}
-
-input UpdatePostInput {
-  id: ID!
-  title: String
-  authors: UpdateAuthorRelation
-}
-
-input UpdateAuthorRelation {
+input UpdateAuthorBelongsToMany {
   create: [CreateAuthorInput!]
   connect: [ID!]
   update: [UpdateAuthorInput!]
@@ -527,21 +523,115 @@ input UpdateAuthorRelation {
   delete: [ID!]
   disconnect: [ID!]
 }
+```
 
-input CreateAuthorInput {
-  name: String!
+### Storing Pivot Data
+
+It is common that many-to-many relations store some extra data in pivot tables.
+Suppose we want to track what movies a user has seen. In addition to connecting
+the two entities, we want to store how well they liked it:
+
+```graphql
+type User {
+    id: ID!
+    seenMovies: [Movie!] @belongsToMany
 }
 
-input UpdateAuthorInput {
-  id: ID!
-  name: String!
+type Movie {
+    id: ID!
+    pivot: UserMoviePivot
 }
 
-input UpsertAuthorInput {
-  id: ID!
-  name: String!
+type UserMoviePivot {
+    "How well did the user like the movie?"
+    rating: String
 }
 ```
+
+Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass
+an array where the keys are IDs of related models and the values are pivot data.
+
+Lighthouse exposes this capability through the nested operations on many-to-many relations.
+Instead of passing just a list of ids, you can define an `input` type that also contains pivot data.
+It must contain a field called `id` to contain the ID of the related model,
+all other fields will be inserted into the pivot table.
+
+```graphql
+type Mutation {
+    updateUser(input: UpdateUserInput! @spread): User @update
+}
+
+input UpdateUserInput {
+    id: ID!
+    seenMovies: UpdateUserSeenMovies
+}
+
+input UpdateUserSeenMovies {
+    connect: [ConnectUserSeenMovie!]
+}
+
+input ConnectUserSeenMovie {
+    id: ID!
+    rating: String
+}
+```
+
+You can now pass along pivot data when connecting users to movies:
+
+```graphql
+mutation {
+  updateUser(input: {
+    id: 1
+    seenMovies: {
+      connect: [
+        {
+          id: 6
+          rating: "A perfect 5/7"
+        }
+        {
+          id: 23
+        }
+      ]
+    },
+  }) {
+    id
+    seenMovies {
+      id
+      pivot {
+        rating
+      }
+    }
+  }
+}
+```
+
+And you will get the following response: 
+
+```json
+{
+  "data": {
+    "updateUser": {
+      "id": 1,
+      "seenMovies": [
+        {
+          "id": 6,
+          "pivot": {
+            "rating": "A perfect 5/7"
+          }
+        },
+        {
+          "id": 20,
+          "pivot": {
+            "rating": null
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+It is also possible to use the `sync` and `syncWithoutDetach` operations.
 
 ## MorphTo
 
@@ -571,7 +661,7 @@ input CreateHourInput {
   from: String
   to: String
   weekday: Int
-  hourable: CreateHourableOperations
+  hourable: CreateHourableMorphTo
 }
 
 input UpdateHourInput {
@@ -579,7 +669,7 @@ input UpdateHourInput {
   from: String
   to: String
   weekday: Int
-  hourable: UpdateHourableOperations
+  hourable: UpdateHourableMorphTo
 }
 
 input UpsertHourInput {
@@ -587,20 +677,20 @@ input UpsertHourInput {
   from: String
   to: String
   weekday: Int
-  hourable: UpsertHourableOperations
+  hourable: UpsertHourableMorphTo
 }
 
-input CreateHourableOperations {
+input CreateHourableMorphTo {
   connect: ConnectHourableInput
 }
 
-input UpdateHourableOperations {
+input UpdateHourableMorphTo {
   connect: ConnectHourableInput
   disconnect: Boolean
   delete: Boolean
 }
 
-input UpsertHourableOperations {
+input UpsertHourableMorphTo {
   connect: ConnectHourableInput
   disconnect: Boolean
   delete: Boolean
@@ -687,10 +777,10 @@ type Mutation {
 
 input CreateTaskInput {
   name: String!
-  tags: CreateTagRelation
+  tags: CreateTagMorphToMany
 }
 
-input CreateTagRelation {
+input CreateTagMorphToMany {
   create: [CreateTagInput!]
   upsert: [UpsertTagInput!]
   sync: [ID!]

@@ -62,7 +62,8 @@
         "laravel": {
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
-                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider"
+                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
+                "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider"
             ],
             "aliases": {
                 "graphql": "Nuwave\\Lighthouse\\GraphQL"
