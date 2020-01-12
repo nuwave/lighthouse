@@ -81,15 +81,25 @@ class WhereConstraintsServiceProvider extends ServiceProvider
             ->value;
         $operatorDefault = $operator->default();
 
-        return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ "
-            \"$description\"
+        return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            "$description"
             input $name {
+                "The column that is used for the constraint."
                 column: $columnType
+
+                "The operator that is used for the constraint."
                 operator: $operatorName = $operatorDefault
+
+                "The value that is used for the constraint."
                 value: Mixed
+
+                "A set of constraints that requires all constraints to match."
                 AND: [$name!]
+
+                "A set of constraints that requires at least one constraint to match."
                 OR: [$name!]
             }
-        ");
+GRAPHQL
+        );
     }
 }
