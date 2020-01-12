@@ -316,8 +316,8 @@ class ASTHelper
         $name = $directiveNode->name->value;
 
         if (
-            !$objectType instanceof ObjectTypeDefinitionNode
-            && !$objectType instanceof ObjectTypeExtensionNode
+            ! $objectType instanceof ObjectTypeDefinitionNode
+            && ! $objectType instanceof ObjectTypeExtensionNode
         ) {
             throw new DefinitionException(
                 "The @{$name} directive may only be placed on fields or object types."
@@ -328,7 +328,7 @@ class ASTHelper
         foreach ($objectType->fields as $fieldDefinition) {
             // If the field already has the same directive defined, skip over it.
             // Field directive are more specific then those defined on a type.
-            if (ASTHelper::hasDirective($fieldDefinition, $name)) {
+            if (self::hasDirective($fieldDefinition, $name)) {
                 return;
             }
 

@@ -92,6 +92,7 @@ SDL;
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
                 $this->auth->shouldUse($guard);
+
                 return;
             }
         }
@@ -104,7 +105,6 @@ SDL;
      *
      * @param  array<string|null>  $guards
      * @return void
-     *
      */
     protected function unauthenticated(array $guards): void
     {

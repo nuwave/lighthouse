@@ -47,9 +47,9 @@ class GuardDirectiveTest extends TestCase
                     'message' => AuthenticationException::UNAUTHENTICATED,
                     'extensions' => [
                         'guards' => [
-                            'api'
-                        ]
-                    ]
+                            'api',
+                        ],
+                    ],
                 ],
             ],
         ]);

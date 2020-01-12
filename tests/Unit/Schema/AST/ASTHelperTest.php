@@ -133,7 +133,6 @@ class ASTHelperTest extends TestCase
         }
         ');
 
-
         ASTHelper::addDirectiveToFields(
             PartialParser::directive(/** @lang GraphQL */ '@guard'),
             $object
