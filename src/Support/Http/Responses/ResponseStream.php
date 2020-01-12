@@ -28,7 +28,7 @@ class ResponseStream extends Stream implements CanStreamResponse
         if (! empty($paths)) {
             $lastKey = count($paths) - 1;
 
-            foreach($paths as $i => $path) {
+            foreach ($paths as $i => $path) {
                 $chunk['data'] = Arr::get($data, "data.{$path}");
                 $chunk['path'] = (new Collection(explode('.', $path)))
                     ->map(function ($partial) {
