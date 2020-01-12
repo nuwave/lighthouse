@@ -33,16 +33,6 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
         $this->auth = $auth;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'guard';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
