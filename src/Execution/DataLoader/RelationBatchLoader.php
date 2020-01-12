@@ -80,7 +80,12 @@ class RelationBatchLoader extends BatchLoader
     protected function getParentModels(): EloquentCollection
     {
         return new EloquentCollection(
-            (new Collection($this->keys))->pluck('parent')
+            array_map(
+                function(array $meta) {
+                    return $meta['parent'];
+                },
+                $this->keys
+            )
         );
     }
 }

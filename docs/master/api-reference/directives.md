@@ -747,7 +747,7 @@ type Mutation {
 ```
 
 You can also delete multiple models at once.
-Define a field that takes a list of IDs and returns a Collection of the
+Define a field that takes a list of IDs and returns a collection of the
 deleted models.
 
 _In contrast to Laravel mass updates, this does trigger model events._
