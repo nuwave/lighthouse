@@ -51,6 +51,6 @@ project - it is a relatively simple `ArgManipulator` directive.
 ```diff
 -type PaginatedPost @modelClass(class: "\\App\\Post") {
 +type PaginatedPost @model(class: "\\App\\Post") {
-    id: ObfId!
+    id: ID!
 }
 ```
