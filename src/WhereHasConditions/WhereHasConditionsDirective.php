@@ -38,7 +38,7 @@ class WhereHasConditionsDirective extends BaseDirective implements ArgBuilderDir
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Add a dynamically client-controlled WHERE condition to a fields query.
+Add a dynamically client-controlled relationship WHERE condition to a fields query.
 The argument it is defined on may have any name but **must** be
 of the input type `WhereHasConditions`.
 """
@@ -68,7 +68,7 @@ SDL;
     {
         if ($init) {
             $builder->whereHas($this->directiveArgValue('relation'), function ($builder) use ($whereConditions) {
-                // This extra nesting is required for `OR` condition to work correctly.
+                // This extra nesting is required for the `OR` condition to work correctly.
                 $builder->whereNested(
                     function ($builder) use ($whereConditions): void {
                         $this->handleBuilder($builder, $whereConditions, false);
