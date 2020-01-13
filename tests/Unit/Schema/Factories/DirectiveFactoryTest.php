@@ -37,7 +37,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testHydratesBaseDirectives(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             foo: String @field
         ');
 
@@ -58,7 +58,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testSkipsHydrationForNonBaseDirectives(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             foo: String @foo
         ');
 
@@ -93,7 +93,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testCanCreateSingleDirective(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             foo: [Foo!]! @hasMany
         ');
 
@@ -105,7 +105,7 @@ class DirectiveFactoryTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             bar: [Bar!]! @hasMany @belongsTo
         ');
 
@@ -114,7 +114,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testCanCreateMultipleDirectives(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             bar: String @can(if: ["viewBar"]) @event
         ');
 

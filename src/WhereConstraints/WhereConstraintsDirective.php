@@ -35,7 +35,7 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Add a dynamically client-controlled WHERE constraint to a fields query.
 The argument it is defined on may have any name but **must** be

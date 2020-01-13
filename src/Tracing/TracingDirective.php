@@ -31,7 +31,7 @@ class TracingDirective extends BaseDirective implements FieldMiddleware, Defined
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Do not use this directive directly, it is automatically added to the schema
 when using the tracing extension.

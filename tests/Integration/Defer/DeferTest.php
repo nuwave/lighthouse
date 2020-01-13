@@ -168,7 +168,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = /** @lang GraphQL */"
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User
@@ -236,7 +236,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = /** @lang GraphQL */"
+        $this->schema = /** @lang GraphQL */ "
         type Post {
             title: String
             author: User
@@ -297,7 +297,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = /** @lang GraphQL */"
+        $this->schema = /** @lang GraphQL */ "
         type Comment {
             message: String
         }
@@ -598,7 +598,7 @@ class DeferTest extends TestCase
             'name' => 'John Doe',
         ];
 
-        $this->schema = /** @lang GraphQL */"
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User
@@ -638,7 +638,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = /** @lang GraphQL */"
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User
@@ -674,7 +674,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = /** @lang GraphQL */"
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User @field(resolver: \"{$this->qualifyTestResolver('throw')}\")

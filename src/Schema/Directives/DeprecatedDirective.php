@@ -12,7 +12,7 @@ class DeprecatedDirective extends BaseDirective implements FieldMiddleware, Defi
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Marks an element of a GraphQL schema as no longer supported.
 """

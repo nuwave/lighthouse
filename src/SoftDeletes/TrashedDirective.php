@@ -16,7 +16,7 @@ class TrashedDirective extends BaseDirective implements ArgBuilderDirective, Def
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Allows to filter if trashed elements should be fetched.
 """

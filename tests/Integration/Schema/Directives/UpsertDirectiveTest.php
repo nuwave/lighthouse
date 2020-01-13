@@ -16,7 +16,7 @@ class UpsertDirectiveTest extends DBTestCase
             'name' => 'old',
         ]);
 
-        $this->schema .= /* @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -43,7 +43,7 @@ class UpsertDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateUser(input: {
                 id: 1

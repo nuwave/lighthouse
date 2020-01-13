@@ -25,7 +25,7 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Redefine the default namespaces used in other directives.
 The arguments are a map from directive names to namespaces.

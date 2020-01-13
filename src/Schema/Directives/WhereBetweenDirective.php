@@ -9,7 +9,7 @@ class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Verify that a column\'s value is between two values.
 The type of the input value this is defined upon should be

@@ -10,7 +10,7 @@ class UpdateDirective extends MutationExecutorDirective
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Update an Eloquent model with the input values of the field.
 """

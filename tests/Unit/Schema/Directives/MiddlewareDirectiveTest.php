@@ -62,7 +62,7 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testWrapsExceptionFromMiddlewareInResponse(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             bar: String
             foo: Int @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
@@ -89,7 +89,7 @@ class MiddlewareDirectiveTest extends TestCase
         $router = $this->app['router'];
         $router->aliasMiddleware('foo', CountRuns::class);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
                 @middleware(checks: ["foo"])
@@ -114,7 +114,7 @@ class MiddlewareDirectiveTest extends TestCase
         $router = $this->app['router'];
         $router->middlewareGroup('bar', [Authenticate::class]);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
                 @middleware(checks: ["bar"])
@@ -136,7 +136,7 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testPassesOneFieldButThrowsInAnother(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
                 @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
@@ -177,7 +177,7 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testAddsMiddlewareDirectiveToFields(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {
             foo: Int
         }
@@ -204,7 +204,7 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testPrefersFieldMiddlewareOverTypeMiddleware(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query @middleware(checks: ["auth"]) {
             foo: Int @middleware(checks: ["api"])
         }

@@ -9,7 +9,7 @@ class CreateDirective extends MutationExecutorDirective
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Create a new Eloquent model with the given arguments.
 """

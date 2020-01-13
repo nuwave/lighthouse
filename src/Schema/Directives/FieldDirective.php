@@ -13,7 +13,7 @@ class FieldDirective extends BaseDirective implements FieldResolver, DefinedDire
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Assign a resolver function to a field.
 """

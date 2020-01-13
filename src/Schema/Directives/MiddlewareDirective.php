@@ -59,7 +59,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run Laravel middleware for a specific field or group of fields.
 This can be handy to reuse existing HTTP middleware.

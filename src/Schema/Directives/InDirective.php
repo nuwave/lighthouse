@@ -9,7 +9,7 @@ class InDirective extends BaseDirective implements ArgBuilderDirective, DefinedD
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 directive @in(
   """
   Specify the database column to compare.

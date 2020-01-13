@@ -139,7 +139,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -171,7 +171,7 @@ class UpdateDirectiveTest extends DBTestCase
         ';
 
         $this->expectException(QueryException::class);
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateUser(input: {
                 id: 1
@@ -202,7 +202,7 @@ class UpdateDirectiveTest extends DBTestCase
             'id' => 3,
         ]);
 
-        $this->schema .= /* @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -229,7 +229,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateUser(input: {
                 id: 1

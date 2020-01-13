@@ -3,7 +3,7 @@
 use Faker\Generator as Faker;
 use Tests\Utils\Models\ACL;
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(ACL::class, function (Faker $faker): array {
     return [
         'create_post' => $faker->boolean,

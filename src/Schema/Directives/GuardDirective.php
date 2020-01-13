@@ -37,7 +37,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run authentication through one or more guards.
 This is run per field and may allow unauthenticated
