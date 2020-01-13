@@ -67,14 +67,21 @@ SDL;
     public function handleBuilder($builder, $whereConditions, $init = true, string $boolean = 'and')
     {
         if ($init) {
-            $builder->whereHas($this->directiveArgValue('relation'), function ($builder) use ($whereConditions) {
-                // This extra nesting is required for the `OR` condition to work correctly.
-                $builder->whereNested(
+            // Make sure to ignore empty conditions.
+            // The "operator" key set by default, so the count is 1 when the condition is empty.
+            if (count($whereConditions) > 1) {
+                $builder->whereHas(
+                    $this->directiveArgValue('relation'),
                     function ($builder) use ($whereConditions): void {
-                        $this->handleBuilder($builder, $whereConditions, false);
+                        // This extra nesting is required for the `OR` condition to work correctly.
+                        $builder->whereNested(
+                            function ($builder) use ($whereConditions): void {
+                                $this->handleBuilder($builder, $whereConditions, false);
+                            }
+                        );
                     }
                 );
-            });
+            }
         } else {
             if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
                 $builder->whereNested(
