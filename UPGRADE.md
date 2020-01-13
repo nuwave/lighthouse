@@ -9,6 +9,24 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ## v4 to v5
 
+### Replace @middleware with @guard and specialized FieldMiddleware
+
+The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL
+request handling.
+
+Authentication is one of most common use cases for `@middleware`. You can now use
+the [`@guard`](docs/master/api-reference/directives.md#guard) on selected fields.
+
+```diff
+type Query {
+- profile: User! @middlware(checks: ["auth"])
++ profile: User! @guard
+}
+```
+
+Other functionality can be replaced by a custom [`FieldMiddleware`](docs/master/custom-directives/field-directives.md#fieldmiddleware)
+directive. Just like Laravel Middleware, it can wrap around individual field resolvers.
+
 ### `@orderBy` argument renamed to `column`
 
 The argument to specify the column to order by when using `@orderBy` was renamed
