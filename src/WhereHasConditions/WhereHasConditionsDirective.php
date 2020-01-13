@@ -45,6 +45,7 @@ of the input type `WhereHasConditions`.
 directive @whereHasConditions(
     """
     The Eloquent relationship that the conditions will be applied to.
+    This argument can be ommited if the field name and the relationship name are the same.
     """
     relation: String
 
@@ -70,8 +71,12 @@ SDL;
             // Make sure to ignore empty conditions.
             // The "operator" key set by default, so the count is 1 when the condition is empty.
             if (count($whereConditions) > 1) {
+                $relationName = $this->directiveArgValue('relation')
+                    // Use the name of the argument if no explicit relation name is given.
+                    ?? $this->nodeName();
+
                 $builder->whereHas(
-                    $this->directiveArgValue('relation'),
+                    $relationName,
                     function ($builder) use ($whereConditions): void {
                         // This extra nesting is required for the `OR` condition to work correctly.
                         $builder->whereNested(

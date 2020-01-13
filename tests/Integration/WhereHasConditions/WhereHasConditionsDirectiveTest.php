@@ -46,6 +46,10 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         whitelistedColumns(
             hasCompany: _ @whereHasConditions(relation: "company", columns: ["id", "camelCase"])
         ): [User!]! @all
+
+        withoutRelation(
+            company: _ @whereHasConditions
+        ): [User!]! @all
     }
     ';
 
@@ -437,5 +441,31 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             ],
             $enum
         );
+    }
+
+    public function testWithoutRelationName(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            withoutRelation(
+                company: {
+                    column: "id"
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'withoutRelation' => [
+                    [
+                        'id' => 1,
+                    ],
+                ],
+            ],
+        ]);
     }
 }
