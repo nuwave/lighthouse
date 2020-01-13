@@ -329,7 +329,7 @@ class ASTHelper
             // If the field already has the same directive defined, skip over it.
             // Field directive are more specific then those defined on a type.
             if (self::hasDirective($fieldDefinition, $name)) {
-                return;
+                continue;
             }
 
             $fieldDefinition->directives = $fieldDefinition->directives->merge([$directiveNode]);

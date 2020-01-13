@@ -149,6 +149,7 @@ class ASTHelperTest extends TestCase
         $object = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
         type Query {
             foo: Int @guard(with: "api")
+            bar: String
         }
         ');
 
@@ -161,5 +162,9 @@ class ASTHelperTest extends TestCase
         $fieldGuard = ASTHelper::directiveArgValue($guardOnFooArguments, 'with');
 
         $this->assertSame('api', $fieldGuard);
+        $this->assertSame(
+            'guard',
+            $object->fields[1]->directives[0]->name->value
+        );
     }
 }
