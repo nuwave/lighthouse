@@ -15,7 +15,7 @@ class RenameDirectiveTest extends TestCase
             ];
         });
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Foo @mock
         }
@@ -25,7 +25,7 @@ class RenameDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo {
                 bar
@@ -44,13 +44,13 @@ class RenameDirectiveTest extends TestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: String! @rename
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             fooBar
         }
@@ -63,7 +63,7 @@ class RenameDirectiveTest extends TestCase
             return $args === ['bar' => 'something'];
         });
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(
                 baz: String @rename(attribute: "bar")
@@ -71,7 +71,7 @@ class RenameDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo(baz: "something")
         }

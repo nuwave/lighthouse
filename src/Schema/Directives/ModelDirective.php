@@ -6,7 +6,7 @@ class ModelDirective extends NodeDirective
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Enable fetching an Eloquent model by its global id through the `node` query.
 

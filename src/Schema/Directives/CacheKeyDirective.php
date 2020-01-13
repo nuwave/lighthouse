@@ -9,7 +9,7 @@ class CacheKeyDirective extends BaseDirective implements Directive, DefinedDirec
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Specify the field to use as a key when creating a cache.
 """

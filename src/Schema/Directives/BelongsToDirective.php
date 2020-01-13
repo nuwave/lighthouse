@@ -9,7 +9,7 @@ class BelongsToDirective extends RelationDirective implements FieldResolver, Def
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Resolves a field through the Eloquent `BelongsTo` relationship.
 """

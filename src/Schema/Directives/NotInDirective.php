@@ -9,7 +9,7 @@ class NotInDirective extends BaseDirective implements ArgBuilderDirective, Defin
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Filter a column by an array using a `whereNotIn` clause.
 """

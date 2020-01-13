@@ -13,7 +13,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware, Defi
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Customize the calculation of a fields complexity score before execution.
 """

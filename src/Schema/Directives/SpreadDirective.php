@@ -9,7 +9,7 @@ class SpreadDirective extends BaseDirective implements ArgDirective, DefinedDire
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Merge the fields of a nested input object into the arguments of its parent
 when processing the field arguments given by a client.

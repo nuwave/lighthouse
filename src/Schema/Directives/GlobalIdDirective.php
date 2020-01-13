@@ -32,7 +32,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Converts between IDs/types and global IDs.
 When used upon a field, it encodes,

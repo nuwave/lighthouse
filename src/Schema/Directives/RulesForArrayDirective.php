@@ -16,7 +16,7 @@ class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArr
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 """

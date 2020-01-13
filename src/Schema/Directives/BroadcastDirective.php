@@ -13,7 +13,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware, Defin
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 directive @broadcast(
   """
   Name of the subscription that should be retriggered as a result of this operation..

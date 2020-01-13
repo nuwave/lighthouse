@@ -10,7 +10,7 @@ class UnionDirective extends BaseDirective implements Directive, DefinedDirectiv
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Some other definition then the original.
 """

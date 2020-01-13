@@ -9,7 +9,7 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective, Defi
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Perform a full-text by the given input value.
 """

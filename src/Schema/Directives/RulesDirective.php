@@ -21,7 +21,7 @@ class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRule
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
 """

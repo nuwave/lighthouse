@@ -10,7 +10,7 @@ class GuardDirectiveTest extends TestCase
 {
     public function testGuardsWithDefault(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @guard
         }
@@ -31,7 +31,7 @@ class GuardDirectiveTest extends TestCase
 
     public function testGuardsWithApi(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @guard(with: "api")
         }
@@ -58,7 +58,7 @@ class GuardDirectiveTest extends TestCase
     public function testPassesOneFieldButThrowsInAnother(): void
     {
         $this->be(new User());
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @guard
             bar: String @guard(with: "api")
