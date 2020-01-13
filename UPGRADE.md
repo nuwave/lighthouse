@@ -34,3 +34,9 @@ Client queries will have to be changed like this:
 
 If you absolutely cannot break your clients, you can re-implement `@orderBy` in your
 project - it is a relatively simple `ArgManipulator` directive.
+
+### `@model` directive was repurposed 
+
+`@model` directive in v5 does what `@modelClass` did in v4. To implement similar functionality of `@model` from v4 use `@node` directive instead. 
+
+### `@modelClass` is renamed to `@model`
