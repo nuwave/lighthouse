@@ -23,7 +23,7 @@ class WhereHasConditionsDirective extends BaseDirective implements ArgBuilderDir
     protected $operator;
 
     /**
-     * WhereHasConditionssDirective constructor.
+     * WhereHasConditionsDirective constructor.
      *
      * @param  \Nuwave\Lighthouse\WhereConditions\Operator  $operator
      * @return void
