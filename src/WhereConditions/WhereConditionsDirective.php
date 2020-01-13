@@ -55,7 +55,7 @@ SDL;
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $whereConditions, string $boolean = 'and')
+    public function handleBuilder($builder, array $whereConditions, string $boolean = 'and')
     {
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
             $builder->whereNested(

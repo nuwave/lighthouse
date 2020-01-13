@@ -63,7 +63,7 @@ SDL;
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $whereConditions, $init = true, string $boolean = 'and')
+    public function handleBuilder($builder, array $whereConditions, bool $init = true, string $boolean = 'and')
     {
         if ($init) {
             // Make sure to ignore empty conditions.
