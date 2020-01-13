@@ -37,9 +37,8 @@ class WhereHasConditionsDirective extends BaseDirective implements ArgBuilderDir
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Add a dynamically client-controlled relationship WHERE condition to a fields query.
-The argument it is defined on may have any name but **must** be
-of the input type `WhereHasConditions`.
+Allows clients to filter a query based on the existence of a related model, using
+a dynamically controlled `WHERE` condition that applies to the relationship.
 """
 directive @whereHasConditions(
     """

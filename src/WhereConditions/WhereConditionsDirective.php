@@ -38,8 +38,6 @@ class WhereConditionsDirective extends BaseDirective implements ArgBuilderDirect
         return /** @lang GraphQL */ <<<'SDL'
 """
 Add a dynamically client-controlled WHERE condition to a fields query.
-The argument it is defined on may have any name but **must** be
-of the input type `WhereConditions`.
 """
 directive @whereConditions(
     """
