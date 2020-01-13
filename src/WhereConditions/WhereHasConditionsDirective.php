@@ -172,7 +172,7 @@ SDL;
     {
         return Str::studly($parentField->name->value)
             .Str::studly($argDefinition->name->value)
-            .'WhereHasConditions';
+            .'WhereConditions';
     }
 
     /**
