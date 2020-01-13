@@ -43,7 +43,7 @@ see https://github.com/nuwave/lighthouse/pull/974 for details.
 
 You can adapt to this change in two refactoring steps that must be done in order:
 
-1. Rename all usages of `@model` to `@node`
+1. Rename all usages of `@model` to `@node`, e.g.:
 
     ```diff
     -type User @model {
