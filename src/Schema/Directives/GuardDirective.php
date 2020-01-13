@@ -118,11 +118,11 @@ SDL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveDefinition(), $typeDefinition);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition);
     }
 
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveDefinition(), $typeExtension);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension);
     }
 }
