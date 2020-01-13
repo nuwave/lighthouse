@@ -8,7 +8,6 @@ use Nuwave\Lighthouse\WhereHasConditions\WhereHasConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
-use Tests\Utils\Models\Company;
 
 class WhereHasConditionsDirectiveTest extends DBTestCase
 {
