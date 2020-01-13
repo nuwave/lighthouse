@@ -3,8 +3,8 @@
 namespace Tests\Integration\WhereConditions;
 
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
-use Nuwave\Lighthouse\WhereConditions\WhereHasConditionsDirective;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
+use Nuwave\Lighthouse\WhereConditions\WhereHasConditionsDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
