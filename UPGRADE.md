@@ -39,4 +39,18 @@ project - it is a relatively simple `ArgManipulator` directive.
 
 `@model` directive in v5 does what `@modelClass` did in v4. To implement similar functionality of `@model` from v4 use `@node` directive instead. 
 
+```diff
+-type User @model {
++type User @node {
+    id: ID! @globalId
+}
+```
+
 ### `@modelClass` is renamed to `@model`
+
+```diff
+-type PaginatedPost @modelClass(class: "\\App\\Post") {
++type PaginatedPost @model(class: "\\App\\Post") {
+    id: ObfId!
+}
+```
