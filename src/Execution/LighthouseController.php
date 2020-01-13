@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
 use Laragraph\LaravelGraphQLUtils\RequestParser;
-use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Utils;
@@ -84,6 +83,4 @@ class LighthouseController
 
         $operationParams = $this->parseRequest($request);
     }
-
-
 }
