@@ -113,4 +113,58 @@ class ASTHelperTest extends TestCase
         $this->assertTrue(ASTHelper::typeImplementsInterface($type, 'Bar'));
         $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
     }
+
+    public function testThrowsWhenDefinedOnInvalidTypes(): void
+    {
+        $notAnObject = PartialParser::scalarTypeDefinition(/** @lang GraphQL */ '
+        scalar NotAnObject
+        ');
+        $directive = PartialParser::directive(/** @lang GraphQL */ '@foo');
+
+        $this->expectException(DefinitionException::class);
+        ASTHelper::addDirectiveToFields($directive, $notAnObject);
+    }
+
+    public function testAddDirectiveToFields(): void
+    {
+        $object = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+        type Query {
+            foo: Int
+        }
+        ');
+
+        ASTHelper::addDirectiveToFields(
+            PartialParser::directive(/** @lang GraphQL */ '@guard'),
+            $object
+        );
+
+        $this->assertSame(
+            'guard',
+            $object->fields[0]->directives[0]->name->value
+        );
+    }
+
+    public function testPrefersFieldDirectivesOverTypeDirectives(): void
+    {
+        $object = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+        type Query {
+            foo: Int @guard(with: "api")
+            bar: String
+        }
+        ');
+
+        ASTHelper::addDirectiveToFields(
+            PartialParser::directive(/** @lang GraphQL */ '@guard'),
+            $object
+        );
+
+        $guardOnFooArguments = $object->fields[0]->directives[0];
+        $fieldGuard = ASTHelper::directiveArgValue($guardOnFooArguments, 'with');
+
+        $this->assertSame('api', $fieldGuard);
+        $this->assertSame(
+            'guard',
+            $object->fields[1]->directives[0]->name->value
+        );
+    }
 }

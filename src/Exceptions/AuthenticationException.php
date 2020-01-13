@@ -6,6 +6,8 @@ use Illuminate\Auth\AuthenticationException as IlluminateAuthenticationException
 
 class AuthenticationException extends IlluminateAuthenticationException implements RendersErrorsExtensions
 {
+    public const UNAUTHENTICATED = 'Unauthenticated.';
+
     /**
      * Returns true when exception message is safe to be displayed to a client.
      *

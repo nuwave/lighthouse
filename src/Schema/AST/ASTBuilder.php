@@ -252,6 +252,7 @@ class ASTBuilder
     {
         $this->documentAST->setTypeDefinition(
             PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+                "Pagination information about the corresponding list of items."
                 type PaginatorInfo {
                   "Total count of available items in the page."
                   count: Int!
@@ -282,6 +283,7 @@ class ASTBuilder
 
         $this->documentAST->setTypeDefinition(
             PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+                "Pagination information about the corresponding list of items."
                 type PageInfo {
                   "When paginating forwards, are there more items?"
                   hasNextPage: Boolean!

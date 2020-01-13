@@ -48,9 +48,15 @@ class SoftDeletesServiceProvider extends ServiceProvider
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
                         PartialParser::enumTypeDefinition('
+                            "Specify if you want to include or exclude trashed results from a query."
                             enum Trashed {
+                                "Only return trashed results."
                                 ONLY @enum(value: "only")
+
+                                "Return both trashed and non-trashed results."
                                 WITH @enum(value: "with")
+
+                                "Only return non-trashed results."
                                 WITHOUT @enum(value: "without")
                             }
                         ')

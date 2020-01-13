@@ -13,16 +13,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class InjectDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'inject';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

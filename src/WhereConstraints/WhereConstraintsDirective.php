@@ -17,8 +17,6 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
-    const NAME = 'whereConstraints';
-
     /**
      * @var \Nuwave\Lighthouse\WhereConstraints\Operator
      */
@@ -33,16 +31,6 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
     public function __construct(Operator $operator)
     {
         $this->operator = $operator;
-    }
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
     }
 
     public static function definition(): string
@@ -89,17 +77,6 @@ SDL;
                     }
                 },
                 'or'
-            );
-        }
-
-        if ($notConnectedConstraints = $whereConstraints['NOT'] ?? null) {
-            $builder->whereNested(
-                function ($builder) use ($notConnectedConstraints): void {
-                    foreach ($notConnectedConstraints as $constraint) {
-                        $this->handleBuilder($builder, $constraint);
-                    }
-                },
-                'not'
             );
         }
 

@@ -16,8 +16,8 @@ class MemoryStream extends Stream implements CanStreamResponse
     /**
      * Stream graphql response.
      *
-     * @param  array  $data
-     * @param  array  $paths
+     * @param  mixed[]  $data
+     * @param  string[]  $paths
      * @param  bool  $final
      * @return void
      */
@@ -25,7 +25,7 @@ class MemoryStream extends Stream implements CanStreamResponse
     {
         if (! empty($paths)) {
             $data = (new Collection($paths))
-                ->mapWithKeys(function ($path) use ($data): array {
+                ->mapWithKeys(function (string $path) use ($data): array {
                     $response['data'] = Arr::get($data, "data.{$path}", []);
                     $errors = $this->chunkError($path, $data);
                     if (! empty($errors)) {

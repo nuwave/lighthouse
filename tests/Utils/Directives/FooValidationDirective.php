@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
 class FooValidationDirective extends ValidationDirective
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'fooValidation';
-    }
-
-    /**
      * @return mixed[]
      */
     public function rules(): array

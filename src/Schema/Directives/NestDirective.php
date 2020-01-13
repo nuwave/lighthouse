@@ -9,11 +9,6 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class NestDirective extends BaseDirective implements ArgResolver
 {
-    public function name(): string
-    {
-        return 'nest';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

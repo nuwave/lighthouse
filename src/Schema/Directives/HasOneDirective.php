@@ -7,16 +7,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class HasOneDirective extends RelationDirective implements FieldResolver, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'hasOne';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

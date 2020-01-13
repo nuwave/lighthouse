@@ -35,14 +35,14 @@ class DeferTest extends TestCase
 
     public function testAddsTheDeferClientDirective(): void
     {
-        $introspection = $this->graphQL('
-          query IntrospectionQuery {
-            __schema {
-              directives {
-                name
-              }
+        $introspection = $this->graphQL(/** @lang GraphQL */ '
+        query IntrospectionQuery {
+          __schema {
+            directives {
+              name
             }
           }
+        }
         ');
 
         $this->assertTrue(
@@ -479,7 +479,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -523,7 +523,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             userInclude: user {
                 name
@@ -570,14 +570,14 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         fragment UserWithParent on User {
             name
             parent {
                 name
             }
         }
-        {
+        query {
             user {
                 ...UserWithParent
                 parent @defer {
@@ -614,7 +614,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation UpdateUser {
             updateUser(name: "John Doe") @defer {
                 name
@@ -649,7 +649,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name

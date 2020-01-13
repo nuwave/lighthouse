@@ -7,11 +7,6 @@ use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 
 class CreateDirective extends MutationExecutorDirective
 {
-    public function name(): string
-    {
-        return 'create';
-    }
-
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'

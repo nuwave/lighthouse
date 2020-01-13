@@ -15,8 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
 - Add support in `@whereConstraints` for IN, IS NULL and BETWEEN operators https://github.com/nuwave/lighthouse/pull/1099
+- Add ability to define pivot data on nested mutations within `sync`, `syncWithoutDetach` and `connect` https://github.com/nuwave/lighthouse/pull/1110
 - Allow restricting the columns for `@orderBy` to a given whitelist and generate
   an `enum` definition for it https://github.com/nuwave/lighthouse/pull/1118
+- Allow passing variables in `->graphQL()` test helper https://github.com/nuwave/lighthouse/pull/1127
+- Add missing schema descriptions to some inputs, types, and enums https://github.com/nuwave/lighthouse/pull/1131
+- Add `@guard` directive to handle authentication https://github.com/nuwave/lighthouse/pull/1135
 
 ### Changed
 
@@ -25,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   overwriting it through a service provider https://github.com/nuwave/lighthouse/pull/1099
 - Always automatically set the correct argument type when using `@whereConstraints` or `@orderBy`
   directives https://github.com/nuwave/lighthouse/pull/1118
+- Implement the `name()` function generically in the BaseDirective class https://github.com/nuwave/lighthouse/pull/1098
 
 ### Fixed
 
@@ -36,6 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The argument `field` within the `OrderByClause` used for `@orderBy` will be renamed to `column`
   in v5 https://github.com/nuwave/lighthouse/pull/1118
+- Deprecated the `@middleware` directive, as it violates the boundary between HTTP and GraphQL
+  request handling. Use `@guard` or other field middleware directives instead https://github.com/nuwave/lighthouse/pull/1135
+
+### Removed
+
+- Remove broken `NOT` conditional when using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/1125
 
 ## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
 
