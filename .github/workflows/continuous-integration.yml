@@ -1,0 +1,223 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Continuous Integration"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "master"
+
+env:
+  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
+
+jobs:
+  coding-standards:
+    name: "Coding Standards"
+
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        php-version:
+          - "7.4"
+        laravel-version:
+          - "^6.0"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.0.0"
+
+      - name: "Install PHP with extensions"
+        uses: "shivammathur/setup-php@1.7.2"
+        with:
+          coverage: "none"
+          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Cache dependencies installed with composer"
+        uses: "actions/cache@v1.0.3"
+        with:
+          path: "~/.composer/cache"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+
+      - name: "Run ergebnis/composer-normalize"
+        run: "composer normalize --dry-run"
+
+  static-code-analysis:
+    name: "Static Code Analysis"
+
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        php-version:
+          - "7.4"
+        laravel-version:
+          - "^6.0"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.0.0"
+
+      - name: "Install PHP with extensions"
+        uses: "shivammathur/setup-php@1.7.2"
+        with:
+          coverage: "none"
+          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Cache dependencies installed with composer"
+        uses: "actions/cache@v1.0.3"
+        with:
+          path: "~/.composer/cache"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+
+      - name: "Create cache directory for phpstan/phpstan"
+        run: "mkdir -p .build/phpstan"
+
+      - name: "Run phpstan/phpstan"
+        run: "vendor/bin/phpstan analyse --configuration=phpstan.neon"
+
+  tests:
+    name: "Tests"
+
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        php-version:
+          - "7.1"
+          - "7.2"
+          - "7.3"
+          - "7.4"
+        laravel-version:
+          - "5.5.*"
+          - "5.6.*"
+          - "5.7.*"
+          - "5.8.*"
+          - "^6.0"
+        exclude:
+          - php-version: "7.1"
+            laravel-version: "^6.0"
+          - php-version: "7.4"
+            laravel-version: "5.5.*"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.0.0"
+
+      - name: "Install PHP with extensions"
+        uses: "shivammathur/setup-php@1.7.2"
+        with:
+          coverage: "none"
+          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Cache dependencies installed with composer"
+        uses: "actions/cache@v1.0.3"
+        with:
+          path: "~/.composer/cache"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Remove larastan for Laravel 5.5"
+        if: "matrix.laravel-version == '5.5.*'"
+        run: "composer remove --dev nunomaduro/larastan --no-update"
+
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+
+      - name: "Set up the database"
+        run: "mysql --user=root --password=root --execute='CREATE DATABASE test;'"
+
+      - name: "Run tests with phpunit/phpunit"
+        run: "vendor/bin/phpunit --colors=always --verbose"
+
+  code-coverage:
+    name: "Code Coverage"
+
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        php-version:
+          - "7.4"
+        laravel-version:
+          - "^6.0"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.0.0"
+
+      - name: "Install PHP with extensions"
+        uses: "shivammathur/setup-php@1.7.2"
+        with:
+          coverage: "pcov"
+          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Cache dependencies installed with composer"
+        uses: "actions/cache@v1.0.3"
+        with:
+          path: "~/.composer/cache"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+
+      - name: "Set up the database"
+        run: "mysql --user=root --password=root --execute='CREATE DATABASE test;'"
+
+      - name: "Collect code coverage with pcov and phpunit/phpunit"
+        run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
+
+      - name: "Send code coverage report to Codecov.io"
+        env:
+          CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
+        run: "bash <(curl -s https://codecov.io/bash)"
+
+  benchmark:
+    name: "Benchmarks"
+
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        php-version:
+          - "7.4"
+        laravel-version:
+          - "^6.0"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.0.0"
+
+      - name: "Install PHP with extensions"
+        uses: "shivammathur/setup-php@1.7.2"
+        with:
+          coverage: "none"
+          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Cache dependencies installed with composer"
+        uses: "actions/cache@v1.0.3"
+        with:
+          path: "~/.composer/cache"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
+          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Install dependencies with composer"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+
+      - name: "Collect code coverage with pcov and phpunit/phpunit"
+        run: "vendor/bin/phpbench run --progress=none --report=ast"
