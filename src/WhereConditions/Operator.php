@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\WhereConstraints;
+namespace Nuwave\Lighthouse\WhereConditions;
 
 /**
  * An Operator handles the database or application specific bits
- * of applying WHERE constraints to a database query builder.
+ * of applying WHERE conditions to a database query builder.
  */
 interface Operator
 {
@@ -25,12 +25,12 @@ interface Operator
     public function default(): string;
 
     /**
-     * Apply the constraints to the query builder.
+     * Apply the conditions to the query builder.
      *
      * @param  \Illuminate\Database\Query\Builder  $builder
-     * @param  array  $whereConstraints
+     * @param  array  $whereConditions
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder
      */
-    public function applyConstraints($builder, array $whereConstraints, string $boolean);
+    public function applyConditions($builder, array $whereConditions, string $boolean);
 }

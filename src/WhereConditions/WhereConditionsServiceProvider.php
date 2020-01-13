@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\WhereConstraints;
+namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -10,9 +10,10 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
-class WhereConstraintsServiceProvider extends ServiceProvider
+class WhereConditionsServiceProvider extends ServiceProvider
 {
-    const DEFAULT_WHERE_CONSTRAINTS = 'WhereConstraints';
+    const DEFAULT_WHERE_CONDITIONS = 'WhereConditions';
+    const DEFAULT_WHERE_HAS_CONDITIONS = 'WhereHasConditions';
 
     /**
      * Register any application services.
@@ -43,14 +44,21 @@ class WhereConstraintsServiceProvider extends ServiceProvider
         $dispatcher->listen(
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
-                /** @var \Nuwave\Lighthouse\WhereConstraints\Operator $operator */
+                /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
                 $operator = $this->app->make(Operator::class);
 
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
-                        static::createWhereConstraintsInputType(
-                            static::DEFAULT_WHERE_CONSTRAINTS,
-                            'Dynamic WHERE constraints for queries.',
+                        static::createWhereConditionsInputType(
+                            static::DEFAULT_WHERE_CONDITIONS,
+                            'Dynamic WHERE conditions for queries.',
+                            'String'
+                        )
+                    )
+                    ->setTypeDefinition(
+                        static::createWhereConditionsInputType(
+                            static::DEFAULT_WHERE_HAS_CONDITIONS,
+                            'Dynamic relationship WHERE condition for queries.',
                             'String'
                         )
                     )
@@ -68,9 +76,9 @@ class WhereConstraintsServiceProvider extends ServiceProvider
         );
     }
 
-    public static function createWhereConstraintsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
+    public static function createWhereConditionsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
-        /** @var \Nuwave\Lighthouse\WhereConstraints\Operator $operator */
+        /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
         $operatorName = PartialParser
@@ -84,19 +92,19 @@ class WhereConstraintsServiceProvider extends ServiceProvider
         return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
-                "The column that is used for the constraint."
+                "The column that is used for the condition."
                 column: $columnType
 
-                "The operator that is used for the constraint."
+                "The operator that is used for the condition."
                 operator: $operatorName = $operatorDefault
 
-                "The value that is used for the constraint."
+                "The value that is used for the condition."
                 value: Mixed
 
-                "A set of constraints that requires all constraints to match."
+                "A set of conditions that requires all conditions to match."
                 AND: [$name!]
 
-                "A set of constraints that requires at least one constraint to match."
+                "A set of conditions that requires at least one condition to match."
                 OR: [$name!]
             }
 GRAPHQL

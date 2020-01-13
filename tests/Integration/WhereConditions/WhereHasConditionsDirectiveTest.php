@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Integration\WhereHasConditions;
+namespace Tests\Integration\WhereConditions;
 
-use Nuwave\Lighthouse\WhereConstraints\SQLOperator;
-use Nuwave\Lighthouse\WhereHasConditions\WhereHasConditionsDirective;
-use Nuwave\Lighthouse\WhereHasConditions\WhereHasConditionsServiceProvider;
+use Nuwave\Lighthouse\WhereConditions\SQLOperator;
+use Nuwave\Lighthouse\WhereConditions\WhereHasConditionsDirective;
+use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -57,7 +57,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [WhereHasConditionsServiceProvider::class]
+            [WhereConditionsServiceProvider::class]
         );
     }
 

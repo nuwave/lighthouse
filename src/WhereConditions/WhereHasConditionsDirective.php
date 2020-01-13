@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\WhereHasConditions;
+namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -14,19 +14,18 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\WhereConstraints\Operator;
 
 class WhereHasConditionsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
     /**
-     * @var \Nuwave\Lighthouse\WhereConstraints\Operator
+     * @var \Nuwave\Lighthouse\WhereConditions\Operator
      */
     protected $operator;
 
     /**
      * WhereHasConditionssDirective constructor.
      *
-     * @param  \Nuwave\Lighthouse\WhereConstraints\Operator  $operator
+     * @param  \Nuwave\Lighthouse\WhereConditions\Operator  $operator
      * @return void
      */
     public function __construct(Operator $operator)
@@ -112,7 +111,7 @@ SDL;
             if ($column = $whereConditions['column'] ?? null) {
                 static::assertValidColumnName($column);
 
-                return $this->operator->applyConstraints($builder, $whereConditions, $boolean);
+                return $this->operator->applyConditions($builder, $whereConditions, $boolean);
             }
         }
 
@@ -147,7 +146,7 @@ SDL;
 
             $documentAST
                 ->setTypeDefinition(
-                    WhereHasConditionsServiceProvider::createWhereHasConditionsInputType(
+                    WhereConditionsServiceProvider::createWhereConditionsInputType(
                         $restrictedWhereHasConditionsName,
                         "Dynamic relationship WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
                         $allowedColumnsEnumName
@@ -157,7 +156,7 @@ SDL;
                     Codegen::createAllowedColumnsEnum($argDefinition, $parentField, $allowedColumns, $allowedColumnsEnumName)
                 );
         } else {
-            $argDefinition->type = PartialParser::namedType(WhereHasConditionsServiceProvider::DEFAULT_WHERE_HAS_CONDITIONS);
+            $argDefinition->type = PartialParser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_HAS_CONDITIONS);
         }
     }
 

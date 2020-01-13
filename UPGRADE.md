@@ -12,7 +12,7 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 ### `@orderBy` argument renamed to `column`
 
 The argument to specify the column to order by when using `@orderBy` was renamed
-to `column` to match the `@whereConstraints` directive.
+to `column` to match the `@whereConditions` directive.
 
 Client queries will have to be changed like this:
 

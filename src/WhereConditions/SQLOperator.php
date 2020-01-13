@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\WhereConstraints;
+namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Error\Error;
 
@@ -8,7 +8,7 @@ class SQLOperator implements Operator
 {
     public static function missingValueForColumn(string $column): string
     {
-        return "Did not receive a value to match the WhereConstraints for column {$column}.";
+        return "Did not receive a value to match the WhereConditions for column {$column}.";
     }
 
     public function enumDefinition(): string
@@ -67,16 +67,16 @@ GRAPHQL;
     }
 
     /**
-     * Apply the constraints to the query builder.
+     * Apply the conditions to the query builder.
      *
      * @param  \Illuminate\Database\Query\Builder  $builder
-     * @param  array  $whereConstraints
+     * @param  array  $whereConditions
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder
      */
-    public function applyConstraints($builder, array $whereConstraints, string $boolean)
+    public function applyConditions($builder, array $whereConditions, string $boolean)
     {
-        $column = $whereConstraints['column'];
+        $column = $whereConditions['column'];
 
         // Laravel's conditions always start off with this prefix
         $method = 'where';
@@ -85,7 +85,7 @@ GRAPHQL;
         $args[] = $column;
 
         // Some operators require calling Laravel's conditions in different ways
-        $operator = $whereConstraints['operator'];
+        $operator = $whereConditions['operator'];
         $arity = $this->operatorArity($operator);
 
         if ($arity === 3) {
@@ -101,13 +101,13 @@ GRAPHQL;
         if ($arity > 1) {
             // The conditions with arity 1 require no args apart from the column name.
             // All other arities take a value to query against.
-            if (! array_key_exists('value', $whereConstraints)) {
+            if (! array_key_exists('value', $whereConditions)) {
                 throw new Error(
                     self::missingValueForColumn($column)
                 );
             }
 
-            $args[] = $whereConstraints['value'];
+            $args[] = $whereConditions['value'];
         }
 
         // The condition methods always have the `$boolean` arg after the value
