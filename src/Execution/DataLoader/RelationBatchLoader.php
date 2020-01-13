@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -80,7 +79,12 @@ class RelationBatchLoader extends BatchLoader
     protected function getParentModels(): EloquentCollection
     {
         return new EloquentCollection(
-            (new Collection($this->keys))->pluck('parent')
+            array_map(
+                function (array $meta) {
+                    return $meta['parent'];
+                },
+                $this->keys
+            )
         );
     }
 }

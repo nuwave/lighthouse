@@ -32,7 +32,7 @@ class SchemaCachingTest extends TestCase
 
     public function testSchemaCachingWithUnionType(): void
     {
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Foo @mock
         }
@@ -55,7 +55,7 @@ class SchemaCachingTest extends TestCase
             ]);
         });
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo {
                 ... on Comment {

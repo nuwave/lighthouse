@@ -139,7 +139,7 @@ helper method.
 ```php
 $this->multipartGraphQL(
     [
-        'operations' => /* @lang JSON */
+        'operations' => /** @lang JSON */
             '
             {
                 "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
@@ -148,7 +148,7 @@ $this->multipartGraphQL(
                 }
             }
         ',
-        'map' => /* @lang JSON */
+        'map' => /** @lang JSON */
             '
             {
                 "0": ["variables.file"]

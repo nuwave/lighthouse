@@ -28,7 +28,7 @@ class BuilderTest extends DBTestCase
 
     public function testCanAttachEqFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(id: ID @eq): [User!]! @all
         }
@@ -49,7 +49,7 @@ class BuilderTest extends DBTestCase
 
     public function testCanAttachEqFilterFromInputObject(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(input: UserInput! @spread): [User!]! @all
         }
@@ -217,7 +217,7 @@ class BuilderTest extends DBTestCase
 
     public function testCanUseInputObjectsForWhereBetweenFilter(): void
     {
-        $this->schema .= /** @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 created: TimeRange @whereBetween(key: "created_at")

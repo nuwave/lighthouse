@@ -747,7 +747,7 @@ type Mutation {
 ```
 
 You can also delete multiple models at once.
-Define a field that takes a list of IDs and returns a Collection of the
+Define a field that takes a list of IDs and returns a collection of the
 deleted models.
 
 _In contrast to Laravel mass updates, this does trigger model events._
@@ -1130,6 +1130,25 @@ split into type and ID.
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
+## @guard
+
+```graphql
+"""
+Run authentication through one or more guards.
+This is run per field and may allow unauthenticated
+users to still receive partial results.
+"""
+directive @guard(
+  """
+  Specify which guards to use, e.g. "api".
+  When not defined, the default driver is used.
+  """
+  with: [String!]
+) on FIELD_DEFINITION | OBJECT
+```
+
+
+
 ## @hasMany
 
 Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
@@ -1474,6 +1493,9 @@ directive @method(
 ```
 
 ## @middleware
+
+**DEPRECATED**
+Use [`@guard`](#guard) or custom [`FieldMiddleware`](../custom-directives/field-directives.md#fieldmiddleware) instead.
 
 ```graphql
 """

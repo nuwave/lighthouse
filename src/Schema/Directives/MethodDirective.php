@@ -12,7 +12,7 @@ class MethodDirective extends BaseDirective implements FieldResolver, DefinedDir
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Call a method with a given `name` on the class that represents a type to resolve a field.
 Use this if the data is not accessible as an attribute (e.g. `$model->myData`).

@@ -9,7 +9,7 @@ class BuilderDirective extends BaseDirective implements ArgBuilderDirective, Def
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use an argument to modify the query builder for a field.
 """

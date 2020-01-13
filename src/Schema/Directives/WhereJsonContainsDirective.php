@@ -9,7 +9,7 @@ class WhereJsonContainsDirective extends BaseDirective implements ArgBuilderDire
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses).
 """

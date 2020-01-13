@@ -26,7 +26,7 @@ class NestedOneToOne implements ArgResolver
         /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
         $relation = $parent->{$this->relationName}();
 
-        /* @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
         if (isset($args->arguments['create'])) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 

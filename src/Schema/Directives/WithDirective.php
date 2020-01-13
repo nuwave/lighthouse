@@ -17,7 +17,7 @@ class WithDirective extends RelationDirective implements FieldMiddleware, Define
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Eager-load an Eloquent relation.
 """

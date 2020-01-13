@@ -26,33 +26,33 @@ class ResponseStream extends Stream implements CanStreamResponse
     public function stream(array $data, array $paths, bool $final): void
     {
         if (! empty($paths)) {
-            $paths = new Collection($paths);
-            $lastKey = $paths->count() - 1;
+            $lastKey = count($paths) - 1;
 
-            $paths
-                ->map(function (string $path, int $i) use ($data, $final, $lastKey): string {
-                    $terminating = $final && ($i === $lastKey);
-                    $chunk['data'] = Arr::get($data, "data.{$path}");
-                    $chunk['path'] = (new Collection(explode('.', $path)))
-                        ->map(function ($partial) {
-                            return is_numeric($partial)
-                                ? (int) $partial
-                                : $partial;
-                        })
-                        ->all();
+            foreach ($paths as $i => $path) {
+                $chunk['data'] = Arr::get($data, "data.{$path}");
+                $chunk['path'] = (new Collection(explode('.', $path)))
+                    ->map(function ($partial) {
+                        return is_numeric($partial)
+                            ? (int) $partial
+                            : $partial;
+                    })
+                    ->all();
 
-                    $errors = $this->chunkError($path, $data);
-                    if (! empty($errors)) {
-                        $chunk['errors'] = $errors;
-                    }
+                $errors = $this->chunkError($path, $data);
+                if (! empty($errors)) {
+                    $chunk['errors'] = $errors;
+                }
 
-                    return $this->chunk($chunk, $terminating);
-                })
-                ->each(function (string $chunk) {
-                    $this->emit($chunk);
-                });
+                $terminating = $final && ($i === $lastKey);
+
+                $this->emit(
+                    $this->chunk($chunk, $terminating)
+                );
+            }
         } else {
-            $this->emit($this->chunk($data, $final));
+            $this->emit(
+                $this->chunk($data, $final)
+            );
         }
 
         if ($final) {

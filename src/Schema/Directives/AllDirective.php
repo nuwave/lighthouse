@@ -13,7 +13,7 @@ class AllDirective extends BaseDirective implements DefinedDirective, FieldResol
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 directive @all(
   """
   Specify the class name of the model to use.

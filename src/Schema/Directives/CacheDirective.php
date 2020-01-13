@@ -37,7 +37,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDi
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Cache the result of a resolver.
 """

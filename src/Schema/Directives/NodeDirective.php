@@ -32,7 +32,7 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Register a type for Relay's global object identification.
 When used without any arguments, Lighthouse will attempt

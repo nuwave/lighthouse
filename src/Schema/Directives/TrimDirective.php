@@ -9,7 +9,7 @@ class TrimDirective extends BaseDirective implements ArgTransformerDirective, De
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run the `trim` function on an input value.
 """

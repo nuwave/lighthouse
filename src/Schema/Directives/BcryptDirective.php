@@ -9,7 +9,7 @@ class BcryptDirective extends BaseDirective implements ArgTransformerDirective, 
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run the `bcrypt` function on the argument it is defined on.
 """

@@ -197,9 +197,9 @@ class ArgumentSetTest extends TestCase
     {
         $renameDirective = new RenameDirective();
         $renameDirective->hydrate(
-            PartialParser::directive(/* @lang GraphQL */ "@rename(attribute: \"$attribute\")"),
+            PartialParser::directive(/** @lang GraphQL */ "@rename(attribute: \"$attribute\")"),
             // We require some placeholder for the directive definition to sit on
-            PartialParser::fieldDefinition(/* @lang GraphQL */ 'placeholder: ID')
+            PartialParser::fieldDefinition(/** @lang GraphQL */ 'placeholder: ID')
         );
 
         return $renameDirective;
