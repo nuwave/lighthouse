@@ -1134,7 +1134,7 @@ own mechanism of encoding/decoding global ids.
 
 ```graphql
 """
-Run authentication through one more guards.
+Run authentication through one or more guards.
 This is run per field and may allow unauthenticated
 users to still receive partial results.
 """
