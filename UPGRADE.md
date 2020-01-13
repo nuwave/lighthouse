@@ -34,3 +34,29 @@ Client queries will have to be changed like this:
 
 If you absolutely cannot break your clients, you can re-implement `@orderBy` in your
 project - it is a relatively simple `ArgManipulator` directive.
+
+### `@modelClass` and `@model` changed 
+
+The `@model` directive was repurposed to take the place of `@modelClass`. As a replacement
+for the current functionality of `@model`, the new `@node` directive was added,
+see https://github.com/nuwave/lighthouse/pull/974 for details.
+
+You can adapt to this change in two refactoring steps that must be done in order:
+
+1. Rename all usages of `@model` to `@node`, e.g.:
+
+    ```diff
+    -type User @model {
+    +type User @node {
+        id: ID! @globalId
+    }
+    ```
+
+2. Rename all usages of `@modelClass` to `@model`, e.g.
+
+    ```diff
+    -type PaginatedPost @modelClass(class: "\\App\\Post") {
+    +type PaginatedPost @model(class: "\\App\\Post") {
+        id: ID!
+    }
+    ```
