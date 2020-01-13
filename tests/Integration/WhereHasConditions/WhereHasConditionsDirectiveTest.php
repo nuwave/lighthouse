@@ -3,8 +3,8 @@
 namespace Tests\Integration\WhereHasConditions;
 
 use Nuwave\Lighthouse\WhereConstraints\SQLOperator;
-use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
-use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
+use Nuwave\Lighthouse\WhereHasConditions\WhereHasConditionsDirective;
+use Nuwave\Lighthouse\WhereHasConditions\WhereHasConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -32,20 +32,20 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
 
     type Query {
         posts(
-            hasUser: _ @whereHasConditions
+            hasUser: _ @whereHasConditions(relation: "user")
         ): [Post!]! @all
 
         users(
-            hasCompany: _ @whereHasConditions
-            hasPost: _ @whereHasConditions
+            hasCompany: _ @whereHasConditions(relation: "company")
+            hasPost: _ @whereHasConditions(relation: "posts")
         ): [User!]! @all
 
         companies(
-            hasUser: _ @whereHasConditions
+            hasUser: _ @whereHasConditions(relation: "users")
         ): [Company!]! @all
 
         whitelistedColumns(
-            hasCompany: _ @whereHasConditions(columns: ["id", "camelCase"])
+            hasCompany: _ @whereHasConditions(relation: "company", columns: ["id", "camelCase"])
         ): [User!]! @all
     }
     ';
@@ -312,7 +312,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonFragment([
-            'message' => WhereConstraintsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
+            'message' => WhereHasConditionsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
         ]);
     }
 
@@ -364,12 +364,11 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                 }
             ) {
                 id
-                name
             }
         }
         ')->assertJson([
             'data' => [
-                'users' => [
+                'companies' => [
                     [
                         'id' => $userNamedNull->company_id,
                     ],
@@ -420,14 +419,14 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $expectedEnumName = 'WhitelistedColumnsWhereColumn';
+        $expectedEnumName = 'WhitelistedColumnsHasCompanyColumn';
         $enum = $this->introspectType($expectedEnumName);
 
         $this->assertArraySubset(
             [
                 'kind' => 'ENUM',
                 'name' => $expectedEnumName,
-                'description' => 'Allowed column names for the `where` argument on the query `whitelistedColumns`.',
+                'description' => 'Allowed column names for the `hasCompany` argument on the query `whitelistedColumns`.',
                 'enumValues' => [
                     [
                         'name' => 'ID',
