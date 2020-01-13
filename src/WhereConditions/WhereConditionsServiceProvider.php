@@ -13,7 +13,6 @@ use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 class WhereConditionsServiceProvider extends ServiceProvider
 {
     const DEFAULT_WHERE_CONDITIONS = 'WhereConditions';
-    const DEFAULT_WHERE_HAS_CONDITIONS = 'WhereHasConditions';
 
     /**
      * Register any application services.
@@ -52,13 +51,6 @@ class WhereConditionsServiceProvider extends ServiceProvider
                         static::createWhereConditionsInputType(
                             static::DEFAULT_WHERE_CONDITIONS,
                             'Dynamic WHERE conditions for queries.',
-                            'String'
-                        )
-                    )
-                    ->setTypeDefinition(
-                        static::createWhereConditionsInputType(
-                            static::DEFAULT_WHERE_HAS_CONDITIONS,
-                            'Dynamic relationship WHERE condition for queries.',
                             'String'
                         )
                     )
