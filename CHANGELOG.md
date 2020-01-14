@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow passing variables in `->graphQL()` test helper https://github.com/nuwave/lighthouse/pull/1127
 - Add missing schema descriptions to some inputs, types, and enums https://github.com/nuwave/lighthouse/pull/1131
 - Add `@guard` directive to handle authentication https://github.com/nuwave/lighthouse/pull/1135
+- Add `@whereHasConditions` directive to filter query results based on the existence of a relationship https://github.com/nuwave/lighthouse/pull/1140
 
 ### Changed
 
@@ -30,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Always automatically set the correct argument type when using `@whereConstraints` or `@orderBy`
   directives https://github.com/nuwave/lighthouse/pull/1118
 - Implement the `name()` function generically in the BaseDirective class https://github.com/nuwave/lighthouse/pull/1098
+- Renamed the `@whereConstraints` to `@whereConditions` https://github.com/nuwave/lighthouse/pull/1140
 
 ### Fixed
 
