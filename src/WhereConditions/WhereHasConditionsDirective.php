@@ -34,6 +34,38 @@ SDL;
      */
     public function handleBuilder($builder, $whereConditions)
     {
-        return $this->handleWhereHasConditions($builder, $whereConditions);
+        // Make sure to ignore empty conditions.
+        // The "operator" key set by default, so the count is 1 when the condition is empty.
+        if (count($whereConditions) > 1) {
+            $builder->whereHas(
+                $this->getRelationName(),
+                function ($builder) use ($whereConditions): void {
+                    // This extra nesting is required for the `OR` condition to work correctly.
+                    $builder->whereNested(
+                        function ($builder) use ($whereConditions): void {
+                            $this->handleWhereConditions($builder, $whereConditions);
+                        }
+                    );
+                }
+            );
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Get the name of the Eloquent relationship that is used for the query.
+     *
+     * @return string
+     */
+    public function getRelationName()
+    {
+        $relationName = $this->directiveArgValue('relation');
+
+        if (is_null($relationName)) {
+            $relationName = lcfirst(str_replace('has', '', $this->nodeName()));
+        }
+
+        return $relationName;
     }
 }

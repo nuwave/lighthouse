@@ -36,36 +36,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array  $whereConditions
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function handleWhereHasConditions($builder, array $whereConditions)
-    {
-        // Make sure to ignore empty conditions.
-        // The "operator" key set by default, so the count is 1 when the condition is empty.
-        if (count($whereConditions) > 1) {
-            $relationName = $this->directiveArgValue('relation')
-                // Use the name of the argument if no explicit relation name is given.
-                ?? $this->nodeName();
-
-            $builder->whereHas(
-                $relationName,
-                function ($builder) use ($whereConditions): void {
-                    // This extra nesting is required for the `OR` condition to work correctly.
-                    $builder->whereNested(
-                        function ($builder) use ($whereConditions): void {
-                            $this->handleWhereConditions($builder, $whereConditions);
-                        }
-                    );
-                }
-            );
-        }
-
-        return $builder;
-    }
-
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array  $whereConditions
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */

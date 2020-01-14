@@ -48,7 +48,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         ): [User!]! @all
 
         withoutRelation(
-            company: _ @whereHasConditions
+            hasCompany: _ @whereHasConditions
         ): [User!]! @all
     }
     ';
@@ -450,7 +450,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             withoutRelation(
-                company: {
+                hasCompany: {
                     column: "id"
                     value: 1
                 }
