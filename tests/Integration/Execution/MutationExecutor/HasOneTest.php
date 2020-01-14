@@ -8,7 +8,7 @@ use Tests\Utils\Models\Task;
 
 class HasOneTest extends DBTestCase
 {
-    protected $schema = /* @lang GraphQL */ '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!

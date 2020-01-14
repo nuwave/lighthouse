@@ -8,7 +8,7 @@ use Tests\Utils\Queries\Foo;
 
 class FileUploadTest extends TestCase
 {
-    protected $schema = /* @lang GraphQL */'
+    protected $schema = /** @lang GraphQL */ '
     scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
 
     type Mutation {
@@ -23,7 +23,7 @@ class FileUploadTest extends TestCase
     {
         $this->multipartGraphQL(
             [
-                'operations' => /* @lang JSON */'
+                'operations' => /** @lang JSON */ '
                     {
                         "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
                         "variables": {
@@ -31,7 +31,7 @@ class FileUploadTest extends TestCase
                         }
                     }
                 ',
-                'map' => /* @lang JSON */'
+                'map' => /** @lang JSON */ '
                     {
                         "0": ["variables.file"]
                     }
@@ -54,7 +54,7 @@ class FileUploadTest extends TestCase
     {
         $this->multipartGraphQL(
             [
-                'operations' => /* @lang JSON */'
+                'operations' => /** @lang JSON */ '
                     [
                         {
                             "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
@@ -70,7 +70,7 @@ class FileUploadTest extends TestCase
                         }
                     ]
                 ',
-                'map' => /* @lang JSON */'
+                'map' => /** @lang JSON */ '
                     {
                         "0": ["0.variables.file"],
                         "1": ["1.variables.file"]
@@ -99,13 +99,13 @@ class FileUploadTest extends TestCase
     {
         $this->multipartGraphQL(
             [
-                'operations' => /* @lang JSON */ '
+                'operations' => /** @lang JSON */ '
                     {
                         "query": "{ foo }",
                         "variables": {}
                     }
                 ',
-                'map' => /* @lang JSON */'{}',
+                'map' => /** @lang JSON */ '{}',
             ],
             []
         )->assertJson([

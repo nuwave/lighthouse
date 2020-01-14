@@ -8,6 +8,7 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\EnumType;
@@ -301,5 +302,37 @@ class ASTHelper
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
         return self::firstByName($type->interfaces, $interfaceName) !== null;
+    }
+
+    /**
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directiveNode
+     * @return void
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    public static function addDirectiveToFields(DirectiveNode $directiveNode, &$objectType): void
+    {
+        $name = $directiveNode->name->value;
+
+        if (
+            ! $objectType instanceof ObjectTypeDefinitionNode
+            && ! $objectType instanceof ObjectTypeExtensionNode
+        ) {
+            throw new DefinitionException(
+                "The @{$name} directive may only be placed on fields or object types."
+            );
+        }
+
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
+        foreach ($objectType->fields as $fieldDefinition) {
+            // If the field already has the same directive defined, skip over it.
+            // Field directives are more specific than those defined on a type.
+            if (self::hasDirective($fieldDefinition, $name)) {
+                continue;
+            }
+
+            $fieldDefinition->directives = $fieldDefinition->directives->merge([$directiveNode]);
+        }
     }
 }

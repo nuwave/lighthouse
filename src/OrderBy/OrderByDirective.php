@@ -19,7 +19,7 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Sort a result list by one or more given columns.
 """

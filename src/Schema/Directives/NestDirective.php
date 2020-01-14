@@ -11,7 +11,7 @@ class NestDirective extends BaseDirective implements ArgResolver
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 A no-op nested arg resolver that delegates all calls
 to the ArgResolver directives attached to the children.

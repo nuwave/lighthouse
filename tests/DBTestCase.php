@@ -39,8 +39,9 @@ abstract class DBTestCase extends TestCase
         $app['config']->set('database.connections.mysql', [
             'driver' => 'mysql',
             'database' => 'test',
-            'host' => env('TRAVIS') ? '127.0.0.1' : 'mysql',
+            'host' => env('GITHUB_ACTIONS') ? '127.0.0.1' : 'mysql',
             'username' => 'root',
+            'password' => env('GITHUB_ACTIONS') ? 'root' : '',
         ]);
     }
 }

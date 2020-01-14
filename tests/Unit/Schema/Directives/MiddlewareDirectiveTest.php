@@ -2,13 +2,16 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
 use Tests\Utils\Middleware\Authenticate;
 use Tests\Utils\Middleware\CountRuns;
 
+/**
+ * @deprecated The @middleware directive will be removed in v5
+ */
 class MiddlewareDirectiveTest extends TestCase
 {
     /**
@@ -19,7 +22,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function testCallsFooMiddleware(string $query): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
                 @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
@@ -40,16 +43,16 @@ class MiddlewareDirectiveTest extends TestCase
     public function fooMiddlewareQueries(): array
     {
         return [
-            ['
+            [/** @lang GraphQL */ '
             {
                 foo
             }
             '],
-            ['
+            [/** @lang GraphQL */ '
             query FooQuery {
                 ...Foo_Fragment
             }
-            
+
             fragment Foo_Fragment on Query {
                 foo
             }
@@ -59,15 +62,17 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testWrapsExceptionFromMiddlewareInResponse(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
+            bar: String
             foo: Int @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo
+            bar
         }
         ')->assertJson([
             'errors' => [
@@ -84,7 +89,7 @@ class MiddlewareDirectiveTest extends TestCase
         $router = $this->app['router'];
         $router->aliasMiddleware('foo', CountRuns::class);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
                 @middleware(checks: ["foo"])
@@ -92,7 +97,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo
         }
@@ -109,14 +114,14 @@ class MiddlewareDirectiveTest extends TestCase
         $router = $this->app['router'];
         $router->middlewareGroup('bar', [Authenticate::class]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
                 @middleware(checks: ["bar"])
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo
         }
@@ -131,7 +136,7 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testPassesOneFieldButThrowsInAnother(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
                 @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
@@ -141,7 +146,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo
             pass
@@ -164,18 +169,18 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testThrowsWhenDefiningMiddlewareOnInvalidTypes(): void
     {
-        $this->expectException(DirectiveException::class);
-        $this->buildSchemaWithPlaceholderQuery('
+        $this->expectException(DefinitionException::class);
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         scalar Foo @middleware
         ');
     }
 
     public function testAddsMiddlewareDirectiveToFields(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {
             foo: Int
-        } 
+        }
         ';
 
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
@@ -199,10 +204,10 @@ class MiddlewareDirectiveTest extends TestCase
 
     public function testPrefersFieldMiddlewareOverTypeMiddleware(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query @middleware(checks: ["auth"]) {
             foo: Int @middleware(checks: ["api"])
-        } 
+        }
         ';
 
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */

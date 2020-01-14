@@ -15,7 +15,7 @@ class MorphManyDirective extends RelationDirective implements FieldResolver, Fie
      */
     public static function definition()
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """

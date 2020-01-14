@@ -33,7 +33,7 @@ class MockDirective extends BaseDirective implements FieldResolver, DefinedDirec
      */
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Allows you to easily hook up a resolver for an endpoint.
 """

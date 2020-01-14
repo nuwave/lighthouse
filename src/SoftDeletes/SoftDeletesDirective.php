@@ -15,7 +15,7 @@ class SoftDeletesDirective extends BaseDirective implements FieldManipulator, De
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Allows to filter if trashed elements should be fetched.
 This manipulates the schema by adding the argument
@@ -33,7 +33,7 @@ SDL;
      */
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $softDeletesArgument = PartialParser::inputValueDefinition(/* @lang GraphQL */ <<<'SDL'
+        $softDeletesArgument = PartialParser::inputValueDefinition(/** @lang GraphQL */ <<<'SDL'
 """
 Allows to filter if trashed elements should be fetched.
 """

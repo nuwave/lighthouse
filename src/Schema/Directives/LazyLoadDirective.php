@@ -15,7 +15,7 @@ class LazyLoadDirective extends BaseDirective implements DefinedDirective, Field
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
 on the relations of a list of models.

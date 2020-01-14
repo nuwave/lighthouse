@@ -11,7 +11,7 @@ use Tests\Utils\Models\User;
 
 class WhereConditionsDirectiveTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */'
+    protected $schema = /** @lang GraphQL */ '
     type User {
         id: ID!
         name: String
@@ -453,7 +453,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             whitelistedColumns(
                 where: {

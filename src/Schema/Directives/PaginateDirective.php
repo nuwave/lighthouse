@@ -20,7 +20,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Query multiple entries as a paginated list.
 """

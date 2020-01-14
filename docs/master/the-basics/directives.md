@@ -55,8 +55,8 @@ type Query {
   ): [Post!]!
     # Resolve as a paginated list
     @paginate
-    # Reuse existing Laravel authentication middleware
-    @middleware(checks: ["auth:api"])
+    # Require authentication
+    @guard(with: "api")
 }
 ```
 

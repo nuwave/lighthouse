@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 
 class BelongsToManyTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */'
+    protected $schema = /** @lang GraphQL */ '
     type Role {
         id: ID!
         name: String

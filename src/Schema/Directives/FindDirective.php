@@ -14,7 +14,7 @@ class FindDirective extends BaseDirective implements FieldResolver, DefinedDirec
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Find a model based on the arguments provided.
 """

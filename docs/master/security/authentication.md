@@ -1,13 +1,40 @@
 # Authentication
 
+## Global
+
 You can use standard Laravel mechanisms to authenticate users of your GraphQL API.
+Just add middleware trough your `lighthouse.php` configuration.
 The [API Authentication](https://laravel.com/docs/api-authentication) is especially
 suited because of its stateless nature.
+
+As all GraphQL requests are served at a single HTTP endpoint, this will guard your
+entire API against unauthenticated users.
+
+## Guard selected fields
+
+If you want to guard only selected fields, you can use the [`@guard`](../api-reference/directives.md#guard)
+directive to require authentication for accessing them.
+
+```graphql
+type Query {
+  profile: User! @guard
+}
+```
+
+If you need to guard multiple fields, just use [`@guard`](../api-reference/directives.md#guard)
+on a `type` or an `extend type` definition. It will be applied to all fields within that type.
+
+```graphql
+extend type Query @guard(with: ["api:admin"]){
+  adminInfo: Secrets
+  nukeCodes: [NukeCode!]!
+}
+```
 
 ## Get the current user
 
 Lighthouse provides a really simple way to fetch the information of the currently authenticated user.
-Just add a field that returns your `User` type and decorate it with the [@auth](../api-reference/directives.md#auth) directive.
+Just add a field that returns your `User` type and decorate it with the [`@auth`](../api-reference/directives.md#auth) directive.
 
 ```graphql
 type Query {
@@ -24,29 +51,5 @@ or `null` if the request is not authenticated.
     name
     email
   }
-}
-```
-
-## Apply auth middleware
-
-Lighthouse allows you to configure global middleware that is run for every
-request to your endpoint, but also define it on a per-field basis.
-
-Use the [@middleware](../api-reference/directives.md#middleware) directive to apply Laravel middleware,
-such as the `auth` middleware, to selected fields of your GraphQL endpoint.
-
-```graphql
-type Query {
-  users: [User!]! @middleware(checks: ["auth:api", "custom"]) @all
-}
-```
-
-If you need to apply middleware to multiple fields, just use [@middleware](../api-reference/directives.md#middleware)
-on a `type` or an `extend type` definition.
-
-```graphql
-extend type Query @middleware(checks: ["auth:admin"]){
-  adminInfo: Secrets
-  nukeCodes: [NukeCode!]!
 }
 ```

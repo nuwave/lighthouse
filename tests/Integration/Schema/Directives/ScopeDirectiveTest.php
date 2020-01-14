@@ -28,7 +28,7 @@ class ScopeDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks(tags: [String!] @scope(name: "whereTags")): [Task!]! @hasMany
         }
@@ -49,7 +49,7 @@ class ScopeDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */'
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(tags: ["Lighthouse"]) {
@@ -72,7 +72,7 @@ class ScopeDirectiveTest extends DBTestCase
 
     public function testCanThrowExceptionOnInvalidScope(): void
     {
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             tasks(
                 name: String @scope(name: "nonExistantScope")
@@ -85,7 +85,7 @@ class ScopeDirectiveTest extends DBTestCase
         ';
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             tasks(name: "Lighthouse rocks") {
                 id

@@ -41,7 +41,7 @@ class DeferDBTest extends DBTestCase
             return $user;
         });
 
-        $this->schema = /* @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
         }
@@ -61,7 +61,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
+        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -96,7 +96,7 @@ class DeferDBTest extends DBTestCase
             return $user;
         });
 
-        $this->schema = /* @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
             users: [User] @hasMany
@@ -117,7 +117,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
+        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -172,7 +172,7 @@ class DeferDBTest extends DBTestCase
             return $companies;
         });
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
             users: [User] @hasMany
@@ -193,7 +193,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
+        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
         {
             companies {
                 name

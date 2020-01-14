@@ -28,7 +28,7 @@ class AuthDirective extends BaseDirective implements DefinedDirective, FieldReso
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Return the currently authenticated user as the result of a query.
 """
