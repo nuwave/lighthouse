@@ -3004,7 +3004,128 @@ query gets people that have no hair and blue-ish eyes:
 
 You may register a custom `\Nuwave\Lighthouse\WhereConditions\Operator` through a service provider.
 This may be necessary if your database uses different SQL operators then Lighthouse's default or you
-want to extend/restrict the allowed operators. 
+want to extend/restrict the allowed operators.
+
+## @whereHasConditions
+
+```graphql
+""""
+Allows clients to filter a query based on the existence of a related model, using
+a dynamically controlled `WHERE` condition that applies to the relationship.
+"""
+directive @whereHasConditions(
+    """
+    The Eloquent relationship that the conditions will be applied to.
+    This argument can be ommited if the field name follows a `hasRelationship` naming convention.
+    Example: If the Eloquent relationship is named `posts`, you can name your field  `hasPosts` and
+    ommit this argument; the `posts` relationship will be automatically resolved.
+    """
+    relation: String
+
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    """
+    columns: [String!]
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+### Setup
+
+**This is an experimental feature and not included in Lighthouse by default.**
+
+Add the service provider to your `config/app.php`
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
+],
+```
+
+Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
+
+    composer require mll-lab/graphql-php-scalars
+
+### Usage
+
+```graphql
+type Person {
+    id: ID!
+    age: Int!
+    height: Int!
+    type: String!
+    hair_colour: String!
+}
+
+type Family {
+    id: ID!
+    last_name: Int!
+}
+
+type Query {
+    people(
+        hasFamily: _ @whereHasConditions(columns: ["id", "last_name"])
+    ): [Person!]! @all
+}
+```
+
+Lighthouse automatically generates definitions for an `Enum` type and an `Input` type
+that are restricted to the defined columns, so you do not have to specify them by hand.
+The blank type named `_` will be changed to the actual type.
+Here are the types that will be included in the compiled schema:
+
+```graphql
+"Dynamic WHERE conditions for the `hasFamily` argument on the query `people`."
+input PeopleHasFamilyWhereConditions {
+    "The column that is used for the condition."
+    column: PeopleHasFamilyColumn
+
+    "The operator that is used for the condition."
+    operator: SQLOperator = EQ
+
+    "The value that is used for the condition."
+    value: Mixed
+
+    "A set of conditions that requires all conditions to match."
+    AND: [PeopleHasFamilyWhereConditions!]
+
+    "A set of conditions that requires at least one condition to match."
+    OR: [PeopleHasFamilyWhereConditions!]
+}
+
+"Allowed column names for the `hasFamily` argument on the query `people`."
+enum PeopleHasFamilyColumn {
+    ID @enum(value: "id")
+    LAST_NAME @enum(value: "last_name")
+}
+```
+
+When you are not specifying `columns` to allow, clients can specify arbitrary
+column names as a `String`. This approach should by taken with care, as it carries
+potential performance and security risks and offers little type safety.
+
+A simple query for a person who has a family with the last name `Smith` would look like this:
+
+```graphql
+{
+  people(
+    hasFamily: { column: LAST_NAME, operator: EQ, value: "Smith" }
+  ) {
+    name
+  }
+}
+```
+
+Note that the operator defaults to `EQ` (`=`) if not given, so you could
+also omit it from the previous example and get the same result.
+
+For more advanced query examples, you can take a look at the [@whereConditions](../api-reference/directives.md#whereconditions) directive.
+
+### Custom operator
+
+You may register a custom `\Nuwave\Lighthouse\WhereConditions\Operator` through a service provider.
+This may be necessary if your database uses different SQL operators then Lighthouse's default or you
+want to extend/restrict the allowed operators.
 
 ## @whereJsonContains
 
