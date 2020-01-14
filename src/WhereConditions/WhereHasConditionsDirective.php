@@ -14,9 +14,10 @@ a dynamically controlled `WHERE` condition that applies to the relationship.
 directive @whereHasConditions(
     """
     The Eloquent relationship that the conditions will be applied to.
-    This argument can be ommited if the field name follows a `hasRelationship` naming convention.
-    Example: If the Eloquent relationship is named `posts`, you can name your field  `hasPosts` and
-    ommit this argument; the `posts` relationship will be automatically resolved.
+
+    This argument can be omitted if the argument name follows the naming
+    convention `has{$RELATION}`. For example, if the Eloquent relationship
+    is named `posts`, the argument name must be `hasPosts`.
     """
     relation: String
 
