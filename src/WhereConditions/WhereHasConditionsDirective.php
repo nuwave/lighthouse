@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
+use Illuminate\Support\Str;
+
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string
@@ -38,7 +40,7 @@ SDL;
     public function handleBuilder($builder, $whereConditions)
     {
         // Make sure to ignore empty conditions.
-        // The "operator" key set by default, so the count is 1 when the condition is empty.
+        // The "operator" key is set by default, so the count is 1 when the condition is empty.
         if (count($whereConditions) > 1) {
             $builder->whereHas(
                 $this->getRelationName(),
@@ -61,12 +63,16 @@ SDL;
      *
      * @return string
      */
-    public function getRelationName()
+    public function getRelationName(): string
     {
         $relationName = $this->directiveArgValue('relation');
 
+        // If the relation name is not set explicitly, we assume the argument
+        // name follows a convention and contains the relation name
         if (is_null($relationName)) {
-            $relationName = lcfirst(str_replace('has', '', $this->nodeName()));
+            $relationName = lcfirst(
+                Str::after($this->nodeName(), 'has')
+            );
         }
 
         return $relationName;
