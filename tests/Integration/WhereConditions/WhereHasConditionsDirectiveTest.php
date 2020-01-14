@@ -58,11 +58,13 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         );
     }
 
-    public function testIgnoreEmptyConditions(): void
+    public function testExistenceWithEmptyCondition(): void
     {
         factory(User::class)->create([
             'company_id' => null,
         ]);
+
+        factory(User::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -72,7 +74,38 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testIgnoreNullCondition(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                hasCompany: null
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testWithoutRelationName(): void
@@ -90,11 +123,11 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'withoutRelation' => [
                     [
-                        'id' => 1,
+                        'id' => '1',
                     ],
                 ],
             ],

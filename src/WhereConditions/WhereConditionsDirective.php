@@ -27,6 +27,12 @@ SDL;
      */
     public function handleBuilder($builder, $whereConditions)
     {
+        // The value `null` should be allowed but have no effect on the query.
+        // Just return the unmodified Builder instance.
+        if (is_null($whereConditions)) {
+            return $builder;
+        }
+
         return $this->handleWhereConditions($builder, $whereConditions);
     }
 }

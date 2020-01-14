@@ -494,4 +494,27 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $enum
         );
     }
+
+    public function testIgnoreNullCondition(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: null
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

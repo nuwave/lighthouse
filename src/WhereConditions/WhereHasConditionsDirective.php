@@ -39,23 +39,23 @@ SDL;
      */
     public function handleBuilder($builder, $whereConditions)
     {
-        // Make sure to ignore empty conditions.
-        // The "operator" key is set by default, so the count is 1 when the condition is empty.
-        if (count($whereConditions) > 1) {
-            $builder->whereHas(
-                $this->getRelationName(),
-                function ($builder) use ($whereConditions): void {
-                    // This extra nesting is required for the `OR` condition to work correctly.
-                    $builder->whereNested(
-                        function ($builder) use ($whereConditions): void {
-                            $this->handleWhereConditions($builder, $whereConditions);
-                        }
-                    );
-                }
-            );
+        // The value `null` should be allowed but have no effect on the query.
+        // Just return the unmodified Builder instance.
+        if (is_null($whereConditions)) {
+            return $builder;
         }
 
-        return $builder;
+        return $builder->whereHas(
+            $this->getRelationName(),
+            function ($builder) use ($whereConditions): void {
+                // This extra nesting is required for the `OR` condition to work correctly.
+                $builder->whereNested(
+                    function ($builder) use ($whereConditions): void {
+                        $this->handleWhereConditions($builder, $whereConditions);
+                    }
+                );
+            }
+        );
     }
 
     /**

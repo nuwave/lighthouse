@@ -152,6 +152,19 @@ query gets people that have no hair and blue-ish eyes:
 }
 ```
 
+Using `null` as argument value does not have any effect on the query.
+This query would retrieve all persons without any condition:
+
+```graphql
+{
+  people(
+    where: null
+  ) {
+    name
+  }
+}
+```
+
 ### @whereHasConditions
 
 ```graphql
@@ -233,6 +246,33 @@ their roles, looks like this:
   }
 }
 ```
+
+You can also query for relationship existence without any condition; simply use an empty object as argument value.
+This query would retrieve all persons that have a role:
+
+```graphql
+{
+  people(
+    hasRole: {}
+  ) {
+    name
+  }
+}
+```
+
+Just like with the `@whereCondition` directive, using `null` as argument value does not have any effect on the query.
+This query would retrieve all persons, no matter if they have a role or not:
+
+```graphql
+{
+  people(
+    hasRole: null
+  ) {
+    name
+  }
+}
+```
+
 
 ## Custom operator
 
