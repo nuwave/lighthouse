@@ -2858,19 +2858,16 @@ directive @whereBetween(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-## @whereConstraints
+## @whereConditions
 
 ```graphql
 """
-Add a dynamically client-controlled WHERE constraint to a fields query.
-The argument it is defined on may have any name but **must** be
-of the input type `WhereConstraints`.
+Add a dynamically client-controlled WHERE condition to a fields query.
 """
-directive @whereConstraints(
+directive @whereConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    By default, clients are allowed to use arbitrary columns.
     """
     columns: [String!]
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -2884,7 +2881,7 @@ Add the service provider to your `config/app.php`
 
 ```php
 'providers' => [
-    \Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider::class,
+    \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
 ],
 ```
 
@@ -2905,7 +2902,7 @@ type Person {
 
 type Query {
     people(
-        where: _ @whereConstraints(columns: ["age", "type", "haircolour", "height"])
+        where: _ @whereConditions(columns: ["age", "type", "haircolour", "height"])
     ): [Person!]! @all
 }
 ```
@@ -2916,22 +2913,22 @@ The blank type named `_` will be changed to the actual type.
 Here are the types that will be included in the compiled schema:
 
 ```graphql
-"Dynamic WHERE constraints for the `where` argument on the query `people`."
-input PeopleWhereWhereConstraints {
-    "The column that is used for the constraint."
+"Dynamic WHERE conditions for the `where` argument on the query `people`."
+input PeopleWhereWhereConditions {
+    "The column that is used for the condition."
     column: PeopleWhereColumn
 
-    "The operator that is used for the constraint."
+    "The operator that is used for the condition."
     operator: SQLOperator = EQ
 
-    "The value that is used for the constraint."
+    "The value that is used for the condition."
     value: Mixed
 
-    "A set of constraints that requires all constraints to match."
-    AND: [PeopleWhereWhereConstraints!]
+    "A set of conditions that requires all conditions to match."
+    AND: [PeopleWhereWhereConditions!]
 
-    "A set of constraints that requires at least one constraint to match."
-    OR: [PeopleWhereWhereConstraints!]
+    "A set of conditions that requires at least one condition to match."
+    OR: [PeopleWhereWhereConditions!]
 }
 
 "Allowed column names for the `where` argument on the query `people`."
@@ -2959,7 +2956,7 @@ A simple query for a person who is exactly 42 years old would look like this:
 }
 ```
 
-Note that the operator defaults to `EQ`/`=` if not given, so you could
+Note that the operator defaults to `EQ` (`=`) if not given, so you could
 also omit it from the previous example and get the same result.
 
 The following query gets actors over age 37 who either have red hair or are at least 150cm:
@@ -3005,7 +3002,7 @@ query gets people that have no hair and blue-ish eyes:
 
 ### Custom operator
 
-You may register a custom `\Nuwave\Lighthouse\WhereConstraints\Operator` through a service provider.
+You may register a custom `\Nuwave\Lighthouse\WhereConditions\Operator` through a service provider.
 This may be necessary if your database uses different SQL operators then Lighthouse's default or you
 want to extend/restrict the allowed operators. 
 
