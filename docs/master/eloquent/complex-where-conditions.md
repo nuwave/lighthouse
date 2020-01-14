@@ -152,7 +152,7 @@ query gets people that have no hair and blue-ish eyes:
 }
 ```
 
-## @whereHasConditions
+### @whereHasConditions
 
 ```graphql
 """
