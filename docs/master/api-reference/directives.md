@@ -2845,7 +2845,22 @@ directive @where(
 
 ## @whereBetween
 
+```graphql
+"""
 Verify that a column's value is between two values.
+The type of the input value this is defined upon should be
+an `input` object with two fields.
+"""
+directive @whereBetween(
+  """
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This example defines an `input` to filter that a value is between two dates.
 
 ```graphql
 type Query {
@@ -2860,25 +2875,8 @@ input DateRange {
 }
 ```
 
-The type of the input value this is defined upon should be
-an `input` object with two fields.
-
-### Definition
-
-```graphql
-"""
-Verify that a column's value is between two values.
-The type of the input value this is defined upon should be
-an `input` object with two fields.
-"""
-directive @whereBetween(
-  """
-  Specify the database column to compare. 
-  Only required if database column has a different name than the attribute in your schema.
-  """
-  key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
+You may use any custom `input` type for the argument. Make sure it has
+exactly two required fields to ensure the query is valid.
 
 ## @whereConditions
 
