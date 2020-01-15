@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\WhereConstraints;
+namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -15,17 +15,17 @@ use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
+abstract class WhereConditionsBaseDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
     /**
-     * @var \Nuwave\Lighthouse\WhereConstraints\Operator
+     * @var \Nuwave\Lighthouse\WhereConditions\Operator
      */
     protected $operator;
 
     /**
-     * WhereConstraintsDirective constructor.
+     * WhereConditions constructor.
      *
-     * @param  \Nuwave\Lighthouse\WhereConstraints\Operator  $operator
+     * @param  \Nuwave\Lighthouse\WhereConditions\Operator  $operator
      * @return void
      */
     public function __construct(Operator $operator)
@@ -33,57 +33,39 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
         $this->operator = $operator;
     }
 
-    public static function definition(): string
-    {
-        return /** @lang GraphQL */ <<<'SDL'
-"""
-Add a dynamically client-controlled WHERE constraint to a fields query.
-The argument it is defined on may have any name but **must** be
-of the input type `WhereConstraints`.
-"""
-directive @whereConstraints(
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    """
-    columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
-    }
-
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed[]  $whereConstraints
+     * @param  array  $whereConditions
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $whereConstraints, string $boolean = 'and')
+    public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')
     {
-        if ($andConnectedConstraints = $whereConstraints['AND'] ?? null) {
+        if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($andConnectedConstraints): void {
-                    foreach ($andConnectedConstraints as $constraint) {
-                        $this->handleBuilder($builder, $constraint);
+                function ($builder) use ($andConnectedConditions): void {
+                    foreach ($andConnectedConditions as $condition) {
+                        $this->handleWhereConditions($builder, $condition);
                     }
                 }
             );
         }
 
-        if ($orConnectedConstraints = $whereConstraints['OR'] ?? null) {
+        if ($orConnectedConditions = $whereConditions['OR'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($orConnectedConstraints): void {
-                    foreach ($orConnectedConstraints as $constraint) {
-                        $this->handleBuilder($builder, $constraint, 'or');
+                function ($builder) use ($orConnectedConditions): void {
+                    foreach ($orConnectedConditions as $condition) {
+                        $this->handleWhereConditions($builder, $condition, 'or');
                     }
                 },
                 'or'
             );
         }
 
-        if ($column = $whereConstraints['column'] ?? null) {
+        if ($column = $whereConditions['column'] ?? null) {
             static::assertValidColumnName($column);
 
-            return $this->operator->applyConstraints($builder, $whereConstraints, $boolean);
+            return $this->operator->applyConditions($builder, $whereConditions, $boolean);
         }
 
         return $builder;
@@ -110,16 +92,16 @@ SDL;
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($allowedColumns = $this->directiveArgValue('columns')) {
-            $restrictedWhereConstraintsName = $this->restrictedWhereConstraintsName($argDefinition, $parentField);
-            $argDefinition->type = PartialParser::namedType($restrictedWhereConstraintsName);
+            $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
+            $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
 
             $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
 
             $documentAST
                 ->setTypeDefinition(
-                    WhereConstraintsServiceProvider::createWhereConstraintsInputType(
-                        $restrictedWhereConstraintsName,
-                        "Dynamic WHERE constraints for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                    WhereConditionsServiceProvider::createWhereConditionsInputType(
+                        $restrictedWhereConditionsName,
+                        "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
                         $allowedColumnsEnumName
                     )
                 )
@@ -127,24 +109,24 @@ SDL;
                     Codegen::createAllowedColumnsEnum($argDefinition, $parentField, $allowedColumns, $allowedColumnsEnumName)
                 );
         } else {
-            $argDefinition->type = PartialParser::namedType(WhereConstraintsServiceProvider::DEFAULT_WHERE_CONSTRAINTS);
+            $argDefinition->type = PartialParser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
         }
     }
 
     /**
-     * Create the name for the restricted WhereConstraints input.
+     * Create the name for the restricted WhereConditions input.
      *
-     * @example FieldNameArgNameWhereConstraints
+     * @example FieldNameArgNameWhereHasConditions
      *
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
      * @return string
      */
-    protected function restrictedWhereConstraintsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
+    protected function restrictedWhereConditionsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
     {
         return Str::studly($parentField->name->value)
             .Str::studly($argDefinition->name->value)
-            .'WhereConstraints';
+            .'WhereConditions';
     }
 
     /**

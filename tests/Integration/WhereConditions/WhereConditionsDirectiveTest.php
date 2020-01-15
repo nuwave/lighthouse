@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\Integration\WhereConstraints;
+namespace Tests\Integration\WhereConditions;
 
-use Nuwave\Lighthouse\WhereConstraints\SQLOperator;
-use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
-use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
+use Nuwave\Lighthouse\WhereConditions\SQLOperator;
+use Nuwave\Lighthouse\WhereConditions\WhereConditionsDirective;
+use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class WhereConstraintsDirectiveTest extends DBTestCase
+class WhereConditionsDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type User {
@@ -26,10 +26,10 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     }
 
     type Query {
-        posts(where: _ @whereConstraints): [Post!]! @all
-        users(where: _ @whereConstraints): [User!]! @all
+        posts(where: _ @whereConditions): [Post!]! @all
+        users(where: _ @whereConditions): [User!]! @all
         whitelistedColumns(
-            where: _ @whereConstraints(columns: ["id", "camelCase"])
+            where: _ @whereConditions(columns: ["id", "camelCase"])
         ): [User!]! @all
     }
     ';
@@ -38,7 +38,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [WhereConstraintsServiceProvider::class]
+            [WhereConditionsServiceProvider::class]
         );
     }
 
@@ -364,7 +364,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonFragment([
-            'message' => WhereConstraintsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
+            'message' => WhereConditionsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
         ]);
     }
 
@@ -493,5 +493,28 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             ],
             $enum
         );
+    }
+
+    public function testIgnoreNullCondition(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: null
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
     }
 }

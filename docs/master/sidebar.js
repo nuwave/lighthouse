@@ -24,6 +24,7 @@ module.exports = [
             'eloquent/polymorphic-relationships',
             'eloquent/soft-deleting',
             'eloquent/nested-mutations',
+            'eloquent/complex-where-conditions',
         ]
     },
     {
