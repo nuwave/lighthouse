@@ -44,16 +44,16 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testCanQueryHasManyRelationship(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany
         }
-        
+
         type Task {
             id: Int
             foo: String
         }
-        
+
         type Query {
             user: User @auth
         }
@@ -66,7 +66,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertSame(4, $tasksWithoutGlobalScope);
 
         // Ensure global scopes are respected here
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks {
@@ -81,22 +81,22 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->assertCount(3, $this->user->tasks);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks(foo: Int): [Task!]! @hasMany(scopes: ["foo"])
         }
-        
+
         type Task {
             id: Int
             foo: String
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(foo: 2) {
@@ -109,26 +109,26 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testCanQueryHasManyPaginator(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator")
             posts: [Post!]! @hasMany(type: "paginator")
         }
-        
+
         type Task {
             id: Int!
         }
-        
+
         type Post {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(first: 2) {
@@ -160,21 +160,21 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testDoesNotRequireModelClassForPaginatedHasMany(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [NotTheModelNameTask!]! @hasMany(type: "paginator")
         }
-        
+
         type NotTheModelNameTask {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(first: 2) {
@@ -208,21 +208,21 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 1]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator", maxCount: 3)
         }
-        
+
         type Task {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(first: 5) {
@@ -242,22 +242,22 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testHandlesPaginationWithCountZero(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID
             tasks: [Task!] @hasMany(type: "paginator")
         }
-        
+
         type Task {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 id
@@ -282,21 +282,21 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 1]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "relay", maxCount: 3)
         }
-        
+
         type Task {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(first: 5) {
@@ -320,21 +320,21 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator")
         }
-        
+
         type Task {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(first: 3) {
@@ -356,21 +356,21 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
-        $this->schema = '
-         type User {
-             tasks: [Task!]! @hasMany(type: "relay")
-         }
-         
-         type Task {
-             id: Int!
-         }
-         
-         type Query {
-             user: User @auth
-         }
-         ';
+        $this->schema = /** @lang GraphQL */'
+        type User {
+            tasks: [Task!]! @hasMany(type: "relay")
+        }
 
-        $result = $this->graphQL('
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(first: 3) {
@@ -392,7 +392,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testUsesEdgeTypeForRelayConnections(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany (
                 type: "relay"
@@ -436,11 +436,11 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testCanQueryHasManyPaginatorWithADefaultCount(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator", defaultCount: 2)
         }
-        
+
         type Task {
             id: Int!
         }
@@ -450,7 +450,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks {
@@ -482,21 +482,21 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testCanQueryHasManyRelayConnection(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "relay")
         }
-        
+
         type Task {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks(first: 2) {
@@ -526,21 +526,21 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testCanQueryHasManyRelayConnectionWithADefaultCount(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "relay", defaultCount: 2)
         }
-        
+
         type Task {
             id: Int!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 tasks {
@@ -570,30 +570,30 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testCanQueryHasManyNestedRelationships(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "relay")
         }
-        
+
         type Task {
             id: Int!
             user: User @belongsTo
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
-        { 
-            user { 
-                tasks(first: 2) { 
-                    pageInfo { 
-                        hasNextPage 
-                    } 
-                    edges { 
-                        node { 
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                tasks(first: 2) {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        node {
                             id
                             user {
                                 tasks(first: 2) {
@@ -604,10 +604,10 @@ class HasManyDirectiveTest extends DBTestCase
                                     }
                                 }
                             }
-                        } 
-                    } 
-                } 
-            } 
+                        }
+                    }
+                }
+            }
         }
         ')->assertJson([
             'data' => [
@@ -639,19 +639,19 @@ class HasManyDirectiveTest extends DBTestCase
             'parent_id' => $post2->getKey(),
         ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: Int!
             parent: Post @belongsTo
         }
-        
+
         type Query {
             posts: [Post!]! @all
         }
         ';
 
-        $this->graphQL('
-        { 
+        $this->graphQL(/** @lang GraphQL */ '
+        {
             posts {
                 id
                 parent {
@@ -660,7 +660,7 @@ class HasManyDirectiveTest extends DBTestCase
                         id
                     }
                 }
-            } 
+            }
         }
         ')->assertJson([
             'data' => [
@@ -694,11 +694,11 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 
-        $schema = $this->buildSchemaWithPlaceholderQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
         }
-        
+
         type Task {
             foo: String
         }
@@ -711,7 +711,7 @@ class HasManyDirectiveTest extends DBTestCase
     public function testCanQueryHasManyPaginatorBeforeQuery(): void
     {
         // BeforeQuery
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
             tasks: [Task!]! @hasMany(type: "paginator")
@@ -727,10 +727,10 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            tasks(first:2){
-                data{
+            tasks(first: 2) {
+                data {
                     id
                 }
             }
@@ -741,7 +741,7 @@ class HasManyDirectiveTest extends DBTestCase
     public function testCanQueryHasManyPaginatorAfterQuery(): void
     {
         // AfterQuery
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID! @eq): User @find
             tasks: [Task!]! @paginate
@@ -757,9 +757,9 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            tasks(first:2){
+            tasks(first: 2) {
                 data{
                     id
                 }
@@ -771,7 +771,7 @@ class HasManyDirectiveTest extends DBTestCase
     public function testCanQueryHasManyNoTypePaginator(): void
     {
         // AfterQuery
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID! @eq): User @find
             tasks: [Task!]! @paginate
@@ -787,9 +787,9 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            tasks(first:2){
+            tasks(first: 2) {
                 data{
                     id
                 }
