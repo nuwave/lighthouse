@@ -735,7 +735,7 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(2, 'data.user.tasks.data');
+        ')->assertJsonCount(2, 'data.tasks.data');
     }
 
     public function testCanQueryHasManyPaginatorAfterQuery(): void
@@ -765,7 +765,7 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(2, 'data.user.tasks.data');
+        ')->assertJsonCount(2, 'data.tasks.data');
     }
 
     public function testCanQueryHasManyNoTypePaginator(): void
@@ -795,6 +795,6 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(2, 'data.user.tasks.data');
+        ')->assertJsonCount(2, 'data.tasks.data');
     }
 }
