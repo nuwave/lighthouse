@@ -1922,6 +1922,13 @@ directive @orderBy(
     If not given, the column names can be passed as a String by clients.
     """
     columns: [String!]
+
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    The effect is exactly the same as with the `columns` argument.
+    """
+    columnsEnum: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -1962,6 +1969,25 @@ enum SortOrder {
     DESC
 }
 ```
+
+If you want to re-use a list of allowed columns, you can define your own enumeration type and use the `columnsEnum` argument instead of `columns`.
+Here's an example of how you could define it in your schema:
+
+```graphql
+type Query {
+    allPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]! @all
+    paginatedPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]! @paginate
+}
+
+enum PostColumn {
+  POSTED_AT @enum(value: "posted_at")
+  TITLE @enum(value: "title")
+}
+```
+
+Lighthouse will still automatically generate the necessary input types and the `SortOrder` enum.
+But instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
+
 
 Querying a field that has an `orderBy` argument looks like this:
 
