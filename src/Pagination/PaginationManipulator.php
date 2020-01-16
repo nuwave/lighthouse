@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 class PaginationManipulator
 {
     /**
-     * @var DocumentAST
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
@@ -159,7 +159,7 @@ GRAPHQL
         ?int $maxCount = null
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
-        $paginatorTypeName = "{$fieldTypeName}Paginator";
+        $paginatorTypeName = "{$parentType->name->value}{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
