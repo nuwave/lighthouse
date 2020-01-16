@@ -81,7 +81,7 @@ SDL;
             $restrictedOrderByName = $this->restrictedOrderByName($argDefinition, $parentField);
             $argDefinition->type = PartialParser::listType("[$restrictedOrderByName!]");
 
-            if (! is_null($allowedColumns)) {
+            if (! isset($allowedColumnsEnumName)) {
                 $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
                 $documentAST
                     ->setTypeDefinition(

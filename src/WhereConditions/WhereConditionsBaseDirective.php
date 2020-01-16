@@ -95,7 +95,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
             $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
 
-            if (! is_null($allowedColumns)) {
+            if (! isset($allowedColumnsEnumName)) {
                 $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
                 $documentAST
                     ->setTypeDefinition(
