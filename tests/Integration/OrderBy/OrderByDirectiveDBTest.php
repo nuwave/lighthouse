@@ -12,12 +12,17 @@ class OrderByDirectiveDBTest extends DBTestCase
         users(
             orderBy: _ @orderBy
             orderByRestricted: _ @orderBy(columns: ["name"])
+            orderByRestrictedEnum: _ @orderBy(columnsEnum: "UserColumn")
         ): [User!]! @all
     }
 
     type User {
         name: String
         team_id: Int
+    }
+
+    enum UserColumn {
+        NAME @enum(value: "name")
     }
     ';
 
@@ -178,6 +183,38 @@ class OrderByDirectiveDBTest extends DBTestCase
                 orderBy: [
                     {
                         column: "name"
+                        order: ASC
+                    }
+                ]
+            ) {
+                name
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'name' => 'A',
+                    ],
+                    [
+                        'name' => 'B',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanUseColumnEnumsArg(): void
+    {
+        factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderByRestrictedEnum: [
+                    {
+                        field: NAME
                         order: ASC
                     }
                 ]

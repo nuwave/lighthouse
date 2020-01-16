@@ -91,11 +91,17 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        if ($allowedColumns = $this->directiveArgValue('columns')) {
+        if (($allowedColumns = $this->directiveArgValue('columns')) || ($allowedColumnsEnumName = $this->directiveArgValue('columnsEnum'))) {
             $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
             $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
 
-            $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
+            if (! is_null($allowedColumns)) {
+                $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
+                $documentAST
+                    ->setTypeDefinition(
+                        Codegen::createAllowedColumnsEnum($argDefinition, $parentField, $allowedColumns, $allowedColumnsEnumName)
+                    );
+            }
 
             $documentAST
                 ->setTypeDefinition(
@@ -104,9 +110,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                         "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
                         $allowedColumnsEnumName
                     )
-                )
-                ->setTypeDefinition(
-                    Codegen::createAllowedColumnsEnum($argDefinition, $parentField, $allowedColumns, $allowedColumnsEnumName)
                 );
         } else {
             $argDefinition->type = PartialParser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
