@@ -707,4 +707,94 @@ class HasManyDirectiveTest extends DBTestCase
         $type = $schema->getType('User');
         $type->config['fields']();
     }
+
+    public function testCanQueryHasManyPaginatorBeforeQuery(): void
+    {
+        // BeforeQuery
+        $this->schema = '
+        type User {
+            id: Int!
+            tasks: [Task!]! @hasMany(type: "paginator")
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+            tasks: [Task!]! @paginate
+        }
+        ';
+
+        $this->graphQL('
+        {
+            tasks(first:2){
+                data{
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.user.tasks.data');
+    }
+
+    public function testCanQueryHasManyPaginatorAfterQuery(): void
+    {
+        // AfterQuery
+        $this->schema = '
+        type Query {
+            user(id: ID! @eq): User @find
+            tasks: [Task!]! @paginate
+        }
+
+        type User {
+            id: Int!
+            tasks: [Task!]! @hasMany(type: "paginator")
+        }
+
+        type Task {
+            id: Int!
+        }
+        ';
+
+        $this->graphQL('
+        {
+            tasks(first:2){
+                data{
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.user.tasks.data');
+    }
+
+    public function testCanQueryHasManyNoTypePaginator(): void
+    {
+        // AfterQuery
+        $this->schema = '
+        type Query {
+            user(id: ID! @eq): User @find
+            tasks: [Task!]! @paginate
+        }
+
+        type User {
+            id: Int!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: Int!
+        }
+        ';
+
+        $this->graphQL('
+        {
+            tasks(first:2){
+                data{
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.user.tasks.data');
+    }
 }
