@@ -16,6 +16,13 @@ directive @whereConditions(
     This improves introspection capabilities and security.
     """
     columns: [String!]
+
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    The effect is exactly the same as with the `columns` argument.
+    """
+    columnsEnum: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
