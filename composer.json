@@ -83,7 +83,7 @@
     "scripts": {
         "bench": "phpbench run",
         "stan": "phpstan analyse --memory-limit 2048M",
-        "test": "phpunit --colors=always --filter=testCanUseColumnEnumsArg",
+        "test": "phpunit --colors=always",
         "test:integration": "phpunit --colors=always --testsuite Integration",
         "test:unit": "phpunit --colors=always --testsuite Unit"
     },
