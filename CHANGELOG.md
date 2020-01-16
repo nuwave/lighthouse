@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.8.0...master)
 
+### Added
+
+- Add optional `columnsEnum` argument to the `@whereConditions`, `@whereHasConditions` and `@orderBy` directives https://github.com/nuwave/lighthouse/pull/1150
+
 ## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.7.2)
 
 ### Added
