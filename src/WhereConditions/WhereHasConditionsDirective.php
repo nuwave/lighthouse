@@ -26,6 +26,7 @@ directive @whereHasConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
+    Mutually exclusive with the `columnsEnum` argument.
     """
     columns: [String!]
 
