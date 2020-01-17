@@ -17,7 +17,7 @@ test: ## Runs tests with phpunit
 bench: ## Run benchmarks
 	docker-compose exec php composer bench
 
-vendor: composer.json composer.lock ## Install composer dependencies
+vendor: composer.json ## Install composer dependencies
 	composer validate --strict
 	composer install
 	composer normalize
