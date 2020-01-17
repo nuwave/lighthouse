@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\Codegen;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 
 trait GeneratesColumnsEnum
 {
