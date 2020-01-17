@@ -50,7 +50,7 @@ We welcome contributions of any kind.
 - Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Have an idea? [Propose a feature](https://github.com/nuwave/lighthouse/issues/new?template=feature_proposal.md)
-- Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/.github/CONTRIBUTING.md)
+- Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/CONTRIBUTING.md)
 
 ## Changelog
 
