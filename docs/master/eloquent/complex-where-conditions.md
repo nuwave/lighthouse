@@ -113,6 +113,7 @@ type Query {
     ): [Person!]! @paginated
 }
 
+"A custom description for this custom enum."
 enum PersonColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")

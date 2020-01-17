@@ -1979,6 +1979,7 @@ type Query {
     paginatedPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]! @paginate
 }
 
+"A custom description for this custom enum."
 enum PostColumn {
   POSTED_AT @enum(value: "posted_at")
   TITLE @enum(value: "title")
