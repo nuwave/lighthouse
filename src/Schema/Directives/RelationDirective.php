@@ -100,7 +100,7 @@ abstract class RelationDirective extends BaseDirective
         // there are multiple different models at the same path in the query.
         // Because the RelationBatchLoader can only deal with one kind of parent model,
         // we make sure we get one unique batch loader instance per model class.
-        $path []= get_class($parent);
+        $path [] = get_class($parent);
 
         return $path;
     }

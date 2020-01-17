@@ -12,9 +12,16 @@ use Tests\Utils\Models\User;
 
 class MorphOneDirectiveOnInterfaceTest extends DBTestCase
 {
+    /** @var \Tests\Utils\Models\Employee */
     protected $employee;
+
+    /** @var \Tests\Utils\Models\Contractor */
     protected $contractor;
+
+    /** @var \Tests\Utils\Models\Color */
     protected $color1;
+
+    /** @var \Tests\Utils\Models\Color */
     protected $color2;
 
     protected function setUp(): void

@@ -38,24 +38,28 @@ class MorphOneDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->hour = $this->task->hours()->save(factory(Hour::class)->create());
+        $this->hour = $this->task
+            ->hours()
+            ->save(
+                factory(Hour::class)->create()
+            );
     }
 
     public function testCanResolveMorphOneRelationship(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Hour {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Task {
             id: ID!
             name: String!
             hour: Hour! @morphOne
         }
-        
+
         type Query {
             task (
                 id: ID! @eq
@@ -63,9 +67,9 @@ class MorphOneDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
-        {
-            task(id: {$this->task->id}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!){
+            task(id: $id) {
                 id
                 name
                 hour {
@@ -75,7 +79,9 @@ class MorphOneDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $this->task->id,
+        ])->assertJson([
             'data' => [
                 'task' => [
                     'id' => $this->task->id,
@@ -92,19 +98,19 @@ class MorphOneDirectiveTest extends DBTestCase
 
     public function testCanResolveMorphOneWithCustomName(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Hour {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Task {
             id: ID!
             name: String!
             customHour: Hour! @morphOne(relation: "hour")
         }
-        
+
         type Query {
             task (
                 id: ID! @eq
@@ -112,9 +118,9 @@ class MorphOneDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
-        {
-            task(id: {$this->task->id}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!){
+            task(id: $id) {
                 id
                 name
                 customHour {
@@ -124,7 +130,9 @@ class MorphOneDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $this->task->id,
+        ])->assertJson([
             'data' => [
                 'task' => [
                     'id' => $this->task->id,

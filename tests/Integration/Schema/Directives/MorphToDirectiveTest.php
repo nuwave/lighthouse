@@ -44,19 +44,19 @@ class MorphToDirectiveTest extends DBTestCase
 
     public function testCanResolveMorphToRelationship(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Hour {
             id: ID!
             from: String
             to: String
             hourable: Task! @morphTo(relation: "hourable")
         }
-        
+
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type Query {
             hour (
                 id: ID! @eq
@@ -64,9 +64,9 @@ class MorphToDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
-        {
-            hour(id: {$this->hour->id}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            hour(id: $id) {
                 id
                 from
                 to
@@ -76,7 +76,9 @@ class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $this->hour->id,
+        ])->assertJson([
             'data' => [
                 'hour' => [
                     'id' => $this->hour->id,
@@ -93,19 +95,19 @@ class MorphToDirectiveTest extends DBTestCase
 
     public function testCanResolveMorphToWithCustomName(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Hour {
             id: ID!
             from: String
             to: String
             customHourable: Task! @morphTo(relation: "hourable")
         }
-        
+
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type Query {
             hour (
                 id: ID! @eq
@@ -113,9 +115,9 @@ class MorphToDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
-        {
-            hour(id: {$this->hour->id}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            hour(id: $id) {
                 id
                 from
                 to
@@ -125,7 +127,9 @@ class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $this->hour->id,
+        ])->assertJson([
             'data' => [
                 'hour' => [
                     'id' => $this->hour->id,
@@ -145,9 +149,11 @@ class MorphToDirectiveTest extends DBTestCase
         $post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $postHour = $post->hours()->save(factory(Hour::class)->create());
+        $postHour = $post->hours()->save(
+            factory(Hour::class)->create()
+        );
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         interface Hourable {
             id: ID!
         }
@@ -156,19 +162,19 @@ class MorphToDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Post implements Hourable {
             id: ID!
             title: String!
         }
-        
+
         type Hour {
             id: ID!
             from: String
             to: String
             hourable: Hourable! @morphTo
         }
-        
+
         type Query {
             hour (
                 id: ID! @eq
@@ -176,9 +182,9 @@ class MorphToDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
-        {
-            taskHour:hour(id: {$this->hour->id}) {
+        $this->graphQL(/** @lang GraphQL */ "
+        query ($taskHour: ID!, $postHour: ID!){
+            taskHour: hour(id: $taskHour) {
                 id
                 from
                 to
@@ -193,7 +199,7 @@ class MorphToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            postHour:hour(id: {$postHour->id}) {
+            postHour: hour(id: $postHour) {
                 id
                 from
                 to
@@ -209,7 +215,10 @@ class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ", [
+            'taskHour' => $this->hour->id,
+            'postHour' => $postHour->id,
+        ])->assertJson([
             'data' => [
                 'taskHour' => [
                     'id' => $this->hour->id,
