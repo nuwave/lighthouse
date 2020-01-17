@@ -363,7 +363,7 @@ class GraphQLServiceProvider extends ServiceProvider
 }
 ```
 
-Don't forget to register you just created service provider in `config/app.php`
+Don't forget to register your new service provider in `config/app.php`:
 
 ```php
 'providers' => [
