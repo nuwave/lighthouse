@@ -323,29 +323,9 @@ You may register a custom `\Nuwave\Lighthouse\WhereConditions\Operator` through 
 This may be necessary if your database uses different SQL operators then Lighthouse's default or you
 want to extend/restrict the allowed operators.
 
-First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`, e.g. `\App\GraphQL\CustomSQLOperator`.
-In following example we will extend `\Nuwave\Lighthouse\WhereConditions\SQLOperator` that actually implements 
-`\Nuwave\Lighthouse\WhereConditions\Operator` and modify result of `enumDefinition()` to include `ILIKE` operator to the
-end of the `SQLOperator` enum. 
-
-```php
-use Nuwave\Lighthouse\WhereConditions\SQLOperator;
-
-class CustomSQLOperator extends SQLOperator
-{
-    public function enumDefinition(): string
-    {
-        $originalDefinition = parent::enumDefinition();
-        $additionOperators = '
-    "Simple pattern matching (`ILIKE`)"
-    ILIKE @enum(value: "ILIKE")
-';
-        $pos = strrpos($originalDefinition, '}');
-        return substr_replace($originalDefinition, $additionOperators, $pos, 0);
-    }
-}
-```
-
+First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`, e.g. `\App\GraphQL\CustomSQLOperator`,
+where you can define GraphQL `SQLOperator` enum and how query builder has to be modified depending on passed operator.
+  
 To tell lighthouse to use your custom Operator definition, you have to bind it in one of the service providers that comes 
 after `\Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class` in your `config/app.php`. E.g. create `\App\Providers\GraphQLServiceProvider`:
 
