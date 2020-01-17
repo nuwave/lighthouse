@@ -153,11 +153,11 @@ GRAPHQL
     protected function addPaginationWrapperType(ObjectTypeDefinitionNode $objectType): void
     {
         // If the type already exists, we use that instead
-        if(isset($this->documentAST->types[$objectType->name->value])) {
+        if (isset($this->documentAST->types[$objectType->name->value])) {
             $objectType = $this->documentAST->types[$objectType->name->value];
         }
 
-        if($this->modelClass) {
+        if ($this->modelClass) {
             $objectType->directives = ASTHelper::mergeNodeList(
                 $objectType->directives,
                 [PartialParser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
