@@ -4,18 +4,19 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchColorsTable extends Migration
+class CreateTestbenchImagesTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('colors', function (Blueprint $table): void {
+        Schema::create('images', function (Blueprint $table): void {
             $table->increments('id');
-            $table->string('name');
-            $table->unsignedInteger('creator_id')->nullable();
-            $table->string('creator_type')->nullable();
+            $table->string('imageable_type')->nullable();
+            $table->unsignedInteger('imageable_id')->nullable();
+            $table->string('url')->nullable();
+
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ class CreateTestbenchColorsTable extends Migration
      */
     public function down(): void
     {
-        Schema::drop('colors');
+        Schema::drop('images');
     }
 }

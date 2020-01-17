@@ -5,11 +5,11 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Hour extends Model
+class Image extends Model
 {
     protected $guarded = [];
 
-    public function hourable(): MorphTo
+    public function imageable(): MorphTo
     {
         return $this->morphTo();
     }

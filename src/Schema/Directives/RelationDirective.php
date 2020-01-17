@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -19,11 +20,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 abstract class RelationDirective extends BaseDirective
 {
     /**
-     * @var \GraphQL\Type\Definition\ResolveInfo
-     */
-    protected $resolveInfo;
-
-    /**
      * Resolve the field directive.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
@@ -35,17 +31,8 @@ abstract class RelationDirective extends BaseDirective
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationName = $this->directiveArgValue('relation', $this->nodeName());
 
-                $decorateBuilder = function ($builder) use ($resolveInfo) {
-                    $resolveInfo
-                        ->argumentSet
-                        ->enhanceBuilder($builder, $this->directiveArgValue('scopes', []));
-                };
-
-                /** @var \Nuwave\Lighthouse\Pagination\PaginationArgs|null $paginationArgs */
-                $paginationArgs = null;
-                if ($paginationType = $this->paginationType()) {
-                    $paginationArgs = PaginationArgs::extractArgs($args, $paginationType, $this->paginateMaxCount());
-                }
+                $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
+                $paginationArgs = $this->paginationArgs($args);
 
                 if (config('lighthouse.batchload_relations')) {
                     $constructorArgs = [
@@ -62,7 +49,7 @@ abstract class RelationDirective extends BaseDirective
                     return BatchLoader
                         ::instance(
                             RelationBatchLoader::class,
-                            $resolveInfo->path,
+                            $this->buildPath($resolveInfo, $parent),
                             $constructorArgs
                         )
                         ->load(
@@ -85,6 +72,37 @@ abstract class RelationDirective extends BaseDirective
         );
 
         return $value;
+    }
+
+    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
+    {
+        return function ($builder) use ($resolveInfo) {
+            $resolveInfo
+                ->argumentSet
+                ->enhanceBuilder($builder, $this->directiveArgValue('scopes', []));
+        };
+    }
+
+    protected function paginationArgs(array $args): ?PaginationArgs
+    {
+        if ($paginationType = $this->paginationType()) {
+            return PaginationArgs::extractArgs($args, $paginationType, $this->paginateMaxCount());
+        }
+
+        return null;
+    }
+
+    protected function buildPath(ResolveInfo $resolveInfo, Model $parent): array
+    {
+        $path = $resolveInfo->path;
+
+        // When dealing with polymorphic relations, we might have a case where
+        // there are multiple different models at the same path in the query.
+        // Because the RelationBatchLoader can only deal with one kind of parent model,
+        // we make sure we get one unique batch loader instance per model class.
+        $path [] = get_class($parent);
+
+        return $path;
     }
 
     /**

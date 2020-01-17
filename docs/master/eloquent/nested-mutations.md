@@ -645,58 +645,52 @@ type Task {
   name: String
 }
 
-type Hour {
+type Image {
   id: ID
-  weekday: Int
-  hourable: Task
+  url: String
+  imageable: Task
 }
 
 type Mutation {
-  createHour(input: CreateHourInput! @spread): Hour @create
-  updateHour(input: UpdateHourInput! @spread): Hour @update
-  upsertHour(input: UpsertHourInput! @spread): Hour @upsert
+  createImage(input: CreateImageInput! @spread): Image @create
+  updateImage(input: UpdateImageInput! @spread): Image @update
+  upsertImage(input: UpsertImageInput! @spread): Image @upsert
 }
 
-input CreateHourInput {
-  from: String
-  to: String
-  weekday: Int
-  hourable: CreateHourableMorphTo
+input CreateImageInput {
+  url: String
+  imageable: CreateImageableMorphTo
 }
 
-input UpdateHourInput {
+input UpdateImageInput {
   id: ID!
-  from: String
-  to: String
-  weekday: Int
-  hourable: UpdateHourableMorphTo
+  url: String
+  imageable: UpdateImageableMorphTo
 }
 
-input UpsertHourInput {
+input UpsertImageInput {
   id: ID!
-  from: String
-  to: String
-  weekday: Int
-  hourable: UpsertHourableMorphTo
+  url: String
+  imageable: UpsertImageableMorphTo
 }
 
-input CreateHourableMorphTo {
-  connect: ConnectHourableInput
+input CreateImageableMorphTo {
+  connect: ConnectImageableInput
 }
 
-input UpdateHourableMorphTo {
-  connect: ConnectHourableInput
+input UpdateImageableMorphTo {
+  connect: ConnectImageableInput
   disconnect: Boolean
   delete: Boolean
 }
 
-input UpsertHourableMorphTo {
-  connect: ConnectHourableInput
+input UpsertImageableMorphTo {
+  connect: ConnectImageableInput
   disconnect: Boolean
   delete: Boolean
 }
 
-input ConnectHourableInput {
+input ConnectImageableInput {
   type: String!
   id: ID!
 }
@@ -706,9 +700,9 @@ You can use `connect` to associate existing models.
 
 ```graphql
 mutation {
-  createHour(input: {
-    weekday: 2
-    hourable: {
+  createImage(input: {
+    url: "https://cats.example/cute"
+    imageable: {
       connect: {
         type: "App\\Models\\Task"
         id: 1
@@ -716,8 +710,8 @@ mutation {
     }
   }) {
     id
-    weekday
-    hourable {
+    url
+    imageable {
       id
       name
     }
@@ -729,15 +723,15 @@ The `disconnect` operations allows you to detach the currently associated model.
 
 ```graphql
 mutation {
-  updateHour(input: {
+  updateImage(input: {
     id: 1
-    weekday: 2
-    hourable: {
+    url: "https://dogs.example/supercute"
+    imageable: {
       disconnect: true
     }
   }) {
-    weekday
-    hourable {
+    url
+    imageable {
       id
       name
     }
@@ -749,15 +743,15 @@ The `delete` operation both detaches and deletes the currently associated model.
 
 ```graphql
 mutation {
-  upsertHour(input: {
+  upsertImage(input: {
     id: 1
-    weekday: 2
-    hourable: {
+    url: "https://bizniz.example/serious"
+    imageable: {
       delete: true
     }
   }) {
-    weekday
-    hourable {
+    url
+    imageable {
       id
       name
     }

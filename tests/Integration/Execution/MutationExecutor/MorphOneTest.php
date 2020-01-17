@@ -3,96 +3,97 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Hour;
+use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
 class MorphOneTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */
+        '
     type Task {
         id: ID!
         name: String!
-        hour: Hour
+        image: Image
     }
-    
-    type Hour {
+
+    type Image {
         id: ID!
-        weekday: Int
+        url: String
     }
-    
+
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
         upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
-    
+
     input CreateTaskInput {
         name: String!
-        hour: CreateHourRelation
+        image: CreateImageRelation
     }
-    
-    input CreateHourRelation {
-        create: CreateHourInput
-        upsert: UpsertHourInput
+
+    input CreateImageRelation {
+        create: CreateImageInput
+        upsert: UpsertImageInput
     }
-    
-    input CreateHourInput {
-        weekday: Int
+
+    input CreateImageInput {
+        url: String
     }
-    
+
     input UpdateTaskInput {
         id: ID!
         name: String
-        hour: UpdateHourRelation
+        image: UpdateImageRelation
     }
-    
-    input UpdateHourRelation {
-        create: CreateHourInput
-        update: UpdateHourInput
-        upsert: UpsertHourInput
+
+    input UpdateImageRelation {
+        create: CreateImageInput
+        update: UpdateImageInput
+        upsert: UpsertImageInput
         delete: ID
     }
-    
-    input UpdateHourInput {
+
+    input UpdateImageInput {
         id: ID!
-        weekday: Int
+        url: String
     }
 
     input UpsertTaskInput {
         id: ID
         name: String
-        hour: UpsertHourRelation
+        image: UpsertImageRelation
     }
 
-    input UpsertHourRelation {
-        create: CreateHourInput
-        update: UpdateHourInput
-        upsert: UpsertHourInput
+    input UpsertImageRelation {
+        create: CreateImageInput
+        update: UpdateImageInput
+        upsert: UpsertImageInput
         delete: ID
     }
 
-    input UpsertHourInput {
+    input UpsertImageInput {
         id: ID
-        weekday: Int
+        url: String
     }
     '.self::PLACEHOLDER_QUERY;
 
     public function testCanCreateWithNewMorphOne(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
-                hour: {
+                image: {
                     create: {
-                        weekday: 3
+                        url: "foo"
                     }
                 }
             }) {
                 id
                 name
-                hour {
-                    weekday
+                image {
+                    url
                 }
             }
         }
@@ -101,8 +102,8 @@ class MorphOneTest extends DBTestCase
                 'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hour' => [
-                        'weekday' => 3,
+                    'image' => [
+                        'url' => 'foo',
                     ],
                 ],
             ],
@@ -111,21 +112,21 @@ class MorphOneTest extends DBTestCase
 
     public function testCanCreateWithUpsertMorphOne(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
-                hour: {
+                image: {
                     upsert: {
                         id: 1
-                        weekday: 3
+                        url: "foo"
                     }
                 }
             }) {
                 id
                 name
-                hour {
-                    weekday
+                image {
+                    url
                 }
             }
         }
@@ -134,8 +135,8 @@ class MorphOneTest extends DBTestCase
                 'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hour' => [
-                        'weekday' => 3,
+                    'image' => [
+                        'url' => 'foo',
                     ],
                 ],
             ],
@@ -148,17 +149,17 @@ class MorphOneTest extends DBTestCase
         mutation {
             upsertTask(input: {
                 name: "foo"
-                hour: {
+                image: {
                     upsert: {
-                        weekday: 3
+                        url: "foo"
                     }
                 }
             }) {
                 id
                 name
-                hour {
+                image {
                     id
-                    weekday
+                    url
                 }
             }
         }
@@ -168,9 +169,9 @@ GRAPHQL
                 'upsertTask' => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hour' => [
+                    'image' => [
                         'id' => 1,
-                        'weekday' => 3,
+                        'url' => 'foo',
                     ],
                 ],
             ],
@@ -192,21 +193,21 @@ GRAPHQL
     {
         factory(Task::class)->create();
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hour: {
+                image: {
                     create: {
-                        weekday: 3
+                        url: \"foo\"
                     }
                 }
             }) {
                 id
                 name
-                hour {
-                    weekday
+                image {
+                    url
                 }
             }
         }
@@ -215,8 +216,8 @@ GRAPHQL
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hour' => [
-                        'weekday' => 3,
+                    'image' => [
+                        'url' => 'foo',
                     ],
                 ],
             ],
@@ -230,22 +231,22 @@ GRAPHQL
     {
         factory(Task::class)->create();
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hour: {
+                image: {
                     upsert: {
                         id: 1
-                        weekday: 3
+                        url: \"foo\"
                     }
                 }
             }) {
                 id
                 name
-                hour {
-                    weekday
+                image {
+                    url
                 }
             }
         }
@@ -254,8 +255,8 @@ GRAPHQL
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hour' => [
-                        'weekday' => 3,
+                    'image' => [
+                        'url' => 'foo',
                     ],
                 ],
             ],
@@ -269,27 +270,27 @@ GRAPHQL
     {
         factory(Task::class)
             ->create()
-            ->hour()
+            ->images()
             ->save(
-                factory(Hour::class)->create()
+                factory(Image::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hour: {
+                image: {
                     update: {
                         id: 1
-                        weekday: 3
+                        url: \"foo\"
                     }
                 }
             }) {
                 id
                 name
-                hour {
-                    weekday
+                image {
+                    url
                 }
             }
         }
@@ -298,8 +299,8 @@ GRAPHQL
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hour' => [
-                        'weekday' => 3,
+                    'image' => [
+                        'url' => 'foo',
                     ],
                 ],
             ],
@@ -313,9 +314,9 @@ GRAPHQL
     {
         factory(Task::class)
             ->create()
-            ->hour()
+            ->images()
             ->save(
-                factory(Hour::class)->create()
+                factory(Image::class)->create()
             );
 
         $this->graphQL("
@@ -323,14 +324,14 @@ GRAPHQL
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hour: {
+                image: {
                     delete: 1
                 }
             }) {
                 id
                 name
-                hour {
-                    weekday
+                image {
+                    url
                 }
             }
         }
@@ -339,7 +340,7 @@ GRAPHQL
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hour' => null,
+                    'image' => null,
                 ],
             ],
         ]);
