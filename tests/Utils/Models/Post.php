@@ -40,8 +40,8 @@ class Post extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    public function hours(): MorphMany
+    public function images(): MorphMany
     {
-        return $this->morphMany(Hour::class, 'hourable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 }

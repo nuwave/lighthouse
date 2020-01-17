@@ -10,7 +10,7 @@ use Tests\Utils\Models\Employee;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class MorphOneDirectiveOnInterfaceTest extends DBTestCase
+class MorphOneFromUnionTest extends DBTestCase
 {
     /** @var \Tests\Utils\Models\Employee */
     protected $employee;

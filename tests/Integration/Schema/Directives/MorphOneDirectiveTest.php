@@ -3,7 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Hour;
+use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -24,11 +24,11 @@ class MorphOneDirectiveTest extends DBTestCase
     protected $task;
 
     /**
-     * Task's hour.
+     * Task's image.
      *
-     * @var \Tests\Utils\Models\Hour
+     * @var \Tests\Utils\Models\Image
      */
-    protected $hour;
+    protected $image;
 
     protected function setUp(): void
     {
@@ -38,17 +38,17 @@ class MorphOneDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->hour = $this->task
-            ->hours()
+        $this->image = $this->task
+            ->images()
             ->save(
-                factory(Hour::class)->create()
+                factory(Image::class)->create()
             );
     }
 
     public function testCanResolveMorphOneRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
-        type Hour {
+        type Image {
             id: ID!
             from: String
             to: String
@@ -57,7 +57,7 @@ class MorphOneDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            hour: Hour! @morphOne
+            image: Image! @morphOne
         }
 
         type Query {
@@ -72,7 +72,7 @@ class MorphOneDirectiveTest extends DBTestCase
             task(id: $id) {
                 id
                 name
-                hour {
+                image {
                     id
                     from
                     to
@@ -86,10 +86,10 @@ class MorphOneDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
-                    'hour' => [
-                        'id' => $this->hour->id,
-                        'from' => $this->hour->from,
-                        'to' => $this->hour->to,
+                    'image' => [
+                        'id' => $this->image->id,
+                        'from' => $this->image->from,
+                        'to' => $this->image->to,
                     ],
                 ],
             ],
@@ -99,7 +99,7 @@ class MorphOneDirectiveTest extends DBTestCase
     public function testCanResolveMorphOneWithCustomName(): void
     {
         $this->schema = /** @lang GraphQL */ '
-        type Hour {
+        type Image {
             id: ID!
             from: String
             to: String
@@ -108,7 +108,7 @@ class MorphOneDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            customHour: Hour! @morphOne(relation: "hour")
+            customImage: Image! @morphOne(relation: "image")
         }
 
         type Query {
@@ -123,7 +123,7 @@ class MorphOneDirectiveTest extends DBTestCase
             task(id: $id) {
                 id
                 name
-                customHour {
+                customImage {
                     id
                     from
                     to
@@ -137,10 +137,10 @@ class MorphOneDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
-                    'customHour' => [
-                        'id' => $this->hour->id,
-                        'from' => $this->hour->from,
-                        'to' => $this->hour->to,
+                    'customImage' => [
+                        'id' => $this->image->id,
+                        'from' => $this->image->from,
+                        'to' => $this->image->to,
                     ],
                 ],
             ],
