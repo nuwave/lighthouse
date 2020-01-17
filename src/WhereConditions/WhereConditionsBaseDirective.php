@@ -7,16 +7,18 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Schema\AST\Codegen;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
 
 abstract class WhereConditionsBaseDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
+    use GeneratesColumnsEnum;
+
     /**
      * @var \Nuwave\Lighthouse\WhereConditions\Operator
      */
@@ -91,11 +93,10 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        if ($allowedColumns = $this->directiveArgValue('columns')) {
+        if ($this->hasAllowedColumns()) {
             $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
             $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
-
-            $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
+            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField);
 
             $documentAST
                 ->setTypeDefinition(
@@ -104,9 +105,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                         "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
                         $allowedColumnsEnumName
                     )
-                )
-                ->setTypeDefinition(
-                    Codegen::createAllowedColumnsEnum($argDefinition, $parentField, $allowedColumns, $allowedColumnsEnumName)
                 );
         } else {
             $argDefinition->type = PartialParser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);

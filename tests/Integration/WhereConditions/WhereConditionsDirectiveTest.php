@@ -31,6 +31,14 @@ class WhereConditionsDirectiveTest extends DBTestCase
         whitelistedColumns(
             where: _ @whereConditions(columns: ["id", "camelCase"])
         ): [User!]! @all
+        enumColumns(
+            where: _ @whereConditions(columnsEnum: "UserColumn")
+        ): [User!]! @all
+    }
+
+    enum UserColumn {
+        ID @enum(value: "id")
+        NAME @enum(value: "name")
     }
     ';
 
@@ -493,6 +501,32 @@ class WhereConditionsDirectiveTest extends DBTestCase
             ],
             $enum
         );
+    }
+
+    public function testCanUseColumnEnumsArg(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            enumColumns(
+                where: {
+                    column: ID
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => 1,
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testIgnoreNullCondition(): void

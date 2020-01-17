@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\OrderBy;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -12,12 +13,17 @@ class OrderByDirectiveDBTest extends DBTestCase
         users(
             orderBy: _ @orderBy
             orderByRestricted: _ @orderBy(columns: ["name"])
+            orderByRestrictedEnum: _ @orderBy(columnsEnum: "UserColumn")
         ): [User!]! @all
     }
 
     type User {
         name: String
         team_id: Int
+    }
+
+    enum UserColumn {
+        NAME @enum(value: "name")
     }
     ';
 
@@ -197,5 +203,59 @@ class OrderByDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testCanUseColumnEnumsArg(): void
+    {
+        factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderByRestrictedEnum: [
+                    {
+                        field: NAME
+                        order: ASC
+                    }
+                ]
+            ) {
+                name
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'name' => 'A',
+                    ],
+                    [
+                        'name' => 'B',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testRejectsDefinitionWithDuplicateColumnArgument(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            users(
+                orderBy: _ @orderBy(columns: ["name"], columnsEnum: "UserColumn")
+            ): [User!]! @all
+        }
+
+        type User {
+            name: String
+            team_id: Int
+        }
+
+        enum UserColumn {
+            NAME @enum(value: "name")
+        }
+        ');
     }
 }

@@ -36,8 +36,16 @@ directive @whereConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
+    Mutually exclusive with the `columnsEnum` argument.
     """
     columns: [String!]
+
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    Mutually exclusive with the `columns` argument.
+    """
+    columnsEnum: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -92,8 +100,35 @@ enum PeopleWhereColumn {
 }
 ```
 
-When you are not specifying `columns` to allow, clients can specify arbitrary
-column names as a `String`. This approach should by taken with care, as it carries
+Alternatively to the `columns` argument, you can also use `columnsEnum` in case you
+want to re-use a list of allowed columns. Here's how your schema could look like:
+
+```graphql
+type Query {
+    allPeople(
+        where: _ @whereConditions(columnsEnum: "PersonColumn")
+    ): [Person!]! @all
+
+    paginatedPeople(
+        where: _ @whereConditions(columnsEnum: "PersonColumn")
+    ): [Person!]! @paginated
+}
+
+"A custom description for this custom enum."
+enum PersonColumn {
+  AGE @enum(value: "age")
+  TYPE @enum(value: "type")
+  HAIRCOLOUR @enum(value: "haircolour")
+  HEIGHT @enum(value: "height")
+}
+```
+
+Lighthouse will still automatically generate the necessary input types.
+But instead of creating enums for the allowed columns, it will simply use the existing `PersonColumn` enum.
+
+It is recommended to either use the `columns` or the `columnsEnum` argument.
+When you don't define any allowed columns, clients can specify arbitrary column names as a `String`.
+This approach should by taken with care, as it carries
 potential performance and security risks and offers little type safety.
 
 A simple query for a person who is exactly 42 years old would look like this:
@@ -185,8 +220,16 @@ directive @whereHasConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
+    Mutually exclusive with the `columnsEnum` argument.
     """
     columns: [String!]
+
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    Mutually exclusive with the `columns` argument.
+    """
+    columnsEnum: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
