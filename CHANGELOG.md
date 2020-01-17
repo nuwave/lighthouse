@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix eager-loading relations where the parent is a `union` type 
+- Fix eager-loading relations where the parent type is an `interface` or `union` and
+  may correspond to multiple different models https://github.com/nuwave/lighthouse/pull/1035
 
 ## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.1...4.8.0)
 
