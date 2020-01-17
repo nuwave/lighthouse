@@ -305,9 +305,14 @@ class FieldFactory
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
             if ($directive instanceof ProvidesRules) {
-                // We gather the rules from all arguments and then run validation in one full swoop
-                $this->rules = array_merge($this->rules, $directive->rules());
-                $this->messages = array_merge($this->messages, $directive->messages());
+                $validators = $this->gatherValidationDirectives($directives);
+
+                $validators->push($directive);
+                foreach ($validators as $validator) {
+                    // We gather the rules from all arguments and then run validation in one full swoop
+                    $this->rules = array_merge_recursive($this->rules, $validator->rules());
+                    $this->messages = array_merge_recursive($this->messages, $validator->messages());
+                }
 
                 break;
             }
@@ -325,6 +330,23 @@ class FieldFactory
         if ($directives->isNotEmpty()) {
             $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
         }
+    }
+
+    protected function gatherValidationDirectives(Collection &$directives): Collection
+    {
+        // We only get the validator directives that are directly following on the latest validator
+        // directive. If we'd get all validator directives and merge them together, it wouldn't
+        // be possible anymore to mutate the input with argument transformer directives.
+        $validators = new Collection();
+        while ($directive = $directives->first()) {
+            if ($directive instanceof ProvidesRules) {
+                $validators->push($directives->shift());
+            } else {
+                return $validators;
+            }
+        }
+
+        return $validators;
     }
 
     protected function argValueExists(array $argumentPath): bool

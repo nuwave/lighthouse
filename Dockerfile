@@ -19,3 +19,5 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
+
+RUN echo "alias phpunit='vendor/bin/phpunit'" >> ~/.bashrc

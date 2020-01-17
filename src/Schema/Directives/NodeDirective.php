@@ -30,19 +30,9 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
         $this->nodeRegistry = $nodeRegistry;
     }
 
-    /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'node';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Register a type for Relay's global object identification.
 When used without any arguments, Lighthouse will attempt

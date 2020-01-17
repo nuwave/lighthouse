@@ -79,4 +79,20 @@ class Utils
             return $default;
         }
     }
+
+    /**
+     * Apply a callback to a value or each value in an array.
+     *
+     * @param  \Closure  $callback
+     * @param  mixed|mixed[]  $valueOrValues
+     * @return mixed|mixed[]
+     */
+    public static function applyEach(\Closure $callback, $valueOrValues)
+    {
+        if (! is_array($valueOrValues)) {
+            return $callback($valueOrValues);
+        }
+
+        return array_map($callback, $valueOrValues);
+    }
 }

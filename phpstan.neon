@@ -1,10 +1,10 @@
 includes:
-- ./vendor/nunomaduro/larastan/extension.neon
+- vendor/nunomaduro/larastan/extension.neon
+- vendor/bensampo/laravel-enum/extension.neon
 parameters:
   level: 1
   paths:
   - benchmarks
-  - config
   - src
   - tests
   excludes_analyse:

@@ -6,14 +6,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class EnumDirective extends BaseDirective implements DefinedDirective
 {
-    public function name(): string
-    {
-        return 'enum';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Assign an internal value to an enum key.
 When dealing with the Enum type in your code,

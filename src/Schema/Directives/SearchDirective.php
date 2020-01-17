@@ -7,19 +7,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class SearchDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'search';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Perform a full-text by the given input value.
 """

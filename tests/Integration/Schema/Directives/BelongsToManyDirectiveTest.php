@@ -48,22 +48,22 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyRelationship(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany
         }
-        
+
         type Role {
             id: Int!
             name: String!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 roles {
@@ -74,24 +74,52 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJsonCount($this->rolesCount, 'data.user.roles');
     }
 
-    public function testCanQueryBelongsToManyPaginator(): void
+    public function testCanNameRelationExplicitly(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "paginator")
+            foo: [Role!] @belongsToMany(relation: "roles")
         }
-        
+
         type Role {
             id: Int!
             name: String!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                foo {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount($this->rolesCount, 'data.user.foo');
+    }
+
+    public function testCanQueryBelongsToManyPaginator(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "paginator")
+        }
+
+        type Role {
+            id: Int!
+            name: String!
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 roles(first: 2) {
@@ -123,22 +151,22 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyRelayConnection(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay")
         }
-        
+
         type Role {
             id: Int!
             name: String!
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 roles(first: 2) {
@@ -168,28 +196,28 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
         }
-        
+
         type Role {
             id: Int!
             name: String!
         }
-        
+
         type CustomRoleEdge {
             node: Role
             cursor: String!
             meta: String
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 roles(first: 2) {
@@ -219,16 +247,16 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
         }
-        
+
         type Role {
             id: Int!
             name: String!
         }
-        
+
         type Query {
             user: User @auth
         }
@@ -236,7 +264,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
         $this->expectException(DirectiveException::class);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 roles(first: 2) {
@@ -254,29 +282,29 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay")
         }
-        
+
         type Role {
             id: Int!
             name: String!
         }
-        
+
         type RoleEdge {
             node: Role
             cursor: String!
             meta: String
             nofield: String
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 roles(first: 2) {
@@ -308,12 +336,12 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyNestedRelationships(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
             roles: [Role!]! @belongsToMany(type: "relay")
         }
-        
+
         type ACL {
             id: Int!
             create_post: Boolean!
@@ -321,28 +349,28 @@ class BelongsToManyDirectiveTest extends DBTestCase
             update_post: Boolean!
             delete_post: Boolean!
         }
-        
+
         type Role {
             id: Int!
             name: String!
             acl: ACL @belongsTo
             users: [User]! @belongsToMany
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $result = $this->graphQL('
-        { 
-            user { 
-                roles(first: 2) { 
-                    pageInfo { 
-                        hasNextPage 
-                    } 
-                    edges { 
-                        node { 
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                roles(first: 2) {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        node {
                             id
                             acl {
                                 id
@@ -360,10 +388,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
                                     }
                                 }
                             }
-                        } 
-                    } 
-                } 
-            } 
+                        }
+                    }
+                }
+            }
         }
         ');
 
@@ -381,11 +409,11 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 
-        $schema = $this->buildSchemaWithPlaceholderQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
             roles(first: Int! after: Int): [Role!]! @belongsToMany(type:"foo")
         }
-        
+
         type Role {
             foo: String
         }

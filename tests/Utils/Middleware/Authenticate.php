@@ -6,6 +6,9 @@ use Closure;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
+/**
+ * @deprecated The @middleware directive will be removed in v5
+ */
 class Authenticate
 {
     /**

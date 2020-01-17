@@ -13,8 +13,9 @@ use Tests\Utils\Models\User;
 
 class RelationBatchLoaderTest extends DBTestCase
 {
-    protected $schema = /* @lang GraphQL */ '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
+        id: ID
         name: String
     }
 
@@ -48,7 +49,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
     public function testCanResolveBatchedFieldsFromBatchedRequests(): void
     {
-        $query = /* @lang GraphQL */ '
+        $query = /** @lang GraphQL */ '
         query User($id: ID!) {
             user(id: $id) {
                 email
@@ -95,7 +96,7 @@ class RelationBatchLoaderTest extends DBTestCase
         });
 
         $this
-            ->graphQL(/* @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ '
             {
                 users {
                     email
@@ -147,7 +148,7 @@ class RelationBatchLoaderTest extends DBTestCase
             'many'
         );
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             name: String
         }
@@ -163,7 +164,7 @@ class RelationBatchLoaderTest extends DBTestCase
         }
         ';
 
-        $query = /* @lang GraphQL */ '
+        $query = /** @lang GraphQL */ '
         query User($id: ID!, $ids: [ID!]!) {
             user(id: $id) {
                 email
@@ -192,5 +193,64 @@ class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount(3, 'data.manyUsers.0.tasks')
             ->assertJsonCount(3, 'data.manyUsers.1.tasks')
             ->assertJsonCount(3, 'data.user.tasks');
+    }
+
+    public function testTwoBatchloadedQueriesWithDifferentResults(): void
+    {
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user(id: 1) {
+                    tasks {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'user' => [
+                        'tasks' => [
+                            [
+                                'id' => '1',
+                            ],
+                            [
+                                'id' => '2',
+                            ],
+                            [
+                                'id' => '3',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user(id: 2) {
+                    tasks {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'user' => [
+                        'tasks' => [
+                            [
+                                'id' => '4',
+                            ],
+                            [
+                                'id' => '5',
+                            ],
+                            [
+                                'id' => '6',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 }

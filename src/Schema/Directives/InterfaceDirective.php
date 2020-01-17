@@ -6,23 +6,13 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class InterfaceDirective extends BaseDirective implements DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'interface';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use a custom resolver to determine the concrete type of an interface.
 """
-directive @interface(      
+directive @interface(
   """
   Reference to a custom type-resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.

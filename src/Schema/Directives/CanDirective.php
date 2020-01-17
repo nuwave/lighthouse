@@ -32,19 +32,9 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
         $this->gate = $gate;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'can';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
@@ -56,7 +46,7 @@ directive @can(
   The ability to check permissions for.
   """
   ability: String!
-  
+
   """
   The name of the argument that is used to find a specific model
   instance against which the permissions should be checked.
@@ -64,13 +54,12 @@ directive @can(
   find: String
 
   """
-  Pass along the client given input data as arguments to `Gate::check`. 
+  Pass along the client given input data as arguments to `Gate::check`.
   """
   injectArgs: Boolean = false
-
   """
   Statically defined arguments that are passed to `Gate::check`.
-  
+
   You may pass pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
@@ -154,7 +143,7 @@ SDL;
 
         if (! $gate->check($ability, $arguments)) {
             throw new AuthorizationException(
-                "You are not authorized to access {$this->definitionNode->name->value}"
+                "You are not authorized to access {$this->nodeName()}"
             );
         }
     }

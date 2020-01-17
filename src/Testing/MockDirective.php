@@ -27,23 +27,13 @@ class MockDirective extends BaseDirective implements FieldResolver, DefinedDirec
     }
 
     /**
-     * Name of the directive as used in the schema.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'mock';
-    }
-
-    /**
      * SDL definition of the directive.
      *
      * @return string
      */
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Allows you to easily hook up a resolver for an endpoint.
 """

@@ -15,19 +15,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class WithDirective extends RelationDirective implements FieldMiddleware, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'with';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Eager-load an Eloquent relation.
 """
@@ -64,10 +54,12 @@ SDL;
                         RelationBatchLoader::class,
                         $resolveInfo->path,
                         [
-                            'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
-                            'args' => $args,
-                            'scopes' => $this->directiveArgValue('scopes', []),
-                            'resolveInfo' => $resolveInfo,
+                            'relationName' => $this->directiveArgValue('relation', $this->nodeName()),
+                            'decorateBuilder' => function ($query) use ($resolveInfo) {
+                                $resolveInfo
+                                    ->argumentSet
+                                    ->enhanceBuilder($query, $this->directiveArgValue('scopes', []));
+                            },
                         ]
                     );
 

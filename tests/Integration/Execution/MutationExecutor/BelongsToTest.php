@@ -8,63 +8,63 @@ use Tests\Utils\Models\User;
 
 class BelongsToTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
         user: User @belongsTo
     }
-    
+
     type User {
         id: ID!
         name: String!
     }
-    
+
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
         upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
-    
+
     input CreateTaskInput {
         name: String
         user: CreateUserRelation
     }
-    
+
     input CreateUserRelation {
         connect: ID
         create: CreateUserInput
         update: UpdateUserInput
         upsert: UpsertUserInput
     }
-    
+
     input CreateUserInput {
         name: String!
     }
-    
+
     input UpdateUserInput {
         id: ID!
         name: String
     }
-    
+
     input UpdateTaskInput {
         id: ID!
         name: String
         user: UpdateUserRelation
     }
-    
+
     input UpdateUserRelation {
         disconnect: Boolean
         delete: Boolean
     }
 
     input UpsertUserInput {
-        id: ID!
+        id: ID
         name: String
     }
 
     input UpsertTaskInput {
-        id: ID!
+        id: ID
         name: String
         user: UpsertUserRelation
     }
@@ -83,7 +83,7 @@ class BelongsToTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
@@ -115,7 +115,7 @@ class BelongsToTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -146,7 +146,7 @@ class BelongsToTest extends DBTestCase
 
     public function testCanCreateWithNewBelongsTo(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
@@ -178,7 +178,7 @@ class BelongsToTest extends DBTestCase
 
     public function testCanUpsertWithNewBelongsTo(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
@@ -209,9 +209,42 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
+    public function testUpsertBelongsToWithoutId()
+    {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                user: {
+                    upsert: {
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testCanUpsertUsingCreateWithNewBelongsTo(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -244,7 +277,7 @@ class BelongsToTest extends DBTestCase
 
     public function testCanUpsertUsingCreateWithNewUpsertBelongsTo(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -282,7 +315,7 @@ class BelongsToTest extends DBTestCase
             'name' => 'foo',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
@@ -321,7 +354,7 @@ class BelongsToTest extends DBTestCase
             'name' => 'foo',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -361,7 +394,7 @@ class BelongsToTest extends DBTestCase
             'name' => 'foo',
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -408,9 +441,11 @@ class BelongsToTest extends DBTestCase
      */
     public function testCanUpdateAndDisconnectBelongsTo(string $action): void
     {
-        factory(Task::class)->create();
+        /** @var \Tests\Utils\Models\Task $task */
+        $task = factory(Task::class)->create();
+        $task->user()->create();
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
@@ -449,9 +484,13 @@ class BelongsToTest extends DBTestCase
 
     public function testCanCreateUsingUpsertAndDisconnectBelongsTo(): void
     {
-        factory(User::class)->create();
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+        $task = $user->tasks()->save(
+            factory(Task::class)->make()
+        );
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -478,12 +517,12 @@ class BelongsToTest extends DBTestCase
         ]);
 
         $this->assertTrue(
-            User::find(1)->exists,
+            User::find($user->id)->exists,
             'Must not delete the second model.'
         );
 
         $this->assertNull(
-            Task::find(1)->user,
+            $task->refresh()->user_id,
             'Must disconnect the parent relationship.'
         );
     }
@@ -493,9 +532,13 @@ class BelongsToTest extends DBTestCase
      */
     public function testCanUpdateAndDeleteBelongsTo(string $action): void
     {
-        factory(Task::class)->create();
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+        $task = $user->tasks()->save(
+            factory(Task::class)->make()
+        );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
@@ -522,12 +565,12 @@ class BelongsToTest extends DBTestCase
         ]);
 
         $this->assertNull(
-            User::find(1),
+            User::find($user->id),
             'This model should be deleted.'
         );
 
         $this->assertNull(
-            Task::find(1)->user,
+            $task->refresh()->user_id,
             'Must disconnect the parent relationship.'
         );
     }
@@ -536,7 +579,7 @@ class BelongsToTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -578,9 +621,13 @@ class BelongsToTest extends DBTestCase
      */
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
-        factory(Task::class)->create();
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+        $task = $user->tasks()->save(
+            factory(Task::class)->make()
+        );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
@@ -610,8 +657,8 @@ class BelongsToTest extends DBTestCase
         ]);
 
         $this->assertSame(
-            1,
-            Task::find(1)->user->id,
+            $user->id,
+            $task->refresh()->user->id,
             'The parent relationship remains untouched.'
         );
     }

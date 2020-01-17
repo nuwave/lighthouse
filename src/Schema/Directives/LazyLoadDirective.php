@@ -13,19 +13,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class LazyLoadDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'lazyLoad';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
 on the relations of a list of models.
