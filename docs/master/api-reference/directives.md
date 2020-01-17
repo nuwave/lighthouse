@@ -1981,7 +1981,9 @@ type Query {
 
 "A custom description for this custom enum."
 enum PostColumn {
-  POSTED_AT @enum(value: "posted_at")
+  # Another reason why you might want to have a custom enum is to
+  # correct typos or bad naming in column names.
+  POSTED_AT @enum(value: "postd_timestamp")
   TITLE @enum(value: "title")
 }
 ```
