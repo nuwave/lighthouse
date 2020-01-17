@@ -2,186 +2,72 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Http\UploadedFile;
-use Tests\DBTestCase;
-use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
+use GraphQL\Error\Error;
+use Tests\TestCase;
+use Tests\Utils\Queries\Bar;
+use Tests\Utils\Queries\Foo;
 
-class GraphQLTest extends DBTestCase
+class GraphQLTest extends TestCase
 {
-    protected $schema = '
-    scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
-    type User {
-        id: ID!
-        name: String!
-        email: String!
-        created_at: String!
-        updated_at: String!
-        tasks: [Task!]! @hasMany
-    }
-    
-    type Task {
-        id: ID!
-        name: String!
-        created_at: String!
-        updated_at: String!
-        user: User! @belongsTo
-    }
-    
+    protected $schema = /** @lang GraphQL */ '
     type Query {
-        user: User @auth
-    }
-    
-    type Mutation {
-        upload(file: Upload!): Boolean
+        foo: Int
+        bar: String
     }
     ';
 
-    /**
-     * The user that shall make the requests.
-     *
-     * @var \Tests\Utils\Models\User
-     */
-    protected $user;
-
-    /**
-     * Tasks associated with the current user.
-     *
-     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Task>
-     */
-    protected $tasks;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->tasks = factory(Task::class, 5)->create([
-            'user_id' => $this->user->getKey(),
-        ]);
-
-        $this->be($this->user);
-    }
-
     public function testResolvesQueryViaPostRequest(): void
     {
-        $this->graphQL('
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
             }
-        }
-        ')->assertJson([
-            'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                    'tasks' => $this->tasks
-                        ->map(
-                            function (Task $task): array {
-                                return ['name' => $task->name];
-                            }
-                        )
-                        ->all(),
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
                 ],
-            ],
-        ]);
+            ]);
     }
 
     public function testResolvesQueryViaGetRequest(): void
     {
-        $this->getJson(
-            'graphql?'
-            .http_build_query(
-                ['query' => '
-                    query UserWithTasks {
-                        user {
-                            email
-                            tasks {
-                                name
-                            }
+        $this
+            ->getJson(
+                'graphql?'
+                .http_build_query(
+                    [
+                        'query' => /** @lang GraphQL */ '
+                        {
+                            foo
                         }
-                    }
-                    ',
-                ]
+                        ',
+                    ]
+                )
             )
-        )->assertExactJson([
-            'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                    'tasks' => $this->tasks
-                        ->map(function (Task $task): array {
-                            return ['name' => $task->name];
-                        })
-                        ->all(),
-                ],
-            ],
-        ]);
-    }
-
-    public function testCanResolveBatchedQueries(): void
-    {
-        $this->postGraphQL([
-            [
-                'query' => '
-                    {
-                        user {
-                            email
-                        }
-                    }
-                    ',
-            ],
-            [
-                'query' => '
-                    {
-                        user {
-                            name
-                        }
-                    }
-                    ',
-            ],
-        ])->assertExactJson([
-            [
+            ->assertExactJson([
                 'data' => [
-                    'user' => [
-                        'email' => $this->user->email,
-                    ],
+                    'foo' => Foo::THE_ANSWER,
                 ],
-            ],
-            [
-                'data' => [
-                    'user' => [
-                        'name' => $this->user->name,
-                    ],
-                ],
-            ],
-        ]);
+            ]);
     }
 
     public function testResolvesNamedOperation(): void
     {
         $this->postGraphQL([
-            'query' => '
-                query User {
-                    user {
-                        email
-                    }
+            'query' => /** @lang GraphQL */ '
+                query Foo {
+                    foo
                 }
-                query User2 {
-                    user {
-                        name
-                    }
+                query Bar {
+                    bar
                 }
             ',
-            'operationName' => 'User',
+            'operationName' => 'Bar',
         ])->assertExactJson([
             'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                ],
+                'bar' => Bar::RESULT,
             ],
         ]);
     }
@@ -206,7 +92,7 @@ class GraphQLTest extends DBTestCase
 
     public function testRejectsEmptyQuery(): void
     {
-        $this->graphQL('')
+        $this->graphQL(/** @lang GraphQL */ '')
              ->assertStatus(200)
              ->assertJson([
                  'errors' => [
@@ -222,11 +108,12 @@ class GraphQLTest extends DBTestCase
 
     public function testRejectsInvalidQuery(): void
     {
-        $result = $this->graphQL('
-        {
-            nonExistingField
-        }
-        ');
+        $result = $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                nonExistingField
+            }
+            ');
 
         // TODO remove as we stop supporting Laravel 5.5/PHPUnit 6
         $assertContains = method_exists($this, 'assertStringContainsString')
@@ -239,120 +126,77 @@ class GraphQLTest extends DBTestCase
         );
     }
 
+    public function testHandlesErrorInResolver(): void
+    {
+        $message = 'foo';
+        $this->mockResolver(function () use ($message) {
+            throw new Error($message);
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => null,
+                ],
+                'errors' => [
+                    [
+                        'message' => $message,
+                    ],
+                ],
+            ]);
+    }
+
     public function testIgnoresInvalidJSONVariables(): void
     {
         $result = $this->postGraphQL([
-            'query' => '{}',
-            'variables' => '{}',
+            'query' => /** @lang GraphQL */ '{}',
+            'variables' => /** @lang JSON */ '{}',
         ]);
 
         $result->assertStatus(200);
     }
 
-    public function testResolvesQueryViaMultipartRequest(): void
+    public function testCanResolveBatchedQueries(): void
     {
-        $this->multipartGraphQL(
-            [
-                'operations' => /* @lang JSON */
-                    '
-                    {
-                        "query": "{ user { email } }",
-                        "variables": {}
-                    }
-                ',
-                'map' => /* @lang JSON */
-                    '{}',
-            ],
-            []
-        )->assertJson([
-            'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
-     */
-    public function testResolvesUploadViaMultipartRequest(): void
-    {
-        $this->multipartGraphQL(
-            [
-                'operations' => /* @lang JSON */
-                    '
-                    {
-                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
-                        "variables": {
-                            "file": null
-                        }
-                    }
-                ',
-                'map' => /* @lang JSON */
-                    '
-                    {
-                        "0": ["variables.file"]
-                    }
-                ',
-            ],
-            [
-                '0' => UploadedFile::fake()->create('image.jpg', 500),
-            ]
-        )->assertJson([
-            'data' => [
-                'upload' => true,
-            ],
-        ]);
-    }
-
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching.
-     */
-    public function testResolvesUploadViaBatchedMultipartRequest(): void
-    {
-        $this->multipartGraphQL(
-            [
-                'operations' => /* @lang JSON */
-                    '
-                    [
+        $this
+            ->postGraphQL([
+                [
+                    'query' => /** @lang GraphQL */ '
                         {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
-                            "variables": {
-                                "file": null
-                            }
-                        },
-                        {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file)} ",
-                            "variables": {
-                                "file": null
-                            }
+                            foo
                         }
-                    ]
-                ',
-                'map' => /* @lang JSON */
-                    '
-                    {
-                        "0": ["0.variables.file"],
-                        "1": ["1.variables.file"]
-                    }
-                ',
-            ],
-            [
-                '0' => UploadedFile::fake()->create('image.jpg', 500),
-                '1' => UploadedFile::fake()->create('image.jpg', 500),
-            ]
-        )->assertJson([
-            [
-                'data' => [
-                    'upload' => true,
+                        ',
                 ],
-            ],
-            [
-                'data' => [
-                    'upload' => true,
+                [
+                    'query' => /** @lang GraphQL */ '
+                        {
+                            bar
+                        }
+                        ',
                 ],
-            ],
-        ]);
+            ])
+            ->assertExactJson([
+                [
+                    'data' => [
+                        'foo' => Foo::THE_ANSWER,
+                    ],
+                ],
+                [
+                    'data' => [
+                        'bar' => Bar::RESULT,
+                    ],
+                ],
+            ]);
     }
 }

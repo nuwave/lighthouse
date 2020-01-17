@@ -8,19 +8,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'belongsToMany';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
@@ -30,7 +20,7 @@ directive @belongsToMany(
   if it is named different from the field in the schema.
   """
   relation: String
-  
+
   """
   Apply scopes to the underlying query.
   """
@@ -47,13 +37,13 @@ directive @belongsToMany(
   Only applies when using pagination.
   """
   defaultCount: Int
-  
+
   """
   Specify the maximum quantity of elements to be returned.
   Only applies when using pagination.
   """
   maxCount: Int
-  
+
   """
   Specify a custom type that implements the Edge interface
   to extend edge object.

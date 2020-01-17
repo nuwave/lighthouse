@@ -11,19 +11,9 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class FieldDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'field';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Assign a resolver function to a field.
 """

@@ -17,7 +17,7 @@ class Product extends Model
      */
     public $incrementing = false;
 
-    public function color() : BelongsTo
+    public function color(): BelongsTo
     {
         return $this->belongsTo(Color::class);
     }

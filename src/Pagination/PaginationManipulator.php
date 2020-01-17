@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 class PaginationManipulator
 {
     /**
-     * @var DocumentAST
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
@@ -102,21 +102,33 @@ class PaginationManipulator
 
         $connectionFieldName = addslashes(ConnectionField::class);
 
-        $connectionType = PartialParser::objectTypeDefinition("
-            type $connectionTypeName {$this->modelClassDirective()} {
-                pageInfo: PageInfo! @field(resolver: \"{$connectionFieldName}@pageInfoResolver\")
-                edges: [$connectionEdgeName] @field(resolver: \"{$connectionFieldName}@edgeResolver\")
+        $connectionType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            "A paginated list of $fieldTypeName edges."
+            type $connectionTypeName {
+                "Pagination information about the list of edges."
+                pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
+
+                "A list of $fieldTypeName edges."
+                edges: [$connectionEdgeName] @field(resolver: "{$connectionFieldName}@edgeResolver")
             }
-        ");
+GRAPHQL
+        );
+        $this->addPaginationWrapperType($connectionType);
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
-            ?? PartialParser::objectTypeDefinition("
+            ?? PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+                "An edge that contains a node of type $fieldTypeName and a cursor."
                 type $connectionEdgeName {
+                    "The $fieldTypeName node."
                     node: $fieldTypeName
+
+                    "A unique cursor that can be used for pagination."
                     cursor: String!
                 }
-            ");
+GRAPHQL
+            );
+        $this->documentAST->setTypeDefinition($connectionEdge);
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),
@@ -128,9 +140,31 @@ class PaginationManipulator
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
+    }
 
-        $this->documentAST->setTypeDefinition($connectionType);
-        $this->documentAST->setTypeDefinition($connectionEdge);
+    /**
+     * Add the wrapping type for paginated results.
+     *
+     * This merges preexisting definitions to preserve maximum information.
+     *
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectType
+     * @return void
+     */
+    protected function addPaginationWrapperType(ObjectTypeDefinitionNode $objectType): void
+    {
+        // If the type already exists, we use that instead
+        if (isset($this->documentAST->types[$objectType->name->value])) {
+            $objectType = $this->documentAST->types[$objectType->name->value];
+        }
+
+        if ($this->modelClass) {
+            $objectType->directives = ASTHelper::mergeNodeList(
+                $objectType->directives,
+                [PartialParser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
+            );
+        }
+
+        $this->documentAST->setTypeDefinition($objectType);
     }
 
     /**
@@ -152,12 +186,18 @@ class PaginationManipulator
         $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
-        $paginatorType = PartialParser::objectTypeDefinition("
-            type $paginatorTypeName {$this->modelClassDirective()} {
-                paginatorInfo: PaginatorInfo! @field(resolver: \"{$paginatorFieldClassName}@paginatorInfoResolver\")
-                data: [$fieldTypeName!]! @field(resolver: \"{$paginatorFieldClassName}@dataResolver\")
+        $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            "A paginated list of $fieldTypeName items."
+            type $paginatorTypeName {
+                "Pagination information about the list of items."
+                paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+
+                "A list of $fieldTypeName items."
+                data: [$fieldTypeName!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
             }
-        ");
+GRAPHQL
+        );
+        $this->addPaginationWrapperType($paginatorType);
 
         $inputValueDefinitions = [
             self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
@@ -169,8 +209,6 @@ class PaginationManipulator
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
-
-        $this->documentAST->setTypeDefinition($paginatorType);
     }
 
     /**
@@ -196,19 +234,5 @@ class PaginationManipulator
             );
 
         return $description.$definition;
-    }
-
-    /**
-     * Get the definition for the @modelClass directive if needed.
-     *
-     * This will be empty when not applicable.
-     *
-     * @return string
-     */
-    protected function modelClassDirective(): string
-    {
-        return $this->modelClass
-            ? '@modelClass(class: "'.addslashes($this->modelClass).'")'
-            : '';
     }
 }

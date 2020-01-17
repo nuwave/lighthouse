@@ -6,10 +6,9 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
-use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -19,19 +18,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'paginate';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Query multiple entries as a paginated list.
 """
@@ -58,7 +47,7 @@ directive @paginate(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-  
+
   """
   Overwrite the paginate_max_count setting value to limit the
   amount of items that a user can request per page.
@@ -113,10 +102,6 @@ SDL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
-                /** @var int $first */
-                /** @var int $page */
-                [$first, $page] = PaginationUtils::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
-
                 if ($this->directiveHasArgument('builder')) {
                     $query = call_user_func(
                         $this->getResolverFromArgument('builder'),
@@ -136,11 +121,9 @@ SDL;
                         $this->directiveArgValue('scopes', [])
                     );
 
-                if ($query instanceof ScoutBuilder) {
-                    return $query->paginate($first, 'page', $page);
-                }
-
-                return $query->paginate($first, ['*'], 'page', $page);
+                return PaginationArgs
+                    ::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
+                    ->applyToBuilder($query);
             }
         );
     }

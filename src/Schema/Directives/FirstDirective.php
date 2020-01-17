@@ -11,23 +11,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class FirstDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'first';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Get the first query result from a collection of Eloquent models.
 """
-directive @first(  
+directive @first(
   """
   Specify the class name of the model to use.
   This is only needed when the default model resolution does not work.

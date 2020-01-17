@@ -12,14 +12,14 @@ docs/
 │   └── versions.json     # auto-generated versions file
 │
 ├── master/               
-│   ├── guides/         
+│   ├── guides/           
 │   │   └── auth.md       # http://mysite.com/master/guides/auth.html
-│   ├── the-basics/         
+│   ├── the-basics/       
 │   │   └── fields.md     # http://mysite.com/master/the-basics/fields.html
-│   │ 
+│   │
 │   └── sidebar.js        # versioned sidebar for this version   
 │
-├── 2.6/               
+├── 2.6/                  
 │   └── ...               # same structure as "docs/master/"
 │
 ├── pages/

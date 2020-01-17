@@ -5,7 +5,7 @@ use Tests\Utils\Models\Brand;
 use Tests\Utils\Models\Color;
 use Tests\Utils\Models\Product;
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Product::class, function (Faker $faker): array {
     return [
         'barcode' => $faker->ean13,

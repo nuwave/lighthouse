@@ -28,86 +28,102 @@ class BuilderTest extends DBTestCase
 
     public function testCanAttachEqFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(id: ID @eq): [User!]! @all
         }
         ';
 
-        $this->graphQL('
-        {
-            users(id: '.$this->users->first()->getKey().') {
-                id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID) {
+                users(id: $id) {
+                    id
+                }
             }
-        }
-        ')->assertJsonCount(1, 'data.users');
+            ', [
+                'id' => $this->users->first()->getKey(),
+            ])
+            ->assertJsonCount(1, 'data.users');
     }
 
     public function testCanAttachEqFilterFromInputObject(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(input: UserInput! @spread): [User!]! @all
         }
-        
+
         input UserInput {
             id: ID @eq
         }
         ';
 
-        $this->graphQL('
-        {
-            users(
-                input: {
-                    id: '.$this->users->first()->getKey().'
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID) {
+                users(
+                    input: {
+                        id: $id
+                    }
+                ) {
+                    id
                 }
-            ) {
-                id
             }
-        }
-        ')->assertJsonCount(1, 'data.users');
+            ', [
+                'id' => $this->users->first()->getKey(),
+            ])
+            ->assertJsonCount(1, 'data.users');
     }
 
     public function testCanAttachNeqFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(id: ID @neq): [User!]! @all
         }
         ';
 
-        $this->graphQL('
-        {
-            users(id: '.$this->users->first()->getKey().') {
-                id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID) {
+                users(id: $id) {
+                    id
+                }
             }
-        }
-        ')->assertJsonCount(4, 'data.users');
+            ', [
+                'id' => $this->users->first()->getKey(),
+            ])
+            ->assertJsonCount(4, 'data.users');
     }
 
     public function testCanAttachInFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(include: [Int] @in(key: "id")): [User!]! @all
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
-
-        $this->graphQL('
-        {
-            users(include: ['.$user1.', '.$user2.']) {
-                id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($ids: [Int]) {
+                users(include: $ids) {
+                    id
+                }
             }
-        }
-        ')->assertJsonCount(2, 'data.users');
+            ', [
+                'ids' => [
+                    $this->users->first()->getKey(),
+                    $this->users->last()->getKey(),
+                ],
+            ])
+            ->assertJsonCount(2, 'data.users');
     }
 
     public function testCanAttachNotInFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(exclude: [Int] @notIn(key: "id")): [User!]! @all
         }
@@ -201,13 +217,13 @@ class BuilderTest extends DBTestCase
 
     public function testCanUseInputObjectsForWhereBetweenFilter(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 created: TimeRange @whereBetween(key: "created_at")
             ): [User!]! @all
         }
-        
+
         input TimeRange {
             start: String!
             end: String!
