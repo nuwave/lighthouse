@@ -84,7 +84,6 @@
         "bench": "phpbench run",
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",
-        "test:bug": "phpunit --colors=always tests/Integration/Schema/Directives/MorphOneDirectiveOnInterfaceTest.php",
         "test:integration": "phpunit --colors=always --testsuite Integration",
         "test:unit": "phpunit --colors=always --testsuite Unit"
     },
