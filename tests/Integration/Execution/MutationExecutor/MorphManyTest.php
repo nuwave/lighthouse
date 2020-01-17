@@ -103,7 +103,7 @@ class MorphManyTest extends DBTestCase
                     'name' => 'foo',
                     'images' => [
                         [
-                            'url' => "foo",
+                            'url' => 'foo',
                         ],
                     ],
                 ],
@@ -138,7 +138,7 @@ class MorphManyTest extends DBTestCase
                     'name' => 'foo',
                     'images' => [
                         [
-                            'url' => "foo",
+                            'url' => 'foo',
                         ],
                     ],
                 ],
@@ -175,7 +175,7 @@ GRAPHQL
                     'images' => [
                         [
                             'id' => 1,
-                            'url' => "foo",
+                            'url' => 'foo',
                         ],
                     ],
                 ],
