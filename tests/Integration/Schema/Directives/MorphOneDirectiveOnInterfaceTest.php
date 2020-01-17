@@ -47,7 +47,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
 
     public function testCanResolveMorphOneRelationshipOnInterface(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         interface Person {
             id: ID!
             user: User! @morphOne
@@ -84,7 +84,7 @@ class MorphOneDirectiveOnInterfaceTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             colors {
                 id
