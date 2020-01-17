@@ -356,7 +356,7 @@ use Nuwave\Lighthouse\WhereConditions\Operator;
 
 class GraphQLServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
         $this->app->bind(Operator::class, CustomSQLOperator::class);
     }
