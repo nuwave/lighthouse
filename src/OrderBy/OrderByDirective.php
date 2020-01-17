@@ -6,7 +6,6 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Schema\AST\Codegen;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -14,9 +13,12 @@ use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
 
 class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
 {
+    use GeneratesColumnsEnum;
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -78,17 +80,10 @@ SDL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        if (($allowedColumns = $this->directiveArgValue('columns')) || ($allowedColumnsEnumName = $this->directiveArgValue('columnsEnum'))) {
+        if ($this->hasAllowedColumns()) {
             $restrictedOrderByName = $this->restrictedOrderByName($argDefinition, $parentField);
             $argDefinition->type = PartialParser::listType("[$restrictedOrderByName!]");
-
-            if (! isset($allowedColumnsEnumName)) {
-                $allowedColumnsEnumName = Codegen::allowedColumnsEnumName($argDefinition, $parentField);
-                $documentAST
-                    ->setTypeDefinition(
-                        Codegen::createAllowedColumnsEnum($argDefinition, $parentField, $allowedColumns, $allowedColumnsEnumName)
-                    );
-            }
+            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField);
 
             $documentAST
                 ->setTypeDefinition(

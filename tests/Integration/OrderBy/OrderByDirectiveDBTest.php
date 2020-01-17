@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\OrderBy;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -234,5 +235,27 @@ class OrderByDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testRejectsDefinitionWithDuplicateColumnArgument(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            users(
+                orderBy: _ @orderBy(columns: ["name"], columnsEnum: "UserColumn")
+            ): [User!]! @all
+        }
+
+        type User {
+            name: String
+            team_id: Int
+        }
+
+        enum UserColumn {
+            NAME @enum(value: "name")
+        }
+        ');
     }
 }
