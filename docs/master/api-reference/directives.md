@@ -1988,7 +1988,6 @@ enum PostColumn {
 Lighthouse will still automatically generate the necessary input types and the `SortOrder` enum.
 But instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
 
-
 Querying a field that has an `orderBy` argument looks like this:
 
 ```graphql
