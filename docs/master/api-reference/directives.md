@@ -1920,6 +1920,7 @@ directive @orderBy(
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
     If not given, the column names can be passed as a String by clients.
+    Mutually exclusive with the `columnsEnum` argument.
     """
     columns: [String!]
 
