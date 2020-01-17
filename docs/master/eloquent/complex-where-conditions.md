@@ -319,17 +319,29 @@ This query would retrieve all persons, no matter if they have a role or not:
 
 ## Custom operator
 
-You may register a custom `\Nuwave\Lighthouse\WhereConditions\Operator` through a service provider.
+If Lighthouse's default `SQLOperator` does not fit your use case, you can register a custom operator class.
 This may be necessary if your database uses different SQL operators then Lighthouse's default or you
 want to extend/restrict the allowed operators.
 
-First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`, e.g. `\App\GraphQL\CustomSQLOperator`,
-where you can define GraphQL `SQLOperator` enum and how query builder has to be modified depending on passed operator.
-  
-To tell lighthouse to use your custom Operator definition, you have to bind it in one of the service providers that comes 
-after `\Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class` in your `config/app.php`. E.g. create `\App\Providers\GraphQLServiceProvider`:
+First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`. For example:
 
 ```php
+namespace App\GraphQL;
+
+use Nuwave\Lighthouse\WhereConditions\Operator;
+
+class CustomSQLOperator implements Operator { ... }
+```
+
+An `Operator` has two responsibilities:
+- provide an `enum` definition that will be used throughout the schema
+- handle client input and apply the operators to the query builder 
+
+To tell Lighthouse to use your custom operator class, you have to bind it in a service provider:
+
+```php
+namespace App\GraphQL;
+
 use App\GraphQL\CustomSQLOperator;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\WhereConditions\Operator;
@@ -343,11 +355,19 @@ class GraphQLServiceProvider extends ServiceProvider
 }
 ```
 
-Don't forget to register your new service provider in `config/app.php`:
+Don't forget to register your new service provider in `config/app.php`.
+Make sure to add it after Lighthouse's `\Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class`:
 
-```php
+```diff
 'providers' => [
+    /*
+     * Package Service Providers...
+     */
     \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
-    \App\Providers\GraphQLServiceProvider::class,
+
+    /*
+     * Application Service Providers...
+     */
++   \App\GraphQL\GraphQLServiceProvider::class,
 ],
 ```
