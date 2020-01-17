@@ -159,7 +159,7 @@ GRAPHQL
         ?int $maxCount = null
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
-        $paginatorTypeName = "{$parentType->name->value}{$fieldTypeName}Paginator";
+        $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
