@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 class PaginationManipulator
 {
     /**
-     * @var DocumentAST
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
@@ -104,7 +104,7 @@ class PaginationManipulator
 
         $connectionType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName edges."
-            type $connectionTypeName {$this->modelClassDirective()} {
+            type $connectionTypeName {
                 "Pagination information about the list of edges."
                 pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
@@ -113,6 +113,7 @@ class PaginationManipulator
             }
 GRAPHQL
         );
+        $this->addPaginationWrapperType($connectionType);
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
@@ -127,6 +128,7 @@ GRAPHQL
                 }
 GRAPHQL
             );
+        $this->documentAST->setTypeDefinition($connectionEdge);
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),
@@ -138,9 +140,31 @@ GRAPHQL
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
+    }
 
-        $this->documentAST->setTypeDefinition($connectionType);
-        $this->documentAST->setTypeDefinition($connectionEdge);
+    /**
+     * Add the wrapping type for paginated results.
+     *
+     * This merges preexisting definitions to preserve maximum information.
+     *
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectType
+     * @return void
+     */
+    protected function addPaginationWrapperType(ObjectTypeDefinitionNode $objectType): void
+    {
+        // If the type already exists, we use that instead
+        if (isset($this->documentAST->types[$objectType->name->value])) {
+            $objectType = $this->documentAST->types[$objectType->name->value];
+        }
+
+        if ($this->modelClass) {
+            $objectType->directives = ASTHelper::mergeNodeList(
+                $objectType->directives,
+                [PartialParser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
+            );
+        }
+
+        $this->documentAST->setTypeDefinition($objectType);
     }
 
     /**
@@ -164,7 +188,7 @@ GRAPHQL
 
         $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName items."
-            type $paginatorTypeName {$this->modelClassDirective()} {
+            type $paginatorTypeName {
                 "Pagination information about the list of items."
                 paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
@@ -173,6 +197,7 @@ GRAPHQL
             }
 GRAPHQL
         );
+        $this->addPaginationWrapperType($paginatorType);
 
         $inputValueDefinitions = [
             self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
@@ -184,8 +209,6 @@ GRAPHQL
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
-
-        $this->documentAST->setTypeDefinition($paginatorType);
     }
 
     /**
@@ -211,19 +234,5 @@ GRAPHQL
             );
 
         return $description.$definition;
-    }
-
-    /**
-     * Get the definition for the @modelClass directive if needed.
-     *
-     * This will be empty when not applicable.
-     *
-     * @return string
-     */
-    protected function modelClassDirective(): string
-    {
-        return $this->modelClass
-            ? '@modelClass(class: "'.addslashes($this->modelClass).'")'
-            : '';
     }
 }

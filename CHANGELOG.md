@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.8.0...master)
 
+### Fixed
+
+- Avoid erasing the model information from the wrapping paginated results `type` when defining
+  a paginated `@hasMany` field after a field with `@paginate` https://github.com/nuwave/lighthouse/pull/1149
+
 ## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.7.2)
 
 ### Added
