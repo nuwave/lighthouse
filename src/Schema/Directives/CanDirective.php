@@ -52,6 +52,12 @@ directive @can(
   instance against which the permissions should be checked.
   """
   find: String
+  
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
 
   """
   Pass along the client given input data as arguments to `Gate::check`.
