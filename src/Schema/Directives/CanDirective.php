@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -106,9 +108,29 @@ SDL;
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
+            $queryBuilder = $this->getModelClass()::query();
+
+            $directivesContainsForceDelete = $argumentSet->directives->contains(
+                function (Directive $directive): bool {
+                    return $directive instanceof ForceDeleteDirective;
+                }
+            );
+            if ($directivesContainsForceDelete) {
+                $queryBuilder->withTrashed();
+            }
+
+            $directivesContainsRestore = $argumentSet->directives->contains(
+                function (Directive $directive): bool {
+                    return $directive instanceof RestoreDirective;
+                }
+            );
+            if ($directivesContainsRestore) {
+                $queryBuilder->onlyTrashed();
+            }
+
             $modelOrModels = $argumentSet
                 ->enhanceBuilder(
-                    $this->getModelClass()::query(),
+                    $queryBuilder,
                     [],
                     function (Directive $directive): bool {
                         return $directive instanceof TrashedDirective;
