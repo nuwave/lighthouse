@@ -132,6 +132,38 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
+    public function testForceDeleteWorksWithCanOldWay(): void
+    {
+        $user = User::create([
+            'name' => UserPolicy::ADMIN,
+        ]);
+        $task = factory(Task::class)->make();
+        $user->tasks()->save($task);
+        $task->delete();
+        $this->be($user);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String
+        }
+
+        type Mutation {
+            forceDeleteTasks(id: ID!): Task! @forceDelete @softDeletes @can(ability: "delete", find: "id")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            forceDeleteTasks(id: 1, trashed: WITH) {
+                name
+            }
+        }
+        ')->assertJsonCount(1, 'data.forceDeleteTasks');
+
+        $this->assertCount(0, Task::withTrashed()->get());
+    }
+
     public function testRejectsDefinitionWithNullableArgument(): void
     {
         $this->expectException(DefinitionException::class);
