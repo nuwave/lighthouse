@@ -476,51 +476,6 @@ directive @can(
 ) on FIELD_DEFINITION
 ```
 
-This directive is most commonly used for mutations:
-
-```graphql
-type Mutation {
-    createPost(input: PostInput): Post @can(ability: "create")
-}
-```
-
-```php
-class PostPolicy
-{
-    public function create(User $user): bool
-    {
-        return $user->is_admin;
-    }
-}
-```
-
-In `find` parameter you may specify an input argument which is used to find a specific model
-instance by primary key against which the permissions should be checked:
-
-```graphql
-type Query {
-    post(id: ID @eq): Post @can(ability: "view", find: "id")
-}
-```
-
-```php
-class PostPolicy
-{
-    public function update(User $user, Post $post): bool
-    {
-        return $user->id === $post->author_id;
-    }
-}
-```
-
-It also works with soft deleted models in combination with `@softDeletes` directive:
-
-```graphql
-type Query {
-    post(id: ID @eq): Post @softDeletes @can(ability: "view", find: "id")
-}
-```
-
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
 passing the `model` argument.
 
@@ -531,29 +486,7 @@ type Mutation {
 }
 ```
 
-You can pass additional arguments to the policy checks by specifying them as `args`:
-
-```graphql
-type Mutation {
-    createPost(input: PostInput): Post
-        @can(ability: "create", args: ["FROM_GRAPHQL"])
-}
-```
-
-You can pass along the client given input data as arguments to the policy checks
-with the `injectArgs` argument:
-
-```graphql
-type Mutation {
-    createPost(input: PostInput): Post
-        @can(ability: "create", injectArgs: "true")
-}
-```
-
-Now you will have access to `PostInput` values in the policy. 
-
-Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
-Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
+You can find usage examples of this directive in [the authorization docs](../security/authorization.md#restrict-fields-through-policies).
 
 ## @complexity
 
