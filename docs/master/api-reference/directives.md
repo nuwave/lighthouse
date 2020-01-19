@@ -19,7 +19,7 @@ in the default model namespace `App`. [You can change this configuration](../get
 directive @all(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -436,7 +436,47 @@ directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 ## @can
 
+```graphql
+"""
 Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+When `injectArgs` and `args` are used together, the client given
+arguments will be passed before the static args.
+"""
+directive @can(
+  """
+  The ability to check permissions for.
+  """
+  ability: String!
+
+  """
+  The name of the argument that is used to find a specific model
+  instance against which the permissions should be checked.
+  """
+  find: String
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Pass along the client given input data as arguments to `Gate::check`.
+  """
+  injectArgs: Boolean = false
+
+  """
+  Statically defined arguments that are passed to `Gate::check`.
+
+  You may pass pass arbitrary GraphQL literals,
+  e.g.: [1, 2, 3] or { foo: "bar" }
+  """
+  args: Mixed
+) on FIELD_DEFINITION
+```
+
+This directive is most commonly used for mutations:
 
 ```graphql
 type Mutation {
@@ -453,44 +493,6 @@ class PostPolicy
     }
 }
 ```
-
-### Definition
-
-```graphql
-"""
-Check a Laravel Policy to ensure the current user is authorized to access a field.
-
-When `injectArgs` and `args` are used together, the client given
-arguments will be passed before the static args.
-"""
-directive @can(
-  """
-  The ability to check permissions for.
-  """
-  ability: String!
-  
-  """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
-  """
-  find: String
-
-  """
-  Pass along the client given input data as arguments to `Gate::check`. 
-  """
-  injectArgs: Boolean = false
-
-  """
-  Statically defined arguments that are passed to `Gate::check`.
-  
-  You may pass pass arbitrary GraphQL literals,
-  e.g.: [1, 2, 3] or { foo: "bar" }
-  """
-  args: Mixed
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 In `find` parameter you may specify an input argument which is used to find a specific model
 instance by primary key against which the permissions should be checked:
@@ -655,7 +657,7 @@ Create a new Eloquent model with the given arguments.
 directive @create(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -716,7 +718,7 @@ directive @delete(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -896,7 +898,7 @@ Find a model based on the arguments provided.
 directive @find(  
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -939,7 +941,7 @@ Get the first query result from a collection of Eloquent models.
 directive @first(  
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -979,7 +981,7 @@ directive @forceDelete(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 ) on FIELD_DEFINITION
@@ -1842,7 +1844,7 @@ directive @node(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 ) on FIELD_DEFINITION
@@ -2101,7 +2103,7 @@ directive @paginate(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -2257,7 +2259,7 @@ directive @restore(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 ) on FIELD_DEFINITION
@@ -2734,7 +2736,7 @@ Update an Eloquent model with the input values of the field.
 directive @update(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -2796,7 +2798,7 @@ Create or update an Eloquent model with the input values of the field.
 directive @upsert(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
