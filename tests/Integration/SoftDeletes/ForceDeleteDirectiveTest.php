@@ -152,9 +152,10 @@ class ForceDeleteDirectiveTest extends DBTestCase
 
         type Mutation {
             forceDeleteTasks(id: ID!): Task!
-                @softDeletes
                 @can(ability: "delete", find: "id")
                 @forceDelete
+                # The order has to be like this, otherwise @forceDelete will throw
+                @softDeletes
         }
         ';
 
