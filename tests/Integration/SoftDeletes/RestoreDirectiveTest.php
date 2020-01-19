@@ -78,7 +78,7 @@ class RestoreDirectiveTest extends DBTestCase
         $this->assertCount(2, Task::withoutTrashed()->get());
     }
 
-    public function testRestoreWorksWithCan(): void
+    public function testCanDirectiveExcludesTrashedModelsWhenUsingRestore(): void
     {
         $user = User::create([
             'name' => UserPolicy::ADMIN,
@@ -97,7 +97,9 @@ class RestoreDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            restoreTasks(id: ID!): Task! @restore @can(ability: "delete", find: "id")
+            restoreTasks(id: ID!): Task!
+                @can(ability: "delete", find: "id")
+                @restore
         }
         ';
 

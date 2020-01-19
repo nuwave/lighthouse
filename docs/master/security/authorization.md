@@ -1,5 +1,8 @@
 # Authorization
 
+Not every user in your application may be allowed to see all data or do any action.
+You can control what they can do by enforcing authorization rules.
+
 ## Utilize the Viewer pattern
 
 A common pattern is to allow users to only access entries that belong to them.

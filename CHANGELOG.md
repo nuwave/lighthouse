@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add optional `columnsEnum` argument to the `@whereConditions`, `@whereHasConditions`
   and `@orderBy` directives https://github.com/nuwave/lighthouse/pull/1150
+- Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used
+  so the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
 
 ### Fixed
 

@@ -79,7 +79,10 @@ abstract class RelationDirective extends BaseDirective
         return function ($builder) use ($resolveInfo) {
             $resolveInfo
                 ->argumentSet
-                ->enhanceBuilder($builder, $this->directiveArgValue('scopes', []));
+                ->enhanceBuilder(
+                    $builder,
+                    $this->directiveArgValue('scopes', [])
+                );
         };
     }
 

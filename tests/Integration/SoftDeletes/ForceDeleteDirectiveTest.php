@@ -100,7 +100,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    public function testForceDeleteWorksWithCan(): void
+    public function testCanDirectiveIncludesTrashedModelsWhenUsingForceDelete(): void
     {
         $user = User::create([
             'name' => UserPolicy::ADMIN,
@@ -117,7 +117,9 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTasks(id: ID!): Task! @forceDelete @can(ability: "delete", find: "id")
+            forceDeleteTasks(id: ID!): Task!
+                @can(ability: "delete", find: "id")
+                @forceDelete
         }
         ';
 
@@ -132,7 +134,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    public function testForceDeleteWorksWithCanOldWay(): void
+    public function testCanDirectiveUsesExplicitTrashedArgument(): void
     {
         $user = User::create([
             'name' => UserPolicy::ADMIN,
@@ -149,7 +151,10 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTasks(id: ID!): Task! @forceDelete @softDeletes @can(ability: "delete", find: "id")
+            forceDeleteTasks(id: ID!): Task!
+                @softDeletes
+                @can(ability: "delete", find: "id")
+                @forceDelete
         }
         ';
 
