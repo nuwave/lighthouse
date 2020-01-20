@@ -184,7 +184,7 @@ directive @belongsToMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
@@ -1114,7 +1114,7 @@ directive @hasMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
@@ -1566,7 +1566,7 @@ directive @morphMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
@@ -1979,13 +1979,60 @@ And usage example:
 
 ## @paginate
 
-Query multiple entries as a paginated list.
+```graphql
+"""
+Query multiple model entries as a paginated list.
+"""
+directive @paginate(
+  """
+  Which pagination style to use.
+  Allowed values: `paginator`, `connection`.
+  """
+  type: String = "paginator"
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+  
+  """
+  Overwrite the paginate_max_count setting value to limit the
+  amount of items that a user can request per page.
+  """
+  maxCount: Int
+
+  """
+  Use a default value for the amount of returned items
+  in case the client does not request it explicitly
+  """
+  defaultCount: Int
+) on FIELD_DEFINITION
+```
+
+### Basic usage
+
+This directive is meant to be used on root query fields:
 
 ```graphql
 type Query {
     posts: [Post!]! @paginate
 }
 ```
+
+> When you want to paginate a relationship, use the to-many relationship
+> directives such as [`@hasMany`](directives.md#hasmany) instead.
 
 The schema definition is automatically transformed to this:
 
@@ -2021,51 +2068,7 @@ And can be queried like this:
 }
 ```
 
-### Definition
-
-```graphql
-"""
-Query multiple entries as a paginated list.
-"""
-directive @paginate(
-  """
-  Which pagination style to use.
-  Allowed values: paginator, connection.
-  """
-  type: String = "paginator"
-
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model detection does not work.
-  """
-  model: String
-
-  """
-  Point to a function that provides a Query Builder instance.
-  This replaces the use of a model.
-  """
-  builder: String
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-  
-  """
-  Overwrite the paginate_max_count setting value to limit the
-  amount of items that a user can request per page.
-  """
-  maxCount: Int
-
-  """
-  Use a default value for the amount of returned items
-  in case the client does not request it explicitly
-  """
-  defaultCount: Int
-) on FIELD_DEFINITION
-```
-
-### Examples
+### Pagination type
 
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
@@ -2078,6 +2081,34 @@ type Query {
     posts: [Post!]! @paginate(type: "connection")
 }
 ```
+
+The final schema will be transformed to this:
+
+```graphql
+type Query {
+    posts(first: Int!, page: Int): PostConnection
+}
+
+"A paginated list of Post edges."
+type PostConnection {
+    "Pagination information about the list of edges."
+    pageInfo: PageInfo!
+
+    "A list of Post edges."
+    edges: [PostEdge]
+}
+
+"An edge that contains a node of type Post and a cursor."
+type PostEdge {
+    "The Post node."
+    node: Post
+
+    "A unique cursor that can be used for pagination."
+    cursor: String!
+}
+```
+
+### Default count
 
 You can supply a `defaultCount` to set a default count for any kind of paginator.
 
@@ -2098,6 +2129,8 @@ query {
 }
 ```
 
+### Limit maximum count
+
 Lighthouse allows you to specify a global maximum for the number of items a user
 can request through pagination through the config. You may also overwrite this
 per field with the `maxCount` argument:
@@ -2108,6 +2141,8 @@ type Query {
 }
 ```
 
+### Overwrite model
+
 By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same
 name as the returned type. You can overwrite this by setting the `model` argument.
 
@@ -2116,6 +2151,8 @@ type Query {
     posts: [Post!]! @paginate(model: "App\\Blog\\BlogPost")
 }
 ```
+
+### Custom builder
 
 If simply querying Eloquent does not fit your use-case, you can specify a custom `builder`.
 
