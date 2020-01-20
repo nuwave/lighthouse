@@ -33,7 +33,7 @@ directive @morphMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
