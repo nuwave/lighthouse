@@ -29,9 +29,23 @@ class RulesDirectiveTest extends TestCase
             ];
         });
 
+        $this->mockResolver(function ($root, $args): array {
+            return [
+                'first_name' => 'John' . ($args['foo'] ?? ''),
+                'last_name' => 'Doe',
+                'full_name' => 'John Doe',
+                'input_object' => true,
+            ];
+        }, 'with exclude if');
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: String @rules(apply: ["required"])): User @mock
+
+            withExcludeIfRule(
+                foo: String @rules(apply: ["exclude_if:bar,baz"])
+                bar: String
+            ): User @mock(key: "with exclude if")
         }
 
         type Mutation {
@@ -353,6 +367,28 @@ GRAPHQL
                 'rulesForArray' => [
                     FooBarRule::MESSAGE,
                 ],
+            ]);
+    }
+
+    public function testSupportExcludeIf(): void
+    {
+        $r = $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+{
+    withExcludeIfRule (
+        foo: "baz"
+        bar: "baz"
+    ) {
+        first_name
+    }
+}
+GRAPHQL
+            )->assertJson([
+                'data' => [
+                    'withExcludeIfRule' => [
+                        'first_name' => 'John'
+                    ]
+                ]
             ]);
     }
 
