@@ -400,6 +400,9 @@ class FieldFactory
             );
         }
 
+        // support exclude_if and exclude_unless
+        $this->args = $validator->attributes();
+
         // reset rules and messages
         $this->rules = [];
         $this->messages = [];
