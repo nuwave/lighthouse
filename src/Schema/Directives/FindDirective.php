@@ -12,26 +12,16 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class FindDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'find';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Find a model based on the arguments provided.
 """
-directive @find(  
+directive @find(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 

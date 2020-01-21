@@ -10,16 +10,6 @@ class ComplexValidationDirective extends ValidationDirective
     const UNIQUE_VALIDATION_MESSAGE = 'Used to test this exact validation is triggered';
 
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'complexValidation';
-    }
-
-    /**
      * @return mixed[]
      */
     public function rules(): array

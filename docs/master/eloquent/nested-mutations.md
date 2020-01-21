@@ -22,7 +22,7 @@ class Post extends Model
     // DOES NOT WORK
     public function comments()
     {
-        return $this->hasMany(Comment::class);        
+        return $this->hasMany(Comment::class);
     }
 }
 ```
@@ -463,7 +463,7 @@ mutation {
 }
 ```
 
-Lighthouse will detect the relationship and attach/update/create it.
+Lighthouse will detect the relationship and attach, update or create it.
 
 ```json
 {
@@ -525,6 +525,114 @@ input UpdateAuthorBelongsToMany {
 }
 ```
 
+### Storing Pivot Data
+
+It is common that many-to-many relations store some extra data in pivot tables.
+Suppose we want to track what movies a user has seen. In addition to connecting
+the two entities, we want to store how well they liked it:
+
+```graphql
+type User {
+    id: ID!
+    seenMovies: [Movie!] @belongsToMany
+}
+
+type Movie {
+    id: ID!
+    pivot: UserMoviePivot
+}
+
+type UserMoviePivot {
+    "How well did the user like the movie?"
+    rating: String
+}
+```
+
+Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass
+an array where the keys are IDs of related models and the values are pivot data.
+
+Lighthouse exposes this capability through the nested operations on many-to-many relations.
+Instead of passing just a list of ids, you can define an `input` type that also contains pivot data.
+It must contain a field called `id` to contain the ID of the related model,
+all other fields will be inserted into the pivot table.
+
+```graphql
+type Mutation {
+    updateUser(input: UpdateUserInput! @spread): User @update
+}
+
+input UpdateUserInput {
+    id: ID!
+    seenMovies: UpdateUserSeenMovies
+}
+
+input UpdateUserSeenMovies {
+    connect: [ConnectUserSeenMovie!]
+}
+
+input ConnectUserSeenMovie {
+    id: ID!
+    rating: String
+}
+```
+
+You can now pass along pivot data when connecting users to movies:
+
+```graphql
+mutation {
+  updateUser(input: {
+    id: 1
+    seenMovies: {
+      connect: [
+        {
+          id: 6
+          rating: "A perfect 5/7"
+        }
+        {
+          id: 23
+        }
+      ]
+    },
+  }) {
+    id
+    seenMovies {
+      id
+      pivot {
+        rating
+      }
+    }
+  }
+}
+```
+
+And you will get the following response: 
+
+```json
+{
+  "data": {
+    "updateUser": {
+      "id": 1,
+      "seenMovies": [
+        {
+          "id": 6,
+          "pivot": {
+            "rating": "A perfect 5/7"
+          }
+        },
+        {
+          "id": 20,
+          "pivot": {
+            "rating": null
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+It is also possible to use the `sync` and `syncWithoutDetach` operations.
+
 ## MorphTo
 
 __The GraphQL Specification does not support Input Union types,
@@ -537,58 +645,52 @@ type Task {
   name: String
 }
 
-type Hour {
+type Image {
   id: ID
-  weekday: Int
-  hourable: Task
+  url: String
+  imageable: Task
 }
 
 type Mutation {
-  createHour(input: CreateHourInput! @spread): Hour @create
-  updateHour(input: UpdateHourInput! @spread): Hour @update
-  upsertHour(input: UpsertHourInput! @spread): Hour @upsert
+  createImage(input: CreateImageInput! @spread): Image @create
+  updateImage(input: UpdateImageInput! @spread): Image @update
+  upsertImage(input: UpsertImageInput! @spread): Image @upsert
 }
 
-input CreateHourInput {
-  from: String
-  to: String
-  weekday: Int
-  hourable: CreateHourableMorphTo
+input CreateImageInput {
+  url: String
+  imageable: CreateImageableMorphTo
 }
 
-input UpdateHourInput {
+input UpdateImageInput {
   id: ID!
-  from: String
-  to: String
-  weekday: Int
-  hourable: UpdateHourableMorphTo
+  url: String
+  imageable: UpdateImageableMorphTo
 }
 
-input UpsertHourInput {
+input UpsertImageInput {
   id: ID!
-  from: String
-  to: String
-  weekday: Int
-  hourable: UpsertHourableMorphTo
+  url: String
+  imageable: UpsertImageableMorphTo
 }
 
-input CreateHourableMorphTo {
-  connect: ConnectHourableInput
+input CreateImageableMorphTo {
+  connect: ConnectImageableInput
 }
 
-input UpdateHourableMorphTo {
-  connect: ConnectHourableInput
+input UpdateImageableMorphTo {
+  connect: ConnectImageableInput
   disconnect: Boolean
   delete: Boolean
 }
 
-input UpsertHourableMorphTo {
-  connect: ConnectHourableInput
+input UpsertImageableMorphTo {
+  connect: ConnectImageableInput
   disconnect: Boolean
   delete: Boolean
 }
 
-input ConnectHourableInput {
+input ConnectImageableInput {
   type: String!
   id: ID!
 }
@@ -598,9 +700,9 @@ You can use `connect` to associate existing models.
 
 ```graphql
 mutation {
-  createHour(input: {
-    weekday: 2
-    hourable: {
+  createImage(input: {
+    url: "https://cats.example/cute"
+    imageable: {
       connect: {
         type: "App\\Models\\Task"
         id: 1
@@ -608,8 +710,8 @@ mutation {
     }
   }) {
     id
-    weekday
-    hourable {
+    url
+    imageable {
       id
       name
     }
@@ -621,15 +723,15 @@ The `disconnect` operations allows you to detach the currently associated model.
 
 ```graphql
 mutation {
-  updateHour(input: {
+  updateImage(input: {
     id: 1
-    weekday: 2
-    hourable: {
+    url: "https://dogs.example/supercute"
+    imageable: {
       disconnect: true
     }
   }) {
-    weekday
-    hourable {
+    url
+    imageable {
       id
       name
     }
@@ -641,15 +743,15 @@ The `delete` operation both detaches and deletes the currently associated model.
 
 ```graphql
 mutation {
-  upsertHour(input: {
+  upsertImage(input: {
     id: 1
-    weekday: 2
-    hourable: {
+    url: "https://bizniz.example/serious"
+    imageable: {
       delete: true
     }
   }) {
-    weekday
-    hourable {
+    url
+    imageable {
       id
       name
     }

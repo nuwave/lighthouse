@@ -30,19 +30,9 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
         $this->globalId = $globalId;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'globalId';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Converts between IDs/types and global IDs.
 When used upon a field, it encodes,

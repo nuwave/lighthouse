@@ -18,19 +18,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective, ArgResolver, ArgManipulator
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'delete';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Delete one or more models by their ID.
 The field must have a single non-null argument that may be a list.
@@ -44,7 +34,7 @@ directive @delete(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 

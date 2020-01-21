@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -32,19 +34,9 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
         $this->gate = $gate;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'can';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
@@ -62,6 +54,12 @@ directive @can(
   instance against which the permissions should be checked.
   """
   find: String
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
   """
   Pass along the client given input data as arguments to `Gate::check`.
@@ -117,9 +115,29 @@ SDL;
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
+            $queryBuilder = $this->getModelClass()::query();
+
+            $directivesContainsForceDelete = $argumentSet->directives->contains(
+                function (Directive $directive): bool {
+                    return $directive instanceof ForceDeleteDirective;
+                }
+            );
+            if ($directivesContainsForceDelete) {
+                $queryBuilder->withTrashed();
+            }
+
+            $directivesContainsRestore = $argumentSet->directives->contains(
+                function (Directive $directive): bool {
+                    return $directive instanceof RestoreDirective;
+                }
+            );
+            if ($directivesContainsRestore) {
+                $queryBuilder->onlyTrashed();
+            }
+
             $modelOrModels = $argumentSet
                 ->enhanceBuilder(
-                    $this->getModelClass()::query(),
+                    $queryBuilder,
                     [],
                     function (Directive $directive): bool {
                         return $directive instanceof TrashedDirective;

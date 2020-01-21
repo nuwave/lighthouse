@@ -6,7 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Hour;
+use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -23,32 +23,24 @@ class MorphManyDirectiveTest extends DBTestCase
     protected $user;
 
     /**
-     * User's task.
-     *
      * @var \Tests\Utils\Models\Task
      */
     protected $task;
 
     /**
-     * Task's hours.
-     *
-     * @var Collection
+     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Image>
      */
-    protected $taskHours;
+    protected $taskImages;
 
     /**
-     * User's post.
-     *
      * @var \Tests\Utils\Models\Post
      */
     protected $post;
 
     /**
-     * Post's hours.
-     *
-     * @var Collection
+     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Image>
      */
-    protected $postHours;
+    protected $postImages;
 
     protected function setUp(): void
     {
@@ -59,28 +51,28 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->taskHours = Collection
+        $this->taskImages = Collection
             ::times(10)
             ->map(function () {
                 return $this->task
-                    ->hours()
+                    ->images()
                     ->save(
-                        factory(Hour::class)->create()
+                        factory(Image::class)->create()
                     );
             });
 
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->postHours = Collection
+        $this->postImages = Collection
             ::times(
                 $this->faker()->numberBetween(1, 10)
             )
             ->map(function () {
                 return $this->post
-                    ->hours()
+                    ->images()
                     ->save(
-                        factory(Hour::class)->create()
+                        factory(Image::class)->create()
                     );
             });
     }
@@ -91,26 +83,26 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            hours: [Hour!] @morphMany
+            images: [Image!] @morphMany
         }
-        
+
         type Task {
             id: ID!
             name: String!
-            hours: [Hour!] @morphMany
+            images: [Image!] @morphMany
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             post (
                 id: ID! @eq
             ): Post @find
-            
+
             task (
                 id: ID! @eq
             ): Task @find
@@ -122,17 +114,17 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                hours {
+                images {
                     id
                     from
                     to
                 }
             }
-            
+
             task (id: {$this->task->id}) {
                 id
                 name
-                hours {
+                images {
                     id
                     from
                     to
@@ -144,12 +136,12 @@ class MorphManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'title' => $this->post->title,
-                    'hours' => $this->postHours
-                        ->map(function (Hour $hour) {
+                    'images' => $this->postImages
+                        ->map(function (Image $image) {
                             return [
-                                'id' => $hour->id,
-                                'from' => $hour->from,
-                                'to' => $hour->to,
+                                'id' => $image->id,
+                                'from' => $image->from,
+                                'to' => $image->to,
                             ];
                         })
                         ->toArray(),
@@ -157,19 +149,19 @@ class MorphManyDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
-                    'hours' => $this->taskHours
-                        ->map(function (Hour $hour) {
+                    'images' => $this->taskImages
+                        ->map(function (Image $image) {
                             return [
-                                'id' => $hour->id,
-                                'from' => $hour->from,
-                                'to' => $hour->to,
+                                'id' => $image->id,
+                                'from' => $image->from,
+                                'to' => $image->to,
                             ];
                         })
                         ->toArray(),
                 ],
             ],
-        ])->assertJsonCount($this->postHours->count(), 'data.post.hours')
-            ->assertJsonCount($this->taskHours->count(), 'data.task.hours');
+        ])->assertJsonCount($this->postImages->count(), 'data.post.images')
+            ->assertJsonCount($this->taskImages->count(), 'data.task.images');
     }
 
     public function testCanQueryMorphManyPaginator(): void
@@ -178,15 +170,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            hours: [Hour!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: "paginator")
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             post (
                 id: ID! @eq
@@ -199,7 +191,7 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                hours(first: 10) {
+                images(first: 10) {
                     data {
                         id
                         from
@@ -213,20 +205,20 @@ class MorphManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'title' => $this->post->title,
-                    'hours' => [
-                        'data' => $this->postHours
-                            ->map(function (Hour $hour) {
+                    'images' => [
+                        'data' => $this->postImages
+                            ->map(function (Image $image) {
                                 return [
-                                    'id' => $hour->id,
-                                    'from' => $hour->from,
-                                    'to' => $hour->to,
+                                    'id' => $image->id,
+                                    'from' => $image->from,
+                                    'to' => $image->to,
                                 ];
                             })
                             ->toArray(),
                     ],
                 ],
             ],
-        ])->assertJsonCount($this->postHours->count(), 'data.post.hours.data');
+        ])->assertJsonCount($this->postImages->count(), 'data.post.images.data');
     }
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
@@ -237,15 +229,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            hours: [Hour!] @morphMany(type: "paginator", maxCount: 3)
+            images: [Image!] @morphMany(type: "paginator", maxCount: 3)
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             post (
                 id: ID! @eq
@@ -258,7 +250,7 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                hours(first: 10) {
+                images(first: 10) {
                     data {
                         id
                     }
@@ -281,15 +273,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            hours: [Hour!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: "paginator")
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             post (
                 id: ID! @eq
@@ -302,7 +294,7 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                hours(first: 10) {
+                images(first: 10) {
                     data {
                         id
                     }
@@ -323,15 +315,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            hours: [Hour!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: "paginator")
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             post (
                 id: ID! @eq
@@ -344,7 +336,7 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                hours(first: 0) {
+                images(first: 0) {
                     data {
                         id
                         from
@@ -358,7 +350,7 @@ class MorphManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'title' => $this->post->title,
-                    'hours' => null,
+                    'images' => null,
                 ],
             ],
         ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
@@ -370,15 +362,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            hours: [Hour!] @morphMany(type: "paginator", defaultCount: 3)
+            images: [Image!] @morphMany(type: "paginator", defaultCount: 3)
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             task (
                 id: ID! @eq
@@ -391,7 +383,7 @@ class MorphManyDirectiveTest extends DBTestCase
             task(id: {$this->task->id}) {
                 id
                 name
-                hours {
+                images {
                     paginatorInfo {
                         count
                         hasMorePages
@@ -408,7 +400,7 @@ class MorphManyDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
-                    'hours' => [
+                    'images' => [
                         'paginatorInfo' => [
                             'count' => 3,
                             'hasMorePages' => true,
@@ -417,7 +409,7 @@ class MorphManyDirectiveTest extends DBTestCase
                     ],
                 ],
             ],
-        ])->assertJsonCount(3, 'data.task.hours.data');
+        ])->assertJsonCount(3, 'data.task.images.data');
     }
 
     public function testCanQueryMorphManyRelayConnection(): void
@@ -426,15 +418,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            hours: [Hour!] @morphMany(type: "relay")
+            images: [Image!] @morphMany(type: "relay")
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             task (
                 id: ID! @eq
@@ -447,7 +439,7 @@ class MorphManyDirectiveTest extends DBTestCase
             task(id: {$this->task->id}) {
                 id
                 name
-                hours(first: 3) {
+                images(first: 3) {
                     pageInfo {
                         hasNextPage
                     }
@@ -464,14 +456,14 @@ class MorphManyDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
-                    'hours' => [
+                    'images' => [
                         'pageInfo' => [
                             'hasNextPage' => true,
                         ],
                     ],
                 ],
             ],
-        ])->assertJsonCount(3, 'data.task.hours.edges');
+        ])->assertJsonCount(3, 'data.task.images.edges');
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
@@ -482,15 +474,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            hours: [Hour!] @morphMany(type: "relay", maxCount: 3)
+            images: [Image!] @morphMany(type: "relay", maxCount: 3)
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             task (
                 id: ID! @eq
@@ -503,7 +495,7 @@ class MorphManyDirectiveTest extends DBTestCase
             task(id: {$this->task->id}) {
                 id
                 name
-                hours(first: 10) {
+                images(first: 10) {
                     edges {
                         node {
                             id
@@ -528,15 +520,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            hours: [Hour!] @morphMany(type: "relay")
+            images: [Image!] @morphMany(type: "relay")
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             task (
                 id: ID! @eq
@@ -549,7 +541,7 @@ class MorphManyDirectiveTest extends DBTestCase
             task(id: {$this->task->id}) {
                 id
                 name
-                hours(first: 10) {
+                images(first: 10) {
                     edges {
                         node {
                             id
@@ -572,15 +564,15 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            hours: [Hour!] @morphMany(type: "relay", defaultCount: 3)
+            images: [Image!] @morphMany(type: "relay", defaultCount: 3)
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
         }
-        
+
         type Query {
             task (
                 id: ID! @eq
@@ -593,7 +585,7 @@ class MorphManyDirectiveTest extends DBTestCase
             task(id: {$this->task->id}) {
                 id
                 name
-                hours {
+                images {
                     pageInfo {
                         hasNextPage
                     }
@@ -610,13 +602,13 @@ class MorphManyDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
-                    'hours' => [
+                    'images' => [
                         'pageInfo' => [
                             'hasNextPage' => true,
                         ],
                     ],
                 ],
             ],
-        ])->assertJsonCount(3, 'data.task.hours.edges');
+        ])->assertJsonCount(3, 'data.task.images.edges');
     }
 }

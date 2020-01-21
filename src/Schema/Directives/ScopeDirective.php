@@ -9,14 +9,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ScopeDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    public function name()
-    {
-        return 'scope';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Adds a scope to the query builder.
 The scope method will receive the client-given value of the argument as the second parameter.

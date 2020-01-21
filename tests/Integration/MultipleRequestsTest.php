@@ -8,13 +8,13 @@ class MultipleRequestsTest extends TestCase
 {
     public function testCanFireMultipleRequestsInOneTest(): void
     {
-        $this->schema = /* @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             return(this: String!): String @field(resolver:"'.$this->qualifyTestResolver().'")
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             return(this: "foo")
         }
@@ -24,14 +24,14 @@ class MultipleRequestsTest extends TestCase
             ],
         ]);
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             return(this: "bar")
         }
         ')->assertExactJson([
-           'data' => [
-               'return' => 'bar',
-           ],
+            'data' => [
+                'return' => 'bar',
+            ],
         ]);
     }
 

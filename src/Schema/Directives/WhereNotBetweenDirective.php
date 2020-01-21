@@ -7,21 +7,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    const NAME = 'whereNotBetween';
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Verify that a column\'s value lies outside of two values.
 The type of the input value this is defined upon should be

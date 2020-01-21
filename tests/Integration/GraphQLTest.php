@@ -9,7 +9,7 @@ use Tests\Utils\Queries\Foo;
 
 class GraphQLTest extends TestCase
 {
-    protected $schema = /* @lang GraphQL */ '
+    protected $schema = /** @lang GraphQL */ '
     type Query {
         foo: Int
         bar: String
@@ -19,7 +19,7 @@ class GraphQLTest extends TestCase
     public function testResolvesQueryViaPostRequest(): void
     {
         $this
-            ->graphQL(/* @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ '
             {
                 foo
             }
@@ -38,7 +38,7 @@ class GraphQLTest extends TestCase
                 'graphql?'
                 .http_build_query(
                     [
-                        'query' => /* @lang GraphQL */ '
+                        'query' => /** @lang GraphQL */ '
                         {
                             foo
                         }
@@ -56,7 +56,7 @@ class GraphQLTest extends TestCase
     public function testResolvesNamedOperation(): void
     {
         $this->postGraphQL([
-            'query' => /* @lang GraphQL */ '
+            'query' => /** @lang GraphQL */ '
                 query Foo {
                     foo
                 }
@@ -92,7 +92,7 @@ class GraphQLTest extends TestCase
 
     public function testRejectsEmptyQuery(): void
     {
-        $this->graphQL(/* @lang GraphQL */ '')
+        $this->graphQL(/** @lang GraphQL */ '')
              ->assertStatus(200)
              ->assertJson([
                  'errors' => [
@@ -109,7 +109,7 @@ class GraphQLTest extends TestCase
     public function testRejectsInvalidQuery(): void
     {
         $result = $this
-            ->graphQL(/* @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ '
             {
                 nonExistingField
             }
@@ -133,14 +133,14 @@ class GraphQLTest extends TestCase
             throw new Error($message);
         });
 
-        $this->schema = /* @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: ID @mock
         }
         ';
 
         $this
-            ->graphQL(/* @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ '
             {
                 foo
             }
@@ -160,8 +160,8 @@ class GraphQLTest extends TestCase
     public function testIgnoresInvalidJSONVariables(): void
     {
         $result = $this->postGraphQL([
-            'query' => /* @lang GraphQL */ '{}',
-            'variables' => /* @lang JSON */ '{}',
+            'query' => /** @lang GraphQL */ '{}',
+            'variables' => /** @lang JSON */ '{}',
         ]);
 
         $result->assertStatus(200);
@@ -172,14 +172,14 @@ class GraphQLTest extends TestCase
         $this
             ->postGraphQL([
                 [
-                    'query' => /* @lang GraphQL */ '
+                    'query' => /** @lang GraphQL */ '
                         {
                             foo
                         }
                         ',
                 ],
                 [
-                    'query' => /* @lang GraphQL */ '
+                    'query' => /** @lang GraphQL */ '
                         {
                             bar
                         }

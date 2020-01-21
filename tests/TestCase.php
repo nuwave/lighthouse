@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
+use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
@@ -49,12 +50,13 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            ScoutServiceProvider::class,
             AuthServiceProvider::class,
+            ConsoleServiceProvider::class,
+            ScoutServiceProvider::class,
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            OrderByServiceProvider::class,
             TestingServiceProvider::class,
-            ConsoleServiceProvider::class,
         ];
     }
 

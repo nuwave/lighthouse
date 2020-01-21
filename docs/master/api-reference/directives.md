@@ -19,7 +19,7 @@ in the default model namespace `App`. [You can change this configuration](../get
 directive @all(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -184,7 +184,7 @@ directive @belongsToMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
@@ -436,26 +436,6 @@ directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 ## @can
 
-Check a Laravel Policy to ensure the current user is authorized to access a field.
-
-```graphql
-type Mutation {
-    createPost(input: PostInput): Post @can(ability: "create")
-}
-```
-
-```php
-class PostPolicy
-{
-    public function create(User $user): bool
-    {
-        return $user->is_admin;
-    }
-}
-```
-
-### Definition
-
 ```graphql
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
@@ -468,7 +448,7 @@ directive @can(
   The ability to check permissions for.
   """
   ability: String!
-  
+
   """
   The name of the argument that is used to find a specific model
   instance against which the permissions should be checked.
@@ -476,47 +456,24 @@ directive @can(
   find: String
 
   """
-  Pass along the client given input data as arguments to `Gate::check`. 
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Pass along the client given input data as arguments to `Gate::check`.
   """
   injectArgs: Boolean = false
 
   """
   Statically defined arguments that are passed to `Gate::check`.
-  
+
   You may pass pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: Mixed
 ) on FIELD_DEFINITION
-```
-
-### Examples
-
-In `find` parameter you may specify an input argument which is used to find a specific model
-instance by primary key against which the permissions should be checked:
-
-```graphql
-type Query {
-    post(id: ID @eq): Post @can(ability: "view", find: "id")
-}
-```
-
-```php
-class PostPolicy
-{
-    public function update(User $user, Post $post): bool
-    {
-        return $user->id === $post->author_id;
-    }
-}
-```
-
-It also works with soft deleted models in combination with `@softDeletes` directive:
-
-```graphql
-type Query {
-    post(id: ID @eq): Post @softDeletes @can(ability: "view", find: "id")
-}
 ```
 
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
@@ -529,29 +486,7 @@ type Mutation {
 }
 ```
 
-You can pass additional arguments to the policy checks by specifying them as `args`:
-
-```graphql
-type Mutation {
-    createPost(input: PostInput): Post
-        @can(ability: "create", args: ["FROM_GRAPHQL"])
-}
-```
-
-You can pass along the client given input data as arguments to the policy checks
-with the `injectArgs` argument:
-
-```graphql
-type Mutation {
-    createPost(input: PostInput): Post
-        @can(ability: "create", injectArgs: "true")
-}
-```
-
-Now you will have access to `PostInput` values in the policy. 
-
-Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
-Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
+You can find usage examples of this directive in [the authorization docs](../security/authorization.md#restrict-fields-through-policies).
 
 ## @complexity
 
@@ -655,7 +590,7 @@ Create a new Eloquent model with the given arguments.
 directive @create(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -716,7 +651,7 @@ directive @delete(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -747,7 +682,7 @@ type Mutation {
 ```
 
 You can also delete multiple models at once.
-Define a field that takes a list of IDs and returns a Collection of the
+Define a field that takes a list of IDs and returns a collection of the
 deleted models.
 
 _In contrast to Laravel mass updates, this does trigger model events._
@@ -896,7 +831,7 @@ Find a model based on the arguments provided.
 directive @find(  
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -939,7 +874,7 @@ Get the first query result from a collection of Eloquent models.
 directive @first(  
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -979,7 +914,7 @@ directive @forceDelete(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 ) on FIELD_DEFINITION
@@ -1130,6 +1065,25 @@ split into type and ID.
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
+## @guard
+
+```graphql
+"""
+Run authentication through one or more guards.
+This is run per field and may allow unauthenticated
+users to still receive partial results.
+"""
+directive @guard(
+  """
+  Specify which guards to use, e.g. "api".
+  When not defined, the default driver is used.
+  """
+  with: [String!]
+) on FIELD_DEFINITION | OBJECT
+```
+
+
+
 ## @hasMany
 
 Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
@@ -1160,7 +1114,7 @@ directive @hasMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
@@ -1214,7 +1168,7 @@ type User {
 """
 Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
 """
-directive @hasOne(      
+directive @hasOne(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
@@ -1252,7 +1206,7 @@ type Query {
 ### Definition
 
 ```graphql
-directive @in(      
+directive @in(
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema.
@@ -1311,7 +1265,7 @@ automatically used for creating new models and can not be manipulated.
 ### Definition
 
 ```graphql
-directive @inject(      
+directive @inject(
   """
   A path to the property of the context that will be injected.
   If the value is nested within the context, you may use dot notation
@@ -1409,7 +1363,7 @@ class Commentable
 """
 Use a custom resolver to determine the concrete type of an interface.
 """
-directive @interface(      
+directive @interface(
   """
   Reference to a custom type-resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
@@ -1465,7 +1419,7 @@ so the method can be `public static` if needed.
 Call a method with a given `name` on the class that represents a type to resolve a field.
 Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
 """
-directive @method(      
+directive @method(
   """
   Specify the method of which to fetch the data from.
   """
@@ -1475,12 +1429,15 @@ directive @method(
 
 ## @middleware
 
+**DEPRECATED**
+Use [`@guard`](#guard) or custom [`FieldMiddleware`](../custom-directives/field-directives.md#fieldmiddleware) instead.
+
 ```graphql
 """
 Run Laravel middleware for a specific field or group of fields.
 This can be handy to reuse existing HTTP middleware.
 """
-directive @middleware(      
+directive @middleware(
   """
   Specify which middleware to run. 
   Pass in either a fully qualified class name, an alias or
@@ -1609,7 +1566,7 @@ directive @morphMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
@@ -1656,7 +1613,7 @@ union Imageable = Post | User
 """
 Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @morphOne(      
+directive @morphOne(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
@@ -1688,7 +1645,7 @@ union Imageable = Post | User
 """
 Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @morphTo(      
+directive @morphTo(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
@@ -1820,7 +1777,7 @@ directive @node(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 ) on FIELD_DEFINITION
@@ -1878,7 +1835,7 @@ type Query {
 """
 Filter a column by an array using a `whereNotIn` clause.
 """
-directive @notIn(      
+directive @notIn(
   """
   Specify the name of the column.
   Only required if it differs from the name of the argument.
@@ -1889,34 +1846,86 @@ directive @notIn(
 
 ## @orderBy
 
-Sort a result list by one or more given fields.
+```graphql
+"""
+Sort a result list by one or more given columns.
+"""
+directive @orderBy(
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    If not given, the column names can be passed as a String by clients.
+    Mutually exclusive with the `columnsEnum` argument.
+    """
+    columns: [String!]
+
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    Mutually exclusive with the `columns` argument.
+    """
+    columnsEnum: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+Use it on a field argument of an Eloquent query. The type of the argument
+can be left blank as `_` , as it will be automatically generated.
 
 ```graphql
 type Query {
-    posts(orderBy: [OrderByClause!] @orderBy): [Post!]!
+    posts(orderBy: _ @orderBy(columns: ["posted_at", "title"])): [Post!]! @all
 }
 ```
 
-### Definition
+Lighthouse will automatically generate an input that takes enumerated column names,
+together with the `SortOrder` enum, and add that to your schema. Here is how it looks:
 
 ```graphql
-directive @orderBy on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
+"Allows ordering a list of records."
+input PostsOrderByOrderByClause {
+    "The column that is used for ordering."
+    column: PostsOrderByColumn!
 
-The `OrderByClause` input is automatically added to the schema,
-together with the `SortOrder` enum.
-
-```graphql
-input OrderByClause{
-    field: String!
+    "The direction that is used for ordering."
     order: SortOrder!
 }
 
+"Order by clause for the `orderBy` argument on the query `posts`."
+enum PostsOrderByColumn {
+    POSTED_AT @enum(value: "posted_at")
+    TITLE @enum(value: "title")
+}
+
+"The available directions for ordering a list of records."
 enum SortOrder {
+    "Sort records in ascending order."
     ASC
+
+    "Sort records in descending order."
     DESC
 }
 ```
+
+If you want to re-use a list of allowed columns, you can define your own enumeration type and use the `columnsEnum` argument instead of `columns`.
+Here's an example of how you could define it in your schema:
+
+```graphql
+type Query {
+    allPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]! @all
+    paginatedPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]! @paginate
+}
+
+"A custom description for this custom enum."
+enum PostColumn {
+  # Another reason why you might want to have a custom enum is to
+  # correct typos or bad naming in column names.
+  POSTED_AT @enum(value: "postd_timestamp")
+  TITLE @enum(value: "title")
+}
+```
+
+Lighthouse will still automatically generate the necessary input types and the `SortOrder` enum.
+But instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
 
 Querying a field that has an `orderBy` argument looks like this:
 
@@ -1925,7 +1934,7 @@ Querying a field that has an `orderBy` argument looks like this:
     posts (
         orderBy: [
             {
-                field: "postedAt"
+                column: POSTED_AT
                 order: ASC
             }
         ]
@@ -1960,8 +1969,8 @@ And usage example:
             {
                 field: "postedAt"
                 order: ASC
-            }    
-        ]       
+            }
+        ]
     }) {
         title
     }
@@ -1970,60 +1979,20 @@ And usage example:
 
 ## @paginate
 
-Query multiple entries as a paginated list.
-
-```graphql
-type Query {
-    posts: [Post!]! @paginate
-}
-```
-
-The schema definition is automatically transformed to this:
-
-```graphql
-type Query {
-    posts(first: Int!, page: Int): PostPaginator
-}
-
-type PostPaginator {
-    data: [Post!]!
-    paginatorInfo: PaginatorInfo!
-}
-```
-
-And can be queried like this:
-
-```graphql
-{
-    posts(first: 10) {
-        data {
-            id
-            title
-        }
-        paginatorInfo {
-            currentPage
-            lastPage
-        }
-    }
-}
-```
-
-### Definition
-
 ```graphql
 """
-Query multiple entries as a paginated list.
+Query multiple model entries as a paginated list.
 """
 directive @paginate(
   """
   Which pagination style to use.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String = "paginator"
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -2052,7 +2021,54 @@ directive @paginate(
 ) on FIELD_DEFINITION
 ```
 
-### Examples
+### Basic usage
+
+This directive is meant to be used on root query fields:
+
+```graphql
+type Query {
+    posts: [Post!]! @paginate
+}
+```
+
+> When you want to paginate a relationship, use the to-many relationship
+> directives such as [`@hasMany`](directives.md#hasmany) instead.
+
+The schema definition is automatically transformed to this:
+
+```graphql
+type Query {
+    posts(first: Int!, page: Int): PostPaginator
+}
+
+"A paginated list of Post items."
+type PostPaginator {
+    "A list of Post items."
+    data: [Post!]!
+
+    "Pagination information about the list of items."
+    paginatorInfo: PaginatorInfo!
+}
+```
+
+And can be queried like this:
+
+```graphql
+{
+    posts(first: 10) {
+        data {
+            id
+            title
+        }
+        paginatorInfo {
+            currentPage
+            lastPage
+        }
+    }
+}
+```
+
+### Pagination type
 
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
@@ -2065,6 +2081,34 @@ type Query {
     posts: [Post!]! @paginate(type: "connection")
 }
 ```
+
+The final schema will be transformed to this:
+
+```graphql
+type Query {
+    posts(first: Int!, page: Int): PostConnection
+}
+
+"A paginated list of Post edges."
+type PostConnection {
+    "Pagination information about the list of edges."
+    pageInfo: PageInfo!
+
+    "A list of Post edges."
+    edges: [PostEdge]
+}
+
+"An edge that contains a node of type Post and a cursor."
+type PostEdge {
+    "The Post node."
+    node: Post
+
+    "A unique cursor that can be used for pagination."
+    cursor: String!
+}
+```
+
+### Default count
 
 You can supply a `defaultCount` to set a default count for any kind of paginator.
 
@@ -2085,6 +2129,8 @@ query {
 }
 ```
 
+### Limit maximum count
+
 Lighthouse allows you to specify a global maximum for the number of items a user
 can request through pagination through the config. You may also overwrite this
 per field with the `maxCount` argument:
@@ -2095,6 +2141,8 @@ type Query {
 }
 ```
 
+### Overwrite model
+
 By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same
 name as the returned type. You can overwrite this by setting the `model` argument.
 
@@ -2103,6 +2151,8 @@ type Query {
     posts: [Post!]! @paginate(model: "App\\Blog\\BlogPost")
 }
 ```
+
+### Custom builder
 
 If simply querying Eloquent does not fit your use-case, you can specify a custom `builder`.
 
@@ -2179,7 +2229,7 @@ directive @restore(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 ) on FIELD_DEFINITION
@@ -2656,7 +2706,7 @@ Update an Eloquent model with the input values of the field.
 directive @update(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -2718,7 +2768,7 @@ Create or update an Eloquent model with the input values of the field.
 directive @upsert(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
@@ -2738,7 +2788,8 @@ directive @upsert(
 ```
 
 Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
-If the model doesn't exist, it will be created using the given `id`.
+If the model doesn't exist, it will be newly created with a given `id`.
+In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
 ```graphql
 type Mutation {
@@ -2795,7 +2846,22 @@ directive @where(
 
 ## @whereBetween
 
+```graphql
+"""
 Verify that a column's value is between two values.
+The type of the input value this is defined upon should be
+an `input` object with two fields.
+"""
+directive @whereBetween(
+  """
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This example defines an `input` to filter that a value is between two dates.
 
 ```graphql
 type Query {
@@ -2810,149 +2876,16 @@ input DateRange {
 }
 ```
 
-The type of the input value this is defined upon should be
-an `input` object with two fields.
+You may use any custom `input` type for the argument. Make sure it has
+exactly two required fields to ensure the query is valid.
 
-### Definition
+## @whereConditions
 
-```graphql
-"""
-Verify that a column's value is between two values.
-The type of the input value this is defined upon should be
-an `input` object with two fields.
-"""
-directive @whereBetween(
-  """
-  Specify the database column to compare. 
-  Only required if database column has a different name than the attribute in your schema.
-  """
-  key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
+The documentation for this directive is found in [`Complex Where Conditions`](../eloquent/complex-where-conditions.md#whereconditions).
 
-## @whereConstraints
+## @whereHasConditions
 
-Add a dynamically client-controlled WHERE constraint to a fields query.
-
-### Definition
-
-```graphql
-"""
-Add a dynamically client-controlled WHERE constraint to a fields query.
-The argument it is defined on may have any name but **must** be
-of the input type `WhereConstraints`.
-"""
-directive @whereConstraints(
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    """
-    columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
-### Setup
-
-**This is an experimental feature and not included in Lighthouse by default.**
-
-Add the service provider to your `config/app.php`
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider::class,
-],
-```
-
-Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
-
-    composer require mll-lab/graphql-php-scalars
-
-It contains the scalar type `Mixed`, which enables the dynamic query capabilities.
-
-```graphql
-scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
-```
-
-Add an enum type `Operator` to your schema. Depending on your
-database, you may want to allow different internal values. This default
-should work for most databases:
-
-```graphql
-enum Operator {
-    EQ @enum(value: "=")
-    NEQ @enum(value: "!=")
-    GT @enum(value: ">")
-    GTE @enum(value: ">=")
-    LT @enum(value: "<")
-    LTE @enum(value: "<=")
-    LIKE @enum(value: "LIKE")
-    NOT_LIKE @enum(value: "NOT_LIKE")
-}
-```
-
-### Usage
-
-```graphql
-type Query {
-    people(
-        where: WhereConstraints @whereConstraints(columns: ["age", "type", "haircolour", "height"])
-    ): [Person!]!
-}
-```
-
-This is how you can use it to construct a complex query
-that gets actors over age 37 who either have red hair or are at least 150cm.
-
-```graphql
-{
-  people(
-    filter: {
-      where: [
-        {
-          AND: [
-            { column: AGE, operator: GT value: 37 }
-            { column: TYPE, value: "Actor" }
-            {
-              OR: [
-                { column: HAIRCOLOUR, value: "red" }
-                { column: HEIGHT, operator: GTE, value: 150 }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ) {
-    name
-  }
-}
-```
-
-Lighthouse generates definitions for an `Enum` type and an `Input` type
-that are restricted to the defined columns.
-
-```graphql
-"Dynamic WHERE constraints for the `where` argument on the query `people`.
-input PeopleWhereWhereConstraints {
-    column: PeopleWhereColumn
-    operator: String = EQ
-    value: Mixed
-    AND: [PeopleWhereWhereConstraints!]
-    OR: [PeopleWhereWhereConstraints!]
-    NOT: [PeopleWhereWhereConstraints!]
-}
-
-"Allowed column names for the `where` argument on the query `people`."
-enum PeopleWhereColumn {
-    AGE @enum(value: "age")
-    TYPE @enum(value: "type")
-    HAIRCOLOUR @enum(value: "haircolour")
-    HEIGHT @enum(value: "height")
-}
-```
-
-When you are not specifying `columns` to allow, a generic input with dynamic
-column names will be used instead.
+The documentation for this directive is found in [`Complex Where Conditions`](../eloquent/complex-where-conditions.md#wherehasconditions).
 
 ## @whereJsonContains
 

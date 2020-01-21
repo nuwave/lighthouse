@@ -7,23 +7,11 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    const NAME = 'whereBetween';
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
-Verify that a column\'s value is between two values.
+Verify that a column's value is between two values.
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """

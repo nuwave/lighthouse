@@ -7,14 +7,10 @@ about: Propose an idea for a feature
 <!-- Please keep in mind that Lighthouse is a community project and features take effort.
 Are you willing to provide a PR for this issue or aid in developing it? -->
 
-**Is your feature proposal related to a problem? Please describe.**
+**What problem does this feature proposal attempt to solve?**
 
 <!-- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
 
-**Describe the solution you'd like**
+**Which possible solutions should be considered?**
 
-<!-- A clear and concise description of what you want to happen. -->
-
-**Describe alternatives you've considered**
-
-<!-- A clear and concise description of any alternative solutions or features you've considered. -->
+<!-- How could the problem be solved? What alternative solutions exist? Which is best? -->

@@ -190,7 +190,7 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('author_id');
             $table->string('title');
             $table->string('content');
             $table->timestamps();
@@ -278,7 +278,7 @@ class User extends Authenticatable
 
     public function posts(): HasMany
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(Post::class, 'author_id');
     }
 }
 ```
@@ -307,9 +307,9 @@ naming - the type name `Post` is also the name of our Model - and the use of ser
 We add additional type definitions that clearly define the shape of our data: 
 
 ```graphql
-type Query{
+type Query {
     posts: [Post!]! @all
-    post (id: Int! @eq): Post @find
+    post(id: Int! @eq): Post @find
 }
 
 type User {
@@ -329,7 +329,7 @@ type Post {
     comments: [Comment!]! @hasMany
 }
 
-type Comment{
+type Comment {
     id: ID!
     reply: String!
     post: Post! @belongsTo

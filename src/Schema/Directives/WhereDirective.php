@@ -7,19 +7,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class WhereDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'where';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
 """
