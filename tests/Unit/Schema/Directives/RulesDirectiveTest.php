@@ -36,7 +36,7 @@ class RulesDirectiveTest extends TestCase
                 'full_name' => 'John Doe',
                 'input_object' => true,
             ];
-        }, 'with exclude if');
+        }, 'with exclude');
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -45,7 +45,12 @@ class RulesDirectiveTest extends TestCase
             withExcludeIfRule(
                 foo: String @rules(apply: ["exclude_if:bar,baz"])
                 bar: String
-            ): User @mock(key: "with exclude if")
+            ): User @mock(key: "with exclude")
+
+            withExcludeUnlessRule(
+                foo: String @rules(apply: ["exclude_unless:bar,barbaz"])
+                bar: String
+            ): User @mock(key: "with exclude")
         }
 
         type Mutation {
@@ -386,6 +391,28 @@ GRAPHQL
             )->assertJson([
                 'data' => [
                     'withExcludeIfRule' => [
+                        'first_name' => 'John'
+                    ]
+                ]
+            ]);
+    }
+
+    public function testSupportExcludeUnless(): void
+    {
+        $r = $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+{
+    withExcludeUnlessRule (
+        foo: "baz"
+        bar: "baz"
+    ) {
+        first_name
+    }
+}
+GRAPHQL
+            )->assertJson([
+                'data' => [
+                    'withExcludeUnlessRule' => [
                         'first_name' => 'John'
                     ]
                 ]
