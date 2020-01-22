@@ -3,15 +3,14 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 
 /**
  * Useful helpers for PHPUnit testing.
  *
- * @mixin \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
+ * @mixin \Laravel\Lumen\Testing\Concerns\MakesHttpRequests
  */
-trait MakesGraphQLRequests
+trait MakesGraphQLRequestsLumen
 {
     /**
      * Stores the result of the introspection query.
@@ -19,7 +18,7 @@ trait MakesGraphQLRequests
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Foundation\Testing\TestResponse|null
+     * @var \Illuminate\Http\Response|null
      */
     protected $introspectionResult;
 
@@ -29,9 +28,9 @@ trait MakesGraphQLRequests
      * @param  string  $query
      * @param  array|null  $variables
      * @param  array  $extraParams
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return $this
      */
-    protected function graphQL(string $query, array $variables = null, array $extraParams = []): TestResponse
+    protected function graphQL(string $query, array $variables = null, array $extraParams = []): MakesGraphQLRequestsLumen
     {
         $params = ['query' => $query];
 
@@ -40,8 +39,9 @@ trait MakesGraphQLRequests
         }
 
         $params += $extraParams;
+        $this->postGraphQL($params);
 
-        return $this->postGraphQL($params);
+        return $this;
     }
 
     /**
@@ -49,15 +49,17 @@ trait MakesGraphQLRequests
      *
      * @param  mixed[]  $data
      * @param  mixed[]  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return $this
      */
-    protected function postGraphQL(array $data, array $headers = []): TestResponse
+    protected function postGraphQL(array $data, array $headers = []): MakesGraphQLRequestsLumen
     {
-        return $this->postJson(
+        $this->post(
             $this->graphQLEndpointUrl(),
             $data,
             $headers
         );
+
+        return $this;
     }
 
     /**
@@ -68,11 +70,11 @@ trait MakesGraphQLRequests
      *
      * @param  mixed[]  $parameters
      * @param  mixed[]  $files
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return $this
      */
-    protected function multipartGraphQL(array $parameters, array $files): TestResponse
+    protected function multipartGraphQL(array $parameters, array $files): MakesGraphQLRequestsLumen
     {
-        return $this->call(
+        $this->call(
             'POST',
             $this->graphQLEndpointUrl(),
             $parameters,
@@ -82,20 +84,25 @@ trait MakesGraphQLRequests
                 'Content-Type' => 'multipart/form-data',
             ])
         );
+
+        return $this;
     }
 
     /**
      * Execute the introspection query on the GraphQL server.
      *
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return $this
      */
-    protected function introspect(): TestResponse
+    protected function introspect(): MakesGraphQLRequestsLumen
     {
         if ($this->introspectionResult) {
-            return $this->introspectionResult;
+            return $this;
         }
 
-        return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
+        $this->graphQL(Introspection::getIntrospectionQuery());
+        $this->introspectionResult = $this->response;
+
+        return $this;
     }
 
     /**
