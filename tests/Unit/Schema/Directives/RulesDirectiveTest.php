@@ -396,8 +396,8 @@ GRAPHQL
                 'data' => [
                     'withExcludeIfRule' => [
                         'first_name' => 'John',
-                    ]
-                ]
+                    ],
+                ],
             ]);
     }
 
@@ -422,14 +422,15 @@ GRAPHQL
                 'data' => [
                     'withExcludeUnlessRule' => [
                         'first_name' => 'John',
-                    ]
-                ]
+                    ],
+                ],
             ]);
     }
 
     private function isRuleExists($rule)
     {
         $validator = $this->app->make('validator')->make([], []);
+
         return method_exists(
             $validator,
             \Illuminate\Support\Str::camel('validate_'.$rule)
