@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 
 /**
@@ -19,7 +18,7 @@ trait MakesGraphQLRequests
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Foundation\Testing\TestResponse|null
+     * @var|\Illuminate\Foundation\Testing\TestResponse|null
      */
     protected $introspectionResult;
 
@@ -29,9 +28,9 @@ trait MakesGraphQLRequests
      * @param  string  $query
      * @param  array|null  $variables
      * @param  array  $extraParams
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|$this
      */
-    protected function graphQL(string $query, array $variables = null, array $extraParams = []): TestResponse
+    protected function graphQL(string $query, array $variables = null, array $extraParams = [])
     {
         $params = ['query' => $query];
 
@@ -49,11 +48,11 @@ trait MakesGraphQLRequests
      *
      * @param  mixed[]  $data
      * @param  mixed[]  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|$this
      */
-    protected function postGraphQL(array $data, array $headers = []): TestResponse
+    protected function postGraphQL(array $data, array $headers = [])
     {
-        return $this->postJson(
+        return $this->post(
             $this->graphQLEndpointUrl(),
             $data,
             $headers
@@ -68,11 +67,11 @@ trait MakesGraphQLRequests
      *
      * @param  mixed[]  $parameters
      * @param  mixed[]  $files
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|$this
      */
-    protected function multipartGraphQL(array $parameters, array $files): TestResponse
+    protected function multipartGraphQL(array $parameters, array $files)
     {
-        return $this->call(
+        $response = $this->call(
             'POST',
             $this->graphQLEndpointUrl(),
             $parameters,
@@ -82,14 +81,16 @@ trait MakesGraphQLRequests
                 'Content-Type' => 'multipart/form-data',
             ])
         );
+
+        return $this->isInstanceOfTestResponce($response) ? $response : $this;
     }
 
     /**
      * Execute the introspection query on the GraphQL server.
      *
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|$this
      */
-    protected function introspect(): TestResponse
+    protected function introspect()
     {
         if ($this->introspectionResult) {
             return $this->introspectionResult;
@@ -133,11 +134,18 @@ trait MakesGraphQLRequests
             $this->introspect();
         }
 
-        // TODO Replace with ->json() once we remove support for Laravel 5.5
-        $results = data_get(
-            $this->introspectionResult->decodeResponseJson(),
-            $path
-        );
+        if($this->isInstanceOfTestResponce($this->introspectionResult)) {
+            // TODO Replace with ->json() once we remove support for Laravel 5.5
+            $results = data_get(
+                $this->introspectionResult->decodeResponseJson(),
+                $path
+            );
+        } else {
+            $results = data_get(
+                json_decode($this->introspectionResult->response->getContent(), true),
+                $path
+            );
+        }
 
         return Arr::first(
             $results,
@@ -155,5 +163,17 @@ trait MakesGraphQLRequests
     protected function graphQLEndpointUrl(): string
     {
         return config('lighthouse.route.uri');
+    }
+
+    /**
+     * Is the value an instance of TestResponse?
+     *
+     * @param mixed $class
+     *
+     * @return bool
+     */
+    private function isInstanceOfTestResponce($class): bool
+    {
+        return $class instanceof \Illuminate\Foundation\Testing\TestResponse;
     }
 }
