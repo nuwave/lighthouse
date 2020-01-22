@@ -134,7 +134,7 @@ trait MakesGraphQLRequests
             $this->introspect();
         }
 
-        if($this->isInstanceOfTestResponce($this->introspectionResult)) {
+        if ($this->isInstanceOfTestResponce($this->introspectionResult)) {
             // TODO Replace with ->json() once we remove support for Laravel 5.5
             $results = data_get(
                 $this->introspectionResult->decodeResponseJson(),
