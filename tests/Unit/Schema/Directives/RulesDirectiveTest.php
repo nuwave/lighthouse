@@ -31,7 +31,7 @@ class RulesDirectiveTest extends TestCase
 
         $this->mockResolver(function ($root, $args): array {
             return [
-                'first_name' => 'John' . ($args['foo'] ?? ''),
+                'first_name' => 'John'.($args['foo'] ?? ''),
                 'last_name' => 'Doe',
                 'full_name' => 'John Doe',
                 'input_object' => true,
@@ -377,7 +377,7 @@ GRAPHQL
 
     public function testSupportExcludeIf(): void
     {
-        if (!$this->isRuleExists('exclude_if')) {
+        if (! $this->isRuleExists('exclude_if')) {
             $this->markTestSkipped('The "exclude_if" rule does not implement.');
         }
 
@@ -395,7 +395,7 @@ GRAPHQL
             )->assertJson([
                 'data' => [
                     'withExcludeIfRule' => [
-                        'first_name' => 'John'
+                        'first_name' => 'John',
                     ]
                 ]
             ]);
@@ -403,7 +403,7 @@ GRAPHQL
 
     public function testSupportExcludeUnless(): void
     {
-        if (!$this->isRuleExists('exclude_unless')) {
+        if (! $this->isRuleExists('exclude_unless')) {
             $this->markTestSkipped('The "exclude_unless" rule does not implement.');
         }
 
@@ -421,7 +421,7 @@ GRAPHQL
             )->assertJson([
                 'data' => [
                     'withExcludeUnlessRule' => [
-                        'first_name' => 'John'
+                        'first_name' => 'John',
                     ]
                 ]
             ]);
@@ -432,7 +432,7 @@ GRAPHQL
         $validator = $this->app->make('validator')->make([], []);
         return method_exists(
             $validator,
-            \Illuminate\Support\Str::camel('validate_' . $rule)
+            \Illuminate\Support\Str::camel('validate_'.$rule)
         );
     }
 
