@@ -377,6 +377,10 @@ GRAPHQL
 
     public function testSupportExcludeIf(): void
     {
+        if (!$this->isRuleExists('exclude_if')) {
+            $this->markTestSkipped('The "exclude_if" rule does not implement.');
+        }
+
         $r = $this
             ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
@@ -399,6 +403,10 @@ GRAPHQL
 
     public function testSupportExcludeUnless(): void
     {
+        if (!$this->isRuleExists('exclude_unless')) {
+            $this->markTestSkipped('The "exclude_unless" rule does not implement.');
+        }
+
         $r = $this
             ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
@@ -417,6 +425,15 @@ GRAPHQL
                     ]
                 ]
             ]);
+    }
+
+    private function isRuleExists($rule)
+    {
+        $validator = $this->app->make('validator')->make([], []);
+        return method_exists(
+            $validator,
+            \Illuminate\Support\Str::camel('validate_' . $rule)
+        );
     }
 
     public function testRulesHaveToBeArray(): void
