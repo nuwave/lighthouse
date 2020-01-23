@@ -87,8 +87,8 @@ class RenameDirectiveTest extends TestCase
         $this->mockResolver(function ($root, array $args) {
             return $args === [
                 'input' => [
-                    ['bar' => 'something']
-                ]
+                    ['bar' => 'something'],
+                ],
             ];
         });
 

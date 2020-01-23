@@ -93,7 +93,7 @@ class ArgumentSet
             // might be contained within an array.
             $argument->value = Utils::applyEach(
                 function ($value) {
-                    if($value instanceof self) {
+                    if ($value instanceof self) {
                         return $value->rename();
                     }
 
