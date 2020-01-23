@@ -81,4 +81,43 @@ class RenameDirectiveTest extends TestCase
             ],
         ]);
     }
+
+    public function testRenameListOfInputs(): void
+    {
+        $this->mockResolver(function ($root, array $args) {
+            return $args === [
+                'input' => [
+                    ['bar' => 'something']
+                ]
+            ];
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                input: [FooInput]
+            ): Boolean @mock
+        }
+
+        input FooInput {
+            baz: String @rename(attribute: "bar")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(
+                input: [
+                    {
+                        baz: "something"
+                    }
+                ]
+            )
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => true,
+            ],
+        ]);
+    }
 }
