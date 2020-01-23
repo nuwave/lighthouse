@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `@orderBy` directives https://github.com/nuwave/lighthouse/pull/1150
 - Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used
   so the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
+- Add test trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
+  with Lumen https://github.com/nuwave/lighthouse/pull/1100
 
 ### Fixed
 
@@ -37,17 +39,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
 - Add support in `@whereConditions` for IN, IS NULL and BETWEEN operators https://github.com/nuwave/lighthouse/pull/1099
-- Add ability to define pivot data on nested mutations within `sync`, `syncWithoutDetach` and `connect` https://github.com/nuwave/lighthouse/pull/1110
+- Add ability to define pivot data on nested mutations within `sync`, `syncWithoutDetach`
+  and `connect` https://github.com/nuwave/lighthouse/pull/1110
 - Allow restricting the columns for `@orderBy` to a given whitelist and generate
   an `enum` definition for it https://github.com/nuwave/lighthouse/pull/1118
 - Allow passing variables in `->graphQL()` test helper https://github.com/nuwave/lighthouse/pull/1127
 - Add missing schema descriptions to some inputs, types, and enums https://github.com/nuwave/lighthouse/pull/1131
 - Add `@guard` directive to handle authentication https://github.com/nuwave/lighthouse/pull/1135
-- Add `@whereHasConditions` directive to filter query results based on the existence of a relationship https://github.com/nuwave/lighthouse/pull/1140
+- Add `@whereHasConditions` directive to filter query results based on the existence
+  of a relationship https://github.com/nuwave/lighthouse/pull/1140
 
 ### Changed
 
-- Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favour of modular nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
+- Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favour of modular
+  nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Register the operator enum for `@whereConditions` programmatically and allow
   overwriting it through a service provider https://github.com/nuwave/lighthouse/pull/1099
 - Always automatically set the correct argument type when using `@whereConditions` or `@orderBy`
@@ -57,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Enable chained rule provider directives (`ProvidesRules`) to merge the rules before validating https://github.com/nuwave/lighthouse/pull/1082
+- Enable chained rule provider directives (`ProvidesRules`) to merge the rules
+  before validating https://github.com/nuwave/lighthouse/pull/1082
 - Apply nested `OR` conditions in `@whereConditions` correctly https://github.com/nuwave/lighthouse/pull/1099
 - Allow passing `null` or simply no `id` when using `@upsert` https://github.com/nuwave/lighthouse/pull/1114
 
