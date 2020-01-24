@@ -69,6 +69,7 @@ module.exports = [
             'security/authentication',
             'security/authorization',
             'security/validation',
+            'security/sanitization',
             ['security/resource-exhaustion', 'Resource Exhaustion'],
         ]
     },

@@ -187,3 +187,40 @@ You can also introspect client directives.
 ```php
 $customDirective = $this->introspectDirective('custom');
 ```
+
+## Lumen
+
+Because the `TestResponse` class is not available in Lumen, you must use a different
+test trait:
+
+```diff
+<?php
+
+namespace Tests;
+
++use Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen;
+
+abstract class TestCase extends Laravel\Lumen\Testing\TestCase
+{
++   use MakesGraphQLRequestsLumen;
+}
+```
+
+All the test helpers are called the same as in `MakesGraphQLRequest`, the only
+difference is that they return `$this` instead of a `TestResponse`.
+Assertions work differently as a result:
+
+```php
+public function testHelloWorld(): void
+{
+    $this->graphQL(/** @lang GraphQL */ '
+    {
+        hello
+    }
+    ')->seeJson([
+        'data' => [
+            'hello' => 'world'
+        ]
+    ])->seeHeader('SomeHeader', 'value');
+}
+```
