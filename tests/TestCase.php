@@ -16,6 +16,7 @@ use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
+use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Tests\Utils\Middleware\CountRuns;
@@ -25,6 +26,7 @@ abstract class TestCase extends BaseTestCase
 {
     use MakesGraphQLRequests;
     use MocksResolvers;
+    use UsesTestSchema;
 
     const PLACEHOLDER_QUERY = '
     type Query {
@@ -32,14 +34,13 @@ abstract class TestCase extends BaseTestCase
     }
     ';
 
-    /**
-     * This variable is injected the main GraphQL class
-     * during execution of each test. It may be set either
-     * for an entire test class or for a single test.
-     *
-     * @var string
-     */
-    protected $schema = self::PLACEHOLDER_QUERY;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->schema = self::PLACEHOLDER_QUERY;
+        $this->setUpTestSchema();
+    }
 
     /**
      * Get package providers.
@@ -68,13 +69,6 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app->bind(
-            SchemaSourceProvider::class,
-            function (): TestSchemaProvider {
-                return new TestSchemaProvider($this->schema);
-            }
-        );
-
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
 

@@ -5,6 +5,9 @@ namespace Tests\Utils\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
+/**
+ * @deprecated will be removed with @middleware
+ */
 class CountRuns
 {
     /**
