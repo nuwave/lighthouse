@@ -29,7 +29,7 @@ class SpreadDirectiveTest extends TestCase
         }
         ';
 
-        $r = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo(input: {
                 foo: 1
