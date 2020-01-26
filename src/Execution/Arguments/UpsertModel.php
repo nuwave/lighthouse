@@ -32,7 +32,7 @@ class UpsertModel implements ArgResolver
                 ?? $args->arguments[$model->getKeyName()]
                 ?? null
         ) {
-            if(
+            if (
                 $existingModel = $model
                     ->newQuery()
                     ->find($id->value)
