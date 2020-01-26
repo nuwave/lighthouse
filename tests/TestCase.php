@@ -28,7 +28,10 @@ abstract class TestCase extends BaseTestCase
     use MocksResolvers;
     use UsesTestSchema;
 
-    const PLACEHOLDER_QUERY = '
+    /**
+     * A dummy query type definition that is added to tests by default.
+     */
+    const PLACEHOLDER_QUERY = /** @lang GraphQL */ '
     type Query {
         foo: Int
     }
@@ -38,7 +41,10 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->schema = self::PLACEHOLDER_QUERY;
+        if(!$this->schema) {
+            $this->schema = self::PLACEHOLDER_QUERY;
+        }
+
         $this->setUpTestSchema();
     }
 
