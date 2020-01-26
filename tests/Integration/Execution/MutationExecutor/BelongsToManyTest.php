@@ -160,10 +160,10 @@ class BelongsToManyTest extends DBTestCase
                     'id' => '1',
                     'users' => [
                         [
-                            'id' => '1',
+                            'id' => '2',
                         ],
                         [
-                            'id' => '2',
+                            'id' => '1',
                         ],
                     ],
                 ],
@@ -178,12 +178,14 @@ class BelongsToManyTest extends DBTestCase
             createRole(input: {
                 name: "foobar"
                 users: {
-                    create: [{
-                        name: "bar"
-                    },
-                    {
-                        name: "foo"
-                    }]
+                    create: [
+                        {
+                            name: "bar"
+                        },
+                        {
+                            name: "foo"
+                        }
+                    ]
                 }
             }) {
                 id
@@ -218,14 +220,16 @@ class BelongsToManyTest extends DBTestCase
                 id: 1
                 name: "is_user"
                 users: {
-                    upsert: [{
-                        id: 10
-                        name: "user1"
-                    },
-                    {
-                        id: 20
-                        name: "user2"
-                    }]
+                    upsert: [
+                        {
+                            id: 10
+                            name: "user1"
+                        },
+                        {
+                            id: 20
+                            name: "user2"
+                        }
+                    ]
                 }
             }) {
                 id
@@ -268,12 +272,14 @@ class BelongsToManyTest extends DBTestCase
             upsertRole(input: {
                 name: "is_user"
                 users: {
-                    upsert: [{
-                        name: "user1"
-                    },
-                    {
-                        name: "user2"
-                    }]
+                    upsert: [
+                        {
+                            name: "user1"
+                        },
+                        {
+                            name: "user2"
+                        }
+                    ]
                 }
             }) {
                 id
@@ -320,9 +326,7 @@ GRAPHQL
             createRole(input: {
                 name: "foobar"
                 users: {
-                    connect: [
-                        1,2
-                    ]
+                    connect: [1, 2]
                 }
             }) {
                 id
@@ -364,9 +368,7 @@ GRAPHQL
                 id: 1
                 name: "foobar"
                 users: {
-                    connect: [
-                        1,2
-                    ]
+                    connect: [1, 2]
                 }
             }) {
                 id
@@ -409,12 +411,14 @@ GRAPHQL
                 id: 1
                 name: "is_user"
                 users: {
-                    create: [{
-                        name: "user1"
-                    },
-                    {
-                        name: "user2"
-                    }]
+                    create: [
+                        {
+                            name: "user1"
+                        },
+                        {
+                            name: "user2"
+                        }
+                    ]
                 }
             }) {
                 id
@@ -462,14 +466,16 @@ GRAPHQL
                 id: 1
                 name: "is_user"
                 users: {
-                    upsert: [{
-                        id: 1
-                        name: "user1"
-                    },
-                    {
-                        id: 2
-                        name: "user2"
-                    }]
+                    upsert: [
+                        {
+                            id: 1
+                            name: "user1"
+                        },
+                        {
+                            id: 2
+                            name: "user2"
+                        }
+                    ]
                 }
             }) {
                 id
@@ -527,19 +533,19 @@ GRAPHQL
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Role(input: {
                 id: 1
-                name: \"is_user\"
+                name: "is_user"
                 users: {
                     ${action}: [{
                         id: 1
-                        name: \"user1\"
+                        name: "user1"
                     },
                     {
                         id: 2
-                        name: \"user2\"
+                        name: "user2"
                     }]
                 }
             }) {
@@ -551,7 +557,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Role" => [
                     'id' => '1',
@@ -590,11 +597,11 @@ GRAPHQL
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Role(input: {
                 id: 1
-                name: \"is_user\"
+                name: "is_user"
                 users: {
                     delete: [1]
                 }
@@ -606,7 +613,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Role" => [
                     'id' => '1',
@@ -642,7 +650,7 @@ GRAPHQL
                 factory(User::class)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Role(input: {
                 id: 1
@@ -657,16 +665,17 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
-                            'id' => '1',
+                            'id' => '2',
                         ],
                         [
-                            'id' => '2',
+                            'id' => '1',
                         ],
                     ],
                 ],
@@ -691,12 +700,12 @@ GRAPHQL
                 factory(User::class)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Role(input: {
                 id: 1
                 users: {
-                    sync: [1,2]
+                    sync: [1, 2]
                 }
             }) {
                 id
@@ -706,16 +715,17 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
-                            'id' => '1',
+                            'id' => '2',
                         ],
                         [
-                            'id' => '2',
+                            'id' => '1',
                         ],
                     ],
                 ],
@@ -739,7 +749,7 @@ GRAPHQL
                 factory(User::class, 2)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Role(input: {
                 id: 1
@@ -753,7 +763,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Role" => [
                     'id' => '1',
@@ -783,9 +794,7 @@ GRAPHQL
             createRole(input: {
                 name: "foobar"
                 users: {
-                    sync: [
-                        1,2
-                    ]
+                    sync: [1, 2]
                 }
             }) {
                 id
@@ -823,9 +832,7 @@ GRAPHQL
                 id: 1
                 name: "foobar"
                 users: {
-                    sync: [
-                        1,2
-                    ]
+                    sync: [1, 2]
                 }
             }) {
                 id
@@ -903,17 +910,17 @@ GRAPHQL
         $role2 = factory(Role::class)->create();
         $user->roles()->attach($role2);
 
-        $metaText = Lorem::sentence();
+        $meta = Lorem::sentence();
 
         $this->graphQL(/** @lang GraphQL */ '
-        mutation {
+        mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
                 roles: {
                     sync: [
                         {
                             id: 1,
-                            meta: "'.$metaText.'"
+                            meta: $meta
                         },
                         {
                             id: 2
@@ -929,20 +936,22 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        ', [
+            'meta' => $meta,
+        ])->assertJson([
             'data' => [
                 'pivotsUpdateUser' => [
                     'roles' => [
                         [
-                            'id' => 1,
-                            'pivot' => [
-                                'meta' => $metaText,
-                            ],
-                        ],
-                        [
                             'id' => 2,
                             'pivot' => [
                                 'meta' => null,
+                            ],
+                        ],
+                        [
+                            'id' => 1,
+                            'pivot' => [
+                                'meta' => $meta,
                             ],
                         ],
                     ],
@@ -958,17 +967,17 @@ GRAPHQL
         $role2 = factory(Role::class)->create();
         $user->roles()->attach($role2);
 
-        $metaText = Lorem::sentence();
+        $meta = Lorem::sentence();
 
         $this->graphQL(/** @lang GraphQL */ '
-        mutation {
+        mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
                 roles: {
                     syncWithoutDetaching: [
                         {
                             id: 1,
-                            meta: "'.$metaText.'"
+                            meta: $meta
                         }
                     ]
                 },
@@ -980,18 +989,20 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        ', [
+            'meta' => $meta,
+        ])->assertJson([
             'data' => [
                 'pivotsUpdateUser' => [
                     'roles' => [
                         [
                             'pivot' => [
-                                'meta' => $metaText,
+                                'meta' => null,
                             ],
                         ],
                         [
                             'pivot' => [
-                                'meta' => null,
+                                'meta' => $meta,
                             ],
                         ],
                     ],
@@ -1002,20 +1013,20 @@ GRAPHQL
 
     public function testCanConnectUserWithRoleAndPivotMetaByUsingConnect(): void
     {
-        $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        factory(User::class)->create();
+        factory(Role::class)->create();
 
-        $metaText = Lorem::sentence();
+        $meta = Lorem::sentence();
 
         $this->graphQL(/** @lang GraphQL */ '
-        mutation {
+        mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
                 roles: {
                     connect: [
                         {
                             id: 1,
-                            meta: "'.$metaText.'"
+                            meta: $meta
                         }
                     ]
                 },
@@ -1027,13 +1038,15 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        ', [
+            'meta' => $meta,
+        ])->assertJson([
             'data' => [
                 'pivotsUpdateUser' => [
                     'roles' => [
                         [
                             'pivot' => [
-                                'meta' => $metaText,
+                                'meta' => $meta,
                             ],
                         ],
                     ],
