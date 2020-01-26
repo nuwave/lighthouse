@@ -31,6 +31,7 @@ module.exports = [
         title: "Testing",
         children: [
             'testing/phpunit',
+            'testing/extensions',
         ],
     },
     {
