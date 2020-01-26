@@ -11,7 +11,6 @@ use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
@@ -41,7 +40,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        if(!$this->schema) {
+        if (! $this->schema) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
