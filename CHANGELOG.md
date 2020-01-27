@@ -22,14 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   may correspond to multiple different models https://github.com/nuwave/lighthouse/pull/1035
 - Fix renaming input fields that are nested within lists using @rename https://github.com/nuwave/lighthouse/pull/1166
 
-## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.1...4.8.0)
+## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
 ### Fixed
 
 - Avoid erasing the model information from the wrapping paginated results `type` when defining
   a paginated `@hasMany` field after a field with `@paginate` https://github.com/nuwave/lighthouse/pull/1149
 
-## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.7.2)
+## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.7.2...v4.8.0)
 
 ### Added
 
