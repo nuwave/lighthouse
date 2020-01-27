@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
 - Add test trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
+- Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
+  a dummy schema for testing custom Lighthouse extensions https://github.com/nuwave/lighthouse/pull/1171
 
 ### Fixed
 

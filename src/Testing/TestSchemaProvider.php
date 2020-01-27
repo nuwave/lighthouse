@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Nuwave\Lighthouse\Testing;
 
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
