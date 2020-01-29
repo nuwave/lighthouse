@@ -144,6 +144,42 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
+    public function testAllowsNullOperations(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertTask(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    connect: null
+                    create: null
+                    update: null
+                    upsert: null
+                    disconnect: null
+                    delete: null
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => null,
+                ],
+            ],
+        ]);
+    }
+
     public function testCanCreateWithNewBelongsTo(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
