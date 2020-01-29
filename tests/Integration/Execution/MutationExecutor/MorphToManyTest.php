@@ -7,7 +7,7 @@ use Tests\Utils\Models\Tag;
 
 class MorphToManyTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected $schema = '
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         upsertTask(input: UpsertTaskInput! @spread): Task @upsert
@@ -63,7 +63,7 @@ class MorphToManyTest extends DBTestCase
     {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL('
         mutation {
             createTask(input: {
                 name: "Finish tests"
@@ -71,7 +71,7 @@ class MorphToManyTest extends DBTestCase
                     connect: [1]
                 }
             }) {
-                tags {
+                tags{
                     id
                 }
             }
@@ -84,35 +84,6 @@ class MorphToManyTest extends DBTestCase
                             'id' => $id,
                         ],
                     ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testAllowsNullOperations(): void
-    {
-        $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            createTask(input: {
-                name: "Finish tests"
-                tags: {
-                    create: null
-                    upsert: null
-                    sync: null
-                    connect: null
-                }
-            }) {
-                name
-                tags {
-                    id
-                }
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'createTask' => [
-                    'name' => 'Finish tests',
-                    'tags' => [],
                 ],
             ],
         ]);

@@ -8,51 +8,51 @@ use Tests\Utils\Models\User;
 
 class HasManyTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected $schema = '
     type Task {
         id: ID!
         name: String!
     }
-
+    
     type User {
         id: ID!
         name: String
         tasks: [Task!]! @hasMany
     }
-
+    
     type Mutation {
         createUser(input: CreateUserInput! @spread): User @create
         updateUser(input: UpdateUserInput! @spread): User @update
         upsertUser(input: UpsertUserInput! @spread): User @upsert
     }
-
+    
     input CreateUserInput {
         name: String
         tasks: CreateTaskRelation
     }
-
+    
     input CreateTaskRelation {
         create: [CreateTaskInput!]
         upsert: [UpsertTaskInput!]
     }
-
+    
     input CreateTaskInput {
         name: String
     }
-
+        
     input UpdateUserInput {
         id: ID!
         name: String
         tasks: UpdateTaskRelation
     }
-
+    
     input UpdateTaskRelation {
         create: [CreateTaskInput!]
         update: [UpdateTaskInput!]
         upsert: [UpsertTaskInput!]
         delete: [ID!]
     }
-
+    
     input UpdateTaskInput {
         id: ID!
         name: String
@@ -79,16 +79,14 @@ class HasManyTest extends DBTestCase
 
     public function testCanCreateWithNewHasMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL('
         mutation {
             createUser(input: {
                 name: "foo"
                 tasks: {
-                    create: [
-                        {
-                            name: "bar"
-                        }
-                    ]
+                    create: [{
+                        name: "bar"
+                    }]
                 }
             }) {
                 id
@@ -110,38 +108,6 @@ class HasManyTest extends DBTestCase
                             'name' => 'bar',
                         ],
                     ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testAllowsNullOperations(): void
-    {
-        factory(User::class)->create();
-
-        $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            updateUser(input: {
-                id: 1
-                name: "foo"
-                tasks: {
-                    create: null
-                    update: null
-                    upsert: null
-                    delete: null
-                }
-            }) {
-                name
-                tasks {
-                    id
-                }
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'updateUser' => [
-                    'name' => 'foo',
-                    'tasks' => [],
                 ],
             ],
         ]);

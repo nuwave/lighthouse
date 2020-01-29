@@ -27,13 +27,13 @@ class NestedManyToMany implements ArgResolver
         /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
         $relation = $parent->{$this->relationName}();
 
-        if ($args->has('sync')) {
+        if (isset($args->arguments['sync'])) {
             $relation->sync(
                 $this->generateRelationArray($args->arguments['sync'])
             );
         }
 
-        if ($args->has('syncWithoutDetaching')) {
+        if (isset($args->arguments['syncWithoutDetaching'])) {
             $relation->syncWithoutDetaching(
                 $this->generateRelationArray($args->arguments['syncWithoutDetaching'])
             );
@@ -41,20 +41,20 @@ class NestedManyToMany implements ArgResolver
 
         NestedOneToMany::createUpdateUpsert($args, $relation);
 
-        if ($args->has('delete')) {
+        if (isset($args->arguments['delete'])) {
             $ids = $args->arguments['delete']->toPlain();
 
             $relation->detach($ids);
             $relation->getRelated()::destroy($ids);
         }
 
-        if ($args->has('connect')) {
+        if (isset($args->arguments['connect'])) {
             $relation->attach(
                 $this->generateRelationArray($args->arguments['connect'])
             );
         }
 
-        if ($args->has('disconnect')) {
+        if (isset($args->arguments['disconnect'])) {
             $relation->detach(
                 $args->arguments['disconnect']->toPlain()
             );

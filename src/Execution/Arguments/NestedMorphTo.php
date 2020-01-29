@@ -28,7 +28,7 @@ class NestedMorphTo implements ArgResolver
 
         // TODO implement create and update once we figure out how to do polymorphic input types https://github.com/nuwave/lighthouse/issues/900
 
-        if ($args->has('connect')) {
+        if (isset($args->arguments['connect'])) {
             $connectArgs = $args->arguments['connect']->value;
 
             $morphToModel = $relation->createModelByType(

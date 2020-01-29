@@ -11,26 +11,6 @@ use Tests\TestCase;
 
 class ArgumentSetTest extends TestCase
 {
-    public function testHasArgument(): void
-    {
-        $set = new ArgumentSet();
-
-        $this->assertFalse($set->has('foo'));
-
-        $set->arguments['foo'] = new Argument();
-        $this->assertFalse($set->has('foo'));
-
-        $arg = new Argument();
-        $arg->value = null;
-        $set->arguments['foo'] = $arg;
-        $this->assertFalse($set->has('foo'));
-
-        $arg = new Argument();
-        $arg->value = 0;
-        $set->arguments['foo'] = $arg;
-        $this->assertTrue($set->has('foo'));
-    }
-
     public function testSpreadsNestedInput(): void
     {
         $spreadDirective = new SpreadDirective();

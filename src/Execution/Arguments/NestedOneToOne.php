@@ -27,25 +27,25 @@ class NestedOneToOne implements ArgResolver
         $relation = $parent->{$this->relationName}();
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
-        if ($args->has('create')) {
+        if (isset($args->arguments['create'])) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 
             $saveModel($relation->make(), $args->arguments['create']->value);
         }
 
-        if ($args->has('update')) {
+        if (isset($args->arguments['update'])) {
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             $updateModel($relation->make(), $args->arguments['update']->value);
         }
 
-        if ($args->has('upsert')) {
+        if (isset($args->arguments['upsert'])) {
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             $upsertModel($relation->make(), $args->arguments['upsert']->value);
         }
 
-        if ($args->has('delete')) {
+        if (isset($args->arguments['delete'])) {
             $relation->getRelated()::destroy(
                 $args->arguments['delete']->toPlain()
             );

@@ -27,7 +27,7 @@ class NestedBelongsTo implements ArgResolver
         /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
         $relation = $parent->{$this->relationName}();
 
-        if ($args->has('create')) {
+        if (isset($args->arguments['create'])) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 
             $related = $saveModel(
@@ -37,11 +37,11 @@ class NestedBelongsTo implements ArgResolver
             $relation->associate($related);
         }
 
-        if ($args->has('connect')) {
+        if (isset($args->arguments['connect'])) {
             $relation->associate($args->arguments['connect']->value);
         }
 
-        if ($args->has('update')) {
+        if (isset($args->arguments['update'])) {
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             $related = $updateModel(
@@ -51,7 +51,7 @@ class NestedBelongsTo implements ArgResolver
             $relation->associate($related);
         }
 
-        if ($args->has('upsert')) {
+        if (isset($args->arguments['upsert'])) {
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             $related = $upsertModel(
@@ -71,14 +71,14 @@ class NestedBelongsTo implements ArgResolver
         // but GraphQL forces us to pass some value. It would be unintuitive for
         // the end user if the given value had no effect on the execution.
         if (
-            $args->has('disconnect')
+            isset($args->arguments['disconnect'])
             && $args->arguments['disconnect']->value
         ) {
             $relation->dissociate();
         }
 
         if (
-            $args->has('delete')
+            isset($args->arguments['delete'])
             && $args->arguments['delete']->value
         ) {
             $relation->dissociate();
