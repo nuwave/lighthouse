@@ -3,11 +3,12 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
 class MorphToTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID
         name: String
@@ -140,6 +141,37 @@ class MorphToTest extends DBTestCase
                         'id' => '1',
                         'name' => 'first_task',
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testAllowsNullOperations(): void
+    {
+        factory(Image::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateImage(input: {
+                id: 1
+                url: "foo"
+                imageable: {
+                    connect: null
+                    disconnect: null
+                    delete: null
+                }
+            }) {
+                url
+                imageable {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateImage' => [
+                    'url' => 'foo',
+                    'imageable' => null,
                 ],
             ],
         ]);

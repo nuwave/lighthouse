@@ -183,6 +183,38 @@ GRAPHQL
         ]);
     }
 
+    public function testAllowsNullOperations(): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "foo"
+                images: {
+                    create: null
+                    update: null
+                    upsert: null
+                    delete: null
+                }
+            }) {
+                name
+                images {
+                    url
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'name' => 'foo',
+                    'images' => [],
+                ],
+            ],
+        ]);
+    }
+
     public function existingModelMutations()
     {
         return [
