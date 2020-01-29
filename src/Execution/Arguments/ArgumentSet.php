@@ -55,7 +55,7 @@ class ArgumentSet
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
         $argument = $this->arguments[$key] ?? null;
 
-        if($argument === null) {
+        if ($argument === null) {
             return false;
         }
 
