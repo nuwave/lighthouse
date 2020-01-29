@@ -169,7 +169,7 @@ class MorphToTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                "updateImage" => [
+                'updateImage' => [
                     'url' => 'foo',
                     'imageable' => null,
                 ],

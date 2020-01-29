@@ -221,7 +221,7 @@ class HasOneTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateTask(input: {
                 id: 1
@@ -242,7 +242,7 @@ class HasOneTest extends DBTestCase
 GRAPHQL
         )->assertJson([
             'data' => [
-                "updateTask" => [
+                'updateTask' => [
                     'name' => 'foo',
                     'post' => null,
                 ],

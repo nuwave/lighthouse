@@ -182,6 +182,7 @@ GRAPHQL
             ],
         ]);
     }
+
     public function testAllowsNullOperations(): void
     {
         factory(Task::class)->create();
@@ -206,13 +207,14 @@ GRAPHQL
         }
         ')->assertJson([
             'data' => [
-                "updateTask" => [
+                'updateTask' => [
                     'name' => 'foo',
                     'images' => [],
                 ],
             ],
         ]);
     }
+
     public function existingModelMutations()
     {
         return [
