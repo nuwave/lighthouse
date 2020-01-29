@@ -45,6 +45,24 @@ class ArgumentSet
     }
 
     /**
+     * Check if the ArgumentSet has a non-null value with the given key.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
+        $argument = $this->arguments[$key] ?? null;
+
+        if($argument === null) {
+            return false;
+        }
+
+        return $argument->value !== null;
+    }
+
+    /**
      * Apply the @spread directive and return a new, modified instance.
      *
      * @return self
