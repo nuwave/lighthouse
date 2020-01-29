@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix eager-loading relations where the parent type is an `interface` or `union` and
   may correspond to multiple different models https://github.com/nuwave/lighthouse/pull/1035
 - Fix renaming input fields that are nested within lists using @rename https://github.com/nuwave/lighthouse/pull/1166
+- Fix handling of nested mutation operations that receive `null` https://github.com/nuwave/lighthouse/pull/1174
 
 ## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.1...4.8.0)
 
