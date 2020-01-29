@@ -25,9 +25,10 @@ class ArgumentSetTest extends TestCase
         $set->arguments['foo'] = $arg;
         $this->assertFalse($set->has('foo'));
 
-        $arg = new Argument();
-        $arg->value = 0;
-        $set->arguments['foo'] = $arg;
+        $arg->value = false;
+        $this->assertTrue($set->has('foo'));
+
+        $arg->value = 'foobar';
         $this->assertTrue($set->has('foo'));
     }
 
