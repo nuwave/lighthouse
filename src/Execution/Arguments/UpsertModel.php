@@ -37,12 +37,6 @@ class UpsertModel implements ArgResolver
                     ->newQuery()
                     ->find($id->value)
             ) {
-                // TODO there is a slight lingering bug here. In case the $model already
-                // has a parent relationship associated with it that differs from what is
-                // currently persisted, that change will be forgotten. How can we safely
-                // merge the values of $model and $existingModel together? Simply taking
-                // all values within $model and overwriting $existingModel could go wrong
-                // if $model has default attributes that have already been changed.
                 $model = $existingModel;
             }
         }
