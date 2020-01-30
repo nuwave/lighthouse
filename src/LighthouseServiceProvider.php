@@ -62,7 +62,7 @@ class LighthouseServiceProvider extends ServiceProvider
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__.'/../config/config.php' => $this->app->make('path.config').'/lighthouse.php',
+            __DIR__.'/lighthouse.php' => $this->app->make('path.config').'/lighthouse.php',
         ], 'config');
 
         $this->publishes([
@@ -105,7 +105,7 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
+        $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
         $this->app->singleton(ASTBuilder::class);

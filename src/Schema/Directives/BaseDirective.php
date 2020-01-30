@@ -4,9 +4,16 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -17,66 +24,48 @@ use Nuwave\Lighthouse\Support\Utils;
 abstract class BaseDirective implements Directive
 {
     /**
+     * The AST node of the directive.
+     *
+     * @var \GraphQL\Language\AST\DirectiveNode
+     */
+    protected $directiveNode;
+
+    /**
      * The node the directive is defined on.
      *
-     * @var \GraphQL\Language\AST\Node
+     * @see \GraphQL\Language\DirectiveLocation
+     *
+     * Intentionally leaving out the request definitions and the 'SCHEMA' location.
+     *
+     * @var ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode
      */
     protected $definitionNode;
 
     /**
+     * Returns the name of the used directive.
+     *
+     * TODO: Change to a strongly typed hint in v5
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return $this->directiveNode->name->value;
+    }
+
+    /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directiveNode
      * @param  \GraphQL\Language\AST\Node  $definitionNode
      * @return $this
      */
-    public function hydrate(Node $definitionNode): self
+    public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
+        $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
 
         return $this;
-    }
-
-    /**
-     * Get the directive definition associated with the current directive.
-     *
-     * @return \GraphQL\Language\AST\DirectiveNode
-     */
-    protected function directiveDefinition(): DirectiveNode
-    {
-        return ASTHelper::directiveDefinition(
-            $this->definitionNode,
-            static::name()
-        );
-    }
-
-    /**
-     * Get directive argument value.
-     *
-     * @param  string  $name
-     * @param  mixed|null  $default
-     * @return mixed|null
-     */
-    protected function directiveArgValue(string $name, $default = null)
-    {
-        return ASTHelper::directiveArgValue(
-            $this->directiveDefinition(),
-            $name,
-            $default
-        );
-    }
-
-    /**
-     * Does the current directive have an argument with the given name?
-     *
-     * @param  string  $name
-     * @return bool
-     */
-    public function directiveHasArgument(string $name): bool
-    {
-        return ASTHelper::directiveHasArgument(
-            $this->directiveDefinition(),
-            $name
-        );
     }
 
     /**
@@ -92,6 +81,50 @@ abstract class BaseDirective implements Directive
         $namespacedClassName = $this->namespaceClassName($className);
 
         return Utils::constructResolver($namespacedClassName, $methodName);
+    }
+
+    /**
+     * Does the current directive have an argument with the given name?
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function directiveHasArgument(string $name): bool
+    {
+        return ASTHelper::directiveHasArgument($this->directiveNode, $name);
+    }
+
+    /**
+     * The name of the node the directive is defined upon.
+     *
+     * @return string
+     */
+    protected function nodeName(): string
+    {
+        return $this->definitionNode->name->value;
+    }
+
+    /**
+     * Get the AST definition node associated with the current directive.
+     *
+     * @deprecated in favour of the plain property
+     * @return \GraphQL\Language\AST\DirectiveNode
+     */
+    protected function directiveDefinition(): DirectiveNode
+    {
+        return $this->directiveNode;
+    }
+
+    /**
+     * Get the value of an argument on the directive.
+     *
+     * @param  string  $name
+     * @param  mixed|null  $default
+     * @return mixed|null
+     */
+    protected function directiveArgValue(string $name, $default = null)
+    {
+        return ASTHelper::directiveArgValue($this->directiveNode, $name, $default);
     }
 
     /**
@@ -116,7 +149,7 @@ abstract class BaseDirective implements Directive
 
                 if (! isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(
-                        "Type '$returnTypeName' on '{$this->definitionNode->name->value}' can not be found in the schema.'"
+                        "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
                     );
                 }
                 $type = $documentAST->types[$returnTypeName];
@@ -127,13 +160,13 @@ abstract class BaseDirective implements Directive
                     $model = $returnTypeName;
                 }
             } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
-                $model = $this->definitionNode->name->value;
+                $model = $this->nodeName();
             }
         }
 
         if (! $model) {
             throw new DefinitionException(
-                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
             );
         }
 
@@ -141,6 +174,8 @@ abstract class BaseDirective implements Directive
     }
 
     /**
+     * Find a class name in a set of given namespaces.
+     *
      * @param  string  $classCandidate
      * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch
@@ -155,7 +190,7 @@ abstract class BaseDirective implements Directive
             $namespacesToTry,
             ASTHelper::getNamespaceForDirective(
                 $this->definitionNode,
-                static::name()
+                $this->name()
             )
         );
 

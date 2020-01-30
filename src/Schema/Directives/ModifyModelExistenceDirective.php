@@ -8,7 +8,7 @@ use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -91,13 +91,16 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * Get the type of the id argument.
      *
      * Not using an actual type hint, as the manipulateFieldDefinition function
-     * validates the type during schema build time.f
+     * validates the type during schema build time.
      *
      * @return \GraphQL\Language\AST\NonNullTypeNode
      */
     protected function idArgument()
     {
-        return $this->definitionNode->arguments[0]->type;
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldNode */
+        $fieldNode = $this->definitionNode;
+
+        return $fieldNode->arguments[0]->type;
     }
 
     /**
@@ -106,7 +109,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * @param  ObjectTypeDefinitionNode  $parentType
      * @return void
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
@@ -115,14 +118,14 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     ): void {
         // Ensure there is only a single argument defined on the field.
         if (count($this->definitionNode->arguments) !== 1) {
-            throw new DirectiveException(
-                'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
+            throw new DefinitionException(
+                'The @'.static::name()." directive requires the field {$this->nodeName()} to only contain a single argument."
             );
         }
 
         if (! $this->idArgument() instanceof NonNullTypeNode) {
-            throw new DirectiveException(
-                'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
+            throw new DefinitionException(
+                'The @'.static::name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
             );
         }
     }

@@ -14,6 +14,7 @@ use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -206,6 +207,8 @@ class GraphQL
             new ManipulateResult($result)
         );
 
+        $this->cleanUp();
+
         return $result;
     }
 
@@ -237,6 +240,16 @@ class GraphQL
             QueryDepth::class => new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
             DisableIntrospection::class => new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
         ];
+    }
+
+    /**
+     * Clean up after executing a query.
+     *
+     * @return void
+     */
+    protected function cleanUp(): void
+    {
+        BatchLoader::forgetInstances();
     }
 
     /**

@@ -10,16 +10,16 @@ class FieldDirectiveTest extends TestCase
 {
     public function testAssignsResolverFromCombinedDefinition(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             bar: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             bar
-        }        
+        }
         ')->assertJson([
             'data' => [
                 'bar' => 'foo.bar',
@@ -29,13 +29,13 @@ class FieldDirectiveTest extends TestCase
 
     public function testAssignsResolverWithInvokableClass(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             baz: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             baz
         }
@@ -48,16 +48,16 @@ class FieldDirectiveTest extends TestCase
 
     public function testCanResolveFieldWithMergedArgs(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args:["foo.baz"])
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             bar
-        }        
+        }
         ')->assertJson([
             'data' => [
                 'bar' => 'foo.baz',
@@ -67,16 +67,16 @@ class FieldDirectiveTest extends TestCase
 
     public function testUsesDefaultFieldNamespace(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             bar: String! @field(resolver: "FooBar@customResolve")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             bar
-        }        
+        }
         ')->assertJson([
             'data' => [
                 'bar' => FooBar::CUSTOM_RESOLVE_RESULT,
@@ -86,13 +86,13 @@ class FieldDirectiveTest extends TestCase
 
     public function testUsesDefaultFieldNamespaceForInvokableClass(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             baz: String! @field(resolver: "FooBar")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             baz
         }
@@ -106,33 +106,33 @@ class FieldDirectiveTest extends TestCase
     public function testThrowsAnErrorWhenNoClassFound(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage("No class 'bar' was found for directive 'field'");
+        $this->expectExceptionMessage("No class 'NonExisting' was found for directive 'field'");
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            bar: String! @field(resolver: "bar")
+            foo: String! @field(resolver: "NonExisting")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            bar
-        }        
+            foo
+        }
         ');
     }
 
-    public function testThrowsAnErrorWhenClassIsntInvokable(): void
+    public function testThrowsAnErrorWhenClassIsNotInvokable(): void
     {
         $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\Foo'");
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             bar: String! @field(resolver: "Foo")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             bar
         }

@@ -21,9 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 
@@ -42,19 +40,9 @@ class FieldFactory
     protected $argumentFactory;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver
-     */
-    protected $providesResolver;
-
-    /**
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
-
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver
-     */
-    protected $providesSubscriptionResolver;
 
     /**
      * @var \Illuminate\Contracts\Validation\Factory
@@ -100,8 +88,6 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver  $providesResolver
-     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver  $providesSubscriptionResolver
      * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
      * @param  \Nuwave\Lighthouse\Execution\Arguments\TypedArgs  $typedArgs
      * @return void
@@ -110,16 +96,12 @@ class FieldFactory
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
-        ProvidesResolver $providesResolver,
-        ProvidesSubscriptionResolver $providesSubscriptionResolver,
         ValidationFactory $validationFactory,
         TypedArgs $typedArgs
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
-        $this->providesResolver = $providesResolver;
-        $this->providesSubscriptionResolver = $providesSubscriptionResolver;
         $this->validationFactory = $validationFactory;
         $this->typedArgs = $typedArgs;
     }
@@ -139,11 +121,7 @@ class FieldFactory
         if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
             $this->fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
-            $this->fieldValue = $fieldValue->setResolver(
-                $fieldValue->getParentName() === 'Subscription'
-                    ? $this->providesSubscriptionResolver->provideSubscriptionResolver($fieldValue)
-                    : $this->providesResolver->provideResolver($fieldValue)
-            );
+            $this->fieldValue = $fieldValue->useDefaultResolver();
         }
 
         $fieldMiddleware = $this->passResolverArguments(
@@ -184,10 +162,17 @@ class FieldFactory
                 $this->flushValidationErrorBuffer();
 
                 $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
-                $spreadArguments = $argumentSet->spread();
-                $this->resolveInfo->argumentSet = $spreadArguments;
+                $modifiedArgumentSet = $argumentSet
+                    ->spread()
+                    ->rename();
+                $this->resolveInfo->argumentSet = $modifiedArgumentSet;
 
-                return $resolverWithMiddleware($this->root, $spreadArguments->toArray(), $this->context, $this->resolveInfo);
+                return $resolverWithMiddleware(
+                    $this->root,
+                    $modifiedArgumentSet->toArray(),
+                    $this->context,
+                    $this->resolveInfo
+                );
             }
         );
 
@@ -320,9 +305,14 @@ class FieldFactory
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
             if ($directive instanceof ProvidesRules) {
-                // We gather the rules from all arguments and then run validation in one full swoop
-                $this->rules = array_merge($this->rules, $directive->rules());
-                $this->messages = array_merge($this->messages, $directive->messages());
+                $validators = $this->gatherValidationDirectives($directives);
+
+                $validators->push($directive);
+                foreach ($validators as $validator) {
+                    // We gather the rules from all arguments and then run validation in one full swoop
+                    $this->rules = array_merge_recursive($this->rules, $validator->rules());
+                    $this->messages = array_merge_recursive($this->messages, $validator->messages());
+                }
 
                 break;
             }
@@ -340,6 +330,23 @@ class FieldFactory
         if ($directives->isNotEmpty()) {
             $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
         }
+    }
+
+    protected function gatherValidationDirectives(Collection &$directives): Collection
+    {
+        // We only get the validator directives that are directly following on the latest validator
+        // directive. If we'd get all validator directives and merge them together, it wouldn't
+        // be possible anymore to mutate the input with argument transformer directives.
+        $validators = new Collection();
+        while ($directive = $directives->first()) {
+            if ($directive instanceof ProvidesRules) {
+                $validators->push($directives->shift());
+            } else {
+                return $validators;
+            }
+        }
+
+        return $validators;
     }
 
     protected function argValueExists(array $argumentPath): bool

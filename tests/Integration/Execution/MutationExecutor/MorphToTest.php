@@ -3,68 +3,69 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
 class MorphToTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID
         name: String
     }
-    
-    type Hour {
+
+    type Image {
         id: ID
-        weekday: Int
-        hourable: Task
-    }
-    
-    type Mutation {
-        createHour(input: CreateHourInput! @spread): Hour @create
-        updateHour(input: UpdateHourInput! @spread): Hour @update
-        upsertHour(input: UpsertHourInput! @spread): Hour @upsert
-    }
-    
-    input CreateHourInput {
-        from: String
-        to: String
-        weekday: Int
-        hourable: CreateHourableOperations
-    }
-    
-    input CreateHourableOperations {
-        connect: ConnectHourableInput
+        url: String
+        imageable: Task
     }
 
-    input ConnectHourableInput {
+    type Mutation {
+        createImage(input: CreateImageInput! @spread): Image @create
+        updateImage(input: UpdateImageInput! @spread): Image @update
+        upsertImage(input: UpsertImageInput! @spread): Image @upsert
+    }
+
+    input CreateImageInput {
+        from: String
+        to: String
+        url: String
+        imageable: CreateImageableOperations
+    }
+
+    input CreateImageableOperations {
+        connect: ConnectImageableInput
+    }
+
+    input ConnectImageableInput {
         type: String!
         id: ID!
     }
 
-    input UpdateHourInput {
+    input UpdateImageInput {
         id: ID!
         from: String
         to: String
-        weekday: Int
-        hourable: UpdateHourableOperations
+        url: String
+        imageable: UpdateImageableOperations
     }
-    
-    input UpdateHourableOperations {
-        connect: ConnectHourableInput
+
+    input UpdateImageableOperations {
+        connect: ConnectImageableInput
         disconnect: Boolean
         delete: Boolean
     }
-    
-    input UpsertHourInput {
+
+    input UpsertImageInput {
         id: ID!
         from: String
         to: String
-        weekday: Int
-        hourable: UpsertHourableOperations
+        url: String
+        imageable: UpsertImageableOperations
     }
 
-    input UpsertHourableOperations {
-        connect: ConnectHourableInput
+    input UpsertImageableOperations {
+        connect: ConnectImageableInput
         disconnect: Boolean
         delete: Boolean
     }
@@ -74,11 +75,11 @@ class MorphToTest extends DBTestCase
     {
         factory(Task::class)->create(['name' => 'first_task']);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
-            createHour(input: {
-                weekday: 2
-                hourable: {
+            createImage(input: {
+                url: "foo"
+                imageable: {
                     connect: {
                         type: "Tests\\\Utils\\\Models\\\Task"
                         id: 1
@@ -86,8 +87,8 @@ class MorphToTest extends DBTestCase
                 }
             }) {
                 id
-                weekday
-                hourable {
+                url
+                imageable {
                     id
                     name
                 }
@@ -95,10 +96,10 @@ class MorphToTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'createHour' => [
+                'createImage' => [
                     'id' => '1',
-                    'weekday' => 2,
-                    'hourable' => [
+                    'url' => 'foo',
+                    'imageable' => [
                         'id' => '1',
                         'name' => 'first_task',
                     ],
@@ -111,12 +112,12 @@ class MorphToTest extends DBTestCase
     {
         factory(Task::class)->create(['name' => 'first_task']);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
-            upsertHour(input: {
+            upsertImage(input: {
                 id: 1
-                weekday: 2
-                hourable: {
+                url: "foo"
+                imageable: {
                     connect: {
                         type: "Tests\\\Utils\\\Models\\\Task"
                         id: 1
@@ -124,8 +125,8 @@ class MorphToTest extends DBTestCase
                 }
             }) {
                 id
-                weekday
-                hourable {
+                url
+                imageable {
                     id
                     name
                 }
@@ -133,13 +134,44 @@ class MorphToTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'upsertHour' => [
+                'upsertImage' => [
                     'id' => '1',
-                    'weekday' => 2,
-                    'hourable' => [
+                    'url' => 'foo',
+                    'imageable' => [
                         'id' => '1',
                         'name' => 'first_task',
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testAllowsNullOperations(): void
+    {
+        factory(Image::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateImage(input: {
+                id: 1
+                url: "foo"
+                imageable: {
+                    connect: null
+                    disconnect: null
+                    delete: null
+                }
+            }) {
+                url
+                imageable {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateImage' => [
+                    'url' => 'foo',
+                    'imageable' => null,
                 ],
             ],
         ]);
@@ -160,21 +192,21 @@ class MorphToTest extends DBTestCase
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
-        $task->hour()->create([
-            'weekday' => 1,
+        $task->image()->create([
+            'url' => 'bar',
         ]);
 
         $this->graphQL("
         mutation {
-            ${action}Hour(input: {
+            ${action}Image(input: {
                 id: 1
-                weekday: 2
-                hourable: {
+                url: \"foo\"
+                imageable: {
                     disconnect: true
                 }
             }) {
-                weekday
-                hourable {
+                url
+                imageable {
                     id
                     name
                 }
@@ -182,9 +214,9 @@ class MorphToTest extends DBTestCase
         }
         ")->assertJson([
             'data' => [
-                "${action}Hour" => [
-                    'weekday' => 2,
-                    'hourable' => null,
+                "${action}Image" => [
+                    'url' => 'foo',
+                    'imageable' => null,
                 ],
             ],
         ]);
@@ -197,21 +229,21 @@ class MorphToTest extends DBTestCase
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
-        $task->hour()->create([
-            'weekday' => 1,
+        $task->image()->create([
+            'url' => 'bar',
         ]);
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Hour(input: {
+            ${action}Image(input: {
                 id: 1
-                weekday: 2
-                hourable: {
+                url: \"foo\"
+                imageable: {
                     delete: true
                 }
             }) {
-                weekday
-                hourable {
+                url
+                imageable {
                     id
                     name
                 }
@@ -219,9 +251,9 @@ class MorphToTest extends DBTestCase
         }
         ")->assertJson([
             'data' => [
-                "${action}Hour" => [
-                    'weekday' => 2,
-                    'hourable' => null,
+                "${action}Image" => [
+                    'url' => 'foo',
+                    'imageable' => null,
                 ],
             ],
         ]);

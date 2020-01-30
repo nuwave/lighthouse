@@ -11,19 +11,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class BroadcastDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'broadcast';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 directive @broadcast(
   """
   Name of the subscription that should be retriggered as a result of this operation..

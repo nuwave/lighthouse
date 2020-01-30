@@ -15,6 +15,11 @@ class Post extends Model
 
     protected $guarded = [];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
@@ -25,12 +30,12 @@ class Post extends Model
         return $this->belongsTo(Task::class);
     }
 
-    public function parent() : BelongsTo
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class);
     }
 
-    public function children() : HasMany
+    public function children(): HasMany
     {
         return $this->hasMany(self::class);
     }
@@ -40,8 +45,8 @@ class Post extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    public function hours(): MorphMany
+    public function images(): MorphMany
     {
-        return $this->morphMany(Hour::class, 'hourable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 }

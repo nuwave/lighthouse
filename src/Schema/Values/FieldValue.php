@@ -7,6 +7,8 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldValue
 {
@@ -34,7 +36,7 @@ class FieldValue
     /**
      * The actual field resolver.
      *
-     * @var \Closure|null
+     * @var callable|null
      */
     protected $resolver;
 
@@ -68,12 +70,26 @@ class FieldValue
     /**
      * Overwrite the current/default resolver.
      *
-     * @param  \Closure  $resolver
+     * @param  callable  $resolver
      * @return $this
      */
-    public function setResolver(Closure $resolver): self
+    public function setResolver(callable $resolver): self
     {
         $this->resolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Use the default resolver.
+     *
+     * @return $this
+     */
+    public function useDefaultResolver(): self
+    {
+        $this->resolver = $this->getParentName() === 'Subscription'
+            ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
+            : app(ProvidesResolver::class)->provideResolver($this);
 
         return $this;
     }
@@ -149,9 +165,9 @@ class FieldValue
     /**
      * Get field resolver.
      *
-     * @return \Closure
+     * @return callable|null
      */
-    public function getResolver(): ?Closure
+    public function getResolver(): ?callable
     {
         return $this->resolver;
     }

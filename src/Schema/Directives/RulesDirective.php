@@ -2,38 +2,37 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 
-class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract, DefinedDirective
+class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract, DefinedDirective, ArgManipulator
 {
     use HasArgumentPathTrait;
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'rules';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
-Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
+Validate an argument using [Laravel validation](https://laravel.com/docs/validation).
 """
 directive @rules(
   """
   Specify the validation rules to apply to the field.
-  This can either be a reference to any of Laravel\'s built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
+  This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules),
   or the fully qualified class name of a custom validation rule.
+
+  Rules that mutate the incoming arguments, such as `exclude_if`, are not supported
+  by Lighthouse. Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
   """
   apply: [String!]!
 
@@ -78,5 +77,18 @@ SDL;
                 return ["{$argumentPath}.{$rule}" => $message];
             })
             ->all();
+    }
+
+    public function manipulateArgDefinition(
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ) {
+        $rules = $this->directiveArgValue('apply');
+
+        if (! is_array($rules)) {
+            throw new DefinitionException("The apply argument of @rules on has to be an array, got: {$rules}");
+        }
     }
 }

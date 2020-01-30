@@ -24,12 +24,14 @@ module.exports = [
             'eloquent/polymorphic-relationships',
             'eloquent/soft-deleting',
             'eloquent/nested-mutations',
+            'eloquent/complex-where-conditions',
         ]
     },
     {
         title: "Testing",
         children: [
             'testing/phpunit',
+            'testing/extensions',
         ],
     },
     {
@@ -68,6 +70,7 @@ module.exports = [
             'security/authentication',
             'security/authorization',
             'security/validation',
+            'security/sanitization',
             ['security/resource-exhaustion', 'Resource Exhaustion'],
         ]
     },
@@ -79,6 +82,12 @@ module.exports = [
             'performance/deferred',
             'performance/tracing',
             'performance/server-configuration',
+        ]
+    },
+    {
+        title: 'Concepts',
+        children: [
+            'concepts/arg-resolvers',
         ]
     },
     {

@@ -32,7 +32,7 @@ The `graphQL` test helper runs a query on your GraphQL endpoint and returns a `T
 public function testQueriesPosts(): void
 {
     /** @var \Illuminate\Foundation\Testing\TestResponse $response */
-    $response = $this->graphQL('
+    $response = $this->graphQL(/** @lang GraphQL */ '
     {
         posts {
             id
@@ -43,23 +43,20 @@ public function testQueriesPosts(): void
 }
 ```
 
-If you want to use variables within your query, you can use the `postGraphQL` function instead.
+If you want to use variables within your query, pass an associative array as the second argument:
 
 ```php
 public function testCreatePost(): void
 {
     /** @var \Illuminate\Foundation\Testing\TestResponse $response */
-    $response = $this->postGraphQL([
-        'query' => '
-            mutation CreatePost($title: String!) {
-                createPost(title: $title) {
-                    id
-                }
+    $response = $this->graphQL(/** @lang GraphQL */ '
+        mutation CreatePost($title: String!) {
+            createPost(title: $title) {
+                id
             }
-        ',
-        'variables' => [
-            'title' => 'Automatic testing proven to reduce stress levels in developers'
-        ],
+        }
+    ', [
+        'title' => 'Automatic testing proven to reduce stress levels in developers'
     ]);
 }
 ```
@@ -79,7 +76,7 @@ public function testQueriesPosts(): void
 {
     $post = factory(Post::class)->create();
 
-    $this->graphQL('
+    $this->graphQL(/** @lang GraphQL */ '
     {
         posts {
             id
@@ -108,7 +105,7 @@ public function testOrdersUsersByName(): void
     factory(User::class)->create(['name' => 'Chris']);
     factory(User::class)->create(['name' => 'Benedikt']);
 
-    $response = $this->graphQL('
+    $response = $this->graphQL(/** @lang GraphQL */ '
     {
         users(orderBy: "name") {
             name
@@ -139,7 +136,7 @@ helper method.
 ```php
 $this->multipartGraphQL(
     [
-        'operations' => /* @lang JSON */
+        'operations' => /** @lang JSON */
             '
             {
                 "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
@@ -148,7 +145,7 @@ $this->multipartGraphQL(
                 }
             }
         ',
-        'map' => /* @lang JSON */
+        'map' => /** @lang JSON */
             '
             {
                 "0": ["variables.file"]
@@ -189,4 +186,41 @@ You can also introspect client directives.
 
 ```php
 $customDirective = $this->introspectDirective('custom');
+```
+
+## Lumen
+
+Because the `TestResponse` class is not available in Lumen, you must use a different
+test trait:
+
+```diff
+<?php
+
+namespace Tests;
+
++use Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen;
+
+abstract class TestCase extends Laravel\Lumen\Testing\TestCase
+{
++   use MakesGraphQLRequestsLumen;
+}
+```
+
+All the test helpers are called the same as in `MakesGraphQLRequest`, the only
+difference is that they return `$this` instead of a `TestResponse`.
+Assertions work differently as a result:
+
+```php
+public function testHelloWorld(): void
+{
+    $this->graphQL(/** @lang GraphQL */ '
+    {
+        hello
+    }
+    ')->seeJson([
+        'data' => [
+            'hello' => 'world'
+        ]
+    ])->seeHeader('SomeHeader', 'value');
+}
 ```

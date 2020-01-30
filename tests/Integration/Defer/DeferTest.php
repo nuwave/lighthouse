@@ -35,14 +35,14 @@ class DeferTest extends TestCase
 
     public function testAddsTheDeferClientDirective(): void
     {
-        $introspection = $this->graphQL('
-          query IntrospectionQuery {
-            __schema {
-              directives {
-                name
-              }
+        $introspection = $this->graphQL(/** @lang GraphQL */ '
+        query IntrospectionQuery {
+          __schema {
+            directives {
+              name
             }
           }
+        }
         ');
 
         $this->assertTrue(
@@ -74,7 +74,7 @@ class DeferTest extends TestCase
         ";
 
         $chunks = $this->getStreamedChunks('
-        { 
+        {
             user {
                 name
                 parent @defer {
@@ -130,7 +130,7 @@ class DeferTest extends TestCase
         ";
 
         $chunks = $this->getStreamedChunks('
-        { 
+        {
             user {
                 name
                 parent @defer {
@@ -168,16 +168,16 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User
         }
-        
+
         type Query {
             user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
-        
+
         type Mutation {
             updateUser(name: String!): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
@@ -185,7 +185,7 @@ class DeferTest extends TestCase
         ";
 
         $chunks = $this->getStreamedChunks('
-        mutation { 
+        mutation {
             updateUser(
                 name: "Foo"
             ) {
@@ -236,23 +236,23 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ "
         type Post {
             title: String
             author: User
         }
-        
+
         type User {
             name: String!
         }
-        
+
         type Query {
             posts: [Post] @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
         $chunks = $this->getStreamedChunks('
-        { 
+        {
             posts {
                 title
                 author @defer {
@@ -297,28 +297,28 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ "
         type Comment {
             message: String
         }
-        
+
         type Post {
             title: String
             author: User
             comments: [Comment]
         }
-        
+
         type User {
             name: String!
         }
-        
+
         type Query {
             posts: [Post] @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
         $chunks = $this->getStreamedChunks('
-        { 
+        {
             posts {
                 title
                 author @defer {
@@ -380,7 +380,7 @@ class DeferTest extends TestCase
         ];
 
         $chunks = $this->getStreamedChunks('
-        { 
+        {
             user {
                 name
                 parent @defer {
@@ -434,7 +434,7 @@ class DeferTest extends TestCase
         ];
 
         $chunks = $this->getStreamedChunks('
-        { 
+        {
             user {
                 name
                 parent @defer {
@@ -479,8 +479,8 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
-        { 
+        $this->graphQL(/** @lang GraphQL */ '
+        {
             user {
                 name
                 parent @defer {
@@ -523,8 +523,8 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
-        { 
+        $this->graphQL(/** @lang GraphQL */ '
+        {
             userInclude: user {
                 name
                 parent @defer @include(if: false) {
@@ -570,14 +570,14 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         fragment UserWithParent on User {
             name
             parent {
                 name
             }
         }
-        { 
+        query {
             user {
                 ...UserWithParent
                 parent @defer {
@@ -598,26 +598,26 @@ class DeferTest extends TestCase
             'name' => 'John Doe',
         ];
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User
         }
-        
+
         type Query {
             user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
-        
+
         type Mutation {
             updateUser(name: String!): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation UpdateUser {
             updateUser(name: "John Doe") @defer {
-                name 
+                name
             }
         }
         ')->assertJson([
@@ -638,18 +638,18 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User
         }
-        
+
         type Query {
             user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -674,12 +674,12 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ "
         type User {
             name: String!
             parent: User @field(resolver: \"{$this->qualifyTestResolver('throw')}\")
         }
-        
+
         type Query {
             user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }

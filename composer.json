@@ -34,7 +34,7 @@
         "webonyx/graphql-php": "^0.13.2"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "^1.22",
+        "bensampo/laravel-enum": "^1.28",
         "haydenpierce/class-finder": "^0.4.0",
         "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
         "laravel/scout": "^4.0 || ^5.0 || ^6.0 || ^7.0",
@@ -45,12 +45,13 @@
         "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0",
         "orchestra/testbench": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0",
         "phpbench/phpbench": "@dev",
+        "phpunit/phpunit": "^6.5 || ^7.5 || ^8.4",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
         "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",
         "laravel/scout": "Required for the @search directive",
-        "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConstraints",
+        "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
         "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel"
     },
     "config": {
@@ -60,7 +61,8 @@
         "laravel": {
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
-                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider"
+                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
+                "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider"
             ],
             "aliases": {
                 "graphql": "Nuwave\\Lighthouse\\GraphQL"

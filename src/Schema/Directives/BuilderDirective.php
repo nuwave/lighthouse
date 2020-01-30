@@ -7,19 +7,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class BuilderDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'builder';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use an argument to modify the query builder for a field.
 """
@@ -30,7 +20,7 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on ARGUMENT_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 

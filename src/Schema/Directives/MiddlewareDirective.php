@@ -3,15 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -25,14 +22,11 @@ use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Pipeline;
 
+/**
+ * @deprecated Will be removed in v5
+ */
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator, DefinedDirective
 {
-    /**
-     * todo remove as soon as name() is static itself.
-     * @var string
-     */
-    const NAME = 'middleware';
-
     /**
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
@@ -63,27 +57,21 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
         $this->middlewareAdapter = $middlewareAdapter;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
-directive @middleware(      
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Run Laravel middleware for a specific field or group of fields.
+This can be handy to reuse existing HTTP middleware.
+"""
+directive @middleware(
   """
-  Specify which middleware to run. 
+  Specify which middleware to run.
   Pass in either a fully qualified class name, an alias or
   a middleware group - or any combination of them.
   """
   checks: [String!]
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | OBJECT
 SDL;
     }
 
@@ -145,7 +133,7 @@ SDL;
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        self::addMiddlewareDirectiveToFields($typeDefinition);
+        $this->addMiddlewareDirectiveToFields($typeDefinition);
     }
 
     /**
@@ -154,19 +142,10 @@ SDL;
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    public function addMiddlewareDirectiveToFields(&$objectType): void
+    protected function addMiddlewareDirectiveToFields(&$objectType): void
     {
-        if (
-            ! $objectType instanceof ObjectTypeDefinitionNode
-            && ! $objectType instanceof ObjectTypeExtensionNode
-        ) {
-            throw new DirectiveException(
-                'The '.self::NAME.' directive may only be placed on fields or object types.'
-            );
-        }
-
         $middlewareArgValue = (new Collection($this->directiveArgValue('checks')))
-            ->map(function (string $middleware) : string {
+            ->map(function (string $middleware): string {
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
             })
@@ -174,16 +153,7 @@ SDL;
 
         $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
-        foreach ($objectType->fields as $fieldDefinition) {
-            // If the field already has middleware defined, skip over it
-            // Field middleware are more specific then those defined on a type
-            if (ASTHelper::hasDirective($fieldDefinition, self::NAME)) {
-                return;
-            }
-
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
-        }
+        ASTHelper::addDirectiveToFields($middlewareDirective, $objectType);
     }
 
     /**
@@ -195,6 +165,6 @@ SDL;
      */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
-        self::addMiddlewareDirectiveToFields($typeExtension);
+        $this->addMiddlewareDirectiveToFields($typeExtension);
     }
 }

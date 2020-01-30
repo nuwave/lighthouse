@@ -13,19 +13,19 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "adminOnly")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -40,19 +40,20 @@ class CanDirectiveTest extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->schema = '
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "adminOnly")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -73,19 +74,20 @@ class CanDirectiveTest extends TestCase
             $this->markTestSkipped('Version less than 5.7 do not support guest user.');
         }
 
-        $this->schema = '
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "guestOnly")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -106,19 +108,20 @@ class CanDirectiveTest extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->schema = '
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: ["adminOnly", "alwaysTrue"])
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -135,19 +138,19 @@ class CanDirectiveTest extends TestCase
 
     public function testProcessesTheArgsArgument(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "dependingOnArg", args: [false])
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -159,19 +162,21 @@ class CanDirectiveTest extends TestCase
     public function testInjectArgsPassesClientArgumentToPolicy(): void
     {
         $this->be(new User);
-        $this->schema = /* @lang GraphQL */'
+
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!
                 @can(ability:"injectArgs", injectArgs: true)
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(foo: "bar"){
                 name
@@ -189,7 +194,9 @@ class CanDirectiveTest extends TestCase
     public function testInjectedArgsAndStaticArgs(): void
     {
         $this->be(new User);
-        $this->schema = /* @lang GraphQL */'
+
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!
                 @can(
@@ -197,15 +204,15 @@ class CanDirectiveTest extends TestCase
                     args: { foo: "static" }
                     injectArgs: true
                 )
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(foo: "dynamic"){
                 name

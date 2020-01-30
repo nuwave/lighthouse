@@ -9,14 +9,9 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ScopeDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    public function name()
-    {
-        return 'scope';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Adds a scope to the query builder.
 The scope method will receive the client-given value of the argument as the second parameter.
@@ -26,7 +21,7 @@ directive @scope(
   The name of the scope.
   """
   name: String
-) on ARGUMENT_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -46,7 +41,7 @@ SDL;
             return $builder->{$scope}($value);
         } catch (BadMethodCallException $exception) {
             throw new DefinitionException(
-                $exception->getMessage()." in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
+                $exception->getMessage()." in {$this->name()} directive on {$this->nodeName()} argument.",
                 $exception->getCode(),
                 $exception->getPrevious()
             );

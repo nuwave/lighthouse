@@ -68,7 +68,7 @@ This mutation will return the restored object.
 
 ## Permanently Deleting Models
 
-To truly remove model from database,
+To truly remove a model from the database,
 use the [@forceDelete](../api-reference/directives.md#forcedelete) directive.
 Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait. 
 
@@ -78,7 +78,7 @@ type Mutation {
 }
 ```
 
-Simply call it with the ID of the Flight you want to permanently remove.
+Simply call it with the ID of the `Flight` you want to permanently remove.
 
 ```graphql
 mutation {

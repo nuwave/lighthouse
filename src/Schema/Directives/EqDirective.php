@@ -7,22 +7,12 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'eq';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
-directive @eq(  
+        return /** @lang GraphQL */ <<<'SDL'
+directive @eq(
   """
-  Specify the database column to compare. 
+  Specify the database column to compare.
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
@@ -40,7 +30,7 @@ SDL;
     public function handleBuilder($builder, $value)
     {
         return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }

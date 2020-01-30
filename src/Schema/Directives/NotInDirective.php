@@ -7,23 +7,13 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class NotInDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'notIn';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Filter a column by an array using a `whereNotIn` clause.
 """
-directive @notIn(      
+directive @notIn(
   """
   Specify the name of the column.
   Only required if it differs from the name of the argument.
@@ -43,7 +33,7 @@ SDL;
     public function handleBuilder($builder, $values)
     {
         return $builder->whereNotIn(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $values
         );
     }
