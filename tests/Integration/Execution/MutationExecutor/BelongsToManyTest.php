@@ -454,6 +454,45 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
+    public function testAllowsNullOperations(): void
+    {
+        factory(Role::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateRole(input: {
+                id: 1
+                name: "is_user"
+                users: {
+                    create: null
+                    update: null
+                    upsert: null
+                    delete: null
+                    connect: null
+                    sync: null
+                    syncWithoutDetaching: null
+                    disconnect: null
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateRole' => [
+                    'id' => '1',
+                    'name' => 'is_user',
+                    'users' => [],
+                ],
+            ],
+        ]);
+    }
+
     public function testCanUpsertUsingCreationWithBelongsToMany(): void
     {
         factory(Role::class)->create([

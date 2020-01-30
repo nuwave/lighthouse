@@ -217,6 +217,39 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
+    public function testAllowsNullOperations(): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    create: null
+                    update: null
+                    upsert: null
+                    delete: null
+                }
+            }) {
+                name
+                post {
+                    id
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'name' => 'foo',
+                    'post' => null,
+                ],
+            ],
+        ]);
+    }
+
     public function existingModelMutations(): array
     {
         return [

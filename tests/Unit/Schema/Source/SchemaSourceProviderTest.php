@@ -24,6 +24,10 @@ class SchemaSourceProviderTest extends TestCase
     {
         parent::setUp();
 
+        app()->singleton(SchemaSourceProvider::class, function () {
+            return new SchemaStitcher(config('lighthouse.schema.register', ''));
+        });
+
         $currentDir = new Filesystem(new Local(__DIR__));
 
         $currentDir->deleteDir('schema');
@@ -39,13 +43,6 @@ class SchemaSourceProviderTest extends TestCase
         $currentDir = new Filesystem(new Local(__DIR__));
 
         $currentDir->deleteDir('schema');
-    }
-
-    protected function getEnvironmentSetUp($app)
-    {
-        $app->singleton(SchemaSourceProvider::class, function () {
-            return new SchemaStitcher(config('lighthouse.schema.register', ''));
-        });
     }
 
     public function testCanSetRootPath(): void
