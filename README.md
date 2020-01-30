@@ -56,6 +56,10 @@ We welcome contributions of any kind.
 
 All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG.md).
 
+## Upgrade Guide
+
+When upgrading between major versions of Lighthouse, consider [`UPGRADE.MD`](UPGRADE.md).
+
 ## Contributing
 
 See how you can start [`CONTRIBUTING.md`](CONTRIBUTING.md) to this project.

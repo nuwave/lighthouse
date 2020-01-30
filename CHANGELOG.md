@@ -26,14 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix handling of nested mutation operations that receive `null` https://github.com/nuwave/lighthouse/pull/1174
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
 
-## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.1...4.8.0)
+## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
 ### Fixed
 
 - Avoid erasing the model information from the wrapping paginated results `type` when defining
   a paginated `@hasMany` field after a field with `@paginate` https://github.com/nuwave/lighthouse/pull/1149
 
-## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.7.2)
+## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.7.2...v4.8.0)
 
 ### Added
 
