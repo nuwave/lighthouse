@@ -22,8 +22,6 @@ class ManipulateAST
     public $documentAST;
 
     /**
-     * BuildSchemaString constructor.
-     *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return void
      */
