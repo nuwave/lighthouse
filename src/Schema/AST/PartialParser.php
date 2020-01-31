@@ -12,6 +12,7 @@ use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
@@ -262,6 +263,20 @@ class PartialParser
         return self::validateType(
             self::parseType($typeName),
             NamedTypeNode::class
+        );
+    }
+
+    /**
+     * @param  string  $typeDefinition
+     * @return \GraphQL\Language\AST\ListTypeNode
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
+     */
+    public static function listType(string $typeDefinition): ListTypeNode
+    {
+        return self::validateType(
+            self::parseType($typeDefinition),
+            ListTypeNode::class
         );
     }
 

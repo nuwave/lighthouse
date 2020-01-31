@@ -10,11 +10,12 @@ use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
+use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Tests\Utils\Middleware\CountRuns;
@@ -24,21 +25,27 @@ abstract class TestCase extends BaseTestCase
 {
     use MakesGraphQLRequests;
     use MocksResolvers;
+    use UsesTestSchema;
 
-    const PLACEHOLDER_QUERY = '
+    /**
+     * A dummy query type definition that is added to tests by default.
+     */
+    const PLACEHOLDER_QUERY = /** @lang GraphQL */ '
     type Query {
         foo: Int
     }
     ';
 
-    /**
-     * This variable is injected the main GraphQL class
-     * during execution of each test. It may be set either
-     * for an entire test class or for a single test.
-     *
-     * @var string
-     */
-    protected $schema = self::PLACEHOLDER_QUERY;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (! $this->schema) {
+            $this->schema = self::PLACEHOLDER_QUERY;
+        }
+
+        $this->setUpTestSchema();
+    }
 
     /**
      * Get package providers.
@@ -49,12 +56,13 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            ScoutServiceProvider::class,
             AuthServiceProvider::class,
+            ConsoleServiceProvider::class,
+            ScoutServiceProvider::class,
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            OrderByServiceProvider::class,
             TestingServiceProvider::class,
-            ConsoleServiceProvider::class,
         ];
     }
 
@@ -66,13 +74,6 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app->bind(
-            SchemaSourceProvider::class,
-            function (): TestSchemaProvider {
-                return new TestSchemaProvider($this->schema);
-            }
-        );
-
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
 

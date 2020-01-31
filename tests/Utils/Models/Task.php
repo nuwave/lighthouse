@@ -47,14 +47,14 @@ class Task extends Model
         return $query->limit($args['foo']);
     }
 
-    public function hours(): MorphMany
+    public function images(): MorphMany
     {
-        return $this->morphMany(Hour::class, 'hourable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function hour(): MorphOne
+    public function image(): MorphOne
     {
-        return $this->morphOne(Hour::class, 'hourable');
+        return $this->morphOne(Image::class, 'imageable');
     }
 
     public function scopeWhereTags(Builder $query, $tags)

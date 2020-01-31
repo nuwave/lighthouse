@@ -2,17 +2,8 @@
 
 namespace Tests\Utils\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class FooDirective implements Directive
+class FooDirective extends BaseDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'foo';
-    }
 }

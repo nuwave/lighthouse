@@ -14,22 +14,22 @@ class SpreadDirectiveTest extends TestCase
                 'baz' => 2,
             ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(input: Foo @spread): Int @mock
         }
-        
+
         input Foo {
             foo: Int
             bar: Bar @spread
         }
-        
+
         input Bar {
             baz: Int
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo(input: {
                 foo: 1

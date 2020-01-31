@@ -26,19 +26,9 @@ class AuthDirective extends BaseDirective implements DefinedDirective, FieldReso
         $this->authFactory = $authFactory;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'auth';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Return the currently authenticated user as the result of a query.
 """

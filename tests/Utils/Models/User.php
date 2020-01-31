@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tests\Utils\LaravelEnums\UserType;
 
@@ -57,6 +58,16 @@ class User extends Authenticatable
         return $this
             ->belongsToMany(Role::class)
             ->withPivot(['meta']);
+    }
+
+    public function rolesPivot(): HasMany
+    {
+        return $this->hasMany(RoleUserPivot::class, 'user_id');
+    }
+
+    public function image(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable');
     }
 
     public function scopeCompanyName(Builder $query, array $args): Builder

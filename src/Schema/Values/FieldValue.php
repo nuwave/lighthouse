@@ -36,7 +36,7 @@ class FieldValue
     /**
      * The actual field resolver.
      *
-     * @var \Closure|null
+     * @var callable|null
      */
     protected $resolver;
 
@@ -70,10 +70,10 @@ class FieldValue
     /**
      * Overwrite the current/default resolver.
      *
-     * @param  \Closure  $resolver
+     * @param  callable  $resolver
      * @return $this
      */
-    public function setResolver(Closure $resolver): self
+    public function setResolver(callable $resolver): self
     {
         $this->resolver = $resolver;
 
@@ -165,9 +165,9 @@ class FieldValue
     /**
      * Get field resolver.
      *
-     * @return \Closure
+     * @return callable|null
      */
-    public function getResolver(): ?Closure
+    public function getResolver(): ?callable
     {
         return $this->resolver;
     }

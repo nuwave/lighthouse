@@ -15,7 +15,7 @@ class RenameDirectiveTest extends TestCase
             ];
         });
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Foo @mock
         }
@@ -25,7 +25,7 @@ class RenameDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo {
                 bar
@@ -44,13 +44,13 @@ class RenameDirectiveTest extends TestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: String! @rename
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             fooBar
         }
@@ -63,7 +63,7 @@ class RenameDirectiveTest extends TestCase
             return $args === ['bar' => 'something'];
         });
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(
                 baz: String @rename(attribute: "bar")
@@ -71,9 +71,48 @@ class RenameDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo(baz: "something")
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => true,
+            ],
+        ]);
+    }
+
+    public function testRenameListOfInputs(): void
+    {
+        $this->mockResolver(function ($root, array $args) {
+            return $args === [
+                'input' => [
+                    ['bar' => 'something'],
+                ],
+            ];
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                input: [FooInput]
+            ): Boolean @mock
+        }
+
+        input FooInput {
+            baz: String @rename(attribute: "bar")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(
+                input: [
+                    {
+                        baz: "something"
+                    }
+                ]
+            )
         }
         ')->assertJson([
             'data' => [

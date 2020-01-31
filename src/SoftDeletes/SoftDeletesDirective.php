@@ -13,19 +13,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class SoftDeletesDirective extends BaseDirective implements FieldManipulator, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'softDeletes';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Allows to filter if trashed elements should be fetched.
 This manipulates the schema by adding the argument
@@ -43,7 +33,7 @@ SDL;
      */
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $softDeletesArgument = PartialParser::inputValueDefinition(/* @lang GraphQL */ <<<'SDL'
+        $softDeletesArgument = PartialParser::inputValueDefinition(/** @lang GraphQL */ <<<'SDL'
 """
 Allows to filter if trashed elements should be fetched.
 """

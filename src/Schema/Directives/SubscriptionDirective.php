@@ -11,23 +11,13 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
  *
  * @see \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
  */
-class SubscriptionDirective implements Directive, DefinedDirective
+class SubscriptionDirective extends BaseDirective implements Directive, DefinedDirective
 {
     const NAME = 'subscription';
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Reference a class to handle the broadcasting of a subscription to clients.
 The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.

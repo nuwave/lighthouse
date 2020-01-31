@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentSet
 {
@@ -41,6 +42,24 @@ class ArgumentSet
         }
 
         return $plainArguments;
+    }
+
+    /**
+     * Check if the ArgumentSet has a non-null value with the given key.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
+        $argument = $this->arguments[$key] ?? null;
+
+        if ($argument === null) {
+            return false;
+        }
+
+        return $argument->value !== null;
     }
 
     /**
@@ -87,10 +106,19 @@ class ArgumentSet
         $argumentSet->directives = $this->directives;
 
         foreach ($this->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs
-            if ($argument->value instanceof self) {
-                $argument->value = $argument->value->rename();
-            }
+            // Recursively apply the renaming to nested inputs.
+            // We look for further ArgumentSet instances, they
+            // might be contained within an array.
+            $argument->value = Utils::applyEach(
+                function ($value) {
+                    if ($value instanceof self) {
+                        return $value->rename();
+                    }
+
+                    return $value;
+                },
+                $argument->value
+            );
 
             /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
             $renameDirective = $argument->directives->first(function ($directive) {
@@ -110,11 +138,11 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      * @param  string[]  $scopes
      * @param  \Closure  $directiveFilter
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation
      */
     public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
@@ -149,5 +177,42 @@ class ArgumentSet
         }
 
         return $builder;
+    }
+
+    /**
+     * Add a value at the dot-separated path.
+     *
+     * Works just like the Laravel Arr::add() function.
+     * @see \Illuminate\Support\Arr
+     *
+     * @param  string  $path
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function addValue(string $path, $value): self
+    {
+        $argumentSet = $this;
+        $keys = explode('.', $path);
+
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+
+            // If the key doesn't exist at this depth, we will just create an empty ArgumentSet
+            // to hold the next value, allowing us to create the ArgumentSet to hold a final
+            // value at the correct depth. Then we'll keep digging into the ArgumentSet.
+            if (! isset($argumentSet->arguments[$key])) {
+                $argument = new Argument();
+                $argument->value = new self();
+                $argumentSet->arguments[$key] = $argument;
+            }
+
+            $argumentSet = $argumentSet->arguments[$key]->value;
+        }
+
+        $argument = new Argument();
+        $argument->value = $value;
+        $argumentSet->arguments[array_shift($keys)] = $argument;
+
+        return $this;
     }
 }

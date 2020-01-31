@@ -13,20 +13,10 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class InjectDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'inject';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
-directive @inject(      
+        return /** @lang GraphQL */ <<<'SDL'
+directive @inject(
   """
   A path to the property of the context that will be injected.
   If the value is nested within the context, you may use dot notation
@@ -74,12 +64,12 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolver) {
-                    return $previousResolver(
-                        $rootValue,
-                        Arr::add($args, $argumentName, data_get($context, $contextAttributeName)),
-                        $context,
-                        $resolveInfo
-                    );
+                    $valueFromContext = data_get($context, $contextAttributeName);
+                    $args = Arr::add($args, $argumentName, $valueFromContext);
+
+                    $resolveInfo->argumentSet->addValue($argumentName, $valueFromContext);
+
+                    return $previousResolver($rootValue, $args, $context, $resolveInfo);
                 }
             )
         );

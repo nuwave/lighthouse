@@ -14,21 +14,11 @@ class RestoreDirective extends ModifyModelExistenceDirective implements DefinedD
 {
     const MODEL_NOT_USING_SOFT_DELETES = 'Use the @restore directive only for Model classes that use the SoftDeletes trait.';
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'restore';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
-Un-delete one or more soft deleted models by their ID. 
+Un-delete one or more soft deleted models by their ID.
 The field must have a single non-null argument that may be a list.
 """
 directive @restore(
@@ -40,7 +30,7 @@ directive @restore(
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 ) on FIELD_DEFINITION

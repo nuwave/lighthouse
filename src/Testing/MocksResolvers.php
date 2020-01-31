@@ -24,7 +24,7 @@ trait MocksResolvers
         $this->registerMockResolver($mock, $key);
 
         $method = $mock
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('__invoke');
 
         if ($resolver) {

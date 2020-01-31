@@ -2,6 +2,10 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+/**
+ * @deprecated will be integrated into
+ * @see \Nuwave\Lighthouse\Support\Contracts\Directive
+ */
 interface DefinedDirective
 {
     /**

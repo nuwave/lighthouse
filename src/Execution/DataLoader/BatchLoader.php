@@ -3,13 +3,9 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
 {
-    use HandlesCompositeKey;
-
     /**
      * Active BatchLoader instances.
      *
@@ -68,14 +64,16 @@ abstract class BatchLoader
      */
     public static function instanceKey(array $path): string
     {
-        $pathIgnoringLists = (new Collection($path))
-            ->filter(function ($path): bool {
+        $significantPathSegments = array_filter(
+            $path,
+            function ($path): bool {
                 // Ignore numeric path entries, as those signify a list of fields.
                 // Combining the queries for those is the very purpose of the
                 // batch loader, so they must not be included.
                 return ! is_numeric($path);
-            })
-            ->implode('.');
+            }
+        );
+        $pathIgnoringLists = implode('.', $significantPathSegments);
 
         return 'nuwave/lighthouse/batchloader/'.$pathIgnoringLists;
     }
@@ -140,4 +138,19 @@ abstract class BatchLoader
      * @return array<mixed, mixed>
      */
     abstract public function resolve(): array;
+
+    /**
+     * Build a key out of one or more given keys, supporting composite keys.
+     *
+     * E.g.: $primaryKey = ['key1', 'key2'];.
+     *
+     * @param  mixed  $key
+     * @return string
+     */
+    protected function buildKey($key): string
+    {
+        return is_array($key)
+            ? implode('___', $key)
+            : $key;
+    }
 }

@@ -11,6 +11,27 @@ use Tests\TestCase;
 
 class ArgumentSetTest extends TestCase
 {
+    public function testHasArgument(): void
+    {
+        $set = new ArgumentSet();
+
+        $this->assertFalse($set->has('foo'));
+
+        $set->arguments['foo'] = new Argument();
+        $this->assertFalse($set->has('foo'));
+
+        $arg = new Argument();
+        $arg->value = null;
+        $set->arguments['foo'] = $arg;
+        $this->assertFalse($set->has('foo'));
+
+        $arg->value = false;
+        $this->assertTrue($set->has('foo'));
+
+        $arg->value = 'foobar';
+        $this->assertTrue($set->has('foo'));
+    }
+
     public function testSpreadsNestedInput(): void
     {
         $spreadDirective = new SpreadDirective();
@@ -123,6 +144,24 @@ class ArgumentSetTest extends TestCase
         );
     }
 
+    public function testAddValueAtRootLevel(): void
+    {
+        $set = new ArgumentSet();
+        $set->addValue('foo', 42);
+
+        $this->assertSame(42, $set->arguments['foo']->value);
+    }
+
+    public function testAddValueDeep(): void
+    {
+        $set = new ArgumentSet();
+        $set->addValue('foo.bar', 42);
+
+        $foo = $set->arguments['foo']->value;
+
+        $this->assertSame(42, $foo->arguments['bar']->value);
+    }
+
     public function testRenameInput(): void
     {
         $firstName = new Argument();
@@ -179,11 +218,9 @@ class ArgumentSetTest extends TestCase
     {
         $renameDirective = new RenameDirective();
         $renameDirective->hydrate(
+            PartialParser::directive(/** @lang GraphQL */ "@rename(attribute: \"$attribute\")"),
             // We require some placeholder for the directive definition to sit on
-            PartialParser::fieldDefinition(/* @lang GraphQL */ <<<GRAPHQL
-placeholder: ID @rename(attribute: "$attribute")
-GRAPHQL
-            )
+            PartialParser::fieldDefinition(/** @lang GraphQL */ 'placeholder: ID')
         );
 
         return $renameDirective;

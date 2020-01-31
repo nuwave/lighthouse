@@ -11,23 +11,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class AllDirective extends BaseDirective implements DefinedDirective, FieldResolver
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'all';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 directive @all(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 
