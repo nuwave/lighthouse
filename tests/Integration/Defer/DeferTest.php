@@ -668,7 +668,7 @@ class DeferTest extends TestCase
             ],
         ]);
 
-        $this->mockResolver(function() {
+        $this->mockResolver(function () {
             throw new Error('deferred_exception');
         });
 

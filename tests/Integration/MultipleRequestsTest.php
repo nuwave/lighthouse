@@ -8,7 +8,7 @@ class MultipleRequestsTest extends TestCase
 {
     public function testCanFireMultipleRequestsInOneTest(): void
     {
-        $this->mockResolver(function($root, array $args): string {
+        $this->mockResolver(function ($root, array $args): string {
             return $args['this'];
         });
 
