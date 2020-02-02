@@ -75,6 +75,8 @@ class ArgumentSet
         foreach ($this->arguments as $name => $argument) {
             $value = $argument->value;
 
+            // In this case, we do not care about argument sets nested within
+            // lists, spreading only makes sense for single nested inputs.
             if ($value instanceof self) {
                 // Recurse down first, as that resolves the more deeply nested spreads first
                 $value = $value->spread();
@@ -146,7 +148,25 @@ class ArgumentSet
      */
     public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
-        foreach ($this->arguments as $argument) {
+        self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
+
+        foreach ($scopes as $scope) {
+            call_user_func([$builder, $scope], $this->toArray());
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Recursively apply the ArgBuilderDirectives onto the builder.
+     *
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Closure|null  $directiveFilter
+     */
+    protected static function applyArgBuilderDirectives(self $argumentSet, $builder, Closure $directiveFilter = null)
+    {
+        foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
 
             // TODO switch to instanceof when we require bensampo/laravel-enum
@@ -169,14 +189,15 @@ class ArgumentSet
                 $builder = $argBuilderDirective->handleBuilder($builder, $value);
             });
 
-            // TODO recurse deeper into the input to allow nested input objects to add filters
+            Utils::applyEach(
+                function ($value)  use ($builder, $directiveFilter){
+                    if($value instanceof self){
+                        self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
+                    }
+                },
+                $argument->value
+            );
         }
-
-        foreach ($scopes as $scope) {
-            call_user_func([$builder, $scope], $this->toArray());
-        }
-
-        return $builder;
     }
 
     /**
