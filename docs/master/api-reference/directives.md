@@ -1967,7 +1967,7 @@ And usage example:
     posts(filter: {
         orderBy: [
             {
-                field: "postedAt"
+                column: "posted_at"
                 order: ASC
             }
         ]

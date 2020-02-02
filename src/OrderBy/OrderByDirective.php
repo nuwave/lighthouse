@@ -54,8 +54,7 @@ SDL;
     {
         foreach ($value as $orderByClause) {
             $builder->orderBy(
-                // TODO deprecated in v5
-                $orderByClause[config('lighthouse.orderBy')],
+                $orderByClause['column'],
                 $orderByClause['order']
             );
         }
