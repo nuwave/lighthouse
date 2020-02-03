@@ -190,8 +190,8 @@ class ArgumentSet
             });
 
             Utils::applyEach(
-                function ($value)  use ($builder, $directiveFilter){
-                    if($value instanceof self){
+                function ($value) use ($builder, $directiveFilter) {
+                    if ($value instanceof self) {
                         self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
                     }
                 },
