@@ -63,8 +63,13 @@ class DirectiveFactoryTest extends TestCase
         ');
 
         $directive = new class implements FieldMiddleware {
-            public static function definition(): string {}
-            public function handleField(FieldValue $fieldValue, Closure $next): void {}
+            public static function definition(): string
+            {
+            }
+
+            public function handleField(FieldValue $fieldValue, Closure $next): void
+            {
+            }
         };
 
         $this->directiveFactory->setResolved('foo', get_class($directive));

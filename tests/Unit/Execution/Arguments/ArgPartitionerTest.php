@@ -8,7 +8,6 @@ use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 

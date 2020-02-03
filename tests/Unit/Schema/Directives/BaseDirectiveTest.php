@@ -167,7 +167,9 @@ class BaseDirectiveTest extends TestCase
     protected function constructTestDirective($definitionNode): BaseDirective
     {
         $directive = new class extends BaseDirective {
-            public static function definition(): string {}
+            public static function definition(): string
+            {
+            }
 
             /**
              * Allow to call protected methods from the test.
