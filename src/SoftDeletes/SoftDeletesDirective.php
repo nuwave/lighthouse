@@ -8,10 +8,9 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class SoftDeletesDirective extends BaseDirective implements FieldManipulator, DefinedDirective
+class SoftDeletesDirective extends BaseDirective implements FieldManipulator
 {
     public static function definition(): string
     {

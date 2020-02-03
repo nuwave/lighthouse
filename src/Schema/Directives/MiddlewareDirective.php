@@ -15,7 +15,6 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
@@ -25,7 +24,7 @@ use Nuwave\Lighthouse\Support\Pipeline;
 /**
  * @deprecated Will be removed in v5
  */
-class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator, DefinedDirective
+class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Pipeline

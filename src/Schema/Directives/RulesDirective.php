@@ -10,12 +10,11 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 
-class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract, DefinedDirective, ArgManipulator
+class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract, ArgManipulator
 {
     use HasArgumentPathTrait;
 

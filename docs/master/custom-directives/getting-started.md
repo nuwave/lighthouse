@@ -3,26 +3,51 @@
 As you grow your GraphQL schema, you may find the need for more specialized functionality.
 Learn how you can abstract logic in a composable and reusable manner by using custom directives.  
 
-## Naming Conventions
-
 Directives are implemented as PHP classes, each directive available
 in the schema corresponds to a single class.
+
+## Naming Convention
 
 Directive names themselves are typically defined in **camelCase**.
 The class name of a directive must follow the following pattern:
 
     <DirectiveName>Directive
 
-Let's implement a simple `@upperCase` directive as a part of this introduction.
-We will put it in a class called `UpperCaseDirective` and extend the
-abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
+As an example, the directive `@upperCase` will have to be in a class called `UpperCaseDirective`.
+
+## Class Definition
+
+Each directive has to implement the interface `\Nuwave\Lighthouse\Support\Contracts\Directive`, with
+the single method `definition`. For convenience, it is recommended to extend the abstract class
+`\Nuwave\Lighthouse\Schema\Directives\BaseDirective` which includes useful helper functions.
 
 ```php
 <?php
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class UpperCaseDirective extends BaseDirective {}
+class UpperCaseDirective extends BaseDirective
+{
+    /**
+     * Formal directive specification in schema definition language (SDL).
+     *
+     * @return string
+     */
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+A description of what this directive does.
+"""
+directive @upperCase(
+    """
+    Directives can have arguments to parameterize them.
+    """
+    someArg: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+}
 ```
 
 ## Directive Interfaces
@@ -49,6 +74,8 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class UpperCaseDirective extends BaseDirective implements FieldMiddleware
 {
+    public static function definition(): string {}
+
     /**
      * Wrap around the final field resolver.
      *

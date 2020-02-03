@@ -5,12 +5,9 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 interface Directive
 {
     /**
-     * Name of the directive as used in the schema.
-     *
-     * @deprecated will be replaced by definition(): string
-     * @see \Nuwave\Lighthouse\Support\Contracts\DefinedDirective
+     * Formal directive specification in schema definition language (SDL).
      *
      * @return string
      */
-    public function name();
+    public static function definition(): string;
 }

@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class SpreadDirective extends BaseDirective implements ArgDirective, DefinedDirective
+class SpreadDirective extends BaseDirective implements ArgDirective
 {
     public static function definition(): string
     {

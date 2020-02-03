@@ -11,12 +11,11 @@ use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
+class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
     public static function definition(): string
     {

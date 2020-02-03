@@ -25,9 +25,8 @@ Let's take a look at the built-in `@trim` directive.
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
+class TrimDirective extends BaseDirective implements ArgTransformerDirective
 {
     public static function definition(): string
     {
@@ -134,9 +133,8 @@ So let's take a look at the built-in `@eq` directive.
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
@@ -221,9 +219,8 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class ModelArgsDirective extends BaseDirective implements ArgManipulator, DefinedDirective
+class ModelArgsDirective extends BaseDirective implements ArgManipulator
 {
     /**
      * SDL definition of the directive.

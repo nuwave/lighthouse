@@ -5,10 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class AuthDirective extends BaseDirective implements DefinedDirective, FieldResolver
+class AuthDirective extends BaseDirective implements FieldResolver
 {
     /**
      * @var \Illuminate\Contracts\Auth\Factory

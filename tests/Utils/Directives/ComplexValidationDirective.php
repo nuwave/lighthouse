@@ -9,6 +9,13 @@ class ComplexValidationDirective extends ValidationDirective
 {
     const UNIQUE_VALIDATION_MESSAGE = 'Used to test this exact validation is triggered';
 
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<'SDL'
+directive @customValidation on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
     /**
      * @return mixed[]
      */

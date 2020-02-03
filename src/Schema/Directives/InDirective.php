@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class InDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class InDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {

@@ -66,8 +66,15 @@ class ArgPartitionerTest extends TestCase
     }
 }
 
-class Nested extends BaseDirective implements ArgResolver, Directive
+class Nested extends BaseDirective implements ArgResolver
 {
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<'SDL'
+directive @nested on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
     public function __invoke($root, $args)
     {
     }

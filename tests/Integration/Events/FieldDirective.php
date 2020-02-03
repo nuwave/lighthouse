@@ -6,4 +6,13 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class FieldDirective extends BaseDirective
 {
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<'SDL'
+    """
+    An alternate @field.
+    """
+    directive @field on FIELD_DEFINITION
+SDL;
+    }
 }

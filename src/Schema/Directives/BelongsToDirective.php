@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class BelongsToDirective extends RelationDirective implements FieldResolver, DefinedDirective
+class BelongsToDirective extends RelationDirective implements FieldResolver
 {
     public static function definition(): string
     {

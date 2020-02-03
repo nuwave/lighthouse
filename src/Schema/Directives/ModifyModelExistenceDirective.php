@@ -11,12 +11,11 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
-abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
+abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
     /**
      * The GlobalId resolver.
@@ -119,13 +118,13 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         // Ensure there is only a single argument defined on the field.
         if (count($this->definitionNode->arguments) !== 1) {
             throw new DefinitionException(
-                'The @'.static::name()." directive requires the field {$this->nodeName()} to only contain a single argument."
+                'The @'.$this->name()." directive requires the field {$this->nodeName()} to only contain a single argument."
             );
         }
 
         if (! $this->idArgument() instanceof NonNullTypeNode) {
             throw new DefinitionException(
-                'The @'.static::name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
+                'The @'.$this->name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
             );
         }
     }

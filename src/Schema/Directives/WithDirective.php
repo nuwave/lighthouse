@@ -9,11 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class WithDirective extends RelationDirective implements FieldMiddleware, DefinedDirective
+class WithDirective extends RelationDirective implements FieldMiddleware
 {
     public static function definition(): string
     {

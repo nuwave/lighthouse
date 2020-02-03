@@ -8,9 +8,8 @@ use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrashedDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class TrashedDirective extends BaseDirective implements ArgBuilderDirective
 {
     const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
 
