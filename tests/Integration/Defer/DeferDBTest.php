@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Defer;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
