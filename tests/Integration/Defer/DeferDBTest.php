@@ -37,9 +37,7 @@ class DeferDBTest extends DBTestCase
             'company_id' => $company->getKey(),
         ]);
 
-        $this->mockResolver(function () use ($user): User {
-            return $user;
-        });
+        $this->mockResolver($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -92,9 +90,7 @@ class DeferDBTest extends DBTestCase
         ]);
         $user = $users[0];
 
-        $this->mockResolver(function () use ($user): User {
-            return $user;
-        });
+        $this->mockResolver($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -168,9 +164,7 @@ class DeferDBTest extends DBTestCase
                 ]);
             });
 
-        $this->mockResolver(function () use ($companies): Collection {
-            return $companies;
-        });
+        $this->mockResolver($companies);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {

@@ -20,14 +20,12 @@ class RulesDirectiveTest extends TestCase
     {
         parent::setUp();
 
-        $this->mockResolver(function (): array {
-            return [
-                'first_name' => 'John',
-                'last_name' => 'Doe',
-                'full_name' => 'John Doe',
-                'input_object' => true,
-            ];
-        });
+        $this->mockResolver([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'full_name' => 'John Doe',
+            'input_object' => true,
+        ]);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

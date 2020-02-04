@@ -668,9 +668,12 @@ class DeferTest extends TestCase
             ],
         ]);
 
-        $this->mockResolver(function () {
-            throw new Error('deferred_exception');
-        });
+        $this->mockResolver(
+            function() {
+                throw new Error('deferred_exception');
+            },
+            'throw'
+        );
 
         $this->schema = /** @lang GraphQL */ '
         type User {

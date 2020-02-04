@@ -18,13 +18,14 @@ trait MocksResolvers
      */
     protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
     {
-        $mock = $this->getMockBuilder(MockResolver::class)
+        $mock = $this
+            ->getMockBuilder(MockResolver::class)
             ->getMock();
 
         $this->registerMockResolver($mock, $key);
 
         $method = $mock
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('__invoke');
 
         if (is_callable($resolverOrValue)) {
