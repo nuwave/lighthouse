@@ -160,11 +160,14 @@ class ArgumentSet
     /**
      * Recursively apply the ArgBuilderDirectives onto the builder.
      *
+     * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
+     * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
+     *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      * @param  \Closure|null  $directiveFilter
      */
-    protected static function applyArgBuilderDirectives(self $argumentSet, $builder, Closure $directiveFilter = null)
+    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null)
     {
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
@@ -190,7 +193,7 @@ class ArgumentSet
             });
 
             Utils::applyEach(
-                function ($value) use ($builder, $directiveFilter) {
+                function ($value) use (&$builder, $directiveFilter) {
                     if ($value instanceof self) {
                         self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
                     }

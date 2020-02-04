@@ -181,7 +181,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = $this->users->first();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
