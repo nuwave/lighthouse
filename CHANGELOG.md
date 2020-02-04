@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
 - Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
   a dummy schema for testing custom Lighthouse extensions https://github.com/nuwave/lighthouse/pull/1171
+- Simplify mocking resolvers that just return static data https://github.com/nuwave/lighthouse/pull/1177
 
 ### Fixed
 

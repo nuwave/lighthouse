@@ -75,15 +75,12 @@ Reverts a string, e.g. 'foo' => 'oof'.
 directive @revert on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-We just pass a resolver function into `mockResolver()` and place
-the `@mock` directive on the field:
+The simplest way to mock a resolver is to have it return static data:
 
 ```php
     public function testReverseField(): void
     {
-        $this->mockResolver(function(): string {
-            return 'foo';
-        });
+        $this->mockResolver('foo');
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -101,7 +98,6 @@ the `@mock` directive on the field:
             ],
         ]);
     }
-}
 ```
 
 Since we get back an instance of PHPUnit's `InvocationMocker`, we can also assert
@@ -130,7 +126,34 @@ explicit resolver function here. The default resolver will simply return `null`.
             ],
         ]);
     }
-}
+```
+
+If you have to handle the incoming resolver arguments dynamically, you can also
+pass a function that is called:
+
+```php
+    public function testReverseInput(): void
+    {
+        $this->mockResolver(function($root, array $args): string {
+            return $args['bar'];
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: String @reverse): String @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: "bar")
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => 'rab',
+            ],
+        ]);
+    }
 ```
 
 We might have a need to add multiple resolvers to a single schema. For that case,
@@ -139,8 +162,8 @@ we can specify unique `key` for the mock resolver (it defaults to `default`):
 ```php
     public function testMultipleResolvers(): void
     {
-        $this->mockResolver(function () { ... }, 'first');
-        $this->mockResolver(function () { ... }, 'second');
+        $this->mockResolver(..., 'first');
+        $this->mockResolver(..., 'second');
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -149,5 +172,4 @@ we can specify unique `key` for the mock resolver (it defaults to `default`):
         }
         ';
     }
-}
 ```
