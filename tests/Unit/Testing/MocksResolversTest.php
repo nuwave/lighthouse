@@ -30,4 +30,10 @@ class MocksResolversTest extends TestCase
             ],
         ]);
     }
+
+    public function testCustomExpects(): void
+    {
+        $this->mockResolver()
+            ->expects($this->never());
+    }
 }
