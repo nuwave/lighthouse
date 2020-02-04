@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix handling of nested mutation operations that receive `null` https://github.com/nuwave/lighthouse/pull/1174
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
 - Apply query filters using an `ArgBuilderDirective` such as `@eq` when the argument
-  is nested deeply within the input
+  is nested deeply within the input https://github.com/nuwave/lighthouse/pull/1176
 
 ## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
