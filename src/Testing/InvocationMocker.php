@@ -40,7 +40,7 @@ class InvocationMocker
     {
         // We do this little dance in order to allow setting a custom
         // invocation rule without having to define the method __invoke.
-        if($name === 'expects') {
+        if ($name === 'expects') {
             $invocationMocker = $this->mockObject->expects($arguments[0]);
         } else {
             $invocationMocker = $this->mockObject->expects(new InvokedAtLeastOnce());
