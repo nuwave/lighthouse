@@ -8,23 +8,6 @@ The [GraphQL specification](https://graphql.github.io/graphql-spec/June2018/#sec
 mentions two client directives: [`@skip`](#skip) and [`@include`](#include).
 Both are built-in to Lighthouse and work out-of-the-box.
 
-## Custom Client Directives
-
-You can implement your own client directives.
-Add a definition to your schema to show it in introspection.
-
-```graphql
-"A description of what this directive does."
-directive @example(
-    "Client directives can have arguments too!"
-    someArg: String
-) on FIELD
-```
-
-By itself, a custom client directive does not do anything.
-Use the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature)
-to check the presence and/or value of a client directive and act on it.
-
 ## @skip
 
 This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
@@ -78,3 +61,65 @@ query myQuery($someTest: Boolean) {
   experimentalField @include(if: $someTest)
 }
 ```
+
+## Custom Client Directives
+
+You can implement your own client directives.
+First, add a definition of your directive to your schema.
+
+```graphql
+"A description of what this directive does."
+directive @example(
+    "Client directives can have arguments too!"
+    someArg: String
+) on FIELD
+```
+
+By itself, a custom client directive does not do anything.
+Lighthouse provides a class to retrieve information about where client directives
+were placed in the query and what arguments were given to them.
+
+```php
+$clientDirective = new \Nuwave\Lighthouse\ClientDirectives\ClientDirective('example');
+```
+
+The most common use case for a client directive is to place it on a field. There is a caveat
+to working with this that is unintuitive at first: There might be multiple nodes referencing a single
+field, and each of those may or may not have the client directive set, with possibly different arguments.
+
+The following example illustrates how a field `foo` can be referenced three times with different
+configurations of a client directive:
+
+```graphql
+{
+    foo
+    fooBar: foo @example
+    ... on Query {
+        foo @example(bar: "baz")
+    }
+}
+```
+
+You can get all arguments for every node that is referencing the field you are currently
+resolving, passing the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature):
+
+```php
+$arguments = $clientDirective->forField($resolveInfo);
+```
+
+The resulting `$arguments` will be an array of 1 to n values, n being the amount of nodes.
+For the example query above, it will look like this:
+
+```php
+[
+    null, # No directive on the first reference
+    [], # Directive present, but no arguments given
+    ['bar' => 'baz'], # Present with arguments
+]
+```
+
+You are then free to implement whatever logic on top of that. Some client directives may require
+only one field node to have it set, whereas others might require all of them to have the same configuration.
+
+> There are other locations where client directives may be used on: http://spec.graphql.org/draft/#ExecutableDirectiveLocation
+> You can add a PR to Lighthouse if you need them.
