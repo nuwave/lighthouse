@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix handling of nested mutation operations that receive `null` https://github.com/nuwave/lighthouse/pull/1174
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
 
+### Deprecated
+
+- Deprecate `\Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider#setRootPath()`, this function
+  is never called or used anywhere within Lighthouse. It will be removed from the interface.
+
 ## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
 ### Fixed
