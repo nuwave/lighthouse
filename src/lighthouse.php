@@ -93,6 +93,7 @@ return [
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
         'directives' => ['App\\GraphQL\\Directives'],
+        'validators' => ['App\\GraphQL\\Validators'],
     ],
 
     /*
