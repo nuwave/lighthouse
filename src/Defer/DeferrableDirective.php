@@ -91,7 +91,7 @@ SDL;
     {
         $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
 
-        if($this->anyFieldHasDefer($defers)) {
+        if ($this->anyFieldHasDefer($defers)) {
             if ($resolveInfo->parentType->name === 'Mutation') {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
@@ -102,22 +102,22 @@ SDL;
 
         // Following the semantics of Apollo:
         // All declarations of a field have to contain @defer for the field to be deferred
-        foreach($defers as $defer) {
-            if($defer === null || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
+        foreach ($defers as $defer) {
+            if ($defer === null || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
                 return false;
             }
         }
 
         $skips = (new ClientDirective(Directive::SKIP_NAME))->forField($resolveInfo);
-        foreach($skips as $skip) {
-            if($skip === [Directive::IF_ARGUMENT_NAME => true]) {
+        foreach ($skips as $skip) {
+            if ($skip === [Directive::IF_ARGUMENT_NAME => true]) {
                 return false;
             }
         }
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
-        foreach($includes as $include) {
-            if($include === [Directive::IF_ARGUMENT_NAME => false]) {
+        foreach ($includes as $include) {
+            if ($include === [Directive::IF_ARGUMENT_NAME => false]) {
                 return false;
             }
         }
@@ -127,7 +127,7 @@ SDL;
 
     protected function anyFieldHasDefer(array $defers): bool
     {
-        foreach($defers as $defer) {
+        foreach ($defers as $defer) {
             if ($defer !== null) {
                 return true;
             }

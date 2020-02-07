@@ -62,7 +62,7 @@ class ClientDirective
      */
     protected function definition(): Directive
     {
-        if($this->definition) {
+        if ($this->definition) {
             return $this->definition;
         }
 

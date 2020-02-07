@@ -178,13 +178,13 @@ trait MakesGraphQLRequests
      */
     protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
     {
-        if($this->deferStream === null) {
+        if ($this->deferStream === null) {
             $this->setUpDeferStream();
         }
 
         $response = $this->graphQL($query, $variables, $extraParams);
 
-        if(! $response->baseResponse instanceof StreamedResponse) {
+        if (! $response->baseResponse instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
         }
 

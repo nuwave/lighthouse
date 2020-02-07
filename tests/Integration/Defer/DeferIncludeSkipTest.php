@@ -10,7 +10,7 @@ class DeferIncludeSkipTest extends TestCase
     protected $schema = /** @lang GraphQL */ '
     directive @include(if: Boolean!) on FIELD
     directive @skip(if: Boolean!) on FIELD
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     protected function getPackageProviders($app)
     {
@@ -27,7 +27,7 @@ class DeferIncludeSkipTest extends TestCase
             foo @defer @include(if: false)
         }
         ')->assertExactJson([
-            'data' => []
+            'data' => [],
         ]);
     }
 
@@ -62,7 +62,7 @@ class DeferIncludeSkipTest extends TestCase
             foo @defer @skip(if: true)
         }
         ')->assertExactJson([
-            'data' => []
+            'data' => [],
         ]);
     }
 

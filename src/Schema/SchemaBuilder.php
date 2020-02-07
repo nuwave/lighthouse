@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class SchemaBuilder
 {
