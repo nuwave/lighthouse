@@ -18,9 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
   a dummy schema for testing custom Lighthouse extensions https://github.com/nuwave/lighthouse/pull/1171
 - Add utility `\Nuwave\Lighthouse\ClientDirectives\ClientDirective` to correctly
-  get the arguments passed through a client directive
+  get the arguments passed through a client directive https://github.com/nuwave/lighthouse/pull/1184
 - Add `streamGraphQL()` helper method to `\Nuwave\Lighthouse\Testing\MakesGraphQLRequests` for
-  simple testing of streamed responses, such as `@defer`
+  simple testing of streamed responses, such as `@defer` https://github.com/nuwave/lighthouse/pull/1184
 
 ### Fixed
 
@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix renaming input fields that are nested within lists using `@rename` https://github.com/nuwave/lighthouse/pull/1166
 - Fix handling of nested mutation operations that receive `null` https://github.com/nuwave/lighthouse/pull/1174
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
-- Handle multiple instances of client directives with `@defer` correctly 
+- Handle multiple instances of client directives with `@defer` correctly https://github.com/nuwave/lighthouse/pull/1184
 
 ## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
