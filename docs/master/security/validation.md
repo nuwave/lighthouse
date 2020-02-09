@@ -167,3 +167,61 @@ You can customize the messages for the given rules by implementing the `messages
         ];
     }
 ```
+## Validate Input Types
+
+In cases where your validation becomes too complex and demanding, you want to have the power of PHP to actual do the 
+complex validation. For example, accessing existing data in the database or validating complex combination of input 
+values cannot be achieved with the examples above. This is where input type validation comes into play.
+
+```graphql
+    type User {
+      id: ID!
+      name: String!
+      email: String!
+    }
+
+    input CreateUserInput @validate {
+      name: String!
+      email: String!
+      password: String!
+    }
+
+    type Mutation {
+      createUser(input: CreateUserInput! @spread): User @create
+    }
+```
+Note that the fields on the `CreateUserInput` do not have the `@rules` directive.
+
+The corresponding validation class for the input type looks like the following.
+
+```php
+use Illuminate\Validation\Rule;
+use Nuwave\Lighthouse\Execution\InputTypeValidator;
+
+class CreateUserInputValidator extends InputTypeValidator
+{
+
+    public function rules(): array
+    {
+        return [
+            'name'     => ['required'],
+            'email'    => ['required', 'email', Rule::unique('users', 'email')],
+            'password' => ['required']
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [];
+    }
+}
+```
+This will allow you to define all the rules for the fields on an input type programmatically. This gives more 
+flexibility then when defining them on the fields in the schema.
+
+The location of these validator classes are located in `App\\GraphQL\\Validators`. Other locations can be added by 
+adding new items to the `lighthouse.namespaces.validators` config value.
+
+When updating for example a user, it is possible to obtain an instance of it by using `$this->model(User::class)`. This 
+will return an instance of the user model based on it's primary key name.   
+

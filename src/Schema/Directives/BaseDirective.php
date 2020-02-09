@@ -16,6 +16,7 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\InputTypeValidator;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -23,6 +24,7 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class BaseDirective implements Directive
 {
+
     /**
      * The AST node of the directive.
      *
@@ -56,8 +58,9 @@ abstract class BaseDirective implements Directive
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
-     * @param  \GraphQL\Language\AST\DirectiveNode  $directiveNode
-     * @param  \GraphQL\Language\AST\Node  $definitionNode
+     * @param \GraphQL\Language\AST\DirectiveNode $directiveNode
+     * @param \GraphQL\Language\AST\Node          $definitionNode
+     *
      * @return $this
      */
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
@@ -71,7 +74,8 @@ abstract class BaseDirective implements Directive
     /**
      * Get a Closure that is defined through an argument on the directive.
      *
-     * @param  string  $argumentName
+     * @param string $argumentName
+     *
      * @return \Closure
      */
     public function getResolverFromArgument(string $argumentName): Closure
@@ -86,7 +90,8 @@ abstract class BaseDirective implements Directive
     /**
      * Does the current directive have an argument with the given name?
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
     public function directiveHasArgument(string $name): bool
@@ -107,8 +112,8 @@ abstract class BaseDirective implements Directive
     /**
      * Get the AST definition node associated with the current directive.
      *
-     * @deprecated in favour of the plain property
      * @return \GraphQL\Language\AST\DirectiveNode
+     * @deprecated in favour of the plain property
      */
     protected function directiveDefinition(): DirectiveNode
     {
@@ -118,8 +123,9 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param  string  $name
-     * @param  mixed|null  $default
+     * @param string     $name
+     * @param mixed|null $default
+     *
      * @return mixed|null
      */
     protected function directiveArgValue(string $name, $default = null)
@@ -130,7 +136,8 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param  string  $argumentName The default argument name "model" may be overwritten
+     * @param string $argumentName The default argument name "model" may be overwritten
+     *
      * @return string|\Illuminate\Database\Eloquent\Model
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -140,31 +147,38 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if (! $model) {
-            if ($this->definitionNode instanceof FieldDefinitionNode) {
+        if ( ! $model)
+        {
+            if ($this->definitionNode instanceof FieldDefinitionNode)
+            {
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
                 /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
                 $documentAST = app(ASTBuilder::class)->documentAST();
 
-                if (! isset($documentAST->types[$returnTypeName])) {
+                if ( ! isset($documentAST->types[$returnTypeName]))
+                {
                     throw new DefinitionException(
                         "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
                     );
                 }
                 $type = $documentAST->types[$returnTypeName];
 
-                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')) {
+                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass'))
+                {
                     $model = ASTHelper::directiveArgValue($modelClass, 'class');
-                } else {
+                } else
+                {
                     $model = $returnTypeName;
                 }
-            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
+            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode)
+            {
                 $model = $this->nodeName();
             }
         }
 
-        if (! $model) {
+        if ( ! $model)
+        {
             throw new DefinitionException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
             );
@@ -176,9 +190,10 @@ abstract class BaseDirective implements Directive
     /**
      * Find a class name in a set of given namespaces.
      *
-     * @param  string  $classCandidate
-     * @param  string[]  $namespacesToTry
-     * @param  callable  $determineMatch
+     * @param string   $classCandidate
+     * @param string[] $namespacesToTry
+     * @param callable $determineMatch
+     *
      * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -194,7 +209,8 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if (! $determineMatch) {
+        if ( ! $determineMatch)
+        {
             $determineMatch = 'class_exists';
         }
 
@@ -204,7 +220,8 @@ abstract class BaseDirective implements Directive
             $determineMatch
         );
 
-        if (! $className) {
+        if ( ! $className)
+        {
             throw new DefinitionException(
                 "No class '{$classCandidate}' was found for directive '{$this->name()}'"
             );
@@ -220,7 +237,8 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @param  string  $argumentName
+     * @param string $argumentName
+     *
      * @return string[] Contains two entries: [string $className, string $methodName]
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -235,13 +253,15 @@ abstract class BaseDirective implements Directive
         if (
             count($argumentParts) > 2
             || empty($argumentParts[0])
-        ) {
+        )
+        {
             throw new DefinitionException(
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
             );
         }
 
-        if (empty($argumentParts[1])) {
+        if (empty($argumentParts[1]))
+        {
             $argumentParts[1] = '__invoke';
         }
 
@@ -251,16 +271,34 @@ abstract class BaseDirective implements Directive
     /**
      * Try adding the default model namespace and ensure the given class is a model.
      *
-     * @param  string  $modelClassCandidate
+     * @param string $modelClassCandidate
+     *
      * @return string
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
         return $this->namespaceClassName(
             $modelClassCandidate,
-            (array) config('lighthouse.namespaces.models'),
+            (array)config('lighthouse.namespaces.models'),
             function (string $classCandidate): bool {
                 return is_subclass_of($classCandidate, Model::class);
+            }
+        );
+    }
+
+    /**
+     * @param string $validatorCandidate
+     *
+     * @return string
+     * @throws DefinitionException
+     */
+    protected function inputTypeValidatorClass(string $validatorCandidate): string
+    {
+        return $this->namespaceClassName(
+            $validatorCandidate,
+            (array)config('lighthouse.namespaces.validators'),
+            function (string $classCandidate): bool {
+                return is_subclass_of($classCandidate, InputTypeValidator::class);
             }
         );
     }

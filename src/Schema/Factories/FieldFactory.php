@@ -21,6 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
+use Nuwave\Lighthouse\Support\Contracts\HasInput;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
@@ -237,7 +238,8 @@ class FieldFactory
 
         if ($type instanceof InputObjectType)
         {
-            $this->handleArgWithAssociatedDirectives($type, $astNode, $type->directives, $argumentPath);
+            $inputDirectives = $this->directiveFactory->createAssociatedDirectives($type->astNode);
+            $this->handleArgWithAssociatedDirectives($type, $astNode, $inputDirectives, $argumentPath);
 
             foreach ($type->getFields() as $field)
             {
@@ -317,6 +319,10 @@ class FieldFactory
             {
                 $directive->setArgumentPath($argumentPath);
             }
+            if ($directive instanceof HasInput)
+            {
+                $directive->setInput($this->argValue($argumentPath));
+            }
         });
 
         // Remove the directive from the list to avoid evaluating the same directive twice
@@ -328,7 +334,7 @@ class FieldFactory
             if ($directive instanceof ProvidesRules)
             {
                 $validators = $this->gatherValidationDirectives($directives);
-                
+
                 $validators->push($directive);
                 foreach ($validators as $validator)
                 {

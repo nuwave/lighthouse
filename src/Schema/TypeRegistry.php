@@ -328,6 +328,7 @@ EOL
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
+            'astNode' => $inputDefinition,
             'fields' => function () use ($inputDefinition): array {
                 return $this->argumentFactory->toTypeMap($inputDefinition->fields);
             },
