@@ -39,7 +39,7 @@ class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesR
 """
 Validate given input object with a validation class.
 """
-directive @validate on INPUT_OBJECT
+directive @validate(validator: String) on INPUT_OBJECT
 SDL;
     }
 
