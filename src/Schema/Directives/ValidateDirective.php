@@ -3,7 +3,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\InputTypeValidator;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
@@ -53,7 +52,7 @@ SDL;
 
     /**
      * @inheritDoc
-     * @throws DefinitionException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function rules(): array
     {
@@ -61,12 +60,8 @@ SDL;
 
         $validator = new $class($this->input);
         $this->validator = $validator;
-        $argumentBasePathDotNotation = implode('.', $this->argumentPath);
 
-        return collect($validator->rules())->mapWithKeys(function ($value, $key) use ($argumentBasePathDotNotation) {
-            return [$argumentBasePathDotNotation . '.' . $key => $value];
-        })->toArray();
-
+        return $this->addFullInputPathToKeys($this->validator->rules());
     }
 
     /**
@@ -74,7 +69,7 @@ SDL;
      */
     public function messages(): array
     {
-        return $this->validator->messages();
+        return $this->addFullInputPathToKeys($this->validator->messages());
     }
 
     public function setInput(array $args): void
@@ -96,5 +91,21 @@ SDL;
     public function setArgumentPath(array $argumentPath)
     {
         $this->argumentPath = $argumentPath;
+    }
+
+    /**
+     * @param array $collection
+     *
+     * @return array
+     */
+    private function addFullInputPathToKeys(array $collection): array
+    {
+        $argumentBasePathDotNotation = implode('.', $this->argumentPath);
+
+        return collect($this->validator->rules())
+            ->mapWithKeys(function ($value, $key) use ($argumentBasePathDotNotation) {
+                return [$argumentBasePathDotNotation . '.' . $key => $value];
+            })
+            ->toArray();
     }
 }
