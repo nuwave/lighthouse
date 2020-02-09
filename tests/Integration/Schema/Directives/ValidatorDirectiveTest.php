@@ -27,7 +27,7 @@ class ValidatorDirectiveTest extends DBTestCase
           email: String!
         }
 
-        input CreateUserInput @validate(validator: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\CreateUserInputValidator") {
+        input CreateUserInput @validate {
           name: String!
           email: String!
           password: String!
@@ -68,7 +68,6 @@ class ValidatorDirectiveTest extends DBTestCase
     /** @test */
     public function testNestedInputTypeValidator()
     {
-        config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
         $this->schema .= /** @lang GraphQL */
             '
         type Company {
@@ -137,6 +136,49 @@ class ValidatorDirectiveTest extends DBTestCase
                                   ]
                               ]);
     }
+
+    public function testValidationMessages()
+    {
+        config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
+        $this->schema .= /** @lang GraphQL */
+            '
+        type User {
+          id: ID!
+          name: String!
+          email: String!
+        }
+
+        input CreateUserInput @validate {
+          name: String!
+          email: String!
+          password: String!
+        }
+
+        type Mutation {
+          createUser(input: CreateUserInput! @spread): User @create
+        }
+        ';
+
+        $response = $this->graphQL(
+        /** @lang GraphQL */ '
+                mutation ($input: CreateUserInput!){
+                  createUser(input: $input){
+                   email
+                }
+              }
+                ',
+                             [
+                                 'input' => [
+                                     'name'     => 'short',
+                                     'email'    => 'user@company.test',
+                                     'password' => 'supersecret',
+                                 ]
+                             ]
+        );
+
+        $this->assertValidationError($response, 'input.name', 'name validation message');
+
+    }
 }
 
 class CreateUserInputValidator extends InputTypeValidator
@@ -145,7 +187,7 @@ class CreateUserInputValidator extends InputTypeValidator
     public function rules(): array
     {
         return [
-            'name'     => ['required'],
+            'name'     => ['min:6'],
             'email'    => ['required', 'email', Rule::unique('users', 'email')],
             'password' => ['required']
         ];
@@ -153,7 +195,9 @@ class CreateUserInputValidator extends InputTypeValidator
 
     public function messages(): array
     {
-        return [];
+        return [
+            'name.min' => 'Name validation message.',
+        ];
     }
 }
 

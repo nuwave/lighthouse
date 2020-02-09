@@ -53,7 +53,16 @@ abstract class InputTypeValidator
         return $modelClass::find($this->input($model->getKeyName()));
     }
 
+    /**
+     * @return array
+     */
     abstract function rules(): array;
 
-    abstract function messages(): array;
+    /**
+     * @return array
+     */
+    function messages(): array
+    {
+        return [];
+    }
 }

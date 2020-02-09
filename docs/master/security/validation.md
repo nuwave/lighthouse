@@ -209,11 +209,6 @@ class CreateUserInputValidator extends InputTypeValidator
             'password' => ['required']
         ];
     }
-
-    public function messages(): array
-    {
-        return [];
-    }
 }
 ```
 This will allow you to define all the rules for the fields on an input type programmatically. This gives more 
