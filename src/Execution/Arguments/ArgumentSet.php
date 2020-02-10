@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentSet
 {
@@ -41,6 +42,24 @@ class ArgumentSet
         }
 
         return $plainArguments;
+    }
+
+    /**
+     * Check if the ArgumentSet has a non-null value with the given key.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
+        $argument = $this->arguments[$key] ?? null;
+
+        if ($argument === null) {
+            return false;
+        }
+
+        return $argument->value !== null;
     }
 
     /**
@@ -87,10 +106,19 @@ class ArgumentSet
         $argumentSet->directives = $this->directives;
 
         foreach ($this->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs
-            if ($argument->value instanceof self) {
-                $argument->value = $argument->value->rename();
-            }
+            // Recursively apply the renaming to nested inputs.
+            // We look for further ArgumentSet instances, they
+            // might be contained within an array.
+            $argument->value = Utils::applyEach(
+                function ($value) {
+                    if ($value instanceof self) {
+                        return $value->rename();
+                    }
+
+                    return $value;
+                },
+                $argument->value
+            );
 
             /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
             $renameDirective = $argument->directives->first(function ($directive) {

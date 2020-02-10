@@ -60,6 +60,11 @@ class User extends Authenticatable
             ->withPivot(['meta']);
     }
 
+    public function rolesPivot(): HasMany
+    {
+        return $this->hasMany(RoleUserPivot::class, 'user_id');
+    }
+
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');

@@ -8,8 +8,7 @@ use Tests\Utils\Models\Task;
 
 class MorphOneTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */
-        '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
@@ -173,6 +172,38 @@ GRAPHQL
                         'id' => 1,
                         'url' => 'foo',
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testAllowsNullOperations(): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "foo"
+                image: {
+                    create: null
+                    update: null
+                    upsert: null
+                    delete: null
+                }
+            }) {
+                name
+                image {
+                    url
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'name' => 'foo',
+                    'image' => null,
                 ],
             ],
         ]);

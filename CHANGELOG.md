@@ -15,20 +15,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
 - Add test trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
+- Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
+  a dummy schema for testing custom Lighthouse extensions https://github.com/nuwave/lighthouse/pull/1171
 
 ### Fixed
 
 - Fix eager-loading relations where the parent type is an `interface` or `union` and
   may correspond to multiple different models https://github.com/nuwave/lighthouse/pull/1035
+- Fix renaming input fields that are nested within lists using `@rename` https://github.com/nuwave/lighthouse/pull/1166
+- Fix handling of nested mutation operations that receive `null` https://github.com/nuwave/lighthouse/pull/1174
+- Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
 
-## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.1...4.8.0)
+## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
 ### Fixed
 
 - Avoid erasing the model information from the wrapping paginated results `type` when defining
   a paginated `@hasMany` field after a field with `@paginate` https://github.com/nuwave/lighthouse/pull/1149
 
-## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.7.2)
+## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.7.2...v4.8.0)
 
 ### Added
 
