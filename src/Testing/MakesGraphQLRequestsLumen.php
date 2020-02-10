@@ -35,10 +35,10 @@ trait MakesGraphQLRequestsLumen
         $params = ['query' => $query];
 
         if ($variables) {
-            $params = array_merge($params, ['variables' => $variables]);
+            $params += ['variables' => $variables];
         }
 
-        $params = array_merge($params, $extraParams);
+        $params += $extraParams;
         $this->postGraphQL($params);
 
         return $this;
