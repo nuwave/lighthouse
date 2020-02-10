@@ -157,15 +157,15 @@ type Mutation {
 You can customize the messages for the given rules by implementing the `messages` function.
 
 ```php
-    /**
-     * @return string[]
-     */
-    public function messages(): array
-    {
-        return [
-            'name.unique' => 'The chosen username is not available',
-        ];
-    }
+/**
+ * @return string[]
+ */
+public function messages(): array
+{
+    return [
+        'name.unique' => 'The chosen username is not available',
+    ];
+}
 ```
 ## Validate Input Types
 
@@ -173,50 +173,54 @@ In cases where your validation becomes too complex and demanding, you want to ha
 complex validation. For example, accessing existing data in the database or validating complex combination of input 
 values cannot be achieved with the examples above. This is where input type validation comes into play.
 
+As an example, let's make the the following mutation is called with valid inputs:
+
 ```graphql
-    type User {
-      id: ID!
-      name: String!
-      email: String!
-    }
-
-    input CreateUserInput @validate {
-      name: String!
-      email: String!
-      password: String!
-    }
-
-    type Mutation {
-      createUser(input: CreateUserInput! @spread): User @create
-    }
+type Mutation {
+  createUser(input: CreateUserInput! @spread): User @create
+}
 ```
-Note that the fields on the `CreateUserInput` do not have the `@rules` directive.
 
-The corresponding validation class for the input type looks like the following.
+Unlike the field level validation of [`@rules`](../api-reference/directives.md#rules), input validation
+works by decorating the `input` type with the [`@validate`](../api-reference/directives.md#validate) directive:
+
+```graphql
+input CreateUserInput @validate {
+  name: String!
+  email: String!
+  password: String!
+}
+```
+
+This definition alone does not do anything though - we have to add a validation class that
+corresponds to the `CreateUserInput` we defined. Let's create one with the artisan command:
+
+    php artisan lighthouse:validator
+
+The resulting class will be placed in your configured validator namespace. Let's go ahead
+and define the validation rules for the input:
 
 ```php
+namespace App\GraphQL\Validators;
+
 use Illuminate\Validation\Rule;
 use Nuwave\Lighthouse\Execution\InputTypeValidator;
 
 class CreateUserInputValidator extends InputTypeValidator
 {
-
     public function rules(): array
     {
         return [
-            'name'     => ['required'],
-            'email'    => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required']
+            'name' => ['required'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')],
+            'password' => ['required'],
         ];
     }
 }
 ```
-This will allow you to define all the rules for the fields on an input type programmatically. This gives more 
-flexibility then when defining them on the fields in the schema.
 
-The location of these validator classes are located in `App\\GraphQL\\Validators`. Other locations can be added by 
-adding new items to the `lighthouse.namespaces.validators` config value.
+Note that this gives you access to all kinds of programmatic validation rules that Laravel
+provides. This can give you additional flexibility when you need it.
 
 When updating for example a user, it is possible to obtain an instance of it by using `$this->model(User::class)`. This 
 will return an instance of the user model based on it's primary key name.   
-
