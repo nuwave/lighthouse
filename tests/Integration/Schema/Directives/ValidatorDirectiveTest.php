@@ -16,60 +16,8 @@ use Tests\Utils\Models\User;
 class ValidatorDirectiveTest extends DBTestCase
 {
 
-    public function testInputTypeValidator()
-    {
-        config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
-        $this->schema .= /** @lang GraphQL */
-            '
-        type User {
-          id: ID!
-          name: String!
-          email: String!
-        }
-
-        input CreateUserInput @validate {
-          name: String!
-          email: String!
-          password: String!
-        }
-
-        type Mutation {
-          createUser(input: CreateUserInput! @spread): User @create
-        }
-        ';
-
-        $response = $this->graphQL(
-        /** @lang GraphQL */ '
-                mutation ($input: CreateUserInput!){
-                  createUser(input: $input){
-                   email
-                }
-              }
-                ',
-                             [
-                                 'input' => [
-                                     'name'     => 'User',
-                                     'email'    => 'user@company.test',
-                                     'password' => 'supersecret',
-                                 ]
-                             ]
-        );
-
-        $response->assertJson([
-                                  'data' => [
-                                      'createUser' => [
-                                          'email' => 'user@company.test'
-                                      ]
-                                  ]
-                              ]);
-
-    }
-
-    /** @test */
-    public function testNestedInputTypeValidator()
-    {
-        $this->schema .= /** @lang GraphQL */
-            '
+    protected $schema = /** @lang GraphQL */
+        '
         type Company {
           id: ID!
           name: String!
@@ -94,6 +42,12 @@ class ValidatorDirectiveTest extends DBTestCase
           update: UpdateCompanyInput
         }
 
+        input CreateUserInput @validate {
+          name: String!
+          email: String!
+          password: String!
+        }
+
         input UpdateCompanyInput @validate(validator: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\UpdateCompanyInputValidator") {
           id: ID!
           name: String!
@@ -101,8 +55,48 @@ class ValidatorDirectiveTest extends DBTestCase
 
         type Mutation {
           updateUser(input: UpdateUserInput! @spread): User @update
+          createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        type Query {
+          me: User @auth
         }
         ';
+
+    public function testInputTypeValidator()
+    {
+        config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
+
+        $response = $this->graphQL(
+        /** @lang GraphQL */ '
+                mutation ($input: CreateUserInput!){
+                  createUser(input: $input){
+                   email
+                }
+              }
+                ',
+                             [
+                                 'input' => [
+                                     'name'     => 'Username',
+                                     'email'    => 'user@company.test',
+                                     'password' => 'supersecret',
+                                 ]
+                             ]
+        );
+
+        $response->assertJson([
+                                  'data' => [
+                                      'createUser' => [
+                                          'email' => 'user@company.test'
+                                      ]
+                                  ]
+                              ]);
+
+    }
+
+    /** @test */
+    public function testNestedInputTypeValidator()
+    {
         $company = factory(Company::class)->create(['name' => 'The Company']);
         $user = factory(User::class)->create(['company_id' => $company->id]);
 
@@ -140,24 +134,6 @@ class ValidatorDirectiveTest extends DBTestCase
     public function testValidationMessages()
     {
         config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
-        $this->schema .= /** @lang GraphQL */
-            '
-        type User {
-          id: ID!
-          name: String!
-          email: String!
-        }
-
-        input CreateUserInput @validate {
-          name: String!
-          email: String!
-          password: String!
-        }
-
-        type Mutation {
-          createUser(input: CreateUserInput! @spread): User @create
-        }
-        ';
 
         $response = $this->graphQL(
         /** @lang GraphQL */ '
@@ -176,7 +152,7 @@ class ValidatorDirectiveTest extends DBTestCase
                              ]
         );
 
-        $this->assertValidationError($response, 'input.name', 'name validation message');
+        $this->assertValidationError($response, 'input.name', 'Name validation message.');
 
     }
 }

@@ -332,7 +332,6 @@ EOL
             'fields' => function () use ($inputDefinition): array {
                 return $this->argumentFactory->toTypeMap($inputDefinition->fields);
             },
-            'directives' => $this->directiveFactory->createAssociatedDirectives($inputDefinition),
         ]);
     }
 

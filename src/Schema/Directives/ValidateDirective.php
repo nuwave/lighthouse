@@ -94,15 +94,15 @@ SDL;
     }
 
     /**
-     * @param array $collection
+     * @param array $array
      *
      * @return array
      */
-    private function addFullInputPathToKeys(array $collection): array
+    private function addFullInputPathToKeys(array $array): array
     {
         $argumentBasePathDotNotation = implode('.', $this->argumentPath);
 
-        return collect($this->validator->rules())
+        return collect($array)
             ->mapWithKeys(function ($value, $key) use ($argumentBasePathDotNotation) {
                 return [$argumentBasePathDotNotation . '.' . $key => $value];
             })
