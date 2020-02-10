@@ -13,7 +13,6 @@ use Illuminate\Support\Arr;
  */
 trait MakesGraphQLRequests
 {
-
     /**
      * Stores the result of the introspection query.
      *
@@ -37,8 +36,7 @@ trait MakesGraphQLRequests
     {
         $params = ['query' => $query];
 
-        if ($variables)
-        {
+        if ($variables) {
             $params += ['variables' => $variables];
         }
 
@@ -84,8 +82,8 @@ trait MakesGraphQLRequests
             [],
             $files,
             $this->transformHeadersToServerVars([
-                                                    'Content-Type' => 'multipart/form-data',
-                                                ])
+                'Content-Type' => 'multipart/form-data',
+            ])
         );
     }
 
@@ -96,8 +94,7 @@ trait MakesGraphQLRequests
      */
     protected function introspect(): TestResponse
     {
-        if ($this->introspectionResult)
-        {
+        if ($this->introspectionResult) {
             return $this->introspectionResult;
         }
 
@@ -138,8 +135,7 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if ( ! $this->introspectionResult)
-        {
+        if (! $this->introspectionResult) {
             $this->introspect();
         }
 
@@ -180,7 +176,7 @@ trait MakesGraphQLRequests
         $this->assertArrayNotHasKey(
             $key,
             $validation,
-            'Failed asserting that the response is missing a validation error for ' . $key
+            'Failed asserting that the response is missing a validation error for '.$key
         );
     }
 
@@ -194,17 +190,17 @@ trait MakesGraphQLRequests
     public function assertValidationError(TestResponse $response, string $key, string $message)
     {
         $response->assertJson([
-                                  'errors' => [
-                                      [
-                                          'extensions' => [
-                                              'validation' => [
-                                                  $key => [
-                                                      $message,
-                                                  ],
-                                              ],
-                                          ],
-                                      ],
-                                  ],
-                              ]);
+            'errors' => [
+                [
+                    'extensions' => [
+                        'validation' => [
+                            $key => [
+                                $message,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

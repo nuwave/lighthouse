@@ -24,7 +24,6 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class BaseDirective implements Directive
 {
-
     /**
      * The AST node of the directive.
      *
@@ -147,38 +146,31 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if ( ! $model)
-        {
-            if ($this->definitionNode instanceof FieldDefinitionNode)
-            {
+        if (! $model) {
+            if ($this->definitionNode instanceof FieldDefinitionNode) {
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
                 /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
                 $documentAST = app(ASTBuilder::class)->documentAST();
 
-                if ( ! isset($documentAST->types[$returnTypeName]))
-                {
+                if (! isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(
                         "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
                     );
                 }
                 $type = $documentAST->types[$returnTypeName];
 
-                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass'))
-                {
+                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')) {
                     $model = ASTHelper::directiveArgValue($modelClass, 'class');
-                } else
-                {
+                } else {
                     $model = $returnTypeName;
                 }
-            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode)
-            {
+            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
                 $model = $this->nodeName();
             }
         }
 
-        if ( ! $model)
-        {
+        if (! $model) {
             throw new DefinitionException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
             );
@@ -209,8 +201,7 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if ( ! $determineMatch)
-        {
+        if (! $determineMatch) {
             $determineMatch = 'class_exists';
         }
 
@@ -220,8 +211,7 @@ abstract class BaseDirective implements Directive
             $determineMatch
         );
 
-        if ( ! $className)
-        {
+        if (! $className) {
             throw new DefinitionException(
                 "No class '{$classCandidate}' was found for directive '{$this->name()}'"
             );
@@ -253,15 +243,13 @@ abstract class BaseDirective implements Directive
         if (
             count($argumentParts) > 2
             || empty($argumentParts[0])
-        )
-        {
+        ) {
             throw new DefinitionException(
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
             );
         }
 
-        if (empty($argumentParts[1]))
-        {
+        if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
 
@@ -279,7 +267,7 @@ abstract class BaseDirective implements Directive
     {
         return $this->namespaceClassName(
             $modelClassCandidate,
-            (array)config('lighthouse.namespaces.models'),
+            (array) config('lighthouse.namespaces.models'),
             function (string $classCandidate): bool {
                 return is_subclass_of($classCandidate, Model::class);
             }
@@ -296,7 +284,7 @@ abstract class BaseDirective implements Directive
     {
         return $this->namespaceClassName(
             $validatorCandidate,
-            (array)config('lighthouse.namespaces.validators'),
+            (array) config('lighthouse.namespaces.validators'),
             function (string $classCandidate): bool {
                 return is_subclass_of($classCandidate, InputTypeValidator::class);
             }

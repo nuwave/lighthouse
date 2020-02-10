@@ -23,7 +23,6 @@ use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
-
     use MakesGraphQLRequests;
     use MocksResolvers;
     use UsesTestSchema;
@@ -42,8 +41,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        if ( ! $this->schema)
-        {
+        if (! $this->schema) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
@@ -148,7 +146,6 @@ abstract class TestCase extends BaseTestCase
     {
         $app->singleton(ExceptionHandler::class, function () {
             return new class implements ExceptionHandler {
-
                 public function report(Exception $e)
                 {
                     //
@@ -189,7 +186,7 @@ abstract class TestCase extends BaseTestCase
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema . self::PLACEHOLDER_QUERY
+            $schema.self::PLACEHOLDER_QUERY
         );
     }
 
@@ -218,6 +215,6 @@ abstract class TestCase extends BaseTestCase
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
-        return addslashes(static::class) . '@' . $method;
+        return addslashes(static::class).'@'.$method;
     }
 }

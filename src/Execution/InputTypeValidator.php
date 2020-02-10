@@ -1,17 +1,14 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Execution;
-
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class InputTypeValidator
+ * Class InputTypeValidator.
  */
 abstract class InputTypeValidator
 {
-
     /**
      * @var array
      */
@@ -56,12 +53,12 @@ abstract class InputTypeValidator
     /**
      * @return array
      */
-    abstract function rules(): array;
+    abstract public function rules(): array;
 
     /**
      * @return array
      */
-    function messages(): array
+    public function messages(): array
     {
         return [];
     }

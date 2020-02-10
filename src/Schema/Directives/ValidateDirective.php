@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Execution\InputTypeValidator;
@@ -10,11 +9,10 @@ use Nuwave\Lighthouse\Support\Contracts\HasInput;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 
 /**
- * Class ValidateDirective
+ * Class ValidateDirective.
  */
 class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasInput, HasArgumentPath
 {
-
     /**
      * @var array
      */
@@ -30,7 +28,7 @@ class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesR
     private $argumentPath;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function definition()
     {
@@ -43,7 +41,7 @@ SDL;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function name(): string
     {
@@ -51,12 +49,12 @@ SDL;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function rules(): array
     {
-        $class = $this->directiveArgValue('validator') ?? $this->inputTypeValidatorClass($this->nodeName() . 'Validator');
+        $class = $this->directiveArgValue('validator') ?? $this->inputTypeValidatorClass($this->nodeName().'Validator');
 
         $validator = new $class($this->input);
         $this->validator = $validator;
@@ -65,7 +63,7 @@ SDL;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function messages(): array
     {
@@ -78,7 +76,7 @@ SDL;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function argumentPath(): array
     {
@@ -86,7 +84,7 @@ SDL;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setArgumentPath(array $argumentPath)
     {
@@ -104,7 +102,7 @@ SDL;
 
         return collect($array)
             ->mapWithKeys(function ($value, $key) use ($argumentBasePathDotNotation) {
-                return [$argumentBasePathDotNotation . '.' . $key => $value];
+                return [$argumentBasePathDotNotation.'.'.$key => $value];
             })
             ->toArray();
     }
