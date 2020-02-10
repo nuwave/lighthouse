@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix renaming input fields that are nested within lists using `@rename` https://github.com/nuwave/lighthouse/pull/1166
 - Fix handling of nested mutation operations that receive `null` https://github.com/nuwave/lighthouse/pull/1174
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
+- Fix `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` test helper https://github.com/nuwave/lighthouse/pull/1186
 
 ## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
