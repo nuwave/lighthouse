@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Testing;
 
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
-use PHPUnit\Framework\MockObject\Rule\InvokedAtLeastOnce;
 
 /**
  * @mixin \PHPUnit\Framework\TestCase
@@ -20,7 +19,7 @@ trait MocksResolvers
      */
     protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
     {
-        $method = $this->mockResolverExpects(new InvokedAtLeastOnce(), $key);
+        $method = $this->mockResolverExpects($this->atLeastOnce(), $key);
 
         if (is_callable($resolverOrValue)) {
             $method->willReturnCallback($resolverOrValue);
