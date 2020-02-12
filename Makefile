@@ -18,6 +18,6 @@ bench: ## Run benchmarks
 	docker-compose exec php composer bench
 
 vendor: composer.json ## Install composer dependencies
-	composer validate --strict
-	composer install
-	composer normalize
+	docker-compose exec php composer validate --strict
+	docker-compose exec php composer install
+	docker-compose exec php composer normalize

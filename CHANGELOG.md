@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
 - Apply query filters using an `ArgBuilderDirective` such as `@eq` when the argument
   is nested deeply within the input https://github.com/nuwave/lighthouse/pull/1176
+- Fix `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` test helper https://github.com/nuwave/lighthouse/pull/1186
+
+### Deprecated
+
+- Deprecate `\Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider#setRootPath()`, this function
+  is never called or used anywhere within Lighthouse. It will be removed from the interface.
 
 ## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
 
