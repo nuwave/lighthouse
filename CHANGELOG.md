@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
 - Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
   a dummy schema for testing custom Lighthouse extensions https://github.com/nuwave/lighthouse/pull/1171
-- Add `@validate` directive to validate input types with a `InputTypeValidator` class. https://github.com/nuwave/lighthouse/pull/1185
+- Add `@validate` directive to validate input types by extending `\Nuwave\Lighthouse\Execution\InputTypeValidator`  https://github.com/nuwave/lighthouse/pull/1185
 
 ### Fixed
 
