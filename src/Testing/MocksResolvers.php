@@ -2,6 +2,10 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
+use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
+use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
+use PHPUnit\Framework\MockObject\Rule\InvokedAtLeastOnce;
+
 /**
  * @mixin \PHPUnit\Framework\TestCase
  */
@@ -12,9 +16,29 @@ trait MocksResolvers
      *
      * @param  callable|mixed|null  $resolverOrValue
      * @param  string  $key
-     * @return \Nuwave\Lighthouse\Testing\InvocationMocker
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
      */
     protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
+    {
+        $method = $this->mockResolverExpects(new InvokedAtLeastOnce(), $key);
+
+        if (is_callable($resolverOrValue)) {
+            $method->willReturnCallback($resolverOrValue);
+        } else {
+            $method->willReturn($resolverOrValue);
+        }
+
+        return $method;
+    }
+
+    /**
+     * Register a resolver for @mock.
+     *
+     * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
+     * @param  string  $key
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
+     */
+    protected function mockResolverExpects(InvocationOrder $invocationOrder, string $key = 'default'): InvocationMocker
     {
         $mock = $this
             ->getMockBuilder(MockResolver::class)
@@ -22,7 +46,9 @@ trait MocksResolvers
 
         $this->registerMockResolver($mock, $key);
 
-        return new InvocationMocker($mock, $resolverOrValue);
+        return $mock
+            ->expects($invocationOrder)
+            ->method('__invoke');
     }
 
     /**

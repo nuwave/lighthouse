@@ -22,13 +22,15 @@ class BcryptDirectiveTest extends TestCase
             return $args;
         });
 
-        $password = $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(bar: "password") {
-                bar
+        $password = $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(bar: "password") {
+                    bar
+                }
             }
-        }
-        ')->jsonGet('data.foo.bar');
+            ')
+            ->jsonGet('data.foo.bar');
 
         $this->assertNotSame('password', $password);
         $this->assertTrue(password_verify('password', $password));

@@ -75,11 +75,7 @@ class RenameDirectiveTest extends TestCase
         {
             foo(baz: "something")
         }
-        ')->assertJson([
-            'data' => [
-                'foo' => true,
-            ],
-        ]);
+        ');
     }
 
     public function testRenameListOfInputs(): void

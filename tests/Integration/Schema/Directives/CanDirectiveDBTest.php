@@ -20,22 +20,24 @@ class CanDirectiveDBTest extends DBTestCase
             ])
         );
 
-        $user = factory(User::class)->create(['name' => 'foo']);
+        $user = factory(User::class)->create([
+            'name' => 'foo'
+        ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", find: "id")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @first
         }
-        
+
         type User {
             id: ID!
             name: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             user(id: {$user->getKey()}) {
                 name
@@ -57,14 +59,18 @@ class CanDirectiveDBTest extends DBTestCase
                 'name' => UserPolicy::ADMIN,
             ])
         );
+        $this->mockResolverExpects(
+            $this->never()
+        );
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */
+            '
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", find: "id")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             id: ID!
             name: String!
@@ -72,7 +78,7 @@ class CanDirectiveDBTest extends DBTestCase
         ';
 
         $this->expectException(ModelNotFoundException::class);
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(id: "not-present") {
                 name
@@ -98,20 +104,24 @@ class CanDirectiveDBTest extends DBTestCase
             'title' => 'Harry Potter and the Half-Blood Prince',
         ]);
 
-        $this->schema = '
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             post(foo: ID @eq): Post
                 @can(ability: "view", find: "foo")
-                @field(resolver: "'.$this->qualifyTestResolver('resolvePost').'")
+                @mock
         }
-        
+
         type Post {
             id: ID!
             title: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             post(foo: {$postB->getKey()}) {
                 title
@@ -136,20 +146,20 @@ class CanDirectiveDBTest extends DBTestCase
             'title' => 'Harry Potter and the Chamber of Secrets',
         ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             deletePosts(ids: [ID!]!): [Post!]!
-                @delete
                 @can(ability: "delete", find: "ids")
+                @delete
         }
-        
+
         type Post {
             id: ID!
             title: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             deletePosts(ids: [{$postA->getKey()}, {$postB->getKey()}]) {
                 title
@@ -180,20 +190,20 @@ class CanDirectiveDBTest extends DBTestCase
         $task = factory(Task::class)->create();
         $task->delete();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             task(id: ID @eq): Task
                 @can(ability: "adminOnly", find: "id")
                 @softDeletes
                 @find
         }
-        
+
         type Task {
             name: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             task(id: {$task->getKey()}, trashed: WITH) {
                 name
@@ -206,15 +216,5 @@ class CanDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
-    }
-
-    public function resolveUser($root, array $args): ?User
-    {
-        return User::where('id', $args['id'])->first();
-    }
-
-    public function resolvePost($root, array $args): ?User
-    {
-        return Post::where('id', $args['id'])->first();
     }
 }

@@ -594,7 +594,9 @@ class DeferTest extends TestCase
 
     public function testThrowsIfTryingToDeferRootMutationFields(): void
     {
-        $this->mockResolver();
+        $this->mockResolverExpects(
+            $this->never()
+        );
 
         $this->schema = /** @lang GraphQL */ '
         type User {
