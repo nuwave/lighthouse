@@ -48,7 +48,15 @@ module.exports = {
             {
                 text: 'Users',
                 link: '/users/'
-            }
+            },
+            {
+                text: 'Changelog',
+                link: 'https://github.com/nuwave/lighthouse/blob/master/CHANGELOG.md'
+            },
+            {
+                text: 'Upgrade Guide',
+                link: 'https://github.com/nuwave/lighthouse/blob/master/UPGRADE.md'
+            },
         ],
         sidebar: versioning.sidebars
     },

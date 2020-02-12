@@ -3,6 +3,7 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -481,11 +482,11 @@ GRAPHQL
         $task = factory(Task::class)->create();
         $task->user()->create();
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 user: {
                     disconnect: true
                 }
@@ -497,7 +498,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Task" => [
                     'id' => '1',
@@ -574,11 +576,11 @@ GRAPHQL
             factory(Task::class)->make()
         );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 user: {
                     delete: true
                 }
@@ -590,7 +592,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Task" => [
                     'id' => '1',
@@ -663,11 +666,11 @@ GRAPHQL
             factory(Task::class)->make()
         );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 user: {
                     delete: null
                     disconnect: false
@@ -680,7 +683,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}Task" => [
                     'id' => '1',
@@ -697,5 +701,209 @@ GRAPHQL
             $task->refresh()->user->id,
             'The parent relationship remains untouched.'
         );
+    }
+
+    public function testUpsertAcrossTwoNestedBelongsToRelations(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            name: String!
+            roles: [Role!] @belongsToMany
+        }
+
+        type Role {
+            name: String!
+        }
+
+        type Mutation {
+            upsertUser(input: UpsertUserInput! @spread): User @upsert
+        }
+
+        input UpsertUserInput {
+            name: String!
+            rolesPivot: UpsertRoleUserPivotBelongsTo
+        }
+
+        input UpsertRoleUserPivotBelongsTo {
+            upsert: [UpsertRoleUserPivotInput!]
+        }
+
+        input UpsertRoleUserPivotInput {
+            role: UpsertRoleBelongsTo
+        }
+
+        input UpsertRoleBelongsTo {
+            upsert: UpsertRoleInput
+        }
+
+        input UpsertRoleInput {
+            name: String!
+        }
+        '.self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertUser(input: {
+                name: "foo"
+                rolesPivot: {
+                    upsert: [{
+                        role: {
+                            upsert: {
+                                name: "bar"
+                            }
+                        }
+                    }]
+                }
+            }) {
+                name
+                roles {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'name' => 'foo',
+                    'roles' => [
+                        [
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertAcrossTwoNestedBelongsToRelationsAndOverrideExistingModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+            roles: [Role!] @belongsToMany
+        }
+
+        type Role {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            upsertUser(input: UpsertUserInput! @spread): User @upsert
+        }
+
+        input UpsertUserInput {
+            id: ID
+            name: String!
+            rolesPivot: UpsertRoleUserPivotBelongsTo
+        }
+
+        input UpsertRoleUserPivotBelongsTo {
+            upsert: [UpsertRoleUserPivotInput!]
+        }
+
+        input UpsertRoleUserPivotInput {
+            role: UpsertRoleBelongsTo
+        }
+
+        input UpsertRoleBelongsTo {
+            upsert: UpsertRoleInput
+        }
+
+        input UpsertRoleInput {
+            id: ID
+            name: String!
+            users: UpsertRoleUsersRelation
+        }
+        
+        input UpsertRoleUsersRelation {
+            sync: [ID!]
+        }
+        '.self::PLACEHOLDER_QUERY;
+
+        // Create the first User with a Role.
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertUser(input: {
+                name: "foo"
+                rolesPivot: {
+                    upsert: [{
+                        role: {
+                            upsert: {
+                                name: "bar"
+                            }
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                roles {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'roles' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        // The first User has the first Role.
+        $role = Role::first();
+        $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
+
+        // Create another User.
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertUser(input: {
+                id: "1"
+                name: "fooz"
+                rolesPivot: {
+                    upsert: [{
+                        role: {
+                            upsert: {
+                                id: "1"
+                                name: "baz"
+                                users: {
+                                    sync: ["2"] # Here the first User is switching the relationship of the first Role to another User.
+                                }
+                            }
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                roles {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'id' => '1',
+                    'name' => 'fooz',
+                    'roles' => [],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
     }
 }

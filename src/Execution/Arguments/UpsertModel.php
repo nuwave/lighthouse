@@ -27,16 +27,18 @@ class UpsertModel implements ArgResolver
      */
     public function __invoke($model, $args)
     {
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $id */
-        $id = $args->arguments['id']
-            ?? $args->arguments[$model->getKeyName()]
-            ?? null;
-
-        if ($id) {
-            $model = $model->newQuery()->find($id->value)
-                ?? $model->newInstance();
-        } else {
-            $model = $model->newInstance();
+        if (
+            $id = $args->arguments['id']
+                ?? $args->arguments[$model->getKeyName()]
+                ?? null
+        ) {
+            if (
+                $existingModel = $model
+                    ->newQuery()
+                    ->find($id->value)
+            ) {
+                $model = $existingModel;
+            }
         }
 
         return ($this->previous)($model, $args);

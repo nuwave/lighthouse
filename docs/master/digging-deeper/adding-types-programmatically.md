@@ -6,7 +6,24 @@ You might want to add additional types to the schema programmatically.
 
 If you want to use the SDL to define additional types dynamically,
 you can listen for the [`BuildSchemaString`](../api-reference/events.md#buildschemastring)
-event and add in schema definitions as a simple string.
+event and return additional schema definitions as a string:
+
+```php
+app('events')->listen(
+    \Nuwave\Lighthouse\Events\BuildSchemaString::class,
+    function(): string {
+        // You can get your schema from anywhere you want, e.g. a database, hardcoded
+    }
+);
+```
+
+When your schema is defined within files and you want to use `#import` to combine them,
+you can use the `\Nuwave\Lighthouse\Schema\Source\SchemaStitcher` to load your file:
+
+```php
+$stitcher = new \Nuwave\Lighthouse\Schema\Source\SchemaStitcher(__DIR__ . '/path/to/schema.graphql');
+return $stitcher->getSchemaString();
+```
 
 ## Native PHP types
 
