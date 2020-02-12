@@ -21,7 +21,7 @@ class CanDirectiveDBTest extends DBTestCase
         );
 
         $user = factory(User::class)->create([
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
 
         $this->schema = /** @lang GraphQL */ '

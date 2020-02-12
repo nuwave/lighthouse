@@ -12,7 +12,7 @@ class CustomDefaultResolverTest extends TestCase
     public function testCanSpecifyACustomDefaultResolver(): void
     {
         $this->mockResolver([
-            'bar' => 'should not be returned'
+            'bar' => 'should not be returned',
         ]);
 
         $this->schema = /** @lang GraphQL */ '
