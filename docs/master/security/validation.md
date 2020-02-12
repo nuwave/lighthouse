@@ -169,7 +169,7 @@ public function messages(): array
 ```
 ## Validate Input Types
 
-In cases where your validation becomes too complex and demanding, you want to have the power of PHP to actual do the 
+In cases where your validation becomes too complex and demanding, you want to have the power of PHP to actually do the 
 complex validation. For example, accessing existing data in the database or validating complex combination of input 
 values cannot be achieved with the examples above. This is where input type validation comes into play.
 
