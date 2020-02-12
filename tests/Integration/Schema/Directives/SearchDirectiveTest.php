@@ -52,20 +52,26 @@ class SearchDirectiveTest extends DBTestCase
             'title' => 'another great title',
         ]);
 
-        $this->engine->shouldReceive('map')->andReturn(new Collection([$postA, $postC]));
+        $this->engine
+            ->shouldReceive('map')
+            ->andReturn(
+                new Collection([$postA, $postC])
+            );
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
         }
 
         type Query {
-            posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
+            posts(
+                search: String @search
+            ): [Post!]! @paginate(type: "paginator")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts(first: 10 search: "great") {
                 data {
@@ -123,18 +129,20 @@ class SearchDirectiveTest extends DBTestCase
             ->andReturn(new Collection([$postA, $postB]))
             ->once();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
         }
 
         type Query {
-            posts(search: String @search(within: "my.index")): [Post!]! @paginate(type: "paginator" model: "Post")
+            posts(
+                search: String @search(within: "my.index")
+            ): [Post!]! @paginate
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts(first: 10 search: "great") {
                 data {
@@ -186,18 +194,20 @@ class SearchDirectiveTest extends DBTestCase
             ->andReturn(new Collection([$postA, $postB]))
             ->once();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
         }
 
         type Query {
-            posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
+            posts(
+                search: String @search
+            ): [Post!]! @paginate(type: "paginator")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts(first: 10 search: "great") {
                 data {
