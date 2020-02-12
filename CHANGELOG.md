@@ -29,6 +29,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
 - Fix `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` test helper https://github.com/nuwave/lighthouse/pull/1186
 
+### Deprecated
+
+- Deprecate `\Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider#setRootPath()`, this function
+  is never called or used anywhere within Lighthouse. It will be removed from the interface.
+
 ## 4.8.1
 
 ### Fixed
