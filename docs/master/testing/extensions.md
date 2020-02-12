@@ -78,26 +78,26 @@ directive @revert on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINI
 The simplest way to mock a resolver is to have it return static data:
 
 ```php
-    public function testReverseField(): void
-    {
-        $this->mockResolver('foo');
+public function testReverseField(): void
+{
+    $this->mockResolver('foo');
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: String @reverse @mock
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertExactJson([
-            'data' => [
-                'foo' => 'oof',
-            ],
-        ]);
+    $this->schema = /** @lang GraphQL */ '
+    type Query {
+        foo: String @reverse @mock
     }
+    ';
+
+    $this->graphQL(/** @lang GraphQL */ '
+    {
+        foo
+    }
+    ')->assertExactJson([
+        'data' => [
+            'foo' => 'oof',
+        ],
+    ]);
+}
 ```
 
 Since we get back an instance of PHPUnit's `InvocationMocker`, we can also assert
@@ -105,71 +105,95 @@ that our resolver is called with certain values. Note that we are not passing an
 explicit resolver function here. The default resolver will simply return `null`.
 
 ```php
-    public function testReverseInput(): void
-    {
-        $this->mockResolver()
-            ->with(null, ['bar' => 'rab']);
+public function testReverseInput(): void
+{
+    $this->mockResolver()
+        ->with(null, ['bar' => 'rab']);
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo(bar: String @reverse): String @mock
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(bar: "bar")
-        }
-        ')->assertExactJson([
-            'data' => [
-                'foo' => null,
-            ],
-        ]);
+    $this->schema = /** @lang GraphQL */ '
+    type Query {
+        foo(bar: String @reverse): String @mock
     }
+    ';
+
+    $this->graphQL(/** @lang GraphQL */ '
+    {
+        foo(bar: "bar")
+    }
+    ')->assertExactJson([
+        'data' => [
+            'foo' => null,
+        ],
+    ]);
+}
 ```
 
 If you have to handle the incoming resolver arguments dynamically, you can also
 pass a function that is called:
 
 ```php
-    public function testReverseInput(): void
-    {
-        $this->mockResolver(function($root, array $args): string {
-            return $args['bar'];
-        });
+public function testReverseInput(): void
+{
+    $this->mockResolver(function($root, array $args): string {
+        return $args['bar'];
+    });
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo(bar: String @reverse): String @mock
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(bar: "bar")
-        }
-        ')->assertExactJson([
-            'data' => [
-                'foo' => 'rab',
-            ],
-        ]);
+    $this->schema = /** @lang GraphQL */ '
+    type Query {
+        foo(bar: String @reverse): String @mock
     }
+    ';
+
+    $this->graphQL(/** @lang GraphQL */ '
+    {
+        foo(bar: "bar")
+    }
+    ')->assertExactJson([
+        'data' => [
+            'foo' => 'rab',
+        ],
+    ]);
+}
 ```
 
-We might have a need to add multiple resolvers to a single schema. For that case,
-we can specify unique `key` for the mock resolver (it defaults to `default`):
+You might have a need to add multiple resolvers to a single schema. For that case,
+specify a unique `key` for the mock resolver (it defaults to `default`):
 
 ```php
-    public function testMultipleResolvers(): void
-    {
-        $this->mockResolver(..., 'first');
-        $this->mockResolver(..., 'second');
+public function testMultipleResolvers(): void
+{
+    $this->mockResolver(..., 'first');
+    $this->mockResolver(..., 'second');
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: Int @mock(key: "first")
-            bar: ID @mock(key: "second")
-        }
-        ';
+    $this->schema = /** @lang GraphQL */ '
+    type Query {
+        foo: Int @mock(key: "first")
+        bar: ID @mock(key: "second")
     }
+    ';
+}
+```
+
+By default, the resolver from `mockResolver` expects to be called at least once.
+If you want to set a different expectation, you can use `mockResolverExpects`:
+
+```php
+public function testAbortsBeforeResolver(): void
+{
+    $this->mockResolverExpects(
+        $this->never()
+    );
+
+    $this->schema = /** @lang GraphQL */ '
+    type Query {
+        foo: Int @someValidationThatFails @mock
+    }
+    ';
+
+    $this->graphQL(/** @lang GraphQL */ '
+    {
+        foo
+    }
+    ');
+}
 ```
