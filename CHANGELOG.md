@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.8.1...master)
+You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
+
+## Unreleased
 
 ### Added
 
@@ -34,14 +36,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deprecate `\Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider#setRootPath()`, this function
   is never called or used anywhere within Lighthouse. It will be removed from the interface.
 
-## [4.8.1](https://github.com/nuwave/lighthouse/compare/v4.8.0...4.8.1)
+## 4.8.1
 
 ### Fixed
 
 - Avoid erasing the model information from the wrapping paginated results `type` when defining
   a paginated `@hasMany` field after a field with `@paginate` https://github.com/nuwave/lighthouse/pull/1149
 
-## [4.8.0](https://github.com/nuwave/lighthouse/compare/v4.7.2...v4.8.0)
+## 4.8.0
 
 ### Added
 
@@ -90,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove broken `NOT` conditional when using `@whereConditions` https://github.com/nuwave/lighthouse/pull/1125
 
-## [4.7.2](https://github.com/nuwave/lighthouse/compare/v4.7.1...v4.7.2)
+## 4.7.2
 
 ### Fixed
 
@@ -98,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   after executing each query https://github.com/nuwave/lighthouse/pull/1030
 - Keep the query and pagination capabilities of relation directives when disabling batch loading https://github.com/nuwave/lighthouse/pull/1083
 
-## [4.7.1](https://github.com/nuwave/lighthouse/compare/v4.7.0...v4.7.1)
+## 4.7.1
 
 ### Changed
 
@@ -109,7 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Define `@enum` as a directive class so it shows up in `schema-directives.graphql`
   and can potentially be overwritten https://github.com/nuwave/lighthouse/pull/1078
 
-## [4.7.0](https://github.com/nuwave/lighthouse/compare/v4.6.0...v4.7.0)
+## 4.7.0
 
 ### Added
 
@@ -129,7 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Throw `DefinitionException` when missing a type in the type registry https://github.com/nuwave/lighthouse/pull/1066
 - Add `INPUT_FIELD_DEFINITION` to `orderBy` directive location https://github.com/nuwave/lighthouse/pull/1069
 
-## [4.6.0](https://github.com/nuwave/lighthouse/compare/v4.5.3...v4.6.0)
+## 4.6.0
 
 ### Added
 
@@ -143,25 +145,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Handle arrays of namespaces in generator commands https://github.com/nuwave/lighthouse/pull/1033
 
-## [4.5.3](https://github.com/nuwave/lighthouse/compare/v4.5.2...v4.5.3)
+## 4.5.3
 
 ### Fixed
 
 - Handle `null` being passed to a nullable argument that is an input object type https://github.com/nuwave/lighthouse/pull/1021
 
-## [4.5.2](https://github.com/nuwave/lighthouse/compare/v4.5.1...v4.5.2)
+## 4.5.2
 
 ### Fixed
 
 - Fix conversion of client directives after the schema was cached https://github.com/nuwave/lighthouse/pull/1019
 
-## [4.5.1](https://github.com/nuwave/lighthouse/compare/v4.5.0...v4.5.1)
+## 4.5.1
 
 ### Fixed
 
 - Handle `null` being passed to a nullable argument that is a list of type https://github.com/nuwave/lighthouse/pull/1016
 
-## [4.5.0](https://github.com/nuwave/lighthouse/compare/v4.4.2...v4.5.0)
+## 4.5.0
 
 ### Added
 
@@ -172,7 +174,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015 
 
-## [4.4.2](https://github.com/nuwave/lighthouse/compare/v4.4.1...v4.4.2)
+## 4.4.2
 
 ### Added
 
@@ -184,14 +186,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Do not require the type of a field matching a model class when using the
   `builder` argument of `@paginate` https://github.com/nuwave/lighthouse/pull/1011
 
-## [4.4.1](https://github.com/nuwave/lighthouse/compare/v4.4.0...v4.4.1)
+## 4.4.1
 
 ### Fixed
 
 - Fix regression in 4.4.0 that required matching the type returned from paginated relationship
   fields with the class name of the model https://github.com/nuwave/lighthouse/pull/1011
 
-## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
+## 4.4.0
 
 ### Added
 
@@ -222,7 +224,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use the `RegisterDirectiveNamespaces` event instead of `DirectiveFactory#addResolved()` https://github.com/nuwave/lighthouse/pull/950
 - Use `@node` instead of `@model` to resolve models through Relay's global identification https://github.com/nuwave/lighthouse/pull/974
 
-## [4.3.0](https://github.com/nuwave/lighthouse/compare/v4.2.1...v4.3.0)
+## 4.3.0
 
 ### Added
 
@@ -239,13 +241,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validate requirements for argument definitions of `@delete`, `@forceDelete` and `@restore`
   during schema build time https://github.com/nuwave/lighthouse/pull/941
 
-## [4.2.1](https://github.com/nuwave/lighthouse/compare/v4.2.0...v4.2.1)
+## 4.2.1
 
 ### Fixed
 
 - Actually use the specified `edgeType` in Relay style connections https://github.com/nuwave/lighthouse/pull/939
 
-## [4.2.0](https://github.com/nuwave/lighthouse/compare/v4.1.1...v4.2.0)
+## 4.2.0
 
 ### Added
 
@@ -255,18 +257,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support Laravel `^6.0` https://github.com/nuwave/lighthouse/pull/926
 - Add command `lighthouse:ide-helper` for generating a definition file with all schema directives https://github.com/nuwave/lighthouse/pull/933
 
-## [4.1.1](https://github.com/nuwave/lighthouse/compare/v4.1.0...v4.1.1)
+## 4.1.1
 
 ### Fixed
 
 - Unbox laravel-enum inputs when using the builder directives https://github.com/nuwave/lighthouse/pull/927
 
-## [4.1.0](https://github.com/nuwave/lighthouse/compare/v4.0.0...v4.1.0)
+## 4.1.0
 
 ### Added
 
 - Add the `@whereJsonContains` directive to an input value as
-  a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses) https://github.com/nuwave/lighthouse/pull/919
+  a [whereJsonContains filter
 - Allow using callable classes with `__invoke` when referencing methods in directives
   and when looking for default resolvers or type resolvers https://github.com/nuwave/lighthouse/issues/882
 - Allow to restrict column names to a well-defined list in `@whereContraints`
@@ -282,7 +284,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed the `ValidationDirective` not setting the mutation or query arguments to itself https://github.com/nuwave/lighthouse/pull/915
 
-## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
+## 4.0.0
 
 ### Added
 
@@ -346,7 +348,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The configuration option `pagination_amount_argument` will be removed in v5
 
-## [3.7.0](https://github.com/nuwave/lighthouse/compare/v3.6.1...v3.7.0)
+## 3.7.0
 
 ### Added
 
@@ -366,31 +368,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The `GraphQL` facade and the container alias `graphql` will be removed in v4 
 
-## [3.6.1](https://github.com/nuwave/lighthouse/compare/v3.6.0...v3.6.1)
+## 3.6.1
 
 ### Fixed
 
 - Use the spec-compliant default deprecation reason for `@deprecate` directive https://github.com/nuwave/lighthouse/pull/787
 
-## [3.6.0](https://github.com/nuwave/lighthouse/compare/v3.5.3...v3.6.0)
+## 3.6.0
 
 ### Added
 
 - Add `@whereConstraints` directive that offers flexible query capabilities to the client https://github.com/nuwave/lighthouse/pull/753
-- Add convenience wrapper for registering Enum types based on [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
+- Add convenience wrapper for registering Enum types based on [BenSampo/laravel-enum
   https://github.com/nuwave/lighthouse/pull/779
 
 ### Deprecated
 
 - The `controller` config option will be removed in v4 https://github.com/nuwave/lighthouse/pull/781
 
-## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
+## 3.5.3
 
 ### Fixed
 
 - Respect the model's connection for database transaction during `@create` and `@update` https://github.com/nuwave/lighthouse/pull/777
 
-## [3.5.2](https://github.com/nuwave/lighthouse/compare/v3.5.1...v3.5.2)
+## 3.5.2
 
 ### Fixed
 
@@ -401,13 +403,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The class `SubscriptionExceptionHandler` will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
 
-## [3.5.1](https://github.com/nuwave/lighthouse/compare/v3.5.0...v3.5.1)
+## 3.5.1
 
 ### Fixed
 
 - Throw error if pagination amount `<= 0` is requested https://github.com/nuwave/lighthouse/pull/765
 
-## [3.5.0](https://github.com/nuwave/lighthouse/compare/v3.4.0...v3.5.0)
+## 3.5.0
 
 ### Changed
 
@@ -429,13 +431,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refresh GraphQLRequest singleton between multiple requests to prevent
   a common error in test execution https://github.com/nuwave/lighthouse/pull/761
 
-## [3.4.0](https://github.com/nuwave/lighthouse/compare/v3.3.0...v3.4.0) - 2019-04-18
+## 3.4.0
 
 ### Added
 
 - Allow rebinding a custom GlobalId resolver https://github.com/nuwave/lighthouse/pull/739
 
-## [3.3.0](https://github.com/nuwave/lighthouse/compare/v3.2.1...v3.3.0) - 2019-04-15
+## 3.3.0
 
 ### Added
 
@@ -452,19 +454,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@whereBetween` and `@whereNotBetween` will take a single input object
   instead of being spread across two args https://github.com/nuwave/lighthouse/pull/680
 
-## [3.2.1](https://github.com/nuwave/lighthouse/compare/v3.2.0...v3.2.1) - 2019-04-12
+## 3.2.1
 
 ### Changed
 
 - Flatten the namespace for the built-in directives https://github.com/nuwave/lighthouse/pull/700
 
-## [3.2.0](https://github.com/nuwave/lighthouse/compare/v3.1.0...v3.2.0) - 2019-04-10
+## 3.2.0
 
 ### Added
 
 - Sync and connect existing models in morphToMany relations using nested mutations https://github.com/nuwave/lighthouse/pull/707
 
-## [3.1.0](https://github.com/nuwave/lighthouse/compare/v3.0.0...v3.1.0) - 2019-04-07
+## 3.1.0
 
 ### Added
 
@@ -474,7 +476,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Aliases `fire` and `class` for dispatching through `@event` https://github.com/nuwave/lighthouse/pull/719
 
-## [3.0.0](https://github.com/nuwave/lighthouse/compare/v2.6.4...v3.0.0) - 2019-04-03
+## 3.0.0
 
 ### Added
 
