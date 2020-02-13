@@ -12,15 +12,6 @@ use Tests\Utils\Models\User;
 
 class DeferDBTest extends DBTestCase
 {
-    use SetUpDefer;
-
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $this->setUpDefer($app);
-    }
-
     protected function getPackageProviders($app)
     {
         return array_merge(
@@ -58,7 +49,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -112,7 +103,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -186,7 +177,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             companies {
                 name

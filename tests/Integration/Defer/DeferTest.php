@@ -11,13 +11,11 @@ use Tests\TestCase;
 
 class DeferTest extends TestCase
 {
-    use SetUpDefer;
-
-    protected function getEnvironmentSetUp($app)
+    protected function setUp(): void
     {
-        parent::getEnvironmentSetUp($app);
+        parent::setUp();
 
-        $this->setUpDefer($app);
+        $this->setUpDeferStream();
     }
 
     protected function getPackageProviders($app)
@@ -68,7 +66,7 @@ class DeferTest extends TestCase
         }
         ';
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -125,7 +123,7 @@ class DeferTest extends TestCase
         }
         ';
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -179,7 +177,7 @@ class DeferTest extends TestCase
         }
         ';
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         mutation {
             updateUser(
                 name: "Foo"
@@ -247,7 +245,7 @@ class DeferTest extends TestCase
         }
         ';
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             posts {
                 title
@@ -314,7 +312,7 @@ class DeferTest extends TestCase
         }
         ';
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             posts {
                 title
@@ -377,7 +375,7 @@ class DeferTest extends TestCase
         // Set max execution time to now so we immediately resolve deferred fields
         $defer->setMaxExecutionTime(microtime(true));
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -432,7 +430,7 @@ class DeferTest extends TestCase
         $defer = app(Defer::class);
         $defer->setMaxNestedFields(1);
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -500,13 +498,11 @@ class DeferTest extends TestCase
     {
         $this->mockResolver([
             'name' => 'John Doe',
-            'parent' => [
-                'name' => 'Jane Doe',
-                'parent' => [
-                    'name' => 'Mr. Smith',
-                ],
-            ],
         ]);
+        $this->mockResolverExpects(
+            $this->never(),
+            'skipped'
+        );
 
         $this->schema = /** @lang GraphQL */ '
         directive @include(if: Boolean!) on FIELD
@@ -514,7 +510,7 @@ class DeferTest extends TestCase
 
         type User {
             name: String!
-            parent: User
+            parent: User @mock(key: "skipped")
         }
 
         type Query {
@@ -524,9 +520,32 @@ class DeferTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
+            user {
+                name
+                parent @defer @include(if: false) {
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'user' => [
+                    'name' => 'John Doe',
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($include: Boolean!, $skip: Boolean!){
             userInclude: user {
                 name
                 parent @defer @include(if: false) {
+                    name
+                }
+            }
+            userIncludeVariable: user {
+                name
+                parent @defer @include(if: $include) {
                     name
                 }
             }
@@ -536,13 +555,28 @@ class DeferTest extends TestCase
                     name
                 }
             }
+            userSkipVariable: user {
+                name
+                parent @defer @skip(if: $skip) {
+                    name
+                }
+            }
         }
-        ')->assertExactJson([
+        ', [
+            'include' => false,
+            'skip' => true,
+        ])->assertExactJson([
             'data' => [
                 'userInclude' => [
                     'name' => 'John Doe',
                 ],
+                'userIncludeVariable' => [
+                    'name' => 'John Doe',
+                ],
                 'userSkip' => [
+                    'name' => 'John Doe',
+                ],
+                'userSkipVariable' => [
                     'name' => 'John Doe',
                 ],
             ],
@@ -688,7 +722,7 @@ class DeferTest extends TestCase
         }
         ';
 
-        $chunks = $this->getStreamedChunks(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 name

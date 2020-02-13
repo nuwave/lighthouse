@@ -20,6 +20,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
   a dummy schema for testing custom Lighthouse extensions https://github.com/nuwave/lighthouse/pull/1171
 - Simplify mocking resolvers that just return static data https://github.com/nuwave/lighthouse/pull/1177
+- Add utility `\Nuwave\Lighthouse\ClientDirectives\ClientDirective` to correctly
+  get the arguments passed through a client directive https://github.com/nuwave/lighthouse/pull/1184
+- Add `streamGraphQL()` helper method to `\Nuwave\Lighthouse\Testing\MakesGraphQLRequests` for
+  simple testing of streamed responses, such as `@defer` https://github.com/nuwave/lighthouse/pull/1184
 
 ### Fixed
 
@@ -31,6 +35,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Apply query filters using an `ArgBuilderDirective` such as `@eq` when the argument
   is nested deeply within the input https://github.com/nuwave/lighthouse/pull/1176
 - Fix `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` test helper https://github.com/nuwave/lighthouse/pull/1186
+- Handle multiple instances of client directives with `@defer` correctly https://github.com/nuwave/lighthouse/pull/1184
 
 ### Deprecated
 

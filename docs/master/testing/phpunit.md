@@ -188,6 +188,43 @@ You can also introspect client directives.
 $customDirective = $this->introspectDirective('custom');
 ```
 
+## Defer
+
+When sending requests with field containing `@defer`, use the `streamGraphQL()` helper.
+It automatically captures the full streamed response and provides you the returned chunks.
+
+```php
+$chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+{
+    now
+    later @defer
+}
+');
+
+$this->assertSame(
+    [
+        [
+            'data' => [
+                'now' => 'some value',
+                'later' => null,
+            ],
+        ],
+        [
+            'later' => [
+                'data' => 'another value',
+            ],
+        ],
+    ],
+    $chunks
+);
+```
+
+You can also set up the in-memory stream manually:
+
+```php
+$this->setUpDeferStream();
+```
+
 ## Lumen
 
 Because the `TestResponse` class is not available in Lumen, you must use a different
