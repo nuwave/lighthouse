@@ -3,13 +3,11 @@
 namespace Tests\Unit\Support\Http\Middleware;
 
 use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Context;
+use Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication;
 use Tests\Utils\Models\User;
 
 class AttemptAuthenticationTest extends TestCase
@@ -25,6 +23,7 @@ class AttemptAuthenticationTest extends TestCase
         $authManager = $app->make(AuthManager::class);
         $authManager->viaRequest('foo', function () {
             dd($this->user);
+
             return $this->user;
         });
 
@@ -36,15 +35,14 @@ class AttemptAuthenticationTest extends TestCase
         ]);
 //        dd($config->get('auth'));
         $config->set('auth.guards.api.driver', 'foo');
-
     }
 
     public function testAttemptsAuthenticationGuest(): void
     {
         /** @var \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication $middleware */
         $middleware = app(AttemptAuthentication::class);
-        $middleware->handle(new Request(), function() {});
-
+        $middleware->handle(new Request(), function () {
+        });
 
         $this->mockResolver()
             ->with(
@@ -90,6 +88,5 @@ class AttemptAuthenticationTest extends TestCase
             foo
         }
         ');
-
     }
 }
