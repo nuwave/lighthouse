@@ -11,6 +11,13 @@ use Tests\TestCase;
 
 class DeferTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->setUpDeferStream();
+    }
+
     protected function getPackageProviders($app)
     {
         return array_merge(
@@ -491,13 +498,11 @@ class DeferTest extends TestCase
     {
         $this->mockResolver([
             'name' => 'John Doe',
-            'parent' => [
-                'name' => 'Jane Doe',
-                'parent' => [
-                    'name' => 'Mr. Smith',
-                ],
-            ],
         ]);
+        $this->mockResolverExpects(
+            $this->never(),
+            'skipped'
+        );
 
         $this->schema = /** @lang GraphQL */ '
         directive @include(if: Boolean!) on FIELD
@@ -505,7 +510,7 @@ class DeferTest extends TestCase
 
         type User {
             name: String!
-            parent: User
+            parent: User @mock(key: "skipped")
         }
 
         type Query {
@@ -565,7 +570,13 @@ class DeferTest extends TestCase
                 'userInclude' => [
                     'name' => 'John Doe',
                 ],
+                'userIncludeVariable' => [
+                    'name' => 'John Doe',
+                ],
                 'userSkip' => [
+                    'name' => 'John Doe',
+                ],
+                'userSkipVariable' => [
                     'name' => 'John Doe',
                 ],
             ],
