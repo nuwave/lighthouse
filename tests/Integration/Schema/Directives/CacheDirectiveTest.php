@@ -26,18 +26,23 @@ class CacheDirectiveTest extends DBTestCase
 
     public function testCanStoreResolverResultInCache(): void
     {
-        $this->schema = "
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String @cache
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $this->graphQL('
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -56,19 +61,25 @@ class CacheDirectiveTest extends DBTestCase
 
     public function testCanPlaceCacheKeyOnAnyField(): void
     {
-        $this->schema = "
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+            'email' => 'foo@bar.com',
+        ]);
+
+        $this->schema = /** @lang GraphQL */'
         type User {
             id: ID!
             name: String @cache
             email: String @cacheKey
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $this->graphQL('
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -91,18 +102,23 @@ class CacheDirectiveTest extends DBTestCase
         $this->be($user);
         $cacheKey = "auth:{$user->getKey()}:user:1:name";
 
-        $this->schema = "
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String @cache(private: true)
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $this->graphQL('
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -121,22 +137,27 @@ class CacheDirectiveTest extends DBTestCase
 
     public function testCanStoreResolverResultInCacheWhenUseModelDirective(): void
     {
-        $this->schema = "
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
         }
-        
+
         type User @model {
             name: String @cache
             posts: [Post!]!
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $this->graphQL('
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -155,18 +176,23 @@ class CacheDirectiveTest extends DBTestCase
 
     public function testFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
     {
-        $this->schema = "
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String @cache(private: true)
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $this->graphQL('
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -187,18 +213,18 @@ class CacheDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User] @paginate(type: "paginator", model: "User") @cache
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 5) {
                 data {
@@ -223,24 +249,24 @@ class CacheDirectiveTest extends DBTestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String
         }
-        
+
         type User {
             id: ID!
             name: String!
             posts: [Post] @hasMany(type: "paginator") @cache
         }
-        
+
         type Query {
             user(id: ID! @eq): User @find(model: "User")
         }
         ';
 
-        $query = '
+        $query = /** @lang GraphQL */ '
         {
             user(id: '.$user->getKey().') {
                 id
@@ -287,24 +313,24 @@ class CacheDirectiveTest extends DBTestCase
 
         $tags = ['graphql:user:1', 'graphql:user:1:posts'];
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String
         }
-        
+
         type User {
             id: ID!
             name: String!
             posts: [Post] @hasMany(type: "paginator") @cache
         }
-        
+
         type Query {
             user(id: ID! @eq): User @find(model: "User")
         }
         ';
 
-        $query = '
+        $query = /** @lang GraphQL */ '
         {
             user(id: '.$user->getKey().') {
                 id
@@ -338,17 +364,5 @@ class CacheDirectiveTest extends DBTestCase
             $firstResponse->jsonGet(),
             $cachedResponse->jsonGet()
         );
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function resolve(): array
-    {
-        return [
-            'id' => 1,
-            'name' => 'foobar',
-            'email' => 'foo@bar.com',
-        ];
     }
 }
