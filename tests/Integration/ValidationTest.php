@@ -86,7 +86,7 @@ class ValidationTest extends DBTestCase
         );
 
         $this->schema = /** @lang GraphQL */ '
-        type Mutation {
+        type Query {
             doNotCall(
                 bar: String @rules(apply: ["required"])
             ): String @mock
@@ -94,7 +94,7 @@ class ValidationTest extends DBTestCase
         ';
 
         $response = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
+        {
             doNotCall
         }
         ');
