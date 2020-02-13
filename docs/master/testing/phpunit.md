@@ -219,6 +219,12 @@ $this->assertSame(
 );
 ```
 
+You can also set up the in-memory stream manually:
+
+```php
+$this->setUpDeferStream();
+```
+
 ## Lumen
 
 Because the `TestResponse` class is not available in Lumen, you must use a different
