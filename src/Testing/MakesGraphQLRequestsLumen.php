@@ -30,7 +30,7 @@ trait MakesGraphQLRequestsLumen
      * @param  array  $extraParams
      * @return $this
      */
-    protected function graphQL(string $query, array $variables = null, array $extraParams = []): MakesGraphQLRequestsLumen
+    protected function graphQL(string $query, array $variables = null, array $extraParams = []): self
     {
         $params = ['query' => $query];
 
@@ -51,7 +51,7 @@ trait MakesGraphQLRequestsLumen
      * @param  mixed[]  $headers
      * @return $this
      */
-    protected function postGraphQL(array $data, array $headers = []): MakesGraphQLRequestsLumen
+    protected function postGraphQL(array $data, array $headers = []): self
     {
         $this->post(
             $this->graphQLEndpointUrl(),
@@ -72,7 +72,7 @@ trait MakesGraphQLRequestsLumen
      * @param  mixed[]  $files
      * @return $this
      */
-    protected function multipartGraphQL(array $parameters, array $files): MakesGraphQLRequestsLumen
+    protected function multipartGraphQL(array $parameters, array $files): self
     {
         $this->call(
             'POST',
@@ -93,7 +93,7 @@ trait MakesGraphQLRequestsLumen
      *
      * @return $this
      */
-    protected function introspect(): MakesGraphQLRequestsLumen
+    protected function introspect(): self
     {
         if ($this->introspectionResult) {
             return $this;
@@ -140,15 +140,14 @@ trait MakesGraphQLRequestsLumen
             $this->introspect();
         }
 
-        // TODO Replace with ->json() once we remove support for Laravel 5.5
         $results = data_get(
-            $this->introspectionResult->decodeResponseJson(),
+            json_decode($this->introspectionResult->getContent(), true),
             $path
         );
 
         return Arr::first(
             $results,
-            function (array $result) use ($name): bool {
+            static function (array $result) use ($name): bool {
                 return $result['name'] === $name;
             }
         );

@@ -59,9 +59,6 @@ class ValidationTest extends DBTestCase
     }
     ';
 
-    /** @var int */
-    private static $callCount = 0;
-
     /**
      * @param  mixed  $root
      * @param  mixed[]  $args
@@ -84,45 +81,28 @@ class ValidationTest extends DBTestCase
 
     public function testRunsValidationBeforeCallingTheResolver(): void
     {
-        $shouldNotBeCalled = '@field(resolver: "'.$this->qualifyTestResolver('resolveDoNotCall').'")';
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            ensureThisWorks: String '.$shouldNotBeCalled.'
-        }
-
-        type Mutation {
-            resolveDoNotCall(
+            doNotCall(
                 bar: String @rules(apply: ["required"])
-            ): String '.$shouldNotBeCalled.'
+            ): String @mock
         }
         ';
 
-        $this->assertSame(0, self::$callCount);
-
-        // Sanity check to ensure the test works
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            ensureThisWorks
-        }
-        ');
-        $this->assertSame(1, self::$callCount);
-
         $response = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            resolveDoNotCall
+        {
+            doNotCall
         }
         ');
 
-        $this->assertSame(1, self::$callCount);
         $this->assertValidationKeysSame(
             ['bar'],
             $response
         );
-    }
-
-    public function resolveDoNotCall()
-    {
-        self::$callCount++;
     }
 
     public function testValidatesDifferentPathsIndividually(): void
