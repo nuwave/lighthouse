@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
+## 5.0.0
+
+### Changed
+
+- `__invoke` is now the only supported method name for convention based
+  field resolver classes 
+
 ## Unreleased
 
 ## 4.9.0

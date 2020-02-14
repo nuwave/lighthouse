@@ -9,7 +9,21 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ## v4 to v5
 
-### Replace @middleware with @guard and specialized FieldMiddleware
+### Rename `resolve` to `__invoke`
+
+Field resolver classes now only support the method name `__invoke`, using
+the name `resolve` no longer works.
+
+```diff
+namespace App\GraphQL\Queries;
+
+class SomeField
+{
+-   public function resolve(...
++   public function __invoke(...
+```
+
+### Replace `@middleware` with `@guard` and specialized FieldMiddleware
 
 The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL
 request handling.
