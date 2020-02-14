@@ -24,7 +24,6 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class BaseDirective implements Directive
 {
-
     /**
      * The AST node of the directive.
      *
@@ -45,7 +44,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Returns the name of the used directive.
-     *
      * TODO: Change to a strongly typed hint in v5
      *
      * @return string
@@ -73,7 +71,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Get a Closure that is defined through an argument on the directive.
-     *
      * @param  string  $argumentName
      *
      * @return \Closure
@@ -89,7 +86,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Does the current directive have an argument with the given name?
-     *
      * @param  string  $name
      *
      * @return bool
@@ -101,7 +97,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * The name of the node the directive is defined upon.
-     *
      * @return string
      */
     protected function nodeName(): string
@@ -122,7 +117,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Get the value of an argument on the directive.
-     *
      * @param  string  $name
      * @param  mixed|null  $default
      *
@@ -135,7 +129,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Get the model class from the `model` argument of the field.
-     *
      * @param  string  $argumentName  The default argument name "model" may be overwritten
      *
      * @return string|\Illuminate\Database\Eloquent\Model
@@ -147,14 +140,14 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if ( ! $model) {
+        if (!$model) {
             if ($this->definitionNode instanceof FieldDefinitionNode) {
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
                 /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
                 $documentAST = app(ASTBuilder::class)->documentAST();
 
-                if ( ! isset($documentAST->types[$returnTypeName])) {
+                if (!isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(
                         "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
                     );
@@ -171,7 +164,7 @@ abstract class BaseDirective implements Directive
             }
         }
 
-        if ( ! $model) {
+        if (!$model) {
             throw new DefinitionException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
             );
@@ -182,7 +175,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Find a class name in a set of given namespaces.
-     *
      * @param  string  $classCandidate
      * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch
@@ -205,7 +197,7 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if ( ! $determineMatch) {
+        if (!$determineMatch) {
             $determineMatch = 'class_exists';
         }
 
@@ -215,7 +207,7 @@ abstract class BaseDirective implements Directive
             $determineMatch
         );
 
-        if ( ! $className) {
+        if (!$className) {
             throw new DefinitionException(
                 "No class '{$classCandidate}' was found for directive '{$this->name()}'"
             );
@@ -230,7 +222,6 @@ abstract class BaseDirective implements Directive
      * A method argument is expected to contain a class and a method name, separated by an @ symbol.
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
-     *
      * @param  string  $argumentName
      *
      * @return string[] Contains two entries: [string $className, string $methodName]
@@ -262,7 +253,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Try adding the default model namespace and ensure the given class is a model.
-     *
      * @param  string  $modelClassCandidate
      *
      * @return string
@@ -284,7 +274,7 @@ abstract class BaseDirective implements Directive
      * @return string
      * @throws DefinitionException
      */
-    protected function inputTypeValidatorClass(string $validatorCandidate): string
+    protected function inputValidatorClass(string $validatorCandidate): string
     {
         return $this->namespaceClassName(
             $validatorCandidate,

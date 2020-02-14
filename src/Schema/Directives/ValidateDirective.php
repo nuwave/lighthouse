@@ -54,7 +54,7 @@ SDL;
      */
     public function rules(): array
     {
-        $class = $this->directiveArgValue('validator') ?? $this->inputTypeValidatorClass($this->nodeName().'Validator');
+        $class = $this->directiveArgValue('validator') ?? $this->inputValidatorClass($this->nodeName().'Validator');
 
         $validator = new $class($this->input);
         $this->validator = $validator;
