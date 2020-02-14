@@ -35,10 +35,10 @@
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.28",
+        "ergebnis/composer-normalize": "^2.2.2",
         "haydenpierce/class-finder": "^0.4.0",
         "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
         "laravel/scout": "^4.0 || ^5.0 || ^6.0 || ^7.0",
-        "localheinz/composer-normalize": "^1.3",
         "mll-lab/graphql-php-scalars": "^2.1",
         "mockery/mockery": "^1.0",
         "nunomaduro/larastan": "^0.4.1",
@@ -50,6 +50,7 @@
     },
     "suggest": {
         "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",
+        "haydenpierce/class-finder": "Required for the artisan command lighthouse:validate-schema",
         "laravel/scout": "Required for the @search directive",
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
         "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel"

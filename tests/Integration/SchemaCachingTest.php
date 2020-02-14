@@ -36,24 +36,22 @@ class SchemaCachingTest extends TestCase
         type Query {
             foo: Foo @mock
         }
-        
+
         union Foo = Comment | Color
-        
+
         type Comment {
             bar: ID
         }
-        
+
         type Color {
             id: ID
         }
         ';
         $this->cacheSchema();
 
-        $this->mockResolver(function () {
-            return new Comment([
-                'bar' => 'bar',
-            ]);
-        });
+        $this->mockResolver(new Comment([
+            'bar' => 'bar',
+        ]));
 
         $this->graphQL(/** @lang GraphQL */ '
         {
