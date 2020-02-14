@@ -6,8 +6,9 @@ use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\ClientDirectives\ClientDirective;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -17,6 +18,7 @@ class DeferrableDirective extends BaseDirective implements FieldMiddleware
 {
     const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
     const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
+    const DEFER_DIRECTIVE_NAME = 'defer';
 
     public static function definition(): string
     {
@@ -86,41 +88,50 @@ SDL;
      */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $resolveInfo): bool
     {
-        foreach ($resolveInfo->fieldNodes as $fieldNode) {
-            $deferDirective = ASTHelper::directiveDefinition($fieldNode, 'defer');
-            if (! $deferDirective) {
-                return false;
-            }
+        $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
 
+        if ($this->anyFieldHasDefer($defers)) {
             if ($resolveInfo->parentType->name === 'Mutation') {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
-
-            if (! ASTHelper::directiveArgValue($deferDirective, 'if', true)) {
-                return false;
+            if ($fieldType instanceof NonNullTypeNode) {
+                throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
             }
+        }
 
-            $skipDirective = ASTHelper::directiveDefinition($fieldNode, 'skip');
-            if (
-                $skipDirective
-                && ASTHelper::directiveArgValue($skipDirective, 'if') === true
-            ) {
-                return false;
-            }
-
-            $includeDirective = ASTHelper::directiveDefinition($fieldNode, 'include');
-            if (
-                $includeDirective
-                && ASTHelper::directiveArgValue($includeDirective, 'if') === false
-            ) {
+        // Following the semantics of Apollo:
+        // All declarations of a field have to contain @defer for the field to be deferred
+        foreach ($defers as $defer) {
+            if ($defer === null || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
                 return false;
             }
         }
 
-        if ($fieldType instanceof NonNullTypeNode) {
-            throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
+        $skips = (new ClientDirective(Directive::SKIP_NAME))->forField($resolveInfo);
+        foreach ($skips as $skip) {
+            if ($skip === [Directive::IF_ARGUMENT_NAME => true]) {
+                return false;
+            }
+        }
+
+        $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
+        foreach ($includes as $include) {
+            if ($include === [Directive::IF_ARGUMENT_NAME => false]) {
+                return false;
+            }
         }
 
         return true;
+    }
+
+    protected function anyFieldHasDefer(array $defers): bool
+    {
+        foreach ($defers as $defer) {
+            if ($defer !== null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

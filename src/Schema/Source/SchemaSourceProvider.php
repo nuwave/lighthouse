@@ -2,14 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Source;
 
-/**
- * Interface SchemaSourceProvider.
- */
 interface SchemaSourceProvider
 {
     /**
      * Set schema root path.
      *
+     * @deprecated will be removed in v5.
      * @param  string  $path
      * @return \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
      */
