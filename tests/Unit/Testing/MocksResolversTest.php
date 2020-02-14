@@ -14,13 +14,13 @@ class MocksResolversTest extends TestCase
             ])
             ->willReturn(2);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(foo: Int): Int @mock
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo(foo: 1)
         }
@@ -29,5 +29,12 @@ class MocksResolversTest extends TestCase
                 'foo' => 2,
             ],
         ]);
+    }
+
+    public function testCustomExpects(): void
+    {
+        $this->mockResolverExpects(
+            $this->never()
+        );
     }
 }

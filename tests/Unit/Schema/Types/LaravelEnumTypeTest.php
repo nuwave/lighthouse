@@ -40,7 +40,7 @@ class LaravelEnumTypeTest extends TestCase
 
     public function testReceivesEnumInstanceInternally(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: UserType): Boolean @mock
         }
