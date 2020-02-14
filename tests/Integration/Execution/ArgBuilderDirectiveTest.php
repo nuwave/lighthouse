@@ -5,25 +5,26 @@ namespace Tests\Integration\Execution;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class BuilderTest extends DBTestCase
+class ArgBuilderDirectiveTest extends DBTestCase
 {
     /**
      * @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User>
      */
     protected $users;
 
+    protected $schema = /** @lang GraphQL */ '
+    type User {
+        id: ID!
+        name: String
+        email: String
+    }
+    ';
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->users = factory(User::class, 5)->create();
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        ';
     }
 
     public function testCanAttachEqFilterToQuery(): void
@@ -51,7 +52,7 @@ class BuilderTest extends DBTestCase
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
-            users(input: UserInput! @spread): [User!]! @all
+            users(input: UserInput!): [User!]! @all
         }
 
         input UserInput {
@@ -66,6 +67,37 @@ class BuilderTest extends DBTestCase
                     input: {
                         id: $id
                     }
+                ) {
+                    id
+                }
+            }
+            ', [
+                'id' => $this->users->first()->getKey(),
+            ])
+            ->assertJsonCount(1, 'data.users');
+    }
+
+    public function testCanAttachEqFilterFromInputObjectWithinList(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Query {
+            users(input: [UserInput!]!): [User!]! @all
+        }
+
+        input UserInput {
+            id: ID @eq
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID) {
+                users(
+                    input: [
+                        {
+                            id: $id
+                        }
+                    ]
                 ) {
                     id
                 }
@@ -132,7 +164,7 @@ class BuilderTest extends DBTestCase
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(exclude: ['.$user1.', '.$user2.']) {
                 id
@@ -143,26 +175,31 @@ class BuilderTest extends DBTestCase
 
     public function testCanAttachWhereFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(id: Int @where(operator: ">")): [User!]! @all
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = $this->users->first();
 
-        $this->graphQL('
-        {
-            users(id: '.$user1.') {
-                id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($userId: Int) {
+                users(id: $userId) {
+                    id
+                }
             }
-        }
-        ')->assertJsonCount(4, 'data.users');
+            ', [
+                'userId' => $user1->id,
+            ])
+            ->assertJsonCount(4, 'data.users');
     }
 
     public function testCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 start: Int @where(key: "id", operator: ">")
@@ -174,9 +211,12 @@ class BuilderTest extends DBTestCase
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            users(start: '.$user1.' end: '.$user2.') {
+            users(
+                start: '.$user1.'
+                end: '.$user2.'
+            ) {
                 id
             }
         }
@@ -185,7 +225,7 @@ class BuilderTest extends DBTestCase
 
     public function testCanAttachWhereBetweenFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 createdBetween: [String!]! @whereBetween(key: "created_at")
@@ -204,7 +244,7 @@ class BuilderTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 createdBetween: ["'.$start.'", "'.$end.'"]
@@ -241,7 +281,7 @@ class BuilderTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 created: {
@@ -257,7 +297,7 @@ class BuilderTest extends DBTestCase
 
     public function testCanAttachWhereNotBetweenFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 notCreatedBetween: [String!]! @whereNotBetween(key: "created_at")
@@ -276,7 +316,7 @@ class BuilderTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 notCreatedBetween: ["'.$start.'", "'.$end.'"]
@@ -289,7 +329,7 @@ class BuilderTest extends DBTestCase
 
     public function testCanAttachWhereClauseFilterToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 created_at: String! @where(clause: "whereYear")
@@ -307,7 +347,7 @@ class BuilderTest extends DBTestCase
 
         $year = now()->subYear()->format('Y');
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(created_at: "'.$year.'") {
                 id
@@ -318,7 +358,7 @@ class BuilderTest extends DBTestCase
 
     public function testOnlyProcessesFilledArguments(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 id: ID @eq
@@ -327,7 +367,7 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(name: "'.$this->users->first()->name.'") {
                 id

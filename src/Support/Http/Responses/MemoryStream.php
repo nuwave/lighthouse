@@ -14,7 +14,7 @@ class MemoryStream extends Stream implements CanStreamResponse
     public $chunks = [];
 
     /**
-     * Stream graphql response.
+     * Stream GraphQL response.
      *
      * @param  mixed[]  $data
      * @param  string[]  $paths

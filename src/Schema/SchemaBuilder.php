@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory;
 
 class SchemaBuilder
 {
@@ -16,13 +16,13 @@ class SchemaBuilder
     protected $typeRegistry;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory
+     * @var \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory
      */
     protected $clientDirectiveFactory;
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @param  \Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory  $clientDirectiveFactory
+     * @param  \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory  $clientDirectiveFactory
      * @return void
      */
     public function __construct(

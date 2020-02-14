@@ -8,9 +8,13 @@ class MultipleRequestsTest extends TestCase
 {
     public function testCanFireMultipleRequestsInOneTest(): void
     {
+        $this->mockResolver(function ($root, array $args): string {
+            return $args['this'];
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            return(this: String!): String @field(resolver:"'.$this->qualifyTestResolver().'")
+            return(this: String!): String @mock
         }
         ';
 
@@ -33,10 +37,5 @@ class MultipleRequestsTest extends TestCase
                 'return' => 'bar',
             ],
         ]);
-    }
-
-    public function resolve($root, array $args): string
-    {
-        return $args['this'];
     }
 }
