@@ -86,12 +86,11 @@ class FieldFactory
     protected $handleArgDirectivesSnapshots = [];
 
     /**
-     * @param \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory $directiveFactory
-     * @param \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
-     * @param \Nuwave\Lighthouse\Support\Pipeline                  $pipeline
-     * @param \Illuminate\Contracts\Validation\Factory             $validationFactory
-     * @param \Nuwave\Lighthouse\Execution\Arguments\TypedArgs     $typedArgs
-     *
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\TypedArgs  $typedArgs
      * @return void
      */
     public function __construct(
@@ -111,8 +110,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @param \Nuwave\Lighthouse\Schema\Values\FieldValue $fieldValue
-     *
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
@@ -165,29 +163,22 @@ class FieldFactory
                 $this->flushValidationErrorBuffer();
 
                 $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
-                $modifiedArgumentSet = $argumentSet
-                    ->spread()
-                    ->rename();
-                $this->resolveInfo->argumentSet = $modifiedArgumentSet;
+                $spreadArguments = $argumentSet->spread();
+                $this->resolveInfo->argumentSet = $spreadArguments;
 
-                return $resolverWithMiddleware(
-                    $this->root,
-                    $modifiedArgumentSet->toArray(),
-                    $this->context,
-                    $this->resolveInfo
-                );
+                return $resolverWithMiddleware($this->root, $spreadArguments->toArray(), $this->context, $this->resolveInfo);
             }
         );
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
-            'name'              => $fieldDefinitionNode->name->value,
-            'type'              => $this->fieldValue->getReturnType(),
-            'args'              => $argumentMap,
-            'resolve'           => $this->fieldValue->getResolver(),
-            'description'       => data_get($fieldDefinitionNode->description, 'value'),
-            'complexity'        => $this->fieldValue->getComplexity(),
+            'name' => $fieldDefinitionNode->name->value,
+            'type' => $this->fieldValue->getReturnType(),
+            'args' => $argumentMap,
+            'resolve' => $this->fieldValue->getResolver(),
+            'description' => data_get($fieldDefinitionNode->description, 'value'),
+            'complexity' => $this->fieldValue->getComplexity(),
             'deprecationReason' => $this->fieldValue->getDeprecationReason(),
         ];
     }
@@ -195,10 +186,9 @@ class FieldFactory
     /**
      * Handle the ArgMiddleware.
      *
-     * @param \GraphQL\Type\Definition\InputType             $type
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode $astNode
-     * @param mixed[]                                        $argumentPath
-     *
+     * @param  \GraphQL\Type\Definition\InputType  $type
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  mixed[]  $argumentPath
      * @return void
      */
     protected function handleArgDirectivesRecursively(
@@ -256,11 +246,10 @@ class FieldFactory
     }
 
     /**
-     * @param \GraphQL\Type\Definition\InputType                                             $type
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode                                 $astNode
-     * @param \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> $directives
-     * @param mixed[]                                                                        $argumentPath
-     *
+     * @param  \GraphQL\Type\Definition\InputType  $type
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  mixed[]  $argumentPath
      * @return void
      */
     protected function handleArgWithAssociatedDirectives(
@@ -283,10 +272,9 @@ class FieldFactory
     }
 
     /**
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode $astNode
-     * @param mixed[]                                        $argumentPath
-     * @param \Illuminate\Support\Collection                 $directives
-     *
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  mixed[]  $argumentPath
+     * @param  \Illuminate\Support\Collection  $directives
      * @return void
      */
     protected function handleArgDirectives(
@@ -400,8 +388,8 @@ class FieldFactory
             $this->messages,
             // The presence of those custom attributes ensures we get a GraphQLValidator
             [
-                'root'        => $this->root,
-                'context'     => $this->context,
+                'root' => $this->root,
+                'context' => $this->context,
                 'resolveInfo' => $this->resolveInfo,
             ]
         );
