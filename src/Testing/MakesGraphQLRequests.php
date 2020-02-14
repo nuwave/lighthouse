@@ -26,10 +26,9 @@ trait MakesGraphQLRequests
     /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param string     $query
-     * @param array|null $variables
-     * @param array      $extraParams
-     *
+     * @param  string  $query
+     * @param  array|null  $variables
+     * @param  array  $extraParams
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     protected function graphQL(string $query, array $variables = null, array $extraParams = []): TestResponse
@@ -48,9 +47,8 @@ trait MakesGraphQLRequests
     /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param mixed[] $data
-     * @param mixed[] $headers
-     *
+     * @param  mixed[]  $data
+     * @param  mixed[]  $headers
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     protected function postGraphQL(array $data, array $headers = []): TestResponse
@@ -68,9 +66,8 @@ trait MakesGraphQLRequests
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
-     * @param mixed[] $parameters
-     * @param mixed[] $files
-     *
+     * @param  mixed[]  $parameters
+     * @param  mixed[]  $files
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     protected function multipartGraphQL(array $parameters, array $files): TestResponse
@@ -104,8 +101,7 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a type by name, if present.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectType(string $name): ?array
@@ -116,8 +112,7 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a directive by name, if present.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectDirective(string $name): ?array
@@ -128,9 +123,8 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a result from the given path by name, if present.
      *
-     * @param string $path
-     * @param string $name
-     *
+     * @param  string  $path
+     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectByName(string $path, string $name): ?array

@@ -90,7 +90,6 @@ class ValidatorDirectiveTest extends DBTestCase
         ]);
     }
 
-    /** @test */
     public function testNestedInputTypeValidator()
     {
         $company = factory(Company::class)->create(['name' => 'The Company']);
