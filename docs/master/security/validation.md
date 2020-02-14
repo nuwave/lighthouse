@@ -173,7 +173,7 @@ In cases where your validation becomes too complex and demanding, you want to ha
 complex validation. For example, accessing existing data in the database or validating complex combination of input 
 values cannot be achieved with the examples above. This is where input type validation comes into play.
 
-As an example, let's make the the following mutation is called with valid inputs:
+As an example, let's make sure the the following mutation is called with valid inputs:
 
 ```graphql
 type Mutation {

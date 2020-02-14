@@ -2800,6 +2800,55 @@ type Mutation {
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
 
+## @validate
+
+Validate an input type or a field definition.
+
+```graphql
+"""
+Validate given input object with a validation class.
+"""
+directive @validate(
+    """
+    Secify the class name of the validator to use.
+    This is only when the valdidator is located somewhere else than the default location.
+    """
+    validator: String
+
+) on INPUT_OBJECT | FIELD_DEFINITION
+```
+
+You can add it on an input definition.
+
+```graphql
+input UpdatePostInput @validate {
+    title: String!
+    content: String!
+}
+```
+
+By default it will look for a validator in the `App\GraphQL\Validators` namespace. The location can be configured in the lighthouse.php config file.
+
+An example validator looks like the following, note that it is expected to be the name of the input type, appended with "Validator"  
+```php
+namespace App\GraphQL\Validators;
+
+use Nuwave\Lighthouse\Execution\InputValidator;
+
+class UpdatePostInputValidator extends InputValidator
+{
+    public function rules(): array
+    {
+        return [
+            'title' => ['required', 'max:32'],
+            'content' => ['required', 'min:200'],
+        ];
+    }
+}
+```
+
+A validator class can be created with `php artisan lighthouse:validator`
+
 ## @where
 
 Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
