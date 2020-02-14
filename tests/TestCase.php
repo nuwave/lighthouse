@@ -30,8 +30,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * A dummy query type definition that is added to tests by default.
      */
-    const PLACEHOLDER_QUERY = /** @lang GraphQL */
-        '
+    const PLACEHOLDER_QUERY = /** @lang GraphQL */ '
     type Query {
         foo: Int
     }
@@ -51,8 +50,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get package providers.
      *
-     * @param \Illuminate\Foundation\Application $app
-     *
+     * @param  \Illuminate\Foundation\Application  $app
      * @return string[]
      */
     protected function getPackageProviders($app)
@@ -71,8 +69,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
-     *
+     * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -81,32 +78,32 @@ abstract class TestCase extends BaseTestCase
         $config = $app['config'];
 
         $config->set('lighthouse.namespaces', [
-            'models'        => [
+            'models' => [
                 'Tests\\Utils\\Models',
                 'Tests\\Utils\\ModelsSecondary',
             ],
-            'queries'       => [
+            'queries' => [
                 'Tests\\Utils\\Queries',
                 'Tests\\Utils\\QueriesSecondary',
             ],
-            'mutations'     => [
+            'mutations' => [
                 'Tests\\Utils\\Mutations',
                 'Tests\\Utils\\MutationsSecondary',
             ],
             'subscriptions' => 'Tests\\Utils\\Subscriptions',
-            'interfaces'    => [
+            'interfaces' => [
                 'Tests\\Utils\\Interfaces',
                 'Tests\\Utils\\InterfacesSecondary',
             ],
-            'scalars'       => [
+            'scalars' => [
                 'Tests\\Utils\\Scalars',
                 'Tests\\Utils\\ScalarsSecondary',
             ],
-            'unions'        => [
+            'unions' => [
                 'Tests\\Utils\\Unions',
                 'Tests\\Utils\\UnionsSecondary',
             ],
-            'directives'    => [
+            'directives' => [
                 'Tests\\Utils\\Directives',
             ],
         ]);
@@ -122,7 +119,7 @@ abstract class TestCase extends BaseTestCase
         $config->set(
             'lighthouse.subscriptions',
             [
-                'storage'     => 'array',
+                'storage' => 'array',
                 'broadcaster' => 'log',
             ]
         );
@@ -138,8 +135,7 @@ abstract class TestCase extends BaseTestCase
      * This makes debugging the tests much simpler as Exceptions
      * are fully dumped to the console when making requests.
      *
-     * @param \Illuminate\Foundation\Application $app
-     *
+     * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
     protected function resolveApplicationExceptionHandler($app)
@@ -179,8 +175,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
      *
-     * @param string $schema
-     *
+     * @param  string  $schema
      * @return \GraphQL\Type\Schema
      */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
@@ -193,8 +188,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Build an executable schema from an SDL string.
      *
-     * @param string $schema
-     *
+     * @param  string  $schema
      * @return \GraphQL\Type\Schema
      */
     protected function buildSchema(string $schema): Schema
@@ -209,8 +203,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get a fully qualified reference to a method that is defined on the test class.
      *
-     * @param string $method
-     *
+     * @param  string  $method
      * @return string
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
