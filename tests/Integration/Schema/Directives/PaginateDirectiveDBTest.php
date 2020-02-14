@@ -19,7 +19,7 @@ class PaginateDirectiveDBTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User!]! @paginate
         }
@@ -57,19 +57,19 @@ class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User!]! @paginate(builder: "'.$this->qualifyTestResolver('builder').'")
         }
         ';
 
         // The custom builder is supposed to change the sort order
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 1) {
                 data {
@@ -192,7 +192,7 @@ class PaginateDirectiveDBTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User!]! @paginate(type: "relay")
         }
@@ -230,7 +230,7 @@ class PaginateDirectiveDBTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User!]! @paginate(type: "relay")
         }
@@ -281,7 +281,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         type User {
             id: ID!
         }
-        
+
         type Query {
             users: [User!]! @paginate
         }
@@ -359,7 +359,7 @@ class PaginateDirectiveDBTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User!]! @paginate(defaultCount: 2)
         }

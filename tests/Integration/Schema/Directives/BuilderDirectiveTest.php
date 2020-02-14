@@ -9,13 +9,13 @@ class BuilderDirectiveTest extends DBTestCase
 {
     public function testCallsCustomBuilderMethod(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             users(
                 limit: Int @builder(method: "'.$this->qualifyTestResolver('limit').'")
             ): [User!]! @all
         }
-        
+
         type User {
             id: ID
         }
@@ -23,7 +23,7 @@ class BuilderDirectiveTest extends DBTestCase
 
         factory(User::class, 2)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(limit: 1) {
                 id
