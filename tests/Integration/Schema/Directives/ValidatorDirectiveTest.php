@@ -13,7 +13,6 @@ use Tests\Utils\Models\User;
  */
 class ValidatorDirectiveTest extends DBTestCase
 {
-
     protected $schema = /** @lang GraphQL */
         '
         type Company {
@@ -66,7 +65,7 @@ class ValidatorDirectiveTest extends DBTestCase
         config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
 
         $response = $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
                 mutation ($input: CreateUserInput!){
                   createUser(input: $input){
                    email
@@ -133,7 +132,7 @@ class ValidatorDirectiveTest extends DBTestCase
         config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
 
         $response = $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
                 mutation ($input: CreateUserInput!){
                   createUser(input: $input){
                    email
@@ -155,7 +154,6 @@ class ValidatorDirectiveTest extends DBTestCase
 
 class CreateUserInputValidator extends InputValidator
 {
-
     public function rules(): array
     {
         return [
@@ -175,7 +173,6 @@ class CreateUserInputValidator extends InputValidator
 
 class UpdateUserInputValidator extends InputValidator
 {
-
     public function rules(): array
     {
         $user = $this->model(User::class);
@@ -196,7 +193,6 @@ class UpdateUserInputValidator extends InputValidator
 
 class UpdateCompanyInputValidator extends InputValidator
 {
-
     public function rules(): array
     {
         $company = $this->model(Company::class);

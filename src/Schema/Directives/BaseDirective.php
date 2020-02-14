@@ -44,7 +44,7 @@ abstract class BaseDirective implements Directive
 
     /**
      * Returns the name of the used directive.
-     * TODO: Change to a strongly typed hint in v5
+     * TODO: Change to a strongly typed hint in v5.
      *
      * @return string
      */
@@ -58,7 +58,6 @@ abstract class BaseDirective implements Directive
      *
      * @param  \GraphQL\Language\AST\DirectiveNode  $directiveNode
      * @param  \GraphQL\Language\AST\Node  $definitionNode
-     *
      * @return $this
      */
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
@@ -72,7 +71,6 @@ abstract class BaseDirective implements Directive
     /**
      * Get a Closure that is defined through an argument on the directive.
      * @param  string  $argumentName
-     *
      * @return \Closure
      */
     public function getResolverFromArgument(string $argumentName): Closure
@@ -87,7 +85,6 @@ abstract class BaseDirective implements Directive
     /**
      * Does the current directive have an argument with the given name?
      * @param  string  $name
-     *
      * @return bool
      */
     public function directiveHasArgument(string $name): bool
@@ -130,7 +127,6 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      * @param  string  $argumentName  The default argument name "model" may be overwritten
-     *
      * @return string|\Illuminate\Database\Eloquent\Model
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -140,14 +136,14 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if (!$model) {
+        if (! $model) {
             if ($this->definitionNode instanceof FieldDefinitionNode) {
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
                 /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
                 $documentAST = app(ASTBuilder::class)->documentAST();
 
-                if (!isset($documentAST->types[$returnTypeName])) {
+                if (! isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(
                         "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
                     );
@@ -164,7 +160,7 @@ abstract class BaseDirective implements Directive
             }
         }
 
-        if (!$model) {
+        if (! $model) {
             throw new DefinitionException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
             );
@@ -197,7 +193,7 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if (!$determineMatch) {
+        if (! $determineMatch) {
             $determineMatch = 'class_exists';
         }
 
@@ -207,7 +203,7 @@ abstract class BaseDirective implements Directive
             $determineMatch
         );
 
-        if (!$className) {
+        if (! $className) {
             throw new DefinitionException(
                 "No class '{$classCandidate}' was found for directive '{$this->name()}'"
             );
