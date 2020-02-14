@@ -44,7 +44,8 @@ abstract class BaseDirective implements Directive
 
     /**
      * Returns the name of the used directive.
-     * TODO: Change to a strongly typed hint in v5.
+     *
+     * TODO: Change to a strongly typed hint in v5
      *
      * @return string
      */
@@ -70,6 +71,7 @@ abstract class BaseDirective implements Directive
 
     /**
      * Get a Closure that is defined through an argument on the directive.
+     *
      * @param  string  $argumentName
      * @return \Closure
      */
@@ -84,6 +86,7 @@ abstract class BaseDirective implements Directive
 
     /**
      * Does the current directive have an argument with the given name?
+     *
      * @param  string  $name
      * @return bool
      */
@@ -94,6 +97,7 @@ abstract class BaseDirective implements Directive
 
     /**
      * The name of the node the directive is defined upon.
+     *
      * @return string
      */
     protected function nodeName(): string
@@ -104,8 +108,8 @@ abstract class BaseDirective implements Directive
     /**
      * Get the AST definition node associated with the current directive.
      *
-     * @return \GraphQL\Language\AST\DirectiveNode
      * @deprecated in favour of the plain property
+     * @return \GraphQL\Language\AST\DirectiveNode
      */
     protected function directiveDefinition(): DirectiveNode
     {
@@ -114,9 +118,9 @@ abstract class BaseDirective implements Directive
 
     /**
      * Get the value of an argument on the directive.
+     *
      * @param  string  $name
      * @param  mixed|null  $default
-     *
      * @return mixed|null
      */
     protected function directiveArgValue(string $name, $default = null)
@@ -126,7 +130,8 @@ abstract class BaseDirective implements Directive
 
     /**
      * Get the model class from the `model` argument of the field.
-     * @param  string  $argumentName  The default argument name "model" may be overwritten
+     *
+     * @param  string  $argumentName The default argument name "model" may be overwritten
      * @return string|\Illuminate\Database\Eloquent\Model
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -171,19 +176,16 @@ abstract class BaseDirective implements Directive
 
     /**
      * Find a class name in a set of given namespaces.
+     *
      * @param  string  $classCandidate
      * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch
-     *
      * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    protected function namespaceClassName(
-        string $classCandidate,
-        array $namespacesToTry = [],
-        callable $determineMatch = null
-    ): string {
+    protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
+    {
         // Always try the explicitly set namespace first
         array_unshift(
             $namespacesToTry,
@@ -218,8 +220,8 @@ abstract class BaseDirective implements Directive
      * A method argument is expected to contain a class and a method name, separated by an @ symbol.
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
-     * @param  string  $argumentName
      *
+     * @param  string  $argumentName
      * @return string[] Contains two entries: [string $className, string $methodName]
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -249,8 +251,8 @@ abstract class BaseDirective implements Directive
 
     /**
      * Try adding the default model namespace and ensure the given class is a model.
-     * @param  string  $modelClassCandidate
      *
+     * @param  string  $modelClassCandidate
      * @return string
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
