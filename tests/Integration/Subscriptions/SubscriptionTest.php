@@ -28,17 +28,17 @@ class SubscriptionTest extends TestCase
         type Post {
             body: String
         }
-        
+
         type Subscription {
             onPostCreated: Post
         }
-        
+
         type Mutation {
             createPost(post: String!): Post
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
                 @broadcast(subscription: \"onPostCreated\")
         }
-        
+
         type Query {
             foo: String
         }
@@ -53,7 +53,7 @@ class SubscriptionTest extends TestCase
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
-            $response->jsonGet()
+            $response->json()
         );
     }
 

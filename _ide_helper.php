@@ -13,16 +13,6 @@ namespace Illuminate\Foundation\Testing {
         {
             return $this;
         }
-
-        /**
-         * Just here for compatibility with Laravel 5.5, delete once we drop support.
-         *
-         * @param  string|null  $key
-         * @return mixed
-         */
-        public function jsonGet(string $key = null) {
-            return;
-        }
     }
 }
 

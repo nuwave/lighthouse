@@ -78,3 +78,11 @@ You can adapt to this change in two refactoring steps that must be done in order
         id: ID!
     }
     ```
+
+### Update PHP, Laravel and PHPUnit
+
+The following versions are no longer supported:
+
+- PHP 7.1
+- Laravel 5.5
+- PHPUnit 6

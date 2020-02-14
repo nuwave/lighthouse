@@ -37,7 +37,7 @@ trait MocksResolvers
      * @param  string  $key
      * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
      */
-    protected function mockResolverExpects(/* TODO add strong type hint when bumping PHPUnit */ $invocationOrder, string $key = 'default'): InvocationMocker
+    protected function mockResolverExpects(InvocationOrder $invocationOrder, string $key = 'default'): InvocationMocker
     {
         $mock = $this
             ->getMockBuilder(MockResolver::class)

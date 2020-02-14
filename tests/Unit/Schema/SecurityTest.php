@@ -17,7 +17,7 @@ class SecurityTest extends TestCase
         type Query {
             user: User @first
         }
-        
+
         type User {
             name: String
         }
@@ -34,7 +34,7 @@ class SecurityTest extends TestCase
         type Query {
             user: User @first
         }
-        
+
         type User {
             name: String
             user: User
@@ -63,7 +63,7 @@ class SecurityTest extends TestCase
 
         $this->assertSame(
             QueryComplexity::maxQueryComplexityErrorMessage(1, 2),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -83,7 +83,7 @@ class SecurityTest extends TestCase
 
         $this->assertSame(
             QueryDepth::maxQueryDepthErrorMessage(1, 2),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -101,7 +101,7 @@ class SecurityTest extends TestCase
 
         $this->assertSame(
             DisableIntrospection::introspectionDisabledMessage(),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 }

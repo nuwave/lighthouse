@@ -21,16 +21,16 @@ class InterfaceTest extends DBTestCase
         interface Nameable {
             name: String!
         }
-        
+
         type User implements Nameable {
             id: ID!
             name: String!
         }
-        
+
         type Team implements Nameable {
             name: String!
         }
-        
+
         type Query {
             namedThings: [Nameable!]! @field(resolver: "'.$this->qualifyTestResolver('fetchResults').'")
         }
@@ -59,7 +59,7 @@ class InterfaceTest extends DBTestCase
             ],
         ]);
 
-        $this->assertArrayNotHasKey('id', $result->jsonGet('data.namedThings.1'));
+        $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
     }
 
     public function testCanUseCustomTypeResolver(): void
@@ -104,16 +104,16 @@ class InterfaceTest extends DBTestCase
         interface Nameable {
             name: String!
         }
-        
+
         type User implements Nameable {
             id: ID!
             name: String!
         }
-        
+
         type Team implements Nameable {
             name: String!
         }
-        
+
         type Query {
             namedThings: [Nameable!]! @field(resolver: "'.$this->qualifyTestResolver('fetchResults').'")
         }
@@ -133,7 +133,7 @@ class InterfaceTest extends DBTestCase
         }
         ');
 
-        $interface = (new Collection($result->jsonGet('data.__schema.types')))
+        $interface = (new Collection($result->json('data.__schema.types')))
             ->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);

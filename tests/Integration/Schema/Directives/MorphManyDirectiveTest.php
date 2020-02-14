@@ -261,7 +261,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -305,7 +305,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -508,7 +508,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -554,7 +554,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 

@@ -41,7 +41,7 @@ class DeferTest extends TestCase
         $this->assertTrue(
             in_array(
                 'defer',
-                $introspection->jsonGet('data.__schema.directives.*.name')
+                $introspection->json('data.__schema.directives.*.name')
             )
         );
     }

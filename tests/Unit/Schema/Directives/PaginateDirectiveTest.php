@@ -25,7 +25,7 @@ class PaginateDirectiveTest extends TestCase
             type User {
                 name: String
             }
-            
+
             type Query {
                 users: [User!]! @paginate(type: \"$type\")
             }
@@ -43,7 +43,7 @@ class PaginateDirectiveTest extends TestCase
             users2: [User!]! @paginate(type: "relay")
             users3: [User!]! @paginate(type: "connection")
         }
-        
+
         type Query {
             users: [User!]! @paginate
             users2: [User!]! @paginate(type: "relay")
@@ -160,7 +160,7 @@ class PaginateDirectiveTest extends TestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users1: [User!]! @paginate(maxCount: 6)
             users2: [User!]! @paginate(maxCount: 10)
@@ -180,7 +180,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             'Maximum number of 6 requested items exceeded. Fetch smaller chunks.',
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -193,7 +193,7 @@ class PaginateDirectiveTest extends TestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users1: [User!]! @paginate
             users2: [User!]! @paginate(type: "relay")
@@ -213,7 +213,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
-            $resultFromDefaultPagination->jsonGet('errors.0.message')
+            $resultFromDefaultPagination->json('errors.0.message')
         );
 
         $resultFromRelayPagination = $this->graphQL('
@@ -231,7 +231,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
-            $resultFromRelayPagination->jsonGet('errors.0.message')
+            $resultFromRelayPagination->json('errors.0.message')
         );
     }
 
@@ -242,7 +242,7 @@ class PaginateDirectiveTest extends TestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User!] @paginate
         }
@@ -272,7 +272,7 @@ class PaginateDirectiveTest extends TestCase
             type Query {
                 users: [NotAnActualModelName!] @paginate(builder: "'.$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder').'")
             }
-            
+
             type NotAnActualModelName {
                 id: ID!
             }
