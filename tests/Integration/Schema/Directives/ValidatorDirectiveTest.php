@@ -3,7 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Execution\InputTypeValidator;
+use Nuwave\Lighthouse\Execution\InputValidator;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
@@ -13,6 +13,7 @@ use Tests\Utils\Models\User;
  */
 class ValidatorDirectiveTest extends DBTestCase
 {
+
     protected $schema = /** @lang GraphQL */
         '
         type Company {
@@ -65,20 +66,20 @@ class ValidatorDirectiveTest extends DBTestCase
         config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
 
         $response = $this->graphQL(
-/** @lang GraphQL */ '
+        /** @lang GraphQL */ '
                 mutation ($input: CreateUserInput!){
                   createUser(input: $input){
                    email
                 }
               }
                 ',
-                             [
-                                 'input' => [
-                                     'name'     => 'Username',
-                                     'email'    => 'user@company.test',
-                                     'password' => 'supersecret',
-                                 ],
-                             ]
+            [
+                'input' => [
+                    'name'     => 'Username',
+                    'email'    => 'user@company.test',
+                    'password' => 'supersecret',
+                ],
+            ]
         );
 
         $response->assertJson([
@@ -132,28 +133,29 @@ class ValidatorDirectiveTest extends DBTestCase
         config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
 
         $response = $this->graphQL(
-/** @lang GraphQL */ '
+        /** @lang GraphQL */ '
                 mutation ($input: CreateUserInput!){
                   createUser(input: $input){
                    email
                 }
               }
                 ',
-                             [
-                                 'input' => [
-                                     'name'     => 'short',
-                                     'email'    => 'user@company.test',
-                                     'password' => 'supersecret',
-                                 ],
-                             ]
+            [
+                'input' => [
+                    'name'     => 'short',
+                    'email'    => 'user@company.test',
+                    'password' => 'supersecret',
+                ],
+            ]
         );
 
         $this->assertValidationError($response, 'input.name', 'Name validation message.');
     }
 }
 
-class CreateUserInputValidator extends InputTypeValidator
+class CreateUserInputValidator extends InputValidator
 {
+
     public function rules(): array
     {
         return [
@@ -171,8 +173,9 @@ class CreateUserInputValidator extends InputTypeValidator
     }
 }
 
-class UpdateUserInputValidator extends InputTypeValidator
+class UpdateUserInputValidator extends InputValidator
 {
+
     public function rules(): array
     {
         $user = $this->model(User::class);
@@ -191,8 +194,9 @@ class UpdateUserInputValidator extends InputTypeValidator
     }
 }
 
-class UpdateCompanyInputValidator extends InputTypeValidator
+class UpdateCompanyInputValidator extends InputValidator
 {
+
     public function rules(): array
     {
         $company = $this->model(Company::class);

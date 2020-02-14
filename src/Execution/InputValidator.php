@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution;
 
 use Illuminate\Database\Eloquent\Model;
 
-abstract class InputTypeValidator
+abstract class InputValidator
 {
     /**
      * @var array

@@ -204,9 +204,9 @@ and define the validation rules for the input:
 namespace App\GraphQL\Validators;
 
 use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Execution\InputTypeValidator;
+use Nuwave\Lighthouse\Execution\InputValidator;
 
-class CreateUserInputValidator extends InputTypeValidator
+class CreateUserInputValidator extends InputValidator
 {
     public function rules(): array
     {

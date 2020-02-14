@@ -16,7 +16,7 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\InputTypeValidator;
+use Nuwave\Lighthouse\Execution\InputValidator;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -286,7 +286,7 @@ abstract class BaseDirective implements Directive
             $validatorCandidate,
             (array) config('lighthouse.namespaces.validators'),
             function (string $classCandidate): bool {
-                return is_subclass_of($classCandidate, InputTypeValidator::class);
+                return is_subclass_of($classCandidate, InputValidator::class);
             }
         );
     }

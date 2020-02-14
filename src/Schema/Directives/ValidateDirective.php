@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Execution\InputTypeValidator;
+use Nuwave\Lighthouse\Execution\InputValidator;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasInput;
@@ -19,7 +19,7 @@ class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesR
     private $input;
 
     /**
-     * @var InputTypeValidator
+     * @var InputValidator
      */
     private $validator;
     /**
