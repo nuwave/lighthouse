@@ -9,6 +9,8 @@ use Illuminate\Cache\ArrayStore;
  *
  * Works like Laravel's usual "array" store, expect
  * it actually serializes/unserializes the values.
+ *
+ * TODO remove as we support only Laravel 7.x, it allows configuring the array driver like this
  */
 class SerializingArrayStore extends ArrayStore
 {
@@ -21,7 +23,7 @@ class SerializingArrayStore extends ArrayStore
     public function get($key)
     {
         if (! isset($this->storage[$key])) {
-            return;
+            return null;
         }
 
         $item = $this->storage[$key];
@@ -31,7 +33,7 @@ class SerializingArrayStore extends ArrayStore
         if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
             $this->forget($key);
 
-            return;
+            return null;
         }
 
         return unserialize($item['value']);
@@ -45,7 +47,7 @@ class SerializingArrayStore extends ArrayStore
      * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $seconds)
+    public function put($key, $value, $seconds): bool
     {
         $this->storage[$key] = [
             'value' => serialize($value),

@@ -40,7 +40,7 @@ SDL;
      * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
         $clause = $this->directiveArgValue('clause', 'where');

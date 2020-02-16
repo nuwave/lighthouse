@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -28,17 +28,17 @@ class SubscriptionTest extends TestCase
         type Post {
             body: String
         }
-        
+
         type Subscription {
             onPostCreated: Post
         }
-        
+
         type Mutation {
             createPost(post: String!): Post
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
                 @broadcast(subscription: \"onPostCreated\")
         }
-        
+
         type Query {
             foo: String
         }

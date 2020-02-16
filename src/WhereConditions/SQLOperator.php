@@ -74,7 +74,7 @@ GRAPHQL;
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder
      */
-    public function applyConditions($builder, array $whereConditions, string $boolean)
+    public function applyConditions($builder, array $whereConditions, string $boolean): object
     {
         $column = $whereConditions['column'];
 

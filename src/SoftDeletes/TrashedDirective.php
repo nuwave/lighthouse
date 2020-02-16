@@ -32,7 +32,7 @@ SDL;
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         if ($builder instanceof Relation) {
             $model = $builder->getRelated();

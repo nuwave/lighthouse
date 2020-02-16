@@ -50,7 +50,7 @@ SDL;
      * @param  string[]  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         foreach ($value as $orderByClause) {
             $builder->orderBy(

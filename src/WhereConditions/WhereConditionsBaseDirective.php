@@ -41,7 +41,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')
+    public function handleWhereConditions(object $builder, array $whereConditions, string $boolean = 'and'): object
     {
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
             $builder->whereNested(

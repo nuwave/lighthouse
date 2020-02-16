@@ -93,7 +93,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * Not using an actual type hint, as the manipulateFieldDefinition function
      * validates the type during schema build time.
      *
-     * @return \GraphQL\Language\AST\NonNullTypeNode
+     * @return mixed but should be a \GraphQL\Language\AST\NonNullTypeNode
      */
     protected function idArgument()
     {

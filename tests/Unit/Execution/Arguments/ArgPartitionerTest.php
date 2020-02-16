@@ -68,7 +68,5 @@ class ArgPartitionerTest extends TestCase
 
 class Nested extends BaseDirective implements ArgResolver, Directive
 {
-    public function __invoke($root, $args)
-    {
-    }
+    public function __invoke($root, $args) {}
 }

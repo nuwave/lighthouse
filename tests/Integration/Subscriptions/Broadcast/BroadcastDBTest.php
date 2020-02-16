@@ -16,21 +16,21 @@ class BroadcastDBTest extends DBTestCase
         id: ID!
         name: String!
     }
-    
+
     type Query {
         task(id: Int @eq): Task @first
     }
-    
+
     type Mutation {
         updateTask(id: Int! @eq, name: String!): Task @update @broadcast(subscription: "taskUpdated")
     }
-    
+
     type Subscription {
         taskUpdated: Task
     }
     ';
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),

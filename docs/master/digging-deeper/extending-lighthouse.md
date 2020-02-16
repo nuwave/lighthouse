@@ -52,6 +52,7 @@ The following example is just a starting point of what you can do:
 namespace Nuwave\Lighthouse\Schema;
 
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MyContext implements GraphQLContext
@@ -91,7 +92,7 @@ class MyContext implements GraphQLContext
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function user()
+    public function user(): ?Authenticatable
     {
         // TODO implement yourself
     }
@@ -128,7 +129,7 @@ class MyContextFactory implements CreatesContext
 Rebind the interface in a service provider (e.g. your `AppServiceProvider` or a new `GraphQLServiceProvider`):
 
 ```php
-public function register()
+public function register(): void
 {
     $this->app->bind(
         \Nuwave\Lighthouse\Support\Contracts\CreatesContext::class,

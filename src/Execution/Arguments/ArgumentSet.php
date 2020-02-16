@@ -146,7 +146,7 @@ class ArgumentSet
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
+    public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
 
@@ -167,7 +167,7 @@ class ArgumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      * @param  \Closure|null  $directiveFilter
      */
-    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null)
+    protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
     {
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();

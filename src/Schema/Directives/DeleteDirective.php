@@ -55,7 +55,7 @@ SDL;
      * @param string|int|string[]|int[] $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
-    protected function find(string $modelClass, $idOrIds)
+    protected function find(string $modelClass, $idOrIds): object
     {
         return $modelClass::find($idOrIds);
     }

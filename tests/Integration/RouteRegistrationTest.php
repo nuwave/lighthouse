@@ -13,14 +13,14 @@ class RouteRegistrationTest extends TestCase
      * @param  \Illuminate\Foundation\Application  $app
      * @return string[]
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             LighthouseServiceProvider::class,
         ];
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 

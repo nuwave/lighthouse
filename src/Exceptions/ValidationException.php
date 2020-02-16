@@ -9,7 +9,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
      *
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
@@ -19,7 +19,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
      *
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'validation';
     }

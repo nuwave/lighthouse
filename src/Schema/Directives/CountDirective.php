@@ -36,7 +36,7 @@ SDL;
      * @param FieldValue $value
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         return $value->setResolver(
             function (?Model $model) {

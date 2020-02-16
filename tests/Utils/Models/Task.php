@@ -17,7 +17,7 @@ class Task extends Model
 
     protected $guarded = [];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
@@ -57,7 +57,7 @@ class Task extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function scopeWhereTags(Builder $query, $tags)
+    public function scopeWhereTags(Builder $query, iterable $tags): Builder
     {
         return $query->whereHas('tags', function (Builder $query) use ($tags) {
             $query->whereIn('name', $tags);

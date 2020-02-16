@@ -22,7 +22,7 @@ class NestedOneToMany implements ArgResolver
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      * @return void
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
         $relation = $parent->{$this->relationName}();

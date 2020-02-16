@@ -42,7 +42,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     }
     ';
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),

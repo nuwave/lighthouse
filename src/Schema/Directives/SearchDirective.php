@@ -29,7 +29,7 @@ SDL;
      * @param  mixed  $value
      * @return \Laravel\Scout\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         /** @var \Laravel\Scout\Searchable $modelClass */
         $modelClass = get_class($builder->getModel());

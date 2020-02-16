@@ -19,7 +19,7 @@ class BroadcastManagerTest extends TestCase
      */
     protected $broadcastManager;
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): void
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -53,25 +53,10 @@ class BroadcastManagerTest extends TestCase
         $broadcasterConfig = [];
 
         $broadcaster = new class implements Broadcaster {
-            public function authorized(Request $request)
-            {
-                //
-            }
-
-            public function unauthorized(Request $request)
-            {
-                //
-            }
-
-            public function hook(Request $request)
-            {
-                //
-            }
-
-            public function broadcast(Subscriber $subscriber, array $data)
-            {
-                //
-            }
+            public function authorized(Request $request) {}
+            public function unauthorized(Request $request) {}
+            public function hook(Request $request) {}
+            public function broadcast(Subscriber $subscriber, array $data) {}
         };
 
         $this->broadcastManager->extend('foo', function ($app, array $config) use (&$broadcasterConfig, $broadcaster): Broadcaster {

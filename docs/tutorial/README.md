@@ -186,7 +186,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreatePostsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
@@ -197,7 +197,7 @@ class CreatePostsTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('posts');
     }
@@ -232,7 +232,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateCommentsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
@@ -242,7 +242,7 @@ class CreateCommentsTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('comments');
     }

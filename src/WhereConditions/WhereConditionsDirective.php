@@ -33,7 +33,7 @@ SDL;
      * @param  mixed[]  $whereConditions
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $whereConditions)
+    public function handleBuilder($builder, $whereConditions): object
     {
         // The value `null` should be allowed but have no effect on the query.
         // Just return the unmodified Builder instance.

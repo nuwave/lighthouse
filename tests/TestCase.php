@@ -53,7 +53,7 @@ abstract class TestCase extends BaseTestCase
      * @param  \Illuminate\Foundation\Application  $app
      * @return string[]
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             AuthServiceProvider::class,
@@ -72,7 +72,7 @@ abstract class TestCase extends BaseTestCase
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
@@ -142,22 +142,16 @@ abstract class TestCase extends BaseTestCase
     {
         $app->singleton(ExceptionHandler::class, function () {
             return new class implements ExceptionHandler {
-                public function report(Exception $e)
-                {
-                    //
-                }
+                public function report(Exception $e) {}
 
-                public function render($request, Exception $e)
+                public function render($request, Exception $e): void
                 {
                     throw $e;
                 }
 
-                public function renderForConsole($output, Exception $e)
-                {
-                    //
-                }
+                public function renderForConsole($output, Exception $e) {}
 
-                public function shouldReport(Exception $e)
+                public function shouldReport(Exception $e): bool
                 {
                     return false;
                 }

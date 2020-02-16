@@ -23,7 +23,7 @@ class StorageManagerTest extends TestCase
      */
     protected $storage;
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -38,51 +38,22 @@ class StorageManagerTest extends TestCase
         $this->storage = app(StorageManager::class);
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
         $app->bind(ContextSerializer::class, function (): ContextSerializer {
             return new class implements ContextSerializer {
-                /**
-                 * Serialize the context.
-                 *
-                 * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-                 * @return string
-                 */
-                public function serialize(GraphQLContext $context)
+                public function serialize(GraphQLContext $context): string
                 {
                     return 'foo';
                 }
 
-                /**
-                 * Unserialize the context.
-                 *
-                 * @param  string  $context
-                 * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-                 */
-                public function unserialize(string $context)
+                public function unserialize(string $context): GraphQLContext
                 {
                     return new class implements GraphQLContext {
-                        /**
-                         * Get an instance of the authenticated user.
-                         *
-                         * @return \Illuminate\Foundation\Auth\User|null
-                         */
-                        public function user()
-                        {
-                            //
-                        }
-
-                        /**
-                         * Get an instance of the current HTTP request.
-                         *
-                         * @return \Illuminate\Http\Request
-                         */
-                        public function request()
-                        {
-                            //
-                        }
+                        public function user() {}
+                        public function request() {}
                     };
                 }
             };

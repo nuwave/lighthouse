@@ -102,10 +102,11 @@ class Subscriber implements Serializable
     /**
      * Convert this into a JSON string.
      *
-     * @return false|string
+     * @return string
      */
-    public function serialize()
+    public function serialize(): string
     {
+        // TODO use safe-php
         return json_encode([
             'operation_name' => $this->operationName,
             'channel' => $this->channel,

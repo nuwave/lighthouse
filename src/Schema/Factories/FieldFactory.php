@@ -349,16 +349,29 @@ class FieldFactory
         return $validators;
     }
 
+    /**
+     * @param  string[]  $argumentPath
+     * @return bool
+     */
     protected function argValueExists(array $argumentPath): bool
     {
         return Arr::has($this->args, implode('.', $argumentPath));
     }
 
+    /**
+     * @param  string[]  $argumentPath
+     * @param  mixed  $value
+     * @return mixed[]
+     */
     protected function setArgValue(array $argumentPath, $value): array
     {
         return Arr::set($this->args, implode('.', $argumentPath), $value);
     }
 
+    /**
+     * @param  string[]  $argumentPath
+     * @return mixed
+     */
     protected function argValue(array $argumentPath)
     {
         return Arr::get($this->args, implode('.', $argumentPath));

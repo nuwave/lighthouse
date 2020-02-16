@@ -30,7 +30,7 @@ SDL;
      * @param  mixed  $values
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $values)
+    public function handleBuilder($builder, $values): object
     {
         return $builder->whereNotIn(
             $this->directiveArgValue('key', $this->nodeName()),

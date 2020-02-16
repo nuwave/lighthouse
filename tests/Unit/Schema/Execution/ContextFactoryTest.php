@@ -15,7 +15,7 @@ class ContextFactoryTest extends TestCase
 
         $app->singleton(CreatesContext::class, function (): CreatesContext {
             return new class implements CreatesContext {
-                public function generate(Request $request)
+                public function generate(Request $request): GraphQLContext
                 {
                     return new class($request) implements GraphQLContext {
                         /**
@@ -28,10 +28,7 @@ class ContextFactoryTest extends TestCase
                             $this->request = $request;
                         }
 
-                        public function user(): void
-                        {
-                            //
-                        }
+                        public function user(): void {}
 
                         public function request(): Request
                         {

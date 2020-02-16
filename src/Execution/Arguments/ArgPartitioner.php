@@ -154,7 +154,7 @@ class ArgPartitioner
      * @param  \Closure  $predicate
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
-    public static function partition(ArgumentSet $argumentSet, \Closure $predicate)
+    public static function partition(ArgumentSet $argumentSet, \Closure $predicate): array
     {
         $matched = new ArgumentSet();
         $notMatched = new ArgumentSet();
