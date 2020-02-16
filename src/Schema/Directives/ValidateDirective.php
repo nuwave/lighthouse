@@ -8,9 +8,6 @@ use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasInput;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 
-/**
- * Class ValidateDirective.
- */
 class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasInput, HasArgumentPath
 {
     /**
@@ -22,14 +19,12 @@ class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesR
      * @var InputValidator
      */
     private $validator;
+
     /**
      * @var array
      */
     private $argumentPath;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function definition()
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -47,16 +42,12 @@ directive @validate(
 SDL;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function name(): string
     {
         return 'validate';
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function rules(): array
@@ -69,9 +60,6 @@ SDL;
         return $this->addFullInputPathToKeys($this->validator->rules());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function messages(): array
     {
         return $this->addFullInputPathToKeys($this->validator->messages());
@@ -82,17 +70,11 @@ SDL;
         $this->input = $args;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function argumentPath(): array
     {
         return $this->argumentPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setArgumentPath(array $argumentPath)
     {
         $this->argumentPath = $argumentPath;
