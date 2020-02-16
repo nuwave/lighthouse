@@ -297,7 +297,6 @@ class FieldFactory
             if ($directive instanceof HasErrorBuffer) {
                 $directive->setErrorBuffer($this->validationErrorBuffer);
             }
-
             if ($directive instanceof HasArgumentPath) {
                 $directive->setArgumentPath($argumentPath);
             }
