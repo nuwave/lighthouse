@@ -129,9 +129,8 @@ class GraphQLTest extends TestCase
     public function testHandlesErrorInResolver(): void
     {
         $message = 'foo';
-        $this->mockResolver(function () use ($message) {
-            throw new Error($message);
-        });
+        $this->mockResolver()
+            ->willThrowException(new Error($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

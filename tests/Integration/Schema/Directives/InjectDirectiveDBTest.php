@@ -12,37 +12,27 @@ class InjectDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $this->schema = '
+        $this->mockResolver()
+            ->with(null, ['user_id' => 1]);
+
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
         }
-        
+
         type Query {
-            me: User!
+            me: User
                 @inject(context: "user.id", name: "user_id")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             me {
                 id
             }
         }
-        ')->assertJson([
-            'data' => [
-                'me' => [
-                    'id' => 1,
-                ],
-            ],
-        ]);
-    }
-
-    public function resolveUser($root, array $args): array
-    {
-        return [
-            'id' => $args['user_id'],
-        ];
+        ');
     }
 }
