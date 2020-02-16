@@ -52,8 +52,13 @@ class StorageManagerTest extends TestCase
                 public function unserialize(string $context): GraphQLContext
                 {
                     return new class implements GraphQLContext {
-                        public function user() {}
-                        public function request() {}
+                        public function user()
+                        {
+                        }
+
+                        public function request()
+                        {
+                        }
                     };
                 }
             };

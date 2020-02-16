@@ -28,7 +28,9 @@ class ContextFactoryTest extends TestCase
                             $this->request = $request;
                         }
 
-                        public function user(): void {}
+                        public function user(): void
+                        {
+                        }
 
                         public function request(): Request
                         {

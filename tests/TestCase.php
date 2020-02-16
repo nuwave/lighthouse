@@ -142,14 +142,18 @@ abstract class TestCase extends BaseTestCase
     {
         $app->singleton(ExceptionHandler::class, function () {
             return new class implements ExceptionHandler {
-                public function report(Exception $e) {}
+                public function report(Exception $e)
+                {
+                }
 
                 public function render($request, Exception $e): void
                 {
                     throw $e;
                 }
 
-                public function renderForConsole($output, Exception $e) {}
+                public function renderForConsole($output, Exception $e)
+                {
+                }
 
                 public function shouldReport(Exception $e): bool
                 {

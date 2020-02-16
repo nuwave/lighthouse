@@ -8,5 +8,7 @@ namespace Nuwave\Lighthouse\Testing;
  */
 class MockResolver
 {
-    public function __invoke(): void {}
+    public function __invoke(): void
+    {
+    }
 }

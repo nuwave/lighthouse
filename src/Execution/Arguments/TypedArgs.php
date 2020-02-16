@@ -183,7 +183,7 @@ class TypedArgs
     {
         // As GraphQL does not allow empty input objects, we return null as is
         if ($value === null) {
-            return null;
+            return;
         }
 
         // This might be null if the type is
