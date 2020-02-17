@@ -60,30 +60,42 @@ class ValidatorDirectiveTest extends DBTestCase
 
     public function testInputTypeValidator()
     {
-        $response = $this->graphQL(
-/** @lang GraphQL */ '
-                mutation ($input: CreateUserInput!){
-                  createUser(input: $input){
-                   email
-                }
-              }
-                ',
-            [
+        $mutation = /** @lang GraphQL */
+            '
+            mutation ($input: CreateUserInput!){
+              createUser(input: $input){
+               email
+            }
+          }
+        ';
+        $successful = $this->graphQL($mutation, [
                 'input' => [
-                    'name'     => 'Username',
-                    'email'    => 'user@company.test',
+                    'name' => 'Username',
+                    'email' => 'user@company.test',
                     'password' => 'supersecret',
                 ],
             ]
         );
 
-        $response->assertJson([
+        $successful->assertJson([
             'data' => [
                 'createUser' => [
                     'email' => 'user@company.test',
                 ],
             ],
         ]);
+
+        $fails = $this->graphQL($mutation, [
+            'input' => [
+                'name' => 'n',
+                'email' => 'string',
+                'password' => 's'
+            ]
+        ]);
+
+        $this->assertValidationError($fails, 'input.name', 'Name validation message.');
+        $this->assertValidationError($fails, 'input.email', 'The input.email must be a valid email address.');
+        $this->assertValidationError($fails, 'input.password', 'The input.password must be at least 11 characters.');
     }
 
     public function testNestedInputTypeValidator()
@@ -101,10 +113,10 @@ class ValidatorDirectiveTest extends DBTestCase
         }
         ', [
             'input' => [
-                'id'      => $user->id,
+                'id' => $user->id,
                 'company' => [
                     'update' => [
-                        'id'   => $company->id,
+                        'id' => $company->id,
                         'name' => 'The Company',
                     ],
                 ],
@@ -120,28 +132,5 @@ class ValidatorDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
-    }
-
-    public function testValidationMessages()
-    {
-
-        $response = $this->graphQL(
-/** @lang GraphQL */ '
-                mutation ($input: CreateUserInput!){
-                  createUser(input: $input){
-                   email
-                }
-              }
-                ',
-            [
-                'input' => [
-                    'name'     => 'short',
-                    'email'    => 'user@company.test',
-                    'password' => 'supersecret',
-                ],
-            ]
-        );
-
-        $this->assertValidationError($response, 'input.name', 'Name validation message.');
     }
 }

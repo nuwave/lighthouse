@@ -17,7 +17,7 @@ class CreateUserInputValidator extends InputValidator
         return [
             'name'     => ['min:6'],
             'email'    => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required'],
+            'password' => ['required', 'min:11'],
         ];
     }
 
