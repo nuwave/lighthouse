@@ -55,7 +55,9 @@ SDL;
                     throw new Error('The query returned more than one result.');
                 }
 
-                return $results->first();
+                $first = $results->first();
+
+                return $first;
             }
         );
     }

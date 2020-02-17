@@ -2,14 +2,16 @@
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Laravel\Scout\Searchable;
+use Spatie\MediaLibrary\Models\Media;
 
-class Post extends Model
+class Post extends Media implements Responsable, Htmlable
 {
     use Searchable;
 
@@ -48,5 +50,18 @@ class Post extends Model
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toResponse($request)
+    {
+        die('hard');
+    }
+
+    public function toHtml()
+    {
+        die('html');
     }
 }

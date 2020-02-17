@@ -3,41 +3,38 @@
 namespace Tests\Unit\Support;
 
 use Illuminate\Contracts\Support\Responsable;
+use Tests\DBTestCase;
 use Tests\TestCase;
+use Tests\Utils\Models\Post;
 
-class PipelineTest extends TestCase
+class PipelineTest extends DBTestCase
 {
     public function testDoesNotCallToResponse(): void
     {
-        $this->mockResolver(new class implements Responsable {
-            public $bar = 42;
-
-            public function toResponse($request)
-            {
-                throw new \Exception('Must not be called when returning this from a resolver.');
-            }
-        });
+        $post = factory(Post::class)->create(['title' => 'bar']);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Foo @mock
+            foo(id: ID @eq): Post @find
         }
 
-        type Foo {
-            bar: Int
+        type Post {
+            id: ID!
+            title: String
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            foo {
-                bar
+            foo(id: 1) {
+                id
+                title
             }
         }
         ')->assertExactJson([
             'data' => [
                 'foo' => [
-                    'bar' => 42,
+                    'title' => 42,
                 ],
             ],
         ]);
