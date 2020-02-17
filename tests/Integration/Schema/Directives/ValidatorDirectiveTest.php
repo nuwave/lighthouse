@@ -2,8 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Execution\InputValidator;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
