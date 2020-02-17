@@ -267,5 +267,5 @@ mutation{
 }
 ```
 
-The way how this works is that `$this->model()` looks at the field in the input that is the same as the key name, 
-of the given model and will try to load in a model of based on the value of the key. In most cases, this will be `id`.  
+The way how this works is that `$this->model()` looks at the field in the input that is the same as the key name
+of the given model and will try to load in a model based on the value of the key. In most cases, this will be `id`.  
