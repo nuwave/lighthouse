@@ -2,9 +2,7 @@
 
 namespace Tests\Unit\Support;
 
-use Illuminate\Contracts\Support\Responsable;
 use Tests\DBTestCase;
-use Tests\TestCase;
 use Tests\Utils\Models\Post;
 
 class PipelineTest extends DBTestCase

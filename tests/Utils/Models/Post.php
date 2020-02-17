@@ -2,8 +2,8 @@
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -53,7 +53,7 @@ class Post extends Media implements Responsable, Htmlable
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function toResponse($request)
     {
