@@ -27,7 +27,7 @@ class ValidatorDirectiveTest extends DBTestCase
           company: Company! @belongsTo
         }
 
-        input UpdateUserInput @validate(validator: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\UpdateUserInputValidator") {
+        input UpdateUserInput @validate(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateUserInputValidator") {
           id: ID!
           name: String
           email: String
@@ -45,7 +45,7 @@ class ValidatorDirectiveTest extends DBTestCase
           password: String!
         }
 
-        input UpdateCompanyInput @validate(validator: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\UpdateCompanyInputValidator") {
+        input UpdateCompanyInput @validate(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateCompanyInputValidator") {
           id: ID!
           name: String!
         }
@@ -62,8 +62,6 @@ class ValidatorDirectiveTest extends DBTestCase
 
     public function testInputTypeValidator()
     {
-        config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
-
         $response = $this->graphQL(
 /** @lang GraphQL */ '
                 mutation ($input: CreateUserInput!){
@@ -128,7 +126,6 @@ class ValidatorDirectiveTest extends DBTestCase
 
     public function testValidationMessages()
     {
-        config()->set('lighthouse.namespaces.validators', [__NAMESPACE__]);
 
         $response = $this->graphQL(
 /** @lang GraphQL */ '
@@ -148,61 +145,5 @@ class ValidatorDirectiveTest extends DBTestCase
         );
 
         $this->assertValidationError($response, 'input.name', 'Name validation message.');
-    }
-}
-
-class CreateUserInputValidator extends InputValidator
-{
-    public function rules(): array
-    {
-        return [
-            'name'     => ['min:6'],
-            'email'    => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'name.min' => 'Name validation message.',
-        ];
-    }
-}
-
-class UpdateUserInputValidator extends InputValidator
-{
-    public function rules(): array
-    {
-        $user = $this->model(User::class);
-
-        return [
-            'email' => [
-                'email',
-                Rule::unique('users', 'email')->ignore($user),
-            ],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [];
-    }
-}
-
-class UpdateCompanyInputValidator extends InputValidator
-{
-    public function rules(): array
-    {
-        $company = $this->model(Company::class);
-
-        return [
-            'name' => [Rule::unique('companies', 'name')->ignore($company)],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [];
     }
 }
