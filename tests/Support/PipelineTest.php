@@ -37,9 +37,9 @@ class PipelineTest extends TestCase
         ')->assertExactJson([
             'data' => [
                 'foo' => [
-                    'bar' => 42
-                ]
-            ]
+                    'bar' => 42,
+                ],
+            ],
         ]);
     }
 }
