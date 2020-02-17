@@ -223,4 +223,49 @@ Note that this gives you access to all kinds of programmatic validation rules th
 provides. This can give you additional flexibility when you need it.
 
 When updating for example a user, it is possible to obtain an instance of it by using `$this->model(User::class)`. This 
-will return an instance of the user model based on it's primary key name.   
+will return an instance of the user model based on it's primary key name. 
+
+```graphql
+type User {
+    id: ID!
+    name: String! 
+    email: String!
+}
+
+input UpdateUserInput @validate {
+    id: ID!
+    name: String
+    email: String 
+}
+
+type Mutation {
+    updateUser(input: UpdateUserInput!): Material @update
+}
+```
+
+```php
+    use Illuminate\Validation\Rule;
+    use Nuwave\Lighthouse\Execution\InputValidator;
+
+class UpdateMaterialInputValidator extends InputValidator{
+    public function rules() : array {
+        $user = $this->model(User::class); 
+        return [
+            'email' => Rule::unique('users', 'email')->ignore($user) //note, the column is still required when validating graphql input 
+        ];   
+    }
+}
+```
+
+The above validator will allow updating the user, but ignore the unique rule for its own record in the database.
+
+```graphql
+mutation{
+    updateMaterial(input: {id: 1, email: "foo@bar.test", name: "foo"}){
+       email
+    }
+}
+```
+
+The way how this works is that `$this->model()` looks at the field in the input that is the same as the key name, 
+of the given model and will try to load in a model of based on the value of the key. In most cases, this will be `id`.  
