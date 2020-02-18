@@ -181,11 +181,10 @@ type Mutation {
 }
 ```
 
-Unlike the field level validation of [`@rules`](../api-reference/directives.md#rules), input validation
-works by decorating the `input` type with the [`@validate`](../api-reference/directives.md#validate) directive:
+Input validation works by decorating the `input` type with the [`@rules`](../api-reference/directives.md#rules) directive:
 
 ```graphql
-input CreateUserInput @validate {
+input CreateUserInput @rules {
   name: String!
   email: String!
   password: String!
@@ -232,7 +231,7 @@ type User {
     email: String!
 }
 
-input UpdateUserInput @validate {
+input UpdateUserInput @rules {
     id: ID!
     name: String
     email: String 
@@ -247,7 +246,7 @@ type Mutation {
     use Illuminate\Validation\Rule;
     use Nuwave\Lighthouse\Execution\InputValidator;
 
-class UpdateMaterialInputValidator extends InputValidator{
+class UpdateUserInputValidator extends InputValidator{
     public function rules() : array {
         $user = $this->model(User::class); 
         return [
@@ -261,7 +260,7 @@ The above validator will allow updating the user, but ignore the unique rule for
 
 ```graphql
 mutation{
-    updateMaterial(input: {id: 1, email: "foo@bar.test", name: "foo"}){
+    updateUser(input: {id: 1, email: "foo@bar.test", name: "foo"}){
        email
     }
 }
