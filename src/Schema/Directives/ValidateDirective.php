@@ -8,10 +8,10 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
-use Nuwave\Lighthouse\Support\Contracts\HasInput;
+use Nuwave\Lighthouse\Support\Contracts\HasArgPathValue;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 
-class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasInput, HasArgumentPath, FieldMiddleware
+class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgPathValue, HasArgumentPath, FieldMiddleware
 {
     /**
      * @var array
@@ -60,7 +60,7 @@ SDL;
         $validator = new $class($this->input);
         $this->validator = $validator;
 
-        return $this->addFullInputPathToKeys($this->validator->rules());
+        return $this->addFullInputPathToKeys();
     }
 
     public function messages(): array
@@ -68,7 +68,7 @@ SDL;
         return $this->addFullInputPathToKeys($this->validator->messages());
     }
 
-    public function setInput(array $args): void
+    public function setArgPathValue(array $args): void
     {
         $this->input = $args;
     }

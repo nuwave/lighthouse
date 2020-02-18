@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 /**
  * Class ValidatorDirectiveTest.
  */
-class ValidatorDirectiveTest extends DBTestCase
+class RulesDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */
         '
@@ -25,7 +25,7 @@ class ValidatorDirectiveTest extends DBTestCase
           company: Company! @belongsTo
         }
 
-        input UpdateUserInput @validate(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateUserInputValidator") {
+        input UpdateUserInput @rules(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateUserInputValidator") {
           id: ID!
           name: String
           email: String
@@ -37,13 +37,13 @@ class ValidatorDirectiveTest extends DBTestCase
           update: UpdateCompanyInput
         }
 
-        input CreateUserInput @validate {
+        input CreateUserInput @rules {
           name: String!
           email: String!
           password: String!
         }
 
-        input UpdateCompanyInput @validate(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateCompanyInputValidator") {
+        input UpdateCompanyInput @rules(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateCompanyInputValidator") {
           id: ID!
           name: String!
         }
@@ -51,7 +51,6 @@ class ValidatorDirectiveTest extends DBTestCase
         type Mutation {
           updateUser(input: UpdateUserInput! @spread): User @update
           createUser(input: CreateUserInput! @spread): User @create
-          createCompany(name: String!): Company @validate @create
         }
 
         type Query {
@@ -150,31 +149,5 @@ class ValidatorDirectiveTest extends DBTestCase
         ]);
 
         $this->assertValidationError($fail, 'input.company.update.name', 'The input.company.update.name has already been taken.');
-    }
-
-    public function testValidateFieldDefinition(){
-
-        factory(Company::class)->create(['name' => 'The Second Company']);
-
-        $mutation = /** @lang GraphQL */ '
-        mutation ($name: String!){
-            createCompany(name: $name){
-                name
-            }
-        }
-        ';
-        $success = $this->graphQL($mutation, ['name' => 'The Company']);
-
-        $success->assertExactJson([
-            'data' => [
-                'createCompany' => [
-                    'name'=>'The Company'
-                ]
-            ]
-        ]);
-
-        $fail = $this->graphQL($mutation, ['name' => 'The Second Company']);
-
-         $this->assertValidationError($fail, 'name', 'The name has already been taken.');
     }
 }

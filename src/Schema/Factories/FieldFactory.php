@@ -21,7 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
-use Nuwave\Lighthouse\Support\Contracts\HasInput;
+use Nuwave\Lighthouse\Support\Contracts\HasArgPathValue;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
@@ -301,8 +301,8 @@ class FieldFactory
             if ($directive instanceof HasArgumentPath) {
                 $directive->setArgumentPath($argumentPath);
             }
-            if ($directive instanceof HasInput) {
-                $directive->setInput($this->argValue($argumentPath));
+            if ($directive instanceof HasArgPathValue) {
+                $directive->setArgPathValue($this->argValue($argumentPath));
             }
         });
 

@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 /**
  * Class HasInput.
  */
-interface HasInput
+interface HasArgPathValue
 {
-    public function setInput(array $args): void;
+    public function setArgPathValue($value = null): void;
 }
