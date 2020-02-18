@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 /**
  * Class ValidatorDirectiveTest.
  */
-class RulesDirectiveTest extends DBTestCase
+class RulesDirectiveValidatorClassTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */
         '
