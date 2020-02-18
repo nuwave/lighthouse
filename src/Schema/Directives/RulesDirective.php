@@ -13,8 +13,8 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 use Nuwave\Lighthouse\Support\Contracts\HasArgPathValue;
+use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 
@@ -70,8 +70,7 @@ SDL;
      */
     public function rules(): array
     {
-
-        if($this->definitionNode instanceof InputObjectTypeDefinitionNode){
+        if ($this->definitionNode instanceof InputObjectTypeDefinitionNode) {
             return $this->rulesForInputObject();
         }
 
@@ -83,9 +82,10 @@ SDL;
      */
     public function messages(): array
     {
-        if($this->definitionNode instanceof InputObjectTypeDefinitionNode){
+        if ($this->definitionNode instanceof InputObjectTypeDefinitionNode) {
             return $this->messagesForInputObject();
         }
+
         return (new Collection($this->directiveArgValue('messages')))
             ->mapWithKeys(function (string $message, string $rule): array {
                 $argumentPath = $this->argumentPathAsDotNotation();

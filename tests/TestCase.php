@@ -107,8 +107,8 @@ abstract class TestCase extends BaseTestCase
                 'Tests\\Utils\\Directives',
             ],
             'validators' => [
-                'Tests\\Utils\\Validators'
-            ]
+                'Tests\\Utils\\Validators',
+            ],
         ]);
 
         $config->set(

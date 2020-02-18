@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Utils\Validators;
-
 
 use Illuminate\Validation\Rule;
 use Nuwave\Lighthouse\Execution\InputValidator;

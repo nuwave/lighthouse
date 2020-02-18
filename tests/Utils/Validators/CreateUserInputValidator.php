@@ -1,14 +1,12 @@
 <?php
 
-
 namespace Tests\Utils\Validators;
-
 
 use Illuminate\Validation\Rule;
 use Nuwave\Lighthouse\Execution\InputValidator;
 
 /**
- * Class CreateUserInputValidator
+ * Class CreateUserInputValidator.
  */
 class CreateUserInputValidator extends InputValidator
 {

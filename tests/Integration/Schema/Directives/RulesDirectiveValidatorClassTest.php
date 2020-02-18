@@ -69,12 +69,12 @@ class RulesDirectiveValidatorClassTest extends DBTestCase
           }
         ';
         $successful = $this->graphQL($mutation, [
-                'input' => [
-                    'name' => 'Username',
-                    'email' => 'user@company.test',
-                    'password' => 'supersecret',
-                ],
-            ]
+            'input' => [
+                'name' => 'Username',
+                'email' => 'user@company.test',
+                'password' => 'supersecret',
+            ],
+        ]
         );
 
         $successful->assertJson([
@@ -89,8 +89,8 @@ class RulesDirectiveValidatorClassTest extends DBTestCase
             'input' => [
                 'name' => 'n',
                 'email' => 'string',
-                'password' => 's'
-            ]
+                'password' => 's',
+            ],
         ]);
 
         $this->assertValidationError($fails, 'input.name', 'Name validation message.');
@@ -142,10 +142,10 @@ class RulesDirectiveValidatorClassTest extends DBTestCase
                 'company' => [
                     'update' => [
                         'id' => $company->id,
-                        'name' => 'The Second Company'
-                    ]
-                ]
-            ]
+                        'name' => 'The Second Company',
+                    ],
+                ],
+            ],
         ]);
 
         $this->assertValidationError($fail, 'input.company.update.name', 'The input.company.update.name has already been taken.');
