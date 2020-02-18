@@ -9,7 +9,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Add `@validate` directive to validate input types by extending `\Nuwave\Lighthouse\Execution\InputTypeValidator`  https://github.com/nuwave/lighthouse/pull/1185
+- Add possibility to apply `@rules` directive to input types by providing a validator class that extends `\Nuwave\Lighthouse\Execution\InputTypeValidator`  https://github.com/nuwave/lighthouse/pull/1185
 
 ## 4.9.0
 
