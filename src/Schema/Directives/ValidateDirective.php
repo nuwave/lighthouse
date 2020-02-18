@@ -2,13 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Closure;
 use Nuwave\Lighthouse\Execution\InputValidator;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasInput;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 
-class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasInput, HasArgumentPath
+class ValidateDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasInput, HasArgumentPath, FieldMiddleware
 {
     /**
      * @var array
@@ -94,5 +97,11 @@ SDL;
                 return [$argumentBasePathDotNotation.'.'.$key => $value];
             })
             ->toArray();
+    }
+
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    {
+       $foo = 'bar';
+       return $fieldValue;
     }
 }
