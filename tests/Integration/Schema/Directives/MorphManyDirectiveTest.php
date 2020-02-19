@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use GraphQL\Error\Error;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
@@ -260,7 +261,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ");
 
         $this->assertSame(
-            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(3, 10),
             $result->jsonGet('errors.0.message')
         );
     }
@@ -304,7 +305,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ");
 
         $this->assertSame(
-            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(2, 10),
             $result->jsonGet('errors.0.message')
         );
     }
@@ -507,7 +508,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ");
 
         $this->assertSame(
-            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(3, 10),
             $result->jsonGet('errors.0.message')
         );
     }
@@ -553,7 +554,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ");
 
         $this->assertSame(
-            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(2, 10),
             $result->jsonGet('errors.0.message')
         );
     }
