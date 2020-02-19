@@ -1082,7 +1082,24 @@ directive @guard(
 ) on FIELD_DEFINITION | OBJECT
 ```
 
+## @hash
 
+Runs Laravel's `Hash::make` function on the argument it is defined on.
+
+```graphql
+type Mutation {
+    createUser(name: String, password: String @hash): User
+}
+```
+
+### Definition
+
+```graphql
+"""
+Laravel's `Hash::make` function on the argument it is defined on.
+"""
+directive @hash on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
 
 ## @hasMany
 
