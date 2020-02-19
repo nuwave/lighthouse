@@ -26,11 +26,11 @@ class ASTBuilderTest extends TestCase
         type Query {
             foo: String
         }
-        
+
         extend type Query {
             bar: Int!
         }
-        
+
         extend type Query {
             baz: Boolean
         }
@@ -43,15 +43,132 @@ class ASTBuilderTest extends TestCase
         );
     }
 
+    public function testCanMergeInputExtensionFields(): void
+    {
+        $this->schema = '
+        input Inputs {
+            foo: String
+        }
+
+        extend input Inputs {
+            bar: Int!
+        }
+
+        extend input Inputs {
+            baz: Boolean
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+        $this->assertCount(
+            3,
+            $documentAST->types['Inputs']->fields
+        );
+    }
+
+    public function testCanMergeInterfaceExtensionFields(): void
+    {
+        $this->schema = '
+        interface Named {
+          name: String!
+        }
+
+        extend interface Named {
+          bar: Int!
+        }
+
+        extend interface Named {
+          baz: Boolean
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+        $this->assertCount(
+            3,
+            $documentAST->types['Named']->fields
+        );
+    }
+
+    public function testCanMergeEnumExtensionFields(): void
+    {
+        $this->schema = '
+        enum MyEnum {
+            ONE
+            TWO
+        }
+
+        extend enum MyEnum {
+            THREE
+        }
+
+        extend enum MyEnum {
+            FOUR
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+        $this->assertCount(
+            4,
+            $documentAST->types['MyEnum']->values
+        );
+    }
+
     public function testDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
         $this->schema = '
         type Query {
             foo: String
         }
-        
+
         extend type Query {
             foo: Int
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowDuplicateFieldsOnInputExtensions(): void
+    {
+        $this->schema = '
+        input Inputs {
+            foo: String
+        }
+
+        extend input Inputs {
+            foo: Int
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowDuplicateFieldsOnInterfaceExtensions(): void
+    {
+        $this->schema = '
+        interface Named {
+            foo: String
+        }
+
+        extend interface Named{
+            foo: Int
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowDuplicateValuesOnEnumExtensions(): void
+    {
+        $this->schema = '
+        enum MyEnum {
+            ONE
+            TWO
+        }
+
+        extend enum MyEnum {
+            TWO
+            THREE
         }
         ';
 

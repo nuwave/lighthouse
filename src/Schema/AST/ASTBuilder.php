@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\EnumTypeExtensionNode;
+use GraphQL\Language\AST\InputObjectTypeExtensionNode;
+use GraphQL\Language\AST\InterfaceTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -170,6 +173,7 @@ class ASTBuilder
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
             /** @var \GraphQL\Language\AST\TypeExtensionNode $typeExtension */
             foreach ($typeExtensionsList as $typeExtension) {
+
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
                     $this->directiveFactory->createAssociatedDirectivesOfType($typeExtension, TypeExtensionManipulator::class)
@@ -180,12 +184,22 @@ class ASTBuilder
 
                 // After manipulation on the type extension has been done,
                 // we can merge its fields with the original type
-                if ($typeExtension instanceof ObjectTypeExtensionNode) {
+                if ($typeExtension instanceof ObjectTypeExtensionNode ||
+                    $typeExtension instanceof InputObjectTypeExtensionNode ||
+                    $typeExtension instanceof InterfaceTypeExtensionNode
+                ) {
                     $relatedObjectType = $this->documentAST->types[$typeName];
 
                     $relatedObjectType->fields = ASTHelper::mergeUniqueNodeList(
                         $relatedObjectType->fields,
                         $typeExtension->fields
+                    );
+                } elseif ($typeExtension instanceof EnumTypeExtensionNode) {
+                    $relatedObjectType = $this->documentAST->types[$typeName];
+
+                    $relatedObjectType->values = ASTHelper::mergeUniqueNodeList(
+                        $relatedObjectType->values,
+                        $typeExtension->values
                     );
                 }
             }
