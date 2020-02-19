@@ -81,4 +81,9 @@ class User extends Authenticatable
     {
         return $this->company->name;
     }
+
+    public function scopeNamed(Builder $query): Builder
+    {
+        return $query->whereNotNull('name');
+    }
 }

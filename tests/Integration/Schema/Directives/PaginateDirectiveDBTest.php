@@ -90,6 +90,58 @@ class PaginateDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testPaginateWithScopes(): void
+    {
+        $namedUserName = 'A named user';
+        factory(User::class)->create([
+            'name' => $namedUserName,
+        ]);
+        factory(User::class)->create([
+            'name' => null,
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!]! @paginate(scopes: ["named"])
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 5) {
+                paginatorInfo {
+                    count
+                    total
+                    currentPage
+                }
+                data {
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 1,
+                        'total' => 1,
+                        'currentPage' => 1,
+                    ],
+                    'data' => [
+                        [
+                            'name' => $namedUserName,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function builder(): Builder
     {
         return User::orderBy('id', 'DESC');
