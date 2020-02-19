@@ -94,7 +94,7 @@ class PaginateDirectiveDBTest extends DBTestCase
     {
         $namedUserName = 'A named user';
         factory(User::class)->create([
-            'name' => $namedUserName
+            'name' => $namedUserName,
         ]);
         factory(User::class)->create([
             'name' => null,
