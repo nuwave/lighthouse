@@ -14,7 +14,7 @@ class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -25,7 +25,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 2) {
                 paginatorInfo {
@@ -105,7 +105,7 @@ class PaginateDirectiveDBTest extends DBTestCase
             'post_id' => $posts->first()->id,
         ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -126,7 +126,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 2, page: 1) {
                 paginatorInfo {
@@ -187,7 +187,7 @@ class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -198,7 +198,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 2) {
                 pageInfo {
@@ -225,7 +225,7 @@ class PaginateDirectiveDBTest extends DBTestCase
 
     public function testQueriesConnectionWithNoData(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -236,7 +236,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 5) {
                 pageInfo {
@@ -277,7 +277,7 @@ class PaginateDirectiveDBTest extends DBTestCase
 
     public function testQueriesPaginationWithNoData(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -287,7 +287,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 5) {
                 paginatorInfo {
@@ -327,7 +327,7 @@ class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -338,7 +338,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 1) {
                 data {
@@ -354,7 +354,7 @@ class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -365,7 +365,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users {
                 paginatorInfo {
