@@ -22,7 +22,7 @@ class ASTBuilderTest extends TestCase
 
     public function testCanMergeTypeExtensionFields(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: String
         }
@@ -45,7 +45,7 @@ class ASTBuilderTest extends TestCase
 
     public function testCanMergeInputExtensionFields(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         input Inputs {
             foo: String
         }
@@ -67,7 +67,7 @@ class ASTBuilderTest extends TestCase
 
     public function testCanMergeInterfaceExtensionFields(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         interface Named {
           name: String!
         }
@@ -89,7 +89,7 @@ class ASTBuilderTest extends TestCase
 
     public function testCanMergeEnumExtensionFields(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         enum MyEnum {
             ONE
             TWO
@@ -112,7 +112,7 @@ class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: String
         }
@@ -128,7 +128,7 @@ class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateFieldsOnInputExtensions(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         input Inputs {
             foo: String
         }
@@ -144,7 +144,7 @@ class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateFieldsOnInterfaceExtensions(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         interface Named {
             foo: String
         }
@@ -160,7 +160,7 @@ class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateValuesOnEnumExtensions(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         enum MyEnum {
             ONE
             TWO

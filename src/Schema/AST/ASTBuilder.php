@@ -195,10 +195,10 @@ class ASTBuilder
                         $typeExtension->fields
                     );
                 } elseif ($typeExtension instanceof EnumTypeExtensionNode) {
-                    $relatedObjectType = $this->documentAST->types[$typeName];
+                    $extendedEnum = $this->documentAST->types[$typeName];
 
-                    $relatedObjectType->values = ASTHelper::mergeUniqueNodeList(
-                        $relatedObjectType->values,
+                    $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
+                        $extendedEnum->values,
                         $typeExtension->values
                     );
                 }
