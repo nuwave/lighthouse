@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-interface ProvidesRules
+interface ProvidesRule
 {
     /**
-     * Return validation rules for multiple arguments.
+     * Return validation rules for a single argument.
      *
-     * @return array
+     * @return array|string
      */
-    public function rules(): array;
+    public function rule();
 
     /**
      * Return custom messages for the rules.

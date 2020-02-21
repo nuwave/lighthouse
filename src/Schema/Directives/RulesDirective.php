@@ -36,7 +36,7 @@ class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRule
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Validate an argument or input type using [Laravel validation](https://laravel.com/docs/validation).
+Validate an argument using [Laravel validation](https://laravel.com/docs/validation).
 """
 directive @rules(
   """

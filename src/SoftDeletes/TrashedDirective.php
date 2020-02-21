@@ -42,11 +42,7 @@ SDL;
             $model = $builder->getModel();
         }
 
-        if (! in_array(SoftDeletes::class, class_uses_recursive($model))) {
-            throw new DefinitionException(
-                self::MODEL_MUST_USE_SOFT_DELETES
-            );
-        }
+        SoftDeletesServiceProvider::assertModelUsesSoftDeletes($model, self::MODEL_MUST_USE_SOFT_DELETES);
 
         if (! isset($value)) {
             return $builder;
