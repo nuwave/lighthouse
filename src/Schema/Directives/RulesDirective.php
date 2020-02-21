@@ -135,13 +135,15 @@ SDL;
      */
     private function rulesForInputObject(): array
     {
-        $class = $this->directiveArgValue('validator') ?? $this->inputValidatorClass($this->nodeName().'Validator');
+        $classCandidate = $this->directiveArgValue('validator')
+            ?? $this->nodeName().'Validator';
+        $validatorClass = $this->inputValidatorClass($classCandidate);
 
-        $validator = new $class($this->argPathValue);
-        $this->validator = $validator;
-        $rules = $this->validator->rules();
+        $this->validator = new $validatorClass($this->argPathValue);
 
-        return $this->addFullInputPathToKeys($rules);
+        return $this->addFullInputPathToKeys(
+            $this->validator->rules()
+        );
     }
 
     /**
