@@ -82,9 +82,7 @@ class ArgumentSet
                 $value = $value->spread();
 
                 if ($argument->directives->contains(
-                    function (Directive $directive): bool {
-                        return $directive instanceof SpreadDirective;
-                    }
+                    Utils::instanceofMatcher(SpreadDirective::class)
                 )) {
                     $argumentSet->arguments += $value->arguments;
                     continue;
@@ -180,9 +178,7 @@ class ArgumentSet
 
             $filteredDirectives = $argument
                 ->directives
-                ->filter(function (Directive $directive): bool {
-                    return $directive instanceof ArgBuilderDirective;
-                });
+                ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
             if (! empty($directiveFilter)) {
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);

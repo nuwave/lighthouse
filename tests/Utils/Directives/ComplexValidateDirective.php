@@ -3,9 +3,9 @@
 namespace Tests\Utils\Directives;
 
 use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
+use Nuwave\Lighthouse\Validation\ValidateDirective;
 
-class ComplexValidationDirective extends ValidationDirective
+class ComplexValidateDirective extends ValidateDirective
 {
     const UNIQUE_VALIDATION_MESSAGE = 'Used to test this exact validation is triggered';
 

@@ -2,50 +2,14 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 
 abstract class InputValidator
 {
     /**
-     * @var array
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     protected $input;
-
-    /**
-     * InputTypeValidator constructor.
-     *
-     * @param array $input
-     */
-    public function __construct(array $input)
-    {
-        $this->input = $input;
-    }
-
-    /**
-     * @param string $key
-     * @param null   $default
-     *
-     * @return mixed
-     */
-    public function input(string $key, $default = null)
-    {
-        return data_get($this->input, $key, $default);
-    }
-
-    /**
-     * Get an instance of the model this input type tries to update.
-     *
-     * @param string $modelClass
-     *
-     * @return Model
-     */
-    public function model(string $modelClass): ?Model
-    {
-        /** @var Model $model */
-        $model = new $modelClass;
-
-        return $modelClass::find($this->input($model->getKeyName()));
-    }
 
     /**
      * @return array
@@ -58,5 +22,10 @@ abstract class InputValidator
     public function messages(): array
     {
         return [];
+    }
+
+    public function setInput(ArgumentSet $input): void
+    {
+        $this->input = $input;
     }
 }

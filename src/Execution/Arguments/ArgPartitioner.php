@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 use ReflectionClass;
 use ReflectionNamedType;
 
@@ -94,9 +95,9 @@ class ArgPartitioner
      */
     protected static function attachNestedArgResolver(string $name, Argument &$argument, ?ReflectionClass $model): void
     {
-        $resolverDirective = $argument->directives->first(function (Directive $directive): bool {
-            return $directive instanceof ArgResolver;
-        });
+        $resolverDirective = $argument->directives->first(
+            Utils::instanceofMatcher(ArgResolver::class)
+        );
 
         if ($resolverDirective) {
             $argument->resolver = $resolverDirective;

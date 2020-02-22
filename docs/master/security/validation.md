@@ -129,9 +129,9 @@ class should be located in one of the configured default directive namespaces, e
 namespace App\GraphQL\Directives;
 
 use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
+use Nuwave\Lighthouse\Validation\ValidateDirective;
 
-class UpdateUserValidationDirective extends ValidationDirective
+class UpdateUserValidationDirective extends ValidateDirective
 {
     /**
      * @return mixed[]

@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 
 class DirectiveFactory
 {
@@ -191,9 +192,7 @@ class DirectiveFactory
     {
         return $this
             ->createAssociatedDirectives($node)
-            ->filter(function (Directive $directive) use ($directiveClass): bool {
-                return $directive instanceof $directiveClass;
-            });
+            ->filter(Utils::instanceofMatcher($directiveClass));
     }
 
     /**

@@ -110,4 +110,11 @@ class Utils
             class_uses_recursive($class)
         );
     }
+
+    public static function instanceofMatcher(string $classLike): \Closure
+    {
+        return function ($object) use ($classLike): bool {
+            return $object instanceof $classLike;
+        };
+    }
 }

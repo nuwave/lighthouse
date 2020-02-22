@@ -9,11 +9,11 @@ interface HasArgumentPath
      *
      * @return array
      */
-    public function argumentPath(): array;
+    public function argumentValue(): array;
 
     /**
      * @param  array  $argumentPath
      * @return static
      */
-    public function setArgumentPath(array $argumentPath);
+    public function setArgumentValue(array $argumentPath);
 }

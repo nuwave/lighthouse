@@ -2,7 +2,7 @@
 
 namespace Tests\Utils\Directives;
 
-use Nuwave\Lighthouse\Schema\Directives\RulesDirective;
+use Nuwave\Lighthouse\Validation\RulesDirective;
 
 class CustomRulesDirective extends RulesDirective
 {

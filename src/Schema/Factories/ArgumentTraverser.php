@@ -25,6 +25,7 @@ use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
+use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentTraverser
 {
@@ -157,9 +158,7 @@ class ArgumentTraverser
         Collection $directives,
         array $argumentPath
     ): void {
-        $isArgDirectiveForArray = function (ArgDirective $directive): bool {
-            return $directive instanceof ArgDirectiveForArray;
-        };
+        $isArgDirectiveForArray = Utils::instanceofMatcher(ArgDirectiveForArray::class);
 
         $this->handleArgDirectives(
             $astNode,
@@ -190,7 +189,7 @@ class ArgumentTraverser
                 $directive->setErrorBuffer($this->validationErrorBuffer);
             }
             if ($directive instanceof HasArgumentPath) {
-                $directive->setArgumentPath($argumentPath);
+                $directive->setArgumentValue($argumentPath);
             }
             if ($directive instanceof HasArgPathValue) {
                 $directive->setArgPathValue($this->argValue($argumentPath));

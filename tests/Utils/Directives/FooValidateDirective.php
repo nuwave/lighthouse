@@ -2,9 +2,9 @@
 
 namespace Tests\Utils\Directives;
 
-use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
+use Nuwave\Lighthouse\Validation\ValidateDirective;
 
-class FooValidationDirective extends ValidationDirective
+class FooValidateDirective extends ValidateDirective
 {
     /**
      * @return mixed[]

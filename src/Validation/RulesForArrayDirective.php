@@ -1,19 +1,15 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
-use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 
-class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArray, ProvidesRules, HasArgumentPathContract, DefinedDirective
+class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArray, ProvidesRules, DefinedDirective
 {
-    use HasArgumentPathTrait;
-
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -33,14 +29,11 @@ directive @rulesForArray(
   Specified as an input object that maps rules to messages,
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: [RulesMessageMap!]
+  messages: RulesMessageMap
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
-    /**
-     * @return mixed[]
-     */
     public function rules(): array
     {
         $rules = $this->directiveArgValue('apply');
@@ -58,20 +51,11 @@ SDL;
             }
         }
 
-        return [$this->argumentPathAsDotNotation() => $rules];
+        return $rules;
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
-        return (new Collection($this->directiveArgValue('messages')))
-            ->mapWithKeys(function (string $message, string $rule): array {
-                $argumentPath = $this->argumentPathAsDotNotation();
-
-                return ["{$argumentPath}.{$rule}" => $message];
-            })
-            ->all();
+        return $this->directiveArgValue('messages');
     }
 }

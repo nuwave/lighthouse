@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Validation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -10,13 +10,14 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\InputValidator;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgPathValue;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
-use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
+use Nuwave\Lighthouse\Support\Traits\HasArgumentValue as HasArgumentPathTrait;
 
 class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract, DefinedDirective, ArgManipulator, HasArgPathValue
 {
@@ -55,11 +56,6 @@ directive @rules(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: [RulesMessageMap!]
-
-  """
-  Specify the validator that should be used to validate a given input type.
-  """
-  validator: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT
 SDL;
     }

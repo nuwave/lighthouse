@@ -53,52 +53,6 @@ use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 class LighthouseServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Validation\Factory  $validationFactory
-     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
-     * @return void
-     */
-    public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
-    {
-        $this->publishes([
-            __DIR__.'/lighthouse.php' => $this->app->make('path.config').'/lighthouse.php',
-        ], 'config');
-
-        $this->publishes([
-            __DIR__.'/../assets/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
-        ], 'schema');
-
-        $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
-
-        $validationFactory->resolver(
-            function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {
-                // This determines whether we are resolving a GraphQL field
-                return Arr::has($customAttributes, ['root', 'context', 'resolveInfo'])
-                    ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
-                    : new Validator($translator, $data, $rules, $messages, $customAttributes);
-            }
-        );
-    }
-
-    /**
-     * Load routes from provided path.
-     *
-     * @param  string  $path
-     * @return void
-     */
-    protected function loadRoutesFrom($path): void
-    {
-        if (Str::contains($this->app->version(), 'Lumen')) {
-            require realpath($path);
-
-            return;
-        }
-
-        parent::loadRoutesFrom($path);
-    }
-
-    /**
      * Register any application services.
      *
      * @return void
@@ -180,5 +134,51 @@ class LighthouseServiceProvider extends ServiceProvider
                 ValidateSchemaCommand::class,
             ]);
         }
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @param  \Illuminate\Validation\Factory  $validationFactory
+     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
+     * @return void
+     */
+    public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
+    {
+        $this->publishes([
+            __DIR__.'/lighthouse.php' => $this->app->make('path.config').'/lighthouse.php',
+        ], 'config');
+
+        $this->publishes([
+            __DIR__.'/../assets/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
+        ], 'schema');
+
+        $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
+
+        $validationFactory->resolver(
+            function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {
+                // This determines whether we are resolving a GraphQL field
+                return Arr::has($customAttributes, ['root', 'context', 'resolveInfo'])
+                    ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
+                    : new Validator($translator, $data, $rules, $messages, $customAttributes);
+            }
+        );
+    }
+
+    /**
+     * Load routes from provided path.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadRoutesFrom($path): void
+    {
+        if (Str::contains($this->app->version(), 'Lumen')) {
+            require realpath($path);
+
+            return;
+        }
+
+        parent::loadRoutesFrom($path);
     }
 }

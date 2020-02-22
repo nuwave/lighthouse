@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Tests\DBTestCase;
-use Tests\Utils\Directives\ComplexValidationDirective;
+use Tests\Utils\Directives\ComplexValidateDirective;
 use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
 
@@ -375,7 +375,7 @@ class ValidationTest extends DBTestCase
         $this->assertSame(
             [
                 'name' => [
-                    ComplexValidationDirective::UNIQUE_VALIDATION_MESSAGE,
+                    ComplexValidateDirective::UNIQUE_VALIDATION_MESSAGE,
                 ],
             ],
             $duplicateName->jsonGet('errors.0.extensions.validation')

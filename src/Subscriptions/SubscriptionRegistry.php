@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Support\Utils;
 
 class SubscriptionRegistry
 {
@@ -135,9 +136,9 @@ class SubscriptionRegistry
         $this->graphQL->prepSchema();
 
         return (new Collection($subscriber->query->definitions))
-            ->filter(function (Node $node): bool {
-                return $node instanceof OperationDefinitionNode;
-            })
+            ->filter(
+                Utils::instanceofMatcher(OperationDefinitionNode::class)
+            )
             ->filter(function (OperationDefinitionNode $node): bool {
                 return $node->operation === 'subscription';
             })

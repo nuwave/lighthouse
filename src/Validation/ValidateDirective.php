@@ -1,21 +1,20 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Validation;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Validation\RulesGatherer;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
-use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 
-abstract class ValidationDirective extends BaseDirective implements FieldMiddleware, ProvidesRules
+class ValidateDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    use HasResolverArguments;
-
     /**
      * @var \Illuminate\Contracts\Validation\Factory
      */
@@ -28,6 +27,17 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
     public function __construct(ValidationFactory $validationFactory)
     {
         $this->validationFactory = $validationFactory;
+    }
+
+    public static function definition()
+    {
+        return /** @lang GraphQL */ <<<GRAPHQL
+"""
+Run validation on a field.
+"""
+directive @validate on FIELD_DEFINITION
+GRAPHQL;
+
     }
 
     /**
@@ -44,13 +54,13 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $this->setResolverArguments($root, $args, $context, $resolveInfo);
+                    $rulesGatherer = new RulesGatherer($resolveInfo->argumentSet);
 
                     $validator = $this->validationFactory
                         ->make(
                             $args,
-                            $this->rules(),
-                            $this->messages(),
+                            $rulesGatherer->rules,
+                            $rulesGatherer->messages,
                             // The presence of those custom attributes ensures we get a GraphQLValidator
                             [
                                 'root' => $root,
@@ -67,15 +77,5 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
                 }
             )
         );
-    }
-
-    /**
-     * Return custom messages for the rules.
-     *
-     * @return array
-     */
-    public function messages(): array
-    {
-        return [];
     }
 }
