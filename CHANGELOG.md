@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `@hash` directive which uses Laravel's hashing configuration https://github.com/nuwave/lighthouse/pull/1200
+
+### Deprecated
+
+- Remove `@bcrypt` in favour of `@hash` https://github.com/nuwave/lighthouse/pull/1200
+
 ## 4.9.0
 
 ### Added
