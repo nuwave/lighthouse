@@ -78,8 +78,27 @@ type Query {
 }
 ```
 
-__Attention__: A valid `Query` type definition with at least one field
-must be present in the root schema.
+Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
+in your main file, but that spreads the definition apart, and could also grow quite large over time.
+
+Another way would be to extend the `Query` type and colocate the type definition with its Queries in `post.graphql`.
+
+```graphql
+type Post {
+  title: String
+  author: User @belongsTo
+}
+
+extend type Query {
+  posts: [Post!]! @paginate
+}
+```
+
+The fields in the `extend type` definition are merged with those of the original type.
+
+### Root Definitions
+
+A valid `Query` type definition with at least one field must be present in the root schema.
 This is because `extend type` needs the original type to get merged into.
 
 You can provide an empty `Query` type (without curly braces) in the root schema:
@@ -101,20 +120,8 @@ type Mutation
 #import post.graphql
 ```
 
-Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
-in your main file, but that spreads the definition apart, and could also grow quite large over time.
+### Extending other types
 
-Another way would be to extend the `Query` type and colocate the type definition with its Queries in `post.graphql`.
-
-```graphql
-type Post {
-  title: String
-  author: User @belongsTo
-}
-
-extend type Query {
-  posts: [Post!]! @paginate
-}
-```
-
-The fields in the `extend type` definition are merged with those of the original type.
+Apart from object types, you can also extend `input`, `interface` and `enum` types.
+Lighthouse will merge the fields (or values) with the original definition and always
+produce a single type in the final schema.
