@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution;
+namespace Nuwave\Lighthouse\Validation;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Arr;

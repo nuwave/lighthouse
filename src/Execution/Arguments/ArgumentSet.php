@@ -6,7 +6,6 @@ use Closure;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentSet
@@ -38,6 +37,10 @@ class ArgumentSet
         $plainArguments = [];
 
         foreach ($this->arguments as $name => $argument) {
+            if($argument->value === Undefined::undefined()) {
+                continue;
+            }
+
             $plainArguments[$name] = $argument->toPlain();
         }
 

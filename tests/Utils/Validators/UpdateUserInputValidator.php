@@ -3,7 +3,7 @@
 namespace Tests\Utils\Validators;
 
 use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Execution\InputValidator;
+use Nuwave\Lighthouse\Validation\InputValidator;
 use Tests\Utils\Models\User;
 
 class UpdateUserInputValidator extends InputValidator

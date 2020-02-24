@@ -16,6 +16,7 @@ use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
+use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Tests\Utils\Middleware\CountRuns;
@@ -63,6 +64,7 @@ abstract class TestCase extends BaseTestCase
             SoftDeletesServiceProvider::class,
             OrderByServiceProvider::class,
             TestingServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 

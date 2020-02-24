@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Validation;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\InputValidator;
+use Nuwave\Lighthouse\Validation\InputValidator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;

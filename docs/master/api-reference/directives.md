@@ -2301,7 +2301,7 @@ An example validator looks like the following, note that it is expected to be th
 ```php
 namespace App\GraphQL\Validators;
 
-use Nuwave\Lighthouse\Execution\InputValidator;
+use Nuwave\Lighthouse\Validation\InputValidator;
 
 class UpdatePostInputValidator extends InputValidator
 {

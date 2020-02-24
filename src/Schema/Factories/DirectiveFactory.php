@@ -62,23 +62,44 @@ class DirectiveFactory
      */
     public function create(string $directiveName): Directive
     {
-        return $this->resolve($directiveName)
-            ?? $this->createOrFail($directiveName);
+        $directiveClass = $this->resolve($directiveName);
+
+        return app($directiveClass);
     }
 
     /**
-     * Create a directive from resolved directive classes.
+     * Resolve the class for a given directive name.
      *
      * @param  string  $directiveName
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive|null
+     * @return string
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    protected function resolve(string $directiveName): ?Directive
+    protected function resolve(string $directiveName): string
     {
-        if ($className = Arr::get($this->resolvedClassnames, $directiveName)) {
-            return app($className);
+        if ($directiveClass = Arr::get($this->resolvedClassnames, $directiveName)) {
+            return $directiveClass;
         }
 
-        return null;
+        if (! $this->directiveNamespaces) {
+            $this->directiveNamespaces = $this->directiveNamespacer->gather();
+        }
+
+        foreach ($this->directiveNamespaces as $baseNamespace) {
+            $directiveClass = $baseNamespace.'\\'.static::className($directiveName);
+
+            if (class_exists($directiveClass)) {
+                if (! is_a($directiveClass, Directive::class, true)) {
+                    throw new DirectiveException("Class $directiveClass must implement the interface " . Directive::class);
+                }
+
+                $this->addResolved($directiveName, $directiveClass);
+
+                return $directiveClass;
+            }
+        }
+
+        throw new DirectiveException("No directive found for `{$directiveName}`");
     }
 
     /**

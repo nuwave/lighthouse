@@ -6,8 +6,8 @@ use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Execution\Arguments\Undefined;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Validation\RulesGatherer;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -37,7 +37,11 @@ Run validation on a field.
 """
 directive @validate on FIELD_DEFINITION
 GRAPHQL;
+    }
 
+    public static function make(): self
+    {
+        return app(self::class);
     }
 
     /**
@@ -54,7 +58,8 @@ GRAPHQL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $rulesGatherer = new RulesGatherer($resolveInfo->argumentSet);
+                    $argumentSet = $resolveInfo->argumentSet;
+                    $rulesGatherer = new RulesGatherer($argumentSet);
 
                     $validator = $this->validationFactory
                         ->make(
@@ -70,8 +75,16 @@ GRAPHQL;
                         );
 
                     if ($validator->fails()) {
-                        throw new ValidationException($validator);
+                        $path = implode(
+                            '.',
+                            $resolveInfo->path
+                        );
+
+                        throw new ValidationException("Validation failed for the field [$path].", $validator);
                     }
+
+                    $withoutUndefined = Undefined::removeUndefined($argumentSet);
+                    $resolveInfo->argumentSet = $withoutUndefined;
 
                     return $resolver($root, $args, $context, $resolveInfo);
                 }

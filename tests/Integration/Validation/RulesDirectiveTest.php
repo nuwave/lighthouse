@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Integration\Validation;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;

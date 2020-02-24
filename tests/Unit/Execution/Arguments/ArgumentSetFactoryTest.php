@@ -4,16 +4,16 @@ namespace Tests\Unit\Execution\Arguments;
 
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
 
-class TypedArgsTest extends TestCase
+class ArgumentSetFactoryTest extends TestCase
 {
     public function testSimpleField(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: Int): Int
         }
@@ -32,7 +32,7 @@ class TypedArgsTest extends TestCase
 
     public function testNullableList(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: [Int!]): Int
         }
@@ -51,11 +51,11 @@ class TypedArgsTest extends TestCase
 
     public function testNullableInputObject(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: Bar): Int
         }
-        
+
         input Bar {
             baz: ID
         }
@@ -77,8 +77,8 @@ class TypedArgsTest extends TestCase
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs $typedArgs */
-        $typedArgs = $this->app->make(TypedArgs::class);
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $typedArgs */
+        $typedArgs = $this->app->make(ArgumentSetFactory::class);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types['Query'];

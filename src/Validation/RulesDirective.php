@@ -3,36 +3,18 @@
 namespace Nuwave\Lighthouse\Validation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\InputValidator;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\HasArgPathValue;
-use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
-use Nuwave\Lighthouse\Support\Traits\HasArgumentValue as HasArgumentPathTrait;
 
-class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract, DefinedDirective, ArgManipulator, HasArgPathValue
+class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, DefinedDirective, ArgManipulator
 {
-    use HasArgumentPathTrait;
-
-    /**
-     * @var array
-     */
-    private $argPathValue;
-
-    /**
-     * @var InputValidator
-     */
-    private $validator;
-
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -66,11 +48,18 @@ SDL;
      */
     public function rules(): array
     {
-        if ($this->definitionNode instanceof InputObjectTypeDefinitionNode) {
-            return $this->rulesForInputObject();
+        $rules = $this->directiveArgValue('apply');
+
+        // Custom rules may be referenced through their fully qualified class name.
+        // The Laravel validator expects a class instance to be passed, so we
+        // resolve any given rule where a corresponding class exists.
+        foreach ($rules as $key => $rule) {
+            if (class_exists($rule)) {
+                $rules[$key] = resolve($rule);
+            }
         }
 
-        return $this->rulesForField();
+        return $rules;
     }
 
     /**
@@ -78,17 +67,7 @@ SDL;
      */
     public function messages(): array
     {
-        if ($this->definitionNode instanceof InputObjectTypeDefinitionNode) {
-            return $this->messagesForInputObject();
-        }
-
-        return (new Collection($this->directiveArgValue('messages')))
-            ->mapWithKeys(function (string $message, string $rule): array {
-                $argumentPath = $this->argumentPathAsDotNotation();
-
-                return ["{$argumentPath}.{$rule}" => $message];
-            })
-            ->all();
+        return (array) $this->directiveArgValue('messages');
     }
 
     public function manipulateArgDefinition(
@@ -102,67 +81,5 @@ SDL;
         if (! is_array($rules)) {
             throw new DefinitionException("The apply argument of @rules on has to be an array, got: {$rules}");
         }
-    }
-
-    public function setArgPathValue($value = null): void
-    {
-        $this->argPathValue = $value;
-    }
-
-    /**
-     * @param array $array
-     *
-     * @return array
-     */
-    private function addFullInputPathToKeys(array $array): array
-    {
-        $argumentPath = $this->argumentPathAsDotNotation();
-
-        return collect($array)
-            ->mapWithKeys(function ($value, $key) use ($argumentPath) {
-                return [$argumentPath.'.'.$key => $value];
-            })
-            ->toArray();
-    }
-
-    /**
-     * @return array
-     * @throws DefinitionException
-     */
-    private function rulesForInputObject(): array
-    {
-        $classCandidate = $this->directiveArgValue('validator')
-            ?? $this->nodeName().'Validator';
-        $validatorClass = $this->inputValidatorClass($classCandidate);
-
-        $this->validator = new $validatorClass($this->argPathValue);
-
-        return $this->addFullInputPathToKeys(
-            $this->validator->rules()
-        );
-    }
-
-    /**
-     * @return array
-     */
-    private function rulesForField(): array
-    {
-        $rules = $this->directiveArgValue('apply');
-
-        // Custom rules may be referenced through their fully qualified class name.
-        // The Laravel validator expects a class instance to be passed, so we
-        // resolve any given rule where a corresponding class exists.
-        foreach ($rules as $key => $rule) {
-            if (class_exists($rule)) {
-                $rules[$key] = resolve($rule);
-            }
-        }
-
-        return [$this->argumentPathAsDotNotation() => $rules];
-    }
-
-    private function messagesForInputObject(): array
-    {
-        return $this->addFullInputPathToKeys($this->validator->messages());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration;
+namespace Tests\Integration\Validation;
 
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
@@ -329,142 +329,7 @@ class ValidationTest extends DBTestCase
         ], $result);
     }
 
-    public function testSetsArgumentsOnCustomValidationDirective(): void
-    {
-        $this->schema .= /** @lang GraphQL */ '
-        type Mutation {
-            updateUser(
-                input: UpdateUserInput @spread
-            ): User
-                @complexValidation
-                @update
-        }
-
-        input UpdateUserInput {
-            id: ID
-            name: String
-        }
-
-        type User {
-            id: ID
-            name: String
-        }
-        ';
-
-        factory(User::class)->create([
-            'name' => 'foo',
-        ]);
-
-        factory(User::class)->create([
-            'name' => 'bar',
-        ]);
-
-        $duplicateName = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            updateUser(
-                input: {
-                    id: 1
-                    name: "bar"
-                }
-            ) {
-                id
-            }
-        }
-        ');
-
-        $this->assertSame(
-            [
-                'name' => [
-                    ComplexValidateDirective::UNIQUE_VALIDATION_MESSAGE,
-                ],
-            ],
-            $duplicateName->jsonGet('errors.0.extensions.validation')
-        );
-    }
-
-    public function testIgnoresTheUserWeAreUpdating(): void
-    {
-        $this->schema .= /** @lang GraphQL */ '
-        type Mutation {
-            updateUser(
-                input: UpdateUserInput @spread
-            ): User
-                @complexValidation
-                @update
-        }
-
-        input UpdateUserInput {
-            id: ID
-            name: String
-        }
-
-        type User {
-            id: ID
-            name: String
-        }
-        ';
-
-        factory(User::class)->create(['name' => 'bar']);
-
-        $updateSelf = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            updateUser(
-                input: {
-                    id: 1
-                    name: "bar"
-                }
-            ) {
-                id
-                name
-            }
-        }
-        ');
-        $updateSelf->assertJson([
-            'data' => [
-                'updateUser' => [
-                    'id' => 1,
-                    'name' => 'bar',
-                ],
-            ],
-        ]);
-    }
-
-    public function testCombinesFieldValidationAndArgumentValidation(): void
-    {
-        $this->markTestSkipped('Not implemented as of now as it would require a larger redo.');
-
-        $this->schema .= /** @lang GraphQL */ '
-        type Mutation {
-            createUser(
-                foo: String @rules(apply: ["max:5"])
-            ): User
-                @fooValidation
-                @create
-        }
-
-        type User {
-            id: ID
-            name: String
-        }
-        ';
-
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            createUser(
-                foo: "  ?!?  "
-            ) {
-                id
-            }
-        }
-        ');
-
-        $this->assertCount(
-            2,
-            $result->jsonGet('errors.0.extensions.validation.foo')
-        );
-    }
-
-    public function testCombinesArgumentValidationByPausingAndResuming(): void
+    public function testCombinesMultipleRules(): void
     {
         $this->markTestSkipped('
         This should work once we can reliably depend upon repeatable directives.
@@ -475,7 +340,7 @@ class ValidationTest extends DBTestCase
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             createUser(
-                foo: String @rules(apply: ["max:5"]) @trim @rules(apply: ["min:4"])
+                foo: String @rules(apply: ["max:5"]) @rules(apply: ["min:4"])
             ): User
                 @create
         }
@@ -485,21 +350,6 @@ class ValidationTest extends DBTestCase
             name: String
         }
         ';
-
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            createUser(
-                foo: "  ?!?  "
-            ) {
-                id
-            }
-        }
-        ');
-
-        $this->assertCount(
-            2,
-            $result->jsonGet('errors.0.extensions.validation.foo')
-        );
     }
 
     public function testCombinesArgumentValidationWhenGrouped(): void

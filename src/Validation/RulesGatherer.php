@@ -18,14 +18,14 @@ class RulesGatherer
      *
      * @var array<string, mixed>
      */
-    public $rules;
+    public $rules = [];
 
     /**
      * The gathered messages.
      *
      * @var array<string, mixed>
      */
-    public $messages;
+    public $messages = [];
 
     public function __construct(ArgumentSet $argumentSet)
     {
@@ -83,13 +83,21 @@ class RulesGatherer
 
     public function extractRulesAndMessages(ProvidesRules $providesRules, array $argumentPath)
     {
-        $this->rules += $this->wrap($providesRules->rules(), $argumentPath);
-        $this->messages += $this->wrap($providesRules->messages(), $argumentPath);
+        $rules = $providesRules->rules();
+        // We might be passed just the rules for a single field, without any
+        // field names. In this case, we just add on the path. When we have an
+        // associative array of rules, the path is prepended to every key.
+        $this->rules += isset($rules[0])
+            ? [$this->pathDotNotation($argumentPath) => $rules]
+            : $this->wrap($rules, $argumentPath);
+
+        $messages = $providesRules->messages();
+        $this->messages += $this->wrap($messages, $argumentPath);
     }
 
     protected function wrap(array $rulesOrMessages, array $path)
     {
-        $pathDotNotation = implode('.', $path);
+        $pathDotNotation = $this->pathDotNotation($path);
         $withPath = [];
 
         foreach($rulesOrMessages as $key => $value) {
@@ -97,5 +105,10 @@ class RulesGatherer
         }
 
         return $withPath;
+    }
+
+    protected function pathDotNotation(array $path): string
+    {
+        return implode('.', $path);
     }
 }

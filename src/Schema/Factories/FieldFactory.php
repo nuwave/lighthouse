@@ -10,8 +10,7 @@ use GraphQL\Type\Definition\NonNull;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
-use Nuwave\Lighthouse\Execution\ErrorBuffer;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
@@ -22,10 +21,10 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\HasArgPathValue;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Utils;
+use Nuwave\Lighthouse\Validation\ValidateDirective;
 
 class FieldFactory
 {
@@ -47,17 +46,12 @@ class FieldFactory
     protected $pipeline;
 
     /**
-     * @var \Illuminate\Contracts\Validation\Factory
-     */
-    protected $validationFactory;
-
-    /**
      * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected $fieldValue;
 
     /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory
      */
     protected $typedArgs;
 
@@ -70,11 +64,6 @@ class FieldFactory
      * @var array
      */
     protected $messages = [];
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\ErrorBuffer
-     */
-    protected $validationErrorBuffer;
 
     /**
      * A snapshot of the arguments that are passed to "handleArgDirectives".
@@ -90,21 +79,18 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\TypedArgs  $typedArgs
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory  $typedArgs
      * @return void
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
-        ValidationFactory $validationFactory,
-        TypedArgs $typedArgs
+        ArgumentSetFactory $typedArgs
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
-        $this->validationFactory = $validationFactory;
         $this->typedArgs = $typedArgs;
     }
 
@@ -129,7 +115,8 @@ class FieldFactory
         $fieldMiddleware = $this->passResolverArguments(
             $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
         );
-        $this->validationErrorBuffer = (new ErrorBuffer)->setErrorType('validation');
+
+        $fieldMiddleware->prepend(ValidateDirective::make());
 
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
@@ -158,10 +145,6 @@ class FieldFactory
 
                 // Recurse down the given args and apply ArgDirectives
                 $this->runArgDirectives();
-
-                // Now that we are finished with all argument based validation,
-                // we flush the validation error buffer
-                $this->flushValidationErrorBuffer();
 
                 $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
                 $modifiedArgumentSet = $argumentSet
@@ -306,22 +289,6 @@ class FieldFactory
 
         // Remove the directive from the list to avoid evaluating the same directive twice
         while ($directive = $directives->shift()) {
-            // Pause the iteration once we hit any directive that has to do
-            // with validation. We will resume running through the remaining
-            // directives later, after we completed validation
-            if ($directive instanceof ProvidesRules) {
-                $validators = $this->gatherValidationDirectives($directives);
-
-                $validators->push($directive);
-                foreach ($validators as $validator) {
-                    // We gather the rules from all arguments and then run validation in one full swoop
-                    $this->rules = array_merge_recursive($this->rules, $validator->rules());
-                    $this->messages = array_merge_recursive($this->messages, $validator->messages());
-                }
-
-                break;
-            }
-
             if ($directive instanceof ArgTransformerDirective && $this->argValueExists($argumentPath)) {
                 $this->setArgValue(
                     $argumentPath,
@@ -336,24 +303,6 @@ class FieldFactory
             $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
         }
     }
-
-    protected function gatherValidationDirectives(Collection &$directives): Collection
-    {
-        // We only get the validator directives that are directly following on the latest validator
-        // directive. If we'd get all validator directives and merge them together, it wouldn't
-        // be possible anymore to mutate the input with argument transformer directives.
-        $validators = new Collection();
-        while ($directive = $directives->first()) {
-            if ($directive instanceof ProvidesRules) {
-                $validators->push($directives->shift());
-            } else {
-                return $validators;
-            }
-        }
-
-        return $validators;
-    }
-
     protected function argValueExists(array $argumentPath): bool
     {
         return Arr::has($this->args, implode('.', $argumentPath));
@@ -371,43 +320,7 @@ class FieldFactory
 
     protected function runArgDirectives(): void
     {
-        $this->validateArgs();
         $this->resumeHandlingArgDirectives();
-    }
-
-    /**
-     * Run the gathered validation rules on the arguments.
-     *
-     * @return void
-     */
-    protected function validateArgs(): void
-    {
-        if (! $this->rules) {
-            return;
-        }
-
-        /** @var \Nuwave\Lighthouse\Execution\GraphQLValidator $validator */
-        $validator = $this->validationFactory->make(
-            $this->args,
-            $this->rules,
-            $this->messages,
-            // The presence of those custom attributes ensures we get a GraphQLValidator
-            [
-                'root' => $this->root,
-                'context' => $this->context,
-                'resolveInfo' => $this->resolveInfo,
-            ]
-        );
-
-        if ($validator->fails()) {
-            $this->addValidationErrorsToBuffer(
-                $validator->errors()->getMessages()
-            );
-        }
-
-        // reset rules and messages
-        $this->rules = [];
-        $this->messages = [];
     }
 
     /**
@@ -429,26 +342,5 @@ class FieldFactory
         if (count($this->handleArgDirectivesSnapshots) > 0) {
             $this->runArgDirectives();
         }
-    }
-
-    protected function addValidationErrorsToBuffer(array $validationErrors): void
-    {
-        foreach ($validationErrors as $key => $errorMessages) {
-            foreach ($errorMessages as $errorMessage) {
-                $this->validationErrorBuffer->push($errorMessage, $key);
-            }
-        }
-    }
-
-    protected function flushValidationErrorBuffer(): void
-    {
-        $path = implode(
-            '.',
-            $this->resolveInfo()->path
-        );
-
-        $this->validationErrorBuffer->flush(
-            "Validation failed for the field [$path]."
-        );
     }
 }

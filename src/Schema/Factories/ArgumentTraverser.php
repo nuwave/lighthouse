@@ -10,7 +10,7 @@ use GraphQL\Type\Definition\NonNull;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
@@ -42,7 +42,7 @@ class ArgumentTraverser
     protected $argumentFactory;
 
     /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory
      */
     protected $typedArgs;
 
@@ -59,13 +59,13 @@ class ArgumentTraverser
     /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\TypedArgs  $typedArgs
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory  $typedArgs
      * @return void
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,
-        TypedArgs $typedArgs
+        ArgumentSetFactory $typedArgs
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;

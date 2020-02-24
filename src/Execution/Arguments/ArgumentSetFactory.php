@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
-class TypedArgs
+class ArgumentSetFactory
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
@@ -28,8 +28,6 @@ class TypedArgs
     protected $directiveFactory;
 
     /**
-     * TypedArgs constructor.
-     *
      * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter  $argumentTypeNodeConverter
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
@@ -95,11 +93,13 @@ class TypedArgs
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument[] $arguments */
         $arguments = [];
 
-        foreach ($args as $key => $value) {
-            /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
-            $definition = $argumentDefinitionMap[$key];
+        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
+        foreach($argumentDefinitionMap as $name => $definition) {
+            $value = array_key_exists($name, $args)
+                ? $args[$name]
+                : Undefined::undefined();
 
-            $arguments[$key] = $this->wrapInArgument($value, $definition);
+            $arguments[$name] = $this->wrapInArgument($value, $definition);
         }
 
         return $arguments;
@@ -151,6 +151,11 @@ class TypedArgs
      */
     protected function wrapWithType($valueOrValues, $type)
     {
+        // No need to recurse down any further
+        if($valueOrValues === Undefined::undefined()) {
+            return $valueOrValues;
+        }
+
         // We have to do this conversion here and not in the TypeNodeConverter,
         // because the incoming arguments put a bound on recursion depth
         if ($type instanceof ListType) {
@@ -183,7 +188,7 @@ class TypedArgs
     {
         // As GraphQL does not allow empty input objects, we return null as is
         if ($value === null) {
-            return;
+            return null;
         }
 
         // This might be null if the type is
@@ -200,7 +205,7 @@ class TypedArgs
             return $subArgumentSet;
         }
 
-        // Otherwise, we just return the value as is and are down with that subtree
+        // Otherwise, we just return the value as is and are done with that subtree
         return $value;
     }
 }

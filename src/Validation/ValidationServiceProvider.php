@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\WhereConditions;
+namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -8,7 +8,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Nuwave\Lighthouse\Execution\GraphQLValidator;
 
 class ValidationServiceProvider extends ServiceProvider
 {
@@ -37,5 +36,4 @@ class ValidationServiceProvider extends ServiceProvider
             }
         );
     }
-
 }
