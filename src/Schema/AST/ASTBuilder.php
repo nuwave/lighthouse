@@ -254,7 +254,7 @@ class ASTBuilder
      */
     protected function assertExtensionMatchesDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): void
     {
-        if(static::EXTENSION_TO_DEFINITION_CLASS[get_class($extension)] !== get_class($definition)) {
+        if (static::EXTENSION_TO_DEFINITION_CLASS[get_class($extension)] !== get_class($definition)) {
             throw new DefinitionException(
                 static::extensionDoesNotMatchDefinition($extension, $definition)
             );
@@ -268,7 +268,7 @@ class ASTBuilder
      */
     public static function extensionDoesNotMatchDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): string
     {
-        return 'The type extension ' . $extension->name->value . ' of kind ' . $extension->kind . ' can not extend a definition of kind ' . $definition->kind . '.';
+        return 'The type extension '.$extension->name->value.' of kind '.$extension->kind.' can not extend a definition of kind '.$definition->kind.'.';
     }
 
     /**

@@ -198,7 +198,7 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.');
+        $this->expectExceptionMessage('The type extension Foo of kind '.NodeKind::INTERFACE_TYPE_EXTENSION.' can not extend a definition of kind '.NodeKind::OBJECT_TYPE_DEFINITION.'.');
         $this->astBuilder->documentAST();
     }
 }
