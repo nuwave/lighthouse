@@ -51,6 +51,8 @@ class ASTHelper
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
      * @return \GraphQL\Language\AST\NodeList
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
     {
@@ -66,7 +68,7 @@ class ASTHelper
 
                 if ($collisionOccurred && ! $overwriteDuplicates) {
                     throw new DefinitionException(
-                        "Duplicate definition {$oldName} found when merging."
+                        static::duplicateDefinition($oldName)
                     );
                 }
 
@@ -76,6 +78,11 @@ class ASTHelper
             ->all();
 
         return self::mergeNodeList($remainingDefinitions, $addition);
+    }
+
+    public static function duplicateDefinition(string $oldName): string
+    {
+        return "Duplicate definition {$oldName} found when merging.";
     }
 
     /**

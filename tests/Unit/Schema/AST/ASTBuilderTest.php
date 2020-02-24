@@ -2,8 +2,10 @@
 
 namespace Tests\Unit\Schema\AST;
 
+use GraphQL\Language\AST\NodeKind;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
 
 class ASTBuilderTest extends TestCase
@@ -59,6 +61,7 @@ class ASTBuilderTest extends TestCase
         }
         ';
         $documentAST = $this->astBuilder->documentAST();
+
         $this->assertCount(
             3,
             $documentAST->types['Inputs']->fields
@@ -81,6 +84,7 @@ class ASTBuilderTest extends TestCase
         }
         ';
         $documentAST = $this->astBuilder->documentAST();
+
         $this->assertCount(
             3,
             $documentAST->types['Named']->fields
@@ -104,6 +108,7 @@ class ASTBuilderTest extends TestCase
         }
         ';
         $documentAST = $this->astBuilder->documentAST();
+
         $this->assertCount(
             4,
             $documentAST->types['MyEnum']->values
@@ -123,6 +128,7 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('foo'));
         $this->astBuilder->documentAST();
     }
 
@@ -139,6 +145,7 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('foo'));
         $this->astBuilder->documentAST();
     }
 
@@ -154,6 +161,7 @@ class ASTBuilderTest extends TestCase
         }
         ';
 
+        $this->expectException(DefinitionException::class);
         $this->expectException(DefinitionException::class);
         $this->astBuilder->documentAST();
     }
@@ -173,6 +181,24 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('TWO'));
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowMergingNonMatchingTypes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Foo {
+            bar: ID
+        }
+
+        extend interface Foo {
+            baz: ID
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.');
         $this->astBuilder->documentAST();
     }
 }
