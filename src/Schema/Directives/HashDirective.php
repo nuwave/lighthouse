@@ -2,12 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Hashing\Hasher;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class HashDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
 {
+    protected $hasher;
+
+    public function __construct(Hasher $hasher)
+    {
+        $this->hasher = $hasher;
+    }
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -29,6 +36,6 @@ SDL;
      */
     public function transform($argumentValue): string
     {
-        return Hash::make($argumentValue);
+        return $this->hasher->make($argumentValue);
     }
 }
