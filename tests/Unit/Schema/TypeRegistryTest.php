@@ -156,7 +156,7 @@ class TypeRegistryTest extends TestCase
     {
         $objectTypeNode = PartialParser::objectTypeDefinition('
         type User {
-            foo(bar: String! @bcrypt): String!
+            foo(bar: String! @hash): String!
         }
         ');
         /** @var \GraphQL\Type\Definition\ObjectType $objectType */

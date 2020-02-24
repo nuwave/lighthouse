@@ -19,8 +19,8 @@ the [`@guard`](docs/master/api-reference/directives.md#guard) on selected fields
 
 ```diff
 type Query {
-- profile: User! @middlware(checks: ["auth"])
-+ profile: User! @guard
+-   profile: User! @middlware(checks: ["auth"])
++   profile: User! @guard
 }
 ```
 
@@ -78,3 +78,18 @@ You can adapt to this change in two refactoring steps that must be done in order
         id: ID!
     }
     ```
+
+### Replace `@bcrypt` with `@hash`
+
+The new `@hash` directive is also used for password hashing, but respects the
+configuration settings of your Laravel project.
+
+```diff
+type Mutation {
+    createUser(
+        name: String!
+-       password: String! @bcrypt
++       password: String! @hash
+    ): User!
+}
+```

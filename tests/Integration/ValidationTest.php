@@ -29,7 +29,7 @@ class ValidationTest extends DBTestCase
             password: String
                 @trim
                 @rules(apply: ["min:6", "max:20", "required_with:id"])
-                @bcrypt
+                @hash
             bar: Bar
                 @rules(apply: ["required_if:id,bar"])
         ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")

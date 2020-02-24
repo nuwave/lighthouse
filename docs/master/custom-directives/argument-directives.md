@@ -91,7 +91,7 @@ Argument directives are evaluated in the order that they are defined in the sche
 ```graphql
 type Mutation {
   createUser(
-    password: String @trim @rules(apply: ["min:10,max:20"]) @bcrypt
+    password: String @trim @rules(apply: ["min:10,max:20"]) @hash
   ): User
 }
 ```

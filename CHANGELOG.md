@@ -8,7 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
-- Add `@hash` directive which uses Laravel's `Hash::make` to create an appropriate hash.
+
+### Added
+
+- Add `@hash` directive which uses Laravel's hashing configuration https://github.com/nuwave/lighthouse/pull/1200
+
+### Deprecated
+
+- Remove `@bcrypt` in favour of `@hash` https://github.com/nuwave/lighthouse/pull/1200
 
 ## 4.9.0
 
