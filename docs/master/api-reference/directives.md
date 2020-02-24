@@ -242,22 +242,16 @@ type CustomRoleEdge implements Edge {
 
 ## @bcrypt
 
-Run the `bcrypt` function on the argument it is defined on.
-
-```graphql
-type Mutation {
-    createUser(name: String, password: String @bcrypt): User
-}
-```
-
-### Definition
-
 ```graphql
 """
 Run the `bcrypt` function on the argument it is defined on.
+
+@deprecated(reason: "Use @hash instead. This directive will be removed in v5.")
 """
 directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
+
+Deprecated in favour of [`@hash`](#hash).
 
 ## @broadcast
 
@@ -1082,7 +1076,28 @@ directive @guard(
 ) on FIELD_DEFINITION | OBJECT
 ```
 
+## @hash
 
+```graphql
+"""
+Use Laravel hashing to transform an argument value.
+
+Useful for hashing passwords before inserting them into the database.
+This uses the default hashing driver defined in `config/hashing.php`.
+"""
+directive @hash on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+The most common use case for this is when dealing with passwords:
+
+```graphql
+type Mutation {
+    createUser(
+        name: String!
+        password: String! @hash
+    ): User!
+}
+```
 
 ## @hasMany
 
