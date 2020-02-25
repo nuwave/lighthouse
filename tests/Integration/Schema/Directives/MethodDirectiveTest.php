@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Integration\Schema\Directives;
 
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -37,5 +38,32 @@ class MethodDirectiveTest extends DBTestCase
         ')->assertJsonFragment([
             'name' => Str::upper($user->name),
         ]);
+    }
+
+    public function testShouldThrowExceptionOnInvalidPassArguments(): void
+    {
+        $user = factory(User::class)->create();
+
+        $this->schema = '
+            type User {
+                name(case: String): String
+                    @method(name: "getName", pass: ["invalid"])
+            }
+
+            type Query {
+                user: User @auth
+            }
+        ';
+
+        $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessage('No field argument for the pass element: invalid');
+
+        $response = $this->actingAs($user)->graphQL('
+            {
+                user {
+                    name(case: "uppercase")
+                }
+            }
+        ');
     }
 }
