@@ -1413,30 +1413,17 @@ type Post {
 
 ## @method
 
-Call a method with a given `name` on the class that represents a type to resolve a field.
-Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
-
-```graphql
-type User {
-    mySpecialData: String! @method(name: "findMySpecialData")
-}
-```
-
-This calls a method `App\User::findMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
-
-The first argument is an instance of the class itself,
-so the method can be `public static` if needed.
-
-### Definition
-
 ```graphql
 """
-Call a method with a given `name` on the class that represents a type to resolve a field.
-Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
+Resolve a field by calling a method on the parent object.
+
+Use this if the data is not accessible through simple property access or if you
+want to pass argument to the method.
 """
 directive @method(
   """
   Specify the method of which to fetch the data from.
+  Defaults to the name of the field if not given.
   """
   name: String
 
@@ -1448,22 +1435,22 @@ directive @method(
 ) on FIELD_DEFINITION
 ```
 
-### Examples
-
-Simply call the method and pass the resolver arguments to the method:
+This can be useful on models or other classes that have getters:
 
 ```graphql
 type User {
-    fullName: String @method(name: "getFullName")
+    mySpecialData: String! @method(name: "findMySpecialData")
 }
 ```
 
-Call a method but pass the field arguments along to the model method. This would call the
-method as `$user->fullName($case)`:
+This calls a method `App\User::findMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
+If you want to pass down only specific arguments, you must define in which order they are passed:
 
 ```graphql
 type User {
-    fullName(case: String): String @method(name: "getFullName", pass: ["case"])
+    fullName(
+        case: String
+    ): String @method(name: "getFullName", pass: ["case"])
 }
 ```
 
