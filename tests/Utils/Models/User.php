@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Str;
 use Tests\Utils\LaravelEnums\UserType;
 
 class User extends Authenticatable
@@ -85,5 +86,17 @@ class User extends Authenticatable
     public function scopeNamed(Builder $query): Builder
     {
         return $query->whereNotNull('name');
+    }
+
+    public function getName(string $case)
+    {
+        switch($case) {
+            case 'uppercase':
+                return Str::upper($this->name);
+            case 'lowercase':
+                return Str::lower($this->name);
+            default:
+                return $this->name;
+        }
     }
 }
