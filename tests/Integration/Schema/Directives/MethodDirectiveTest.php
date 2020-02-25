@@ -1,8 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Integration\Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
