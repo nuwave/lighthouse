@@ -1449,7 +1449,9 @@ directive @method(
 ```
 
 ### Examples
+
 Simply call the method and pass the resolver arguments to the method:
+
 ```graphql
 type User {
     fullName: String @method(name: "getFullName")
