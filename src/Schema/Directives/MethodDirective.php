@@ -16,13 +16,20 @@ class MethodDirective extends BaseDirective implements FieldResolver, DefinedDir
         return /** @lang GraphQL */ <<<'SDL'
 """
 Call a method with a given `name` on the class that represents a type to resolve a field.
-Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
+Use this if the data is not accessible as an attribute (e.g. `$model->myData`) or if you
+want to pass argument to the method.
 """
 directive @method(
   """
   Specify the method of which to fetch the data from.
   """
   name: String
+
+  """
+  The field arguments to pass (in order) to the underlying method. Each string in the array
+  should correspond to an argument of the field.
+  """
+  pass: [String!]
 ) on FIELD_DEFINITION
 SDL;
     }

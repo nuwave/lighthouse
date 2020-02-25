@@ -1439,7 +1439,30 @@ directive @method(
   Specify the method of which to fetch the data from.
   """
   name: String
+
+  """
+  The field arguments to pass (in order) to the underlying method. Each string in the array
+  should correspond to an argument of the field.
+  """
+  pass: [String!]
 ) on FIELD_DEFINITION
+```
+
+### Examples
+Simply call the method and pass the resolver arguments to the method:
+```graphql
+type User {
+    fullName: String @method(name: "getFullName")
+}
+```
+
+Call a method but pass the field arguments along to the model method. This would call the
+method as `$user->fullName($case)`:
+
+```graphql
+type User {
+    fullName(case: String): String @method(name: "getFullName", pass: ["case"])
+}
 ```
 
 ## @middleware
