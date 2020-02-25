@@ -48,10 +48,7 @@ SDL;
             $this->nodeName()
         );
 
-        $paramsToBind = $this->directiveArgValue(
-            'pass',
-            $this->nodeName()
-        );
+        $paramsToBind = $this->directiveArgValue('pass');
 
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($method, $paramsToBind) {
