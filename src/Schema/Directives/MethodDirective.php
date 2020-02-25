@@ -59,8 +59,8 @@ SDL;
                     return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
                 }
 
-                $parameters = array_map(function($argument) use($args) {
-                    if (!isset($args[$argument])) {
+                $parameters = array_map(function ($argument) use ($args) {
+                    if (! isset($args[$argument])) {
                         throw new DirectiveException("No field argument for the pass element: $argument");
                     }
 

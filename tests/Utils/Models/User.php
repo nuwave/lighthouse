@@ -90,7 +90,7 @@ class User extends Authenticatable
 
     public function getName(string $case)
     {
-        switch($case) {
+        switch ($case) {
             case 'uppercase':
                 return Str::upper($this->name);
             case 'lowercase':

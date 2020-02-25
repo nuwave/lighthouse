@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Integration\Schema\Directives;
@@ -8,8 +9,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
 /**
- * Class MethodDirectiveTest
- * @package Integration\Schema\Directives
+ * Class MethodDirectiveTest.
  */
 class MethodDirectiveTest extends DBTestCase
 {
@@ -35,7 +35,7 @@ class MethodDirectiveTest extends DBTestCase
                 }
             }
         ')->assertJsonFragment([
-            'name' => Str::upper($user->name)
+            'name' => Str::upper($user->name),
         ]);
     }
 }
