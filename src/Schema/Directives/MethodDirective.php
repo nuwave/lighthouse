@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -40,9 +41,26 @@ SDL;
             $this->nodeName()
         );
 
+        $paramsToBind = $this->directiveArgValue(
+            'pass',
+            $this->nodeName()
+        );
+
         return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($method) {
-                return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($method, $paramsToBind) {
+                if (empty($paramsToBind)) {
+                    return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
+                }
+
+                $parameters = array_map(function($argument) use($args) {
+                    if (!isset($args[$argument])) {
+                        throw new DirectiveException("No field argument for the pass element: $argument");
+                    }
+
+                    return $args[$argument];
+                }, $paramsToBind);
+
+                return call_user_func_array([$root, $method], $parameters);
             }
         );
     }
