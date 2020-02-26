@@ -57,17 +57,17 @@ SDL;
                     $this->nodeName()
                 );
 
-                if($this->directiveArgValue('passOrdered')) {
+                if ($this->directiveArgValue('passOrdered')) {
                     $orderedArgs = [];
-                    foreach($this->definitionNode->arguments as $argDefinition) {
-                        $orderedArgs []= $args[$argDefinition->name->value] ?? null;
+                    foreach ($this->definitionNode->arguments as $argDefinition) {
+                        $orderedArgs [] = $args[$argDefinition->name->value] ?? null;
                     }
 
                     return call_user_func_array([$root, $method], $orderedArgs);
                 }
 
                 // Bring the arguments into the correct order in which to pass them
-                if($paramsToBind = $this->directiveArgValue('pass')) {
+                if ($paramsToBind = $this->directiveArgValue('pass')) {
                     $parameters = array_map(
                         function (string $argumentName) use ($args) {
                             // An argument may simply not be passed, so we fall back to null
