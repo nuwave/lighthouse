@@ -87,16 +87,4 @@ class User extends Authenticatable
     {
         return $query->whereNotNull('name');
     }
-
-    public function getName(string $case)
-    {
-        switch ($case) {
-            case 'uppercase':
-                return Str::upper($this->name);
-            case 'lowercase':
-                return Str::lower($this->name);
-            default:
-                return $this->name;
-        }
-    }
 }
