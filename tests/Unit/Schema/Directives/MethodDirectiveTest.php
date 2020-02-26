@@ -26,7 +26,7 @@ class MethodDirectiveTest extends TestCase
         $foo = $this->mockFoo();
         $foo->expects($this->once())
             ->method('bar')
-            ->with(null, []);
+            ->with($foo, []);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -52,7 +52,7 @@ class MethodDirectiveTest extends TestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo {
-                bar
+                asdf
             }
         }
         ');
