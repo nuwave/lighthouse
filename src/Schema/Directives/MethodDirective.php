@@ -57,21 +57,29 @@ SDL;
                     $this->nodeName()
                 );
 
-                if (! $this->directiveHasArgument('pass')) {
-                    return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
+                if($this->directiveArgValue('passOrdered')) {
+                    $orderedArgs = [];
+                    foreach($this->definitionNode->arguments as $argDefinition) {
+                        $orderedArgs []= $args[$argDefinition->name->value] ?? null;
+                    }
+
+                    return call_user_func_array([$root, $method], $orderedArgs);
                 }
 
                 // Bring the arguments into the correct order in which to pass them
-                $paramsToBind = $this->directiveArgValue('pass');
-                $parameters = array_map(
-                    function (string $argumentName) use ($args) {
-                        // An argument may simply not be passed, so we fall back to null
-                        return $args[$argumentName] ?? null;
-                    },
-                    $paramsToBind
-                );
+                if($paramsToBind = $this->directiveArgValue('pass')) {
+                    $parameters = array_map(
+                        function (string $argumentName) use ($args) {
+                            // An argument may simply not be passed, so we fall back to null
+                            return $args[$argumentName] ?? null;
+                        },
+                        $paramsToBind
+                    );
 
-                return call_user_func_array([$root, $method], $parameters);
+                    return call_user_func_array([$root, $method], $parameters);
+                }
+
+                return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
             }
         );
     }

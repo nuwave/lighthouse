@@ -86,6 +86,34 @@ class MethodDirectiveTest extends TestCase
         ');
     }
 
+    public function testPassArgsInLexicalOrderOfDefinition(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Foo {
+            bar(
+                first: ID
+                second: ID
+            ): ID @method(passOrdered: true)
+        }
+        ';
+
+        $foo = $this->mockFoo();
+        $foo->expects($this->once())
+            ->method('bar')
+            ->with(1, 2);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo {
+                bar(
+                    second: 2
+                    first: 1
+                )
+            }
+        }
+        ');
+    }
+
     public function testPassHasToBeArray(): void
     {
         $this->schema .= /** @lang GraphQL */ '
