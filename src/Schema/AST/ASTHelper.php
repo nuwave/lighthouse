@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
@@ -121,6 +122,18 @@ class ASTHelper
         }
 
         return self::getUnderlyingNamedTypeNode($type);
+    }
+
+    /**
+     * Does the given field have an argument of the given name?
+     *
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  string  $name
+     * @return bool
+     */
+    public static function fieldHasArgument(FieldDefinitionNode $fieldDefinition, string $name): bool
+    {
+        return self::firstByName($fieldDefinition->arguments, $name) !== null;
     }
 
     /**
