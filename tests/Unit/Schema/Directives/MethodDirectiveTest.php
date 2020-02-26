@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\Directives\MethodDirective;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
 
@@ -26,6 +24,7 @@ class MethodDirectiveTest extends TestCase
         $foo = $this->mockFoo();
         $foo->expects($this->once())
             ->method('bar')
+            // TODO remove in v5
             ->with($foo, []);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -53,34 +52,6 @@ class MethodDirectiveTest extends TestCase
         {
             foo {
                 asdf
-            }
-        }
-        ');
-    }
-
-    public function testWillPassArgsInOrder(): void
-    {
-        $this->schema .= /** @lang GraphQL */ '
-        type Foo {
-            bar(
-                first: ID
-                second: ID
-            ): ID @method(pass: ["first", "second"])
-        }
-        ';
-
-        $foo = $this->mockFoo();
-        $foo->expects($this->once())
-            ->method('bar')
-            ->with(1, 2);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo {
-                bar(
-                    second: 2
-                    first: 1
-                )
             }
         }
         ');
@@ -114,32 +85,50 @@ class MethodDirectiveTest extends TestCase
         ');
     }
 
-    public function testPassHasToBeArray(): void
+    public function testPassOrderedDefaultsToNull(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Foo {
-            bar: ID @method(pass: "not like this")
+            bar(
+                baz: ID
+            ): ID @method(passOrdered: true)
         }
         ';
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
-        $astBuilder = app(ASTBuilder::class);
 
-        $this->expectExceptionMessage(MethodDirective::passMustBeAList('bar'));
-        $astBuilder->documentAST();
+        $foo = $this->mockFoo();
+        $foo->expects($this->once())
+            ->method('bar')
+            ->with(null);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo {
+                bar
+            }
+        }
+        ');
     }
 
-    public function testPassArgumentsHaveToExist(): void
+    public function testPassOrderedWithNoArgs(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Foo {
-            bar(baz: ID): ID @method(pass: ["typo"])
+            bar: ID @method(passOrdered: true)
         }
         ';
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
-        $astBuilder = app(ASTBuilder::class);
 
-        $this->expectExceptionMessage(MethodDirective::noArgumentMatchingPass('bar', 'typo'));
-        $astBuilder->documentAST();
+        $foo = $this->mockFoo();
+        $foo->expects($this->once())
+            ->method('bar')
+            ->with();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo {
+                bar
+            }
+        }
+        ');
     }
 
     protected function mockFoo(): MockObject

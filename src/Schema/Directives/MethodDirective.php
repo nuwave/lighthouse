@@ -2,19 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class MethodDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
+class MethodDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     public static function definition(): string
     {
@@ -33,10 +27,12 @@ directive @method(
   name: String
 
   """
-  The field arguments to pass (in order) to the underlying method. Each string in the array
-  should correspond to an argument of the field.
+  Pass the field arguments to the method, using the argument definition
+  order from the schema to sort them before passing them along.
+
+  @deprecated This behaviour will default to true in v5 and this setting will be removed.
   """
-  pass: [String!]
+  passOrdered: Boolean = false
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -57,6 +53,7 @@ SDL;
                     $this->nodeName()
                 );
 
+                // TODO always do this in v5
                 if ($this->directiveArgValue('passOrdered')) {
                     $orderedArgs = [];
                     foreach ($this->definitionNode->arguments as $argDefinition) {
@@ -66,55 +63,8 @@ SDL;
                     return call_user_func_array([$root, $method], $orderedArgs);
                 }
 
-                // Bring the arguments into the correct order in which to pass them
-                if ($paramsToBind = $this->directiveArgValue('pass')) {
-                    $parameters = array_map(
-                        function (string $argumentName) use ($args) {
-                            // An argument may simply not be passed, so we fall back to null
-                            return $args[$argumentName] ?? null;
-                        },
-                        $paramsToBind
-                    );
-
-                    return call_user_func_array([$root, $method], $parameters);
-                }
-
                 return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
             }
         );
-    }
-
-    public function manipulateFieldDefinition(
-        DocumentAST &$documentAST,
-        FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
-    ) {
-        if ($this->directiveHasArgument('pass')) {
-            $paramsToBind = $this->directiveArgValue('pass');
-
-            if (! is_array($paramsToBind)) {
-                throw new DefinitionException(
-                    self::passMustBeAList($this->nodeName())
-                );
-            }
-
-            foreach ($paramsToBind as $pass) {
-                if (! ASTHelper::fieldHasArgument($fieldDefinition, $pass)) {
-                    throw new DefinitionException(
-                        self::noArgumentMatchingPass($this->nodeName(), $pass)
-                    );
-                }
-            }
-        }
-    }
-
-    public static function passMustBeAList(string $fieldName): string
-    {
-        return "The `pass` argument on field {$fieldName} must be a list";
-    }
-
-    public static function noArgumentMatchingPass(string $fieldName, string $pass)
-    {
-        return "No argument to match the `pass` value {$pass} on field {$fieldName}.";
     }
 }

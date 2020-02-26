@@ -1428,10 +1428,12 @@ directive @method(
   name: String
 
   """
-  The field arguments to pass (in order) to the underlying method. Each string in the array
-  should correspond to an argument of the field.
+  Pass the field arguments to the method, using the argument definition
+  order from the schema to sort them before passing them along.
+
+  @deprecated This behaviour will default to true in v5 and this setting will be removed.
   """
-  pass: [String!]
+  passOrdered: Boolean = false
 ) on FIELD_DEFINITION
 ```
 
@@ -1439,19 +1441,44 @@ This can be useful on models or other classes that have getters:
 
 ```graphql
 type User {
-    mySpecialData: String! @method(name: "findMySpecialData")
+    mySpecialData: String! @method(name: "getMySpecialData")
 }
 ```
 
-This calls a method `App\User::findMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
-If you want to pass down only specific arguments, you must define in which order they are passed:
+This calls a method `App\User::getMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
+If you want to pass down only the arguments in sequence, use the `passOrdered` option:
 
 ```graphql
 type User {
-    fullName(
-        case: String
-    ): String @method(name: "getFullName", pass: ["case"])
+    purchasedItemsCount(
+        year: Int!
+        includeReturns: Boolean
+    ): Int @method(passOrdered: true)
 }
+```
+
+This will call the method with the arguments a client passes to the field.
+Ensure the order of the argument definition matches the parameters of your method.
+
+```php
+public function purchasedItemsCount(int $year, ?bool $includeReturns)
+```
+
+Lighthouse will always pass down the same number of arguments and default to `null`
+if the client passes nothing.
+
+```graphql
+{
+    user(id: 3) {
+        purchasedItemsCount(year: 2017)
+    }
+}
+```
+
+The method will get called like this:
+
+```php
+$user->purchasedItemsCount(2017, null)
 ```
 
 ## @middleware

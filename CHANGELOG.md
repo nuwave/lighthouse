@@ -12,10 +12,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add `@hash` directive which uses Laravel's hashing configuration https://github.com/nuwave/lighthouse/pull/1200
+- Add option `passOrdered` to `@method` to pass just the arguments as ordered parameters https://github.com/nuwave/lighthouse/pull/1208
 
 ### Deprecated
 
 - Remove `@bcrypt` in favour of `@hash` https://github.com/nuwave/lighthouse/pull/1200
+- `@method` will call the underlying method with the arguments as ordered parameters instead
+  of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1208
 
 ## 4.9.0
 
