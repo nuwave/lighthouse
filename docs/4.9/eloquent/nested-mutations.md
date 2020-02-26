@@ -65,7 +65,7 @@ A nested `BelongsTo` relationship exposes the following operations:
 - `create` a new related model and attach it
 - `update` an existing model and attach it
 - `upsert` a new or an existing model and attach it
-- `diconnect` the related model
+- `disconnect` the related model
 - `delete` the related model and the association to it
 
 Both `disconnect` and `delete` don't make much sense in the context of an update.
