@@ -1413,33 +1413,72 @@ type Post {
 
 ## @method
 
-Call a method with a given `name` on the class that represents a type to resolve a field.
-Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
-
-```graphql
-type User {
-    mySpecialData: String! @method(name: "findMySpecialData")
-}
-```
-
-This calls a method `App\User::findMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
-
-The first argument is an instance of the class itself,
-so the method can be `public static` if needed.
-
-### Definition
-
 ```graphql
 """
-Call a method with a given `name` on the class that represents a type to resolve a field.
-Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
+Resolve a field by calling a method on the parent object.
+
+Use this if the data is not accessible through simple property access or if you
+want to pass argument to the method.
 """
 directive @method(
   """
   Specify the method of which to fetch the data from.
+  Defaults to the name of the field if not given.
   """
   name: String
+
+  """
+  Pass the field arguments to the method, using the argument definition
+  order from the schema to sort them before passing them along.
+
+  @deprecated This behaviour will default to true in v5 and this setting will be removed.
+  """
+  passOrdered: Boolean = false
 ) on FIELD_DEFINITION
+```
+
+This can be useful on models or other classes that have getters:
+
+```graphql
+type User {
+    mySpecialData: String! @method(name: "getMySpecialData")
+}
+```
+
+This calls a method `App\User::getMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
+If you want to pass down only the arguments in sequence, use the `passOrdered` option:
+
+```graphql
+type User {
+    purchasedItemsCount(
+        year: Int!
+        includeReturns: Boolean
+    ): Int @method(passOrdered: true)
+}
+```
+
+This will call the method with the arguments a client passes to the field.
+Ensure the order of the argument definition matches the parameters of your method.
+
+```php
+public function purchasedItemsCount(int $year, ?bool $includeReturns)
+```
+
+Lighthouse will always pass down the same number of arguments and default to `null`
+if the client passes nothing.
+
+```graphql
+{
+    user(id: 3) {
+        purchasedItemsCount(year: 2017)
+    }
+}
+```
+
+The method will get called like this:
+
+```php
+$user->purchasedItemsCount(2017, null)
 ```
 
 ## @middleware
