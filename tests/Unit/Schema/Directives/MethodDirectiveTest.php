@@ -130,5 +130,7 @@ class MethodDirectiveTest extends TestCase
  */
 class Foo
 {
-    public function bar() {}
+    public function bar()
+    {
+    }
 }

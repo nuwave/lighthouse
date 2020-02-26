@@ -81,17 +81,17 @@ SDL;
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType
     ) {
-        if($this->directiveHasArgument('pass')) {
+        if ($this->directiveHasArgument('pass')) {
             $paramsToBind = $this->directiveArgValue('pass');
 
-            if(! is_array($paramsToBind)) {
+            if (! is_array($paramsToBind)) {
                 throw new DefinitionException(
                     self::passMustBeAList($this->nodeName())
                 );
             }
 
-            foreach($paramsToBind as $pass) {
-                if(! ASTHelper::fieldHasArgument($fieldDefinition, $pass)) {
+            foreach ($paramsToBind as $pass) {
+                if (! ASTHelper::fieldHasArgument($fieldDefinition, $pass)) {
                     throw new DefinitionException(
                         self::noArgumentMatchingPass($this->nodeName(), $pass)
                     );
