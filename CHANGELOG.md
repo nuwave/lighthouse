@@ -7,9 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
-## Unreleased
+### 5.0.0
+
+### Added
 
 - Add possibility to apply `@rules` directive to input types by providing a validator class that extends `\Nuwave\Lighthouse\Execution\InputTypeValidator`  https://github.com/nuwave/lighthouse/pull/1185
+
+## Unreleased
+
+### Added
+
+- Add `@hash` directive which uses Laravel's hashing configuration https://github.com/nuwave/lighthouse/pull/1200
+- Add option `passOrdered` to `@method` to pass just the arguments as ordered parameters https://github.com/nuwave/lighthouse/pull/1208
+
+### Deprecated
+
+- Remove `@bcrypt` in favour of `@hash` https://github.com/nuwave/lighthouse/pull/1200
+- `@method` will call the underlying method with the arguments as ordered parameters instead
+  of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1208
 
 ## 4.9.0
 
@@ -28,6 +43,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   get the arguments passed through a client directive https://github.com/nuwave/lighthouse/pull/1184
 - Add `streamGraphQL()` helper method to `\Nuwave\Lighthouse\Testing\MakesGraphQLRequests` for
   simple testing of streamed responses, such as `@defer` https://github.com/nuwave/lighthouse/pull/1184
+- Add support to extend `input`, `interface` and `enum` types https://github.com/nuwave/lighthouse/pull/1203
 
 ### Fixed
 

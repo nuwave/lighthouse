@@ -4,16 +4,13 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
-/**
- * @deprecated
- */
-class BcryptDirectiveTest extends TestCase
+class HashDirectiveTest extends TestCase
 {
-    public function testCanBcryptAnArgument(): void
+    public function testCanHashAnArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo(bar: String @bcrypt): Foo @mock
+            foo(bar: String @hash): Foo @mock
         }
 
         type Foo {
@@ -39,7 +36,7 @@ class BcryptDirectiveTest extends TestCase
         $this->assertTrue(password_verify('password', $password));
     }
 
-    public function testCanBcryptAnArgumentInInputObjectAndArray(): void
+    public function testCanHashAnArgumentInInputObjectAndArray(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -53,8 +50,8 @@ class BcryptDirectiveTest extends TestCase
         }
 
         input UserInput {
-            password: String @bcrypt
-            alt_passwords: [String] @bcrypt
+            password: String @hash
+            alt_passwords: [String] @hash
             friends: [UserInput]
         }
         ';
