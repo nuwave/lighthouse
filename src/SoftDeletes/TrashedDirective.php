@@ -40,7 +40,10 @@ SDL;
             $model = $builder->getModel();
         }
 
-        SoftDeletesServiceProvider::assertModelUsesSoftDeletes($model, self::MODEL_MUST_USE_SOFT_DELETES);
+        SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
+            get_class($model),
+            self::MODEL_MUST_USE_SOFT_DELETES
+        );
 
         if (! isset($value)) {
             return $builder;

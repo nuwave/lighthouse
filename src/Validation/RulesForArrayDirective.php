@@ -56,6 +56,6 @@ SDL;
 
     public function messages(): array
     {
-        return $this->directiveArgValue('messages');
+        return (array) $this->directiveArgValue('messages');
     }
 }

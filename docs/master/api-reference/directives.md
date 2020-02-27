@@ -2340,39 +2340,6 @@ type Query {
 }
 ```
 
-You can also add it on an input definition.
-
-```graphql
-input UpdatePostInput @rules {
-    title: String!
-    content: String!
-}
-```
-
-By default it will look for a validator in the `App\GraphQL\Validators` namespace. The location can be configured in the lighthouse.php config file.
-
-An example validator looks like the following, note that it is expected to be the name of the input type, appended with "Validator"  
-```php
-namespace App\GraphQL\Validators;
-
-use Nuwave\Lighthouse\Validation\InputValidator;
-
-class UpdatePostInputValidator extends InputValidator
-{
-    public function rules(): array
-    {
-        return [
-            'title' => ['required', 'max:32'],
-            'content' => ['required', 'min:200'],
-        ];
-    }
-}
-```
-
-A validator class can be created with `php artisan lighthouse:validator`
-
-Read more in the [validation docs](../security/validation.md#validating-arguments).
-
 ## @rulesForArray
 
 Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
@@ -2889,6 +2856,26 @@ type Mutation {
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @validator
+
+```graphql
+"""
+Provide validation rules through a PHP class.
+"""
+directive @validator(
+  """
+  The name of the class to use.
+  
+  If defined on an input, this defaults to a class called `{$inputName}Validator` in the
+  default validator namespace. For fields, it uses the name of the parent type
+  and the field name: `{$parent}{$field}Validator`.
+  """
+  class: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
+```
+
+Read more in the [validation docs](../security/validation.md#validator-classes).
 
 ## @where
 

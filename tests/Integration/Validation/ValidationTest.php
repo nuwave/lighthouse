@@ -30,12 +30,12 @@ class ValidationTest extends DBTestCase
                 @hash
             bar: Bar
                 @rules(apply: ["required_if:id,bar"])
-        ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")
+        ): String @field(resolver: "Tests\\\\Integration\\\\Validation\\\\ValidationTest@resolvePassword")
 
         email(
             userId: ID!
             email: Email!
-        ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolveEmail")
+        ): String @field(resolver: "Tests\\\\Integration\\\\Validation\\\\ValidationTest@resolveEmail")
     }
 
     input Email {
@@ -127,13 +127,16 @@ class ValidationTest extends DBTestCase
         }
         ');
 
-        $this->assertValidationKeysSame([
-            'required',
-            'input.0.foobar',
-            'input.1.self.foobar',
-            'input.2.withRequired.invalidDefault',
-            'input.2.withRequired.required',
-        ], $result);
+        $this->assertValidationKeysSame(
+            [
+                'required',
+                'input.0.foobar',
+                'input.1.self.foobar',
+                'input.2.withRequired.invalidDefault',
+                'input.2.withRequired.required',
+            ],
+            $result
+        );
     }
 
     public function testValidatesList(): void

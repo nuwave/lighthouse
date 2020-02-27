@@ -1,15 +1,16 @@
 # Validation
 
-## Validating Arguments
-
 Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your
-queries and mutations. The simplest way to leverage the built-in validation rules is to use the
+queries and mutations.
+
+## Single Arguments
+
+The simplest way to leverage the built-in validation rules is to use the
 [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {
   createUser(
-    name: String @rules(apply: ["required", "min:4"])
     email: String @rules(apply: ["email"])
   ): User
 }
@@ -20,7 +21,7 @@ as part of the response.
 
 ```graphql
 mutation {
-  createUser(email: "hans@peter.xyz"){
+  createUser(email: "foobar"){
     id
   }
 }
@@ -42,7 +43,7 @@ mutation {
       ],
       "extensions": {
         "validation": [
-          "The name field is required."
+          "The email field must be a valid email."
         ]
       }
     }
@@ -77,7 +78,7 @@ input CreatePostInput {
 }
 ```
 
-Using the [`unique`](https://laravel.com/docs/5.8/validation#rule-unique)
+Using the [`unique`](https://laravel.com/docs/validation#rule-unique)
 validation rule can be a bit tricky.
 
 If the argument is nested within an input object, the argument path will not
@@ -92,11 +93,14 @@ input CreateUserInput {
 ## Validating Arrays
 
 When you are passing in an array as an argument to a field, you might
-want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rules)
+want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rulesforarray)
 
 ```graphql
 type Mutation {
-  makeIcecream(topping: [Topping!]! @rulesForArray(apply: ["max:3"])): Icecream
+  makeIcecream(
+    "You may add up to three toppings to your icecream."
+    topping: [Topping!] @rulesForArray(apply: ["max:3"])
+  ): Icecream
 }
 ```
 
@@ -114,87 +118,26 @@ type Mutation {
 }
 ```
 
-## Validate Fields
+## Validator Classes
 
-In some cases, validation rules are more complex and need to use entirely custom logic
-or take multiple arguments into account.
+In cases where your validation becomes too complex and demanding, you want to have the power of PHP to perform 
+complex validation. For example, accessing existing data in the database or validating the combination of input 
+values cannot be achieved with the examples above. This is where validator classes come into play.
 
-To create a reusable validator that can be applied to fields, extend the base validation
-directive `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective`. Your custom directive
-class should be located in one of the configured default directive namespaces, e.g. `App\GraphQL\Directives`.
-
-```php
-<?php
-
-namespace App\GraphQL\Directives;
-
-use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Validation\ValidateDirective;
-
-class UpdateUserValidationDirective extends ValidateDirective
-{
-    /**
-     * @return mixed[]
-     */
-    public function rules(): array
-    {
-        return [
-            'id' => ['required'],
-            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
-        ];
-    }
-}
-```
-
-Use it in your schema upon the field you want to validate.
+Validator classes can be reused on field definitions or input types within your schema.
+Use the [`@validator`](../api-reference/directives.md#validator) directive:
 
 ```graphql
-type Mutation {
-  updateUser(id: ID, name: String): User @update @updateUserValidation
+input UpdateUserInput @validator {
+    id: ID
+    name: String
 }
 ```
 
-You can customize the messages for the given rules by implementing the `messages` function.
+We need to back that with a validator class. Lighthouse uses a simple naming convention for validator classes,
+just use the name of the input type and append `Validator`:
 
-```php
-/**
- * @return string[]
- */
-public function messages(): array
-{
-    return [
-        'name.unique' => 'The chosen username is not available',
-    ];
-}
-```
-## Validate Input Types
-
-In cases where your validation becomes too complex and demanding, you want to have the power of PHP to actually do the 
-complex validation. For example, accessing existing data in the database or validating complex combination of input 
-values cannot be achieved with the examples above. This is where input type validation comes into play.
-
-As an example, let's make sure the the following mutation is called with valid inputs:
-
-```graphql
-type Mutation {
-  createUser(input: CreateUserInput! @spread): User @create
-}
-```
-
-Input validation works by decorating the `input` type with the [`@rules`](../api-reference/directives.md#rules) directive:
-
-```graphql
-input CreateUserInput @rules {
-  name: String!
-  email: String!
-  password: String!
-}
-```
-
-This definition alone does not do anything though - we have to add a validation class that
-corresponds to the `CreateUserInput` we defined. Let's create one with the artisan command:
-
-    php artisan lighthouse:validator
+    php artisan lighthouse:validator UpdateUserInputValidator
 
 The resulting class will be placed in your configured validator namespace. Let's go ahead
 and define the validation rules for the input:
@@ -205,14 +148,18 @@ namespace App\GraphQL\Validators;
 use Illuminate\Validation\Rule;
 use Nuwave\Lighthouse\Validation\InputValidator;
 
-class CreateUserInputValidator extends InputValidator
+class UpdateUserInputValidator extends InputValidator
 {
     public function rules(): array
     {
         return [
-            'name' => ['required'],
-            'email' => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required'],
+            'id' => [
+                'required'
+            ],
+            'name' => [
+                'sometimes',
+                Rule::unique('users', 'name')->ignore($this->input('id'), 'id'),
+            ],
         ];
     }
 }
@@ -221,50 +168,24 @@ class CreateUserInputValidator extends InputValidator
 Note that this gives you access to all kinds of programmatic validation rules that Laravel
 provides. This can give you additional flexibility when you need it.
 
-When updating for example a user, it is possible to obtain an instance of it by using `$this->model(User::class)`. This 
-will return an instance of the user model based on it's primary key name. 
-
-```graphql
-type User {
-    id: ID!
-    name: String! 
-    email: String!
-}
-
-input UpdateUserInput @rules {
-    id: ID!
-    name: String
-    email: String 
-}
-
-type Mutation {
-    updateUser(input: UpdateUserInput!): Material @update
-}
-```
+You can customize the messages for the given rules by implementing the `messages` function:
 
 ```php
-    use Illuminate\Validation\Rule;
-    use Nuwave\Lighthouse\Validation\InputValidator;
-
-class UpdateUserInputValidator extends InputValidator{
-    public function rules() : array {
-        $user = $this->model(User::class); 
-        return [
-            'email' => Rule::unique('users', 'email')->ignore($user) //note, the column is still required when validating graphql input 
-        ];   
-    }
+public function messages(): array
+{
+    return [
+        'name.unique' => 'The chosen username is not available',
+    ];
 }
 ```
 
-The above validator will allow updating the user, but ignore the unique rule for its own record in the database.
+The `@validator` directive can also be used upon fields:
 
 ```graphql
-mutation{
-    updateUser(input: {id: 1, email: "foo@bar.test", name: "foo"}){
-       email
-    }
+type Mutation {
+    updateUser(id: ID!, name: String): User @validator
 }
 ```
 
-The way how this works is that `$this->model()` looks at the field in the input that is the same as the key name
-of the given model and will try to load in a model based on the value of the key. In most cases, this will be `id`.  
+In that case, Lighthouse will look for a validator class in a sub-namespace matching the parent type, in this case
+that would be `Mutation`, so the default FQCN would be `App\GraphQL\Validators\Mutation\UpdateUserValidator`.
