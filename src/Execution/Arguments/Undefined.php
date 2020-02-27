@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Nuwave\Lighthouse\Support\Utils;
 use stdClass;
 
 class Undefined
@@ -23,9 +24,16 @@ class Undefined
 
             if ($value === self::undefined()) {
                 continue;
-            } elseif($value instanceof ArgumentSet) {
-                $argument->value = self::removeUndefined($value);
             }
+
+            $argument->value = Utils::applyEach(
+                function ($value) {
+                    return $value instanceof ArgumentSet
+                        ? static::removeUndefined($value)
+                        : $value;
+                },
+                $value
+            );
 
             $withoutUndefined->arguments[$name] = $argument;
         }
