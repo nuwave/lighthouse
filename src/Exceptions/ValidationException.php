@@ -48,7 +48,7 @@ class ValidationException extends Exception implements RendersErrorsExtensions
     public function extensionsContent(): array
     {
         return [
-            'validation' => $this->validator->errors()->messages()
+            'validation' => $this->validator->errors()->messages(),
         ];
     }
 }

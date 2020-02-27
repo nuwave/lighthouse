@@ -13,7 +13,7 @@ class ArgumentPath
 
     public function add($pathSegment)
     {
-        $this->segments []= $pathSegment;
+        $this->segments [] = $pathSegment;
     }
 
     public function path(): string
@@ -25,8 +25,8 @@ class ArgumentPath
     {
         $withPath = [];
 
-        foreach($rulesOrMessages as $key => $value) {
-            $withPath[$this->path() . $key] = $value;
+        foreach ($rulesOrMessages as $key => $value) {
+            $withPath[$this->path().$key] = $value;
         }
 
         return $withPath;

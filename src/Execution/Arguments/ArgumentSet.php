@@ -37,7 +37,7 @@ class ArgumentSet
         $plainArguments = [];
 
         foreach ($this->arguments as $name => $argument) {
-            if($argument->value === Undefined::undefined()) {
+            if ($argument->value === Undefined::undefined()) {
                 continue;
             }
 

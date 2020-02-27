@@ -26,7 +26,6 @@ use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use Nuwave\Lighthouse\Validation\GraphQLValidator;
 use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Nuwave\Lighthouse\Execution\SingleResponse;
@@ -49,6 +48,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Validation\GraphQLValidator;
 
 class LighthouseServiceProvider extends ServiceProvider
 {

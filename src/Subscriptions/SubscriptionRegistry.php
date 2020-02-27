@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\FieldNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;

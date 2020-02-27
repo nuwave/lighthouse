@@ -36,7 +36,7 @@ class RulesGatherer
     {
         $this->gatherRulesFromProviders($argumentSet, $argumentSet->directives, $argumentPath);
 
-        foreach($argumentSet->arguments as $name => $argument) {
+        foreach ($argumentSet->arguments as $name => $argument) {
             $nestedPath = array_merge($argumentPath, [$name]);
 
             $directivesForArray = $argument->directives->filter(
@@ -48,8 +48,8 @@ class RulesGatherer
                 Utils::instanceofMatcher(ArgDirective::class)
             );
 
-            if($argument->type instanceof ListType) {
-                foreach($argument->value as $index => $value) {
+            if ($argument->type instanceof ListType) {
+                foreach ($argument->value as $index => $value) {
                     $this->handleArgumentValue($value, $directivesForArgument, array_merge($nestedPath, [$index]));
                 }
             } else {
@@ -60,9 +60,9 @@ class RulesGatherer
 
     public function gatherRulesFromProviders($value, Collection $directives, array $path)
     {
-        foreach($directives as $directive) {
-            if($directive instanceof ProvidesRules) {
-                if(Utils::classUsesTrait($directive, HasArgumentValue::class)) {
+        foreach ($directives as $directive) {
+            if ($directive instanceof ProvidesRules) {
+                if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
                     /** @var HasArgumentValue $directive */
                     $directive->setArgumentValue($value);
                 }
@@ -76,7 +76,7 @@ class RulesGatherer
     {
         $this->gatherRulesFromProviders($value, $directives, $path);
 
-        if($value instanceof ArgumentSet) {
+        if ($value instanceof ArgumentSet) {
             $this->gatherRulesRecursively($value, $path);
         }
     }
@@ -100,7 +100,7 @@ class RulesGatherer
         $pathDotNotation = $this->pathDotNotation($path);
         $withPath = [];
 
-        foreach($rulesOrMessages as $key => $value) {
+        foreach ($rulesOrMessages as $key => $value) {
             $withPath["$pathDotNotation.$key"] = $value;
         }
 

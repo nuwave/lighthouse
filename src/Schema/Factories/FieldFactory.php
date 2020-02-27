@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
@@ -303,6 +302,7 @@ class FieldFactory
             $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
         }
     }
+
     protected function argValueExists(array $argumentPath): bool
     {
         return Arr::has($this->args, implode('.', $argumentPath));

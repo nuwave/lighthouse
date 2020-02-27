@@ -90,7 +90,7 @@ class DirectiveFactory
 
             if (class_exists($directiveClass)) {
                 if (! is_a($directiveClass, Directive::class, true)) {
-                    throw new DirectiveException("Class $directiveClass must implement the interface " . Directive::class);
+                    throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
 
                 $this->addResolved($directiveName, $directiveClass);

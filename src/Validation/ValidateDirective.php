@@ -31,7 +31,7 @@ class ValidateDirective extends BaseDirective implements FieldMiddleware, Define
 
     public static function definition()
     {
-        return /** @lang GraphQL */ <<<GRAPHQL
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run validation on a field.
 """

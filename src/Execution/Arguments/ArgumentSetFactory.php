@@ -94,7 +94,7 @@ class ArgumentSetFactory
         $arguments = [];
 
         /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
-        foreach($argumentDefinitionMap as $name => $definition) {
+        foreach ($argumentDefinitionMap as $name => $definition) {
             $value = array_key_exists($name, $args)
                 ? $args[$name]
                 : Undefined::undefined();
@@ -152,7 +152,7 @@ class ArgumentSetFactory
     protected function wrapWithType($valueOrValues, $type)
     {
         // No need to recurse down any further
-        if($valueOrValues === Undefined::undefined()) {
+        if ($valueOrValues === Undefined::undefined()) {
             return $valueOrValues;
         }
 
@@ -188,7 +188,7 @@ class ArgumentSetFactory
     {
         // As GraphQL does not allow empty input objects, we return null as is
         if ($value === null) {
-            return null;
+            return;
         }
 
         // This might be null if the type is

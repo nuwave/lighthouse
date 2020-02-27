@@ -6,8 +6,6 @@ use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Tests\DBTestCase;
-use Tests\Utils\Directives\ComplexValidateDirective;
-use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
 
 class ValidationTest extends DBTestCase

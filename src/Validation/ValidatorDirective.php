@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Validation;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Validation\InputValidator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -53,7 +52,7 @@ SDL;
 
     protected function validator(): InputValidator
     {
-        if(! $this->validator) {
+        if (! $this->validator) {
             $classCandidate = $this->directiveArgValue('validator')
                 ?? $this->nodeName().'Validator';
             $validatorClass = $this->inputValidatorClass($classCandidate);
