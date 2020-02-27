@@ -3,12 +3,9 @@
 namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 
-class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArray, ProvidesRules, DefinedDirective
+class RulesForArrayDirective extends BaseRulesDirective implements ArgDirectiveForArray
 {
     public static function definition(): string
     {
@@ -36,26 +33,12 @@ SDL;
 
     public function rules(): array
     {
-        $rules = $this->directiveArgValue('apply');
+        $rules = parent::rules();
 
         if (! in_array('array', $rules)) {
             $rules = Arr::prepend($rules, 'array');
         }
 
-        // Custom rules may be referenced through their fully qualified class name.
-        // The Laravel validator expects a class instance to be passed, so we
-        // resolve any given rule where a corresponding class exists.
-        foreach ($rules as $key => $rule) {
-            if (class_exists($rule)) {
-                $rules[$key] = resolve($rule);
-            }
-        }
-
         return $rules;
-    }
-
-    public function messages(): array
-    {
-        return (array) $this->directiveArgValue('messages');
     }
 }

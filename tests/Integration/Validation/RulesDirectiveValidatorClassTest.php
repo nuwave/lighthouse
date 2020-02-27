@@ -1,72 +1,67 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Validation;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 
-/**
- * Class ValidatorDirectiveTest.
- */
 class RulesDirectiveValidatorClassTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */
-        '
-        type Company {
-          id: ID!
-          name: String!
-        }
+    protected $schema = /** @lang GraphQL */ '
+    type Company {
+      id: ID!
+      name: String!
+    }
 
-        type User {
-          id: ID!
-          name: String!
-          email: String!
-          company: Company! @belongsTo
-        }
+    type User {
+      id: ID!
+      name: String!
+      email: String!
+      company: Company! @belongsTo
+    }
 
-        input UpdateUserInput @rules(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateUserInputValidator") {
-          id: ID!
-          name: String
-          email: String
-          password: String
-          company: ManageCompanyRelation
-        }
+    input UpdateUserInput @rules(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateUserInputValidator") {
+      id: ID!
+      name: String
+      email: String
+      password: String
+      company: ManageCompanyRelation
+    }
 
-        input ManageCompanyRelation {
-          update: UpdateCompanyInput
-        }
+    input ManageCompanyRelation {
+      update: UpdateCompanyInput
+    }
 
-        input CreateUserInput @rules {
-          name: String!
-          email: String!
-          password: String!
-        }
+    input CreateUserInput @rules {
+      name: String!
+      email: String!
+      password: String!
+    }
 
-        input UpdateCompanyInput @rules(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateCompanyInputValidator") {
-          id: ID!
-          name: String!
-        }
+    input UpdateCompanyInput @rules(validator: "Tests\\\\Utils\\\\Validators\\\\UpdateCompanyInputValidator") {
+      id: ID!
+      name: String!
+    }
 
-        type Mutation {
-          updateUser(input: UpdateUserInput! @spread): User @update
-          createUser(input: CreateUserInput! @spread): User @create
-        }
+    type Mutation {
+      updateUser(input: UpdateUserInput! @spread): User @update
+      createUser(input: CreateUserInput! @spread): User @create
+    }
 
-        type Query {
-          me: User @auth
-        }
-        ';
+    type Query {
+      me: User @auth
+    }
+    ';
 
     public function testInputTypeValidator()
     {
-        $mutation = /** @lang GraphQL */
-            '
-            mutation ($input: CreateUserInput!){
-              createUser(input: $input){
-               email
+        $mutation = /** @lang GraphQL */ '
+        mutation ($input: CreateUserInput!) {
+            createUser(input: $input){
+                email
             }
-          }
+        }
         ';
         $successful = $this->graphQL($mutation, [
             'input' => [
