@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
+class TrimDirective extends BaseDirective implements ArgTransformerDirective, ArgDirective, DefinedDirective
 {
     public static function definition(): string
     {

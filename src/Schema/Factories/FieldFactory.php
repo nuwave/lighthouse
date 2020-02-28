@@ -10,6 +10,8 @@ use GraphQL\Type\Definition\NonNull;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
+use Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
@@ -111,11 +113,13 @@ class FieldFactory
             $this->fieldValue = $fieldValue->useDefaultResolver();
         }
 
-        $fieldMiddleware = $this->passResolverArguments(
+        $fieldMiddleware = (new Collection([
+            SanitizeDirective::make(),
+            ValidateDirective::make(),
+            TransformArgsDirective::make(),
+        ]))->concat(
             $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
         );
-
-        $fieldMiddleware->prepend(ValidateDirective::make());
 
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
@@ -134,16 +138,16 @@ class FieldFactory
             function () use ($argumentMap, $resolverWithMiddleware) {
                 $this->setResolverArguments(...func_get_args());
 
-                foreach ($argumentMap as $name => $argumentValue) {
-                    $this->handleArgDirectivesRecursively(
-                        $argumentValue['type'],
-                        $argumentValue['astNode'],
-                        [$name]
-                    );
-                }
-
-                // Recurse down the given args and apply ArgDirectives
-                $this->runArgDirectives();
+//                foreach ($argumentMap as $name => $argumentValue) {
+//                    $this->handleArgDirectivesRecursively(
+//                        $argumentValue['type'],
+//                        $argumentValue['astNode'],
+//                        [$name]
+//                    );
+//                }
+//
+//                // Recurse down the given args and apply ArgDirectives
+//                $this->runArgDirectives();
 
                 $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
                 $modifiedArgumentSet = $argumentSet
