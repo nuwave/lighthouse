@@ -2,12 +2,13 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Tests\TestCase;
+use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-class CanDirectiveTest extends TestCase
+class CanDirectiveTest extends DBTestCase
 {
     public function testThrowsIfNotAuthorized(): void
     {
@@ -215,6 +216,87 @@ class CanDirectiveTest extends TestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user(foo: "dynamic"){
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    public function testFindArgument(): void
+    {
+        $user = factory(User::class)->create(['name' => 'foo']);
+        $this->be($user);
+
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(foo: ID): User!
+                @can(ability: "alwaysTrue", find: "foo")
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(foo: 1) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+
+        $this->expectException(ModelNotFoundException::class);
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ');
+    }
+
+    public function testFindArgumentNested(): void
+    {
+        $user = factory(User::class)->create(['name' => 'foo']);
+        $this->be($user);
+
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(input: FindUserInput): User!
+                @can(ability: "alwaysTrue", find: "input.foo")
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        
+        input FindUserInput {
+            foo: ID
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(input: {
+                foo: 1
+            }) {
                 name
             }
         }

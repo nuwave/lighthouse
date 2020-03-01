@@ -6,6 +6,7 @@ use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -143,7 +144,7 @@ SDL;
                         return $directive instanceof TrashedDirective;
                     }
                 )
-                ->findOrFail($args[$find]);
+                ->findOrFail(Arr::get($args, $find));
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];
