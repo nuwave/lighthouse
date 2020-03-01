@@ -48,7 +48,6 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Validation\GraphQLValidator;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -154,15 +153,6 @@ class LighthouseServiceProvider extends ServiceProvider
         ], 'schema');
 
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
-
-        $validationFactory->resolver(
-            function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {
-                // This determines whether we are resolving a GraphQL field
-                return Arr::has($customAttributes, ['root', 'context', 'resolveInfo'])
-                    ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
-                    : new Validator($translator, $data, $rules, $messages, $customAttributes);
-            }
-        );
     }
 
     /**

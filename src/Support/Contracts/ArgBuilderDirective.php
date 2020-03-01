@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-interface ArgBuilderDirective extends ArgDirective
+interface ArgBuilderDirective extends Directive
 {
     /**
      * Add additional constraints to the builder based on the given argument value.

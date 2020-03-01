@@ -6,7 +6,6 @@ use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
-use Nuwave\Lighthouse\Execution\Arguments\Undefined;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -65,26 +64,14 @@ GRAPHQL;
                         ->make(
                             $args,
                             $rulesGatherer->rules,
-                            $rulesGatherer->messages,
-                            // The presence of those custom attributes ensures we get a GraphQLValidator
-                            [
-                                'root' => $root,
-                                'context' => $context,
-                                'resolveInfo' => $resolveInfo,
-                            ]
+                            $rulesGatherer->messages
                         );
 
                     if ($validator->fails()) {
-                        $path = implode(
-                            '.',
-                            $resolveInfo->path
-                        );
+                        $path = implode('.', $resolveInfo->path);
 
                         throw new ValidationException("Validation failed for the field [$path].", $validator);
                     }
-
-                    $withoutUndefined = Undefined::removeUndefined($argumentSet);
-                    $resolveInfo->argumentSet = $withoutUndefined;
 
                     return $resolver($root, $args, $context, $resolveInfo);
                 }

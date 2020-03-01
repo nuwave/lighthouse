@@ -38,7 +38,12 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
                     $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
 
-                    return $resolver($root, $args, $context, $resolveInfo);
+                    return $resolver(
+                        $root,
+                        $resolveInfo->argumentSet->toArray(),
+                        $context,
+                        $resolveInfo
+                    );
                 }
             )
         );

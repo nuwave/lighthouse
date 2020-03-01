@@ -358,7 +358,9 @@ class ValidationTest extends DBTestCase
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             withMergedRules(
-                bar: String @rules(apply: ["min:40"]) @customRules(apply: ["bool"])
+                bar: String
+                    @rules(apply: ["min:1"])
+                    @customRules(apply: ["bool"])
             ): User @create
         }
 
@@ -374,7 +376,7 @@ class ValidationTest extends DBTestCase
                 name
             }
         }
-        ')->assertJsonCount(2, 'errors.0.extensions.validation.bar');
+        ')->assertJsonCount(1, 'errors.0.extensions.validation.bar');
     }
 
     /**

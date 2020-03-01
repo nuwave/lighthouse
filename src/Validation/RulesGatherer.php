@@ -36,7 +36,7 @@ class RulesGatherer
     {
         $this->gatherRulesFromProviders($argumentSet, $argumentSet->directives, $argumentPath);
 
-        foreach ($argumentSet->arguments as $name => $argument) {
+        foreach ($argumentSet->argumentsWithUndefined() as $name => $argument) {
             $nestedPath = array_merge($argumentPath, [$name]);
 
             $directivesForArray = $argument->directives->filter(

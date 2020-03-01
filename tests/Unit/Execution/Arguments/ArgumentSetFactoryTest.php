@@ -72,20 +72,39 @@ class ArgumentSetFactoryTest extends TestCase
         $this->assertNull($bar->value);
     }
 
+    public function testWithUndefined(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: ID): Int
+        }
+        ';
+
+        $argumentSet = $this->rootQueryArgumentSet([]);
+
+        $this->assertCount(0, $argumentSet->arguments);
+
+        $this->assertCount(1, $argumentSet->argumentsWithUndefined());
+
+        $bar = $argumentSet->argumentsWithUndefined()['bar'];
+        $this->assertInstanceOf(Argument::class, $bar);
+        $this->assertNull($bar->value);
+    }
+
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $typedArgs */
-        $typedArgs = $this->app->make(ArgumentSetFactory::class);
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
+        $factory = $this->app->make(ArgumentSetFactory::class);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types['Query'];
 
-        return $typedArgs->fromField(
-            $args,
-            ASTHelper::firstByName($queryType->fields, 'foo')
+        return $factory->wrapArgs(
+            ASTHelper::firstByName($queryType->fields, 'foo'),
+            $args
         );
     }
 }

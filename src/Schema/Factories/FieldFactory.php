@@ -2,35 +2,20 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InputType;
-use GraphQL\Type\Definition\ListOfType;
-use GraphQL\Type\Definition\NonNull;
-use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
 use Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\HasArgPathValue;
-use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
-use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Pipeline;
-use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
-use Nuwave\Lighthouse\Support\Utils;
 use Nuwave\Lighthouse\Validation\ValidateDirective;
 
 class FieldFactory
 {
-    use HasResolverArguments;
-
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
@@ -47,34 +32,9 @@ class FieldFactory
     protected $pipeline;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    protected $fieldValue;
-
-    /**
      * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory
      */
-    protected $typedArgs;
-
-    /**
-     * @var array
-     */
-    protected $rules = [];
-
-    /**
-     * @var array
-     */
-    protected $messages = [];
-
-    /**
-     * A snapshot of the arguments that are passed to "handleArgDirectives".
-     *
-     * This is used to pause and resume the evaluation of arg directives
-     * before and after validation.
-     *
-     * @var mixed[]
-     */
-    protected $handleArgDirectivesSnapshots = [];
+    protected $argumentSetFactory;
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
@@ -92,7 +52,7 @@ class FieldFactory
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
-        $this->typedArgs = $typedArgs;
+        $this->argumentSetFactory = $typedArgs;
     }
 
     /**
@@ -108,9 +68,9 @@ class FieldFactory
         // Directives have the first priority for defining a resolver for a field
         /** @var \Nuwave\Lighthouse\Support\Contracts\FieldResolver $resolverDirective */
         if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
-            $this->fieldValue = $resolverDirective->resolveField($fieldValue);
+            $fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
-            $this->fieldValue = $fieldValue->useDefaultResolver();
+            $fieldValue = $fieldValue->useDefaultResolver();
         }
 
         $fieldMiddleware = (new Collection([
@@ -122,7 +82,7 @@ class FieldFactory
         );
 
         $resolverWithMiddleware = $this->pipeline
-            ->send($this->fieldValue)
+            ->send($fieldValue)
             ->through($fieldMiddleware)
             ->via('handleField')
             ->then(function (FieldValue $fieldValue): FieldValue {
@@ -130,36 +90,20 @@ class FieldFactory
             })
             ->getResolver();
 
-        $argumentMap = $this->argumentFactory->toTypeMap(
-            $this->fieldValue->getField()->arguments
-        );
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
+                $argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
 
-        $this->fieldValue->setResolver(
-            function () use ($argumentMap, $resolverWithMiddleware) {
-                $this->setResolverArguments(...func_get_args());
-
-//                foreach ($argumentMap as $name => $argumentValue) {
-//                    $this->handleArgDirectivesRecursively(
-//                        $argumentValue['type'],
-//                        $argumentValue['astNode'],
-//                        [$name]
-//                    );
-//                }
-//
-//                // Recurse down the given args and apply ArgDirectives
-//                $this->runArgDirectives();
-
-                $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
                 $modifiedArgumentSet = $argumentSet
                     ->spread()
                     ->rename();
-                $this->resolveInfo->argumentSet = $modifiedArgumentSet;
+                $resolveInfo->argumentSet = $modifiedArgumentSet;
 
                 return $resolverWithMiddleware(
-                    $this->root,
+                    $root,
                     $modifiedArgumentSet->toArray(),
-                    $this->context,
-                    $this->resolveInfo
+                    $context,
+                    $resolveInfo
                 );
             }
         );
@@ -168,183 +112,14 @@ class FieldFactory
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
             'name' => $fieldDefinitionNode->name->value,
-            'type' => $this->fieldValue->getReturnType(),
-            'args' => $argumentMap,
-            'resolve' => $this->fieldValue->getResolver(),
+            'type' => $fieldValue->getReturnType(),
+            'args' => $this->argumentFactory->toTypeMap(
+                $fieldValue->getField()->arguments
+            ),
+            'resolve' => $fieldValue->getResolver(),
             'description' => data_get($fieldDefinitionNode->description, 'value'),
-            'complexity' => $this->fieldValue->getComplexity(),
-            'deprecationReason' => $this->fieldValue->getDeprecationReason(),
+            'complexity' => $fieldValue->getComplexity(),
+            'deprecationReason' => $fieldValue->getDeprecationReason(),
         ];
-    }
-
-    /**
-     * Handle the ArgMiddleware.
-     *
-     * @param  \GraphQL\Type\Definition\InputType  $type
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
-     * @param  mixed[]  $argumentPath
-     * @return void
-     */
-    protected function handleArgDirectivesRecursively(
-        InputType $type,
-        InputValueDefinitionNode $astNode,
-        array $argumentPath
-    ): void {
-        if ($type instanceof NonNull) {
-            $this->handleArgDirectivesRecursively(
-                $type->getWrappedType(),
-                $astNode,
-                $argumentPath
-            );
-
-            return;
-        }
-
-        $directives = $this->passResolverArguments(
-            $this->directiveFactory->createAssociatedDirectivesOfType($astNode, ArgDirective::class)
-        );
-
-        // Handle the argument itself. At this point, it can be wrapped
-        // in a list or an input object
-        $this->handleArgWithAssociatedDirectives($type, $astNode, $directives, $argumentPath);
-
-        // If we no value or null is given, we bail here to prevent
-        // infinitely going down a chain of nested input objects
-        if (! $this->argValueExists($argumentPath) || $this->argValue($argumentPath) === null) {
-            return;
-        }
-
-        if ($type instanceof InputObjectType) {
-            $inputDirectives = $this->directiveFactory->createAssociatedDirectives($type->astNode);
-            $this->handleArgWithAssociatedDirectives($type, $astNode, $inputDirectives, $argumentPath);
-
-            foreach ($type->getFields() as $field) {
-                $this->handleArgDirectivesRecursively(
-                    $field->type,
-                    $field->astNode,
-                    array_merge($argumentPath, [$field->name])
-                );
-            }
-        }
-
-        if ($type instanceof ListOfType) {
-            foreach ($this->argValue($argumentPath) as $index => $value) {
-                // here we are passing by reference so the `$argValue[$key]` is intended.
-                $this->handleArgDirectivesRecursively(
-                    $type->ofType,
-                    $astNode,
-                    array_merge($argumentPath, [$index])
-                );
-            }
-        }
-    }
-
-    /**
-     * @param  \GraphQL\Type\Definition\InputType  $type
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
-     * @param  mixed[]  $argumentPath
-     * @return void
-     */
-    protected function handleArgWithAssociatedDirectives(
-        InputType $type,
-        InputValueDefinitionNode $astNode,
-        Collection $directives,
-        array $argumentPath
-    ): void {
-        $isArgDirectiveForArray = Utils::instanceofMatcher(ArgDirectiveForArray::class);
-
-        $this->handleArgDirectives(
-            $astNode,
-            $argumentPath,
-            $type instanceof ListOfType
-                ? $directives->filter($isArgDirectiveForArray)
-                : $directives->reject($isArgDirectiveForArray)
-        );
-    }
-
-    /**
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
-     * @param  mixed[]  $argumentPath
-     * @param  \Illuminate\Support\Collection  $directives
-     * @return void
-     */
-    protected function handleArgDirectives(
-        InputValueDefinitionNode $astNode,
-        array $argumentPath,
-        Collection $directives
-    ): void {
-        if ($directives->isEmpty()) {
-            return;
-        }
-
-        $directives->each(function (Directive $directive) use ($argumentPath): void {
-            if ($directive instanceof HasErrorBuffer) {
-                $directive->setErrorBuffer($this->validationErrorBuffer);
-            }
-            if ($directive instanceof HasArgumentPath) {
-                $directive->setArgumentValue($argumentPath);
-            }
-            if ($directive instanceof HasArgPathValue) {
-                $directive->setArgPathValue($this->argValue($argumentPath));
-            }
-        });
-
-        // Remove the directive from the list to avoid evaluating the same directive twice
-        while ($directive = $directives->shift()) {
-            if ($directive instanceof ArgTransformerDirective && $this->argValueExists($argumentPath)) {
-                $this->setArgValue(
-                    $argumentPath,
-                    $directive->transform($this->argValue($argumentPath))
-                );
-            }
-        }
-
-        // If directives remain, snapshot the state that we are in now
-        // to allow resuming after validation has run
-        if ($directives->isNotEmpty()) {
-            $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
-        }
-    }
-
-    protected function argValueExists(array $argumentPath): bool
-    {
-        return Arr::has($this->args, implode('.', $argumentPath));
-    }
-
-    protected function setArgValue(array $argumentPath, $value): array
-    {
-        return Arr::set($this->args, implode('.', $argumentPath), $value);
-    }
-
-    protected function argValue(array $argumentPath)
-    {
-        return Arr::get($this->args, implode('.', $argumentPath));
-    }
-
-    protected function runArgDirectives(): void
-    {
-        $this->resumeHandlingArgDirectives();
-    }
-
-    /**
-     * Continue evaluating the arg directives after validation has run.
-     *
-     * @return void
-     */
-    protected function resumeHandlingArgDirectives(): void
-    {
-        // copy and reset
-        $snapshots = $this->handleArgDirectivesSnapshots;
-        $this->handleArgDirectivesSnapshots = [];
-
-        foreach ($snapshots as $handlerArgs) {
-            $this->handleArgDirectives(...$handlerArgs);
-        }
-
-        // We might have hit more validation-relevant directives so we recurse
-        if (count($this->handleArgDirectivesSnapshots) > 0) {
-            $this->runArgDirectives();
-        }
     }
 }

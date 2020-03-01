@@ -18,6 +18,13 @@ class ArgumentSet
     public $arguments = [];
 
     /**
+     * An associative array of arguments that were not given.
+     *
+     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument[]
+     */
+    public $undefined = [];
+
+    /**
      * A list of directives.
      *
      * This may be coming from the field the arguments are a part of
@@ -37,10 +44,6 @@ class ArgumentSet
         $plainArguments = [];
 
         foreach ($this->arguments as $name => $argument) {
-            if ($argument->value === Undefined::undefined()) {
-                continue;
-            }
-
             $plainArguments[$name] = $argument->toPlain();
         }
 
@@ -237,5 +240,18 @@ class ArgumentSet
         $argumentSet->arguments[array_shift($keys)] = $argument;
 
         return $this;
+    }
+
+    /**
+     * The contained arguments, including all that were not passed.
+     *
+     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument[]
+     */
+    public function argumentsWithUndefined(): array
+    {
+        return array_merge(
+            $this->arguments,
+            $this->undefined
+        );
     }
 }
