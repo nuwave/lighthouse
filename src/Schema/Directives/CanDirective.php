@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
@@ -118,6 +119,10 @@ SDL;
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
+            if (($findValue = Arr::get($args, $find)) === null) {
+                throw new DefinitionException("Could not find key: \"${find}\". The key must be a non-null field");
+            }
+
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
@@ -146,7 +151,7 @@ SDL;
                         return $directive instanceof TrashedDirective;
                     }
                 )
-                ->findOrFail(Arr::get($args, $find));
+                ->findOrFail($findValue);
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];
