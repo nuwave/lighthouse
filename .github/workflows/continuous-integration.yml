@@ -132,8 +132,8 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Remove larastan for Laravel 5.5"
-        if: "matrix.laravel-version == '5.5.*'"
+      - name: "Remove larastan for old Laravel versions"
+        if: "matrix.laravel-version != '^7.0'"
         run: "composer remove --dev nunomaduro/larastan --no-update"
 
       - name: "Install dependencies with composer"
