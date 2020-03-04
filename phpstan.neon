@@ -8,10 +8,10 @@ parameters:
   - src
   - tests
   excludes_analyse:
-  - tests/database/*
-  - tests/TestCase.php
-  - tests/Laravel7ExceptionHandler.php
-  - tests/PreLaravel7ExceptionHandler.php
+  - %rootDir%/../../../tests/database/*
+  - %rootDir%/../../../tests/TestCase.php
+  - %rootDir%/../../../tests/Laravel7ExceptionHandler.php
+  - %rootDir%/../../../tests/PreLaravel7ExceptionHandler.php
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
