@@ -58,7 +58,6 @@
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev",
     "extra": {
         "laravel": {
             "providers": [
@@ -82,6 +81,7 @@
             "Benchmarks\\": "benchmarks"
         }
     },
+    "minimum-stability": "dev",
     "scripts": {
         "bench": "phpbench run",
         "stan": "phpstan analyse --memory-limit 2048M",
