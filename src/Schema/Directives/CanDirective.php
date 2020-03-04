@@ -121,7 +121,7 @@ SDL;
         if ($find = $this->directiveArgValue('find')) {
             $findValue = Arr::get($args, $find);
             if ($findValue === null) {
-                throw new Error("Got no key to find a model at the expected input path: ${find}.");
+                throw new Error(self::missingKeyToFindModel($find));
             }
 
             $queryBuilder = $this->getModelClass()::query();
@@ -162,6 +162,11 @@ SDL;
         }
 
         return [$this->getModelClass()];
+    }
+
+    public static function missingKeyToFindModel(string $find): string
+    {
+        return "Got no key to find a model at the expected input path: ${find}.";
     }
 
     /**

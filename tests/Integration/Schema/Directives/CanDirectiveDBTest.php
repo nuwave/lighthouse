@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -87,7 +88,7 @@ class CanDirectiveDBTest extends DBTestCase
         ');
     }
 
-    public function testThrowsIfNullFindValue(): void
+    public function testThrowsIfFindValueIsNotGiven(): void
     {
         $this->be(
             new User([
@@ -98,7 +99,7 @@ class CanDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID): User
-                @can(ability: "view", find: "id")
+                @can(ability: "view", find: "some.path")
                 @first
         }
 
@@ -108,14 +109,20 @@ class CanDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->expectException(Error::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
             }
         }
-        ');
+        ')->assertJson([
+            'errors' => [
+                [
+
+                'message' => CanDirective::missingKeyToFindModel('some.path')
+                ]
+            ]
+        ]);
     }
 
     public function testFindUsingNestedInputWithDotNotation(): void
