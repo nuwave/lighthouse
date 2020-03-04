@@ -34,7 +34,7 @@
         "webonyx/graphql-php": "^0.13.2"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "dev-inxilpro-feature/laravel-7",
+        "bensampo/laravel-enum": "^1.28.3",
         "ergebnis/composer-normalize": "^2.2.2",
         "haydenpierce/class-finder": "^0.4.0",
         "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || dev-master",
@@ -81,7 +81,6 @@
             "Benchmarks\\": "benchmarks"
         }
     },
-    "minimum-stability": "dev",
     "scripts": {
         "bench": "phpbench run",
         "stan": "phpstan analyse --memory-limit 2048M",
