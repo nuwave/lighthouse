@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -145,7 +144,7 @@ abstract class TestCase extends BaseTestCase
     protected function resolveApplicationExceptionHandler($app)
     {
         $app->singleton(ExceptionHandler::class, function () {
-            if(Str::startsWith(app()->version(), '7.')) {
+            if (Str::startsWith(app()->version(), '7.')) {
                 return new Laravel7ExceptionHandler();
             } else {
                 return new PreLaravel7ExceptionHandler();
