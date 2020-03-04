@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Schema\Directives\CanDirective;
@@ -119,9 +118,9 @@ class CanDirectiveDBTest extends DBTestCase
             'errors' => [
                 [
 
-                'message' => CanDirective::missingKeyToFindModel('some.path')
-                ]
-            ]
+                    'message' => CanDirective::missingKeyToFindModel('some.path'),
+                ],
+            ],
         ]);
     }
 
