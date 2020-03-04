@@ -7,8 +7,8 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
-use Tests\Utils\LaravelEnums\LocalizedUserType;
 use Tests\Utils\LaravelEnums\AOrB;
+use Tests\Utils\LaravelEnums\LocalizedUserType;
 
 class LaravelEnumTypeTest extends TestCase
 {
