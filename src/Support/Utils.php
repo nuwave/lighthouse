@@ -95,4 +95,19 @@ class Utils
 
         return array_map($callback, $valueOrValues);
     }
+
+    /**
+     * Determine if a class uses a trait.
+     *
+     * @param  object|string  $class
+     * @param  string  $trait
+     * @return bool
+     */
+    public static function classUsesTrait($class, string $trait): bool
+    {
+        return in_array(
+            $trait,
+            class_uses_recursive($class)
+        );
+    }
 }
