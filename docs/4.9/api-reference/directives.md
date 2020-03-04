@@ -452,6 +452,8 @@ directive @can(
   """
   The name of the argument that is used to find a specific model
   instance against which the permissions should be checked.
+
+  You may pass the string as a dot notation to search in a array.
   """
   find: String
 

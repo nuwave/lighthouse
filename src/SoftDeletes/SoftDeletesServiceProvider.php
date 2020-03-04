@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Support\Utils;
 
 class SoftDeletesServiceProvider extends ServiceProvider
 {
@@ -24,12 +25,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
     {
-        if (
-            ! in_array(
-                SoftDeletes::class,
-                class_uses_recursive($modelClass)
-            )
-        ) {
+        if (! Utils::classUsesTrait($modelClass, SoftDeletes::class)) {
             throw new DefinitionException($exceptionMessage);
         }
     }

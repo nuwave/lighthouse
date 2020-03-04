@@ -4,6 +4,10 @@ namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Useful helpers for PHPUnit testing.
@@ -21,6 +25,13 @@ trait MakesGraphQLRequestsLumen
      * @var \Illuminate\Http\Response|null
      */
     protected $introspectionResult;
+
+    /**
+     * Used to test deferred queries.
+     *
+     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
+     */
+    protected $deferStream;
 
     /**
      * Execute a query as if it was sent as a request to the server.
@@ -161,5 +172,44 @@ trait MakesGraphQLRequestsLumen
     protected function graphQLEndpointUrl(): string
     {
         return config('lighthouse.route.uri');
+    }
+
+    /**
+     * Send the query and capture all chunks of the streamed response.
+     *
+     * @param  string  $query
+     * @param  array|null  $variables
+     * @param  array  $extraParams
+     * @return array
+     */
+    protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
+    {
+        if ($this->deferStream === null) {
+            $this->setUpDeferStream();
+        }
+
+        $response = $this->graphQL($query, $variables, $extraParams);
+
+        if (! $response->response instanceof StreamedResponse) {
+            Assert::fail('Expected the response to be a streamed response but got a regular response.');
+        }
+
+        $response->response->send();
+
+        return $this->deferStream->chunks;
+    }
+
+    /**
+     * Set up the stream to make queries with @defer.
+     *
+     * @return void
+     */
+    protected function setUpDeferStream(): void
+    {
+        $this->deferStream = new MemoryStream;
+
+        app()->singleton(CanStreamResponse::class, function (): MemoryStream {
+            return $this->deferStream;
+        });
     }
 }
