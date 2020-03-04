@@ -22,7 +22,7 @@ parameters:
   - '#TestResponse#'
 
   # Not compatible with Laravel 7 yet
-  - '#Bensampo#'
+  - '#.*Bensampo.*#'
 
   # We are monkeypatching that to pass around the query builder
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'

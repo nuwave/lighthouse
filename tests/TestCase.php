@@ -6,6 +6,7 @@ use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Str;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
@@ -144,27 +145,11 @@ abstract class TestCase extends BaseTestCase
     protected function resolveApplicationExceptionHandler($app)
     {
         $app->singleton(ExceptionHandler::class, function () {
-            return new class implements ExceptionHandler {
-                public function report(Exception $e)
-                {
-                    //
-                }
-
-                public function render($request, Exception $e)
-                {
-                    throw $e;
-                }
-
-                public function renderForConsole($output, Exception $e)
-                {
-                    //
-                }
-
-                public function shouldReport(Exception $e)
-                {
-                    return false;
-                }
-            };
+            if(Str::startsWith(app()->version(), '7.')) {
+                return new Laravel7ExceptionHandler();
+            } else {
+                return new PreLaravel7ExceptionHandler();
+            }
         });
     }
 
