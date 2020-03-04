@@ -42,8 +42,8 @@
         "mll-lab/graphql-php-scalars": "^2.1",
         "mockery/mockery": "^1.0",
         "nunomaduro/larastan": "^0.5.2",
-        "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0 ",
-        "orchestra/testbench": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0 ",
+        "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || dev-5.x ",
+        "orchestra/testbench": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || dev-5.x ",
         "phpbench/phpbench": "@dev",
         "phpunit/phpunit": "^6.5 || ^7.5 || ^8.4",
         "pusher/pusher-php-server": "^3.2"
