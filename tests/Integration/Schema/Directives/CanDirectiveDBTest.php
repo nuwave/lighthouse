@@ -108,7 +108,6 @@ class CanDirectiveDBTest extends DBTestCase
         }
         ';
 
-
         $this->expectException(Error::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
