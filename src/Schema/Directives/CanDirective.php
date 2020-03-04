@@ -3,12 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
@@ -114,13 +114,14 @@ SDL;
      * @param  array  $args
      * @return iterable<Model|string>
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @throws \GraphQL\Error\Error
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
-            if (($findValue = Arr::get($args, $find)) === null) {
-                throw new DefinitionException("Could not find key: \"${find}\". The key must be a non-null field");
+            $findValue = Arr::get($args, $find);
+            if ($findValue === null) {
+                throw new Error(self::missingKeyToFindModel($find));
             }
 
             $queryBuilder = $this->getModelClass()::query();
@@ -161,6 +162,11 @@ SDL;
         }
 
         return [$this->getModelClass()];
+    }
+
+    public static function missingKeyToFindModel(string $find): string
+    {
+        return "Got no key to find a model at the expected input path: ${find}.";
     }
 
     /**
