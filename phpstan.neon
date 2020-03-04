@@ -10,7 +10,13 @@ parameters:
   excludes_analyse:
   - %rootDir%/../../../tests/database/*
   ignoreErrors:
+  # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched().#'
+  - '#Function factory invoked with 2 parameters, 0 required\.#'
+  - '#Function factory invoked with 1 parameter, 0 required\.#'
+
+  # This is a library, so it should be extendable
+  - '#Unsafe usage of new static.*#'
 
   # Defined mixins
   - '#Call to an undefined method Illuminate\\Foundation\\Testing\\TestResponse::assertErrorCategory().#'
@@ -19,6 +25,5 @@ parameters:
   # We are monkeypatching that to pass around the query builder
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder.#'
 
-  - '#Function factory invoked with 2 parameters, 0 required\.#'
-  - '#Function factory invoked with 1 parameter, 0 required\.#'
-  - '#Unsafe usage of new static.*#'
+  # TODO remove once we no longer support PHPUnit 7
+  - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects() has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
