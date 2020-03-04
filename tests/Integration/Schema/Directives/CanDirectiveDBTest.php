@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -85,6 +86,117 @@ class CanDirectiveDBTest extends DBTestCase
             }
         }
         ');
+    }
+
+    public function testThrowsIfInvalidFindKey()
+    {
+        $this->be(
+            new User([
+                'name' => UserPolicy::ADMIN,
+            ])
+        );
+
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+
+        $this->schema = /** @lang GraphQL */'
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", find: "INVALID_KEY")
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(id: {$user->getKey()}) {
+                name
+            }
+        }");
+    }
+
+    public function testThrowsIfNullFindValue()
+    {
+        $this->be(
+            new User([
+                'name' => UserPolicy::ADMIN,
+            ])
+        );
+
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+
+        $this->schema = /** @lang GraphQL */
+            '
+        type Query {
+            user(id: ID @eq, queriedUserId: ID): User
+                @can(ability: "view", find: "queriedUserId")
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(id: {$user->getKey()}, queriedUserId: null) {
+                name
+            }
+        }");
+    }
+
+    public function testNestedQueriesForSpecificModel(): void
+    {
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */
+            '
+        type Query {
+            user(input: FindUserInput): User
+                @can(ability: "view", find: "input.id")
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        input FindUserInput {
+          id: ID
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(input: {
+              id: {$user->getKey()}
+            }) {
+                name
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
     }
 
     public function testThrowsIfNotAuthorized(): void
