@@ -38,6 +38,7 @@
         "composer/composer": "1.10.0-RC as 1.9.3",
         "ergebnis/composer-normalize": "^2.2.2",
         "haydenpierce/class-finder": "^0.4.0",
+        "laravel/framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || dev-master",
         "laravel/scout": "^4.0 || ^5.0 || ^6.0 || ^7.0",
         "mll-lab/graphql-php-scalars": "^2.1",
