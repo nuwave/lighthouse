@@ -42,6 +42,14 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
+      - name: "Remove larastan for old Laravel versions"
+        if: "matrix.laravel-version != '^7.0'"
+        run: "composer remove --dev nunomaduro/larastan --no-update"
+
+      - name: "Remove bensampo/laravel-enum for incompatible versions"
+        if: "matrix.laravel-version == '^7.0'"
+        run: "composer remove --dev bensampo/laravel-enum --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
@@ -192,6 +200,14 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
+      - name: "Remove larastan for old Laravel versions"
+        if: "matrix.laravel-version != '^7.0'"
+        run: "composer remove --dev nunomaduro/larastan --no-update"
+
+      - name: "Remove bensampo/laravel-enum for incompatible versions"
+        if: "matrix.laravel-version == '^7.0'"
+        run: "composer remove --dev bensampo/laravel-enum --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
@@ -235,6 +251,14 @@ jobs:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Remove larastan for old Laravel versions"
+        if: "matrix.laravel-version != '^7.0'"
+        run: "composer remove --dev nunomaduro/larastan --no-update"
+
+      - name: "Remove bensampo/laravel-enum for incompatible versions"
+        if: "matrix.laravel-version == '^7.0'"
+        run: "composer remove --dev bensampo/laravel-enum --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
