@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Throwable;
 
