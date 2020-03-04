@@ -12,6 +12,9 @@ parameters:
   - %rootDir%/../../../tests/TestCase.php
   - %rootDir%/../../../tests/Laravel7ExceptionHandler.php
   - %rootDir%/../../../tests/PreLaravel7ExceptionHandler.php
+  - %rootDir%/../../../src/Schema/Types/LaravelEnumType.php
+  - %rootDir%/../../../tests/Unit/Schema/Types/LaravelEnumTypeTest.php
+  - %rootDir%/../../../tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
@@ -23,9 +26,6 @@ parameters:
 
   # Laravel 7 moved this class
   - '#TestResponse#'
-
-  # Not compatible with Laravel 7 yet
-  - '#.*Bensampo.*#'
 
   # We are monkeypatching that to pass around the query builder
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
