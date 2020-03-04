@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -64,8 +64,7 @@ class CanDirectiveDBTest extends DBTestCase
             $this->never()
         );
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", find: "id")
@@ -88,7 +87,7 @@ class CanDirectiveDBTest extends DBTestCase
         ');
     }
 
-    public function testThrowsIfInvalidFindKey()
+    public function testThrowsIfFindValueIsNotGiven(): void
     {
         $this->be(
             new User([
@@ -96,14 +95,10 @@ class CanDirectiveDBTest extends DBTestCase
             ])
         );
 
-        $user = factory(User::class)->create([
-            'name' => 'foo',
-        ]);
-
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @eq): User
-                @can(ability: "view", find: "INVALID_KEY")
+            user(id: ID): User
+                @can(ability: "view", find: "some.path")
                 @first
         }
 
@@ -113,59 +108,30 @@ class CanDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            user(id: {$user->getKey()}) {
+            user {
                 name
             }
-        }");
-    }
+        }
+        ')->assertJson([
+            'errors' => [
+                [
 
-    public function testThrowsIfNullFindValue()
-    {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
-
-        $user = factory(User::class)->create([
-            'name' => 'foo',
+                    'message' => CanDirective::missingKeyToFindModel('some.path'),
+                ],
+            ],
         ]);
-
-        $this->schema = /** @lang GraphQL */
-            '
-        type Query {
-            user(id: ID @eq, queriedUserId: ID): User
-                @can(ability: "view", find: "queriedUserId")
-                @first
-        }
-
-        type User {
-            id: ID!
-            name: String!
-        }
-        ';
-
-        $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            user(id: {$user->getKey()}, queriedUserId: null) {
-                name
-            }
-        }");
     }
 
-    public function testNestedQueriesForSpecificModel(): void
+    public function testFindUsingNestedInputWithDotNotation(): void
     {
         $user = factory(User::class)->create([
             'name' => 'foo',
         ]);
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(input: FindUserInput): User
                 @can(ability: "view", find: "input.id")
@@ -176,21 +142,23 @@ class CanDirectiveDBTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         input FindUserInput {
           id: ID
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID){
             user(input: {
-              id: {$user->getKey()}
+              id: $id
             }) {
                 name
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
