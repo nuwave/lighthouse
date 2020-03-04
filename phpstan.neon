@@ -18,3 +18,7 @@ parameters:
 
   # We are monkeypatching that to pass around the query builder
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder.#'
+
+  - '#Function factory invoked with 2 parameters, 0 required\.#'
+  - '#Function factory invoked with 1 parameter, 0 required\.#'
+  - '#Unsafe usage of new static.*#'
