@@ -152,7 +152,7 @@ trait MakesGraphQLRequests
 
         return Arr::first(
             $results,
-            function (array $result) use ($name): bool {
+            static function (array $result) use ($name): bool {
                 return $result['name'] === $name;
             }
         );
