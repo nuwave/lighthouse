@@ -27,6 +27,9 @@ parameters:
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
 
+  # Compatibility fix because Laravel moved the TestResponse class
+  - '#.*TestResponse.*#'
+
   # We are monkeypatching that to pass around the query builder
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
 
