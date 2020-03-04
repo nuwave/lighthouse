@@ -31,7 +31,6 @@ The `graphQL` test helper runs a query on your GraphQL endpoint and returns a `T
 ```php
 public function testQueriesPosts(): void
 {
-    /** @var \Illuminate\Foundation\Testing\TestResponse $response */
     $response = $this->graphQL(/** @lang GraphQL */ '
     {
         posts {
@@ -48,7 +47,6 @@ If you want to use variables within your query, pass an associative array as the
 ```php
 public function testCreatePost(): void
 {
-    /** @var \Illuminate\Foundation\Testing\TestResponse $response */
     $response = $this->graphQL(/** @lang GraphQL */ '
         mutation CreatePost($title: String!) {
             createPost(title: $title) {

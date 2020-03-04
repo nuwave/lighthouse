@@ -6,7 +6,6 @@ use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
@@ -126,7 +125,11 @@ abstract class TestCase extends BaseTestCase
 
         $config->set('app.debug', true);
 
-        TestResponse::mixin(new TestResponseMixin());
+        if(class_exists('Illuminate\Testing\TestResponse')) {
+            \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());
+        } elseif(class_exists('Illuminate\Foundation\Testing\TestResponse')) {
+            \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
+        }
     }
 
     /**

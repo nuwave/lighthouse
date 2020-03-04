@@ -18,9 +18,11 @@ parameters:
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
 
-  # Defined mixins
-  - '#Call to an undefined method Illuminate\\Foundation\\Testing\\TestResponse::assertErrorCategory\(\)\.#'
-  - '#Call to an undefined method Illuminate\\Foundation\\Testing\\TestResponse::jsonGet\(\)\.#'
+  # Laravel 7 moved this class
+  - '#TestResponse#'
+
+  # Not compatible with Laravel 7 yet
+  - '#Bensampo#'
 
   # We are monkeypatching that to pass around the query builder
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
