@@ -18,6 +18,7 @@ parameters:
   - %rootDir%/../../../tests/Unit/Schema/Types/LaravelEnumTypeTest.php
   - %rootDir%/../../../tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
   - %rootDir%/../../../tests/Utils/Models/WithEnum.php
+  - %rootDir%/../../../tests/Utils/LaravelEnums/*
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
