@@ -2,27 +2,19 @@
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tests\Utils\LaravelEnums\UserType;
 
 class User extends Authenticatable
 {
-    use CastsEnums;
-
     /**
      * @var mixed[]
      */
     protected $guarded = [];
-
-    protected $enumCasts = [
-        'type' => UserType::class,
-    ];
 
     public function getTaskCountAsString(): string
     {

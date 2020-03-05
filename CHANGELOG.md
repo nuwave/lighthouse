@@ -16,6 +16,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add option `passOrdered` to `@method` to pass just the arguments as ordered parameters https://github.com/nuwave/lighthouse/pull/1208
 - Add support to extend `input`, `interface` and `enum` types https://github.com/nuwave/lighthouse/pull/1203
 - Implement `streamGraphQL()` helper in `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` https://github.com/nuwave/lighthouse/pull/1222
+- Support Laravel 7 https://github.com/nuwave/lighthouse/pull/1219
 
 ### Deprecated
 
