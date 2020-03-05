@@ -1,6 +1,6 @@
 includes:
 - vendor/nunomaduro/larastan/extension.neon
-- vendor/bensampo/laravel-enum/extension.neon
+#- vendor/bensampo/laravel-enum/extension.neon
 parameters:
   level: 1
   paths:
@@ -9,12 +9,30 @@ parameters:
   - tests
   excludes_analyse:
   - %rootDir%/../../../tests/database/*
+  # Compatibility fix because Laravel moved the TestResponse class
+  - %rootDir%/../../../tests/TestCase.php
+  - %rootDir%/../../../tests/Laravel7ExceptionHandler.php
+  - %rootDir%/../../../tests/PreLaravel7ExceptionHandler.php
+  # Workaround until bensampo/laravel-enum support Laravel 7
+  - %rootDir%/../../../src/Schema/Types/LaravelEnumType.php
+  - %rootDir%/../../../tests/Unit/Schema/Types/LaravelEnumTypeTest.php
+  - %rootDir%/../../../tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
+  - %rootDir%/../../../tests/Utils/Models/WithEnum.php
+  - %rootDir%/../../../tests/Utils/LaravelEnums/*
   ignoreErrors:
-  - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched().#'
+  # Some parts of Laravel are just really magical
+  - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
+  - '#Function factory invoked with 2 parameters, 0 required\.#'
+  - '#Function factory invoked with 1 parameter, 0 required\.#'
 
-  # Defined mixins
-  - '#Call to an undefined method Illuminate\\Foundation\\Testing\\TestResponse::assertErrorCategory().#'
-  - '#Call to an undefined method Illuminate\\Foundation\\Testing\\TestResponse::jsonGet().#'
+  # This is a library, so it should be extendable
+  - '#Unsafe usage of new static.*#'
+
+  # Compatibility fix because Laravel moved the TestResponse class
+  - '#.*TestResponse.*#'
 
   # We are monkeypatching that to pass around the query builder
-  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder.#'
+  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
+
+  # TODO remove once we no longer support PHPUnit 7
+  - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects\(\) has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
