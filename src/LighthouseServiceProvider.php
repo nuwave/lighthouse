@@ -39,6 +39,7 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
@@ -89,7 +90,7 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     protected function loadRoutesFrom($path): void
     {
-        if (Str::contains($this->app->version(), 'Lumen')) {
+        if (AppVersion::isLumen()) {
             require realpath($path);
 
             return;

@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Types;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\Models\WithEnum;
@@ -20,7 +21,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
     {
         parent::setUp();
 
-        if (Str::startsWith(app()->version(), '7.')) {
+        if (AppVersion::atLeast(7.0)) {
             $this->markTestSkipped('TODO remove this once bensampo/laravel-enum supports Laravel 7');
         }
 
@@ -70,7 +71,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
-        if ((float) $this->app->version() < 5.6) {
+        if (AppVersion::below(5.6)) {
             $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
         }
 
