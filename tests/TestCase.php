@@ -5,7 +5,6 @@ namespace Tests;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Support\Str;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;

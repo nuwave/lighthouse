@@ -28,7 +28,7 @@ class AppVersion
 
     protected static function versionNumber(): float
     {
-        if(self::isLumen()) {
+        if (self::isLumen()) {
             // Lumen version strings look like: "Lumen (2.3.4)..."
             return (float) Str::after('(', self::version());
         }

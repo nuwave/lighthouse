@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Types;
 
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 use Nuwave\Lighthouse\Support\AppVersion;
