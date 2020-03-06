@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.10.1
+
+### Fixed
+
+- Fix Laravel version detection for Lumen https://github.com/nuwave/lighthouse/pull/1224
+
 ## 4.10.0
 
 ### Added
