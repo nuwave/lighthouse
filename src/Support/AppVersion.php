@@ -30,7 +30,7 @@ class AppVersion
     {
         if (self::isLumen()) {
             // Lumen version strings look like: "Lumen (2.3.4)..."
-            return (float) Str::after('(', self::version());
+            return (float) Str::after(self::version(), '(');
         }
 
         // Regular Laravel versions look like: "2.3.4"
