@@ -82,13 +82,13 @@ class ArgumentSetFactory
         } elseif ($definition instanceof InputObjectTypeDefinitionNode) {
             $argDefinitions = $definition->fields;
         } else {
-            throw new InvalidArgumentException('Got unexpected node of type ' . get_class($definition));
+            throw new InvalidArgumentException('Got unexpected node of type '.get_class($definition));
         }
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
 
         /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
         foreach ($argumentDefinitionMap as $name => $definition) {
-            if(array_key_exists($name, $args)) {
+            if (array_key_exists($name, $args)) {
                 $argumentSet->arguments[$name] = $this->wrapInArgument($args[$name], $definition);
             } else {
                 $argumentSet->undefined[$name] = $this->wrapInArgument(null, $definition);

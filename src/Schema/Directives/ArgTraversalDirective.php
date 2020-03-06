@@ -80,7 +80,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     protected function transform($value, Collection $directivesForArgument)
     {
-        foreach($directivesForArgument as $directive) {
+        foreach ($directivesForArgument as $directive) {
             $value = $this->applyDirective($directive, $value);
         }
 

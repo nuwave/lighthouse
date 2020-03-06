@@ -9,7 +9,7 @@ class SanitizeDirective extends ArgTraversalDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<GRAPHQL
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Apply sanitization to the arguments of a field.
 """
@@ -19,7 +19,7 @@ GRAPHQL;
 
     protected function applyDirective(Directive $directive, $value)
     {
-        if($directive instanceof ArgSanitizerDirective) {
+        if ($directive instanceof ArgSanitizerDirective) {
             return $directive->sanitize($value);
         }
 
