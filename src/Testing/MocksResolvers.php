@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
-use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 
 /**
  * @mixin \PHPUnit\Framework\TestCase

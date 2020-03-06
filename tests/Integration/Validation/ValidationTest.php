@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Validation;
 
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Tests\DBTestCase;
@@ -383,10 +382,10 @@ class ValidationTest extends DBTestCase
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
      * @param  array  $keys
-     * @param  \Illuminate\Foundation\Testing\TestResponse  $result
+     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $result
      * @return void
      */
-    protected function assertValidationKeysSame(array $keys, TestResponse $result): void
+    protected function assertValidationKeysSame(array $keys, $result): void
     {
         $validation = $result->jsonGet('errors.0.extensions.validation');
 

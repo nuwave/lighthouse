@@ -2,7 +2,6 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Foundation\Testing\TestResponse;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 use Tests\Utils\Scalars\Email;
@@ -15,7 +14,7 @@ class IntrospectionTest extends TestCase
     protected $typeRegistry;
 
     /**
-     * @var TestResponse|null
+     * @var \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse|null
      */
     protected $introspectionResult;
 

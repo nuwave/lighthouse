@@ -3,9 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -51,6 +53,8 @@ directive @can(
   """
   The name of the argument that is used to find a specific model
   instance against which the permissions should be checked.
+
+  You may pass the string as a dot notation to search in a array.
   """
   find: String
 
@@ -109,11 +113,16 @@ SDL;
      * @param  array  $args
      * @return iterable<Model|string>
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @throws \GraphQL\Error\Error
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
+            $findValue = Arr::get($args, $find);
+            if ($findValue === null) {
+                throw new Error(self::missingKeyToFindModel($find));
+            }
+
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
@@ -136,7 +145,7 @@ SDL;
                     [],
                     Utils::instanceofMatcher(TrashedDirective::class)
                 )
-                ->findOrFail($args[$find]);
+                ->findOrFail($findValue);
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];
@@ -146,6 +155,11 @@ SDL;
         }
 
         return [$this->getModelClass()];
+    }
+
+    public static function missingKeyToFindModel(string $find): string
+    {
+        return "Got no key to find a model at the expected input path: ${find}.";
     }
 
     /**

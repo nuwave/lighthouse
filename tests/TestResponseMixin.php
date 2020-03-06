@@ -3,10 +3,9 @@
 namespace Tests;
 
 use Closure;
-use Illuminate\Foundation\Testing\TestResponse;
 
 /**
- * @mixin \Illuminate\Foundation\Testing\TestResponse
+ * @mixin \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
 {
@@ -19,7 +18,7 @@ class TestResponseMixin
 
     public function assertErrorCategory(): Closure
     {
-        return function (string $category): TestResponse {
+        return function (string $category) {
             $this->assertJson([
                 'errors' => [
                     [

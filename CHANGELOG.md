@@ -15,10 +15,22 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.10.1
+
+### Fixed
+
+- Fix Laravel version detection for Lumen https://github.com/nuwave/lighthouse/pull/1224
+
+## 4.10.0
+
 ### Added
 
+- Access nested inputs with dot notation using the `find` option of `@can` https://github.com/nuwave/lighthouse/pull/1216
 - Add `@hash` directive which uses Laravel's hashing configuration https://github.com/nuwave/lighthouse/pull/1200
 - Add option `passOrdered` to `@method` to pass just the arguments as ordered parameters https://github.com/nuwave/lighthouse/pull/1208
+- Add support to extend `input`, `interface` and `enum` types https://github.com/nuwave/lighthouse/pull/1203
+- Implement `streamGraphQL()` helper in `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` https://github.com/nuwave/lighthouse/pull/1222
+- Support Laravel 7 https://github.com/nuwave/lighthouse/pull/1219
 
 ### Deprecated
 
@@ -43,7 +55,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
   get the arguments passed through a client directive https://github.com/nuwave/lighthouse/pull/1184
 - Add `streamGraphQL()` helper method to `\Nuwave\Lighthouse\Testing\MakesGraphQLRequests` for
   simple testing of streamed responses, such as `@defer` https://github.com/nuwave/lighthouse/pull/1184
-- Add support to extend `input`, `interface` and `enum` types https://github.com/nuwave/lighthouse/pull/1203
 
 ### Fixed
 

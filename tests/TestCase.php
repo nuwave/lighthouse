@@ -2,16 +2,15 @@
 
 namespace Tests;
 
-use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
@@ -131,7 +130,11 @@ abstract class TestCase extends BaseTestCase
 
         $config->set('app.debug', true);
 
-        TestResponse::mixin(new TestResponseMixin());
+        if (class_exists('Illuminate\Testing\TestResponse')) {
+            \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());
+        } elseif (class_exists('Illuminate\Foundation\Testing\TestResponse')) {
+            \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
+        }
     }
 
     /**
@@ -146,27 +149,11 @@ abstract class TestCase extends BaseTestCase
     protected function resolveApplicationExceptionHandler($app)
     {
         $app->singleton(ExceptionHandler::class, function () {
-            return new class implements ExceptionHandler {
-                public function report(Exception $e)
-                {
-                    //
-                }
-
-                public function render($request, Exception $e)
-                {
-                    throw $e;
-                }
-
-                public function renderForConsole($output, Exception $e)
-                {
-                    //
-                }
-
-                public function shouldReport(Exception $e)
-                {
-                    return false;
-                }
-            };
+            if (AppVersion::atLeast(7.0)) {
+                return new Laravel7ExceptionHandler();
+            } else {
+                return new PreLaravel7ExceptionHandler();
+            }
         });
     }
 

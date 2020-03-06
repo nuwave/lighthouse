@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Tests\Utils\LaravelEnums\UserType;
 
 class CreateTestbenchUsersTable extends Migration
 {
@@ -21,7 +20,6 @@ class CreateTestbenchUsersTable extends Migration
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
-            $table->enum('type', UserType::getValues())->nullable();
             $table->timestamps();
         });
     }
