@@ -91,7 +91,8 @@ class CanDirectiveDBTest extends DBTestCase
             'data' => [
                 'user' => null,
             ],
-        ])->assertStatus(200);
+        ])->assertErrorCategory('graphql')
+            ->assertStatus(200);
     }
 
     public function testThrowsIfFindValueIsNotGiven(): void
@@ -127,7 +128,8 @@ class CanDirectiveDBTest extends DBTestCase
                     'message' => CanDirective::missingKeyToFindModel('some.path'),
                 ],
             ],
-        ]);
+        ])->assertErrorCategory('graphql')
+            ->assertStatus(200);
     }
 
     public function testFindUsingNestedInputWithDotNotation(): void
@@ -213,7 +215,8 @@ class CanDirectiveDBTest extends DBTestCase
                 title
             }
         }
-        ")->assertErrorCategory(AuthorizationException::CATEGORY);
+        ")->assertErrorCategory(AuthorizationException::CATEGORY)
+            ->assertStatus(200);
     }
 
     public function testCanHandleMultipleModels(): void
