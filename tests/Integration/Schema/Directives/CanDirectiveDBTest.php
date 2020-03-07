@@ -124,7 +124,6 @@ class CanDirectiveDBTest extends DBTestCase
         ')->assertJson([
             'errors' => [
                 [
-
                     'message' => CanDirective::missingKeyToFindModel('some.path'),
                 ],
             ],
