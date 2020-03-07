@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Tests\DBTestCase;
@@ -77,14 +76,22 @@ class CanDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->expectException(ModelNotFoundException::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
             user(id: "not-present") {
                 name
             }
         }
-        ');
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => 'No query results for model [Tests\Utils\Models\User] not-present',
+                ],
+            ],
+            'data' => [
+                'user' => null,
+            ],
+        ])->assertStatus(200);
     }
 
     public function testThrowsIfFindValueIsNotGiven(): void
