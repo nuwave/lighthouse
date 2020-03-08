@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective;
 use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
+use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -40,19 +41,19 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory  $typedArgs
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory  $argumentSetFactory
      * @return void
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
-        ArgumentSetFactory $typedArgs
+        ArgumentSetFactory $argumentSetFactory
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
-        $this->argumentSetFactory = $typedArgs;
+        $this->argumentSetFactory = $argumentSetFactory;
     }
 
     /**
@@ -73,13 +74,14 @@ class FieldFactory
             $fieldValue = $fieldValue->useDefaultResolver();
         }
 
-        $fieldMiddleware = (new Collection([
-            SanitizeDirective::make(),
-            ValidateDirective::make(),
-            TransformArgsDirective::make(),
-        ]))->concat(
-            $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
-        );
+        $fieldMiddleware = $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
+            // Middleware resolve in reversed order
+            ->push(app(RenameArgsDirective::class))
+            ->push(app(SpreadDirective::class))
+            ->push(app(TransformArgsDirective::class))
+            ->push(app(ValidateDirective::class))
+            ->push(app(SanitizeDirective::class))
+        ;
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
@@ -92,19 +94,9 @@ class FieldFactory
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
-                $argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+                $resolveInfo->argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
 
-                $modifiedArgumentSet = $argumentSet
-                    ->spread()
-                    ->rename();
-                $resolveInfo->argumentSet = $modifiedArgumentSet;
-
-                return $resolverWithMiddleware(
-                    $root,
-                    $modifiedArgumentSet->toArray(),
-                    $context,
-                    $resolveInfo
-                );
+                return $resolverWithMiddleware($root, $args, $context, $resolveInfo);
             }
         );
 

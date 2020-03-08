@@ -226,11 +226,11 @@ trait MakesGraphQLRequests
     /**
      * Assert that a given validation error is present in the response.
      *
-     * @param TestResponse $response
-     * @param string       $key
-     * @param string       $message
+     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $response
+     * @param  string  $key
+     * @param  string  $message
      */
-    public function assertValidationError(TestResponse $response, string $key, string $message)
+    public function assertValidationError($response, string $key, string $message)
     {
         $response->assertJson([
             'errors' => [

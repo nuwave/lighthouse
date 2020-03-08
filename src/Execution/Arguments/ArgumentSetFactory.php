@@ -144,8 +144,7 @@ class ArgumentSetFactory
      */
     protected function wrapWithType($valueOrValues, $type)
     {
-
-        // We have to do this conversion here and not in the TypeNodeConverter,
+        // We have to do this conversion as we are resolving a client query
         // because the incoming arguments put a bound on recursion depth
         if ($type instanceof ListType) {
             $typeInList = $type->type;

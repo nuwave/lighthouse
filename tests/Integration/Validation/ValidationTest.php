@@ -104,21 +104,31 @@ class ValidationTest extends DBTestCase
 
     public function testValidatesDifferentPathsIndividually(): void
     {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: String @rules(apply: ["email"])
+                input: [BazInput]
+            ): ID @mock
+        }
+
+        input BazInput {
+            baz: String @rules(apply: ["email"])
+            input: BazInput
+        }
+        ';
+
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
             foo(
+                bar: "invalid email"
                 input: [
                     {
-                        foobar: 123
+                        baz: "invalid email"
                     }
                     {
-                        self: {
-                            foobar: 12
-                        }
-                    }
-                    {
-                        withRequired: {
-                            barbaz: 23
+                        input: {
+                            baz: "invalid email"
                         }
                     }
                 ]
@@ -128,24 +138,55 @@ class ValidationTest extends DBTestCase
 
         $this->assertValidationKeysSame(
             [
-                'required',
-                'input.0.foobar',
-                'input.1.self.foobar',
-                'input.2.withRequired.invalidDefault',
-                'input.2.withRequired.required',
+                'bar',
+                'input.0.baz',
+                'input.1.input.baz',
             ],
             $result
         );
     }
 
-    public function testValidatesList(): void
+    public function testValidatesListSize(): void
     {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                list: [String]
+                    @rulesForArray(apply: ["max:2"])
+            ): ID
+        }
+        ';
+
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(
+                list: []
+            )
+        }
+        ');
+
+        $this->assertValidationKeysSame([
+            'list',
+        ], $result);
+    }
+
+    public function testValidatesListContents(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                list: [String]
+                    @rules(apply: ["required", "email"])
+            ): ID
+        }
+        ';
+
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
             foo(
                 list: [
-                    "valid_email@example.com"
                     null
+                    "valid_email@example.com"
                     "invalid_email"
                 ]
             )
@@ -153,21 +194,28 @@ class ValidationTest extends DBTestCase
         ');
 
         $this->assertValidationKeysSame([
-            'required',
-            'list',
-            'list.1',
+            'list.0',
             'list.2',
         ], $result);
     }
 
     public function testValidatesInputCount(): void
     {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                list: [String]
+                    @rulesForArray(apply: ["max:2"])
+            ): ID
+        }
+        ';
+
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
             foo(
                 stringList: [
                     "asdf",
-                    "one too many"
+                    "one too many",
                 ]
                 input: [{
                     foobar: 1
@@ -177,7 +225,6 @@ class ValidationTest extends DBTestCase
         ');
 
         $this->assertValidationKeysSame([
-            'required',
             'stringList',
             'input',
         ], $result);
@@ -331,16 +378,20 @@ class ValidationTest extends DBTestCase
 
     public function testCombinesMultipleRules(): void
     {
-        $this->markTestSkipped('
-        This should work once we can reliably depend upon repeatable directives.
-        As of now, the rules of the second @rules directive are not considered
-        and Lighthouse uses those of the first directive.
-        ');
+        $this->markTestSkipped(<<<'REASON'
+This should work once we can reliably depend upon repeatable directives.
+As of now, the rules of the second @rules directive are not considered
+and Lighthouse uses those of the first directive.
+
+REASON
+);
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             createUser(
-                foo: String @rules(apply: ["max:5"]) @rules(apply: ["min:4"])
+                foo: String
+                    @rules(apply: ["max:5"])
+                    @rules(apply: ["min:4"])
             ): User
                 @create
         }

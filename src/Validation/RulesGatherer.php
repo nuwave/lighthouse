@@ -36,7 +36,8 @@ class RulesGatherer
     {
         $this->gatherRulesFromProviders($argumentSet, $argumentSet->directives, $argumentPath);
 
-        foreach ($argumentSet->argumentsWithUndefined() as $name => $argument) {
+        $argumentsWithUndefined = $argumentSet->argumentsWithUndefined();
+        foreach ($argumentsWithUndefined as $name => $argument) {
             $nestedPath = array_merge($argumentPath, [$name]);
 
             $directivesForArray = $argument->directives->filter(
@@ -100,11 +101,13 @@ class RulesGatherer
 
     protected function wrap(array $rulesOrMessages, array $path)
     {
-        $pathDotNotation = $this->pathDotNotation($path);
         $withPath = [];
 
         foreach ($rulesOrMessages as $key => $value) {
-            $withPath["$pathDotNotation.$key"] = $value;
+            $combinedPath = array_merge($path, [$key]);
+            $pathDotNotation = $this->pathDotNotation($combinedPath);
+
+            $withPath[$pathDotNotation] = $value;
         }
 
         return $withPath;

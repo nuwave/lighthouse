@@ -265,21 +265,4 @@ abstract class BaseDirective implements Directive
             }
         );
     }
-
-    /**
-     * @param  string  $validatorCandidate
-     *
-     * @return string
-     * @throws DefinitionException
-     */
-    protected function inputValidatorClass(string $validatorCandidate): string
-    {
-        return $this->namespaceClassName(
-            $validatorCandidate,
-            (array) config('lighthouse.namespaces.validators'),
-            function (string $classCandidate): bool {
-                return is_subclass_of($classCandidate, InputValidator::class);
-            }
-        );
-    }
 }

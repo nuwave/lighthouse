@@ -17,11 +17,6 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    public static function make(): self
-    {
-        return app(static::class);
-    }
-
     /**
      * Resolve the field directive.
      *

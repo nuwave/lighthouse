@@ -38,11 +38,6 @@ directive @validate on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public static function make(): self
-    {
-        return app(self::class);
-    }
-
     /**
      * Resolve the field directive.
      *

@@ -10,16 +10,15 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class SpreadDirective extends BaseDirective implements ArgDirective, FieldMiddleware, DefinedDirective
+class RenameArgsDirective extends BaseDirective implements ArgDirective, FieldMiddleware, DefinedDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Merge the fields of a nested input object into the arguments of its parent
-when processing the field arguments given by a client.
+Apply the @rename directives on the incoming arguments.
 """
-directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @renameArgs on FIELD_DEFINITION
 SDL;
     }
 
@@ -30,7 +29,7 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $resolveInfo->argumentSet->spread();
+                    $resolveInfo->argumentSet = $resolveInfo->argumentSet->rename();
 
                     return $resolver(
                         $root,
