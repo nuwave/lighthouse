@@ -82,14 +82,14 @@ SDL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        if(! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
+        if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
             throw new DefinitionException();
         }
 
-        if($this->directiveHasArgument('class')) {
+        if ($this->directiveHasArgument('class')) {
             $classCandidate = $this->directiveArgValue('class');
         } else {
-            $classCandidate = $typeDefinition->name->value . 'Validator';
+            $classCandidate = $typeDefinition->name->value.'Validator';
         }
 
         $this->setFullClassnameOnDirective($typeDefinition, $classCandidate);
@@ -100,13 +100,13 @@ SDL;
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType
     ) {
-        if($this->directiveHasArgument('class')) {
+        if ($this->directiveHasArgument('class')) {
             $classCandidate = $this->directiveArgValue('class');
         } else {
             $classCandidate = $parentType->name->value
-                . '\\'
-                . ucfirst($fieldDefinition->name->value)
-                . 'Validator';
+                .'\\'
+                .ucfirst($fieldDefinition->name->value)
+                .'Validator';
         }
 
         $this->setFullClassnameOnDirective($fieldDefinition, $classCandidate);

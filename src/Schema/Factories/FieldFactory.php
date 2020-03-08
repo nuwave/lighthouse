@@ -80,8 +80,7 @@ class FieldFactory
             ->push(app(SpreadDirective::class))
             ->push(app(TransformArgsDirective::class))
             ->push(app(ValidateDirective::class))
-            ->push(app(SanitizeDirective::class))
-        ;
+            ->push(app(SanitizeDirective::class));
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)

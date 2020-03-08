@@ -20,7 +20,6 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
-use Nuwave\Lighthouse\Validation\InputValidator;
 
 abstract class BaseDirective implements Directive
 {
