@@ -20,10 +20,6 @@ class LaravelEnumTypeDBTest extends DBTestCase
     {
         parent::setUp();
 
-        if (AppVersion::atLeast(7.0)) {
-            $this->markTestSkipped('TODO remove this once bensampo/laravel-enum supports Laravel 7');
-        }
-
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
 
