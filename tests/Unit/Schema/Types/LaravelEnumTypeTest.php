@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Types;
 
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
-use Nuwave\Lighthouse\Support\AppVersion;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\Utils\LaravelEnums\AOrB;
