@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
-- Using `@can` no longer throws `ModelNotFoundException` when model is not found. Instead the object returns as null, and a GraphQL error is sent. Status code is also changed to 200.
+### Changes
+
+- Throw user readable `Error` instead of `ModelNotFoundException` when model is not found in `@can` https://github.com/nuwave/lighthouse/pull/1225
 
 ## 4.10.1
 
