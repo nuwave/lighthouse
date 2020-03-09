@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Throw user readable `Error` instead of `ModelNotFoundException` when model is not found in `@can` https://github.com/nuwave/lighthouse/pull/1225
+
 ## 4.10.1
 
 ### Fixed
