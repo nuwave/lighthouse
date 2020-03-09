@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Types;
 
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
-use Nuwave\Lighthouse\Support\AppVersion;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\Utils\LaravelEnums\AOrB;
@@ -20,10 +19,6 @@ class LaravelEnumTypeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        if (AppVersion::atLeast(7.0)) {
-            $this->markTestSkipped('TODO remove this once bensampo/laravel-enum supports Laravel 7');
-        }
 
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }

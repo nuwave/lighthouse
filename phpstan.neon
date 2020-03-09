@@ -1,6 +1,6 @@
 includes:
 - vendor/nunomaduro/larastan/extension.neon
-#- vendor/bensampo/laravel-enum/extension.neon
+- vendor/bensampo/laravel-enum/extension.neon
 parameters:
   level: 1
   paths:
@@ -13,12 +13,6 @@ parameters:
   - %rootDir%/../../../tests/TestCase.php
   - %rootDir%/../../../tests/Laravel7ExceptionHandler.php
   - %rootDir%/../../../tests/PreLaravel7ExceptionHandler.php
-  # Workaround until bensampo/laravel-enum support Laravel 7
-  - %rootDir%/../../../src/Schema/Types/LaravelEnumType.php
-  - %rootDir%/../../../tests/Unit/Schema/Types/LaravelEnumTypeTest.php
-  - %rootDir%/../../../tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
-  - %rootDir%/../../../tests/Utils/Models/WithEnum.php
-  - %rootDir%/../../../tests/Utils/LaravelEnums/*
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
