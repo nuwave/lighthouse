@@ -106,6 +106,8 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        \GraphQL\GraphQL::useExperimentalExecutor();
+
         $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
