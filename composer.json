@@ -45,7 +45,7 @@
         "nunomaduro/larastan": "^0.4.3 || ^0.5.2",
         "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
         "orchestra/testbench": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
-        "phpbench/phpbench": "^0.17",
+        "phpbench/phpbench": "^0.16",
         "phpunit/phpunit": "^6.5 || ^7.5 || ^8.4",
         "pusher/pusher-php-server": "^3.2"
     },
