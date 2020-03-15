@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `AttemptAuthentication` middleware to optionally log in users on the GraphQL endpoint
+
 ## 4.10.2
 
 ### Fixed
