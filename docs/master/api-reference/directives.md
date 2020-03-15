@@ -2303,7 +2303,7 @@ Works very similar to the [`@delete`](#delete) directive.
 
 ```graphql
 """
-Validate an argument or input type using [Laravel validation](https://laravel.com/docs/validation).
+Validate an argument using [Laravel validation](https://laravel.com/docs/validation).
 """
 directive @rules(
   """
@@ -2322,11 +2322,6 @@ directive @rules(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: [RulesMessageMap!]
-
-  """
-  Specify the validator that should be used to validate a given input type.
-  """
-  validator: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT
 ```
 
@@ -2341,20 +2336,6 @@ type Query {
 ```
 
 ## @rulesForArray
-
-Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
-
-```graphql
-type Mutation {
-  saveIcecream(
-    flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])
-  ): Icecream
-}
-```
-
-Read more in the [validation docs](../security/validation.md#validating-arrays).
-
-### Definition
 
 ```graphql
 """
@@ -2376,6 +2357,18 @@ directive @rulesForArray(
   messages: [RulesMessageMap!]
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
+
+This is typically used to assert a certain number of elements is given in a list.
+
+```graphql
+type Mutation {
+  saveIcecream(
+    flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])
+  ): Icecream
+}
+```
+
+Read more in the [validation docs](../security/validation.md#validating-arrays).
 
 ## @scalar
 
