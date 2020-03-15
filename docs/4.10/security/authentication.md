@@ -1,12 +1,11 @@
 # Authentication
 
+You can use [standard Laravel mechanisms](https://laravel.com/docs/authentication)
+to authenticate users of your GraphQL API. Stateless guards are recommended for most use cases.
+
 ## Global
 
-You can use standard Laravel mechanisms to authenticate users of your GraphQL API.
 Just add middleware trough your `lighthouse.php` configuration.
-The [API Authentication](https://laravel.com/docs/api-authentication) is especially
-suited because of its stateless nature.
-
 As all GraphQL requests are served at a single HTTP endpoint, this will guard your
 entire API against unauthenticated users.
 
