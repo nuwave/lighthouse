@@ -16,15 +16,6 @@ class User extends Authenticatable
      */
     protected $guarded = [];
 
-    public function getTaskCountAsString(): string
-    {
-        if (! $this->relationLoaded('tasks')) {
-            return 'This relation should have been preloaded via @with';
-        }
-
-        return "User has {$this->tasks->count()} tasks.";
-    }
-
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -77,5 +68,19 @@ class User extends Authenticatable
     public function scopeNamed(Builder $query): Builder
     {
         return $query->whereNotNull('name');
+    }
+
+    public function tasksLoaded(): bool
+    {
+        return $this->relationLoaded('tasks');
+    }
+
+    public function postsCommentsLoaded(): bool
+    {
+        return $this->relationLoaded('posts')
+            && $this
+                ->posts
+                ->first()
+                ->relationLoaded('comments');
     }
 }
