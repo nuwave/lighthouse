@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -46,6 +47,11 @@ directive @delete(
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
+    }
+
+    public static function couldNotDelete(Model $user): string
+    {
+        return 'Could not delete model ' . get_class($user) . ' with ID ' . $user->getKey() . '.';
     }
 
     /**
@@ -100,8 +106,6 @@ SDL;
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
-
-                $relation->delete();
             }
         } else {
             $related = $relation->make();
