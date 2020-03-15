@@ -44,8 +44,8 @@ class WithDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'tasksLoaded' => true,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -68,7 +68,7 @@ class WithDirectiveTest extends DBTestCase
         $posts = factory(Post::class, 2)->create([
             'user_id' => $user->id,
         ]);
-        foreach($posts as $post) {
+        foreach ($posts as $post) {
             factory(Comment::class)->create([
                 'post_id' => $post->id,
                 'user_id' => $user->id,
