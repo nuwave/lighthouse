@@ -16,9 +16,9 @@ use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
@@ -128,18 +128,14 @@ SDL;
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
-                function (Directive $directive): bool {
-                    return $directive instanceof ForceDeleteDirective;
-                }
+                Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
                 $queryBuilder->withTrashed();
             }
 
             $directivesContainsRestore = $argumentSet->directives->contains(
-                function (Directive $directive): bool {
-                    return $directive instanceof RestoreDirective;
-                }
+                Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
                 $queryBuilder->onlyTrashed();
@@ -150,9 +146,7 @@ SDL;
                     ->enhanceBuilder(
                         $queryBuilder,
                         [],
-                        function (Directive $directive): bool {
-                            return $directive instanceof TrashedDirective;
-                        }
+                        Utils::instanceofMatcher(TrashedDirective::class)
                     )
                     ->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {
