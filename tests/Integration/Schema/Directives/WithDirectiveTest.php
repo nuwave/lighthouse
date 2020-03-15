@@ -93,6 +93,6 @@ class WithDirectiveTest extends DBTestCase
                     'postsCommentsLoaded' => true,
                 ],
             ],
-      ]);
+        ]);
     }
 }
