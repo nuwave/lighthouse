@@ -2314,7 +2314,7 @@ directive @rules(
   Rules that mutate the incoming arguments, such as `exclude_if`, are not supported
   by Lighthouse. Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
   """
-  apply: [String!]
+  apply: [String!]!
 
   """
   Specify the messages to return if the validators fail.
@@ -2322,7 +2322,7 @@ directive @rules(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: [RulesMessageMap!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 For example, this rule ensures that users pass a valid 2 character country code:

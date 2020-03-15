@@ -2,78 +2,19 @@
 
 namespace Tests\Integration\Validation;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Tests\DBTestCase;
-use Tests\Utils\Queries\Foo;
+use Tests\TestCase;
 
-class ValidationTest extends DBTestCase
+/**
+ * Covers fundamentals of the validation process.
+ */
+class ValidationTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
-    type Query {
-        foo(
-            email: String = "hans@peter.rudolf" @rules(apply: ["email"])
-            required: String @rules(apply: ["required"])
-            stringList: [String!] @rulesForArray(apply: ["array", "max:1"])
-            input: [Bar] @rulesForArray(apply: ["min:3"])
-            list: [String]
-                @rules(apply: ["required", "email"])
-                @rulesForArray(apply: ["max:2"])
-        ): Int
-
-        password(
-            id: String
-            password: String
-                @trim
-                @rules(apply: ["min:6", "max:20", "required_with:id"])
-                @hash
-            bar: Bar
-                @rules(apply: ["required_if:id,bar"])
-        ): String @field(resolver: "Tests\\\\Integration\\\\Validation\\\\ValidationTest@resolvePassword")
-
-        email(
-            userId: ID!
-            email: Email!
-        ): String @field(resolver: "Tests\\\\Integration\\\\Validation\\\\ValidationTest@resolveEmail")
-    }
-
-    input Email {
-        emailAddress: String! @rules(apply: ["email"])
-        business: Boolean @rules(apply: ["required"])
-    }
-
-    input Bar {
-        foobar: Int @rules(apply: ["integer", "max:10"])
-        self: Bar
-        withRequired: Baz
-        optional: String
-    }
-
-    input Baz {
-        barbaz: Int
-        invalidDefault: String = "invalid-mail" @rules(apply: ["email"])
-        required: Int @rules(apply: ["required"])
-    }
-    ';
-
-    /**
-     * @param  mixed  $root
-     * @param  mixed[]  $args
-     * @return string
-     */
-    public function resolvePassword($root, array $args): string
+    protected function getEnvironmentSetUp($app)
     {
-        return $args['password'] ?? 'no-password';
-    }
+        parent::getEnvironmentSetUp($app);
 
-    /**
-     * @param  mixed  $root
-     * @param  mixed[]  $args
-     * @return string
-     */
-    public function resolveEmail($root, array $args): string
-    {
-        return Arr::get($args, 'email.emailAddress', 'no-email');
+        // Ensure we test for the result the end user receives
+        $app['config']->set('app.debug', false);
     }
 
     public function testRunsValidationBeforeCallingTheResolver(): void
@@ -90,16 +31,108 @@ class ValidationTest extends DBTestCase
         }
         ';
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
-        {
-            doNotCall
-        }
-        ');
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                doNotCall
+            }
+            ')
+            ->assertGraphQLValidationKeys(['bar']);
+    }
 
-        $this->assertValidationKeysSame(
-            ['bar'],
-            $response
-        );
+    public function testFullValidationError(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: String @rules(apply: ["required"])
+            ): Int
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertExactJson([
+                'errors' => [
+                    [
+                        'message' => 'Validation failed for the field [foo].',
+                        'extensions' => [
+                            'category' => 'validation',
+                            'validation' => [
+                                'bar' => [
+                                    'The bar field is required.',
+                                ],
+                            ],
+                        ],
+                        'locations' => [
+                            [
+                                'line' => 2,
+                                'column' => 17,
+                            ],
+                        ],
+                        'path' => ['foo'],
+                    ],
+                ],
+                'data' => [
+                    'foo' => null,
+                ],
+            ]);
+    }
+
+    public function testRunsOnNonRootFields(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Foo @mock
+        }
+
+        type Foo {
+            bar: Int
+            baz(
+                required: Int @rules(apply: ["required"])
+            ): Int
+        }
+        ';
+
+        $this->mockResolver([
+            'bar' => 123,
+            'baz' => 'Will not be returned',
+        ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo {
+                    bar
+                    baz
+                }
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => [
+                        'bar' => 123,
+                        'baz' => null,
+                    ],
+                ],
+                'errors' => [
+                    [
+                        'path' => ['foo'],
+                        'message' => 'Validation failed for the field [foo.baz].',
+                        'extensions' => [
+                            'validation' => [
+                                'required' => [
+                                    'The required field is required.',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     public function testValidatesDifferentPathsIndividually(): void
@@ -118,56 +151,29 @@ class ValidationTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(
-                bar: "invalid email"
-                input: [
-                    {
-                        baz: "invalid email"
-                    }
-                    {
-                        input: {
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    bar: "invalid email"
+                    input: [
+                        {
                             baz: "invalid email"
                         }
-                    }
-                ]
-            )
-        }
-        ');
-
-        $this->assertValidationKeysSame(
-            [
+                        {
+                            input: {
+                                baz: "invalid email"
+                            }
+                        }
+                    ]
+                )
+            }
+            ')
+            ->assertGraphQLValidationKeys([
                 'bar',
                 'input.0.baz',
                 'input.1.input.baz',
-            ],
-            $result
-        );
-    }
-
-    public function testValidatesListSize(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo(
-                list: [String]
-                    @rulesForArray(apply: ["max:2"])
-            ): ID
-        }
-        ';
-
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(
-                list: []
-            )
-        }
-        ');
-
-        $this->assertValidationKeysSame([
-            'list',
-        ], $result);
+            ]);
     }
 
     public function testValidatesListContents(): void
@@ -181,85 +187,41 @@ class ValidationTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(
-                list: [
-                    null
-                    "valid_email@example.com"
-                    "invalid_email"
-                ]
-            )
-        }
-        ');
-
-        $this->assertValidationKeysSame([
-            'list.0',
-            'list.2',
-        ], $result);
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    list: [
+                        null
+                        "valid_email@example.com"
+                        "invalid_email"
+                    ]
+                )
+            }
+            ')
+            ->assertGraphQLValidationKeys([
+                'list.0',
+                'list.2',
+            ]);
     }
 
-    public function testValidatesInputCount(): void
+    public function testSanitizeValidateTransform(): void
     {
+        $this->mockResolver(function ($root, array $args): string {
+            return $args['password'];
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo(
-                list: [String]
-                    @rulesForArray(apply: ["max:2"])
-            ): ID
+            password(
+                password: String
+                    @trim
+                    @rules(apply: ["min:6", "max:20", "required_with:id"])
+                    @hash
+            ): String @mock
         }
         ';
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(
-                stringList: [
-                    "asdf",
-                    "one too many",
-                ]
-                input: [{
-                    foobar: 1
-                }]
-            )
-        }
-        ');
-
-        $this->assertValidationKeysSame([
-            'stringList',
-            'input',
-        ], $result);
-
-        $this->assertTrue(
-            Str::endsWith(
-                $result->jsonGet('errors.0.extensions.validation.stringList.0'),
-                'may not have more than 1 items.'
-            )
-        );
-
-        $this->assertTrue(
-            Str::endsWith(
-                $result->jsonGet('errors.0.extensions.validation.input.0'),
-                'must have at least 3 items.'
-            ),
-            'Validate size as an array by prepending the rules with the "array" validation'
-        );
-    }
-
-    public function testPassesIfNothingRequiredIsMissing(): void
-    {
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo(required: "foo")
-        }
-        ')->assertJson([
-            'data' => [
-                'foo' => Foo::THE_ANSWER,
-            ],
-        ]);
-    }
-
-    public function testEvaluatesArgDirectivesInDefinitionOrder(): void
-    {
         $validPasswordResult = $this->graphQL(/** @lang GraphQL */ '
         {
             password(password: " 1234567 ")
@@ -270,176 +232,85 @@ class ValidationTest extends DBTestCase
         $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
 
-        $invalidPasswordResult = $this->graphQL(/** @lang GraphQL */ '
-        {
-            password(password: " 1234 ")
-        }
-        ')->assertJson([
-            'data' => [
-                'password' => null,
-            ],
-        ]);
-
-        $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                password(password: " 1234 ")
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'password' => null,
+                ],
+            ])
+            ->assertGraphQLValidationKeys(['password']);
     }
 
-    public function testEvaluatesConditionalValidation(): void
+    public function testValidatesRulesOnInputObjectFields(): void
     {
-        $validPasswordResult = $this->graphQL(/** @lang GraphQL */ '
-        {
-            password
-        }
-        ');
-
-        $this->assertSame('no-password', $validPasswordResult->jsonGet('data.password'));
-
-        $invalidPasswordResult = $this->graphQL(/** @lang GraphQL */ '
-        {
-            password(id: "foo")
-        }
-        ')->assertJson([
-            'data' => [
-                'password' => null,
-            ],
-        ]);
-
-        $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
-    }
-
-    public function testEvaluatesInputArgValidation(): void
-    {
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        {
-            password(id: "bar", password: "123456")
-        }
-        ')->assertJson([
-            'data' => [
-                'password' => null,
-            ],
-        ]);
-
-        $this->assertValidationKeysSame(['bar'], $result);
-    }
-
-    public function testEvaluatesNonNullInputArgValidation(): void
-    {
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            email(
-                userId: 1
-                email: {
-                    emailAddress: "john@doe.com"
-                    business: true
-                }
-            )
-        }
-        ')->assertJson([
-            'data' => [
-                'email' => 'john@doe.com',
-            ],
-        ]);
-
-        $invalidEmailResult = $this->graphQL(/** @lang GraphQL */ '
-        {
-            email(
-                userId: 1
-                email: {
-                    emailAddress: "invalid_email_address"
-                }
-            )
-        }
-        ')->assertJson([
-            'data' => [
-                'email' => null,
-            ],
-        ]);
-        $this->assertValidationKeysSame([
-            'email.emailAddress',
-            'email.business',
-        ], $invalidEmailResult);
-    }
-
-    public function testErrorsIfSomethingRequiredIsMissing(): void
-    {
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertJson([
-            'data' => [
-                'foo' => null,
-            ],
-        ]);
-
-        $this->assertValidationKeysSame([
-            'required',
-        ], $result);
-    }
-
-    public function testCombinesMultipleRules(): void
-    {
-        $this->markTestSkipped(<<<'REASON'
-This should work once we can reliably depend upon repeatable directives.
-As of now, the rules of the second @rules directive are not considered
-and Lighthouse uses those of the first directive.
-
-REASON
-);
-
-        $this->schema .= /** @lang GraphQL */ '
-        type Mutation {
-            createUser(
-                foo: String
-                    @rules(apply: ["max:5"])
-                    @rules(apply: ["min:4"])
-            ): User
-                @create
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                input: FooInput
+            ): Int
         }
 
-        type User {
-            id: ID
-            name: String
+        input FooInput {
+            email: String @rules(apply: ["email"])
         }
         ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        email: "invalid email"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationKeys(['input.email']);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        email: "valid@email.com"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
     }
 
     public function testCombinesArgumentValidationWhenGrouped(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type Mutation {
-            withMergedRules(
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
                 bar: String
-                    @rules(apply: ["min:1"])
-                    @customRules(apply: ["bool"])
-            ): User @create
-        }
-
-        type User {
-            id: ID
-            name: String
+                    @rules(apply: ["min:2"])
+                    @customRules(apply: ["max:3"])
+            ): Int
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            withMergedRules(bar: "abcdefghijk") {
-                name
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(bar: "f")
             }
-        }
-        ')->assertJsonCount(1, 'errors.0.extensions.validation.bar');
-    }
+            ')
+            ->assertGraphQLValidationError('bar', 'The bar must be at least 2 characters.');
 
-    /**
-     * Assert that the returned result contains an exactly defined array of validation keys.
-     *
-     * @param  array  $keys
-     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $result
-     * @return void
-     */
-    protected function assertValidationKeysSame(array $keys, $result): void
-    {
-        $validation = $result->jsonGet('errors.0.extensions.validation');
-
-        $this->assertSame($keys, array_keys($validation));
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(bar: "fasdf")
+            }
+            ')
+            ->assertGraphQLValidationError('bar', 'The bar may not be greater than 3 characters.');
     }
 }

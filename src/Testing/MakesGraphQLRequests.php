@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Useful helpers for PHPUnit testing.
+ * Testing helpers for making requests to the GraphQL endpoint.
  *
  * @mixin \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
  */
@@ -204,46 +204,5 @@ trait MakesGraphQLRequests
         app()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;
         });
-    }
-
-    /**
-     * Assert that a given validation error is present in the response.
-     *
-     * @param TestResponse $response
-     * @param string       $key
-     */
-    public function assertMissingValidationError(TestResponse $response, string $key)
-    {
-        $validation = $response->json('errors.0.extensions.validation') ?? [];
-
-        $this->assertArrayNotHasKey(
-            $key,
-            $validation,
-            'Failed asserting that the response is missing a validation error for '.$key
-        );
-    }
-
-    /**
-     * Assert that a given validation error is present in the response.
-     *
-     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $response
-     * @param  string  $key
-     * @param  string  $message
-     */
-    public function assertValidationError($response, string $key, string $message)
-    {
-        $response->assertJson([
-            'errors' => [
-                [
-                    'extensions' => [
-                        'validation' => [
-                            $key => [
-                                $message,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
     }
 }

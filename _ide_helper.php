@@ -9,7 +9,40 @@ namespace Illuminate\Foundation\Testing {
          * @param  string  $category
          * @return $this
          */
-        public function assertErrorCategory(string $category): self
+        public function assertGraphQLErrorCategory(string $category): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that the returned result contains an exactly defined array of validation keys.
+         *
+         * @param  array  $keys
+         * @return $this
+         */
+        public function assertGraphQLValidationKeys(array $keys): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that a given validation error is present in the response.
+         *
+         * @param  string  $key
+         * @param  string  $message
+         * @return $this
+         */
+        public function assertGraphQLValidationError(string $key, string $message): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that no validation errors are present in the response.
+         *
+         * @return $this
+         */
+        public function assertGraphQLValidationPasses(): self
         {
             return $this;
         }
@@ -35,7 +68,40 @@ namespace Illuminate\Testing {
          * @param  string  $category
          * @return $this
          */
-        public function assertErrorCategory(string $category): self
+        public function assertGraphQLErrorCategory(string $category): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that the returned result contains an exactly defined array of validation keys.
+         *
+         * @param  array  $keys
+         * @return $this
+         */
+        public function assertGraphQLValidationKeys(array $keys): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that a given validation error is present in the response.
+         *
+         * @param  string  $key
+         * @param  string  $message
+         * @return $this
+         */
+        public function assertGraphQLValidationError(string $key, string $message): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that no validation errors are present in the response.
+         *
+         * @return $this
+         */
+        public function assertGraphQLValidationPasses(): self
         {
             return $this;
         }

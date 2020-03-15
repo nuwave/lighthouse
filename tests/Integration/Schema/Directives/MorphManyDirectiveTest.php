@@ -354,7 +354,7 @@ class MorphManyDirectiveTest extends DBTestCase
                     'images' => null,
                 ],
             ],
-        ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     public function testCanQueryMorphManyPaginatorWithADefaultCount(): void

@@ -7,6 +7,8 @@ use Illuminate\Contracts\Validation\Validator;
 
 class ValidationException extends Exception implements RendersErrorsExtensions
 {
+    const CATEGORY = 'validation';
+
     /**
      * @var \Illuminate\Contracts\Validation\Validator
      */
@@ -36,7 +38,7 @@ class ValidationException extends Exception implements RendersErrorsExtensions
      */
     public function getCategory()
     {
-        return 'validation';
+        return self::CATEGORY;
     }
 
     /**

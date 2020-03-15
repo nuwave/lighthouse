@@ -88,12 +88,15 @@ class RulesGatherer
     public function extractRulesAndMessages(ProvidesRules $providesRules, array $argumentPath)
     {
         $rules = $providesRules->rules();
-        // We might be passed just the rules for a single field, without any
-        // field names. In this case, we just add on the path. When we have an
-        // associative array of rules, the path is prepended to every key.
-        $this->rules += isset($rules[0])
+
+        $inputToRules = isset($rules[0])
+            // We might be passed just the rules for a single field, without any
+            // field names. In this case, we just add on the path.
             ? [$this->pathDotNotation($argumentPath) => $rules]
+            // When we have an associative array of rules, the path is prepended to every key.
             : $this->wrap($rules, $argumentPath);
+
+        $this->rules = array_merge_recursive($this->rules, $inputToRules);
 
         $messages = $providesRules->messages();
         $this->messages += $this->wrap($messages, $argumentPath);
