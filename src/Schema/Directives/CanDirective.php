@@ -134,7 +134,7 @@ SDL;
             }
 
             $directivesContainsRestore = $argumentSet->directives->contains(
-                Utils::instanceofMatcher(ForceDeleteDirective::class)
+                Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
                 $queryBuilder->onlyTrashed();

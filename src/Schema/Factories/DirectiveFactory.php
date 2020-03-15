@@ -103,36 +103,6 @@ class DirectiveFactory
     }
 
     /**
-     * @param  string  $directiveName
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    protected function createOrFail(string $directiveName): Directive
-    {
-        if (! $this->directiveNamespaces) {
-            $this->directiveNamespaces = $this->directiveNamespacer->gather();
-        }
-
-        foreach ($this->directiveNamespaces as $baseNamespace) {
-            $className = $baseNamespace.'\\'.static::className($directiveName);
-            if (class_exists($className)) {
-                $directive = app($className);
-
-                if (! $directive instanceof Directive) {
-                    throw new DirectiveException("Class $className is not a directive.");
-                }
-
-                $this->addResolved($directiveName, $className);
-
-                return $directive;
-            }
-        }
-
-        throw new DirectiveException("No directive found for `{$directiveName}`");
-    }
-
-    /**
      * Returns the expected class name for a directive name.
      *
      * @param  string  $directiveName
