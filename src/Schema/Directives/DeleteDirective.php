@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -51,7 +50,7 @@ SDL;
 
     public static function couldNotDelete(Model $user): string
     {
-        return 'Could not delete model ' . get_class($user) . ' with ID ' . $user->getKey() . '.';
+        return 'Could not delete model '.get_class($user).' with ID '.$user->getKey().'.';
     }
 
     /**
