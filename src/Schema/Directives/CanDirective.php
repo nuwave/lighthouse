@@ -7,6 +7,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -139,13 +140,17 @@ SDL;
                 $queryBuilder->onlyTrashed();
             }
 
-            $modelOrModels = $argumentSet
-                ->enhanceBuilder(
-                    $queryBuilder,
-                    [],
-                    Utils::instanceofMatcher(TrashedDirective::class)
-                )
-                ->findOrFail($findValue);
+            try {
+                $modelOrModels = $argumentSet
+                    ->enhanceBuilder(
+                        $queryBuilder,
+                        [],
+                        Utils::instanceofMatcher(TrashedDirective::class)
+                    )
+                    ->findOrFail($findValue);
+            } catch (ModelNotFoundException $exception) {
+                throw new Error($exception->getMessage());
+            }
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];

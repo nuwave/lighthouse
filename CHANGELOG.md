@@ -15,6 +15,25 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `AttemptAuthentication` middleware to optionally log in users and delegate access guards
+  to the field level https://github.com/nuwave/lighthouse/pull/1197
+
+### Fixed
+
+- Eager load nested relations using the `@with` directive https://github.com/nuwave/lighthouse/pull/1068 
+
+## 4.10.2
+
+### Fixed
+
+- Ensure subscription routes are named uniquely https://github.com/nuwave/lighthouse/pull/1231
+
+### Changed
+
+- Throw user readable `Error` instead of `ModelNotFoundException` when model is not found in `@can` https://github.com/nuwave/lighthouse/pull/1225
+
 ## 4.10.1
 
 ### Fixed
