@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 
 class DirectiveFactory
 {
@@ -61,49 +62,40 @@ class DirectiveFactory
      */
     public function create(string $directiveName): Directive
     {
-        return $this->resolve($directiveName)
-            ?? $this->createOrFail($directiveName);
+        $directiveClass = $this->resolve($directiveName);
+
+        return app($directiveClass);
     }
 
     /**
-     * Create a directive from resolved directive classes.
+     * Resolve the class for a given directive name.
      *
      * @param  string  $directiveName
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive|null
-     */
-    protected function resolve(string $directiveName): ?Directive
-    {
-        if ($className = Arr::get($this->resolvedClassnames, $directiveName)) {
-            return app($className);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param  string  $directiveName
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive
+     * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    protected function createOrFail(string $directiveName): Directive
+    protected function resolve(string $directiveName): string
     {
+        if ($directiveClass = Arr::get($this->resolvedClassnames, $directiveName)) {
+            return $directiveClass;
+        }
+
         if (! $this->directiveNamespaces) {
             $this->directiveNamespaces = $this->directiveNamespacer->gather();
         }
 
         foreach ($this->directiveNamespaces as $baseNamespace) {
-            $className = $baseNamespace.'\\'.static::className($directiveName);
-            if (class_exists($className)) {
-                $directive = app($className);
+            $directiveClass = $baseNamespace.'\\'.static::className($directiveName);
 
-                if (! $directive instanceof Directive) {
-                    throw new DirectiveException("Class $className is not a directive.");
+            if (class_exists($directiveClass)) {
+                if (! is_a($directiveClass, Directive::class, true)) {
+                    throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
 
-                $this->addResolved($directiveName, $className);
+                $this->addResolved($directiveName, $directiveClass);
 
-                return $directive;
+                return $directiveClass;
             }
         }
 
@@ -191,9 +183,7 @@ class DirectiveFactory
     {
         return $this
             ->createAssociatedDirectives($node)
-            ->filter(function (Directive $directive) use ($directiveClass): bool {
-                return $directive instanceof $directiveClass;
-            });
+            ->filter(Utils::instanceofMatcher($directiveClass));
     }
 
     /**

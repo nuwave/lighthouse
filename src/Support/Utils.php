@@ -110,4 +110,17 @@ class Utils
             class_uses_recursive($class)
         );
     }
+
+    /**
+     * Construct a callback that checks if its input is a given class.
+     *
+     * @param  string  $classLike
+     * @return \Closure
+     */
+    public static function instanceofMatcher(string $classLike): \Closure
+    {
+        return function ($object) use ($classLike): bool {
+            return $object instanceof $classLike;
+        };
+    }
 }
