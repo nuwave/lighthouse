@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -134,7 +135,7 @@ SDL;
             }
 
             $directivesContainsRestore = $argumentSet->directives->contains(
-                Utils::instanceofMatcher(ForceDeleteDirective::class)
+                Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
                 $queryBuilder->onlyTrashed();
