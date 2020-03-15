@@ -89,7 +89,9 @@ abstract class TestCase extends BaseTestCase
                 'Tests\\Utils\\Mutations',
                 'Tests\\Utils\\MutationsSecondary',
             ],
-            'subscriptions' => 'Tests\\Utils\\Subscriptions',
+            'subscriptions' => [
+                'Tests\\Utils\\Subscriptions',
+            ],
             'interfaces' => [
                 'Tests\\Utils\\Interfaces',
                 'Tests\\Utils\\InterfacesSecondary',

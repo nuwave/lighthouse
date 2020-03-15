@@ -3,7 +3,6 @@
 namespace Tests\Unit\Support\Http\Middleware;
 
 use Illuminate\Auth\AuthManager;
-use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication;
 use PHPUnit\Framework\Constraint\Callback;
@@ -22,33 +21,30 @@ class AttemptAuthenticationTest extends TestCase
         /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $app->make(AuthManager::class);
         $authManager->viaRequest('foo', function () {
-            dd($this->user);
-
             return $this->user;
         });
 
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
+        $config = $app->make('config');
 
-        $config->set('lighthouse.middleware', [
-            AttemptAuthentication::class,
+        $config->set('lighthouse.route.middleware', [
+            AttemptAuthentication::class . ':foo',
         ]);
-//        dd($config->get('auth'));
-        $config->set('auth.guards.api.driver', 'foo');
+        $config->set('auth.guards.foo', [
+            'driver' => 'foo',
+            'provider' => 'users',
+        ]);
     }
 
     public function testAttemptsAuthenticationGuest(): void
     {
-        /** @var \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication $middleware */
-        $middleware = app(AttemptAuthentication::class);
-        $middleware->handle(new Request(), function () {
-        });
-
         $this->mockResolver()
             ->with(
                 null,
                 [],
-                null
+                new Callback(function (Context $context) {
+                    return $this->user === null;
+                })
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -83,7 +79,7 @@ class AttemptAuthenticationTest extends TestCase
         }
         ';
 
-        $a = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo
         }

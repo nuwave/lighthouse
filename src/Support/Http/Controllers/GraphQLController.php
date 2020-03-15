@@ -61,7 +61,6 @@ class GraphQLController extends Controller
      */
     public function query(GraphQLRequest $request)
     {
-        dd($this->middleware);
         $this->eventsDispatcher->dispatch(
             new StartRequest($request)
         );

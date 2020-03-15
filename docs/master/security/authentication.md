@@ -1,14 +1,38 @@
 # Authentication
 
+You can use standard Laravel mechanisms to authenticate users of your GraphQL API.
+Generally, stateless guards such as [API Authentication](https://laravel.com/docs/api-authentication)
+are recommended for most use cases.
+
 ## Global
 
-You can use standard Laravel mechanisms to authenticate users of your GraphQL API.
-Just add middleware trough your `lighthouse.php` configuration.
-The [API Authentication](https://laravel.com/docs/api-authentication) is especially
-suited because of its stateless nature.
+As all GraphQL requests are served at a single HTTP endpoint, middleware added
+through the `lighthouse.php` config will run for all queries against your server.
 
-As all GraphQL requests are served at a single HTTP endpoint, this will guard your
-entire API against unauthenticated users.
+In most cases, your schema will have some publicly accessible fields and others
+that require authentication. As multiple checks for authentication or permissions may be
+required in a single request, it is convenient to attempt authentication once per request.
+
+```php
+    'route' => [
+        'middleware' => [
+            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class . ':api',
+        ],
+    ],
+```
+
+Note that the `AttemptAuthentication` middleware does *not* protect any of your fields
+by itself, decorate them with [`@guard`](../api-reference/directives.md#guard) as needed.
+
+If you want to guard all your fields against unauthenticated access, you can simply add
+Laravel's build-in auth middleware. Beware that this approach does not allow any GraphQL
+operations for guest users, so you will have to handle login outside of GraphQL.
+
+```php
+'middleware' => [
+    'auth:api',
+],
+```
 
 ## Guard selected fields
 
@@ -25,7 +49,7 @@ If you need to guard multiple fields, just use [`@guard`](../api-reference/direc
 on a `type` or an `extend type` definition. It will be applied to all fields within that type.
 
 ```graphql
-extend type Query @guard(with: ["api:admin"]){
+extend type Query @guard(with: ["api:admin"]) {
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
 }
