@@ -65,7 +65,7 @@ class RelationBatchLoader extends BatchLoader
         return $models
             ->mapWithKeys(
                 function (Model $model): array {
-                    return [$this->buildKey($model->getKey()) => $model->getRelation($this->relationName)];
+                    return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
                 }
             )
             ->all();
@@ -86,5 +86,23 @@ class RelationBatchLoader extends BatchLoader
                 $this->keys
             )
         );
+    }
+
+    /**
+     * Extract the relation that was loaded.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed
+     */
+    protected function extractRelation(Model $model)
+    {
+        // Dot notation may be used to eager load nested relations
+        $parts = explode('.', $this->relationName);
+
+        // We just return the first level of relations for now. They
+        // hold the nested relations in case they are needed.
+        $firstRelation = $parts[0];
+
+        return $model->getRelation($firstRelation);
     }
 }

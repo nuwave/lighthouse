@@ -3,136 +3,94 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Brand;
-use Tests\Utils\Models\Product;
-use Tests\Utils\Models\Supplier;
+use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class WithDirectiveTest extends DBTestCase
 {
-    /**
-     * The currently authenticated user.
-     *
-     * @var \Tests\Utils\Models\User
-     */
-    protected $user;
-
-    /**
-     * The user's tasks.
-     *
-     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Task>
-     */
-    protected $tasks;
-
-    protected function setUp(): void
+    public function testEagerLoadsRelation(): void
     {
-        parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->tasks = factory(Task::class, 3)->create([
-            'user_id' => $this->user->getKey(),
-        ]);
-
-        $this->be($this->user);
-    }
-
-    public function testCanQueryARelationship(): void
-    {
-        $this->schema = '
-        type User {
-            task_count_string: String!
-                @with(relation: "tasks")
-                @method(name: "getTaskCountAsString")
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User @first
         }
 
-        type Query {
-            user: User @auth
+        type User {
+            tasksLoaded: Boolean!
+                @with(relation: "tasks")
+                @method
         }
         ';
 
         /** @var \Tests\Utils\Models\User $user */
-        $user = auth()->user();
+        $user = factory(User::class)->create();
+        factory(Task::class, 3)->create([
+            'user_id' => $user->getKey(),
+        ]);
 
         $this->assertFalse(
-            $user->relationLoaded('tasks')
+            $user->tasksLoaded()
         );
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                task_count_string
+                tasksLoaded
             }
         }
-        ')->assertJsonFragment([
-            'task_count_string' => 'User has 3 tasks.',
+        ')->assertExactJson([
+            'data' => [
+                'user' => [
+                    'tasksLoaded' => true,
+                ]
+            ]
         ]);
-
-        $this->assertCount(
-            3,
-            $user->tasks
-        );
     }
 
-    public function testCanQueryANestedRelationship()
+    public function testEagerLoadsNestedRelation(): void
     {
-        $this->schema = '
-        type Brand {
-            id: Int!
-            name: String
-            suppliers: [Supplier]
-        }
-
-        type Supplier {
-            id: Int!
-            name: String
-            Brand: Brand!
-        }
-
-        type Product {
-            id: Int!
-            preferredSupplier: Supplier! @with(relation: "brand.suppliers")
-        }
-
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            products: [Product] @paginate
+            users: User @first
+        }
+
+        type User {
+            postsCommentsLoaded: Boolean!
+                @with(relation: "posts.comments")
+                @method
         }
         ';
-        /** @var Brand $brand */
-        $brand = factory(Brand::class)->create();
-        $supplier1 = factory(Supplier::class)->create();
-        $supplier2 = factory(Supplier::class)->create();
 
-        $brand->suppliers()->sync([
-            $supplier1->id => ['is_preferred_supplier' => false],
-            $supplier2->id => ['is_preferred_supplier' => true],
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+        $posts = factory(Post::class, 2)->create([
+            'user_id' => $user->id,
         ]);
-
-        $product = factory(Product::class)->create(['brand_id' => $brand->id]);
+        foreach($posts as $post) {
+            factory(Comment::class)->create([
+                'post_id' => $post->id,
+                'user_id' => $user->id,
+            ]);
+        }
 
         $this->assertFalse(
-            $product->relationLoaded('brand.suppliers')
+            $user->postsCommentsLoaded()
         );
 
-        $response = $this->graphQL('{
-            products(first: 1) {
-                data {
-                    preferredSupplier {
-                        id
-                    }
-                }
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                postsCommentsLoaded
             }
         }
         ');
 
         $response->assertJson([
             'data' => [
-                'products' => [
-                    'data' => [
-                        'preferredSupplier' => [
-                            'id' => $supplier2->id,
-                        ],
-                    ],
+                'users' => [
+                    'postsCommentsLoaded' => true,
                 ],
             ],
       ]);
