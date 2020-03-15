@@ -14,7 +14,6 @@ class CreateTestbenchProductsTable extends Migration
         Schema::create('products', function (Blueprint $table): void {
             $table->string('barcode');
             $table->string('uuid');
-            $table->unsignedInteger('brand_id');
             $table->string('name');
             $table->unsignedInteger('color_id');
             $table->timestamps();
