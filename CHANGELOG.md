@@ -11,7 +11,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add `AttemptAuthentication` middleware to optionally log in users on the GraphQL endpoint
+- Add `AttemptAuthentication` middleware to optionally log in users and delegate access guards
+  to the field level https://github.com/nuwave/lighthouse/pull/1197
 
 ## 4.10.2
 
