@@ -2,26 +2,19 @@
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tests\Utils\LaravelEnums\UserType;
 
 class User extends Authenticatable
 {
-    use CastsEnums;
-
     /**
      * @var mixed[]
      */
     protected $guarded = [];
-
-    protected $enumCasts = [
-        'type' => UserType::class,
-    ];
 
     public function getTaskCountAsString(): string
     {
@@ -59,6 +52,16 @@ class User extends Authenticatable
             ->withPivot(['meta']);
     }
 
+    public function rolesPivot(): HasMany
+    {
+        return $this->hasMany(RoleUserPivot::class, 'user_id');
+    }
+
+    public function image(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable');
+    }
+
     public function scopeCompanyName(Builder $query, array $args): Builder
     {
         return $query->whereHas('company', function (Builder $q) use ($args): void {
@@ -69,5 +72,10 @@ class User extends Authenticatable
     public function getCompanyNameAttribute()
     {
         return $this->company->name;
+    }
+
+    public function scopeNamed(Builder $query): Builder
+    {
+        return $query->whereNotNull('name');
     }
 }

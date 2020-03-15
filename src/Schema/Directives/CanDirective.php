@@ -3,12 +3,17 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -50,13 +55,22 @@ directive @can(
   """
   The name of the argument that is used to find a specific model
   instance against which the permissions should be checked.
+
+  You may pass the string as a dot notation to search in a array.
   """
   find: String
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
   """
   Pass along the client given input data as arguments to `Gate::check`.
   """
   injectArgs: Boolean = false
+
   """
   Statically defined arguments that are passed to `Gate::check`.
 
@@ -101,20 +115,49 @@ SDL;
      * @param  array  $args
      * @return iterable<Model|string>
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @throws \GraphQL\Error\Error
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
-            $modelOrModels = $argumentSet
-                ->enhanceBuilder(
-                    $this->getModelClass()::query(),
-                    [],
-                    function (Directive $directive): bool {
-                        return $directive instanceof TrashedDirective;
-                    }
-                )
-                ->findOrFail($args[$find]);
+            $findValue = Arr::get($args, $find);
+            if ($findValue === null) {
+                throw new Error(self::missingKeyToFindModel($find));
+            }
+
+            $queryBuilder = $this->getModelClass()::query();
+
+            $directivesContainsForceDelete = $argumentSet->directives->contains(
+                function (Directive $directive): bool {
+                    return $directive instanceof ForceDeleteDirective;
+                }
+            );
+            if ($directivesContainsForceDelete) {
+                $queryBuilder->withTrashed();
+            }
+
+            $directivesContainsRestore = $argumentSet->directives->contains(
+                function (Directive $directive): bool {
+                    return $directive instanceof RestoreDirective;
+                }
+            );
+            if ($directivesContainsRestore) {
+                $queryBuilder->onlyTrashed();
+            }
+
+            try {
+                $modelOrModels = $argumentSet
+                    ->enhanceBuilder(
+                        $queryBuilder,
+                        [],
+                        function (Directive $directive): bool {
+                            return $directive instanceof TrashedDirective;
+                        }
+                    )
+                    ->findOrFail($findValue);
+            } catch (ModelNotFoundException $exception) {
+                throw new Error($exception->getMessage());
+            }
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];
@@ -124,6 +167,11 @@ SDL;
         }
 
         return [$this->getModelClass()];
+    }
+
+    public static function missingKeyToFindModel(string $find): string
+    {
+        return "Got no key to find a model at the expected input path: ${find}.";
     }
 
     /**

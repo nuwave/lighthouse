@@ -2,13 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\EnumTypeExtensionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeExtensionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\AST\TypeExtensionNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -18,6 +27,13 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
 class ASTBuilder
 {
+    const EXTENSION_TO_DEFINITION_CLASS = [
+        ObjectTypeExtensionNode::class => ObjectTypeDefinitionNode::class,
+        InputObjectTypeExtensionNode::class => InputObjectTypeDefinitionNode::class,
+        InterfaceTypeExtensionNode::class => InterfaceTypeDefinitionNode::class,
+        EnumTypeExtensionNode::class => EnumTypeDefinitionNode::class,
+    ];
+
     /**
      * The directive factory.
      *
@@ -170,26 +186,89 @@ class ASTBuilder
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
             /** @var \GraphQL\Language\AST\TypeExtensionNode $typeExtension */
             foreach ($typeExtensionsList as $typeExtension) {
+                // Before we actually extend the types, we apply the manipulator directives
+                // that are defined on type extensions themselves
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
                     $this->directiveFactory->createAssociatedDirectivesOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
-                    $typeExtensionManipulator->manipulatetypeExtension($this->documentAST, $typeExtension);
+                    $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
                 }
 
                 // After manipulation on the type extension has been done,
-                // we can merge its fields with the original type
-                if ($typeExtension instanceof ObjectTypeExtensionNode) {
-                    $relatedObjectType = $this->documentAST->types[$typeName];
-
-                    $relatedObjectType->fields = ASTHelper::mergeUniqueNodeList(
-                        $relatedObjectType->fields,
-                        $typeExtension->fields
-                    );
+                // we can merge them with the original type
+                if (
+                    $typeExtension instanceof ObjectTypeExtensionNode
+                    || $typeExtension instanceof InputObjectTypeExtensionNode
+                    || $typeExtension instanceof InterfaceTypeExtensionNode
+                ) {
+                    $this->extendObjectLikeType($typeName, $typeExtension);
+                } elseif ($typeExtension instanceof EnumTypeExtensionNode) {
+                    $this->extendEnumType($typeName, $typeExtension);
                 }
             }
         }
+    }
+
+    /**
+     * @param  string  $typeName
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
+    {
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode $extendedObjectLikeType */
+        $extendedObjectLikeType = $this->documentAST->types[$typeName];
+        $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);
+
+        $extendedObjectLikeType->fields = ASTHelper::mergeUniqueNodeList(
+            $extendedObjectLikeType->fields,
+            $typeExtension->fields
+        );
+    }
+
+    /**
+     * @param  string  $typeName
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    protected function extendEnumType(string $typeName, TypeExtensionNode $typeExtension): void
+    {
+        /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode $extendedEnum */
+        $extendedEnum = $this->documentAST->types[$typeName];
+        $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
+
+        $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
+            $extendedEnum->values,
+            $typeExtension->values
+        );
+    }
+
+    /**
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
+     * @return void
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    protected function assertExtensionMatchesDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): void
+    {
+        if (static::EXTENSION_TO_DEFINITION_CLASS[get_class($extension)] !== get_class($definition)) {
+            throw new DefinitionException(
+                static::extensionDoesNotMatchDefinition($extension, $definition)
+            );
+        }
+    }
+
+    /**
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
+     * @return string
+     */
+    public static function extensionDoesNotMatchDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): string
+    {
+        return 'The type extension '.$extension->name->value.' of kind '.$extension->kind.' can not extend a definition of kind '.$definition->kind.'.';
     }
 
     /**

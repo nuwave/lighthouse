@@ -3,7 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Hour;
+use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -25,11 +25,11 @@ class MorphToDirectiveTest extends DBTestCase
     protected $task;
 
     /**
-     * Task's hour.
+     * Task's image.
      *
-     * @var \Tests\Utils\Models\Hour
+     * @var \Tests\Utils\Models\Image
      */
-    protected $hour;
+    protected $image;
 
     protected function setUp(): void
     {
@@ -39,50 +39,52 @@ class MorphToDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->hour = $this->task->hours()->save(factory(Hour::class)->create());
+        $this->image = $this->task->images()->save(factory(Image::class)->create());
     }
 
     public function testCanResolveMorphToRelationship(): void
     {
-        $this->schema = '
-        type Hour {
+        $this->schema = /** @lang GraphQL */ '
+        type Image {
             id: ID!
             from: String
             to: String
-            hourable: Task! @morphTo(relation: "hourable")
+            imageable: Task! @morphTo(relation: "imageable")
         }
-        
+
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type Query {
-            hour (
+            image (
                 id: ID! @eq
-            ): Hour @find
+            ): Image @find
         }
         ';
 
-        $this->graphQL("
-        {
-            hour(id: {$this->hour->id}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            image(id: $id) {
                 id
                 from
                 to
-                hourable {
+                imageable {
                     id
                     name
                 }
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $this->image->id,
+        ])->assertJson([
             'data' => [
-                'hour' => [
-                    'id' => $this->hour->id,
-                    'from' => $this->hour->from,
-                    'to' => $this->hour->to,
-                    'hourable' => [
+                'image' => [
+                    'id' => $this->image->id,
+                    'from' => $this->image->from,
+                    'to' => $this->image->to,
+                    'imageable' => [
                         'id' => $this->task->id,
                         'name' => $this->task->name,
                     ],
@@ -93,45 +95,47 @@ class MorphToDirectiveTest extends DBTestCase
 
     public function testCanResolveMorphToWithCustomName(): void
     {
-        $this->schema = '
-        type Hour {
+        $this->schema = /** @lang GraphQL */ '
+        type Image {
             id: ID!
             from: String
             to: String
-            customHourable: Task! @morphTo(relation: "hourable")
+            customImageable: Task! @morphTo(relation: "imageable")
         }
-        
+
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type Query {
-            hour (
+            image (
                 id: ID! @eq
-            ): Hour @find
+            ): Image @find
         }
         ';
 
-        $this->graphQL("
-        {
-            hour(id: {$this->hour->id}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            image(id: $id) {
                 id
                 from
                 to
-                customHourable {
+                customImageable {
                     id
                     name
                 }
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $this->image->id,
+        ])->assertJson([
             'data' => [
-                'hour' => [
-                    'id' => $this->hour->id,
-                    'from' => $this->hour->from,
-                    'to' => $this->hour->to,
-                    'customHourable' => [
+                'image' => [
+                    'id' => $this->image->id,
+                    'from' => $this->image->from,
+                    'to' => $this->image->to,
+                    'customImageable' => [
                         'id' => $this->task->id,
                         'name' => $this->task->name,
                     ],
@@ -145,44 +149,46 @@ class MorphToDirectiveTest extends DBTestCase
         $post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $postHour = $post->hours()->save(factory(Hour::class)->create());
+        $postImage = $post->images()->save(
+            factory(Image::class)->create()
+        );
 
-        $this->schema = '
-        interface Hourable {
+        $this->schema = /** @lang GraphQL */ '
+        interface Imageable {
             id: ID!
         }
 
-        type Task implements Hourable {
+        type Task implements Imageable {
             id: ID!
             name: String!
         }
-        
-        type Post implements Hourable {
+
+        type Post implements Imageable {
             id: ID!
             title: String!
         }
-        
-        type Hour {
+
+        type Image {
             id: ID!
             from: String
             to: String
-            hourable: Hourable! @morphTo
+            imageable: Imageable! @morphTo
         }
-        
+
         type Query {
-            hour (
+            image (
                 id: ID! @eq
-            ): Hour @find
+            ): Image @find
         }
         ';
 
-        $this->graphQL("
-        {
-            taskHour:hour(id: {$this->hour->id}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($taskImage: ID!, $postImage: ID!){
+            taskImage: image(id: $taskImage) {
                 id
                 from
                 to
-                hourable {
+                imageable {
                     ... on Task {
                         id
                         name
@@ -193,11 +199,11 @@ class MorphToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            postHour:hour(id: {$postHour->id}) {
+            postImage: image(id: $postImage) {
                 id
                 from
                 to
-                hourable {
+                imageable {
                     ... on Task {
                         id
                         name
@@ -209,22 +215,25 @@ class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ', [
+            'taskImage' => $this->image->id,
+            'postImage' => $postImage->id,
+        ])->assertJson([
             'data' => [
-                'taskHour' => [
-                    'id' => $this->hour->id,
-                    'from' => $this->hour->from,
-                    'to' => $this->hour->to,
-                    'hourable' => [
+                'taskImage' => [
+                    'id' => $this->image->id,
+                    'from' => $this->image->from,
+                    'to' => $this->image->to,
+                    'imageable' => [
                         'id' => $this->task->id,
                         'name' => $this->task->name,
                     ],
                 ],
-                'postHour' => [
-                    'id' => $postHour->id,
-                    'from' => $postHour->from,
-                    'to' => $postHour->to,
-                    'hourable' => [
+                'postImage' => [
+                    'id' => $postImage->id,
+                    'from' => $postImage->from,
+                    'to' => $postImage->to,
+                    'imageable' => [
                         'id' => $post->id,
                         'title' => $post->title,
                     ],

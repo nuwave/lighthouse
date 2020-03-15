@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentSet
 {
@@ -44,6 +45,24 @@ class ArgumentSet
     }
 
     /**
+     * Check if the ArgumentSet has a non-null value with the given key.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
+        $argument = $this->arguments[$key] ?? null;
+
+        if ($argument === null) {
+            return false;
+        }
+
+        return $argument->value !== null;
+    }
+
+    /**
      * Apply the @spread directive and return a new, modified instance.
      *
      * @return self
@@ -56,6 +75,8 @@ class ArgumentSet
         foreach ($this->arguments as $name => $argument) {
             $value = $argument->value;
 
+            // In this case, we do not care about argument sets nested within
+            // lists, spreading only makes sense for single nested inputs.
             if ($value instanceof self) {
                 // Recurse down first, as that resolves the more deeply nested spreads first
                 $value = $value->spread();
@@ -87,10 +108,19 @@ class ArgumentSet
         $argumentSet->directives = $this->directives;
 
         foreach ($this->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs
-            if ($argument->value instanceof self) {
-                $argument->value = $argument->value->rename();
-            }
+            // Recursively apply the renaming to nested inputs.
+            // We look for further ArgumentSet instances, they
+            // might be contained within an array.
+            $argument->value = Utils::applyEach(
+                function ($value) {
+                    if ($value instanceof self) {
+                        return $value->rename();
+                    }
+
+                    return $value;
+                },
+                $argument->value
+            );
 
             /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
             $renameDirective = $argument->directives->first(function ($directive) {
@@ -118,7 +148,28 @@ class ArgumentSet
      */
     public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
-        foreach ($this->arguments as $argument) {
+        self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
+
+        foreach ($scopes as $scope) {
+            call_user_func([$builder, $scope], $this->toArray());
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Recursively apply the ArgBuilderDirectives onto the builder.
+     *
+     * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
+     * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
+     *
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Closure|null  $directiveFilter
+     */
+    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null)
+    {
+        foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
 
             // TODO switch to instanceof when we require bensampo/laravel-enum
@@ -141,14 +192,15 @@ class ArgumentSet
                 $builder = $argBuilderDirective->handleBuilder($builder, $value);
             });
 
-            // TODO recurse deeper into the input to allow nested input objects to add filters
+            Utils::applyEach(
+                function ($value) use (&$builder, $directiveFilter) {
+                    if ($value instanceof self) {
+                        self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
+                    }
+                },
+                $argument->value
+            );
         }
-
-        foreach ($scopes as $scope) {
-            call_user_func([$builder, $scope], $this->toArray());
-        }
-
-        return $builder;
     }
 
     /**

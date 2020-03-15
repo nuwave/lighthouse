@@ -58,7 +58,10 @@ SDL;
                             'decorateBuilder' => function ($query) use ($resolveInfo) {
                                 $resolveInfo
                                     ->argumentSet
-                                    ->enhanceBuilder($query, $this->directiveArgValue('scopes', []));
+                                    ->enhanceBuilder(
+                                        $query,
+                                        $this->directiveArgValue('scopes', [])
+                                    );
                             },
                         ]
                     );

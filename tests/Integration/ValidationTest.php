@@ -2,7 +2,6 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Tests\DBTestCase;
@@ -29,7 +28,7 @@ class ValidationTest extends DBTestCase
             password: String
                 @trim
                 @rules(apply: ["min:6", "max:20", "required_with:id"])
-                @bcrypt
+                @hash
             bar: Bar
                 @rules(apply: ["required_if:id,bar"])
         ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")
@@ -59,9 +58,6 @@ class ValidationTest extends DBTestCase
     }
     ';
 
-    /** @var int */
-    private static $callCount = 0;
-
     /**
      * @param  mixed  $root
      * @param  mixed[]  $args
@@ -84,45 +80,28 @@ class ValidationTest extends DBTestCase
 
     public function testRunsValidationBeforeCallingTheResolver(): void
     {
-        $shouldNotBeCalled = '@field(resolver: "'.$this->qualifyTestResolver('resolveDoNotCall').'")';
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            ensureThisWorks: String '.$shouldNotBeCalled.'
-        }
-
-        type Mutation {
-            resolveDoNotCall(
+            doNotCall(
                 bar: String @rules(apply: ["required"])
-            ): String '.$shouldNotBeCalled.'
+            ): String @mock
         }
         ';
 
-        $this->assertSame(0, self::$callCount);
-
-        // Sanity check to ensure the test works
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            ensureThisWorks
-        }
-        ');
-        $this->assertSame(1, self::$callCount);
-
         $response = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            resolveDoNotCall
+        {
+            doNotCall
         }
         ');
 
-        $this->assertSame(1, self::$callCount);
         $this->assertValidationKeysSame(
             ['bar'],
             $response
         );
-    }
-
-    public function resolveDoNotCall()
-    {
-        self::$callCount++;
     }
 
     public function testValidatesDifferentPathsIndividually(): void
@@ -550,10 +529,10 @@ class ValidationTest extends DBTestCase
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
      * @param  array  $keys
-     * @param  \Illuminate\Foundation\Testing\TestResponse  $result
+     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $result
      * @return void
      */
-    protected function assertValidationKeysSame(array $keys, TestResponse $result): void
+    protected function assertValidationKeysSame(array $keys, $result): void
     {
         $validation = $result->jsonGet('errors.0.extensions.validation');
 

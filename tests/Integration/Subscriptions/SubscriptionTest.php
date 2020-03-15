@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Subscriptions;
 
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
@@ -28,17 +27,17 @@ class SubscriptionTest extends TestCase
         type Post {
             body: String
         }
-        
+
         type Subscription {
             onPostCreated: Post
         }
-        
+
         type Mutation {
             createPost(post: String!): Post
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
                 @broadcast(subscription: \"onPostCreated\")
         }
-        
+
         type Query {
             foo: String
         }
@@ -140,7 +139,10 @@ class SubscriptionTest extends TestCase
         return ['body' => $args['post']];
     }
 
-    protected function subscribe(): TestResponse
+    /**
+     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     */
+    protected function subscribe()
     {
         return $this->postGraphQL([
             'query' => '

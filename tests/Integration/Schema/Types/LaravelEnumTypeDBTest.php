@@ -4,9 +4,10 @@ namespace Tests\Integration\Schema\Types;
 
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
-use Tests\Utils\LaravelEnums\UserType;
-use Tests\Utils\Models\User;
+use Tests\Utils\LaravelEnums\AOrB;
+use Tests\Utils\Models\WithEnum;
 
 class LaravelEnumTypeDBTest extends DBTestCase
 {
@@ -24,83 +25,83 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testUseLaravelEnumType(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(type: UserType @eq): User @find
+            withEnum(type: AOrB @eq): WithEnum @find
         }
 
         type Mutation {
-            createUser(type: UserType): User @create
+            createWithEnum(type: AOrB): WithEnum @create
         }
 
-        type User {
-            type: UserType
+        type WithEnum {
+            type: AOrB
         }
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(UserType::class)
+            new LaravelEnumType(AOrB::class)
         );
 
-        $typeAdmistrator = [
-            'type' => 'Administrator',
+        $typeA = [
+            'type' => 'A',
         ];
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
-            createUser(type: Administrator) {
+            createWithEnum(type: A) {
                 type
             }
         }
-        ')->assertJsonFragment($typeAdmistrator);
+        ')->assertJsonFragment($typeA);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            user(type: Administrator) {
+            withEnum(type: A) {
                 type
             }
         }
-        ')->assertJsonFragment($typeAdmistrator);
+        ')->assertJsonFragment($typeA);
     }
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
-        if ((float) $this->app->version() < 5.6) {
+        if (AppVersion::below(5.6)) {
             $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
         }
 
         // We use the "name" field to store the "type" JSON
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(
-                type: UserType @whereJsonContains(key: "name")
-            ): User @find
+            withEnum(
+                type: AOrB @whereJsonContains(key: "name")
+            ): WithEnum @find
         }
 
-        type User {
+        type WithEnum {
             name: String
         }
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(UserType::class)
+            new LaravelEnumType(AOrB::class)
         );
 
-        $encodedType = json_encode([UserType::Administrator]);
+        $encodedType = json_encode([AOrB::A]);
 
-        $user = new User();
-        $user->name = $encodedType;
-        $user->save();
+        $withEnum = new WithEnum();
+        $withEnum->name = $encodedType;
+        $withEnum->save();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            user(type: Administrator) {
+            withEnum(type: A) {
                 name
             }
         }
         ')->assertJson([
             'data' => [
-                'user' => [
+                'withEnum' => [
                     'name' => $encodedType,
                 ],
             ],

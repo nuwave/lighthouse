@@ -4,15 +4,18 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
+/**
+ * @deprecated
+ */
 class BcryptDirectiveTest extends TestCase
 {
     public function testCanBcryptAnArgument(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: String @bcrypt): Foo @mock
         }
-        
+
         type Foo {
             bar: String
         }
@@ -22,13 +25,15 @@ class BcryptDirectiveTest extends TestCase
             return $args;
         });
 
-        $password = $this->graphQL('
-        {
-            foo(bar: "password"){
-                bar
+        $password = $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(bar: "password") {
+                    bar
+                }
             }
-        }
-        ')->jsonGet('data.foo.bar');
+            ')
+            ->jsonGet('data.foo.bar');
 
         $this->assertNotSame('password', $password);
         $this->assertTrue(password_verify('password', $password));
@@ -36,17 +41,17 @@ class BcryptDirectiveTest extends TestCase
 
     public function testCanBcryptAnArgumentInInputObjectAndArray(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(input: UserInput): User @mock
         }
-        
+
         type User {
             password: String!
             alt_passwords: [String]
             friends: [User]
         }
-        
+
         input UserInput {
             password: String @bcrypt
             alt_passwords: [String] @bcrypt
@@ -58,8 +63,8 @@ class BcryptDirectiveTest extends TestCase
             return $args['input'];
         });
 
-        $result = $this->graphQL('
-        query {
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
             user(input: {
                 password: "password"
                 alt_passwords: ["alt_password_1", "alt_password_2"]
@@ -72,7 +77,7 @@ class BcryptDirectiveTest extends TestCase
                             { password: "friend_password_4" }
                         ]
                     }
-                ] 
+                ]
             }) {
                 password
                 alt_passwords

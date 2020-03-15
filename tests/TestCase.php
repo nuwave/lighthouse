@@ -2,20 +2,19 @@
 
 namespace Tests;
 
-use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
+use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Tests\Utils\Middleware\CountRuns;
@@ -25,21 +24,27 @@ abstract class TestCase extends BaseTestCase
 {
     use MakesGraphQLRequests;
     use MocksResolvers;
+    use UsesTestSchema;
 
-    const PLACEHOLDER_QUERY = '
+    /**
+     * A dummy query type definition that is added to tests by default.
+     */
+    const PLACEHOLDER_QUERY = /** @lang GraphQL */ '
     type Query {
         foo: Int
     }
     ';
 
-    /**
-     * This variable is injected the main GraphQL class
-     * during execution of each test. It may be set either
-     * for an entire test class or for a single test.
-     *
-     * @var string
-     */
-    protected $schema = self::PLACEHOLDER_QUERY;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (! $this->schema) {
+            $this->schema = self::PLACEHOLDER_QUERY;
+        }
+
+        $this->setUpTestSchema();
+    }
 
     /**
      * Get package providers.
@@ -68,13 +73,6 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app->bind(
-            SchemaSourceProvider::class,
-            function (): TestSchemaProvider {
-                return new TestSchemaProvider($this->schema);
-            }
-        );
-
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
 
@@ -91,7 +89,9 @@ abstract class TestCase extends BaseTestCase
                 'Tests\\Utils\\Mutations',
                 'Tests\\Utils\\MutationsSecondary',
             ],
-            'subscriptions' => 'Tests\\Utils\\Subscriptions',
+            'subscriptions' => [
+                'Tests\\Utils\\Subscriptions',
+            ],
             'interfaces' => [
                 'Tests\\Utils\\Interfaces',
                 'Tests\\Utils\\InterfacesSecondary',
@@ -127,7 +127,11 @@ abstract class TestCase extends BaseTestCase
 
         $config->set('app.debug', true);
 
-        TestResponse::mixin(new TestResponseMixin());
+        if (class_exists('Illuminate\Testing\TestResponse')) {
+            \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());
+        } elseif (class_exists('Illuminate\Foundation\Testing\TestResponse')) {
+            \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
+        }
     }
 
     /**
@@ -142,27 +146,11 @@ abstract class TestCase extends BaseTestCase
     protected function resolveApplicationExceptionHandler($app)
     {
         $app->singleton(ExceptionHandler::class, function () {
-            return new class implements ExceptionHandler {
-                public function report(Exception $e)
-                {
-                    //
-                }
-
-                public function render($request, Exception $e)
-                {
-                    throw $e;
-                }
-
-                public function renderForConsole($output, Exception $e)
-                {
-                    //
-                }
-
-                public function shouldReport(Exception $e)
-                {
-                    return false;
-                }
-            };
+            if (AppVersion::atLeast(7.0)) {
+                return new Laravel7ExceptionHandler();
+            } else {
+                return new PreLaravel7ExceptionHandler();
+            }
         });
     }
 

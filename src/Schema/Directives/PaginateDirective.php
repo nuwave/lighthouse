@@ -22,18 +22,18 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Query multiple entries as a paginated list.
+Query multiple model entries as a paginated list.
 """
 directive @paginate(
   """
   Which pagination style to use.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String = "paginator"
 
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 

@@ -9,11 +9,9 @@ class RenameDirectiveTest extends TestCase
 {
     public function testRenameField(): void
     {
-        $this->mockResolver(function () {
-            return [
-                'baz' => 'asdf',
-            ];
-        });
+        $this->mockResolver([
+            'baz' => 'asdf',
+        ]);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -59,9 +57,11 @@ class RenameDirectiveTest extends TestCase
 
     public function testRenameArgument(): void
     {
-        $this->mockResolver(function ($root, array $args) {
-            return $args === ['bar' => 'something'];
-        });
+        $this->mockResolver()
+            ->with(
+                null,
+                ['bar' => 'something']
+            );
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -75,10 +75,43 @@ class RenameDirectiveTest extends TestCase
         {
             foo(baz: "something")
         }
-        ')->assertJson([
-            'data' => [
-                'foo' => true,
-            ],
-        ]);
+        ');
+    }
+
+    public function testRenameListOfInputs(): void
+    {
+        $this->mockResolver()
+            ->with(
+                null,
+                [
+                    'input' => [
+                        ['bar' => 'something'],
+                    ],
+                ]
+            );
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                input: [FooInput]
+            ): Boolean @mock
+        }
+
+        input FooInput {
+            baz: String @rename(attribute: "bar")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(
+                input: [
+                    {
+                        baz: "something"
+                    }
+                ]
+            )
+        }
+        ');
     }
 }
