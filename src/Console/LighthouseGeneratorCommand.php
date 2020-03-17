@@ -20,13 +20,19 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         return ucfirst(trim($this->argument('name')));
     }
 
+    protected function rootNamespace()
+    {
+        return $this->getDefaultNamespace();
+    }
+
+
     /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
      * @return string
      */
-    protected function getDefaultNamespace($rootNamespace): string
+    protected function getDefaultNamespace($rootNamespace=""): string
     {
         $namespaces = config('lighthouse.namespaces.'.$this->namespaceConfigKey());
 
