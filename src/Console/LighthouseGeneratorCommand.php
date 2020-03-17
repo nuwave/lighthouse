@@ -80,7 +80,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
 
             $matching [] = $part;
         }
-        
+
         if ($matching) {
             return implode('\\', $matching);
         } else {
