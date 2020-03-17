@@ -22,7 +22,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
 
     protected function rootNamespace()
     {
-        return $this->getDefaultNamespace();
+        return $this->getDefaultNamespace(""); //dummy arg
     }
 
 
@@ -32,7 +32,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
-    protected function getDefaultNamespace($rootNamespace=""): string
+    protected function getDefaultNamespace($rootNamespace): string
     {
         $namespaces = config('lighthouse.namespaces.'.$this->namespaceConfigKey());
 
