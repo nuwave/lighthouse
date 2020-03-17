@@ -84,7 +84,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         if($matching){
             return implode('\\', $matching);
         }else{
-            return end($namespaces)
+            return end($namespaces);
         }
     }
 }
