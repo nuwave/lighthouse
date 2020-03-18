@@ -14,6 +14,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add `AttemptAuthentication` middleware to optionally log in users and delegate access guards
   to the field level https://github.com/nuwave/lighthouse/pull/1197
 
+- Add `lighthouse:directive` Artisan command to create an empty directive class
+
 ### Fixed
 
 - Eager load nested relations using the `@with` directive https://github.com/nuwave/lighthouse/pull/1068 
