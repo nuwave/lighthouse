@@ -17,7 +17,7 @@ class LighthouseGeneratorCommandTest extends TestCase
         );
     }
 
-    public function testCommonNamespaceMultiple(): void
+    public function testCommonNamespaceSharedBase(): void
     {
         $this->assertSame(
             'App',
@@ -29,11 +29,19 @@ class LighthouseGeneratorCommandTest extends TestCase
         );
     }
 
+    public function testCommonNamespaceNothingShared(): void
+    {
+        $first = 'App\\Foo';
+
+        $this->assertSame(
+            $first,
+            LighthouseGeneratorCommand::commonNamespace([$first, 'Foo\\Bar'])
+        );
+    }
+
     public function testCommonNamespaceNone(): void
     {
-        $this->assertSame(
-            '',
-            LighthouseGeneratorCommand::commonNamespace([])
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        LighthouseGeneratorCommand::commonNamespace([]);
     }
 }

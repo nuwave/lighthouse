@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use InvalidArgumentException;
 
 abstract class LighthouseGeneratorCommand extends GeneratorCommand
 {
@@ -51,7 +52,9 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     public static function commonNamespace(array $namespaces): string
     {
         if ($namespaces === []) {
-            return '';
+            throw new InvalidArgumentException(
+                "A default namespace is required for code generation."
+            );
         }
 
         if (count($namespaces) === 1) {
@@ -79,6 +82,12 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
             }
 
             $matching [] = $part;
+        }
+
+        // We could not determine a common part of the configured namespaces,
+        // so we just assume the user will prefer the first one in the list.
+        if ($matching === []) {
+            return reset($namespaces);
         }
 
         return implode('\\', $matching);
