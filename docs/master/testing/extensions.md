@@ -51,7 +51,9 @@ class MyCustomDirectiveTest extends TestCase
 ## Mock resolvers
 
 When testing custom functionality through a dummy schema, you still need to have
-a way to resolve fields. Add the `MocksResolvers` trait to your test class:
+a way to resolve fields. Lighthouse provides a simple way to mock resolvers in a dummy schema.
+
+Add the `MocksResolvers` trait to your test class:
 
 ```php
 <?php
