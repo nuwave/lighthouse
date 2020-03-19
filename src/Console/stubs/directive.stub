@@ -4,7 +4,7 @@ namespace DummyNamespace;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class DummyClass
+class DummyClass extends BaseDirective
 {
     // TODO implement the directive
 }
