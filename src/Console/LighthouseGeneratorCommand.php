@@ -66,18 +66,21 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         // All the strings in the middle can be ignored.
         sort($namespaces);
 
-        $first = explode('\\', reset($namespaces));
-        $last = explode('\\', end($namespaces));
+        $firstNamespace = reset($namespaces);
+        $firstParts = explode('\\', $firstNamespace);
+
+        $lastNamespace = end($namespaces);
+        $lastParts = explode('\\', $lastNamespace);
 
         $matching = [];
-        foreach ($first as $i => $part) {
+        foreach ($firstParts as $i => $part) {
             // We ran out of elements to compare, so we reached the maximum common length
-            if (! isset($last[$i])) {
+            if (! isset($lastParts[$i])) {
                 break;
             }
 
             // We found an element that differs
-            if ($last[$i] !== $part) {
+            if ($lastParts[$i] !== $part) {
                 break;
             }
 
@@ -87,7 +90,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         // We could not determine a common part of the configured namespaces,
         // so we just assume the user will prefer the first one in the list.
         if ($matching === []) {
-            return reset($namespaces);
+            return $firstNamespace;
         }
 
         return implode('\\', $matching);

@@ -24,7 +24,7 @@ class LighthouseGeneratorCommandTest extends TestCase
             LighthouseGeneratorCommand::commonNamespace(['App\\Foo', 'App\\Bar', 'App\\Foo\\Bar'])
         );
         $this->assertSame(
-            '',
+            'Foo',
             LighthouseGeneratorCommand::commonNamespace(['Foo', 'Bar'])
         );
     }
