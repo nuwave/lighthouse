@@ -13,8 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add `AttemptAuthentication` middleware to optionally log in users and delegate access guards
   to the field level https://github.com/nuwave/lighthouse/pull/1197
-
-- Add `lighthouse:directive` Artisan command to create an empty directive class
+- Add artisan command `lighthouse:directive` to add directive class https://github.com/nuwave/lighthouse/pull/1240
 
 ### Fixed
 

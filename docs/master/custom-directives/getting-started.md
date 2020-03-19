@@ -14,7 +14,11 @@ The class name of a directive must follow the following pattern:
     <DirectiveName>Directive
 
 Let's implement a simple `@upperCase` directive as a part of this introduction.
-We will put it in a class called `UpperCaseDirective` and extend the
+Use the artisan generator command to create it:
+
+    php artisan lighthouse:directive upperCase 
+
+That will create a class called `UpperCaseDirective` that extends the
 abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
