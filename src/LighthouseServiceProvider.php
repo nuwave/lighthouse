@@ -15,6 +15,7 @@ use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\Validator;
 use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\DirectiveCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Console\MutationCommand;
@@ -170,6 +171,7 @@ class LighthouseServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ClearCacheCommand::class,
+                DirectiveCommand::class,
                 IdeHelperCommand::class,
                 InterfaceCommand::class,
                 MutationCommand::class,
