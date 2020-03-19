@@ -27,7 +27,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getNameInput(): string
     {
-        return ucfirst(trim($this->argument('name'))) . 'Directive';
+        return ucfirst(trim($this->argument('name'))).'Directive';
     }
 
     protected function namespaceConfigKey(): string
