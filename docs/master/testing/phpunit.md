@@ -115,7 +115,7 @@ public function testOrdersUsersByName(): void
 
     $this->assertSame(
         [
-            'Benedikt'
+            'Benedikt',
             'Chris',
             'Oliver',
         ],

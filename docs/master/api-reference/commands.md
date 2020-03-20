@@ -8,6 +8,12 @@ are namespaced under `lighthouse`.
 Clear the cache for the GraphQL AST.
 
     php artisan lighthouse:clear-cache
+
+## directive
+
+Create a class for a GraphQL directive.
+
+    php artisan lighthouse:directive
    
 ## ide-helper
 
