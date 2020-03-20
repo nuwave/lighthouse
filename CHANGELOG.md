@@ -19,6 +19,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Eager load nested relations using the `@with` directive https://github.com/nuwave/lighthouse/pull/1068 
 - Avoid infinite loop with empty namespace in generator commands https://github.com/nuwave/lighthouse/pull/1245
+- Automatically register `TestingServiceProvider` for `@mock` when running unit tests https://github.com/nuwave/lighthouse/pull/1244
 
 ## 4.10.2
 

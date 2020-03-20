@@ -51,6 +51,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -182,6 +183,10 @@ class LighthouseServiceProvider extends ServiceProvider
                 UnionCommand::class,
                 ValidateSchemaCommand::class,
             ]);
+        }
+
+        if ($this->app->runningUnitTests()) {
+            $this->app->register(TestingServiceProvider::class);
         }
     }
 }
