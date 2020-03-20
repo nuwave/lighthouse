@@ -19,8 +19,8 @@ the [`@guard`](docs/master/api-reference/directives.md#guard) on selected fields
 
 ```diff
 type Query {
-- profile: User! @middlware(checks: ["auth"])
-+ profile: User! @guard
+-   profile: User! @middlware(checks: ["auth"])
++   profile: User! @guard
 }
 ```
 
@@ -78,3 +78,40 @@ You can adapt to this change in two refactoring steps that must be done in order
         id: ID!
     }
     ```
+
+### Replace `@bcrypt` with `@hash`
+
+The new `@hash` directive is also used for password hashing, but respects the
+configuration settings of your Laravel project.
+
+```diff
+type Mutation {
+    createUser(
+        name: String!
+-       password: String! @bcrypt
++       password: String! @hash
+    ): User!
+}
+```
+
+### `@method` passes down just ordered arguments
+
+Instead of passing down the usual resolver arguments, the `@method` directive will
+now pass just the arguments given to a field. This behaviour could previously be
+enabled through the `passOrdered` option, which is now removed.
+
+```graphql
+type User {
+    purchasedItemsCount(
+        year: Int!
+        includeReturns: Boolean
+    ): Int @method
+}
+```
+
+The method will have to change like this:
+
+```diff
+-public function purchasedItemsCount($root, array $args)
++public function purchasedItemsCount(int $year, ?bool $includeReturns)
+```

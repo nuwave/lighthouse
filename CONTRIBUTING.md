@@ -12,6 +12,19 @@ it easy for you.
 1. Write the actual code to make the tests pass
 1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
 
+## Setup
+
+The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/).
+For convenience, common tasks are wrapped up in the [Makefile](Makefile), you will need `make` installed to use it.
+
+Just clone the project and run the following in the project root:
+
+    make
+
+To see the available commands, run:
+
+    make help
+
 ## Testing
 
 We use **PHPUnit** for unit tests and integration tests.
@@ -23,12 +36,6 @@ Fixing a bug? The best way to ensure it is fixed for good and never comes
 back is to write a failing test for it and then make it pass. If you can
 not figure out how to fix it yourself, feel free to submit a PR with a
 failing test.
-
-To run the tests locally, you can use [docker-compose](https://docs.docker.com/compose/install/).
-Just clone the project and run the following in the project root:
-
-    docker-compose up -d
-    make
 
 Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
 

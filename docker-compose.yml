@@ -25,4 +25,4 @@ services:
     working_dir: /app
     ports:
     - 8080:8080
-    command: /bin/bash -c "yarn && yarn start"
+    tty: true

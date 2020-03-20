@@ -9,6 +9,51 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `AttemptAuthentication` middleware to optionally log in users and delegate access guards
+  to the field level https://github.com/nuwave/lighthouse/pull/1197
+- Add artisan command `lighthouse:directive` to add directive class https://github.com/nuwave/lighthouse/pull/1240
+
+### Fixed
+
+- Eager load nested relations using the `@with` directive https://github.com/nuwave/lighthouse/pull/1068 
+- Avoid infinite loop with empty namespace in generator commands https://github.com/nuwave/lighthouse/pull/1245
+- Automatically register `TestingServiceProvider` for `@mock` when running unit tests https://github.com/nuwave/lighthouse/pull/1244
+
+## 4.10.2
+
+### Fixed
+
+- Ensure subscription routes are named uniquely https://github.com/nuwave/lighthouse/pull/1231
+
+### Changed
+
+- Throw user readable `Error` instead of `ModelNotFoundException` when model is not found in `@can` https://github.com/nuwave/lighthouse/pull/1225
+
+## 4.10.1
+
+### Fixed
+
+- Fix Laravel version detection for Lumen https://github.com/nuwave/lighthouse/pull/1224
+
+## 4.10.0
+
+### Added
+
+- Access nested inputs with dot notation using the `find` option of `@can` https://github.com/nuwave/lighthouse/pull/1216
+- Add `@hash` directive which uses Laravel's hashing configuration https://github.com/nuwave/lighthouse/pull/1200
+- Add option `passOrdered` to `@method` to pass just the arguments as ordered parameters https://github.com/nuwave/lighthouse/pull/1208
+- Add support to extend `input`, `interface` and `enum` types https://github.com/nuwave/lighthouse/pull/1203
+- Implement `streamGraphQL()` helper in `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` https://github.com/nuwave/lighthouse/pull/1222
+- Support Laravel 7 https://github.com/nuwave/lighthouse/pull/1219
+
+### Deprecated
+
+- Remove `@bcrypt` in favour of `@hash` https://github.com/nuwave/lighthouse/pull/1200
+- `@method` will call the underlying method with the arguments as ordered parameters instead
+  of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1208
+
 ## 4.9.0
 
 ### Added

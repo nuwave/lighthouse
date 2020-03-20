@@ -25,13 +25,16 @@ return [
         'name' => 'graphql',
 
         /*
-         *
          * Beware that middleware defined here runs before the GraphQL execution phase,
-         * so you have to take extra care to return spec-compliant error responses.
-         * To apply middleware on a field level, use the @middleware directive.
+         * make sure to return spec-compliant responses in case an error is thrown.
          */
         'middleware' => [
             \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
+
+            // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
+            // middleware, this delegates auth and permission checks to the field level.
+            // If you want to use another guard, change the suffix (remove for default).
+            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class.':api',
         ],
 
         /*

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
@@ -51,6 +52,8 @@ class ASTHelper
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
      * @return \GraphQL\Language\AST\NodeList
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
     {
@@ -66,7 +69,7 @@ class ASTHelper
 
                 if ($collisionOccurred && ! $overwriteDuplicates) {
                     throw new DefinitionException(
-                        "Duplicate definition {$oldName} found when merging."
+                        static::duplicateDefinition($oldName)
                     );
                 }
 
@@ -76,6 +79,11 @@ class ASTHelper
             ->all();
 
         return self::mergeNodeList($remainingDefinitions, $addition);
+    }
+
+    public static function duplicateDefinition(string $oldName): string
+    {
+        return "Duplicate definition {$oldName} found when merging.";
     }
 
     /**
@@ -114,6 +122,18 @@ class ASTHelper
         }
 
         return self::getUnderlyingNamedTypeNode($type);
+    }
+
+    /**
+     * Does the given field have an argument of the given name?
+     *
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  string  $name
+     * @return bool
+     */
+    public static function fieldHasArgument(FieldDefinitionNode $fieldDefinition, string $name): bool
+    {
+        return self::firstByName($fieldDefinition->arguments, $name) !== null;
     }
 
     /**

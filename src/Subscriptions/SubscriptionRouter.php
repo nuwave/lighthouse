@@ -20,7 +20,7 @@ class SubscriptionRouter
         ]);
 
         $router->post('graphql/subscriptions/webhook', [
-            'as' => 'lighthouse.subscriptions.auth',
+            'as' => 'lighthouse.subscriptions.webhook',
             'uses' => SubscriptionController::class.'@webhook',
         ]);
     }
