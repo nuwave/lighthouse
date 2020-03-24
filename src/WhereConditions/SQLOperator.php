@@ -139,7 +139,7 @@ GRAPHQL;
         $query = $boolean === 'or' ? 'orWhereHas' : 'whereHas';
 
         $builder->$query($relation, function ($builder) use ($whereConditions, $relationColumn, $relation) {
-            $builder->where($relationColumn, '=', $whereConditions['value']);
+            $builder->where($relationColumn, $whereConditions['operator'], $whereConditions['value']);
         });
 
         return $builder;
