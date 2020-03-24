@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\OrderBy;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -53,14 +54,67 @@ SDL;
     public function handleBuilder($builder, $value)
     {
         foreach ($value as $orderByClause) {
-            $builder->orderBy(
-                // TODO deprecated in v5
+            $model = $builder instanceof Builder ? $builder->getModel() : null;
+
+            if (Str::contains($orderByClause[config('lighthouse.orderBy')], '.') && $model) {
+                $builder = $this->joinRelatedTable($builder, $orderByClause, $model);
+            } else {
+                // fully qualify the column
+                if ($model) {
+                    $orderByClause[config('lighthouse.orderBy')] = $model->qualifyColumn($orderByClause[config('lighthouse.orderBy')]);
+                }
+
+                $builder->orderBy(
+                    // TODO deprecated in v5
+                    $orderByClause[config('lighthouse.orderBy')],
+                    $orderByClause['order']
+                );
+            }
+        }
+
+        return $builder;
+    }
+
+    private function isAlreadyJoined($builder, $table)
+    {
+        $existingJoins = $builder instanceof Builder ? $builder->toBase()->joins : $builder->joins;
+
+        if (!is_array($existingJoins)) {
+            return false;
+        }
+
+        foreach ($existingJoins as $join) {
+            if ($join->table === $table) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function joinRelatedTable($builder, $orderByClause, $model)
+    {
+        [$relation, $column] = explode('.', $orderByClause[config('lighthouse.orderBy')], 2);
+        $builder = $builder instanceof Builder ? $builder : new Builder($builder);
+        $builder->setModel(new $model);
+
+        try {
+            $relatedModel = $builder->getRelation($relation)->getModel();
+        } catch(\Exception $e) {
+            return $builder->orderBy(
                 $orderByClause[config('lighthouse.orderBy')],
                 $orderByClause['order']
             );
         }
 
-        return $builder;
+        if (!$this->isAlreadyJoined($builder, $relatedModel->getTable())) {
+            $builder->join($relatedModel->getTable(), $relatedModel->getForeignKey(), '=', $relatedModel->getQualifiedKeyName());
+        }
+
+        return $builder->orderBy(
+            $relatedModel->qualifyColumn($column),
+            $orderByClause['order']
+        );
     }
 
     /**

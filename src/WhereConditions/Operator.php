@@ -30,7 +30,8 @@ interface Operator
      * @param  \Illuminate\Database\Query\Builder  $builder
      * @param  array  $whereConditions
      * @param  string  $boolean
+     * @param  \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Query\Builder
      */
-    public function applyConditions($builder, array $whereConditions, string $boolean);
+    public function applyConditions($builder, array $whereConditions, string $boolean, $model);
 }

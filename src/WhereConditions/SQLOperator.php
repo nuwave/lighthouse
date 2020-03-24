@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Error\Error;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class SQLOperator implements Operator
 {
@@ -72,17 +73,24 @@ GRAPHQL;
      * @param  \Illuminate\Database\Query\Builder  $builder
      * @param  array  $whereConditions
      * @param  string  $boolean
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
      * @return \Illuminate\Database\Query\Builder
      */
-    public function applyConditions($builder, array $whereConditions, string $boolean)
+    public function applyConditions($builder, array $whereConditions, string $boolean, $model = null)
     {
         $column = $whereConditions['column'];
+
+        if (strpos($column, '.') !== false && $model) {
+            if ($newBuilder = $this->addWhereHasRelation($builder, $whereConditions, $boolean, $model)) {
+                return $newBuilder;
+            }
+        }
 
         // Laravel's conditions always start off with this prefix
         $method = 'where';
 
         // The first argument to conditions methods is always the column name
-        $args[] = $column;
+        $args[] = $model ? $model->qualifyColumn($column) : $column;
 
         // Some operators require calling Laravel's conditions in different ways
         $operator = $whereConditions['operator'];
@@ -114,6 +122,27 @@ GRAPHQL;
         $args[] = $boolean;
 
         return call_user_func_array([$builder, $method], $args);
+    }
+
+    private function addWhereHasRelation($builder, array $whereConditions, string $boolean, $model = null)
+    {
+        [$relation, $relationColumn] = explode('.', $whereConditions['column'], 2);
+        $builder = $builder instanceof EloquentBuilder ? $builder : new EloquentBuilder($builder);
+        $builder->setModel(new $model);
+
+        try {
+            $relationColumn = $builder->getRelation($relation)->getModel()->qualifyColumn($relationColumn);
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        $query = $boolean === 'or' ? 'orWhereHas' : 'whereHas';
+
+        $builder->$query($relation, function ($builder) use ($whereConditions, $relationColumn, $relation) {
+            $builder->where($relationColumn, '=', $whereConditions['value']);
+        });
+
+        return $builder;
     }
 
     protected function operatorArity(string $operator): int

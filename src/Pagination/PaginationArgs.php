@@ -99,6 +99,8 @@ class PaginationArgs
             return $builder->paginate($this->first, 'page', $this->page);
         }
 
-        return $builder->paginate($this->first, ['*'], 'page', $this->page);
+        $table = $builder instanceof \Illuminate\Database\Eloquent\Builder ? $builder->toBase()->from : $builder->from;
+
+        return $builder->paginate($this->first, [$table . '.*'], 'page', $this->page);
     }
 }

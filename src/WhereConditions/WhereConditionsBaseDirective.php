@@ -25,6 +25,11 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     protected $operator;
 
     /**
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    private $model = null;
+
+    /**
      * WhereConditions constructor.
      *
      * @param  \Nuwave\Lighthouse\WhereConditions\Operator  $operator
@@ -43,6 +48,10 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')
     {
+        if (!$this->model) {
+            $this->model = $builder instanceof \Illuminate\Database\Eloquent\Builder ? $builder->getModel() : null;
+        }
+
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
             $builder->whereNested(
                 function ($builder) use ($andConnectedConditions): void {
@@ -67,7 +76,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         if ($column = $whereConditions['column'] ?? null) {
             static::assertValidColumnName($column);
 
-            return $this->operator->applyConditions($builder, $whereConditions, $boolean);
+            return $this->operator->applyConditions($builder, $whereConditions, $boolean, $this->model);
         }
 
         return $builder;
@@ -137,7 +146,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     protected static function assertValidColumnName(string $column): void
     {
-        if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
+        if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_\.-]*$/', $column)) {
             throw new Error(
                 self::invalidColumnName($column)
             );

@@ -45,6 +45,7 @@ SDL;
                         $this->getModelClass()::query(),
                         $this->directiveArgValue('scopes', [])
                     )
+                    ->select(app()->make($this->getModelClass())->qualifyColumn('*'))
                     ->get();
             }
         );
