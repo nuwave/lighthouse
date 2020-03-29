@@ -155,13 +155,13 @@ class ArgumentSet
             $baseBuilder = $builder;
         } elseif ($builder instanceof EloquentBuilder) {
             $baseBuilder = $builder->getQuery();
-        } elseif($builder instanceof Relation) {
+        } elseif ($builder instanceof Relation) {
             $baseBuilder = $builder->getBaseQuery();
         }
 
-        if($baseBuilder && is_null($baseBuilder->columns)) {
+        if ($baseBuilder && is_null($baseBuilder->columns)) {
             // Fix a long standing issue within Eloquent https://github.com/laravel/framework/issues/4962
-            $builder->select($baseBuilder->from . '.*');
+            $builder->select($baseBuilder->from.'.*');
         }
 
         foreach ($scopes as $scope) {
