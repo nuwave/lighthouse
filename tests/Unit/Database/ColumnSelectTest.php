@@ -29,7 +29,7 @@ class ColumnSelectTest extends DBTestCase
     {
         $team = factory(Team::class)->create();
         factory(User::class, 2)->create([
-            'team_id' => $team->id
+            'team_id' => $team->id,
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
