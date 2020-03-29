@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Unit\Database;
-
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
@@ -10,15 +8,18 @@ use Tests\Utils\Models\User;
 
 class ColumnSelectTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */
-        '
+    protected $schema = /** @lang GraphQL */ '
     type Query {
-        usersWithTeam(team: ID! @scope(name: "withTeam")): [User!] @all
+        usersWithTeam(
+            team: ID! @scope(name: "withTeam")
+        ): [User!] @all
     }
+
     type User {
         id: ID!
         team: Team @belongsTo
     }
+
     type Team {
         id: ID!
     }
@@ -27,16 +28,17 @@ class ColumnSelectTest extends DBTestCase
     public function testSelectsSameColumn(): void
     {
         $team = factory(Team::class)->create();
-        factory(User::class, 2)->create(['team_id' => $team->id]);
+        factory(User::class, 2)->create([
+            'team_id' => $team->id
+        ]);
 
-
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         query {
             usersWithTeam(team: 1) {
                 id
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'usersWithTeam' => [
                     [
