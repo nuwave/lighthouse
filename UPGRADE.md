@@ -15,7 +15,7 @@ The `@middleware` directive has been removed, as it violates the boundary betwee
 request handling.
 
 Authentication is one of most common use cases for `@middleware`. You can now use
-the [`@guard`](docs/master/api-reference/directives.md#guard) on selected fields.
+the [`@guard`](docs/master/api-reference/directives.md#guard) directive on selected fields.
 
 ```diff
 type Query {
@@ -23,6 +23,10 @@ type Query {
 +   profile: User! @guard
 }
 ```
+
+Note that [`@guard`](docs/master/api-reference/directives.md#guard) does not log in users.
+To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
+middleware config, see the [default config](src/lighthouse.php) for an example.
 
 Other functionality can be replaced by a custom [`FieldMiddleware`](docs/master/custom-directives/field-directives.md#fieldmiddleware)
 directive. Just like Laravel Middleware, it can wrap around individual field resolvers.
