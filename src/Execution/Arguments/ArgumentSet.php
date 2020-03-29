@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
