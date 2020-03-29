@@ -45,7 +45,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     {
         return 'directives';
     }
-    
+
     /**
      * Build the class with the given name.
      *
@@ -136,7 +136,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             $stub
         );
 
-        if (!$withMethods) {
+        if (! $withMethods) {
             // No need to implement methods for this interface, so return early.
             return;
         }
@@ -216,7 +216,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         return [
             ['type', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to types.'],
             ['field', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to fields.'],
-            ['argument', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to arguments.']
+            ['argument', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to arguments.'],
         ];
     }
 }
