@@ -157,8 +157,6 @@ class ArgumentSet
             $table = $builder->getModel()->getTable();
         } elseif ($builder instanceof Model) {
             $table = $builder->getTable();
-        } elseif ($builder instanceof Relation) {
-            $table = $builder->getParent()->getTable();
         } else {
             $table = null;
         }
