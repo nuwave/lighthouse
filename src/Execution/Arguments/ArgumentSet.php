@@ -3,6 +3,10 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
@@ -146,6 +150,23 @@ class ArgumentSet
     public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
+
+        if($builder instanceof Builder) {
+            $table = $builder->getTable();
+        } elseif($builder instanceof EloquentBuilder) {
+            $table = $builder->getModel()->getTable();
+        } elseif($builder instanceof Model) {
+            $table = $builder->getTable();
+        } elseif($builder instanceof Relation) {
+            $table = $builder->getParent()->getTable();
+        } else {
+            $table = null;
+        }
+
+        if($table) {
+            // Fix a long standing issue within Eloquent https://github.com/laravel/framework/issues/4962
+            $builder->select($table . '.*');
+        }
 
         foreach ($scopes as $scope) {
             call_user_func([$builder, $scope], $this->toArray());
