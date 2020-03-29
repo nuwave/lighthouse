@@ -151,21 +151,21 @@ class ArgumentSet
     {
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
 
-        if($builder instanceof Builder) {
+        if ($builder instanceof Builder) {
             $table = $builder->getTable();
-        } elseif($builder instanceof EloquentBuilder) {
+        } elseif ($builder instanceof EloquentBuilder) {
             $table = $builder->getModel()->getTable();
-        } elseif($builder instanceof Model) {
+        } elseif ($builder instanceof Model) {
             $table = $builder->getTable();
-        } elseif($builder instanceof Relation) {
+        } elseif ($builder instanceof Relation) {
             $table = $builder->getParent()->getTable();
         } else {
             $table = null;
         }
 
-        if($table) {
+        if ($table) {
             // Fix a long standing issue within Eloquent https://github.com/laravel/framework/issues/4962
-            $builder->select($table . '.*');
+            $builder->select($table.'.*');
         }
 
         foreach ($scopes as $scope) {
