@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
@@ -140,29 +140,29 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      * @param  string[]  $scopes
      * @param  \Closure  $directiveFilter
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation
      */
     public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
 
         if ($builder instanceof Builder) {
-            $table = $builder->getTable();
+            $baseBuilder = $builder;
         } elseif ($builder instanceof EloquentBuilder) {
-            $table = $builder->getModel()->getTable();
-        } elseif ($builder instanceof Model) {
-            $table = $builder->getTable();
+            $baseBuilder = $builder->getQuery();
+        } elseif($builder instanceof Relation) {
+            $baseBuilder = $builder->getBaseQuery();
         } else {
-            $table = null;
+            throw new \InvalidArgumentException('Unexpected builder class ' . get_class($builder));
         }
 
-        if ($table) {
+        if(is_null($baseBuilder->columns)) {
             // Fix a long standing issue within Eloquent https://github.com/laravel/framework/issues/4962
-            $builder->select($table.'.*');
+            $builder->select($baseBuilder->from . '.*');
         }
 
         foreach ($scopes as $scope) {
