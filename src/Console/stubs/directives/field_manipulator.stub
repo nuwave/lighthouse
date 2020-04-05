@@ -10,7 +10,6 @@
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType
-    )
-    {
+    ) {
         // TODO implement the field manipulator
     }

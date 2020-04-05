@@ -12,7 +12,6 @@
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
-    )
-    {
+    ) {
         // TODO implement the arg manipulator
     }

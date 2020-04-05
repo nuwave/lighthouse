@@ -20,7 +20,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a class for a directive.';
+    protected $description = 'Create a class for a custom schema directive.';
 
     /**
      * The type of class being generated.
@@ -32,13 +32,13 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * The imports required by the various interfaces, if any.
      *
-     * @var Collection
+     * @var \Illuminate\Support\Collection<string>
      */
     protected $imports;
 
     protected function getNameInput(): string
     {
-        return ucfirst(trim($this->argument('name'))).'Directive';
+        return ucfirst($this->argument('name')).'Directive';
     }
 
     protected function namespaceConfigKey(): string
@@ -54,7 +54,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function buildClass($name)
+    protected function buildClass($name): string
     {
         $this->imports = new Collection();
 
@@ -69,7 +69,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         }
 
         if ($this->option('argument')) {
-            // https://lighthouse-php.com/4.10/custom-directives/argument-directives.html
             // Arg directives always either implement ArgDirective or ArgDirectiveForArray.
             if ($this->confirm('Will your argument directive apply to a list of items?')) {
                 $this->insertInterface($stub, 'ArgDirectiveForArray', false);
@@ -97,14 +96,13 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * Ask the user if the directive should implement any of the given
-     * interfaces.
+     * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param string $stub
-     * @param array $interfaces
+     * @param  string  $stub
+     * @param  array  $interfaces
      * @return void
      */
-    protected function askForInterfaces(string &$stub, array $interfaces)
+    protected function askForInterfaces(string &$stub, array $interfaces): void
     {
         foreach ($interfaces as $interface) {
             if ($this->confirm('Should the directive implement the '.$interface.' middleware?')) {
@@ -114,15 +112,17 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * Insert an interface into a directive stub. Adds the use statement to the
+     * Insert an interface into a directive stub.
+     *
+     * Adds the use statement to the
      * top of the stub and the interface itself in the implements statement.
      *
-     * @param string $stub
-     * @param string $interface
-     * @param bool $withMethods
+     * @param  string  $stub
+     * @param  string  $interface
+     * @param  bool  $withMethods
      * @return void
      */
-    protected function insertInterface(string &$stub, string $interface, bool $withMethods = true)
+    protected function insertInterface(string &$stub, string $interface, bool $withMethods = true): void
     {
         $stub = str_replace(
             '{{ imports }}',
@@ -156,10 +156,10 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Remove any leftover template helper strings in the stub.
      *
-     * @param string $stub
+     * @param  string  $stub
      * @return void
      */
-    protected function cleanup(string &$stub)
+    protected function cleanup(string &$stub): void
     {
         // If one or more interfaces are enabled, we are left with ", {{ implements }}".
         $stub = str_replace(', {{ implements }}', '', $stub);
@@ -187,7 +187,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Get the stub file for the methods required by an interface.
      *
-     * @param string $interface
+     * @param  string  $interface
      * @return string
      */
     protected function getStubForInterfaceMethods(string $interface): string
@@ -198,7 +198,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Get the stub file for the imports required by an interface.
      *
-     * @param string $interface
+     * @param  string  $interface
      * @return string
      */
     protected function getStubForInterfaceImports(string $interface): string
@@ -211,7 +211,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      *
      * @return array
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [
             ['type', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to types.'],
