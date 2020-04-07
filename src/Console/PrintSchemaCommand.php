@@ -20,7 +20,7 @@ class PrintSchemaCommand extends Command
     protected $signature = '
         lighthouse:print-schema
         {--W|write : Write the output to a file}
-        {--json: Output JSON instead of GraphQL SDL}
+        {--json : Output JSON instead of GraphQL SDL}
     ';
 
     /**
