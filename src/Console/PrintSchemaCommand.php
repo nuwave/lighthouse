@@ -40,7 +40,7 @@ class PrintSchemaCommand extends Command
      */
     public function handle(Repository $cache, Filesystem $storage, GraphQL $graphQL): void
     {
-        // Clear the cache so this always gets the current schena
+        // Clear the cache so this always gets the current schema
         $cache->forget(config('lighthouse.cache.key'));
 
         $schema = $graphQL->prepSchema();
