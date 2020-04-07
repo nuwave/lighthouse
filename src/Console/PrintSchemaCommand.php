@@ -44,7 +44,7 @@ class PrintSchemaCommand extends Command
         $cache->forget(config('lighthouse.cache.key'));
 
         $schema = $graphQL->prepSchema();
-        if($this->option('json')) {
+        if ($this->option('json')) {
             $filename = 'lighthouse-schema.json';
             $schemaString = $this->schemaJson($schema);
         } else {
@@ -54,7 +54,7 @@ class PrintSchemaCommand extends Command
 
         if ($this->option('write')) {
             $storage->put($filename, $schemaString);
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "' . $filename . '".');
+            $this->info('Wrote schema to the default file storage (usually storage/app) as "'.$filename.'".');
         } else {
             $this->info($schemaString);
         }
