@@ -24,3 +24,5 @@ return [
     ...
 ];
 ``` 
+
+> CORS is built into Laravel starting from version 7, for previous versions use https://github.com/fruitcake/laravel-cors
