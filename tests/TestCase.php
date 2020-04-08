@@ -4,6 +4,7 @@ namespace Tests;
 
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Illuminate\Console\Command;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
@@ -16,6 +17,7 @@ use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Policies\AuthServiceProvider;
 
@@ -28,11 +30,12 @@ abstract class TestCase extends BaseTestCase
     /**
      * A dummy query type definition that is added to tests by default.
      */
-    const PLACEHOLDER_QUERY = /** @lang GraphQL */ '
-    type Query {
-        foo: Int
-    }
-    ';
+    const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<GRAPHQL
+type Query {
+  foo: Int
+}
+
+GRAPHQL;
 
     protected function setUp(): void
     {
@@ -196,5 +199,18 @@ abstract class TestCase extends BaseTestCase
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
         return addslashes(static::class).'@'.$method;
+    }
+
+    /**
+     * Construct a command tester.
+     *
+     * @param  \Illuminate\Console\Command  $command
+     * @return \Symfony\Component\Console\Tester\CommandTester
+     */
+    protected function commandTester(Command $command): CommandTester
+    {
+        $command->setLaravel($this->app);
+
+        return new CommandTester($command);
     }
 }
