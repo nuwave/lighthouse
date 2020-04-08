@@ -47,6 +47,8 @@ may influence the final schema.
 Use the `-W` / `--write` option to output the schema to the default file storage
 (usually `storage/app`) as `lighthouse-schema.graphql`.
 
+You can output your schema in JSON format by using the `--json` flag.
+
 ## query
 
 Create a class for a single field on the root Query type.

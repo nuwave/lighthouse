@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Type\Introspection;
+use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Cache\Repository;
 use Illuminate\Console\Command;
@@ -10,6 +12,9 @@ use Nuwave\Lighthouse\GraphQL;
 
 class PrintSchemaCommand extends Command
 {
+    const GRAPHQL_FILENAME = 'lighthouse-schema.graphql';
+    const JSON_FILENAME = 'lighthouse-schema.json';
+
     /**
      * The name and signature of the console command.
      *
@@ -18,6 +23,7 @@ class PrintSchemaCommand extends Command
     protected $signature = '
         lighthouse:print-schema
         {--W|write : Write the output to a file}
+        {--json : Output JSON instead of GraphQL SDL}
     ';
 
     /**
@@ -40,15 +46,38 @@ class PrintSchemaCommand extends Command
         // Clear the cache so this always gets the current schema
         $cache->forget(config('lighthouse.cache.key'));
 
-        $schema = SchemaPrinter::doPrint(
-            $graphQL->prepSchema()
-        );
+        $schema = $graphQL->prepSchema();
+        if ($this->option('json')) {
+            $filename = self::JSON_FILENAME;
+            $schemaString = $this->schemaJson($schema);
+        } else {
+            $filename = self::GRAPHQL_FILENAME;
+            $schemaString = SchemaPrinter::doPrint($schema);
+        }
 
         if ($this->option('write')) {
-            $storage->put('lighthouse-schema.graphql', $schema);
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
+            $storage->put($filename, $schemaString);
+            $this->info('Wrote schema to the default file storage (usually storage/app) as "'.$filename.'".');
         } else {
-            $this->info($schema);
+            $this->info($schemaString);
         }
+    }
+
+    /**
+     * Convert the given schema to a JSON string.
+     *
+     * @param  \GraphQL\Type\Schema  $schema
+     * @return string
+     */
+    protected function schemaJson(Schema $schema): string
+    {
+        // TODO simplify once https://github.com/webonyx/graphql-php/pull/539 is released
+        $introspectionResult = \GraphQL\GraphQL::executeQuery(
+            $schema,
+            Introspection::getIntrospectionQuery()
+        );
+
+        // TODO use safe-php
+        return json_encode($introspectionResult->data);
     }
 }
