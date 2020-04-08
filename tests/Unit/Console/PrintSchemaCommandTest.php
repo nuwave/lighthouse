@@ -29,13 +29,13 @@ class PrintSchemaCommandTest extends TestCase
 
     public function testWritesSchema(): void
     {
-        $storage = Storage::fake();
+        Storage::fake();
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--write' => true]);
 
         $this->assertContains(
             $this->schema,
-            $storage->get(PrintSchemaCommand::GRAPHQL_FILENAME)
+            Storage::get(PrintSchemaCommand::GRAPHQL_FILENAME)
         );
     }
 }
