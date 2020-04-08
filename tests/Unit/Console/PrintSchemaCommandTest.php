@@ -12,6 +12,6 @@ class PrintSchemaCommandTest extends TestCase
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute([]);
 
-        $this->assertStringContainsString($this->schema, $tester->getDisplay());
+        $this->assertContains($this->schema, $tester->getDisplay());
     }
 }
