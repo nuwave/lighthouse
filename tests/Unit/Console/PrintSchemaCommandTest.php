@@ -14,4 +14,15 @@ class PrintSchemaCommandTest extends TestCase
 
         $this->assertContains($this->schema, $tester->getDisplay());
     }
+
+    public function testPrintsSchemaAsJSON(): void
+    {
+        $tester = $this->commandTester(new PrintSchemaCommand());
+        $tester->execute(['--json' => true]);
+
+        $json = $tester->getDisplay();
+
+        $this->assertJson($json);
+        $this->assertContains('"name":"foo"', $json, 'Should contain the introspection result for the schema.');
+    }
 }
