@@ -18,6 +18,7 @@ parameters:
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
+  - '#Call to protected static method get\(\) of class Illuminate\\Filesystem\\FilesystemManager\.#'
 
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
