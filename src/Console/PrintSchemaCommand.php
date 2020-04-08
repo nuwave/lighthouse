@@ -12,6 +12,9 @@ use Nuwave\Lighthouse\GraphQL;
 
 class PrintSchemaCommand extends Command
 {
+    const GRAPHQL_FILENAME = 'lighthouse-schema.graphql';
+    const JSON_FILENAME = 'lighthouse-schema.json';
+
     /**
      * The name and signature of the console command.
      *
@@ -45,10 +48,10 @@ class PrintSchemaCommand extends Command
 
         $schema = $graphQL->prepSchema();
         if ($this->option('json')) {
-            $filename = 'lighthouse-schema.json';
+            $filename = self::JSON_FILENAME;
             $schemaString = $this->schemaJson($schema);
         } else {
-            $filename = 'lighthouse-schema.graphql';
+            $filename = self::GRAPHQL_FILENAME;
             $schemaString = SchemaPrinter::doPrint($schema);
         }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Console;
 
+use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Tests\TestCase;
 
@@ -24,5 +25,17 @@ class PrintSchemaCommandTest extends TestCase
 
         $this->assertJson($json);
         $this->assertContains('"name":"foo"', $json, 'Should contain the introspection result for the schema.');
+    }
+
+    public function testWritesSchema(): void
+    {
+        $storage = Storage::fake();
+        $tester = $this->commandTester(new PrintSchemaCommand());
+        $tester->execute(['--write' => true]);
+
+        $this->assertContains(
+            $this->schema,
+            $storage->get(PrintSchemaCommand::GRAPHQL_FILENAME)
+        );
     }
 }
