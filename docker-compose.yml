@@ -4,7 +4,7 @@ services:
   php:
     build: .
     volumes:
-    - ./:/workdir:z
+      - ./:/workdir:z
     depends_on:
       - mysql
     environment:
@@ -20,10 +20,10 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   node:
-    image: node:12
+    image: node:slim
     volumes:
-    - ./docs:/app
+      - ./docs:/app
     working_dir: /app
     ports:
-    - 8080:8080
+      - 8080:8080
     tty: true
