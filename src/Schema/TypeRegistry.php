@@ -363,6 +363,11 @@ EOL
         ]);
     }
 
+    /**
+     * @param  string  $nodeName
+     * @param  array  $namespaces
+     * @return \Closure|null
+     */
     protected function findTypeResolverClass(string $nodeName, array $namespaces): ?Closure
     {
         // TODO use only __invoke in v5

@@ -12,6 +12,12 @@ class NestedOneToMany implements ArgResolver
      */
     private $relationName;
 
+    /**
+     * NestedOneToMany constructor.
+     *
+     * @param  string  $relationName
+     * @return void
+     */
     public function __construct(string $relationName)
     {
         $this->relationName = $relationName;

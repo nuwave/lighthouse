@@ -30,6 +30,10 @@ directive @create(
 SDL;
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return callable
+     */
     protected function makeExecutionFunction(?Relation $parentRelation = null): callable
     {
         return new SaveModel($parentRelation);

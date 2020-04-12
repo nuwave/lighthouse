@@ -121,6 +121,11 @@ SDL;
         return $schema;
     }
 
+    /**
+     * @param  string  $name
+     * @param  string  $directiveClass
+     * @return string
+     */
     protected function define(string $name, string $directiveClass): string
     {
         if (is_a($directiveClass, DefinedDirective::class, true)) {
@@ -137,6 +142,9 @@ SDL;
         }
     }
 
+    /**
+     * @return string
+     */
     public static function filePath(): string
     {
         return base_path().'/schema-directives.graphql';

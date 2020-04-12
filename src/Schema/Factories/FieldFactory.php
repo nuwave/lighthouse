@@ -332,6 +332,10 @@ class FieldFactory
         }
     }
 
+    /**
+     * @param  \Illuminate\Support\Collection  $directives
+     * @return \Illuminate\Support\Collection
+     */
     protected function gatherValidationDirectives(Collection &$directives): Collection
     {
         // We only get the validator directives that are directly following on the latest validator
@@ -349,21 +353,37 @@ class FieldFactory
         return $validators;
     }
 
+    /**
+     * @param  array  $argumentPath
+     * @return bool
+     */
     protected function argValueExists(array $argumentPath): bool
     {
         return Arr::has($this->args, implode('.', $argumentPath));
     }
 
+    /**
+     * @param  array  $argumentPath
+     * @param $value
+     * @return array
+     */
     protected function setArgValue(array $argumentPath, $value): array
     {
         return Arr::set($this->args, implode('.', $argumentPath), $value);
     }
 
+    /**
+     * @param  array  $argumentPath
+     * @return mixed
+     */
     protected function argValue(array $argumentPath)
     {
         return Arr::get($this->args, implode('.', $argumentPath));
     }
 
+    /**
+     * @return void
+     */
     protected function runArgDirectives(): void
     {
         $this->validateArgs();
@@ -426,6 +446,10 @@ class FieldFactory
         }
     }
 
+    /**
+     * @param  array  $validationErrors
+     * @return void
+     */
     protected function addValidationErrorsToBuffer(array $validationErrors): void
     {
         foreach ($validationErrors as $key => $errorMessages) {
@@ -435,6 +459,9 @@ class FieldFactory
         }
     }
 
+    /**
+     * @return void
+     */
     protected function flushValidationErrorBuffer(): void
     {
         $path = implode(

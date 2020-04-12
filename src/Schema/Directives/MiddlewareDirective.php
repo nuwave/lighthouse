@@ -57,6 +57,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
         $this->middlewareAdapter = $middlewareAdapter;
     }
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

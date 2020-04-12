@@ -35,6 +35,9 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
         $this->auth = $auth;
     }
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -116,11 +119,21 @@ SDL;
         );
     }
 
+    /**
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return void
+     */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition);
     }
 
+    /**
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtension
+     * @return void
+     */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
         ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension);

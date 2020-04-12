@@ -25,6 +25,9 @@ class InterfaceCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Interface';
 
+    /**
+     * @return string
+     */
     protected function namespaceConfigKey(): string
     {
         return 'interfaces';

@@ -26,6 +26,9 @@ class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDi
         $this->eventsDispatcher = $eventsDispatcher;
     }
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

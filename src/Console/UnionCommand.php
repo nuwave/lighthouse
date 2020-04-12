@@ -25,6 +25,9 @@ class UnionCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Union';
 
+    /**
+     * @return string
+     */
     protected function namespaceConfigKey(): string
     {
         return 'unions';

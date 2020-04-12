@@ -73,6 +73,10 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         return $builder;
     }
 
+    /**
+     * @param  string  $column
+     * @return string
+     */
     public static function invalidColumnName(string $column): string
     {
         return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: $column";

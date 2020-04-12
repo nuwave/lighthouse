@@ -25,6 +25,9 @@ class ScalarCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Scalar';
 
+    /**
+     * @return string
+     */
     protected function namespaceConfigKey(): string
     {
         return 'scalars';

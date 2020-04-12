@@ -66,6 +66,12 @@ class WhereConditionsServiceProvider extends ServiceProvider
         );
     }
 
+    /**
+     * @param  string  $name
+     * @param  string  $description
+     * @param  string  $columnType
+     * @return \GraphQL\Language\AST\InputObjectTypeDefinitionNode
+     */
     public static function createWhereConditionsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */

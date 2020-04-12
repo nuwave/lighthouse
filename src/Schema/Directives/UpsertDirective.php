@@ -37,6 +37,10 @@ directive @upsert(
 SDL;
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return callable
+     */
     protected function makeExecutionFunction(?Relation $parentRelation = null): callable
     {
         return new UpsertModel(new SaveModel($parentRelation));

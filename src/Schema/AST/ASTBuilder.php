@@ -120,6 +120,9 @@ class ASTBuilder
         return $this->documentAST;
     }
 
+    /**
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     */
     protected function build(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();

@@ -25,6 +25,9 @@ class QueryCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Query';
 
+    /**
+     * @return string
+     */
     protected function namespaceConfigKey(): string
     {
         return 'queries';

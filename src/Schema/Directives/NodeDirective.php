@@ -30,6 +30,9 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
         $this->nodeRegistry = $nodeRegistry;
     }
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

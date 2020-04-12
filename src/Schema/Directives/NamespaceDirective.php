@@ -23,6 +23,9 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
 {
     const NAME = 'namespace';
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

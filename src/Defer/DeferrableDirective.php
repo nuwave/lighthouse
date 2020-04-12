@@ -21,6 +21,9 @@ class DeferrableDirective extends BaseDirective implements DefinedDirective, Fie
     const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
     const DEFER_DIRECTIVE_NAME = 'defer';
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -125,6 +128,10 @@ SDL;
         return true;
     }
 
+    /**
+     * @param  array  $defers
+     * @return bool
+     */
     protected function anyFieldHasDefer(array $defers): bool
     {
         foreach ($defers as $defer) {

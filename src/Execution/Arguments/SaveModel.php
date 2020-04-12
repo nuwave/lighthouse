@@ -16,6 +16,12 @@ class SaveModel implements ArgResolver
      */
     protected $parentRelation;
 
+    /**
+     * SaveModel constructor.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return void
+     */
     public function __construct(?Relation $parentRelation = null)
     {
         $this->parentRelation = $parentRelation;

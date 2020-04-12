@@ -13,6 +13,9 @@ trait UsesTestSchema
      */
     protected $schema;
 
+    /**
+     * @return void
+     */
     protected function setUpTestSchema(): void
     {
         app()->bind(

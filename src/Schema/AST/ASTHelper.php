@@ -81,6 +81,10 @@ class ASTHelper
         return self::mergeNodeList($remainingDefinitions, $addition);
     }
 
+    /**
+     * @param  string  $oldName
+     * @return string
+     */
     public static function duplicateDefinition(string $oldName): string
     {
         return "Duplicate definition {$oldName} found when merging.";

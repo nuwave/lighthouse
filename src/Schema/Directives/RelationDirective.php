@@ -74,6 +74,10 @@ abstract class RelationDirective extends BaseDirective
         return $value;
     }
 
+    /**
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @return \Closure
+     */
     protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
     {
         return function ($builder) use ($resolveInfo) {
@@ -86,6 +90,10 @@ abstract class RelationDirective extends BaseDirective
         };
     }
 
+    /**
+     * @param  array  $args
+     * @return \Nuwave\Lighthouse\Pagination\PaginationArgs|null
+     */
     protected function paginationArgs(array $args): ?PaginationArgs
     {
         if ($paginationType = $this->paginationType()) {
@@ -95,6 +103,11 @@ abstract class RelationDirective extends BaseDirective
         return null;
     }
 
+    /**
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @return array
+     */
     protected function buildPath(ResolveInfo $resolveInfo, Model $parent): array
     {
         $path = $resolveInfo->path;
@@ -138,6 +151,9 @@ abstract class RelationDirective extends BaseDirective
         );
     }
 
+    /**
+     * @return \Nuwave\Lighthouse\Pagination\PaginationType|null
+     */
     protected function paginationType(): ?PaginationType
     {
         if ($paginationType = $this->directiveArgValue('type')) {

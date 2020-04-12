@@ -128,6 +128,9 @@ SDL;
         );
     }
 
+    /**
+     * @return \Nuwave\Lighthouse\Pagination\PaginationType
+     */
     protected function paginationType(): PaginationType
     {
         return new PaginationType(

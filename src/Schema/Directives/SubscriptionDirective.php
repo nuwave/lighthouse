@@ -15,6 +15,9 @@ class SubscriptionDirective extends BaseDirective implements Directive, DefinedD
 {
     const NAME = 'subscription';
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

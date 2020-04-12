@@ -37,6 +37,9 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
         $this->gate = $gate;
     }
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

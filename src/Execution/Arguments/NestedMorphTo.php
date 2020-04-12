@@ -11,6 +11,12 @@ class NestedMorphTo implements ArgResolver
      */
     private $relationName;
 
+    /**
+     * NestedMorphTo constructor.
+     *
+     * @param  string  $relationName
+     * @return void
+     */
     public function __construct(string $relationName)
     {
         $this->relationName = $relationName;

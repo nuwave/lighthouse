@@ -56,6 +56,12 @@ class OrderByServiceProvider extends ServiceProvider
         );
     }
 
+    /**
+     * @param  string  $name
+     * @param  string  $description
+     * @param  string  $columnType
+     * @return \GraphQL\Language\AST\InputObjectTypeDefinitionNode
+     */
     public static function createOrderByClauseInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
         // TODO deprecated remove in v5

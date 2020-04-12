@@ -11,6 +11,9 @@ class SQLOperator implements Operator
         return "Did not receive a value to match the WhereConditions for column {$column}.";
     }
 
+    /**
+     * @return string
+     */
     public function enumDefinition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -61,6 +64,9 @@ enum SQLOperator {
 GRAPHQL;
     }
 
+    /**
+     * @return string
+     */
     public function default(): string
     {
         return 'EQ';
@@ -116,6 +122,10 @@ GRAPHQL;
         return call_user_func_array([$builder, $method], $args);
     }
 
+    /**
+     * @param  string  $operator
+     * @return int
+     */
     protected function operatorArity(string $operator): int
     {
         if (in_array($operator, ['Null', 'NotNull'])) {

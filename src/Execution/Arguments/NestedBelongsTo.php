@@ -12,6 +12,12 @@ class NestedBelongsTo implements ArgResolver
      */
     private $relationName;
 
+    /**
+     * NestedBelongsTo constructor.
+     *
+     * @param  string  $relationName
+     * @return void
+     */
     public function __construct(string $relationName)
     {
         $this->relationName = $relationName;
@@ -64,6 +70,11 @@ class NestedBelongsTo implements ArgResolver
         self::disconnectOrDelete($relation, $args);
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Relations\BelongsTo  $relation
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @return void
+     */
     public static function disconnectOrDelete(BelongsTo $relation, ArgumentSet $args): void
     {
         // We proceed with disconnecting/deleting only if the given $values is truthy.

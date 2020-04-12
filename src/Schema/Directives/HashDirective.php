@@ -13,11 +13,20 @@ class HashDirective extends BaseDirective implements ArgTransformerDirective, De
      */
     protected $hasher;
 
+    /**
+     * HashDirective constructor.
+     *
+     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
+     * @return void
+     */
     public function __construct(Hasher $hasher)
     {
         $this->hasher = $hasher;
     }
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

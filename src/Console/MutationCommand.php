@@ -25,6 +25,9 @@ class MutationCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Mutation';
 
+    /**
+     * @return string
+     */
     protected function namespaceConfigKey(): string
     {
         return 'mutations';

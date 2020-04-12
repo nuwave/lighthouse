@@ -43,11 +43,17 @@ class PaginationType
         }
     }
 
+    /**
+     * @return bool
+     */
     public function isPaginator(): bool
     {
         return $this->type === self::TYPE_PAGINATOR;
     }
 
+    /**
+     * @return bool
+     */
     public function isConnection(): bool
     {
         return $this->type === self::PAGINATION_TYPE_CONNECTION;

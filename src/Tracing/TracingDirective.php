@@ -29,6 +29,9 @@ class TracingDirective extends BaseDirective implements FieldMiddleware, Defined
         $this->tracing = $tracing;
     }
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

@@ -25,6 +25,9 @@ class SubscriptionCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Subscription';
 
+    /**
+     * @return string
+     */
     protected function namespaceConfigKey(): string
     {
         return 'subscriptions';

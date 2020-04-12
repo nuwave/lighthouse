@@ -62,11 +62,20 @@ class PaginationArgs
         return $instance;
     }
 
+    /**
+     * @param  int  $amount
+     * @return string
+     */
     public static function requestedZeroOrLessItems(int $amount): string
     {
         return "Requested pagination amount must be more than 0, got {$amount}.";
     }
 
+    /**
+     * @param  int  $maxCount
+     * @param  int  $actualCount
+     * @return string
+     */
     public static function requestedTooManyItems(int $maxCount, int $actualCount): string
     {
         return "Maximum number of {$maxCount} requested items exceeded, got {$actualCount}. Fetch smaller chunks.";

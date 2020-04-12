@@ -19,6 +19,9 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
 {
     use GeneratesColumnsEnum;
 
+    /**
+     * @return string
+     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
