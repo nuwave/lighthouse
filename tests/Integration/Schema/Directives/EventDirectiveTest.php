@@ -22,7 +22,7 @@ class EventDirectiveTest extends DBTestCase
 
         type Mutation {
             createCompany(name: String): Company @create
-                @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\CompanyWasCreatedEvent")
+                @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fixtures\\\\CompanyWasCreatedEvent")
         }
         ';
 
