@@ -118,7 +118,7 @@ directive @defer(if: Boolean = true) on FIELD
             return $data;
         }
 
-        if ($this->isDeferred($path) || ! $this->acceptFurtherDeferring) {
+        if (! $this->acceptFurtherDeferring || $this->isDeferred($path)) {
             return $this->resolve($resolver, $path);
         }
 
