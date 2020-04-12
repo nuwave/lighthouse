@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Error\Error;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 
@@ -93,7 +94,7 @@ class PaginationArgs
      * @param \Illuminate\Database\Query\Builder $builder
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function applyToBuilder($builder)
+    public function applyToBuilder($builder): LengthAwarePaginator
     {
         if ($builder instanceof ScoutBuilder) {
             return $builder->paginate($this->first, 'page', $this->page);

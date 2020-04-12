@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class GraphQLController extends Controller
 {
@@ -59,7 +60,7 @@ class GraphQLController extends Controller
      * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function query(GraphQLRequest $request)
+    public function query(GraphQLRequest $request): Response
     {
         $this->eventsDispatcher->dispatch(
             new StartRequest($request)

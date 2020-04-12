@@ -15,5 +15,5 @@ interface HasArgumentPath
      * @param  array  $argumentPath
      * @return static
      */
-    public function setArgumentPath(array $argumentPath);
+    public function setArgumentPath(array $argumentPath): self;
 }

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 
 interface TypeResolver extends Directive
@@ -12,5 +13,5 @@ interface TypeResolver extends Directive
      * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $value
      * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveNode(TypeValue $value);
+    public function resolveNode(TypeValue $value): Type;
 }

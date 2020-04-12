@@ -164,7 +164,7 @@ class ArgumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      * @param  \Closure|null  $directiveFilter
      */
-    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null)
+    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null): void
     {
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();

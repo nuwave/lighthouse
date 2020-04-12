@@ -144,7 +144,7 @@ GRAPHQL;
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function resolveApplicationExceptionHandler($app)
+    protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
             if (AppVersion::atLeast(7.0)) {

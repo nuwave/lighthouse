@@ -16,7 +16,7 @@ abstract class GraphQLSubscription
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return bool
      */
-    public function can(Subscriber $subscriber)
+    public function can(Subscriber $subscriber): bool
     {
         return true;
     }
@@ -28,7 +28,7 @@ abstract class GraphQLSubscription
      * @param  string  $fieldName
      * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, string $fieldName)
+    public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
         return strtoupper(
             Str::snake($fieldName)
@@ -42,7 +42,7 @@ abstract class GraphQLSubscription
      * @param  mixed  $root
      * @return string
      */
-    public function decodeTopic(string $fieldName, $root)
+    public function decodeTopic(string $fieldName, $root): string
     {
         return strtoupper(
             Str::snake($fieldName)

@@ -48,7 +48,7 @@ class AttemptAuthentication
      * @param  array  $guards
      * @return void
      */
-    protected function attemptAuthentication(array $guards)
+    protected function attemptAuthentication(array $guards): void
     {
         if (empty($guards)) {
             $guards = [null];
