@@ -160,7 +160,9 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LaravelMiddlewareAdapter(
                     $app->get(Router::class)
                 );
-            } elseif ($app instanceof LumenApplication) {
+            }
+
+            if ($app instanceof LumenApplication) {
                 return new LumenMiddlewareAdapter($app);
             }
 

@@ -56,18 +56,18 @@ abstract class RelationDirective extends BaseDirective
                             $parent->getKey(),
                             ['parent' => $parent]
                         );
-                } else {
-                    /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-                    $relation = $parent->{$relationName}();
-
-                    $decorateBuilder($relation);
-
-                    if ($paginationArgs) {
-                        $relation = $paginationArgs->applyToBuilder($relation);
-                    }
-
-                    return $relation->getResults();
                 }
+
+                /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+                $relation = $parent->{$relationName}();
+
+                $decorateBuilder($relation);
+
+                if ($paginationArgs) {
+                    $relation = $paginationArgs->applyToBuilder($relation);
+                }
+
+                return $relation->getResults();
             }
         );
 

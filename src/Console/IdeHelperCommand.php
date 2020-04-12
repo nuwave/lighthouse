@@ -131,10 +131,10 @@ SDL;
             PartialParser::directiveDefinition($definition);
 
             return trim($definition);
-        } else {
-            return '# Add a proper definition by implementing '.DefinedDirective::class."\n"
-                ."directive @{$name}";
         }
+
+        return '# Add a proper definition by implementing '.DefinedDirective::class."\n"
+            ."directive @{$name}";
     }
 
     public static function filePath(): string
