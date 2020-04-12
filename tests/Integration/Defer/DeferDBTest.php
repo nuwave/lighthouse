@@ -226,11 +226,8 @@ class DeferDBTest extends DBTestCase
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
 
-            $this->assertTrue(
-                in_array(
-                    $item['name'],
-                    $companies->pluck('name')->all()
-                )
+            $this->assertContains(
+                $item['name'], $companies->pluck('name')->all()
             );
         });
     }
