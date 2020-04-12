@@ -7,7 +7,7 @@ use Tests\Utils\Models\User;
 
 class TaskPolicy
 {
-    const ADMIN = 'admin';
+    public const ADMIN = 'admin';
 
     public function adminOnly(User $user): bool
     {

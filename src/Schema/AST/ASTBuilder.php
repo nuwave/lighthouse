@@ -27,7 +27,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
 class ASTBuilder
 {
-    const EXTENSION_TO_DEFINITION_CLASS = [
+    public const EXTENSION_TO_DEFINITION_CLASS = [
         ObjectTypeExtensionNode::class => ObjectTypeDefinitionNode::class,
         InputObjectTypeExtensionNode::class => InputObjectTypeDefinitionNode::class,
         InterfaceTypeExtensionNode::class => InterfaceTypeDefinitionNode::class,

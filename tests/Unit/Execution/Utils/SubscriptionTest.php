@@ -19,7 +19,7 @@ class SubscriptionTest extends TestCase
     /**
      * @var string
      */
-    const SUBSCRIPTION_FIELD = 'postCreated';
+    public const SUBSCRIPTION_FIELD = 'postCreated';
 
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry

@@ -16,7 +16,7 @@ class StorageManagerTest extends TestCase
     /**
      * @var string
      */
-    const TOPIC = 'lighthouse';
+    public const TOPIC = 'lighthouse';
 
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\StorageManager

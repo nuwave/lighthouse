@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 
 class FooBarRule implements Rule
 {
-    const MESSAGE = 'This rule was triggered.';
+    public const MESSAGE = 'This rule was triggered.';
 
     /**
      * Determine if the validation rule passes.

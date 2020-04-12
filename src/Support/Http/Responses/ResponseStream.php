@@ -13,7 +13,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * @var string
      */
-    const EOL = "\r\n";
+    public const EOL = "\r\n";
 
     /**
      * Stream graphql response.

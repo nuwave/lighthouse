@@ -9,7 +9,7 @@ class Foo
      *
      * @var string
      */
-    const NOT_THE_ANSWER = 'war';
+    public const NOT_THE_ANSWER = 'war';
 
     /**
      * Return a value for the field.

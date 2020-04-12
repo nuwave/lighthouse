@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 
 class ForceDeleteDirective extends ModifyModelExistenceDirective
 {
-    const MODEL_NOT_USING_SOFT_DELETES = 'Use the @forceDelete directive only for Model classes that use the SoftDeletes trait.';
+    public const MODEL_NOT_USING_SOFT_DELETES = 'Use the @forceDelete directive only for Model classes that use the SoftDeletes trait.';
 
     public static function definition(): string
     {

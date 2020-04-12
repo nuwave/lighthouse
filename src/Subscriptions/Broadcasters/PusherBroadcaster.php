@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class PusherBroadcaster implements Broadcaster
 {
-    const EVENT_NAME = 'lighthouse-subscription';
+    public const EVENT_NAME = 'lighthouse-subscription';
 
     /**
      * @var \Pusher\Pusher

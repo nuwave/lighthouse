@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * A dummy query type definition that is added to tests by default.
      */
-    const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
+    public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   foo: Int
 }

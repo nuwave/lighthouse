@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class WhereConditionsServiceProvider extends ServiceProvider
 {
-    const DEFAULT_WHERE_CONDITIONS = 'WhereConditions';
+    public const DEFAULT_WHERE_CONDITIONS = 'WhereConditions';
 
     /**
      * Register any application services.

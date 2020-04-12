@@ -14,7 +14,7 @@ class Authenticate
     /**
      * @var string
      */
-    const MESSAGE = 'This middleware always throws.';
+    public const MESSAGE = 'This middleware always throws.';
 
     /**
      * @param  \Illuminate\Http\Request  $request

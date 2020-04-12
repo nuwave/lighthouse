@@ -13,7 +13,7 @@ use Serializable;
 
 class Subscriber implements Serializable
 {
-    const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
+    public const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
 
     /**
      * @var string

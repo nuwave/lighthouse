@@ -9,7 +9,7 @@ class Baz
      *
      * @var int
      */
-    const THE_ANSWER = 42;
+    public const THE_ANSWER = 42;
 
     /**
      * Return a value for the field.
