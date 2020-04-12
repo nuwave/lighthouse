@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -24,7 +23,7 @@ class AcceptJson
      * @param  \Closure  $next
      * @return \Illuminate\Http\JsonResponse
      */
-    public function handle(Request $request, Closure $next): JsonResponse
+    public function handle(Request $request, Closure $next)
     {
         $request->headers->set('Accept', 'application/json');
 
