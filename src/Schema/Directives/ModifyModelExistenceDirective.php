@@ -95,7 +95,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      *
      * @return \GraphQL\Language\AST\NonNullTypeNode
      */
-    protected function idArgument(): NonNullTypeNode
+    protected function idArgument()
     {
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldNode */
         $fieldNode = $this->definitionNode;
