@@ -71,6 +71,9 @@ class Serializer implements ContextSerializer
                 // This is here for backwards compatibility, before the Laravel
                 // `SerializesAndRestoresModelIdentifiers` trait was used to
                 // serialize the user data it was `serialize`d separately
+                // This allows existing subscriptions to be seamlessly
+                // upgraded without breaking an active subscription
+                // TODO remove this fallback in v5
                 if (is_string($user)) {
                     return unserialize($rawUser);
                 }

@@ -48,9 +48,12 @@ class SerializerTest extends DBTestCase
 
         $this->assertTrue($retrievedFromDatabase);
         $this->assertInstanceOf(User::class, $unserialized->user());
-        $this->assertEquals($user->getKey(), $unserialized->user()->getKey());
+        $this->assertSame($user->getKey(), $unserialized->user()->getKey());
     }
 
+    /**
+     * TODO remove this fallback test in v5.
+     */
     public function testSerializerIsBackwardsCompatibleWithSerializedUser(): void
     {
         $user = factory(User::class)->create();
@@ -91,6 +94,6 @@ class SerializerTest extends DBTestCase
 
         $this->assertFalse($retrievedFromDatabase);
         $this->assertInstanceOf(User::class, $unserialized->user());
-        $this->assertEquals($user->getKey(), $unserialized->user()->getKey());
+        $this->assertSame($user->getKey(), $unserialized->user()->getKey());
     }
 }
