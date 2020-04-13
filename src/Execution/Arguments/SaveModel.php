@@ -66,9 +66,15 @@ class SaveModel implements ArgResolver
         $model->save();
 
         if ($this->parentRelation instanceof BelongsTo) {
-            $this->parentRelation
-                ->associate($model)
-                ->save();
+            $parentModel = $this->parentRelation
+                                ->associate($model);
+
+            // If the parent Model does not exist (still to be saved),
+            // a save could break any pending belongsTo relations that still
+            // needs to be created and associated with the parent model
+            if ($parentModel->exists()) {
+                $parentModel->save();
+            }
         }
 
         if ($this->parentRelation instanceof BelongsToMany) {

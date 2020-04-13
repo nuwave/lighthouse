@@ -816,7 +816,7 @@ GRAPHQL
             name: String!
             users: UpsertRoleUsersRelation
         }
-        
+
         input UpsertRoleUsersRelation {
             sync: [ID!]
         }
@@ -905,5 +905,99 @@ GRAPHQL
         ]);
 
         $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
+    }
+
+    public function testCreateMultipleBelongsTothatDontExist()
+    {
+        $this->schema = /** @lang GraphQL */ '
+
+        type RoleUserPivot {
+            id: ID!
+            user: User!
+            role: Role!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Role {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createRoleUser(input: RoleUserInput! @spread): RoleUserPivot @create
+        }
+
+        input RoleUserInput {
+            id: ID!
+            user: UserInput!
+            role: RoleInput!
+        }
+
+        input UserInput {
+            create: CreateUserInput
+        }
+
+        input CreateUserInput {
+            id: ID!
+            name: String!
+        }
+
+        input RoleInput {
+            create: CreateRoleInput
+        }
+
+        input CreateRoleInput {
+            id: ID!
+            name: String!
+        }
+        '.self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation {
+                createRoleUser(input: {
+                    id: "1"
+                    user: {
+                        create: {
+                            id: "2"
+                            name: "user 1"
+                        }
+                    }
+                    role: {
+                        create: {
+                            id: "3",
+                            name: "role 1"
+                        }
+                    }
+                }) {
+                    id
+                    user {
+                        id
+                        name
+                    }
+                    role {
+                        id
+                        name
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'createRoleUser' => [
+                        'id' => '1',
+                        'user' => [
+                            'id' => '2',
+                            'name' => 'user 1',
+                        ],
+                        'role' => [
+                            'id' => '3',
+                            'name' => 'role 1',
+                        ],
+                    ],
+                ],
+            ]);
     }
 }
