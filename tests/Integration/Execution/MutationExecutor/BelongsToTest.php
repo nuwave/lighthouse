@@ -985,19 +985,19 @@ GRAPHQL
                 }
             }
             ')->assertJson([
-                'data' => [
-                    'createRoleUser' => [
-                        'id' => '1',
-                        'user' => [
-                            'id' => '2',
-                            'name' => 'user 1',
-                        ],
-                        'role' => [
-                            'id' => '3',
-                            'name' => 'role 1',
-                        ],
+            'data' => [
+                'createRoleUser' => [
+                    'id' => '1',
+                    'user' => [
+                        'id' => '2',
+                        'name' => 'user 1',
+                    ],
+                    'role' => [
+                        'id' => '3',
+                        'name' => 'role 1',
                     ],
                 ],
-            ]);
+            ],
+        ]);
     }
 }
