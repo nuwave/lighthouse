@@ -118,19 +118,42 @@ class StorageManager implements StoresSubscriptions
     /**
      * Delete subscriber.
      *
+     * @param  string  $channel
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function deleteSubscriber(string $channel): ?Subscriber
     {
-        $key = self::SUBSCRIBER_KEY.".{$channel}";
-        $hasSubscriber = $this->cache->has($key);
-
-        $subscriber = $this->cache->get($key);
+        $subscriberKey = self::SUBSCRIBER_KEY.".{$channel}";
+        $hasSubscriber = $this->cache->has($subscriberKey);
+        $subscriber = $this->cache->get($subscriberKey);
 
         if ($hasSubscriber) {
-            $this->cache->forget($key);
+            $this->removeSubscriberFromTopic($subscriber, $subscriberKey);
+            $this->cache->forget($subscriberKey);
         }
 
         return $subscriber;
+    }
+    
+    /**
+     * Remove the subscriber from the topic they are subscribed to.
+     *
+     * @param  Subscriber $subscriber
+     * @param  string $subscriberKey
+     */
+    public function removeSubscriberFromTopic(Subscriber $subscriber, string $subscriberKey)
+    {
+        $key = strtoupper(Str::snake($subscriber->operationName));
+        $topicKey = self::TOPIC_KEY.".{$key}";
+
+        $topic = Collection::make(
+            $this->cache->has($topicKey)
+                ? json_decode($this->cache->get($topicKey), true)
+                : []
+        )->filter(function ($key) use ($subscriberKey) {
+            return $key === $subscriberKey;
+        });
+
+        $this->cache->forever($topicKey, json_encode($topic->all()));
     }
 }
