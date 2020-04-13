@@ -17,6 +17,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Changed
 
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
+- Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
 
 ## 4.11.0
 
