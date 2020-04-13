@@ -114,7 +114,7 @@ SDL;
                 $cache->forever($cacheKey, $value);
             };
 
-            ($resolvedValue instanceof Deferred)
+            $resolvedValue instanceof Deferred
                 ? $resolvedValue->then(function ($result) use ($storeInCache): void {
                     $storeInCache($result);
                 })
