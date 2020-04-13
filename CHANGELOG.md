@@ -12,9 +12,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add flag `--json` to `print-schema` to output JSON instead of GraphQL SDL https://github.com/nuwave/lighthouse/pull/1268
-
-### Changed
-
 - Add TTL option for subscriptions storage https://github.com/nuwave/lighthouse/pull/1284
 
 ## 4.11.0
