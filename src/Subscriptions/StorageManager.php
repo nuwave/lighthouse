@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions
@@ -134,7 +135,7 @@ class StorageManager implements StoresSubscriptions
 
         return $subscriber;
     }
-    
+
     /**
      * Remove the subscriber from the topic they are subscribed to.
      *
