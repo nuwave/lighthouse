@@ -32,7 +32,6 @@ class ArgumentFactory
      * @see \GraphQL\Type\Definition\FieldArgument
      * @see \GraphQL\Type\Definition\InputObjectField
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $definitionNode
      * @return mixed[]
      */
     public function convert(InputValueDefinitionNode $definitionNode): array

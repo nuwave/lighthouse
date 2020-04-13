@@ -20,8 +20,6 @@ class FooBar
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
     public function resolve(): string
     {
@@ -30,8 +28,6 @@ class FooBar
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
     public function customResolve(): string
     {

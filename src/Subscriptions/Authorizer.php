@@ -26,12 +26,6 @@ class Authorizer implements AuthorizesSubscriptions
      */
     protected $exceptionHandler;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions  $storage
-     * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $registry
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler  $exceptionHandler
-     * @return void
-     */
     public function __construct(
         StoresSubscriptions $storage,
         SubscriptionRegistry $registry,
@@ -44,9 +38,6 @@ class Authorizer implements AuthorizesSubscriptions
 
     /**
      * Authorize subscription request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     public function authorize(Request $request): bool
     {

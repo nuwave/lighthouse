@@ -27,9 +27,6 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
      */
     protected $auth;
 
-    /**
-     * @param  \Illuminate\Contracts\Auth\Factory  $auth
-     */
     public function __construct(AuthFactory $auth)
     {
         $this->auth = $auth;
@@ -55,10 +52,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -81,7 +74,6 @@ SDL;
      * Determine if the user is logged in to any of the given guards.
      *
      * @param  string[]  $guards
-     * @return void
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -106,7 +98,6 @@ SDL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
-     * @return void
      */
     protected function unauthenticated(array $guards): void
     {

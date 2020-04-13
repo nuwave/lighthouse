@@ -36,7 +36,6 @@ SDL;
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     * @return void
      */
     protected function addNamespacesToFields(&$objectType): void
     {
@@ -53,10 +52,6 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return void
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
@@ -67,10 +62,6 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
-     *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\TypeExtensionNode $typeExtension
-     * @return void
      */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {

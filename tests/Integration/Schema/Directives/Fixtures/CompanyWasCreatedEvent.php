@@ -11,12 +11,6 @@ class CompanyWasCreatedEvent
      */
     public $company;
 
-    /**
-     * CompanyWasCreatedEvent constructor.
-     *
-     * @param  \Tests\Utils\Models\Company  $company
-     * @return void
-     */
     public function __construct(Company $company)
     {
         $this->company = $company;

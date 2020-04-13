@@ -15,8 +15,6 @@ interface RendersErrorsExtensions extends ClientAware
     /**
      * Return the content that is put in the "extensions" part
      * of the returned error.
-     *
-     * @return array
      */
     public function extensionsContent(): array;
 }

@@ -34,7 +34,6 @@ class BuilderDirectiveTest extends DBTestCase
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  int  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function limit($builder, int $value)

@@ -1396,10 +1396,6 @@ class Commentable
      */
     protected $typeRegistry;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;
@@ -2654,10 +2650,6 @@ class Person
      */
     protected $typeRegistry;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;

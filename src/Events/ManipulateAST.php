@@ -21,12 +21,6 @@ class ManipulateAST
      */
     public $documentAST;
 
-    /**
-     * BuildSchemaString constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return void
-     */
     public function __construct(DocumentAST &$documentAST)
     {
         $this->documentAST = $documentAST;

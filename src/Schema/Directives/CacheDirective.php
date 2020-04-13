@@ -26,10 +26,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDi
      */
     protected $cacheManager;
 
-    /**
-     * @param  \Illuminate\Cache\CacheManager  $cacheManager
-     * @return void
-     */
     public function __construct(CacheManager $cacheManager)
     {
         $this->cacheManager = $cacheManager;
@@ -60,10 +56,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -126,8 +118,6 @@ SDL;
 
     /**
      * Check if tags should be used and are available.
-     *
-     * @return bool
      */
     protected function shouldUseTags(): bool
     {
@@ -138,8 +128,6 @@ SDL;
     /**
      * Set node's cache key.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $typeValue
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */

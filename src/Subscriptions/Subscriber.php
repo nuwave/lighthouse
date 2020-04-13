@@ -20,9 +20,6 @@ class Subscriber implements Serializable
      */
     public $channel;
 
-    /**
-     * @var mixed
-     */
     public $root;
 
     /**
@@ -30,9 +27,6 @@ class Subscriber implements Serializable
      */
     public $args;
 
-    /**
-     * @var mixed
-     */
     public $context;
 
     /**
@@ -47,9 +41,6 @@ class Subscriber implements Serializable
 
     /**
      * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
      */
@@ -120,7 +111,6 @@ class Subscriber implements Serializable
     /**
      * Set root data.
      *
-     * @param  mixed  $root
      * @return $this
      */
     public function setRoot($root): self
@@ -132,17 +122,12 @@ class Subscriber implements Serializable
 
     /**
      * Generate a unique private channel name.
-     *
-     * @return string
      */
     public static function uniqueChannelName(): string
     {
         return 'private-lighthouse-'.Str::random(32).'-'.time();
     }
 
-    /**
-     * @return \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer
-     */
     protected function contextSerializer(): ContextSerializer
     {
         return app(ContextSerializer::class);

@@ -44,15 +44,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     protected $eventsDispatcher;
 
-    /**
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions  $auth
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator  $iterator
-     * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @return void
-     */
     public function __construct(
         GraphQL $graphQL,
         AuthorizesSubscriptions $auth,
@@ -71,11 +62,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
     /**
      * Queue pushing subscription data to subscribers.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
-     * @param  string  $fieldName
-     * @param  mixed  $root
-     * @return void
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
@@ -86,11 +72,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
     /**
      * Push subscription data to subscribers.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
-     * @param  string  $fieldName
-     * @param  mixed  $root
-     * @return void
      */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
@@ -123,9 +104,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
     /**
      * Authorize the subscription.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authorize(Request $request): Response
     {

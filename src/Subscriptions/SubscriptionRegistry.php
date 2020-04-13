@@ -45,12 +45,6 @@ class SubscriptionRegistry
      */
     protected $subscriptions = [];
 
-    /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @return void
-     */
     public function __construct(ContextSerializer $serializer, StorageManager $storage, GraphQL $graphQL)
     {
         $this->serializer = $serializer;
@@ -61,8 +55,6 @@ class SubscriptionRegistry
     /**
      * Add subscription to registry.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
-     * @param  string  $field
      * @return $this
      */
     public function register(GraphQLSubscription $subscription, string $field): self
@@ -74,9 +66,6 @@ class SubscriptionRegistry
 
     /**
      * Check if subscription is registered.
-     *
-     * @param  string  $key
-     * @return bool
      */
     public function has(string $key): bool
     {
@@ -95,9 +84,6 @@ class SubscriptionRegistry
 
     /**
      * Get instance of subscription.
-     *
-     * @param  string  $key
-     * @return \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
      */
     public function subscription(string $key): GraphQLSubscription
     {
@@ -108,7 +94,6 @@ class SubscriptionRegistry
      * Add subscription to registry.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  string  $channel
      * @return $this
      */
     public function subscriber(Subscriber $subscriber, string $channel): self
@@ -126,7 +111,6 @@ class SubscriptionRegistry
      * Get registered subscriptions.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @return \Illuminate\Support\Collection
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {
@@ -159,9 +143,6 @@ class SubscriptionRegistry
 
     /**
      * Reset the collection of subscribers when a new execution starts.
-     *
-     * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
-     * @return void
      */
     public function handleStartExecution(StartExecution $startExecution): void
     {
@@ -170,8 +151,6 @@ class SubscriptionRegistry
 
     /**
      * Get all current subscribers.
-     *
-     * @return \Nuwave\Lighthouse\Execution\ExtensionsResponse
      */
     public function handleBuildExtensionsResponse(): ExtensionsResponse
     {
