@@ -38,10 +38,10 @@ abstract class DBTestCase extends TestCase
         $app['config']->set('database.default', 'mysql');
         $app['config']->set('database.connections.mysql', [
             'driver' => 'mysql',
-            'database' => 'test',
-            'host' => env('GITHUB_ACTIONS') ? '127.0.0.1' : 'mysql',
-            'username' => 'root',
-            'password' => env('GITHUB_ACTIONS') ? 'root' : '',
+            'database' => env('LIGHTHOUSE_TEST_DB', 'test'),
+            'host' => env('GITHUB_ACTIONS') ? '127.0.0.1' : env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
+            'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
+            'password' => env('GITHUB_ACTIONS') ? 'root' : env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
         ]);
     }
 }
