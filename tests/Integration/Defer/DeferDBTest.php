@@ -227,7 +227,8 @@ class DeferDBTest extends DBTestCase
             $this->assertArrayHasKey('name', $item);
 
             $this->assertContains(
-                $item['name'], $companies->pluck('name')->all()
+                $item['name'],
+                $companies->pluck('name')->all()
             );
         });
     }
