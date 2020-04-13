@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
+use Tests\Utils\Subscriptions\TaskUpdated;
 
 class StorageManagerTest extends TestCase
 {
@@ -135,6 +136,28 @@ class StorageManagerTest extends TestCase
 
         $this->storage->deleteSubscriber($subscriber1->channel);
         $this->assertCount(1, $this->storage->subscribersByTopic(self::TOPIC));
+    }
+
+    public function testDeleteSubscribersInCache(): void
+    {
+        $subscriber1 = $this->subscriber('{ me }');
+        $subscriber2 = $this->subscriber('{ viewer }');
+
+        $subscription = new TaskUpdated();
+        $key = $subscription->encodeTopic($subscriber1, 'TaskCreated');
+
+        $subscriber1->operationName = $key;
+        $subscriber2->operationName = $key;
+
+        $this->storage->storeSubscriber($subscriber1, $key);
+        $this->storage->deleteSubscriber($subscriber1->channel);
+
+        $this->storage->storeSubscriber($subscriber2, $key);
+        $this->storage->deleteSubscriber($subscriber2->channel);
+
+        $this->storage->storeSubscriber($subscriber1, $key);
+
+        $this->assertCount(1, $this->storage->subscribersByTopic($key));
     }
 
     protected function assertSubscriberIsSame(Subscriber $expected, Subscriber $actual): void

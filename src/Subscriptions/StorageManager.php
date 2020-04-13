@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions
@@ -134,7 +135,7 @@ class StorageManager implements StoresSubscriptions
 
         return $subscriber;
     }
-    
+
     /**
      * Remove the subscriber from the topic they are subscribed to.
      *
@@ -150,10 +151,15 @@ class StorageManager implements StoresSubscriptions
             $this->cache->has($topicKey)
                 ? json_decode($this->cache->get($topicKey), true)
                 : []
-        )->filter(function ($key) use ($subscriberKey) {
-            return $key === $subscriberKey;
+        )->reject(function ($key) use ($subscriberKey) {
+            return self::SUBSCRIBER_KEY.".{$key}" === $subscriberKey;
         });
 
-        $this->cache->forever($topicKey, json_encode($topic->all()));
+        if ($this->ttl === null) {
+            $this->cache->forever($topicKey, json_encode($topic->all()));
+            $this->cache->forever($subscriberKey, $subscriber);
+        } else {
+            $this->cache->put($topicKey, json_encode($topic->all()), $this->ttl);
+        }
     }
 }
