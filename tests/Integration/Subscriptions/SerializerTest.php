@@ -47,6 +47,50 @@ class SerializerTest extends DBTestCase
         );
 
         $this->assertTrue($retrievedFromDatabase);
+        $this->assertInstanceOf(User::class, $unserialized->user());
+        $this->assertEquals($user->getKey(), $unserialized->user()->getKey());
+    }
+
+    public function testSerializerIsBackwardsCompatibleWithSerializedUser(): void
+    {
+        $user = factory(User::class)->create();
+
+        $serializer = new Serializer(
+            $contextFactory = new ContextFactory
+        );
+
+        $request = new Request();
+        $request->setUserResolver(static function () use ($user) {
+            return $user;
+        });
+
+        $context = $contextFactory->generate($request);
+
+        $this->assertSame($user, $context->user());
+
+        $retrievedFromDatabase = false;
+
+        User::retrieved(static function () use (&$retrievedFromDatabase) {
+            $retrievedFromDatabase = true;
+        });
+
+        $serialized = serialize([
+            'request' => [
+                'query' => [],
+                'request' => [],
+                'attributes' => [],
+                'cookies' => [],
+                'files' => [],
+                'server' => [],
+                'content' => '',
+            ],
+            'user' => serialize($context->user()),
+        ]);
+
+        $unserialized = $serializer->unserialize($serialized);
+
+        $this->assertFalse($retrievedFromDatabase);
+        $this->assertInstanceOf(User::class, $unserialized->user());
         $this->assertEquals($user->getKey(), $unserialized->user()->getKey());
     }
 }
