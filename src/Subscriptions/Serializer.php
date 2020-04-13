@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
+use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -10,6 +11,8 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Serializer implements ContextSerializer
 {
+    use SerializesAndRestoresModelIdentifiers;
+
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
@@ -37,7 +40,7 @@ class Serializer implements ContextSerializer
                 'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
                 'content' => $request->getContent(),
             ],
-            'user' => serialize($context->user()),
+            'user' => $this->getSerializedPropertyValue($context->user()),
         ]);
     }
 
@@ -63,7 +66,16 @@ class Serializer implements ContextSerializer
 
         $request->setUserResolver(
             function () use ($rawUser) {
-                return unserialize($rawUser);
+                $user = $this->getRestoredPropertyValue($rawUser);
+
+                // This is here for backwards compatibility, before the Laravel
+                // `SerializesAndRestoresModelIdentifiers` trait was used to
+                // serialize the user data it was `serialize`d separately
+                if (is_string($user)) {
+                    return unserialize($rawUser);
+                }
+
+                return $user;
             }
         );
 
