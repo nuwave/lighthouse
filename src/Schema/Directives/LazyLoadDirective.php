@@ -47,7 +47,7 @@ SDL;
                     /** @var \GraphQL\Deferred|\Illuminate\Database\Eloquent\Model $result */
                     $result = $resolver($root, $args, $context, $resolveInfo);
 
-                    ($result instanceof Deferred)
+                    $result instanceof Deferred
                         ? $result->then(function (Collection &$items) use ($relations): Collection {
                             $items->load($relations);
 

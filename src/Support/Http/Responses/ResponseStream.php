@@ -43,7 +43,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $chunk['errors'] = $errors;
                 }
 
-                $terminating = $final && ($i === $lastKey);
+                $terminating = $final && $i === $lastKey;
 
                 $this->emit(
                     $this->chunk($chunk, $terminating)

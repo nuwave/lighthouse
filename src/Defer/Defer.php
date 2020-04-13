@@ -204,7 +204,7 @@ directive @defer(if: Boolean = true) on FIELD
                 $this->stream->stream($result, [], empty($this->deferred));
 
                 if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
-                    $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
+                    $this->maxExecutionTime = microtime(true) + $executionTime * 1000;
                 }
 
                 // TODO: Allow nested_levels to be set in config to break out of loop early.
