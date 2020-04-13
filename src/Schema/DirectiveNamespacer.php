@@ -13,11 +13,6 @@ class DirectiveNamespacer
      */
     protected $dispatcher;
 
-    /**
-     * DirectiveNamespaces constructor.
-     *
-     * @return void
-     */
     public function __construct(Dispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;

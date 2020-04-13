@@ -14,11 +14,6 @@ class AttemptAuthentication
      */
     protected $auth;
 
-    /**
-     * Create a new middleware instance.
-     *
-     * @return void
-     */
     public function __construct(Auth $auth)
     {
         $this->auth = $auth;

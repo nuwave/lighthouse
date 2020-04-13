@@ -37,10 +37,6 @@ SDL;
      */
     protected $defer;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Defer\Defer  $defer
-     * @return void
-     */
     public function __construct(Defer $defer)
     {
         $this->defer = $defer;

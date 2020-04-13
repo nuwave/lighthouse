@@ -43,11 +43,6 @@ class DirectiveFactory
      */
     protected $directiveNamespacer;
 
-    /**
-     * DirectiveFactory constructor.
-     *
-     * @return void
-     */
     public function __construct(DirectiveNamespacer $directiveNamespacer)
     {
         $this->directiveNamespacer = $directiveNamespacer;

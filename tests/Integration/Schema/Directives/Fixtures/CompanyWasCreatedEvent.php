@@ -11,11 +11,6 @@ class CompanyWasCreatedEvent
      */
     public $company;
 
-    /**
-     * CompanyWasCreatedEvent constructor.
-     *
-     * @return void
-     */
     public function __construct(Company $company)
     {
         $this->company = $company;

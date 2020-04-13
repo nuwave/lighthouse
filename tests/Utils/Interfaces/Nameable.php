@@ -14,9 +14,6 @@ class Nameable
      */
     protected $typeRegistry;
 
-    /**
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;

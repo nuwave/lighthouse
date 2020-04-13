@@ -17,11 +17,6 @@ class MultipartFormRequest extends BaseRequest
      */
     protected $operations;
 
-    /**
-     * MultipartFormRequest constructor.
-     *
-     * @return void
-     */
     public function __construct(Request $request)
     {
         if (! $request->has('map')) {

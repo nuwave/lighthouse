@@ -12,9 +12,6 @@ class BroadcastSubscriptionListener implements ShouldQueue
      */
     protected $broadcaster;
 
-    /**
-     * @return void
-     */
     public function __construct(BroadcastsSubscriptions $broadcaster)
     {
         $this->broadcaster = $broadcaster;

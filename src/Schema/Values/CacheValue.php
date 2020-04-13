@@ -33,11 +33,6 @@ class CacheValue
      */
     protected $isPrivate;
 
-    /**
-     * Create instance of cache value.
-     *
-     * @return void
-     */
     public function __construct(array $arguments = [])
     {
         $this->fieldValue = Arr::get($arguments, 'field_value');

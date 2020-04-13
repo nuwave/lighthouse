@@ -22,9 +22,6 @@ class LogBroadcaster implements Broadcaster
      */
     protected $broadcasts = [];
 
-    /**
-     * @return void
-     */
     public function __construct(array $config = [])
     {
         $this->config = $config;

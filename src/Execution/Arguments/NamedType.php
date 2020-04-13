@@ -18,11 +18,6 @@ class NamedType
      */
     public $nonNull = false;
 
-    /**
-     * NamedType constructor.
-     *
-     * @return void
-     */
     public function __construct(string $name)
     {
         $this->name = $name;

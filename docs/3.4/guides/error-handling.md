@@ -37,13 +37,6 @@ class CustomException extends Exception implements RendersErrorsExtensions
     */
     private $reason;
 
-    /**
-    * CustomException constructor.
-    * 
-    * @param  string  $message
-    * @param  string  $reason
-    * @return void
-    */
     public function __construct(string $message, string $reason)
     {
         parent::__construct($message);

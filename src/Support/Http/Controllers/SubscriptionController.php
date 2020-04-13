@@ -20,9 +20,6 @@ class SubscriptionController extends Controller
      */
     protected $broadcasterManager;
 
-    /**
-     * @return void
-     */
     public function __construct(BroadcastsSubscriptions $broadcaster, BroadcastManager $broadcastManager)
     {
         $this->broadcaster = $broadcaster;

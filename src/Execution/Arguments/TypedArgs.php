@@ -27,12 +27,6 @@ class TypedArgs
      */
     protected $directiveFactory;
 
-    /**
-     * TypedArgs constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter  $argumentTypeNodeConverter
-     * @return void
-     */
     public function __construct(
         ASTBuilder $astBuilder,
         ArgumentTypeNodeConverter $argumentTypeNodeConverter,

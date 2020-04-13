@@ -32,11 +32,6 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      */
     protected $globalId;
 
-    /**
-     * UpdateDirective constructor.
-     *
-     * @return void
-     */
     public function __construct(DatabaseManager $databaseManager, GlobalId $globalId)
     {
         $this->databaseManager = $databaseManager;

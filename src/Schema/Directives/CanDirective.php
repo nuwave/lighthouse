@@ -27,10 +27,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
      */
     protected $gate;
 
-    /**
-     * CanDirective constructor.
-     * @return void
-     */
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;

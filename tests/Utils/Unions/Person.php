@@ -12,9 +12,6 @@ class Person
      */
     protected $typeRegistry;
 
-    /**
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;

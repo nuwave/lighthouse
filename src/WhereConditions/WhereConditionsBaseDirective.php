@@ -24,12 +24,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     protected $operator;
 
-    /**
-     * WhereConditions constructor.
-     *
-     * @param  \Nuwave\Lighthouse\WhereConditions\Operator  $operator
-     * @return void
-     */
     public function __construct(Operator $operator)
     {
         $this->operator = $operator;

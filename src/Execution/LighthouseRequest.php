@@ -13,11 +13,6 @@ class LighthouseRequest extends BaseRequest
      */
     protected $request;
 
-    /**
-     * LighthouseRequest constructor.
-     *
-     * @return void
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;

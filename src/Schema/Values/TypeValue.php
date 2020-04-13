@@ -27,9 +27,6 @@ class TypeValue
      */
     protected $cacheKey;
 
-    /**
-     * @return void
-     */
     public function __construct(TypeDefinitionNode $typeDefinition)
     {
         $this->typeDefinition = $typeDefinition;

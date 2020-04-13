@@ -45,10 +45,6 @@ class SubscriptionRegistry
      */
     protected $subscriptions = [];
 
-    /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
-     * @return void
-     */
     public function __construct(ContextSerializer $serializer, StorageManager $storage, GraphQL $graphQL)
     {
         $this->serializer = $serializer;

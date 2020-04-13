@@ -15,9 +15,6 @@ class Serializer implements ContextSerializer
      */
     protected $createsContext;
 
-    /**
-     * @return void
-     */
     public function __construct(CreatesContext $createsContext)
     {
         $this->createsContext = $createsContext;

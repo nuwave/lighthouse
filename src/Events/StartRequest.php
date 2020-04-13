@@ -29,11 +29,6 @@ class StartRequest
      */
     public $moment;
 
-    /**
-     * StartRequest constructor.
-     *
-     * @return void
-     */
     public function __construct(GraphQLRequest $request)
     {
         $this->request = $request;

@@ -32,11 +32,6 @@ class GraphQLController extends Controller
      */
     protected $container;
 
-    /**
-     * Inject middleware into request.
-     *
-     * @return void
-     */
     public function __construct(
         GraphQL $graphQL,
         EventsDispatcher $eventsDispatcher,

@@ -44,11 +44,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     protected $eventsDispatcher;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
-     * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
-     * @return void
-     */
     public function __construct(
         GraphQL $graphQL,
         AuthorizesSubscriptions $auth,

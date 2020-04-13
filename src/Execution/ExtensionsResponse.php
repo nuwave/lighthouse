@@ -20,11 +20,6 @@ class ExtensionsResponse
      */
     protected $content;
 
-    /**
-     * ExtensionsResponse constructor.
-     *
-     * @return void
-     */
     public function __construct(string $key, $content)
     {
         $this->key = $key;

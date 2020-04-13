@@ -24,11 +24,6 @@ class ErrorBuffer
      */
     protected $exceptionResolver;
 
-    /**
-     * ErrorBuffer constructor.
-     *
-     * @return void
-     */
     public function __construct(string $errorType = 'generic', ?Closure $exceptionResolver = null)
     {
         $this->errorType = $errorType;

@@ -34,11 +34,6 @@ class Argument
      */
     public $resolver;
 
-    /**
-     * Argument constructor.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->directives = new Collection();

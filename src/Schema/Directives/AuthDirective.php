@@ -15,11 +15,6 @@ class AuthDirective extends BaseDirective implements DefinedDirective, FieldReso
      */
     protected $authFactory;
 
-    /**
-     * AuthDirective constructor.
-     *
-     * @return void
-     */
     public function __construct(AuthFactory $authFactory)
     {
         $this->authFactory = $authFactory;

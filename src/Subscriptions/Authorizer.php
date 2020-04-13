@@ -26,10 +26,6 @@ class Authorizer implements AuthorizesSubscriptions
      */
     protected $exceptionHandler;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $registry
-     * @return void
-     */
     public function __construct(
         StoresSubscriptions $storage,
         SubscriptionRegistry $registry,

@@ -36,11 +36,6 @@ abstract class DriverManager
      */
     protected $customCreators = [];
 
-    /**
-     * Create a new driver manager instance.
-     *
-     * @return void
-     */
     public function __construct(Application $app)
     {
         $this->app = $app;

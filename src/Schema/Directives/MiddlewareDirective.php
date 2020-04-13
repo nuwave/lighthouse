@@ -42,11 +42,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
      */
     private $middlewareAdapter;
 
-    /**
-     * Create a new middleware directive instance.
-     *
-     * @return void
-     */
     public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareAdapter $middlewareAdapter)
     {
         $this->pipeline = $pipeline;

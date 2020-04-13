@@ -25,11 +25,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      */
     protected $globalId;
 
-    /**
-     * DeleteDirective constructor.
-     *
-     * @return void
-     */
     public function __construct(GlobalId $globalId)
     {
         $this->globalId = $globalId;

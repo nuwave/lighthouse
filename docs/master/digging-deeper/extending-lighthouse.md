@@ -63,12 +63,6 @@ class MyContext implements GraphQLContext
      */
     public $request;
 
-    /**
-     * Create new context.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;

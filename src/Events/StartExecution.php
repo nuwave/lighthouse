@@ -19,11 +19,6 @@ class StartExecution
      */
     public $moment;
 
-    /**
-     * StartRequest constructor.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->moment = Carbon::now();

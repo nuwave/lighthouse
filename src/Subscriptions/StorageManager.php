@@ -28,9 +28,6 @@ class StorageManager implements StoresSubscriptions
      */
     protected $cache;
 
-    /**
-     * @return void
-     */
     public function __construct(CacheManager $cacheManager)
     {
         $this->cache = $cacheManager->store(

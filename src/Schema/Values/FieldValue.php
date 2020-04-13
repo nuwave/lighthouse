@@ -54,12 +54,6 @@ class FieldValue
      */
     protected $complexity;
 
-    /**
-     * Create new field value instance.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $parent
-     * @return void
-     */
     public function __construct(TypeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;

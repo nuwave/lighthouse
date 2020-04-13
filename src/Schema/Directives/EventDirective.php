@@ -15,11 +15,6 @@ class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDi
      */
     protected $eventsDispatcher;
 
-    /**
-     * Construct EventDirective.
-     *
-     * @return void
-     */
     public function __construct(EventsDispatcher $eventsDispatcher)
     {
         $this->eventsDispatcher = $eventsDispatcher;

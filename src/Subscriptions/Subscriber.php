@@ -41,7 +41,6 @@ class Subscriber implements Serializable
 
     /**
      * @param  mixed[]  $args
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
      */

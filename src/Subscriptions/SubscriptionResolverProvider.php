@@ -22,12 +22,6 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
      */
     protected $subscriptionRegistry;
 
-    /**
-     * ResolverProvider constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $subscriptionRegistry
-     * @return void
-     */
     public function __construct(SubscriptionRegistry $subscriptionRegistry)
     {
         $this->subscriptionRegistry = $subscriptionRegistry;

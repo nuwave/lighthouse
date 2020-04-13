@@ -19,11 +19,6 @@ class BuildSchemaString
      */
     public $userSchema;
 
-    /**
-     * BuildSchemaString constructor.
-     *
-     * @return void
-     */
     public function __construct(string $userSchema)
     {
         $this->userSchema = $userSchema;

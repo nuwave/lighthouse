@@ -61,9 +61,6 @@ class TypeRegistry
      */
     protected $documentAST;
 
-    /**
-     * @return void
-     */
     public function __construct(
         Pipeline $pipeline,
         DirectiveFactory $directiveFactory,

@@ -34,6 +34,7 @@ class RelationBatchLoader extends BatchLoader
      */
     public function __construct(
         string $relationName,
+        // Not using a type-hint to avoid resolving those params through the container
         $decorateBuilder,
         $paginationArgs = null
     ) {

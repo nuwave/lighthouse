@@ -18,10 +18,6 @@ class PaginationType
     protected $type;
 
     /**
-     * PaginationType constructor.
-     *
-     * @return void
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function __construct(string $paginationType)

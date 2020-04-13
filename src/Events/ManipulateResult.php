@@ -19,11 +19,6 @@ class ManipulateResult
      */
     public $result;
 
-    /**
-     * ManipulateResult constructor.
-     *
-     * @return void
-     */
     public function __construct(ExecutionResult &$result)
     {
         $this->result = $result;

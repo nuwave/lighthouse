@@ -21,11 +21,6 @@ class ManipulateAST
      */
     public $documentAST;
 
-    /**
-     * BuildSchemaString constructor.
-     *
-     * @return void
-     */
     public function __construct(DocumentAST &$documentAST)
     {
         $this->documentAST = $documentAST;

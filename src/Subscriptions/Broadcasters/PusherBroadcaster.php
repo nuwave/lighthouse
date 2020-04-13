@@ -25,10 +25,7 @@ class PusherBroadcaster implements Broadcaster
     protected $storage;
 
     /**
-     * Create instance of pusher broadcaster.
-     *
-     * @param  \Pusher\Pusher  $pusher
-     * @return void
+     * @param  \Pusher\Pusher  $pusher  TODO make into proper typehint
      */
     public function __construct($pusher)
     {

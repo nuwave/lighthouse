@@ -59,9 +59,6 @@ class Defer implements CreatesResponse
      */
     protected $maxNestedFields = 0;
 
-    /**
-     * @return void
-     */
     public function __construct(CanStreamResponse $stream, GraphQL $graphQL)
     {
         $this->stream = $stream;

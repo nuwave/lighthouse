@@ -21,9 +21,6 @@ class BroadcastSubscriptionEvent
 
     public $root;
 
-    /**
-     * @return void
-     */
     public function __construct(Subscription $subscription, string $fieldName, $root)
     {
         $this->subscription = $subscription;

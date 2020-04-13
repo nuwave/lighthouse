@@ -21,9 +21,6 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
      */
     protected $validationFactory;
 
-    /**
-     * @return void
-     */
     public function __construct(ValidationFactory $validationFactory)
     {
         $this->validationFactory = $validationFactory;

@@ -67,11 +67,6 @@ class GraphQL
      */
     protected $createsContext;
 
-    /**
-     * GraphQL constructor.
-     *
-     * @return void
-     */
     public function __construct(
         SchemaBuilder $schemaBuilder,
         Pipeline $pipeline,

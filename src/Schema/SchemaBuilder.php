@@ -20,10 +20,6 @@ class SchemaBuilder
      */
     protected $clientDirectiveFactory;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(
         TypeRegistry $typeRegistry,
         ClientDirectiveFactory $clientDirectiveFactory

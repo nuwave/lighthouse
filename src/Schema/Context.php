@@ -21,11 +21,6 @@ class Context implements GraphQLContext
      */
     public $user;
 
-    /**
-     * Create new context.
-     *
-     * @return void
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;

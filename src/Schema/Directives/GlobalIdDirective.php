@@ -19,11 +19,6 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      */
     protected $globalId;
 
-    /**
-     * GlobalIdDirective constructor.
-     *
-     * @return void
-     */
     public function __construct(GlobalId $globalId)
     {
         $this->globalId = $globalId;

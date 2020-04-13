@@ -12,11 +12,6 @@ class LumenMiddlewareAdapter implements MiddlewareAdapter
      */
     protected $app;
 
-    /**
-     * Create a middleware adapter for Lumen applications.
-     *
-     * @return void
-     */
     public function __construct(Application $app)
     {
         $this->app = $app;

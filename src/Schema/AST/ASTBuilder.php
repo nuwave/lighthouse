@@ -69,11 +69,6 @@ class ASTBuilder
      */
     protected $documentAST;
 
-    /**
-     * ASTBuilder constructor.
-     *
-     * @return void
-     */
     public function __construct(
         DirectiveFactory $directiveFactory,
         SchemaSourceProvider $schemaSourceProvider,

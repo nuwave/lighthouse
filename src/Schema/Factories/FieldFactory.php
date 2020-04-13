@@ -84,11 +84,6 @@ class FieldFactory
      */
     protected $handleArgDirectivesSnapshots = [];
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
-     * @return void
-     */
     public function __construct(
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,

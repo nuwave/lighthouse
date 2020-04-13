@@ -26,9 +26,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDi
      */
     protected $cacheManager;
 
-    /**
-     * @return void
-     */
     public function __construct(CacheManager $cacheManager)
     {
         $this->cacheManager = $cacheManager;

@@ -21,9 +21,6 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
      */
     protected $nodeRegistry;
 
-    /**
-     * @return void
-     */
     public function __construct(NodeRegistry $nodeRegistry)
     {
         $this->nodeRegistry = $nodeRegistry;

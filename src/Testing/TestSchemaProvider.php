@@ -12,9 +12,7 @@ class TestSchemaProvider implements SchemaSourceProvider
     protected $schema = '';
 
     /**
-     * TestSchemaProvider constructor.
-     *
-     * @return void
+     * @param  string  $schema  May be changed after instantiation, so it is passed as a reference
      */
     public function __construct(string &$schema)
     {

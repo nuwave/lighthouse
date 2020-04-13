@@ -18,12 +18,6 @@ class ListType
      */
     public $nonNull = false;
 
-    /**
-     * ListType constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
-     * @return void
-     */
     public function __construct(NamedType $type)
     {
         $this->type = $type;

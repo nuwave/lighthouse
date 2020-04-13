@@ -16,9 +16,6 @@ class ClientDirectiveFactory
      */
     protected $definitionNodeConverter;
 
-    /**
-     * @return void
-     */
     public function __construct(ExecutableTypeNodeConverter $definitionNodeConverter)
     {
         $this->definitionNodeConverter = $definitionNodeConverter;
