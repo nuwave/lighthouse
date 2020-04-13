@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Support\Utils;
 
 class SubscriptionRegistry
@@ -22,7 +23,7 @@ class SubscriptionRegistry
     protected $serializer;
 
     /**
-     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
      */
     protected $storage;
 
@@ -45,7 +46,7 @@ class SubscriptionRegistry
      */
     protected $subscriptions = [];
 
-    public function __construct(ContextSerializer $serializer, StorageManager $storage, GraphQL $graphQL)
+    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, GraphQL $graphQL)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
