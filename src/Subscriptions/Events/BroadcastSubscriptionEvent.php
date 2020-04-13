@@ -19,15 +19,9 @@ class BroadcastSubscriptionEvent
      */
     public $fieldName;
 
-    /**
-     * @var mixed
-     */
     public $root;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
-     * @param  string  $fieldName
-     * @param  mixed  $root
      * @return void
      */
     public function __construct(Subscription $subscription, string $fieldName, $root)

@@ -22,7 +22,6 @@ class SchemaBuilder
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @param  \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory  $clientDirectiveFactory
      * @return void
      */
     public function __construct(
@@ -35,9 +34,6 @@ class SchemaBuilder
 
     /**
      * Build an executable schema from AST.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \GraphQL\Type\Schema
      */
     public function build(DocumentAST $documentAST): Schema
     {

@@ -10,7 +10,6 @@ interface Broadcaster
     /**
      * Handle authorized subscription request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authorized(Request $request);
@@ -18,7 +17,6 @@ interface Broadcaster
     /**
      * Handle unauthorized subscription request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function unauthorized(Request $request);
@@ -26,7 +24,6 @@ interface Broadcaster
     /**
      * Handle subscription web hook.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function hook(Request $request);
@@ -34,7 +31,6 @@ interface Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  mixed[]  $data
      * @return void
      */

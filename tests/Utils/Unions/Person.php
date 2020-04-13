@@ -13,7 +13,6 @@ class Person
     protected $typeRegistry;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
      * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
@@ -21,10 +20,6 @@ class Person
         $this->typeRegistry = $typeRegistry;
     }
 
-    /**
-     * @param  mixed  $value
-     * @return \GraphQL\Type\Definition\Type
-     */
     public function resolveType($value): Type
     {
         // The return type can be a string either,

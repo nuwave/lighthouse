@@ -13,7 +13,6 @@ class BroadcastSubscriptionListener implements ShouldQueue
     protected $broadcaster;
 
     /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions  $broadcaster
      * @return void
      */
     public function __construct(BroadcastsSubscriptions $broadcaster)
@@ -25,7 +24,6 @@ class BroadcastSubscriptionListener implements ShouldQueue
      * Handle the event.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent  $event
-     * @return void
      */
     public function handle(BroadcastSubscriptionEvent $event): void
     {

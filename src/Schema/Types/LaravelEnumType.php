@@ -52,9 +52,6 @@ class LaravelEnumType extends EnumType
 
     /**
      * Overwrite the native EnumType serialization, as this class does not hold plain values.
-     *
-     * @param  mixed  $value
-     * @return string
      */
     public function serialize($value): string
     {

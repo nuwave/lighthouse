@@ -20,7 +20,6 @@ class PaginationType
     /**
      * PaginationType constructor.
      *
-     * @param  string  $paginationType
      * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException

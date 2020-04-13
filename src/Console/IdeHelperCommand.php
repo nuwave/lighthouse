@@ -35,9 +35,6 @@ SDL;
 
     /**
      * Execute the console command.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespacer  $directiveNamespaces
-     * @return int
      */
     public function handle(DirectiveNamespacer $directiveNamespaces): int
     {
@@ -104,7 +101,6 @@ SDL;
 
     /**
      * @param string[] $directiveClasses
-     * @return string
      */
     protected function buildSchemaString(array $directiveClasses): string
     {

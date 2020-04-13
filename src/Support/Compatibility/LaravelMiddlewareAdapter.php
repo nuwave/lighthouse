@@ -14,7 +14,6 @@ class LaravelMiddlewareAdapter implements MiddlewareAdapter
     /**
      * Create a middleware adapter for Laravel applications.
      *
-     * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
     public function __construct(Router $router)

@@ -29,7 +29,6 @@ class StorageManager implements StoresSubscriptions
     protected $cache;
 
     /**
-     * @param  \Illuminate\Cache\CacheManager  $cacheManager
      * @return void
      */
     public function __construct(CacheManager $cacheManager)
@@ -42,8 +41,6 @@ class StorageManager implements StoresSubscriptions
     /**
      * Get subscriber by request.
      *
-     * @param  array  $input
-     * @param  array  $headers
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function subscriberByRequest(array $input, array $headers): ?Subscriber
@@ -58,7 +55,6 @@ class StorageManager implements StoresSubscriptions
     /**
      * Find subscriber by channel.
      *
-     * @param  string  $channel
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function subscriberByChannel(string $channel): ?Subscriber
@@ -71,7 +67,6 @@ class StorageManager implements StoresSubscriptions
     /**
      * Get collection of subscribers by channel.
      *
-     * @param  string  $topic
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic): Collection
@@ -96,8 +91,6 @@ class StorageManager implements StoresSubscriptions
      * Store subscription.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  string  $topic
-     * @return void
      */
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
     {
@@ -117,7 +110,6 @@ class StorageManager implements StoresSubscriptions
     /**
      * Delete subscriber.
      *
-     * @param  string  $channel
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function deleteSubscriber(string $channel): ?Subscriber

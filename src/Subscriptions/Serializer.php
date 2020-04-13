@@ -16,7 +16,6 @@ class Serializer implements ContextSerializer
     protected $createsContext;
 
     /**
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @return void
      */
     public function __construct(CreatesContext $createsContext)
@@ -26,9 +25,6 @@ class Serializer implements ContextSerializer
 
     /**
      * Serialize the context.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @return string
      */
     public function serialize(GraphQLContext $context): string
     {
@@ -50,9 +46,6 @@ class Serializer implements ContextSerializer
 
     /**
      * Unserialize the context.
-     *
-     * @param  string  $context
-     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function unserialize(string $context): GraphQLContext
     {

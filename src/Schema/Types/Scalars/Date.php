@@ -16,7 +16,6 @@ class Date extends ScalarType
      * Serialize an internal value, ensuring it is a valid date string.
      *
      * @param  \Carbon\Carbon|string  $value
-     * @return string
      */
     public function serialize($value): string
     {
@@ -32,7 +31,6 @@ class Date extends ScalarType
      * Parse a externally provided variable value into a Carbon instance.
      *
      * @param  string  $value
-     * @return \Carbon\Carbon
      */
     public function parseValue($value): Carbon
     {
@@ -44,7 +42,6 @@ class Date extends ScalarType
      *
      * @param  \GraphQL\Language\AST\Node  $valueNode
      * @param  mixed[]|null  $variables
-     * @return \Carbon\Carbon
      *
      * @throws \GraphQL\Error\Error
      */
@@ -65,7 +62,6 @@ class Date extends ScalarType
      *
      * @param  string  $value
      * @param  string|\Exception  $exceptionClass
-     * @return \Carbon\Carbon
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */

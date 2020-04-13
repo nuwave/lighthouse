@@ -21,7 +21,6 @@ class NamedType
     /**
      * NamedType constructor.
      *
-     * @param  string  $name
      * @return void
      */
     public function __construct(string $name)

@@ -35,8 +35,6 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     /**
      * UpdateDirective constructor.
      *
-     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
      * @return void
      */
     public function __construct(DatabaseManager $databaseManager, GlobalId $globalId)
@@ -47,9 +45,6 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -99,9 +94,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
      */
     protected function executeMutation(Model $model, $args, ?Relation $parentRelation = null)
@@ -118,9 +111,6 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
     /**
      * Prepare the execution function for a mutation on a model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
-     * @return callable
      */
     abstract protected function makeExecutionFunction(?Relation $parentRelation = null): callable;
 }

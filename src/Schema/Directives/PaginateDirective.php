@@ -63,12 +63,6 @@ directive @paginate(
 SDL;
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
-     */
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
@@ -94,9 +88,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -137,8 +128,6 @@ SDL;
 
     /**
      * Get either the specific max or the global setting.
-     *
-     * @return int|null
      */
     protected function paginateMaxCount(): ?int
     {

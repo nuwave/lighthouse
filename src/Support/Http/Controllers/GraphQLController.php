@@ -35,10 +35,6 @@ class GraphQLController extends Controller
     /**
      * Inject middleware into request.
      *
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesResponse  $createsResponse
-     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function __construct(
@@ -56,7 +52,6 @@ class GraphQLController extends Controller
     /**
      * Execute GraphQL query.
      *
-     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function query(GraphQLRequest $request)
@@ -82,7 +77,6 @@ class GraphQLController extends Controller
     /**
      * Loop through the individual batched queries and collect the results.
      *
-     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return mixed[]
      */
     protected function executeBatched(GraphQLRequest $request): array

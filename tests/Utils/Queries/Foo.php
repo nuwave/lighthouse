@@ -17,8 +17,6 @@ class Foo
 
     /**
      * Return a value for the field.
-     *
-     * @return int
      */
     public function resolve(): int
     {
@@ -27,8 +25,6 @@ class Foo
 
     /**
      * Calculate the complexity.
-     *
-     * @return int
      */
     public function complexity(): int
     {

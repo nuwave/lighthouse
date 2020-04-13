@@ -36,8 +36,6 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     /**
      * Provide a resolver for a subscription field in case no resolver directive is defined.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Closure
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

@@ -20,7 +20,6 @@ class ResolveNested implements ArgResolver
      * ArgResolver constructor.
      *
      * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver|null  $previous
-     * @param  callable|null  $argPartitioner
      * @return void
      */
     public function __construct(callable $previous = null, callable $argPartitioner = null)
@@ -30,9 +29,7 @@ class ResolveNested implements ArgResolver
     }
 
     /**
-     * @param  mixed  $root
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return mixed
      */
     public function __invoke($root, $args)
     {

@@ -22,7 +22,6 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
     protected $nodeRegistry;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\NodeRegistry  $nodeRegistry
      * @return void
      */
     public function __construct(NodeRegistry $nodeRegistry)
@@ -57,10 +56,6 @@ SDL;
 
     /**
      * Handle type construction.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $value
-     * @param  \Closure  $next
-     * @return \GraphQL\Type\Definition\Type
      */
     public function handleNode(TypeValue $value, Closure $next): Type
     {
@@ -82,10 +77,6 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return void
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {

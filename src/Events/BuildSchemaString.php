@@ -22,7 +22,6 @@ class BuildSchemaString
     /**
      * BuildSchemaString constructor.
      *
-     * @param  string  $userSchema
      * @return void
      */
     public function __construct(string $userSchema)

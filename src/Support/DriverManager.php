@@ -39,7 +39,6 @@ abstract class DriverManager
     /**
      * Create a new driver manager instance.
      *
-     * @param  \Illuminate\Container\Container  $app
      * @return void
      */
     public function __construct(Application $app)
@@ -49,9 +48,6 @@ abstract class DriverManager
 
     /**
      * Get a driver instance by name.
-     *
-     * @param  string|null  $name
-     * @return mixed
      */
     public function driver(?string $name = null)
     {
@@ -62,9 +58,6 @@ abstract class DriverManager
 
     /**
      * Attempt to get the driver from the local cache.
-     *
-     * @param  string  $name
-     * @return mixed
      */
     protected function get(string $name)
     {
@@ -73,8 +66,6 @@ abstract class DriverManager
 
     /**
      * Get the default driver name.
-     *
-     * @return string
      */
     public function getDefaultDriver(): string
     {
@@ -83,9 +74,6 @@ abstract class DriverManager
 
     /**
      * Set the default driver name.
-     *
-     * @param  string  $name
-     * @return void
      */
     public function setDefaultDriver(string $name): void
     {
@@ -94,9 +82,6 @@ abstract class DriverManager
 
     /**
      * Get the driver configuration.
-     *
-     * @param  string  $name
-     * @return array
      */
     protected function getConfig(string $name): array
     {
@@ -109,8 +94,6 @@ abstract class DriverManager
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string  $driver
-     * @param  \Closure  $callback
      * @return $this
      */
     public function extend(string $driver, Closure $callback): self
@@ -123,8 +106,6 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @param  string  $name
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -151,9 +132,6 @@ abstract class DriverManager
 
     /**
      * Call a custom driver creator.
-     *
-     * @param  array  $config
-     * @return mixed
      */
     protected function callCustomCreator(array $config)
     {
@@ -163,8 +141,6 @@ abstract class DriverManager
     /**
      * Validate driver implements the proper interface.
      *
-     * @param  mixed  $driver
-     * @return mixed
      *
      * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
      */
@@ -181,10 +157,6 @@ abstract class DriverManager
 
     /**
      * Dynamically call the default driver instance.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
      */
     public function __call(string $method, array $parameters)
     {

@@ -24,7 +24,6 @@ class Context implements GraphQLContext
     /**
      * Create new context.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     public function __construct(Request $request)
@@ -47,8 +46,6 @@ class Context implements GraphQLContext
 
     /**
      * Get instance of request.
-     *
-     * @return \Illuminate\Http\Request
      */
     public function request(): Request
     {

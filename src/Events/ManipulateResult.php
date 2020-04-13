@@ -22,7 +22,6 @@ class ManipulateResult
     /**
      * ManipulateResult constructor.
      *
-     * @param  \GraphQL\Executor\ExecutionResult  $result
      * @return void
      */
     public function __construct(ExecutionResult &$result)

@@ -20,7 +20,6 @@ class ArgPartitioner
      * Partition the arguments into nested and regular.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  mixed  $root
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
     public static function nestedArgResolvers(ArgumentSet $argumentSet, $root): array
@@ -65,8 +64,6 @@ class ArgPartitioner
      * ]
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $relationClass
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
     public static function relationMethods(
@@ -87,10 +84,7 @@ class ArgPartitioner
     /**
      * Attach a nested argument resolver to an argument.
      *
-     * @param  string  $name
      * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument  $argument
-     * @param  \ReflectionClass|null  $model
-     * @return void
      */
     protected static function attachNestedArgResolver(string $name, Argument &$argument, ?ReflectionClass $model): void
     {
@@ -151,7 +145,6 @@ class ArgPartitioner
      * - the second one contains all arguments for which the predicate did not match
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  \Closure  $predicate
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
      */
     public static function partition(ArgumentSet $argumentSet, \Closure $predicate)
@@ -175,11 +168,6 @@ class ArgPartitioner
 
     /**
      * Does a method on the model return a relation of the given class?
-     *
-     * @param  \ReflectionClass  $modelReflection
-     * @param  string  $name
-     * @param  string  $relationClass
-     * @return bool
      */
     public static function methodReturnsRelation(
         ReflectionClass $modelReflection,

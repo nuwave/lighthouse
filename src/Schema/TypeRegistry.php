@@ -62,9 +62,6 @@ class TypeRegistry
     protected $documentAST;
 
     /**
-     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @return void
      */
     public function __construct(
@@ -78,7 +75,6 @@ class TypeRegistry
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return $this
      */
     public function setDocumentAST(DocumentAST $documentAST): self
@@ -91,8 +87,6 @@ class TypeRegistry
     /**
      * Get the given GraphQL type by name.
      *
-     * @param  string  $name
-     * @return \GraphQL\Type\Definition\Type
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -119,7 +113,6 @@ EOL
     /**
      * Register an executable GraphQL type.
      *
-     * @param  \GraphQL\Type\Definition\Type  $type
      * @return $this
      */
     public function register(Type $type): self
@@ -153,9 +146,6 @@ EOL
 
     /**
      * Transform a definition node to an executable type.
-     *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
-     * @return \GraphQL\Type\Definition\Type
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -180,8 +170,6 @@ EOL
     /**
      * The default type transformations.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return \GraphQL\Type\Definition\Type
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -208,10 +196,6 @@ EOL
         }
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\EnumTypeDefinitionNode  $enumDefinition
-     * @return \GraphQL\Type\Definition\EnumType
-     */
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
     {
         $values = [];
@@ -236,9 +220,6 @@ EOL
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ScalarTypeDefinitionNode  $scalarDefinition
-     * @return \GraphQL\Type\Definition\ScalarType
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function resolveScalarType(ScalarTypeDefinitionNode $scalarDefinition): ScalarType
@@ -271,10 +252,6 @@ EOL
         ]);
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectDefinition
-     * @return \GraphQL\Type\Definition\ObjectType
-     */
     protected function resolveObjectType(ObjectTypeDefinitionNode $objectDefinition): ObjectType
     {
         return new ObjectType([
@@ -298,7 +275,6 @@ EOL
      * Returns a closure that lazy loads the fields for a constructed type.
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
-     * @return \Closure
      */
     protected function resolveFieldsFunction($typeDefinition): Closure
     {
@@ -319,10 +295,6 @@ EOL
         };
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $inputDefinition
-     * @return \GraphQL\Type\Definition\InputObjectType
-     */
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
         return new InputObjectType([
@@ -334,10 +306,6 @@ EOL
         ]);
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\InterfaceTypeDefinitionNode  $interfaceDefinition
-     * @return \GraphQL\Type\Definition\InterfaceType
-     */
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
     {
         $nodeName = $interfaceDefinition->name->value;
@@ -401,8 +369,6 @@ EOL
      * We just assume that the rootValue that shall be returned from the
      * field is a class that is named just like the concrete Object Type
      * that is supposed to be returned.
-     *
-     * @return \Closure
      */
     public function typeResolverFallback(): Closure
     {
@@ -411,10 +377,6 @@ EOL
         };
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\UnionTypeDefinitionNode  $unionDefinition
-     * @return \GraphQL\Type\Definition\UnionType
-     */
     protected function resolveUnionType(UnionTypeDefinitionNode $unionDefinition): UnionType
     {
         $nodeName = $unionDefinition->name->value;

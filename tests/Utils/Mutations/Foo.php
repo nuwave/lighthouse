@@ -17,8 +17,6 @@ class Foo
 
     /**
      * Return a value for the field.
-     *
-     * @return int
      */
     public function resolve(): int
     {

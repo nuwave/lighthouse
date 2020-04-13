@@ -28,7 +28,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     /**
      * DeleteDirective constructor.
      *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
      * @return void
      */
     public function __construct(GlobalId $globalId)
@@ -38,9 +37,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -104,11 +100,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     }
 
     /**
-     * @param  DocumentAST  $documentAST
-     * @param  FieldDefinitionNode  $fieldDefinition
-     * @param  ObjectTypeDefinitionNode  $parentType
-     * @return void
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateFieldDefinition(
@@ -141,9 +132,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     /**
      * Bring a model in or out of existence.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return void
      */
     abstract protected function modifyExistence(Model $model): void;
 }

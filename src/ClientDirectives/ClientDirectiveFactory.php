@@ -17,7 +17,6 @@ class ClientDirectiveFactory
     protected $definitionNodeConverter;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter  $definitionNodeConverter
      * @return void
      */
     public function __construct(ExecutableTypeNodeConverter $definitionNodeConverter)
@@ -27,9 +26,6 @@ class ClientDirectiveFactory
 
     /**
      * Transform node to type.
-     *
-     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode  $directive
-     * @return \GraphQL\Type\Definition\Directive
      */
     public function handle(DirectiveDefinitionNode $directive): Directive
     {

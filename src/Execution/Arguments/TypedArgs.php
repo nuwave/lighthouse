@@ -30,9 +30,7 @@ class TypedArgs
     /**
      * TypedArgs constructor.
      *
-     * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter  $argumentTypeNodeConverter
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @return void
      */
     public function __construct(
@@ -48,8 +46,6 @@ class TypedArgs
     /**
      * Wrap client-given args with type information.
      *
-     * @param  array  $args
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
@@ -68,8 +64,6 @@ class TypedArgs
     /**
      * Wrap client-given args with type information.
      *
-     * @param  array  $args
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function fromField(array $args, FieldDefinitionNode $fieldDefinition): ArgumentSet
@@ -126,8 +120,6 @@ class TypedArgs
     /**
      * Wrap a single client-given argument with type information.
      *
-     * @param  mixed  $value
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $definition
      * @return \Nuwave\Lighthouse\Execution\Arguments\Argument
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
@@ -175,7 +167,6 @@ class TypedArgs
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value
      * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $namedType
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */

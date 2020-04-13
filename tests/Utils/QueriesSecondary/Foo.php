@@ -13,8 +13,6 @@ class Foo
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
     public function resolve(): string
     {

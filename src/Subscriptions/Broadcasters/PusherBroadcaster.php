@@ -38,9 +38,6 @@ class PusherBroadcaster implements Broadcaster
 
     /**
      * Authorize subscription request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function authorized(Request $request): JsonResponse
     {
@@ -56,9 +53,6 @@ class PusherBroadcaster implements Broadcaster
 
     /**
      * Handle unauthorized subscription request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function unauthorized(Request $request): JsonResponse
     {
@@ -67,9 +61,6 @@ class PusherBroadcaster implements Broadcaster
 
     /**
      * Handle subscription web hook.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function hook(Request $request): JsonResponse
     {
@@ -89,9 +80,7 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  mixed[]  $data
-     * @return void
      */
     public function broadcast(Subscriber $subscriber, array $data): void
     {

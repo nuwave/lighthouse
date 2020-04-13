@@ -72,10 +72,6 @@ class ASTBuilder
     /**
      * ASTBuilder constructor.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
-     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
      * @return void
      */
     public function __construct(
@@ -160,8 +156,6 @@ class ASTBuilder
 
     /**
      * Apply directives on type definitions that can manipulate the AST.
-     *
-     * @return void
      */
     protected function applyTypeDefinitionManipulators(): void
     {
@@ -178,8 +172,6 @@ class ASTBuilder
 
     /**
      * Apply directives on type extensions that can manipulate the AST.
-     *
-     * @return void
      */
     protected function applyTypeExtensionManipulators(): void
     {
@@ -212,7 +204,6 @@ class ASTBuilder
     }
 
     /**
-     * @param  string  $typeName
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -229,7 +220,6 @@ class ASTBuilder
     }
 
     /**
-     * @param  string  $typeName
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -247,8 +237,6 @@ class ASTBuilder
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -263,8 +251,6 @@ class ASTBuilder
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
-     * @return string
      */
     public static function extensionDoesNotMatchDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): string
     {
@@ -273,8 +259,6 @@ class ASTBuilder
 
     /**
      * Apply directives on fields that can manipulate the AST.
-     *
-     * @return void
      */
     protected function applyFieldManipulators(): void
     {
@@ -295,8 +279,6 @@ class ASTBuilder
 
     /**
      * Apply directives on args that can manipulate the AST.
-     *
-     * @return void
      */
     protected function applyArgManipulators(): void
     {
@@ -324,8 +306,6 @@ class ASTBuilder
 
     /**
      * Add the types required for pagination.
-     *
-     * @return void
      */
     protected function addPaginationInfoTypes(): void
     {
@@ -394,10 +374,6 @@ class ASTBuilder
 
     /**
      * Returns whether or not the given interface is used within the defined types.
-     *
-     * @param  string  $interfaceName
-     *
-     * @return bool
      */
     protected function hasTypeImplementingInterface(string $interfaceName): bool
     {
@@ -414,8 +390,6 @@ class ASTBuilder
 
     /**
      * Inject the Node interface and a node field into the Query type.
-     *
-     * @return void
      */
     protected function addNodeSupport(): void
     {

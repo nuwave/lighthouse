@@ -13,7 +13,6 @@ class CustomStuff
     protected $typeRegistry;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
      * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
@@ -25,7 +24,6 @@ class CustomStuff
      * Decide which GraphQL type a resolved value has.
      *
      * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @return \GraphQL\Type\Definition\Type
      */
     public function resolveType($rootValue): Type
     {

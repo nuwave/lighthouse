@@ -35,11 +35,6 @@ class PrintSchemaCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  \Illuminate\Cache\Repository  $cache
-     * @param  \Illuminate\Contracts\Filesystem\Filesystem  $storage
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @return void
      */
     public function handle(Repository $cache, Filesystem $storage, GraphQL $graphQL): void
     {
@@ -65,9 +60,6 @@ class PrintSchemaCommand extends Command
 
     /**
      * Convert the given schema to a JSON string.
-     *
-     * @param  \GraphQL\Type\Schema  $schema
-     * @return string
      */
     protected function schemaJson(Schema $schema): string
     {

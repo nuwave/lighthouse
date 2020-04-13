@@ -164,9 +164,6 @@ GRAPHQL;
 
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
-     *
-     * @param  string  $schema
-     * @return \GraphQL\Type\Schema
      */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
@@ -177,9 +174,6 @@ GRAPHQL;
 
     /**
      * Build an executable schema from an SDL string.
-     *
-     * @param  string  $schema
-     * @return \GraphQL\Type\Schema
      */
     protected function buildSchema(string $schema): Schema
     {
@@ -192,9 +186,6 @@ GRAPHQL;
 
     /**
      * Get a fully qualified reference to a method that is defined on the test class.
-     *
-     * @param  string  $method
-     * @return string
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
@@ -203,9 +194,6 @@ GRAPHQL;
 
     /**
      * Construct a command tester.
-     *
-     * @param  \Illuminate\Console\Command  $command
-     * @return \Symfony\Component\Console\Tester\CommandTester
      */
     protected function commandTester(Command $command): CommandTester
     {

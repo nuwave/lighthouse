@@ -37,8 +37,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array  $whereConditions
-     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')
@@ -80,12 +78,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * Manipulate the AST.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
      */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
@@ -115,10 +107,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * Create the name for the restricted WhereConditions input.
      *
      * @example FieldNameArgNameWhereHasConditions
-     *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @return string
      */
     protected function restrictedWhereConditionsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
     {
@@ -130,8 +118,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     /**
      * Ensure the column name is well formed and prevent SQL injection.
      *
-     * @param  string  $column
-     * @return void
      *
      * @throws \GraphQL\Error\Error
      */

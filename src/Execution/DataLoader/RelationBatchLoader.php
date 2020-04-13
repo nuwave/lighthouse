@@ -29,7 +29,6 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationArgs;
 
     /**
-     * @param  string  $relationName
      * @param  \Closure  $decorateBuilder
      * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      */
@@ -73,8 +72,6 @@ class RelationBatchLoader extends BatchLoader
 
     /**
      * Get the parents from the keys that are present on the BatchLoader.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function getParentModels(): EloquentCollection
     {
@@ -90,9 +87,6 @@ class RelationBatchLoader extends BatchLoader
 
     /**
      * Extract the relation that was loaded.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed
      */
     protected function extractRelation(Model $model)
     {

@@ -53,7 +53,6 @@ SDL;
      * Bring a model in or out of existence.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes  $model
-     * @return void
      */
     protected function modifyExistence(Model $model): void
     {
@@ -62,11 +61,6 @@ SDL;
 
     /**
      * Manipulate the AST based on a field definition.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
      */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,

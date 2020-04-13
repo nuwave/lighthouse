@@ -15,8 +15,6 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -25,9 +23,6 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
      */
     public function boot(Dispatcher $dispatcher): void
     {
