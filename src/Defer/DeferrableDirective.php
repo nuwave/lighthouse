@@ -17,9 +17,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeferrableDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
 {
-    const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
-    const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
-    const DEFER_DIRECTIVE_NAME = 'defer';
+    public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
+    public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
+    public const DEFER_DIRECTIVE_NAME = 'defer';
 
     public static function definition(): string
     {

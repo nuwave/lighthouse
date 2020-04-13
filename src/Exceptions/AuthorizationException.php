@@ -10,7 +10,7 @@ class AuthorizationException extends IlluminateAuthorizationException implements
     /**
      * @var string
      */
-    const CATEGORY = 'authorization';
+    public const CATEGORY = 'authorization';
 
     /**
      * Returns true when exception message is safe to be displayed to a client.

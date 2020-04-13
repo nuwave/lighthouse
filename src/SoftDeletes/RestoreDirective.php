@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class RestoreDirective extends ModifyModelExistenceDirective implements DefinedDirective, FieldManipulator
 {
-    const MODEL_NOT_USING_SOFT_DELETES = 'Use the @restore directive only for Model classes that use the SoftDeletes trait.';
+    public const MODEL_NOT_USING_SOFT_DELETES = 'Use the @restore directive only for Model classes that use the SoftDeletes trait.';
 
     public static function definition(): string
     {

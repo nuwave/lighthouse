@@ -12,7 +12,7 @@ class SyncIteratorTest extends TestCase
     /**
      * @var string
      */
-    const EXCEPTION_MESSAGE = 'test_exception';
+    public const EXCEPTION_MESSAGE = 'test_exception';
 
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator

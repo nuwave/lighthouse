@@ -14,14 +14,14 @@ class StorageManager implements StoresSubscriptions
      *
      * @var string
      */
-    const TOPIC_KEY = 'graphql.topic';
+    public const TOPIC_KEY = 'graphql.topic';
 
     /**
      * The cache key for subscribers.
      *
      * @var string
      */
-    const SUBSCRIBER_KEY = 'graphql.subscriber';
+    public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
     /**
      * @var \Illuminate\Contracts\Cache\Repository

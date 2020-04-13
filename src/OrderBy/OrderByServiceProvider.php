@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class OrderByServiceProvider extends ServiceProvider
 {
-    const DEFAULT_ORDER_BY_CLAUSE = 'OrderByClause';
+    public const DEFAULT_ORDER_BY_CLAUSE = 'OrderByClause';
 
     /**
      * Bootstrap any application services.

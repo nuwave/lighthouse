@@ -21,7 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  */
 class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeExtensionManipulator, DefinedDirective
 {
-    const NAME = 'namespace';
+    public const NAME = 'namespace';
 
     public static function definition(): string
     {

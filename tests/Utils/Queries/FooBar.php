@@ -4,9 +4,9 @@ namespace Tests\Utils\Queries;
 
 class FooBar
 {
-    const INVOKE_RESULT = 'foobaz';
-    const RESOLVE_RESULT = 'foobar';
-    const CUSTOM_RESOLVE_RESULT = 'barbaz';
+    public const INVOKE_RESULT = 'foobaz';
+    public const RESOLVE_RESULT = 'foobar';
+    public const CUSTOM_RESOLVE_RESULT = 'barbaz';
 
     /**
      * Return a value for the field.
