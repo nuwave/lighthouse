@@ -254,6 +254,13 @@ return [
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
         /*
+         * Default subscription storage TTL.
+         *
+         * Indicates how long a subscription can be active before it's automatically removed from storage.
+         */
+        'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
+
+        /*
          * Default subscription broadcaster.
          */
         'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),
