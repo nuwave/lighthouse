@@ -254,6 +254,15 @@ return [
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
         /*
+         * Default subscription storage time to live.
+         *
+         * Indicates how long a subscription can be active before it's automatically removed from storage.
+         * Setting this to `null` means the subscriptions are stored forever. This may cause
+         * stale subscriptions to linger indefinitely in case cleanup fails for any reason.
+         */
+        'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
+
+        /*
          * Default subscription broadcaster.
          */
         'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),

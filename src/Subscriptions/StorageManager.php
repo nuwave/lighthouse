@@ -28,11 +28,17 @@ class StorageManager implements StoresSubscriptions
      */
     protected $cache;
 
+    /**
+     * @var \DateInterval|int|null
+     */
+    protected $ttl;
+
     public function __construct(CacheManager $cacheManager)
     {
         $this->cache = $cacheManager->store(
             config('lighthouse.subscriptions.storage', 'redis')
         );
+        $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
     }
 
     /**
@@ -100,8 +106,13 @@ class StorageManager implements StoresSubscriptions
 
         $topic[] = $subscriber->channel;
 
-        $this->cache->forever($topicKey, json_encode($topic));
-        $this->cache->forever($subscriberKey, $subscriber);
+        if ($this->ttl === null) {
+            $this->cache->forever($topicKey, json_encode($topic));
+            $this->cache->forever($subscriberKey, $subscriber);
+        } else {
+            $this->cache->put($topicKey, json_encode($topic), $this->ttl);
+            $this->cache->put($subscriberKey, $subscriber, $this->ttl);
+        }
     }
 
     /**
