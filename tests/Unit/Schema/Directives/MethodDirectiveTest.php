@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\Directives;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
+use Tests\Unit\Schema\Directives\Fixtures\Foo;
 
 class MethodDirectiveTest extends TestCase
 {
@@ -138,16 +139,5 @@ class MethodDirectiveTest extends TestCase
         $this->mockResolver($foo);
 
         return $foo;
-    }
-}
-
-/**
- * TODO remove in favour of ->getMockBuilder(\stdClass::class)->addMethods(['__invoke'])
- * once we no longer support PHPUnit 7.
- */
-class Foo
-{
-    public function bar()
-    {
     }
 }
