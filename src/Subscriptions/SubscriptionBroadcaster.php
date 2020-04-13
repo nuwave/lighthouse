@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     protected $auth;
 
     /**
-     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
      */
     protected $storage;
 
@@ -47,7 +48,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     public function __construct(
         GraphQL $graphQL,
         AuthorizesSubscriptions $auth,
-        StorageManager $storage,
+        StoresSubscriptions $storage,
         SubscriptionIterator $iterator,
         BroadcastManager $broadcastManager,
         EventsDispatcher $eventsDispatcher
