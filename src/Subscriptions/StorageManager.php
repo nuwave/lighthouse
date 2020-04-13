@@ -124,13 +124,13 @@ class StorageManager implements StoresSubscriptions
      */
     public function deleteSubscriber(string $channel): ?Subscriber
     {
-        $subscriberKey = self::SUBSCRIBER_KEY.".{$channel}";
-        $hasSubscriber = $this->cache->has($subscriberKey);
-        $subscriber = $this->cache->get($subscriberKey);
+        $key = self::SUBSCRIBER_KEY.".{$channel}";
+        $hasSubscriber = $this->cache->has($key);
+        $subscriber = $this->cache->get($key);
 
         if ($hasSubscriber) {
-            $this->removeSubscriberFromTopic($subscriber, $subscriberKey);
-            $this->cache->forget($subscriberKey);
+            $this->removeSubscriberFromTopic($subscriber, $key);
+            $this->cache->forget($key);
         }
 
         return $subscriber;
@@ -144,17 +144,22 @@ class StorageManager implements StoresSubscriptions
      */
     public function removeSubscriberFromTopic(Subscriber $subscriber, string $subscriberKey)
     {
-        $key = strtoupper(Str::snake($subscriber->operationName));
+        $key = strtoupper(($subscriber->operationName));
         $topicKey = self::TOPIC_KEY.".{$key}";
 
         $topic = Collection::make(
             $this->cache->has($topicKey)
                 ? json_decode($this->cache->get($topicKey), true)
                 : []
-        )->filter(function ($key) use ($subscriberKey) {
-            return $key === $subscriberKey;
+        )->reject(function ($key) use ($subscriberKey) {
+            return self::SUBSCRIBER_KEY.".{$key}" === $subscriberKey;
         });
 
-        $this->cache->forever($topicKey, json_encode($topic->all()));
+        if ($this->ttl === null) {
+            $this->cache->forever($topicKey, json_encode($topic->all()));
+            $this->cache->forever($subscriberKey, $subscriber);
+        } else {
+            $this->cache->put($topicKey, json_encode($topic->all()), $this->ttl);
+        }
     }
 }
