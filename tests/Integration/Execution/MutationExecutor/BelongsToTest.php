@@ -910,7 +910,6 @@ GRAPHQL
     public function testCreateMultipleBelongsTothatDontExist()
     {
         $this->schema = /** @lang GraphQL */ '
-
         type RoleUserPivot {
             id: ID!
             user: User!
