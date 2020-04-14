@@ -120,10 +120,7 @@ class StorageManager implements StoresSubscriptions
     public function deleteSubscriber(string $channel): ?Subscriber
     {
         $key = self::SUBSCRIBER_KEY.".{$channel}";
-
-        if ($this->cache->has($key)) {
-            $this->removeSubscriberFromTopic($key);
-        }
+        $this->removeSubscriberFromTopic($key);
 
         return $this->cache->pull($key);
     }
