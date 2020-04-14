@@ -11,7 +11,6 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
-use Tests\Utils\Subscriptions\TaskUpdated;
 
 class StorageManagerTest extends TestCase
 {
