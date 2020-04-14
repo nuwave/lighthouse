@@ -907,7 +907,7 @@ GRAPHQL
         $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
     }
 
-    public function testCreateMultipleBelongsTothatDontExist()
+    public function testCreateMultipleBelongsToThatDontExistYet(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type RoleUserPivot {
@@ -927,7 +927,9 @@ GRAPHQL
         }
 
         type Mutation {
-            createRoleUser(input: RoleUserInput! @spread): RoleUserPivot @create
+            createRoleUser(
+                input: RoleUserInput! @spread
+            ): RoleUserPivot @create
         }
 
         input RoleUserInput {
@@ -956,34 +958,34 @@ GRAPHQL
         '.self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
-            mutation {
-                createRoleUser(input: {
-                    id: "1"
-                    user: {
-                        create: {
-                            id: "2"
-                            name: "user 1"
-                        }
-                    }
-                    role: {
-                        create: {
-                            id: "3",
-                            name: "role 1"
-                        }
-                    }
-                }) {
-                    id
-                    user {
-                        id
-                        name
-                    }
-                    role {
-                        id
-                        name
+        mutation {
+            createRoleUser(input: {
+                id: "1"
+                user: {
+                    create: {
+                        id: "2"
+                        name: "user 1"
                     }
                 }
+                role: {
+                    create: {
+                        id: "3",
+                        name: "role 1"
+                    }
+                }
+            }) {
+                id
+                user {
+                    id
+                    name
+                }
+                role {
+                    id
+                    name
+                }
             }
-            ')->assertJson([
+        }
+        ')->assertJson([
             'data' => [
                 'createRoleUser' => [
                     'id' => '1',
