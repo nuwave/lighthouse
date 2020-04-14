@@ -74,13 +74,12 @@ class StorageManager implements StoresSubscriptions
      */
     public function subscribersByTopic(string $topic): Collection
     {
-        $key = self::TOPIC_KEY.".{$topic}";
-
-        if (! $this->cache->has($key)) {
+        $channelsJson = $this->cache->get(self::TOPIC_KEY.".{$topic}");
+        if (! $channelsJson) {
             return new Collection;
         }
 
-        $channels = json_decode($this->cache->get($key), true);
+        $channels = json_decode($channelsJson, true);
 
         return (new Collection($channels))
             ->map(function (string $channel): ?Subscriber {
@@ -90,18 +89,14 @@ class StorageManager implements StoresSubscriptions
             ->values();
     }
 
-    /**
-     * Store subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     */
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
     {
         $topicKey = self::TOPIC_KEY.".{$topic}";
         $subscriberKey = self::SUBSCRIBER_KEY.".{$subscriber->channel}";
 
-        $topic = $this->cache->has($topicKey)
-            ? json_decode($this->cache->get($topicKey), true)
+        $topicJson = $this->cache->get($topicKey);
+        $topic = $topicJson
+            ? json_decode($topicJson, true)
             : [];
 
         $topic[] = $subscriber->channel;
@@ -115,22 +110,8 @@ class StorageManager implements StoresSubscriptions
         }
     }
 
-    /**
-     * Delete subscriber.
-     *
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
-     */
     public function deleteSubscriber(string $channel): ?Subscriber
     {
-        $key = self::SUBSCRIBER_KEY.".{$channel}";
-        $hasSubscriber = $this->cache->has($key);
-
-        $subscriber = $this->cache->get($key);
-
-        if ($hasSubscriber) {
-            $this->cache->forget($key);
-        }
-
-        return $subscriber;
+        return $this->cache->pull(self::SUBSCRIBER_KEY.".{$channel}");
     }
 }
