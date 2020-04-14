@@ -144,6 +144,12 @@ class StorageManager implements StoresSubscriptions
                 return self::SUBSCRIBER_KEY.".{$key}" === self::SUBSCRIBER_KEY.".{$subscriber->channel}";
             });
 
+        if ($topic->isEmpty()) {
+            $this->cache->forget($subscriber->topic);
+            
+            return;
+        }
+
         if ($this->ttl === null) {
             $this->cache->forever($subscriber->topic, json_encode($topic->all()));
         } else {
