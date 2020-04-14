@@ -119,28 +119,29 @@ class StorageManager implements StoresSubscriptions
      */
     public function deleteSubscriber(string $channel): ?Subscriber
     {
-        $key = self::SUBSCRIBER_KEY.".{$channel}";
-        $this->removeSubscriberFromTopic($key);
+        $subscriber = $this->cache->pull(self::SUBSCRIBER_KEY.".{$channel}");
 
-        return $this->cache->pull($key);
+        if ($subscriber !== null) {
+            $this->removeSubscriberFromTopic($subscriber);
+        }
+
+        return $subscriber;
     }
 
     /**
      * Remove the subscriber from the topic they are subscribed to.
      *
-     * @param  string $subscriberKey
+     * @param  Subscriber $subscriber
      */
-    protected function removeSubscriberFromTopic(string $subscriberKey)
+    protected function removeSubscriberFromTopic(Subscriber $subscriber)
     {
-        $subscriber = $this->cache->get($subscriberKey);
-
-        if (!$subscriber || !$subscriber->topic) {
+        if (empty($subscriber->topic)) {
             return;
         }
 
         $topic = Collection::make(json_decode($this->cache->get($subscriber->topic), true))
-            ->reject(function ($key) use ($subscriberKey) {
-                return self::SUBSCRIBER_KEY.".{$key}" === $subscriberKey;
+            ->reject(function ($key) use ($subscriber) {
+                return self::SUBSCRIBER_KEY.".{$key}" === self::SUBSCRIBER_KEY.".{$subscriber->channel}";
             });
 
         if ($this->ttl === null) {
