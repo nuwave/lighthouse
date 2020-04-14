@@ -114,7 +114,6 @@ class StorageManager implements StoresSubscriptions
     /**
      * Delete subscriber.
      *
-     * @param  string  $channel
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function deleteSubscriber(string $channel): ?Subscriber
@@ -130,8 +129,6 @@ class StorageManager implements StoresSubscriptions
 
     /**
      * Remove the subscriber from the topic they are subscribed to.
-     *
-     * @param  Subscriber $subscriber
      */
     protected function removeSubscriberFromTopic(Subscriber $subscriber)
     {
@@ -146,7 +143,7 @@ class StorageManager implements StoresSubscriptions
 
         if ($topic->isEmpty()) {
             $this->cache->forget($subscriber->topic);
-            
+
             return;
         }
 

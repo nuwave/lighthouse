@@ -7,7 +7,6 @@ use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
@@ -142,7 +141,7 @@ class StorageManagerTest extends TestCase
     {
         $subscriber1 = $this->subscriber('{ me }');
         $subscriber2 = $this->subscriber('{ viewer }');
-        $channel =  'TaskUpdated';
+        $channel = 'TaskUpdated';
 
         $this->storage->storeSubscriber($subscriber1, $channel);
         $this->storage->deleteSubscriber($subscriber1->channel);
