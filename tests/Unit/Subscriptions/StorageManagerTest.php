@@ -7,6 +7,7 @@ use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
@@ -142,22 +143,21 @@ class StorageManagerTest extends TestCase
     {
         $subscriber1 = $this->subscriber('{ me }');
         $subscriber2 = $this->subscriber('{ viewer }');
+        $channel =  'TaskUpdated';
 
-        $subscription = new TaskUpdated();
-        $key = $subscription->encodeTopic($subscriber1, 'TaskCreated');
-
-        $subscriber1->operationName = $key;
-        $subscriber2->operationName = $key;
-
-        $this->storage->storeSubscriber($subscriber1, $key);
+        $this->storage->storeSubscriber($subscriber1, $channel);
         $this->storage->deleteSubscriber($subscriber1->channel);
+        $this->assertCount(0, $this->storage->subscribersByTopic($channel));
 
-        $this->storage->storeSubscriber($subscriber2, $key);
+        $this->storage->storeSubscriber($subscriber1, $channel);
+        $this->storage->storeSubscriber($subscriber2, $channel);
+        $this->assertCount(2, $this->storage->subscribersByTopic($channel));
+        $this->storage->deleteSubscriber($subscriber1->channel);
         $this->storage->deleteSubscriber($subscriber2->channel);
 
-        $this->storage->storeSubscriber($subscriber1, $key);
+        $this->storage->storeSubscriber($subscriber1, $channel);
 
-        $this->assertCount(1, $this->storage->subscribersByTopic($key));
+        $this->assertCount(1, $this->storage->subscribersByTopic($channel));
     }
 
     protected function assertSubscriberIsSame(Subscriber $expected, Subscriber $actual): void

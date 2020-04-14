@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions
@@ -105,6 +104,7 @@ class StorageManager implements StoresSubscriptions
             ? json_decode($this->cache->get($topicKey), true)
             : [];
 
+        $subscriber->topic = $topicKey;
         $topic[] = $subscriber->channel;
 
         if ($this->ttl === null) {
@@ -142,24 +142,21 @@ class StorageManager implements StoresSubscriptions
      * @param  Subscriber $subscriber
      * @param  string $subscriberKey
      */
-    public function removeSubscriberFromTopic(Subscriber $subscriber, string $subscriberKey)
+    protected function removeSubscriberFromTopic(Subscriber $subscriber, string $subscriberKey)
     {
-        $key = strtoupper(Str::snake($subscriber->operationName));
-        $topicKey = self::TOPIC_KEY.".{$key}";
+        if (!$subscriber->topic) {
+            return;
+        }
 
-        $topic = Collection::make(
-            $this->cache->has($topicKey)
-                ? json_decode($this->cache->get($topicKey), true)
-                : []
-        )->reject(function ($key) use ($subscriberKey) {
-            return self::SUBSCRIBER_KEY.".{$key}" === $subscriberKey;
-        });
+        $topic = Collection::make(json_decode($this->cache->get($subscriber->topic), true))
+            ->reject(function ($key) use ($subscriberKey) {
+                return self::SUBSCRIBER_KEY.".{$key}" === $subscriberKey;
+            });
 
         if ($this->ttl === null) {
-            $this->cache->forever($topicKey, json_encode($topic->all()));
-            $this->cache->forever($subscriberKey, $subscriber);
+            $this->cache->forever($subscriber->topic, json_encode($topic->all()));
         } else {
-            $this->cache->put($topicKey, json_encode($topic->all()), $this->ttl);
+            $this->cache->put($subscriber->topic, json_encode($topic->all()), $this->ttl);
         }
     }
 }
