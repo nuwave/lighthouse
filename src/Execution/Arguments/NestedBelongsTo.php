@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedBelongsTo implements ArgResolver
 {
     /**
-     * @var BelongsTo
+     * @var \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     protected $relation;
 
