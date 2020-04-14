@@ -1,7 +1,6 @@
 ---
 name: Bug report
 about: Report a bug to help us improve Lighthouse
-
 ---
 
 <!-- Please file a bug report only if there is a problem within Lighthouse.
