@@ -74,13 +74,12 @@ class StorageManager implements StoresSubscriptions
      */
     public function subscribersByTopic(string $topic): Collection
     {
-        $key = self::TOPIC_KEY.".{$topic}";
-
-        if (! $this->cache->has($key)) {
+        $channelsJson = $this->cache->get(self::TOPIC_KEY.".{$topic}");
+        if (! $channelsJson) {
             return new Collection;
         }
 
-        $channels = json_decode($this->cache->get($key), true);
+        $channels = json_decode($channelsJson, true);
 
         return (new Collection($channels))
             ->map(function (string $channel): ?Subscriber {
@@ -90,18 +89,14 @@ class StorageManager implements StoresSubscriptions
             ->values();
     }
 
-    /**
-     * Store subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     */
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
     {
         $topicKey = self::TOPIC_KEY.".{$topic}";
         $subscriberKey = self::SUBSCRIBER_KEY.".{$subscriber->channel}";
 
-        $topic = $this->cache->has($topicKey)
-            ? json_decode($this->cache->get($topicKey), true)
+        $topicJson = $this->cache->get($topicKey);
+        $topic = $topicJson
+            ? json_decode($topicJson, true)
             : [];
 
         $subscriber->topic = $topicKey;
@@ -125,26 +120,24 @@ class StorageManager implements StoresSubscriptions
     public function deleteSubscriber(string $channel): ?Subscriber
     {
         $key = self::SUBSCRIBER_KEY.".{$channel}";
-        $hasSubscriber = $this->cache->has($key);
-        $subscriber = $this->cache->get($key);
 
-        if ($hasSubscriber) {
-            $this->removeSubscriberFromTopic($subscriber, $key);
-            $this->cache->forget($key);
+        if ($this->cache->has($key)) {
+            $this->removeSubscriberFromTopic($key);
         }
 
-        return $subscriber;
+        return $this->cache->pull($key);
     }
 
     /**
      * Remove the subscriber from the topic they are subscribed to.
      *
-     * @param  Subscriber $subscriber
      * @param  string $subscriberKey
      */
-    protected function removeSubscriberFromTopic(Subscriber $subscriber, string $subscriberKey)
+    protected function removeSubscriberFromTopic(string $subscriberKey)
     {
-        if (!$subscriber->topic) {
+        $subscriber = $this->cache->get($subscriberKey);
+
+        if (!$subscriber || !$subscriber->topic) {
             return;
         }
 
