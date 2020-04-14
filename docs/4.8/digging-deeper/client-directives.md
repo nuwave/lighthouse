@@ -16,8 +16,8 @@ Add a definition to your schema to show it in introspection.
 ```graphql
 "A description of what this directive does."
 directive @example(
-    "Client directives can have arguments too!"
-    someArg: String
+  "Client directives can have arguments too!"
+  someArg: String
 ) on FIELD
 ```
 
@@ -28,23 +28,22 @@ to check the presence and/or value of a client directive and act on it.
 ## @skip
 
 This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
-and is built-in to Lighthouse. 
+and is built-in to Lighthouse.
 
-The `@skip` directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional 
+The `@skip` directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
 exclusion during execution as described by the `if` argument.
 
 ```graphql
 directive @skip(
-    """
-    If the value passed into the if field is true the field this 
-    is decorating will not be included in the query response.
-    """
-    if: Boolean!
-) 
-on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+  """
+  If the value passed into the if field is true the field this
+  is decorating will not be included in the query response.
+  """
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 ```
 
-In this example experimentalField will only be queried if the variable $someTest has the value `false`.
+In this example experimentalField will only be queried if the variable \$someTest has the value `false`.
 
 ```graphql
 query myQuery($someTest: Boolean) {
@@ -54,24 +53,23 @@ query myQuery($someTest: Boolean) {
 
 ## @include
 
-This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include) 
-and is built-in to Lighthouse. 
+This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
+and is built-in to Lighthouse.
 
-The `@include` directive may be provided for fields, fragment spreads, and inline fragments, 
+The `@include` directive may be provided for fields, fragment spreads, and inline fragments,
 and allows for conditional inclusion during execution as described by the `if` argument.
 
 ```graphql
 directive @include(
-    """
-    If the "if" value is true the field this is connected with will be included in the query response.
-    Otherwise it will not.
-    """
-    if: Boolean
+  """
+  If the "if" value is true the field this is connected with will be included in the query response.
+  Otherwise it will not.
+  """
+  if: Boolean
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-
 ```
 
-In this example experimentalField will only be queried if the variable $someTest has the value true
+In this example experimentalField will only be queried if the variable \$someTest has the value true
 
 ```graphql
 query myQuery($someTest: Boolean) {

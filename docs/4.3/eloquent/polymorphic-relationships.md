@@ -11,18 +11,18 @@ Let's start off with the plain type definitions, without any relations.
 
 ```graphql
 type Post {
-    id: ID!
-    name: String!
+  id: ID!
+  name: String!
 }
 
 type User {
-    id: ID!
-    name: String!
+  id: ID!
+  name: String!
 }
 
 type Image {
-    id: ID!
-    url: String!
+  id: ID!
+  url: String!
 }
 ```
 
@@ -32,15 +32,15 @@ with the [`@morphOne`](../api-reference/directives.md#morphone) directive.
 
 ```graphql
 type Post {
-    id: ID!
-    name: String!
-    image: Image! @morphOne
+  id: ID!
+  name: String!
+  image: Image! @morphOne
 }
 
 type User {
-    id: ID!
-    name: String!
-    image: Image @morphOne
+  id: ID!
+  name: String!
+  image: Image @morphOne
 }
 ```
 
@@ -61,9 +61,9 @@ for performance optimization.
 
 ```graphql
 type Image {
-    id: ID!
-    url: String!
-    imageable: Imageable! @morphTo
+  id: ID!
+  url: String!
+  imageable: Imageable! @morphTo
 }
 ```
 
@@ -79,15 +79,15 @@ with the [`@morphMany`](../api-reference/directives.md#morphmany) directive.
 
 ```graphql
 type Post {
-    id: ID!
-    name: String!
-    images: [Image]! @morphMany
+  id: ID!
+  name: String!
+  images: [Image]! @morphMany
 }
 
 type Image {
-    id: ID!
-    url: String!
-    imageable: Imageable! @morphTo
+  id: ID!
+  url: String!
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User

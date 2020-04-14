@@ -46,7 +46,7 @@ Lighthouse's default implementation looks for a class with the capitalized name
 of the field in the configured default location.
 
 Non-root fields fall back to [webonyx's default resolver](http://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver).
-You may overwrite this by passing a `callable` to `\GraphQL\Executor\Executor::setDefaultFieldResolver`. 
+You may overwrite this by passing a `callable` to `\GraphQL\Executor\Executor::setDefaultFieldResolver`.
 
 When the field is defined on the root `Subscription` type, the [`\Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver`](../../../src/Support/Contracts/ProvidesSubscriptionResolver.php)
 interface is used instead.

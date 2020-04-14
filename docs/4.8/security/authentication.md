@@ -24,7 +24,7 @@ If you need to guard multiple fields, just use [`@guard`](../api-reference/direc
 on a `type` or an `extend type` definition. It will be applied to all fields within that type.
 
 ```graphql
-extend type Query @guard(with: ["api:admin"]){
+extend type Query @guard(with: ["api:admin"]) {
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
 }
