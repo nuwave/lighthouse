@@ -31,8 +31,8 @@ class SubscriberTest extends TestCase
         $operationName = 'baz';
         $resolveInfo->operation = (object) [
             'name' => (object) [
-                'value' => $operationName
-            ]
+                'value' => $operationName,
+            ],
         ];
         $resolveInfo->fragments = [];
         $context = new Context(new Request());

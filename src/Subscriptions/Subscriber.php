@@ -45,8 +45,6 @@ class Subscriber implements Serializable
 
     /**
      * The root element of the query.
-     *
-     * @var mixed
      */
     public $root;
 
@@ -116,8 +114,6 @@ class Subscriber implements Serializable
 
     /**
      * Convert this into a JSON string.
-     *
-     * @return string
      */
     public function serialize(): string
     {

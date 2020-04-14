@@ -133,8 +133,6 @@ class StorageManager implements StoresSubscriptions
 
     /**
      * Remove the subscriber from the topic they are subscribed to.
-     *
-     * @param  Subscriber  $subscriber
      */
     protected function removeSubscriberFromTopic(Subscriber $subscriber)
     {
