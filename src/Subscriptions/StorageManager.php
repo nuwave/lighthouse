@@ -137,12 +137,12 @@ class StorageManager implements StoresSubscriptions
     protected function removeSubscriberFromTopic(Subscriber $subscriber)
     {
         $topicKey = self::topicKey($subscriber->topic);
-        $channelKey = self::channelKey($subscriber->channel);
+        $channelKeyToRemove = self::channelKey($subscriber->channel);
 
         $topicWithoutSubscriber = $this
             ->retrieveTopic($topicKey)
-            ->reject(function (string $key) use ($channelKey): bool {
-                return self::channelKey($key) === $channelKey;
+            ->reject(function (string $channel) use ($channelKeyToRemove): bool {
+                return self::channelKey($channel) === $channelKeyToRemove;
             });
 
         if ($topicWithoutSubscriber->isEmpty()) {
