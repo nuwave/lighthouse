@@ -24,11 +24,15 @@ class StorageManager implements StoresSubscriptions
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
     /**
+     * The cache to store channels and topics.
+     *
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
 
     /**
+     * The time to live for items in the cache.
+     *
      * @var \DateInterval|int|null
      */
     protected $ttl;
@@ -41,11 +45,6 @@ class StorageManager implements StoresSubscriptions
         $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
     }
 
-    /**
-     * Get subscriber by request.
-     *
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
-     */
     public function subscriberByRequest(array $input, array $headers): ?Subscriber
     {
         $channel = Arr::get($input, 'channel_name');
@@ -55,70 +54,37 @@ class StorageManager implements StoresSubscriptions
             : null;
     }
 
-    /**
-     * Find subscriber by channel.
-     *
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
-     */
     public function subscriberByChannel(string $channel): ?Subscriber
     {
-        $key = self::SUBSCRIBER_KEY.".{$channel}";
-
-        return $this->cache->get($key);
+        return $this->cache->get(self::channelKey($channel));
     }
 
-    /**
-     * Get collection of subscribers by channel.
-     *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
-     */
     public function subscribersByTopic(string $topic): Collection
     {
-        $channelsJson = $this->cache->get(self::TOPIC_KEY.".{$topic}");
-        if (! $channelsJson) {
-            return new Collection;
-        }
-
-        $channels = json_decode($channelsJson, true);
-
-        return (new Collection($channels))
+        return $this
+            ->retrieveTopic(self::topicKey($topic))
             ->map(function (string $channel): ?Subscriber {
                 return $this->subscriberByChannel($channel);
             })
-            ->filter()
-            ->values();
+            ->filter();
     }
 
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
     {
-        $topicKey = self::TOPIC_KEY.".{$topic}";
-        $subscriberKey = self::SUBSCRIBER_KEY.".{$subscriber->channel}";
+        $subscriber->topic = $topic;
+        $this->addSubscriberToTopic($subscriber);
 
-        $topicJson = $this->cache->get($topicKey);
-        $topic = $topicJson
-            ? json_decode($topicJson, true)
-            : [];
-
-        $subscriber->topic = $topicKey;
-        $topic[] = $subscriber->channel;
-
+        $channelKey = self::channelKey($subscriber->channel);
         if ($this->ttl === null) {
-            $this->cache->forever($topicKey, json_encode($topic));
-            $this->cache->forever($subscriberKey, $subscriber);
+            $this->cache->forever($channelKey, $subscriber);
         } else {
-            $this->cache->put($topicKey, json_encode($topic), $this->ttl);
-            $this->cache->put($subscriberKey, $subscriber, $this->ttl);
+            $this->cache->put($channelKey, $subscriber, $this->ttl);
         }
     }
 
-    /**
-     * Delete subscriber.
-     *
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
-     */
     public function deleteSubscriber(string $channel): ?Subscriber
     {
-        $subscriber = $this->cache->pull(self::SUBSCRIBER_KEY.".{$channel}");
+        $subscriber = $this->cache->pull(self::channelKey($channel));
 
         if ($subscriber !== null) {
             $this->removeSubscriberFromTopic($subscriber);
@@ -128,29 +94,75 @@ class StorageManager implements StoresSubscriptions
     }
 
     /**
+     * Store a topic (list of channels) in the cache.
+     *
+     * @param  \Illuminate\Support\Collection<string>  $topic
+     */
+    protected function storeTopic(string $key, Collection $topic): void
+    {
+        if ($this->ttl === null) {
+            $this->cache->forever($key, $topic);
+        } else {
+            $this->cache->put($key, $topic, $this->ttl);
+        }
+    }
+
+    /**
+     * Retrieve a topic (list of channels) from the cache.
+     *
+     * @return \Illuminate\Support\Collection<string>
+     */
+    protected function retrieveTopic(string $key): Collection
+    {
+        return $this->cache->get($key, new Collection());
+    }
+
+    /**
+     * Add the subscriber to the topic they subscribe to.
+     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     */
+    protected function addSubscriberToTopic(Subscriber $subscriber): void
+    {
+        $topicKey = self::topicKey($subscriber->topic);
+
+        $topic = $this->retrieveTopic($topicKey);
+        $topic->push($subscriber->channel);
+        $this->storeTopic($topicKey, $topic);
+    }
+
+    /**
      * Remove the subscriber from the topic they are subscribed to.
+     *
+     * @param  Subscriber  $subscriber
      */
     protected function removeSubscriberFromTopic(Subscriber $subscriber)
     {
-        if (empty($subscriber->topic)) {
-            return;
-        }
+        $topicKey = self::topicKey($subscriber->topic);
+        $channelKey = self::channelKey($subscriber->channel);
 
-        $topic = Collection::make(json_decode($this->cache->get($subscriber->topic), true))
-            ->reject(function ($key) use ($subscriber) {
-                return self::SUBSCRIBER_KEY.".{$key}" === self::SUBSCRIBER_KEY.".{$subscriber->channel}";
+        $topicWithoutSubscriber = $this
+            ->retrieveTopic($topicKey)
+            ->reject(function (string $key) use ($channelKey): bool {
+                return self::channelKey($key) === $channelKey;
             });
 
-        if ($topic->isEmpty()) {
-            $this->cache->forget($subscriber->topic);
+        if ($topicWithoutSubscriber->isEmpty()) {
+            $this->cache->forget($topicKey);
 
             return;
         }
 
-        if ($this->ttl === null) {
-            $this->cache->forever($subscriber->topic, json_encode($topic->all()));
-        } else {
-            $this->cache->put($subscriber->topic, json_encode($topic->all()), $this->ttl);
-        }
+        $this->storeTopic($topicKey, $topicWithoutSubscriber);
+    }
+
+    protected static function channelKey(string $channel): string
+    {
+        return self::SUBSCRIBER_KEY.".{$channel}";
+    }
+
+    protected static function topicKey(string $topic): string
+    {
+        return self::TOPIC_KEY.".{$topic}";
     }
 }
