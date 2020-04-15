@@ -485,6 +485,9 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $expectedEnumName = 'WhitelistedColumnsWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
+        // TODO: assertArraySubset will be removed in PHPUnit 9.
+        //       when PHP 7.1 is not more tested in the matrix, install dms/phpunit-arraysubset-asserts package,
+        //       than add "use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;" to this file
         $this->assertArraySubset(
             [
                 'kind' => 'ENUM',
