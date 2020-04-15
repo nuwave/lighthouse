@@ -16,7 +16,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- When a subscription subscriber is deleted the subscriber reference will also be removed from the topic https://github.com/nuwave/lighthouse/pull/1288
+- Remove subscriber reference from topic when deleted https://github.com/nuwave/lighthouse/pull/1288
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
 - Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
 
