@@ -163,3 +163,87 @@ class PostPolicy
     public function create($user, array $injectedArgs, array $staticArgs): bool { ... }
 }
 ```
+
+## Custom field restrictions
+
+For applications with role management, it is common to hide some model attributes from a
+certain group of users. At the moment, Laravel and Lighthouse offer no canonical solution
+for this.
+
+A great way to implement something that fits your use case is to create
+[a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware). 
+Field middleware allows you to intercept field access and conditionally hide them.
+You can hide a field by returning `null` instead of calling the final resolver, or maybe even
+abort execution by throwing an error.
+
+The following directive `@canAccess` is an example implementation, make sure to adapt it to your needs.
+It assumes a simple role system where a `User` has a single attribute `$role`.
+ 
+```php
+namespace App\GraphQL\Directives;
+
+use Closure;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class CanAccessDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+{
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<GRAPHQL
+"""
+Limit field access to users of a certain role.
+"""
+directive @canAccess(
+  """
+  The name of the role authorized users need to have.
+  """
+  requiredRole: String!
+) on FIELD_DEFINITION
+GRAPHQL;
+    }
+
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    {
+        $originalResolver = $fieldValue->getResolver();
+
+        return $next(
+            $fieldValue->setResolver(
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
+                    $requiredRole = $this->directiveArgValue('requiredRole');
+                    // Throw in case of an invalid schema definition to remind the developer
+                    if ($requiredRole === null) {
+                        throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
+                    }
+
+                    $user = $context->user();
+                    if (
+                        // Unauthenticated users don't get to see anything
+                        ! $user
+                        // The user's role has to match have the required role
+                        || $user->role !== $requiredRole
+                    ) {
+                        return null;
+                    }
+
+                    return $originalResolver($root, $args, $context, $resolveInfo);
+                }
+            )
+        );
+    }
+}
+```
+
+Here is how you would use it in your schema:
+
+```graphql
+type Post {
+    #...
+    secret_admin_note: String @canAccess(requiredRole: "admin")
+}
+```
