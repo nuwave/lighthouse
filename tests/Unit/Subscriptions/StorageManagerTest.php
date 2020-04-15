@@ -4,20 +4,13 @@ namespace Tests\Unit\Subscriptions;
 
 use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
 
 class StorageManagerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    public const TOPIC = 'lighthouse';
-
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
      */
@@ -38,55 +31,6 @@ class StorageManagerTest extends TestCase
         $this->storage = app(StorageManager::class);
     }
 
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app->bind(ContextSerializer::class, function (): ContextSerializer {
-            return new class implements ContextSerializer {
-                /**
-                 * Serialize the context.
-                 *
-                 * @return string
-                 */
-                public function serialize(GraphQLContext $context)
-                {
-                    return 'foo';
-                }
-
-                /**
-                 * Unserialize the context.
-                 *
-                 * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-                 */
-                public function unserialize(string $context)
-                {
-                    return new class implements GraphQLContext {
-                        /**
-                         * Get an instance of the authenticated user.
-                         *
-                         * @return \Illuminate\Foundation\Auth\User|null
-                         */
-                        public function user()
-                        {
-                            //
-                        }
-
-                        /**
-                         * Get an instance of the current HTTP request.
-                         *
-                         * @return \Illuminate\Http\Request
-                         */
-                        public function request()
-                        {
-                            //
-                        }
-                    };
-                }
-            };
-        });
-    }
-
     /**
      * Construct a dummy subscriber for testing.
      */
@@ -103,38 +47,60 @@ class StorageManagerTest extends TestCase
         return $subscriber;
     }
 
-    public function testCanStoreSubscribersInCache(): void
+    public function testStoreAndRetrieveByChannel(): void
     {
-        $subscriber1 = $this->subscriber('{ me }');
-        $subscriber2 = $this->subscriber('{ viewer }');
-        $subscriber3 = $this->subscriber('{ foo }');
-        $this->storage->storeSubscriber($subscriber1, self::TOPIC);
-        $this->storage->storeSubscriber($subscriber2, self::TOPIC);
-        $this->storage->storeSubscriber($subscriber3, self::TOPIC.'-foo');
+        $subscriber = $this->subscriber(/** @lang GraphQL */ '{ me }');
+        $this->storage->storeSubscriber($subscriber, 'foo');
 
         $this->assertSubscriberIsSame(
-            $subscriber1,
-            $this->storage->subscriberByChannel($subscriber1->channel)
-        );
-        $this->assertSubscriberIsSame(
-            $subscriber2,
-            $this->storage->subscriberByChannel($subscriber2->channel)
+            $subscriber,
+            $this->storage->subscriberByChannel($subscriber->channel)
         );
 
         $this->assertSubscriberIsSame(
-            $subscriber1,
-            $this->storage->subscriberByRequest(['channel_name' => $subscriber1->channel], [])
+            $subscriber,
+            $this->storage->subscriberByRequest(['channel_name' => $subscriber->channel], [])
         );
-        $this->assertSubscriberIsSame(
-            $subscriber2,
-            $this->storage->subscriberByRequest(['channel_name' => $subscriber2->channel], [])
-        );
+    }
 
-        $topicSubscribers = $this->storage->subscribersByTopic(self::TOPIC);
-        $this->assertCount(2, $topicSubscribers);
+    public function testStoreAndRetrieveByTopics(): void
+    {
+        $fooTopic = 'foo';
+        $fooSubscriber1 = $this->subscriber(/** @lang GraphQL */ '{ me }');
+        $fooSubscriber2 = $this->subscriber(/** @lang GraphQL */ '{ viewer }');
+        $this->storage->storeSubscriber($fooSubscriber1, $fooTopic);
+        $this->storage->storeSubscriber($fooSubscriber2, $fooTopic);
+
+        $barTopic = 'bar';
+        $barSubscriber = $this->subscriber(/** @lang GraphQL */ '{ bar }');
+        $this->storage->storeSubscriber($barSubscriber, $barTopic);
+
+        $fooSubscribers = $this->storage->subscribersByTopic($fooTopic);
+        $this->assertCount(2, $fooSubscribers);
+
+        $barSubscribers = $this->storage->subscribersByTopic($barTopic);
+        $this->assertCount(1, $barSubscribers);
+    }
+
+    public function testDeleteSubscribersInCache(): void
+    {
+        $subscriber1 = $this->subscriber(/** @lang GraphQL */ '{ me }');
+        $subscriber2 = $this->subscriber(/** @lang GraphQL */ '{ viewer }');
+
+        $topic = 'foo';
+        $this->storage->storeSubscriber($subscriber1, $topic);
+        $this->assertCount(1, $this->storage->subscribersByTopic($topic));
+
+        $this->storage->storeSubscriber($subscriber2, $topic);
+        $this->assertCount(2, $this->storage->subscribersByTopic($topic));
 
         $this->storage->deleteSubscriber($subscriber1->channel);
-        $this->assertCount(1, $this->storage->subscribersByTopic(self::TOPIC));
+        $this->assertNull($this->storage->subscriberByChannel($subscriber1->channel));
+        $this->assertCount(1, $this->storage->subscribersByTopic($topic));
+
+        $this->storage->deleteSubscriber($subscriber2->channel);
+        $this->assertNull($this->storage->subscriberByChannel($subscriber2->channel));
+        $this->assertCount(0, $this->storage->subscribersByTopic($topic));
     }
 
     protected function assertSubscriberIsSame(Subscriber $expected, Subscriber $actual): void
