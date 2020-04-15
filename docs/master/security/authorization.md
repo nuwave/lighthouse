@@ -164,15 +164,20 @@ class PostPolicy
 }
 ```
 
-## Custom fields/attributes restriction
+## Custom field restrictions
 
-For applications with role management it is common to hide particular model attributes from a certain group of users.
-As role management can be done in different ways, it is not possible for lighthouse to implement such a directive. 
-But you can do it yourself by creating a custom directive which implements `FieldMiddleware`. 
+For applications with role management, it is common to hide some model attributes from a
+certain group of users. At the moment, Laravel and Lighthouse offer no canonical solution
+for this.
 
-In the following example we will create `@canAccess` directive which returns `null` instead of original field value,
-if user doesn't have the required role. We will define the required role with a directive argument `requiredRole`. 
-We assume that `User` model has a `role` attribute.
+A great way to implement something that fits your use case is to create
+[a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware). 
+Field middleware allows you to intercept field access and conditionally hide them.
+You can hide a field by returning `null` instead of calling the final resolver, or maybe even
+abort execution by throwing an error.
+
+The following directive `@canAccess` is an example implementation, make sure to adapt it to your needs.
+It assumes a simple role system where a `User` has a single attribute `$role`.
  
 ```php
 namespace App\GraphQL\Directives;
@@ -182,27 +187,47 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CanAccessDirective extends BaseDirective implements FieldMiddleware
+class CanAccessDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<GRAPHQL
+"""
+Limit field access to users of a certain role.
+"""
+directive @canAccess(
+  """
+  The name of the role authorized users need to have.
+  """
+  requiredRole: String!
+) on FIELD_DEFINITION
+GRAPHQL;
+    }
+
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $originalResolver = $fieldValue->getResolver();
+
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
                     $requiredRole = $this->directiveArgValue('requiredRole');
-                    // throw an exception if requiredRole argument is not defined. This is a reminder for developer
+                    // Throw in case of an invalid schema definition to remind the developer
                     if ($requiredRole === null) {
-                        throw new DefinitionException("'requiredRole' argument was not defined!");
+                        throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
                     }
 
-                    // define here condition to verify, if user is able to access the field 
-                    // use $context to access user or the whole request object
                     $user = $context->user();
-                    if (!$user || $user->role !== $requiredRole) {
+                    if (
+                        // Unauthenticated users don't get to see anything
+                        ! $user
+                        // The user's role has to match have the required role
+                        || $user->role !== $requiredRole
+                    ) {
                         return null;
                     }
 
@@ -213,6 +238,8 @@ class CanAccessDirective extends BaseDirective implements FieldMiddleware
     }
 }
 ```
+
+Here is how you would use it in your schema:
 
 ```graphql
 type Post {
