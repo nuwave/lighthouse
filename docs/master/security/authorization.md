@@ -163,3 +163,60 @@ class PostPolicy
     public function create($user, array $injectedArgs, array $staticArgs): bool { ... }
 }
 ```
+
+## Custom fields/attributes restriction
+
+For applications with role management it is common to hide particular model attributes from a certain group of users.
+As role management can be done in different ways, it is not possible for lighthouse to implement such a directive. 
+But you can do it yourself by creating a custom directive which implements `FieldMiddleware`. 
+
+In the following example we will create `@canAccess` directive which returns `null` instead of original field value,
+if user doesn't have the required role. We will define the required role with a directive argument `requiredRole`. 
+We assume that `User` model has a `role` attribute.
+ 
+```php
+namespace App\GraphQL\Directives;
+
+use Closure;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class CanAccessDirective extends BaseDirective implements FieldMiddleware
+{
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    {
+        $originalResolver = $fieldValue->getResolver();
+        return $next(
+            $fieldValue->setResolver(
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
+                    $requiredRole = $this->directiveArgValue('requiredRole');
+                    // throw an exception if requiredRole argument is not defined. This is a reminder for developer
+                    if ($requiredRole === null) {
+                        throw new DefinitionException("'requiredRole' argument was not defined!");
+                    }
+
+                    // define here condition to verify, if user is able to access the field 
+                    // use $context to access user or the whole request object
+                    $user = $context->user();
+                    if (!$user || $user->role !== $requiredRole) {
+                        return null;
+                    }
+
+                    return $originalResolver($root, $args, $context, $resolveInfo);
+                }
+            )
+        );
+    }
+}
+```
+
+```graphql
+type Post {
+    #...
+    secret_admin_note: String @canAccess(requiredRole: "admin")
+}
+```
