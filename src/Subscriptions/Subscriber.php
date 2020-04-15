@@ -73,6 +73,8 @@ class Subscriber implements Serializable
         ResolveInfo $resolveInfo
     ) {
         $operationName = $resolveInfo->operation->name;
+
+        // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
         if (! $operationName) {
             throw new SubscriptionException(self::MISSING_OPERATION_NAME);
         }
