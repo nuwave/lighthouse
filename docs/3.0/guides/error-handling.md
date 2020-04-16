@@ -35,13 +35,6 @@ class CustomException extends Exception implements RendersErrorsExtensions
     */
     private $reason;
 
-    /**
-    * CustomException constructor.
-    * 
-    * @param  string  $message
-    * @param  string  $reason
-    * @return void
-    */
     public function __construct(string $message, string $reason)
     {
         parent::__construct($message);
@@ -137,9 +130,39 @@ A query that produces an error will render like this:
 
 ## Registering Error Handlers
 
-You can use the config to register error handlers that receive the Errors that occur during execution
-and handle them. You may use this to log, filter or format the errors.
-The classes must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
+Error handlers receive the Errors that occur during GraphQL execution.
+They can be used to log, filter or format the errors.
+
+Add them to your `lighthouse.php` config file, for example:
+
+```php
+'error_handlers' => [
+    \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
+    \App\GraphQL\MyErrorHandler::class,
+],
+```
+
+An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
+
+```php
+<?php
+
+namespace App\GraphQL;
+
+use Closure;
+use GraphQL\Error\Error;
+use Nuwave\Lighthouse\Execution\ErrorHandler;
+
+class ExtensionErrorHandler implements ErrorHandler
+{
+    public static function handle(Error $error, Closure $next): array
+    {
+        // TODO do something with $error
+
+        return $next($error);
+    }
+}
+```
 
 ## Collecting Errors
 

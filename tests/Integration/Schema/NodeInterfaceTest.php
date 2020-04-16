@@ -75,7 +75,6 @@ class NodeInterfaceTest extends DBTestCase
     }
 
     /**
-     * @param  int  $id
      * @return mixed[]
      */
     public function resolveNode(int $id): array
@@ -85,7 +84,6 @@ class NodeInterfaceTest extends DBTestCase
 
     /**
      * @dataProvider modelNodeDirectiveStyles
-     * @param  string  $directiveDefinition
      */
     public function testCanResolveModelsNodes(string $directiveDefinition): void
     {

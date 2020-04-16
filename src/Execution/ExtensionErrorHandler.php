@@ -12,10 +12,6 @@ class ExtensionErrorHandler implements ErrorHandler
      * Handle Exceptions that implement Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions
      * and add extra content from them to the 'extensions' key of the Error that is rendered
      * to the User.
-     *
-     * @param  \GraphQL\Error\Error  $error
-     * @param  \Closure  $next
-     * @return array
      */
     public static function handle(Error $error, Closure $next): array
     {

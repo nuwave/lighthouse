@@ -82,9 +82,6 @@ class RelationBatchLoaderTest extends DBTestCase
 
     /**
      * @dataProvider batchloadRelationsSetting
-     *
-     * @param  bool  $batchloadRelations
-     * @param  int  $expectedQueryCount
      */
     public function testBatchloadRelations(bool $batchloadRelations, int $expectedQueryCount): void
     {

@@ -11,10 +11,6 @@ class NotFoundSubscription extends GraphQLSubscription
 {
     /**
      * Authorize subscriber request.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     public function authorize(Subscriber $subscriber, Request $request): bool
     {
@@ -23,10 +19,6 @@ class NotFoundSubscription extends GraphQLSubscription
 
     /**
      * Filter which subscribers should receive the subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  mixed  $root
-     * @return bool
      */
     public function filter(Subscriber $subscriber, $root): bool
     {
@@ -35,12 +27,6 @@ class NotFoundSubscription extends GraphQLSubscription
 
     /**
      * Resolve the subscription.
-     *
-     * @param  mixed  $root
-     * @param  array  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return mixed
      */
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {

@@ -14,11 +14,6 @@ class Utils
      *
      * If the class itself exists, it is simply returned as is.
      * Else, the given namespaces are tried in order.
-     *
-     * @param  string  $classCandidate
-     * @param  array  $namespacesToTry
-     * @param  callable  $determineMatch
-     * @return string|null
      */
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
     {
@@ -44,7 +39,6 @@ class Utils
      *
      * @param  string  $className This class is resolved through the container.
      * @param  string  $methodName The method that gets passed the arguments of the closure.
-     * @return \Closure
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -83,7 +77,6 @@ class Utils
     /**
      * Apply a callback to a value or each value in an array.
      *
-     * @param  \Closure  $callback
      * @param  mixed|mixed[]  $valueOrValues
      * @return mixed|mixed[]
      */
@@ -100,8 +93,6 @@ class Utils
      * Determine if a class uses a trait.
      *
      * @param  object|string  $class
-     * @param  string  $trait
-     * @return bool
      */
     public static function classUsesTrait($class, string $trait): bool
     {
@@ -113,9 +104,6 @@ class Utils
 
     /**
      * Construct a callback that checks if its input is a given class.
-     *
-     * @param  string  $classLike
-     * @return \Closure
      */
     public static function instanceofMatcher(string $classLike): \Closure
     {

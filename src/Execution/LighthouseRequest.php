@@ -13,12 +13,6 @@ class LighthouseRequest extends BaseRequest
      */
     protected $request;
 
-    /**
-     * LighthouseRequest constructor.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -51,8 +45,6 @@ class LighthouseRequest extends BaseRequest
 
     /**
      * Are there more batched queries to process?
-     *
-     * @return bool
      */
     protected function hasMoreBatches(): bool
     {
@@ -64,7 +56,6 @@ class LighthouseRequest extends BaseRequest
      *
      * This is expected to take batched requests into consideration.
      *
-     * @param  string  $key
      * @return array|string|null
      */
     protected function fieldValue(string $key)

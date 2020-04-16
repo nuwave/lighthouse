@@ -36,9 +36,6 @@ trait MakesGraphQLRequests
     /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param  string  $query
-     * @param  array|null  $variables
-     * @param  array  $extraParams
      * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
      */
     protected function graphQL(string $query, array $variables = null, array $extraParams = [])
@@ -111,7 +108,6 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a type by name, if present.
      *
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectType(string $name): ?array
@@ -122,7 +118,6 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a directive by name, if present.
      *
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectDirective(string $name): ?array
@@ -133,8 +128,6 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a result from the given path by name, if present.
      *
-     * @param  string  $path
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectByName(string $path, string $name): ?array
@@ -159,8 +152,6 @@ trait MakesGraphQLRequests
 
     /**
      * Return the full URL to the GraphQL endpoint.
-     *
-     * @return string
      */
     protected function graphQLEndpointUrl(): string
     {
@@ -169,11 +160,6 @@ trait MakesGraphQLRequests
 
     /**
      * Send the query and capture all chunks of the streamed response.
-     *
-     * @param  string  $query
-     * @param  array|null  $variables
-     * @param  array  $extraParams
-     * @return array
      */
     protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
     {
@@ -194,8 +180,6 @@ trait MakesGraphQLRequests
 
     /**
      * Set up the stream to make queries with @defer.
-     *
-     * @return void
      */
     protected function setUpDeferStream(): void
     {

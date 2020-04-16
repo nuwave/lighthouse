@@ -10,9 +10,6 @@ abstract class TypeNodeConverter
 {
     /**
      * Convert an AST type to an executable type.
-     *
-     * @param  \GraphQL\Language\AST\TypeNode  $node
-     * @return mixed
      */
     public function convert(TypeNode $node)
     {
@@ -22,9 +19,7 @@ abstract class TypeNodeConverter
     /**
      * Convert an AST type and apply wrapping types.
      *
-     * @param  \GraphQL\Language\AST\TypeNode  $node
      * @param  string[]  $wrappers
-     * @return mixed
      */
     protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])
     {
@@ -60,25 +55,16 @@ abstract class TypeNodeConverter
 
     /**
      * Wrap or mark the type as non-null.
-     *
-     * @param  mixed  $type
-     * @return mixed
      */
     abstract protected function nonNull($type);
 
     /**
      * Wrap or mark the type as a list.
-     *
-     * @param  mixed  $type
-     * @return mixed
      */
     abstract protected function listOf($type);
 
     /**
      * Get the named type for the given node name.
-     *
-     * @param  string $nodeName
-     * @return mixed
      */
     abstract protected function namedType(string $nodeName);
 }

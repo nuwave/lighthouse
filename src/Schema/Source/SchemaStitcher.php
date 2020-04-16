@@ -13,12 +13,6 @@ class SchemaStitcher implements SchemaSourceProvider
      */
     protected $rootSchemaPath;
 
-    /**
-     * SchemaStitcher constructor.
-     *
-     * @param  string  $rootSchemaPath
-     * @return void
-     */
     public function __construct(string $rootSchemaPath)
     {
         $this->rootSchemaPath = $rootSchemaPath;
@@ -27,7 +21,6 @@ class SchemaStitcher implements SchemaSourceProvider
     /**
      * Set schema root path.
      *
-     * @param  string  $path
      * @return $this
      */
     public function setRootPath(string $path): self
@@ -39,8 +32,6 @@ class SchemaStitcher implements SchemaSourceProvider
 
     /**
      * Stitch together schema documents and return the result as a string.
-     *
-     * @return string
      */
     public function getSchemaString(): string
     {
@@ -49,9 +40,6 @@ class SchemaStitcher implements SchemaSourceProvider
 
     /**
      * Get the schema, starting from a root schema, following the imports recursively.
-     *
-     * @param  string  $path
-     * @return string
      */
     protected static function gatherSchemaImportsRecursively(string $path): string
     {
@@ -90,9 +78,6 @@ class SchemaStitcher implements SchemaSourceProvider
     }
 
     /**
-     * @param  string  $path
-     * @return void
-     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected static function throwFileNotFoundException(string $path): void

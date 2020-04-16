@@ -25,7 +25,6 @@ SDL;
      *
      * @param  mixed  $root  The result of the parent resolver.
      * @param  ArgumentSet|ArgumentSet[]  $args  The slice of arguments that belongs to this nested resolver.
-     * @return mixed
      */
     public function __invoke($root, $args)
     {

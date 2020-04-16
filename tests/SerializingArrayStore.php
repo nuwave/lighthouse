@@ -21,7 +21,6 @@ class SerializingArrayStore extends ArrayStore
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key
-     * @return mixed
      */
     public function get($key)
     {
@@ -46,7 +45,6 @@ class SerializingArrayStore extends ArrayStore
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed   $value
      * @param  int  $seconds
      * @return bool
      */

@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class TrashedDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
+    public const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
 
     public static function definition(): string
     {

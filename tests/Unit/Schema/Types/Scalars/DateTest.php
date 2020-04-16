@@ -14,9 +14,6 @@ class DateTest extends TestCase
 {
     /**
      * @dataProvider invalidDateValues
-     *
-     * @param  mixed  $value
-     * @return void
      */
     public function testThrowsIfSerializingNonString($value): void
     {
@@ -27,9 +24,6 @@ class DateTest extends TestCase
 
     /**
      * @dataProvider invalidDateValues
-     *
-     * @param  mixed  $value
-     * @return void
      */
     public function testThrowsIfParseValueNonString($value): void
     {

@@ -13,8 +13,6 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      * As a typical workflow would be to write the schema first and then copy-paste
      * a field name to generate a class for it, we uppercase it so the user does
      * not run into unnecessary errors. You're welcome.
-     *
-     * @return string
      */
     protected function getNameInput(): string
     {
@@ -25,7 +23,6 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
-     * @return string
      */
     protected function getDefaultNamespace($rootNamespace): string
     {
@@ -36,8 +33,6 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
 
     /**
      * Get the config key that holds the default namespaces for the class.
-     *
-     * @return string
      */
     abstract protected function namespaceConfigKey(): string;
 
@@ -47,7 +42,6 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      * For example, ['App\\Foo\\A', 'App\\Foo\\B'] would return 'App\\Foo'.
      *
      * @param  string[]  $namespaces
-     * @return string
      */
     public static function commonNamespace(array $namespaces): string
     {

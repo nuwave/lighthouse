@@ -57,10 +57,6 @@ class LighthouseServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Validation\Factory  $validationFactory
-     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
-     * @return void
      */
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
@@ -88,7 +84,6 @@ class LighthouseServiceProvider extends ServiceProvider
      * Load routes from provided path.
      *
      * @param  string  $path
-     * @return void
      */
     protected function loadRoutesFrom($path): void
     {
@@ -103,8 +98,6 @@ class LighthouseServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -160,7 +153,9 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LaravelMiddlewareAdapter(
                     $app->get(Router::class)
                 );
-            } elseif ($app instanceof LumenApplication) {
+            }
+
+            if ($app instanceof LumenApplication) {
                 return new LumenMiddlewareAdapter($app);
             }
 

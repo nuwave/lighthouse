@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Facades\Event;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Company;
+use Tests\Integration\Schema\Directives\Fixtures\CompanyWasCreatedEvent;
 
 class EventDirectiveTest extends DBTestCase
 {
@@ -19,10 +19,10 @@ class EventDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Mutation {
             createCompany(name: String): Company @create
-                @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\CompanyWasCreatedEvent")
+                @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fixtures\\\\CompanyWasCreatedEvent")
         }
         ';
 
@@ -46,23 +46,5 @@ class EventDirectiveTest extends DBTestCase
             return $event->company->id === 1
                 && $event->company->name === 'foo';
         });
-    }
-}
-
-class CompanyWasCreatedEvent
-{
-    /**
-     * @var \Tests\Utils\Models\Company
-     */
-    public $company;
-
-    /**
-     * CompanyWasCreatedEvent constructor.
-     * @param  \Tests\Utils\Models\Company  $company
-     * @return void
-     */
-    public function __construct(Company $company)
-    {
-        $this->company = $company;
     }
 }

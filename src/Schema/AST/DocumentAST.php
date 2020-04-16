@@ -31,8 +31,6 @@ class DocumentAST implements Serializable
      * extensions are merged with the types before.
      *
      * ['foo' => [0 => FooExtension, 1 => FooExtension]].
-     *
-     * @var NodeList<TypeExtensionNode>[]
      */
     public $typeExtensions = [];
 
@@ -48,7 +46,6 @@ class DocumentAST implements Serializable
     /**
      * Create a new DocumentAST instance from a schema.
      *
-     * @param  string  $schema
      * @return static
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
@@ -95,8 +92,6 @@ class DocumentAST implements Serializable
      *
      * We exclude the type extensions stored in $typeExtensions,
      * as they are merged with the actual types at this point.
-     *
-     * @return string
      */
     public function serialize(): string
     {
@@ -133,7 +128,6 @@ class DocumentAST implements Serializable
      *
      * This operation will overwrite existing definitions with the same name.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $type
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
@@ -148,7 +142,6 @@ class DocumentAST implements Serializable
      *
      * This operation will overwrite existing definitions with the same name.
      *
-     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode  $directive
      * @return $this
      */
     public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self

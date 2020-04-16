@@ -62,9 +62,6 @@ SDL;
 
     /**
      * Bring a model in or out of existence.
-     *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return void
      */
     protected function modifyExistence(Model $model): void
     {
@@ -76,7 +73,6 @@ SDL;
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  mixed|mixed[]  $idOrIds
-     * @return void
      */
     public function __invoke($parent, $idOrIds): void
     {

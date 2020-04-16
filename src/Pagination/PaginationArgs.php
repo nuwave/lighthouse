@@ -23,7 +23,6 @@ class PaginationArgs
      *
      * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType|null  $paginationType
-     * @param  int|null  $paginateMaxCount
      * @return static
      *
      * @throws \GraphQL\Error\Error
@@ -74,11 +73,6 @@ class PaginationArgs
 
     /**
      * Calculate the current page to inform the user about the pagination state.
-     *
-     * @param  int  $first
-     * @param  int  $after
-     * @param  int  $defaultPage
-     * @return int
      */
     protected static function calculateCurrentPage(int $first, int $after, int $defaultPage = 1): int
     {
