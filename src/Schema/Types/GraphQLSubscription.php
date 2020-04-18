@@ -15,7 +15,7 @@ abstract class GraphQLSubscription
      *
      * @return bool
      */
-    public function can(Subscriber $subscriber): bool
+    public function can(Subscriber $subscriber)
     {
         return true;
     }
@@ -25,7 +25,7 @@ abstract class GraphQLSubscription
      *
      * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, string $fieldName): string
+    public function encodeTopic(Subscriber $subscriber, string $fieldName)
     {
         return strtoupper(
             Str::snake($fieldName)
@@ -37,7 +37,7 @@ abstract class GraphQLSubscription
      *
      * @return string
      */
-    public function decodeTopic(string $fieldName, $root): string
+    public function decodeTopic(string $fieldName, $root)
     {
         return strtoupper(
             Str::snake($fieldName)
