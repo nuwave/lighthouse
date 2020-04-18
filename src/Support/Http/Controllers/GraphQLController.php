@@ -47,8 +47,6 @@ class GraphQLController extends Controller
 
     /**
      * Execute GraphQL query.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function query(GraphQLRequest $request): Response
     {

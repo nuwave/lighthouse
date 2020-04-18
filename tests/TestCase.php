@@ -142,7 +142,6 @@ GRAPHQL;
      * are fully dumped to the console when making requests.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
     protected function resolveApplicationExceptionHandler($app): void
     {

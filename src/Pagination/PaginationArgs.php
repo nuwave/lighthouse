@@ -86,7 +86,6 @@ class PaginationArgs
      * Apply the args to a builder, constructing a paginator.
      *
      * @param \Illuminate\Database\Query\Builder $builder
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function applyToBuilder($builder): LengthAwarePaginator
     {
