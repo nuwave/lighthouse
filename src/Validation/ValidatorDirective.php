@@ -118,7 +118,6 @@ SDL;
      * This allows accessing it straight away when resolving the query.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $definition
-     * @param  string|null  $classCandidate
      */
     protected function setFullClassnameOnDirective(Node &$definition, ?string $classCandidate): void
     {

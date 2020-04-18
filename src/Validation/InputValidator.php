@@ -16,15 +16,11 @@ abstract class InputValidator
 
     /**
      * Return the validation rules for the input.
-     *
-     * @return array
      */
     abstract public function rules(): array;
 
     /**
      * Return custom messages for failing validations.
-     *
-     * @return array
      */
     public function messages(): array
     {
@@ -33,9 +29,6 @@ abstract class InputValidator
 
     /**
      * Set the slice of input to validate.
-     *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $input
-     * @return void
      */
     public function setInput(ArgumentSet $input): void
     {
@@ -47,10 +40,7 @@ abstract class InputValidator
      *
      * Allows getting nested values through dot notation.
      *
-     * @param  string  $key
      * @param  mixed|null   $default
-     *
-     * @return mixed
      */
     protected function input(string $key, $default = null)
     {

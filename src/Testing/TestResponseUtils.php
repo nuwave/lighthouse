@@ -14,7 +14,6 @@ class TestResponseUtils
 {
     /**
      * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $response
-     * @return array|null
      */
     public static function extractValidationErrors($response): ?array
     {

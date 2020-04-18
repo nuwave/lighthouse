@@ -10,9 +10,6 @@ class ValidationServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
      */
     public function boot(Dispatcher $dispatcher): void
     {
