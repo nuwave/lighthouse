@@ -57,7 +57,7 @@ class Task extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function scopeWhereTags(Builder $query, $tags)
+    public function scopeWhereTags(Builder $query, $tags): Builder
     {
         return $query->whereHas('tags', function (Builder $query) use ($tags) {
             $query->whereIn('name', $tags);
