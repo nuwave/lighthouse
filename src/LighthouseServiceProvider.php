@@ -10,7 +10,6 @@ use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Factory as ValidationFactory;
 use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\DirectiveCommand;
@@ -55,7 +54,7 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
+    public function boot(ConfigRepository $configRepository): void
     {
         $this->publishes([
             __DIR__.'/lighthouse.php' => $this->app->make('path.config').'/lighthouse.php',
@@ -64,6 +63,10 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../assets/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'schema');
+
+        $this->publishes([
+            __DIR__.'/../_ide_helper.php' => $this->app->make('path.base').'/_lighthouse_ide_helper.php',
+        ], 'ide-helper');
 
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
     }
@@ -100,7 +103,6 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
-
         $this->app->bind(GlobalIdContract::class, GlobalId::class);
 
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {

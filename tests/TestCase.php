@@ -14,8 +14,6 @@ use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
-use Nuwave\Lighthouse\Testing\TestingServiceProvider;
-use Nuwave\Lighthouse\Testing\TestResponseMixin;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
@@ -66,7 +64,6 @@ GRAPHQL;
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
             OrderByServiceProvider::class,
-            TestingServiceProvider::class,
             ValidationServiceProvider::class,
         ];
     }
@@ -135,12 +132,6 @@ GRAPHQL;
         );
 
         $config->set('app.debug', true);
-
-        if (class_exists('Illuminate\Testing\TestResponse')) {
-            \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());
-        } elseif (class_exists('Illuminate\Foundation\Testing\TestResponse')) {
-            \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
-        }
     }
 
     /**
