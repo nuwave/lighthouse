@@ -97,12 +97,9 @@ class SubscriptionRegistry
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return $this
      */
-    public function subscriber(Subscriber $subscriber, string $channel): self
+    public function subscriber(Subscriber $subscriber, string $topic): self
     {
-        if ($subscriber->channel) {
-            $this->storage->storeSubscriber($subscriber, $channel);
-        }
-
+        $this->storage->storeSubscriber($subscriber, $topic);
         $this->subscribers[$subscriber->operationName] = $subscriber->channel;
 
         return $this;

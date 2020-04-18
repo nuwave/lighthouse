@@ -359,7 +359,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testNestedArgResolverBelongsTo(): void
+    public function testNestedArgResolverForOptionalBelongsTo(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {

@@ -14,8 +14,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add flag `--json` to `print-schema` to output JSON instead of GraphQL SDL https://github.com/nuwave/lighthouse/pull/1268
 - Add TTL option for subscriptions storage https://github.com/nuwave/lighthouse/pull/1284
 
+### Fixed
+
+- Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
+- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290Adds
+
 ### Changed
 
+- Remove subscriber reference from topic when deleted https://github.com/nuwave/lighthouse/pull/1288
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
 - Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
 
