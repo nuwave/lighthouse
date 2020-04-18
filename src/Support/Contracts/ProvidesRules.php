@@ -7,14 +7,14 @@ interface ProvidesRules
     /**
      * Return validation rules for multiple arguments.
      *
-     * @return array
+     * array<string, mixed>
      */
     public function rules(): array;
 
     /**
      * Return custom messages for the rules.
      *
-     * @return array
+     * array<string, mixed>
      */
     public function messages(): array;
 }

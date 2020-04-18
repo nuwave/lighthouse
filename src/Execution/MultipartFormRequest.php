@@ -17,12 +17,6 @@ class MultipartFormRequest extends BaseRequest
      */
     protected $operations;
 
-    /**
-     * MultipartFormRequest constructor.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
     public function __construct(Request $request)
     {
         if (! $request->has('map')) {
@@ -71,7 +65,6 @@ class MultipartFormRequest extends BaseRequest
      * If we are dealing with a batched request, this gets the
      * contents of the currently resolving batch index.
      *
-     * @param  string  $key
      * @return array|string|null
      */
     protected function fieldValue(string $key)
@@ -83,8 +76,6 @@ class MultipartFormRequest extends BaseRequest
 
     /**
      * Are there more batched queries to process?
-     *
-     * @return bool
      */
     protected function hasMoreBatches(): bool
     {

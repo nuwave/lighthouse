@@ -15,8 +15,6 @@ class ResolverProvider implements ProvidesResolver
     /**
      * Provide a field resolver in case no resolver directive is defined for a field.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Closure
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -63,11 +61,6 @@ MESSAGE
         );
     }
 
-    /**
-     * @param  FieldValue  $fieldValue
-     * @param  string  $methodName
-     * @return string|null
-     */
     protected function findResolverClass(FieldValue $fieldValue, string $methodName): ?string
     {
         return Utils::namespaceClassname(

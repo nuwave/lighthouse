@@ -13,7 +13,7 @@ class SchemaSourceProviderTest extends TestCase
     /**
      * @var string
      */
-    const SCHEMA_PATH = __DIR__.'/schema/';
+    public const SCHEMA_PATH = __DIR__.'/schema/';
 
     /**
      * @var \League\Flysystem\Filesystem

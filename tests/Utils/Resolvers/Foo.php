@@ -17,9 +17,7 @@ class Foo
     }
 
     /**
-     * @param  mixed  $root
      * @param  mixed[]  $args
-     * @return mixed
      */
     public function baz($root, array $args)
     {

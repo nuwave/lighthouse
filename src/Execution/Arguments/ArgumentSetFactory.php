@@ -29,12 +29,6 @@ class ArgumentSetFactory
      */
     protected $directiveFactory;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter  $argumentTypeNodeConverter
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @return void
-     */
     public function __construct(
         ASTBuilder $astBuilder,
         ArgumentTypeNodeConverter $argumentTypeNodeConverter,
@@ -48,8 +42,6 @@ class ArgumentSetFactory
     /**
      * Wrap client-given args with type information.
      *
-     * @param  array  $args
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
@@ -119,8 +111,6 @@ class ArgumentSetFactory
     /**
      * Wrap a single client-given argument with type information.
      *
-     * @param  mixed  $value
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $definition
      * @return \Nuwave\Lighthouse\Execution\Arguments\Argument
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
@@ -168,7 +158,6 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value
      * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $namedType
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */

@@ -37,13 +37,6 @@ class FieldFactory
      */
     protected $argumentSetFactory;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
-     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory  $argumentSetFactory
-     * @return void
-     */
     public function __construct(
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,
@@ -59,7 +52,6 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array

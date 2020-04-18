@@ -19,10 +19,6 @@ class ValidateDirective extends BaseDirective implements FieldMiddleware, Define
      */
     protected $validationFactory;
 
-    /**
-     * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
-     * @return void
-     */
     public function __construct(ValidationFactory $validationFactory)
     {
         $this->validationFactory = $validationFactory;
@@ -40,10 +36,6 @@ GRAPHQL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {

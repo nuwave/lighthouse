@@ -23,10 +23,6 @@ class ValidateSchemaCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @return void
      */
     public function handle(Repository $cache, GraphQL $graphQL): void
     {

@@ -21,11 +21,6 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {
-    /**
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
-     * @return void
-     */
     public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void
     {
         $eventsDispatcher->listen(
@@ -59,8 +54,6 @@ class SubscriptionServiceProvider extends ServiceProvider
 
     /**
      * Register subscription services.
-     *
-     * @return void
      */
     public function register(): void
     {

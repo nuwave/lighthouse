@@ -15,12 +15,6 @@ class AuthDirective extends BaseDirective implements DefinedDirective, FieldReso
      */
     protected $authFactory;
 
-    /**
-     * AuthDirective constructor.
-     *
-     * @param  \Illuminate\Contracts\Auth\Factory  $authFactory
-     * @return void
-     */
     public function __construct(AuthFactory $authFactory)
     {
         $this->authFactory = $authFactory;
@@ -43,9 +37,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {

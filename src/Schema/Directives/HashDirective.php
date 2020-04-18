@@ -34,7 +34,6 @@ SDL;
 
     /**
      * @param  string  $argumentValue
-     * @return string
      */
     public function transform($argumentValue): string
     {

@@ -67,7 +67,7 @@ Start out by defining `@can` upon a mutation you want to protect:
 
 ```graphql
 type Mutation {
-    createPost(input: PostInput): Post @can(ability: "create")
+  createPost(input: PostInput): Post @can(ability: "create")
 }
 ```
 
@@ -92,7 +92,7 @@ instance against which the permissions should be checked:
 
 ```graphql
 type Query {
-    post(id: ID @eq): Post @can(ability: "view", find: "id")
+  post(id: ID @eq): Post @can(ability: "view", find: "id")
 }
 ```
 
@@ -110,14 +110,14 @@ Finding models combines nicely with [soft deleting](../eloquent/soft-deleting.md
 Lighthouse will detect if the query will require a filter for trashed models and
 apply that as needed.
 
-### Passing additional arguments 
+### Passing additional arguments
 
 You can pass additional arguments to the policy checks by specifying them as `args`:
 
 ```graphql
 type Mutation {
-    createPost(input: PostInput): Post
-        @can(ability: "create", args: ["FROM_GRAPHQL"])
+  createPost(input: PostInput): Post
+    @can(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
 
@@ -136,8 +136,7 @@ with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
-    createPost(title: String!): Post
-        @can(ability: "create", injectArgs: "true")
+  createPost(title: String!): Post @can(ability: "create", injectArgs: "true")
 }
 ```
 

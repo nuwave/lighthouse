@@ -29,8 +29,6 @@ class BroadcastManagerTest extends TestCase
 
     /**
      * Set up test environment.
-     *
-     * @return void
      */
     protected function setUp(): void
     {

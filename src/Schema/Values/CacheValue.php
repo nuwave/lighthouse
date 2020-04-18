@@ -12,9 +12,6 @@ class CacheValue
      */
     protected $fieldValue;
 
-    /**
-     * @var mixed
-     */
     protected $rootValue;
 
     /**
@@ -22,9 +19,6 @@ class CacheValue
      */
     protected $args;
 
-    /**
-     * @var mixed
-     */
     protected $context;
 
     /**
@@ -32,9 +26,6 @@ class CacheValue
      */
     protected $resolveInfo;
 
-    /**
-     * @var mixed
-     */
     protected $fieldKey;
 
     /**
@@ -42,12 +33,6 @@ class CacheValue
      */
     protected $isPrivate;
 
-    /**
-     * Create instance of cache value.
-     *
-     * @param  array  $arguments
-     * @return void
-     */
     public function __construct(array $arguments = [])
     {
         $this->fieldValue = Arr::get($arguments, 'field_value');
@@ -62,8 +47,6 @@ class CacheValue
 
     /**
      * Resolve key from root value.
-     *
-     * @return string
      */
     public function getKey(): string
     {
@@ -88,8 +71,6 @@ class CacheValue
 
     /**
      * Get cache tags.
-     *
-     * @return array
      */
     public function getTags(): array
     {
@@ -111,8 +92,6 @@ class CacheValue
 
     /**
      * Convert input arguments to keys.
-     *
-     * @return \Illuminate\Support\Collection
      */
     protected function argKeys(): Collection
     {
@@ -152,9 +131,6 @@ class CacheValue
 
     /**
      * Implode value to create string.
-     *
-     * @param  array  $items
-     * @return string
      */
     protected function implode(array $items): string
     {

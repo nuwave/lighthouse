@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\DirectiveCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Console\MutationCommand;
@@ -47,15 +48,12 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Validation\Factory  $validationFactory
-     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
-     * @return void
      */
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
@@ -74,7 +72,6 @@ class LighthouseServiceProvider extends ServiceProvider
      * Load routes from provided path.
      *
      * @param  string  $path
-     * @return void
      */
     protected function loadRoutesFrom($path): void
     {
@@ -89,8 +86,6 @@ class LighthouseServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -146,7 +141,9 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LaravelMiddlewareAdapter(
                     $app->get(Router::class)
                 );
-            } elseif ($app instanceof LumenApplication) {
+            }
+
+            if ($app instanceof LumenApplication) {
                 return new LumenMiddlewareAdapter($app);
             }
 
@@ -158,6 +155,7 @@ class LighthouseServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ClearCacheCommand::class,
+                DirectiveCommand::class,
                 IdeHelperCommand::class,
                 InterfaceCommand::class,
                 MutationCommand::class,
@@ -168,6 +166,10 @@ class LighthouseServiceProvider extends ServiceProvider
                 UnionCommand::class,
                 ValidateSchemaCommand::class,
             ]);
+        }
+
+        if ($this->app->runningUnitTests()) {
+            $this->app->register(TestingServiceProvider::class);
         }
     }
 }

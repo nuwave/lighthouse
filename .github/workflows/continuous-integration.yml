@@ -10,6 +10,8 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
+  LIGHTHOUSE_TEST_DB_HOST: "127.0.0.1"
+  LIGHTHOUSE_TEST_DB_PASSWORD: "root"
 
 jobs:
   coding-standards:
@@ -149,7 +151,9 @@ jobs:
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Set up the database"
-        run: "mysql --user=root --password=root --execute='CREATE DATABASE test;'"
+        run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
 
       - name: "Run tests with phpunit/phpunit"
         run: "vendor/bin/phpunit --colors=always --verbose"
@@ -188,7 +192,9 @@ jobs:
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Set up the database"
-        run: "mysql --user=root --password=root --execute='CREATE DATABASE test;'"
+        run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
 
       - name: "Collect code coverage with pcov and phpunit/phpunit"
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"

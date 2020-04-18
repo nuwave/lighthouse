@@ -34,7 +34,6 @@ class PaginationManipulator
     /**
      * Set the model class to use for code generation.
      *
-     * @param  string  $modelClass
      * @return $this
      */
     public function setModelClass(string $modelClass): self
@@ -51,12 +50,6 @@ class PaginationManipulator
      * The types in between are automatically generated and applied to the schema.
      *
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
-     * @return void
      */
     public function transformToPaginatedField(
         PaginationType $paginationType,
@@ -75,13 +68,6 @@ class PaginationManipulator
 
     /**
      * Register connection with schema.
-     *
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
-     * @return  void
      */
     protected function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
@@ -146,9 +132,6 @@ GRAPHQL
      * Add the wrapping type for paginated results.
      *
      * This merges preexisting definitions to preserve maximum information.
-     *
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectType
-     * @return void
      */
     protected function addPaginationWrapperType(ObjectTypeDefinitionNode $objectType): void
     {
@@ -169,12 +152,6 @@ GRAPHQL
 
     /**
      * Register paginator with schema.
-     *
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @return void
      */
     protected function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
@@ -213,11 +190,6 @@ GRAPHQL
 
     /**
      * Build the count argument definition string, considering default and max values.
-     *
-     * @param  string  $argumentName
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @return string
      */
     protected static function countArgument(string $argumentName, ?int $defaultCount = null, ?int $maxCount = null): string
     {

@@ -2,7 +2,7 @@
 
 The entrypoints to any GraphQL API are the fields of the root types `Query`, `Mutation` and `Subscription`.
 
-*Every* field has a function associated with it that is called when the field
+_Every_ field has a function associated with it that is called when the field
 is requested as part of a query. This function is called a **resolver**.
 
 The following section will teach you how to define a resolver for your fields
@@ -18,7 +18,7 @@ The following schema defines a simple field called `hello` that returns a `Strin
 
 ```graphql
 type Query {
-  hello: String! 
+  hello: String!
 }
 ```
 
@@ -73,7 +73,7 @@ And will return the following response:
 
 ### Fields with arguments
 
-As we learned, *every* field has a resolver function associated with it.
+As we learned, _every_ field has a resolver function associated with it.
 Just like functions, fields can take arguments to control their behaviour.
 
 Let's construct a query that greets the user. We add a required argument `name`
@@ -81,7 +81,7 @@ that is used to construct the greeting.
 
 ```graphql
 type Query {
-    greet(name: String!): String
+  greet(name: String!): String
 }
 ```
 
@@ -89,7 +89,7 @@ A minimal implementation of the field could look something like this.
 The skeleton for this class can be created using `php artisan lighthouse:query Greet`.
 
 The second argument of the resolver function is an associative array of the
-arguments that are passed to the query. 
+arguments that are passed to the query.
 
 ```php
 <?php
@@ -128,7 +128,7 @@ and make the `name` optional and provide a default value.
 
 ```graphql
 type Query {
-    greet(name: String = "you"): String
+  greet(name: String = "you"): String
 }
 ```
 
@@ -266,7 +266,7 @@ The following query:
     id
     name
   }
-}  
+}
 ```
 
 Will return the following result:
@@ -275,8 +275,8 @@ Will return the following result:
 {
   "data": {
     "users": [
-      {"id": 1, "name": "James Bond"},
-      {"id": 2, "name": "Madonna"}
+      { "id": 1, "name": "James Bond" },
+      { "id": 2, "name": "Madonna" }
     ]
   }
 }
@@ -299,7 +299,7 @@ You can query this field like this:
 
 ```graphql
 {
-  user(id: 69){
+  user(id: 69) {
     name
   }
 }
@@ -319,8 +319,8 @@ And, if found, receive a result like this:
 
 ## Mutate data
 
-Per convention, a GraphQL *Query* is not allowed to change data.
-You will need to define a *Mutation* for that.
+Per convention, a GraphQL _Query_ is not allowed to change data.
+You will need to define a _Mutation_ for that.
 Mutations look just like queries, but only they can create, update or delete data.
 
 The following examples will show you how to make changes to a single model.
@@ -341,7 +341,7 @@ This will take the arguments that the `createUser` field receives and use them t
 
 ```graphql
 mutation {
-  createUser(name: "Donald"){
+  createUser(name: "Donald") {
     id
     name
   }
@@ -375,7 +375,7 @@ Since GraphQL allows you to update just parts of your data, it is best to have a
 
 ```graphql
 mutation {
-  updateUser(id: "123" name: "Hillary"){
+  updateUser(id: "123", name: "Hillary") {
     id
     name
   }
@@ -418,7 +418,7 @@ Simply call it with the ID of the user you want to delete.
 
 ```graphql
 mutation {
-  deleteUser(id: "123"){
+  deleteUser(id: "123") {
     secret
   }
 }
@@ -434,11 +434,11 @@ This mutation will return the deleted object, so you will have a last chance to 
     }
   }
 }
-``` 
+```
 
 ## Subscribe to data
- 
+
 Lighthouse allows you to serve GraphQL subscriptions. Compared to queries and
 mutations, a more elaborate setup is required.
- 
+
 [Read more about how to set up subscriptions](../extensions/subscriptions.md)

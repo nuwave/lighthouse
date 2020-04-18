@@ -18,6 +18,7 @@
 [![Get on Slack](https://img.shields.io/badge/slack-join-orange.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
 
 **GraphQL Server for Laravel**
+
 </div>
 
 Lighthouse is a PHP package that allows you to serve a GraphQL endpoint from your
@@ -29,7 +30,7 @@ giving you full control over your data.
 
 The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
 
-If you like reading plain markdown, you can also find the source files in the  [docs folder](/docs).
+If you like reading plain markdown, you can also find the source files in the [docs folder](/docs).
 
 ## Get started
 
@@ -46,7 +47,7 @@ Check out [the docs](https://lighthouse-php.com/) to learn more.
 
 We welcome contributions of any kind.
 
-- Have a question? [Use the laravel-lighthouse tag on Stackoverflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse) 
+- Have a question? [Use the laravel-lighthouse tag on Stackoverflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
 - Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Have an idea? [Propose a feature](https://github.com/nuwave/lighthouse/issues/new?template=feature_proposal.md)

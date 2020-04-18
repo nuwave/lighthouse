@@ -45,12 +45,16 @@ class SaveModel implements ArgResolver
         $model->fill($remaining->toArray());
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
-            $belongsToResolver = new ResolveNested(new NestedBelongsTo($relationName));
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
+            $belongsTo = $model->{$relationName}();
+            $belongsToResolver = new ResolveNested(new NestedBelongsTo($belongsTo));
             $belongsToResolver($model, $nestedOperations->value);
         }
 
         foreach ($morphTo->arguments as $relationName => $nestedOperations) {
-            $morphToResolver = new ResolveNested(new NestedMorphTo($relationName));
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $morphTo */
+            $morphTo = $model->{$relationName}();
+            $morphToResolver = new ResolveNested(new NestedMorphTo($morphTo));
             $morphToResolver($model, $nestedOperations->value);
         }
 
@@ -66,9 +70,14 @@ class SaveModel implements ArgResolver
         $model->save();
 
         if ($this->parentRelation instanceof BelongsTo) {
-            $this->parentRelation
-                ->associate($model)
-                ->save();
+            $parentModel = $this->parentRelation->associate($model);
+
+            // If the parent Model does not exist (still to be saved),
+            // a save could break any pending belongsTo relations that still
+            // needs to be created and associated with the parent model
+            if ($parentModel->exists()) {
+                $parentModel->save();
+            }
         }
 
         if ($this->parentRelation instanceof BelongsToMany) {
