@@ -20,7 +20,7 @@ required in a single request, it is convenient to attempt authentication once pe
     ],
 ```
 
-Note that the `AttemptAuthentication` middleware does *not* protect any of your fields
+Note that the `AttemptAuthentication` middleware does _not_ protect any of your fields
 by itself, decorate them with [`@guard`](../api-reference/directives.md#guard) as needed.
 
 If you want to guard all your fields against unauthenticated access, you can simply add

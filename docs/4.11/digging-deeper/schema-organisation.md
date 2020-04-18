@@ -24,7 +24,7 @@ type Query {
 #import user.graphql
 ```
 
-Imports always begin on a separate line with `#import `, followed by the relative path
+Imports always begin on a separate line with `#import`, followed by the relative path
 to the imported file. The contents of `user.graphql` are pasted in the final schema.
 
 ```graphql
@@ -33,7 +33,7 @@ type Query {
 }
 
 type User {
-    name: String!
+  name: String!
 }
 ```
 
@@ -41,6 +41,7 @@ The import statements are followed recursively, so it is easy to organize even t
 
 You can also import multiple files using wildcard import syntax.
 For example, if you have your schema files like this:
+
 ```
 graphql/
   |-- schema.graphql
@@ -109,7 +110,7 @@ type Query
 #import post.graphql
 ```
 
-The same applies for mutations: if you want to use them, you can define 
+The same applies for mutations: if you want to use them, you can define
 an empty `Mutation` type (without curly braces) within your root schema:
 
 ```graphql

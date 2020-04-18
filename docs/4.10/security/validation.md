@@ -20,7 +20,7 @@ as part of the response.
 
 ```graphql
 mutation {
-  createUser(email: "hans@peter.xyz"){
+  createUser(email: "hans@peter.xyz") {
     id
   }
 }
@@ -41,9 +41,7 @@ mutation {
         }
       ],
       "extensions": {
-        "validation": [
-          "The name field is required."
-        ]
+        "validation": ["The name field is required."]
       }
     }
   ]
@@ -72,8 +70,8 @@ Rules can be defined upon Input Object Values.
 
 ```graphql
 input CreatePostInput {
-    title: String @rules(apply: ["required"])
-    content: String @rules(apply: ["min:50", "max:150"])
+  title: String @rules(apply: ["required"])
+  content: String @rules(apply: ["min:50", "max:150"])
 }
 ```
 
@@ -107,10 +105,8 @@ For example, you might require a list of at least 3 valid emails to be passed.
 ```graphql
 type Mutation {
   attachEmails(
-    email: [String!]!
-      @rules(apply: ["email"])
-      @rulesForArray(apply: ["min:3"])
-   ): File
+    email: [String!]! @rules(apply: ["email"]) @rulesForArray(apply: ["min:3"])
+  ): File
 }
 ```
 

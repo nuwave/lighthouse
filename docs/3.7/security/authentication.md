@@ -43,7 +43,7 @@ type Query {
 If you need to apply middleware to a group of fields, you can put [@middleware](../api-reference/directives.md#middleware) on an Object type.
 
 ```graphql
-extend type Query @middleware(checks: ["auth:admin"]){
+extend type Query @middleware(checks: ["auth:admin"]) {
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
 }
