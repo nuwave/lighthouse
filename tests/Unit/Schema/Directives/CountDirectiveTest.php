@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class CountDirectiveTest extends TestCase
 {
-    public function testRequireRelationOrModelArgument()
+    public function testRequireRelationOrModelArgument(): void
     {
         $this->schema = '
         type Query {
