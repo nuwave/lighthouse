@@ -116,3 +116,57 @@ The method will have to change like this:
 -public function purchasedItemsCount($root, array $args)
 +public function purchasedItemsCount(int $year, ?bool $includeReturns)
 ```
+
+### `ArgDirective` run in distinct phases
+
+The application of directives that implement the `ArgDirective` interface is
+split into three distinct phases:
+
+- Sanitize: Clean the input, e.g. trim whitespace.
+  Directives can hook into this phase by implementing `ArgSanitizerDirective`.
+- Validate: Ensure the input conforms to the expectations, e.g. check a valid email is given
+- Transform: Change the input before processing it further, e.g. hashing passwords.
+  Directives can hook into this phase by implementing `ArgTransformerDirective`
+
+### Replace custom validation directives with validator classes
+
+The `ValidationDirective` abstract class was removed in favour of validator classes.
+They represent a more lightweight way and flexible way to reuse complex validation rules,
+not only on fields but also on input objects.
+
+To convert an existing custom validation directive to a validator class, change it as follows:
+
+```diff
+<?php
+
+-namespace App\GraphQL\Directives;
++namespace App\GraphQL\Validators;
+
+use Illuminate\Validation\Rule;
+-use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
++use Nuwave\Lighthouse\Validation\InputValidator;
+
+-class UpdateUserValidationDirective extends ValidationDirective
++class UpdateUserValidator extends InputValidator
+{
+    /**
+     * @return mixed[]
+     */
+    public function rules(): array
+    {
+        return [
+            'id' => ['required'],
+            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
+        ];
+    }
+}
+```
+
+Instead of directly using this class as a directive, place the `@validator` directive on your field.
+
+```graphql
+type Mutation {
+- updateUser(id: ID, name: String): User @update @updateUserValidation
++ updateUser(id: ID, name: String): User @update @validator
+}
+```

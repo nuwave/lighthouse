@@ -11,7 +11,22 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add possibility to apply `@rules` directive to input types by providing a validator class that extends `\Nuwave\Lighthouse\Execution\InputTypeValidator`  https://github.com/nuwave/lighthouse/pull/1185
+- Apply `@rules` directive to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
+- Provide assertion helpers through `TestResponseMixin` https://github.com/nuwave/lighthouse/pull/1185
+
+### Changed
+
+- `\Nuwave\Lighthouse\Exceptions\ValidationException` no longer extends `\Illuminate\Validation\ValidationException` https://github.com/nuwave/lighthouse/pull/1185
+- Move validation related classes into namespace `Nuwave\Lighthouse\Validation` https://github.com/nuwave/lighthouse/pull/1185
+- Run `ArgDirectives` in distinct phases: Sanitize, Validate, Transform https://github.com/nuwave/lighthouse/pull/1185
+- The directive interfaces `ArgBuilderDirective`, `ArgTransformerDirective` and `ArgDirectiveForArray`
+  extend `Directive` instead of `ArgDirective` https://github.com/nuwave/lighthouse/pull/1185
+
+### Removed
+
+- Remove `\Nuwave\Lighthouse\Execution\GraphQLValidator` as validation now uses Laravel's native validator https://github.com/nuwave/lighthouse/pull/1185
+- Remove interfaces `HasArgumentPath` and `HasErrorBuffer` and the parts of `FieldFactory` that calls them https://github.com/nuwave/lighthouse/pull/1185
+- Remove the `ValidationDirective` abstract class in favour of validator classes https://github.com/nuwave/lighthouse/pull/1185
 
 ## Unreleased
 
