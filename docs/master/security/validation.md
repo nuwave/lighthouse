@@ -140,9 +140,9 @@ and define the validation rules for the input:
 namespace App\GraphQL\Validators;
 
 use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Validation\InputValidator;
+use Nuwave\Lighthouse\Validation\Validator;
 
-class UpdateUserInputValidator extends InputValidator
+class UpdateUserInputValidator extends Validator
 {
     public function rules(): array
     {
@@ -152,7 +152,7 @@ class UpdateUserInputValidator extends InputValidator
             ],
             'name' => [
                 'sometimes',
-                Rule::unique('users', 'name')->ignore($this->input('id'), 'id'),
+                Rule::unique('users', 'name')->ignore($this->arg('id'), 'id'),
             ],
         ];
     }

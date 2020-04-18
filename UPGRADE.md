@@ -144,10 +144,10 @@ To convert an existing custom validation directive to a validator class, change 
 
 use Illuminate\Validation\Rule;
 -use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
-+use Nuwave\Lighthouse\Validation\InputValidator;
++use Nuwave\Lighthouse\Validation\Validator;
 
 -class UpdateUserValidationDirective extends ValidationDirective
-+class UpdateUserValidator extends InputValidator
++class UpdateUserValidator extends Validator
 {
     /**
      * @return mixed[]

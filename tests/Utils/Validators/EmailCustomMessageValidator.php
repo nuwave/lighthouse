@@ -2,9 +2,9 @@
 
 namespace Tests\Utils\Validators;
 
-use Nuwave\Lighthouse\Validation\InputValidator;
+use Nuwave\Lighthouse\Validation\Validator;
 
-class EmailCustomMessageValidator extends InputValidator
+class EmailCustomMessageValidator extends Validator
 {
     const MESSAGE = 'this is a custom error message';
 

@@ -24,7 +24,7 @@ class ValidatorDirective extends BaseDirective implements ArgDirective, Provides
     use HasArgumentValue;
 
     /**
-     * @var \Nuwave\Lighthouse\Validation\InputValidator
+     * @var \Nuwave\Lighthouse\Validation\Validator
      */
     protected $validator;
 
@@ -64,15 +64,15 @@ SDL;
         return $this->validator()->messages();
     }
 
-    protected function validator(): InputValidator
+    protected function validator(): Validator
     {
         if (! $this->validator) {
-            /** @var \Nuwave\Lighthouse\Validation\InputValidator $validator */
+            /** @var \Nuwave\Lighthouse\Validation\Validator $validator */
             $validator = app(
                 // We precomputed and validated the full class name at schema build time
                 $this->directiveArgValue('class')
             );
-            $validator->setInput($this->argumentValue);
+            $validator->setArgs($this->argumentValue);
 
             return $this->validator = $validator;
         }
@@ -140,7 +140,7 @@ SDL;
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
             function (string $classCandidate): bool {
-                return is_subclass_of($classCandidate, InputValidator::class);
+                return is_subclass_of($classCandidate, Validator::class);
             }
         );
     }

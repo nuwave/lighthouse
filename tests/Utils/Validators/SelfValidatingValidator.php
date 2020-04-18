@@ -2,13 +2,13 @@
 
 namespace Tests\Utils\Validators;
 
-use Nuwave\Lighthouse\Validation\InputValidator;
+use Nuwave\Lighthouse\Validation\Validator;
 
-class SelfValidatingValidator extends InputValidator
+class SelfValidatingValidator extends Validator
 {
     public function rules(): array
     {
         // This also tests the input is being passed
-        return $this->input->toArray();
+        return $this->args->toArray();
     }
 }
