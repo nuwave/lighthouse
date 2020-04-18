@@ -1,7 +1,6 @@
 ---
 name: Feature proposal
 about: Propose an idea for a feature
-
 ---
 
 <!-- Please keep in mind that Lighthouse is a community project and features take effort.

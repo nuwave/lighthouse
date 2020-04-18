@@ -210,7 +210,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class  https://github.com/nuwave/lighthouse/pull/1027
+- Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class https://github.com/nuwave/lighthouse/pull/1027
 
 ### Fixed
 
