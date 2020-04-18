@@ -30,7 +30,10 @@ giving you full control over your data.
 
 The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
 
-If you like reading plain markdown, you can also find the source files in the [docs folder](/docs).
+A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn/) and is maintained
+over at https://github.com/haxibiao/lighthouse
+
+You can find the markdown source files in [/docs](/docs).
 
 ## Get started
 
