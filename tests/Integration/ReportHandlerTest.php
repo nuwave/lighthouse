@@ -14,9 +14,10 @@ class ReportHandlerTest extends TestCase
             throw $exception;
         });
 
-        $handler = $this->mock(ExceptionHandler::class);
+        $handler = $this->createMock(ExceptionHandler::class);
         $handler
-            ->shouldReceive('report')
+            ->expects($this->once())
+            ->method('report')
             ->with($exception);
         app()->singleton(ExceptionHandler::class, function () use ($handler) {
             return $handler;
