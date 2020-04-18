@@ -247,6 +247,11 @@ return [
         'queue_broadcasts' => env('LIGHTHOUSE_QUEUE_BROADCASTS', true),
 
         /*
+         * Determines the queue to use for broadcasting queue jobs.
+         */
+        'broadcasts_queue_name' => env('LIGHTHOUSE_BROADCASTS_QUEUE_NAME', null),
+
+        /*
          * Default subscription storage.
          *
          * Any Laravel supported cache driver options are available here.
