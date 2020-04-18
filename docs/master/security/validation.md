@@ -10,9 +10,7 @@ The simplest way to leverage the built-in validation rules is to use the
 
 ```graphql
 type Mutation {
-  createUser(
-    email: String @rules(apply: ["email"])
-  ): User
+  createUser(email: String @rules(apply: ["email"])): User
 }
 ```
 
@@ -116,8 +114,8 @@ type Mutation {
 
 ## Validator Classes
 
-In cases where your validation becomes too complex and demanding, you want to have the power of PHP to perform 
-complex validation. For example, accessing existing data in the database or validating the combination of input 
+In cases where your validation becomes too complex and demanding, you want to have the power of PHP to perform
+complex validation. For example, accessing existing data in the database or validating the combination of input
 values cannot be achieved with the examples above. This is where validator classes come into play.
 
 Validator classes can be reused on field definitions or input types within your schema.
@@ -125,8 +123,8 @@ Use the [`@validator`](../api-reference/directives.md#validator) directive:
 
 ```graphql
 input UpdateUserInput @validator {
-    id: ID
-    name: String
+  id: ID
+  name: String
 }
 ```
 
@@ -179,7 +177,7 @@ The `@validator` directive can also be used upon fields:
 
 ```graphql
 type Mutation {
-    updateUser(id: ID!, name: String): User @validator
+  updateUser(id: ID!, name: String): User @validator
 }
 ```
 
