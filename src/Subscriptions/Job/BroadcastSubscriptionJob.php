@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Subscriptions\Job;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 
 class BroadcastSubscriptionJob implements ShouldQueue
 {
@@ -21,11 +21,6 @@ class BroadcastSubscriptionJob implements ShouldQueue
         $this->event = $event;
     }
 
-    /**
-     * Handle the event.
-     *
-     * @param \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster
-     */
     public function handle(BroadcastsSubscriptions $broadcaster): void
     {
         $broadcaster->broadcast(
