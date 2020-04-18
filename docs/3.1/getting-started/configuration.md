@@ -277,6 +277,6 @@ return [
     'allowed_origins' => explode(',', env('ALLOWED_CORS_ORIGINS', [])),
     ...
 ];
-``` 
+```
 
 > CORS is built into Laravel starting from version 7, for previous versions use https://github.com/fruitcake/laravel-cors

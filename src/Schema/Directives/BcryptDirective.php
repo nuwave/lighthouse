@@ -28,7 +28,6 @@ SDL;
      * Useful for hashing passwords before inserting them into the database.
      *
      * @param  string  $argumentValue
-     * @return string
      */
     public function transform($argumentValue): string
     {

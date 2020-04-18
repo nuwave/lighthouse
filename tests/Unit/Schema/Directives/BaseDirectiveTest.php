@@ -162,7 +162,6 @@ class BaseDirectiveTest extends TestCase
      * Get a testable instance of the BaseDirective that allows calling protected methods.
      *
      * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
-     * @return \Nuwave\Lighthouse\Schema\Directives\BaseDirective
      */
     protected function constructTestDirective($definitionNode): BaseDirective
     {
@@ -170,9 +169,7 @@ class BaseDirectiveTest extends TestCase
             /**
              * Allow to call protected methods from the test.
              *
-             * @param  string  $method
              * @param  mixed[]  $args
-             * @return mixed
              */
             public function __call(string $method, array $args)
             {

@@ -70,8 +70,6 @@ GRAPHQL;
      * Apply the conditions to the query builder.
      *
      * @param  \Illuminate\Database\Query\Builder  $builder
-     * @param  array  $whereConditions
-     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder
      */
     public function applyConditions($builder, array $whereConditions, string $boolean)

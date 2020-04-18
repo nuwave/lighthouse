@@ -130,7 +130,6 @@ class SubscriptionTest extends TestCase
     }
 
     /**
-     * @param  mixed  $root
      * @param  mixed[]  $args
      * @return mixed[]
      */
@@ -159,8 +158,6 @@ class SubscriptionTest extends TestCase
     /**
      * Build the expectation for the first subscription reponse.
      *
-     * @param  string  $channelName
-     * @param  string  $channel
      * @return mixed[]
      */
     protected function buildResponse(string $channelName, string $channel): array

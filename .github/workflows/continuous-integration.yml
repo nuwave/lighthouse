@@ -10,6 +10,8 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
+  LIGHTHOUSE_TEST_DB_HOST: "127.0.0.1"
+  LIGHTHOUSE_TEST_DB_PASSWORD: "root"
 
 jobs:
   coding-standards:

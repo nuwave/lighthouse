@@ -27,11 +27,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
      */
     protected $gate;
 
-    /**
-     * CanDirective constructor.
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
-     * @return void
-     */
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;
@@ -84,10 +79,6 @@ SDL;
 
     /**
      * Ensure the user is authorized to access this field.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -111,8 +102,6 @@ SDL;
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  array  $args
      * @return iterable<Model|string>
      *
      * @throws \GraphQL\Error\Error
@@ -169,11 +158,8 @@ SDL;
     }
 
     /**
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @param  string|string[]  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array  $arguments
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -193,7 +179,6 @@ SDL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array  $args
      * @return mixed[]
      */
     protected function buildCheckArguments(array $args): array

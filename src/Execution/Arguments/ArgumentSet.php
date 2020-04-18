@@ -29,8 +29,6 @@ class ArgumentSet
 
     /**
      * Get a plain array representation of this ArgumentSet.
-     *
-     * @return array
      */
     public function toArray(): array
     {
@@ -45,9 +43,6 @@ class ArgumentSet
 
     /**
      * Check if the ArgumentSet has a non-null value with the given key.
-     *
-     * @param  string  $key
-     * @return bool
      */
     public function has(string $key): bool
     {
@@ -63,8 +58,6 @@ class ArgumentSet
 
     /**
      * Apply the @spread directive and return a new, modified instance.
-     *
-     * @return self
      */
     public function spread(): self
     {
@@ -96,8 +89,6 @@ class ArgumentSet
 
     /**
      * Apply the @rename directive and return a new, modified instance.
-     *
-     * @return self
      */
     public function rename(): self
     {
@@ -162,7 +153,6 @@ class ArgumentSet
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
-     * @param  \Closure|null  $directiveFilter
      */
     protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null): void
     {
@@ -204,8 +194,6 @@ class ArgumentSet
      * Works just like the Laravel Arr::add() function.
      * @see \Illuminate\Support\Arr
      *
-     * @param  string  $path
-     * @param  mixed  $value
      * @return $this
      */
     public function addValue(string $path, $value): self

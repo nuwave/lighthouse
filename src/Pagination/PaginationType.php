@@ -9,8 +9,8 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
  */
 class PaginationType
 {
-    const TYPE_PAGINATOR = 'paginator';
-    const PAGINATION_TYPE_CONNECTION = 'connection';
+    public const TYPE_PAGINATOR = 'paginator';
+    public const PAGINATION_TYPE_CONNECTION = 'connection';
 
     /**
      * @var string PAGINATION_TYPE_PAGINATOR|PAGINATION_TYPE_CONNECTION
@@ -18,11 +18,6 @@ class PaginationType
     protected $type;
 
     /**
-     * PaginationType constructor.
-     *
-     * @param  string  $paginationType
-     * @return void
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function __construct(string $paginationType)

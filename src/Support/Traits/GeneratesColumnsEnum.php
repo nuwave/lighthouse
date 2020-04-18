@@ -19,8 +19,6 @@ trait GeneratesColumnsEnum
 {
     /**
      * Check whether the directive constrains allowed columns.
-     *
-     * @return bool
      */
     protected function hasAllowedColumns(): bool
     {
@@ -39,9 +37,6 @@ trait GeneratesColumnsEnum
     /**
      * Generate the enumeration type for the list of allowed columns.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode $argDefinition
-     * @param \GraphQL\Language\AST\FieldDefinitionNode $parentField
      * @return string The name of the used enum.
      */
     protected function generateColumnsEnum(
@@ -74,10 +69,6 @@ trait GeneratesColumnsEnum
      * Create the name for the Enum that holds the allowed columns.
      *
      * @example FieldNameArgNameColumn
-     *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @return string
      */
     protected function allowedColumnsEnumName(
         InputValueDefinitionNode &$argDefinition,
@@ -91,11 +82,7 @@ trait GeneratesColumnsEnum
     /**
      * Create the Enum that holds the allowed columns.
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
      * @param  string[]  $allowedColumns
-     * @param  string  $allowedColumnsEnumName
-     * @return \GraphQL\Language\AST\EnumTypeDefinitionNode
      */
     protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,

@@ -12,8 +12,8 @@ use Nuwave\Lighthouse\GraphQL;
 
 class PrintSchemaCommand extends Command
 {
-    const GRAPHQL_FILENAME = 'lighthouse-schema.graphql';
-    const JSON_FILENAME = 'lighthouse-schema.json';
+    public const GRAPHQL_FILENAME = 'lighthouse-schema.graphql';
+    public const JSON_FILENAME = 'lighthouse-schema.json';
 
     /**
      * The name and signature of the console command.
@@ -35,11 +35,6 @@ class PrintSchemaCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  \Illuminate\Cache\Repository  $cache
-     * @param  \Illuminate\Contracts\Filesystem\Filesystem  $storage
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @return void
      */
     public function handle(Repository $cache, Filesystem $storage, GraphQL $graphQL): void
     {
@@ -65,9 +60,6 @@ class PrintSchemaCommand extends Command
 
     /**
      * Convert the given schema to a JSON string.
-     *
-     * @param  \GraphQL\Type\Schema  $schema
-     * @return string
      */
     protected function schemaJson(Schema $schema): string
     {

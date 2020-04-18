@@ -14,12 +14,6 @@ class AttemptAuthentication
      */
     protected $auth;
 
-    /**
-     * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Auth\Factory  $auth
-     * @return void
-     */
     public function __construct(Auth $auth)
     {
         $this->auth = $auth;
@@ -29,9 +23,7 @@ class AttemptAuthentication
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string[]  ...$guards
-     * @return mixed
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -45,7 +37,6 @@ class AttemptAuthentication
     /**
      * Attempt to authenticate the user, but don't do anything if they are not.
      *
-     * @param  array  $guards
      * @return void
      */
     protected function attemptAuthentication(array $guards): void

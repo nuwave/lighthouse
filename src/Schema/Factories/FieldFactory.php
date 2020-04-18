@@ -84,14 +84,6 @@ class FieldFactory
      */
     protected $handleArgDirectivesSnapshots = [];
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
-     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\TypedArgs  $typedArgs
-     * @return void
-     */
     public function __construct(
         DirectiveFactory $directiveFactory,
         ArgumentFactory $argumentFactory,
@@ -109,7 +101,6 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
@@ -192,10 +183,7 @@ class FieldFactory
     /**
      * Handle the ArgMiddleware.
      *
-     * @param  \GraphQL\Type\Definition\InputType  $type
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]  $argumentPath
-     * @return void
      */
     protected function handleArgDirectivesRecursively(
         InputType $type,
@@ -249,11 +237,8 @@ class FieldFactory
     }
 
     /**
-     * @param  \GraphQL\Type\Definition\InputType  $type
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  mixed[]  $argumentPath
-     * @return void
      */
     protected function handleArgWithAssociatedDirectives(
         InputType $type,
@@ -275,10 +260,7 @@ class FieldFactory
     }
 
     /**
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]  $argumentPath
-     * @param  \Illuminate\Support\Collection  $directives
-     * @return void
      */
     protected function handleArgDirectives(
         InputValueDefinitionNode $astNode,
@@ -372,8 +354,6 @@ class FieldFactory
 
     /**
      * Run the gathered validation rules on the arguments.
-     *
-     * @return void
      */
     protected function validateArgs(): void
     {
@@ -407,8 +387,6 @@ class FieldFactory
 
     /**
      * Continue evaluating the arg directives after validation has run.
-     *
-     * @return void
      */
     protected function resumeHandlingArgDirectives(): void
     {

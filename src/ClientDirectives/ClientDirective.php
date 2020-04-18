@@ -41,7 +41,6 @@ class ClientDirective
      * - When the directive is present but has no arguments: []
      * - When the directive is present with arguments: an associative array
      *
-     * @param  string  $clientDirectiveName
      * @return array<array<string, mixed>|null>
      */
     public function forField(ResolveInfo $resolveInfo): array
@@ -57,7 +56,6 @@ class ClientDirective
     }
 
     /**
-     * @return \GraphQL\Type\Definition\Directive
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function definition(): Directive

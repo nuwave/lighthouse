@@ -14,7 +14,7 @@ the built-in [`@trim`](../api-reference/directives.md#trim) directive:
 
 ```graphql
 type Mutation {
-    createPost(title: String @trim): Post
+  createPost(title: String @trim): Post
 }
 ```
 

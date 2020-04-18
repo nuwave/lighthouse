@@ -17,9 +17,6 @@ trait HasArgumentPath
         return $this->argumentPath;
     }
 
-    /**
-     * @return string
-     */
     public function argumentPathAsDotNotation(): string
     {
         return implode('.', $this->argumentPath);

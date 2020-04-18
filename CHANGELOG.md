@@ -12,6 +12,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add flag `--json` to `print-schema` to output JSON instead of GraphQL SDL https://github.com/nuwave/lighthouse/pull/1268
+- Add TTL option for subscriptions storage https://github.com/nuwave/lighthouse/pull/1284
+
+### Fixed
+
+- Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
+- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290Adds
+
+### Changed
+
+- Remove subscriber reference from topic when deleted https://github.com/nuwave/lighthouse/pull/1288
+- Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
+- Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
 
 ## 4.11.0
 
@@ -23,7 +35,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Eager load nested relations using the `@with` directive https://github.com/nuwave/lighthouse/pull/1068 
+- Eager load nested relations using the `@with` directive https://github.com/nuwave/lighthouse/pull/1068
 - Avoid infinite loop with empty namespace in generator commands https://github.com/nuwave/lighthouse/pull/1245
 - Automatically register `TestingServiceProvider` for `@mock` when running unit tests https://github.com/nuwave/lighthouse/pull/1244
 
@@ -198,7 +210,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class  https://github.com/nuwave/lighthouse/pull/1027
+- Use detailed `$description` property when generating `enum` values from a `BenSampo\Enum\Enum` class https://github.com/nuwave/lighthouse/pull/1027
 
 ### Fixed
 
@@ -231,7 +243,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015 
+- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015
 
 ## 4.4.2
 
@@ -376,7 +388,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change the signature of the AST manipulating directive interfaces:
   `TypeManipulator`, `FieldManipulator` and `ArgManipulator` https://github.com/nuwave/lighthouse/pull/768
 - Change the API of the `DocumentAST` class to enable a more performant implementation https://github.com/nuwave/lighthouse/pull/768
-- Enable the schema caching option `lighthouse.cache.enable` by default https://github.com/nuwave/lighthouse/pull/768 
+- Enable the schema caching option `lighthouse.cache.enable` by default https://github.com/nuwave/lighthouse/pull/768
 - Lazily load types from the schema. Directives defined on parts of the schema that are not used within the current
   query are no longer run on every request https://github.com/nuwave/lighthouse/pull/768
 - Simplify the default route configuration.
@@ -425,7 +437,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- The `GraphQL` facade and the container alias `graphql` will be removed in v4 
+- The `GraphQL` facade and the container alias `graphql` will be removed in v4
 
 ## 3.6.1
 
@@ -546,8 +558,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
   that sets a default value for the generated field argument `count` https://github.com/nuwave/lighthouse/pull/428
 - Allow user to be guest when using the `@can` directive https://github.com/nuwave/lighthouse/pull/431
 - Add shortcut to get NodeValue type definition fields https://github.com/nuwave/lighthouse/pull/432
-- Use `@inject` with dot notation to set nested value https://github.com/nuwave/lighthouse/pull/511 
-- Populate more relationship types through nested mutations https://github.com/nuwave/lighthouse/pull/514 https://github.com/nuwave/lighthouse/pull/549 
+- Use `@inject` with dot notation to set nested value https://github.com/nuwave/lighthouse/pull/511
+- Populate more relationship types through nested mutations https://github.com/nuwave/lighthouse/pull/514 https://github.com/nuwave/lighthouse/pull/549
 - Support the `@deprecated` directive https://github.com/nuwave/lighthouse/pull/522
 - Allow defining default namespaces as an array https://github.com/nuwave/lighthouse/pull/525
 - Add config & directive argument for `@paginate` to limit the maximum requested count https://github.com/nuwave/lighthouse/pull/569

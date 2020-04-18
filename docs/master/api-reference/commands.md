@@ -14,13 +14,13 @@ Clear the cache for the GraphQL AST.
 Create a class for a GraphQL directive.
 
     php artisan lighthouse:directive
-   
+
 ## ide-helper
 
 Create a schema containing all server-side directives.
 This will allow some IDEs to do code completion in your GraphQL-schema.
 
-    php artisan lighthouse:ide-helper 
+    php artisan lighthouse:ide-helper
 
 ## interface
 

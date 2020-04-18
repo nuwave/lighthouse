@@ -11,7 +11,6 @@ class PaginatorField
      * Resolve paginator info for connection.
      *
      * @param  \Illuminate\Pagination\LengthAwarePaginator  $root
-     * @return array
      */
     public function paginatorInfoResolver(LengthAwarePaginator $root): array
     {
@@ -31,7 +30,6 @@ class PaginatorField
      * Resolve data for connection.
      *
      * @param  \Illuminate\Pagination\LengthAwarePaginator  $root
-     * @return \Illuminate\Support\Collection
      */
     public function dataResolver(LengthAwarePaginator $root): Collection
     {

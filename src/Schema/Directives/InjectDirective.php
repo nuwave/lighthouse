@@ -37,9 +37,6 @@ SDL;
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */

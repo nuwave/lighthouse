@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * A dummy query type definition that is added to tests by default.
      */
-    const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
+    public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   foo: Int
 }
@@ -149,9 +149,9 @@ GRAPHQL;
         $app->singleton(ExceptionHandler::class, function () {
             if (AppVersion::atLeast(7.0)) {
                 return new Laravel7ExceptionHandler();
-            } else {
-                return new PreLaravel7ExceptionHandler();
             }
+
+            return new PreLaravel7ExceptionHandler();
         });
     }
 
@@ -164,9 +164,6 @@ GRAPHQL;
 
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
-     *
-     * @param  string  $schema
-     * @return \GraphQL\Type\Schema
      */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
@@ -177,9 +174,6 @@ GRAPHQL;
 
     /**
      * Build an executable schema from an SDL string.
-     *
-     * @param  string  $schema
-     * @return \GraphQL\Type\Schema
      */
     protected function buildSchema(string $schema): Schema
     {
@@ -192,9 +186,6 @@ GRAPHQL;
 
     /**
      * Get a fully qualified reference to a method that is defined on the test class.
-     *
-     * @param  string  $method
-     * @return string
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
@@ -203,9 +194,6 @@ GRAPHQL;
 
     /**
      * Construct a command tester.
-     *
-     * @param  \Illuminate\Console\Command  $command
-     * @return \Symfony\Component\Console\Tester\CommandTester
      */
     protected function commandTester(Command $command): CommandTester
     {
