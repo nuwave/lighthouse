@@ -92,7 +92,7 @@ configuration settings of your Laravel project.
 type Mutation {
     createUser(
         name: String!
--       password: String! @bcrypt^
+-       password: String! @bcrypt
 +       password: String! @hash
     ): User!
 }
