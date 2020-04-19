@@ -15,7 +15,7 @@ interface SubscriptionIterator
      *
      * @param  \Closure  $handleSubscriber
      * Receives each subscriber in the passed in collection.
-     * function(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber): void
+     * function(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber)
      *
      * @param  \Closure|null  $onError
      * Is called when $handleSubscriber throws.
