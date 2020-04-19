@@ -17,7 +17,7 @@ class ReportErrorHandler implements ErrorHandler
 
         // If the Error does not wrap another Error, it is related to a client error
         // and shown in the error response anyway, we don't really need to report it
-        if($previous) {
+        if ($previous) {
             /** @var \Illuminate\Contracts\Debug\ExceptionHandler $reporter */
             $reporter = app(ExceptionHandler::class);
             $reporter->report($previous);
