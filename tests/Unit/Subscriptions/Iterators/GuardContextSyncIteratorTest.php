@@ -18,11 +18,6 @@ use Tests\Unit\Subscriptions\SubscriptionTestCase;
 class GuardContextSyncIteratorTest extends SubscriptionTestCase
 {
     /**
-     * @var string
-     */
-    public const EXCEPTION_MESSAGE = 'test_exception';
-
-    /**
      * @var \Nuwave\Lighthouse\Subscriptions\Iterators\GuardContextSyncIterator
      */
     protected $iterator;
@@ -50,20 +45,22 @@ class GuardContextSyncIteratorTest extends SubscriptionTestCase
 
     public function testCanPassExceptionToHandler(): void
     {
-        /** @var \Exception|null $exception */
-        $exception = null;
+        $exceptionToThrow = new Exception('test_exception');
+
+        /** @var \Exception|null $exceptionThrown */
+        $exceptionThrown = null;
 
         $this->iterator->process(
             $this->subscribers(),
-            static function (): void {
-                throw new Exception(self::EXCEPTION_MESSAGE);
+            static function () use ($exceptionToThrow): void {
+                throw $exceptionToThrow;
             },
-            static function (Exception $e) use (&$exception): void {
-                $exception = $e;
+            static function (Exception $e) use (&$exceptionThrown): void {
+                $exceptionThrown = $e;
             }
         );
 
-        $this->assertSame(self::EXCEPTION_MESSAGE, $exception->getMessage());
+        $this->assertSame($exceptionToThrow, $exceptionThrown);
     }
 
     public function testSetsAndResetsGuardContextAfterEachIteration(): void
@@ -120,9 +117,7 @@ class GuardContextSyncIteratorTest extends SubscriptionTestCase
 
     private function generateSubscriber(): Subscriber
     {
-        $resolveInfo = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolveInfo = $this->createMock(ResolveInfo::class);
 
         $resolveInfo->operation = (object) [
             'name' => (object) [

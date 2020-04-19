@@ -10,11 +10,6 @@ use Tests\TestCase;
 class SyncIteratorTest extends TestCase
 {
     /**
-     * @var string
-     */
-    public const EXCEPTION_MESSAGE = 'test_exception';
-
-    /**
      * @var \Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator
      */
     protected $iterator;
@@ -42,20 +37,22 @@ class SyncIteratorTest extends TestCase
 
     public function testCanPassExceptionToHandler(): void
     {
-        /** @var \Exception|null $exception */
-        $exception = null;
+        $exceptionToThrow = new Exception('test_exception');
+
+        /** @var \Exception|null $exceptionThrown */
+        $exceptionThrown = null;
 
         $this->iterator->process(
             $this->items(),
-            static function (): void {
-                throw new Exception(self::EXCEPTION_MESSAGE);
+            static function () use ($exceptionToThrow): void {
+                throw $exceptionToThrow;
             },
-            static function (Exception $e) use (&$exception): void {
-                $exception = $e;
+            static function (Exception $e) use (&$exceptionThrown): void {
+                $exceptionThrown = $e;
             }
         );
 
-        $this->assertSame(self::EXCEPTION_MESSAGE, $exception->getMessage());
+        $this->assertSame($exceptionToThrow, $exceptionThrown);
     }
 
     /**
