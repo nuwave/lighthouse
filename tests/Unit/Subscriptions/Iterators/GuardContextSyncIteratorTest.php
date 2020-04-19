@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Mockery;
 use Mockery\MockInterface;
 use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Subscriptions\Iterators\GuardContextSyncIterator;
@@ -72,7 +73,7 @@ class GuardContextSyncIteratorTest extends SubscriptionTestCase
             return $subscriber;
         });
 
-        $guard = $this->mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers) {
+        $guard = Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers) {
             $subscribers->each(static function (Subscriber $subscriber) use ($mock) {
                 $mock->shouldReceive('setUser')->with($subscriber->context->user())->once();
                 $mock->shouldReceive('user')->andReturn($subscriber->context->user())->once();
