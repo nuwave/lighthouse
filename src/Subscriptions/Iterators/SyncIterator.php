@@ -9,20 +9,17 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 
 class SyncIterator implements SubscriptionIterator
 {
-    /**
-     * Process collection of items.
-     */
-    public function process(Collection $items, Closure $cb, Closure $error = null): void
+    public function process(Collection $subscribers, Closure $handleSubscriber, Closure $handleError = null): void
     {
-        $items->each(function ($item) use ($cb, $error): void {
+        $subscribers->each(static function ($item) use ($handleSubscriber, $handleError): void {
             try {
-                $cb($item);
+                $handleSubscriber($item);
             } catch (Exception $e) {
-                if (! $error) {
+                if (! $handleError) {
                     throw $e;
                 }
 
-                $error($e);
+                $handleError($e);
             }
         });
     }
