@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Subscriptions\Job;
+namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

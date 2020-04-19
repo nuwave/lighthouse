@@ -92,7 +92,7 @@ configuration settings of your Laravel project.
 type Mutation {
     createUser(
         name: String!
--       password: String! @bcrypt
+-       password: String! @bcrypt^
 +       password: String! @hash
     ): User!
 }
@@ -119,8 +119,7 @@ The method will have to change like this:
 
 ### Replace `Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent` with queue job
 
-The event is no longer fired. The queued listener for this event is replaced with a queued job.
+The event is no longer fired, and the event class was removed.
+The queued listener for this event is replaced with a queued job.
 
-If you manually fired the event you should replace it by queing an instance of `Nuwave\Lighthouse\Subscriptions\Job\BroadcastSubscriptionJob` instead.
-
-
+If you manually fired the event, replace it by queuing a `Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob`.

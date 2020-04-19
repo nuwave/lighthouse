@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
-use Nuwave\Lighthouse\Subscriptions\Job\BroadcastSubscriptionJob;
+use Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob;
 
 /**
  * @deprecated This class is just here to preserve backwards compatiblity with v4.
