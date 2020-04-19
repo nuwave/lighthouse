@@ -13,7 +13,7 @@ class TypedArgsTest extends TestCase
 {
     public function testSimpleField(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: Int): Int
         }
@@ -32,7 +32,7 @@ class TypedArgsTest extends TestCase
 
     public function testNullableList(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: [Int!]): Int
         }
@@ -51,11 +51,11 @@ class TypedArgsTest extends TestCase
 
     public function testNullableInputObject(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: Bar): Int
         }
-        
+
         input Bar {
             baz: ID
         }

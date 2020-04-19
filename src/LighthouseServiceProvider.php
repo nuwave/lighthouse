@@ -68,6 +68,10 @@ class LighthouseServiceProvider extends ServiceProvider
             __DIR__.'/../assets/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'schema');
 
+        $this->publishes([
+            __DIR__.'/../_ide_helper.php' => $this->app->make('path.base').'/_lighthouse_ide_helper.php',
+        ], 'ide-helper');
+
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
 
         $validationFactory->resolver(
@@ -112,7 +116,6 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
-
         $this->app->bind(GlobalIdContract::class, GlobalId::class);
 
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
