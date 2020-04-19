@@ -27,6 +27,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
 - Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
 - Report errors that are not client-safe through Laravel's `ExceptionHandler` https://github.com/nuwave/lighthouse/pull/1303
+- Log in subscribers when broadcasting a subscription update, so that calls to `auth()->user()` return
+  the authenticated user instead of `null` https://github.com/nuwave/lighthouse/pull/1306
 
 ## 4.11.0
 
