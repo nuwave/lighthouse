@@ -24,7 +24,7 @@ jobs:
         uses: "actions/checkout@v2.0.0"
 
       - name: "Run composer normalize"
-        uses: "docker://ergebnis/composer-normalize-action:latest"
+        uses: "docker://ergebnis/composer-normalize-action:0.5.2"
 
   static-code-analysis:
     name: "Static Code Analysis"
