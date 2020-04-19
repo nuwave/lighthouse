@@ -25,6 +25,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove subscriber reference from topic when deleted https://github.com/nuwave/lighthouse/pull/1288
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
 - Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
+- Report errors that are not client-safe through Laravel's `ExceptionHandler` https://github.com/nuwave/lighthouse/pull/1303
 
 ## 4.11.0
 

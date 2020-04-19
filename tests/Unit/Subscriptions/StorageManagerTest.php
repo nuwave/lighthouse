@@ -37,9 +37,7 @@ class StorageManagerTest extends TestCase
     protected function subscriber(string $queryString): Subscriber
     {
         /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber */
-        $subscriber = $this->getMockBuilder(Subscriber::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $subscriber = $this->createMock(Subscriber::class);
 
         $subscriber->channel = Subscriber::uniqueChannelName();
         $subscriber->query = Parser::parse($queryString);
