@@ -246,7 +246,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    public function testUpsertBelongsToWithoutId()
+    public function testUpsertBelongsToWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
@@ -465,7 +465,7 @@ GRAPHQL
         ]);
     }
 
-    public function existingModelMutations()
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],

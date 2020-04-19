@@ -177,7 +177,7 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    public function existingModelMutations()
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],

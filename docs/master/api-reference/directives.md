@@ -2309,6 +2309,8 @@ type Query {
 }
 ```
 
+Read more in the [validation docs](../security/validation.md#single-arguments).
+
 ## @rulesForArray
 
 ```graphql

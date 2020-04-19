@@ -38,13 +38,15 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
-- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290Adds
+- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290
+- Replace usage of `resolve()` helper with Lumen-compatible `app()` https://github.com/nuwave/lighthouse/pull/1305
 
 ### Changed
 
 - Remove subscriber reference from topic when deleted https://github.com/nuwave/lighthouse/pull/1288
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
 - Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
+- Report errors that are not client-safe through Laravel's `ExceptionHandler` https://github.com/nuwave/lighthouse/pull/1303
 
 ## 4.11.0
 
