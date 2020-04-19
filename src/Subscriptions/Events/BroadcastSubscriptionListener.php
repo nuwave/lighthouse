@@ -2,19 +2,23 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+use Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob;
 
-class BroadcastSubscriptionListener implements ShouldQueue
+/**
+ * @deprecated This class is just here to preserve backwards compatiblity with v4.
+ * TODO remove the event and handle subscriptions as commands only in v5
+ */
+class BroadcastSubscriptionListener
 {
     /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $broadcaster;
+    protected $busDispatcher;
 
-    public function __construct(BroadcastsSubscriptions $broadcaster)
+    public function __construct(BusDispatcher $busDispatcher)
     {
-        $this->broadcaster = $broadcaster;
+        $this->busDispatcher = $busDispatcher;
     }
 
     /**
@@ -24,10 +28,12 @@ class BroadcastSubscriptionListener implements ShouldQueue
      */
     public function handle(BroadcastSubscriptionEvent $event): void
     {
-        $this->broadcaster->broadcast(
-            $event->subscription,
-            $event->fieldName,
-            $event->root
+        $this->busDispatcher->dispatch(
+            (new BroadcastSubscriptionJob(
+                $event->subscription,
+                $event->fieldName,
+                $event->root
+            ))->onQueue(config('lighthouse.subscriptions.broadcasts_queue_name', null))
         );
     }
 }

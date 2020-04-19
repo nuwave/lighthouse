@@ -29,6 +29,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Report errors that are not client-safe through Laravel's `ExceptionHandler` https://github.com/nuwave/lighthouse/pull/1303
 - Log in subscribers when broadcasting a subscription update, so that calls to `auth()->user()` return
   the authenticated user instead of `null` https://github.com/nuwave/lighthouse/pull/1306
+- Replace the subscription broadcast queued event handler with a queued job to allow the queue name to be specified https://github.com/nuwave/lighthouse/pull/1301
 
 ## 4.11.0
 
