@@ -25,9 +25,7 @@ class SubscriberTest extends TestCase
     {
         $args = ['foo' => 'bar'];
 
-        $resolveInfo = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolveInfo = $this->createMock(ResolveInfo::class);
         $operationName = 'baz';
         $resolveInfo->operation = (object) [
             'name' => (object) [

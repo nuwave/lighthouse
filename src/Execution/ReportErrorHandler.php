@@ -13,9 +13,15 @@ class ReportErrorHandler implements ErrorHandler
 {
     public static function handle(Error $error, Closure $next): array
     {
-        /** @var \Illuminate\Contracts\Debug\ExceptionHandler $reporter */
-        $reporter = app(ExceptionHandler::class);
-        $reporter->report($error);
+        $previous = $error->getPrevious();
+
+        // If the Error does not wrap another Error, it is related to a client error
+        // and shown in the error response anyway, we don't really need to report it
+        if($previous) {
+            /** @var \Illuminate\Contracts\Debug\ExceptionHandler $reporter */
+            $reporter = app(ExceptionHandler::class);
+            $reporter->report($previous);
+        }
 
         return $next($error);
     }
