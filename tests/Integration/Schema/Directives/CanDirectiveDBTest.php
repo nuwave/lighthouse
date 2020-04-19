@@ -213,7 +213,7 @@ class CanDirectiveDBTest extends DBTestCase
                 title
             }
         }
-        ")->assertErrorCategory(AuthorizationException::CATEGORY);
+        ")->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testCanHandleMultipleModels(): void

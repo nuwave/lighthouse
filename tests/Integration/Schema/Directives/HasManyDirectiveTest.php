@@ -276,7 +276,7 @@ class HasManyDirectiveTest extends DBTestCase
                     'tasks' => null,
                 ],
             ],
-        ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
