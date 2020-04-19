@@ -32,7 +32,7 @@ class SyncIteratorTest extends TestCase
 
         $this->iterator->process(
             $this->items(),
-            function ($item) use (&$items): void {
+            static function ($item) use (&$items): void {
                 $items[] = $item;
             }
         );
@@ -47,10 +47,10 @@ class SyncIteratorTest extends TestCase
 
         $this->iterator->process(
             $this->items(),
-            function (): void {
+            static function (): void {
                 throw new Exception(self::EXCEPTION_MESSAGE);
             },
-            function (Exception $e) use (&$exception): void {
+            static function (Exception $e) use (&$exception): void {
                 $exception = $e;
             }
         );
