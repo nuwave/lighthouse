@@ -14,7 +14,7 @@ class SyncIterator implements SubscriptionIterator
      */
     public function process(Collection $items, Closure $cb, Closure $error = null): void
     {
-        $items->each(function ($item) use ($cb, $error): void {
+        $items->each(static function ($item) use ($cb, $error): void {
             try {
                 $cb($item);
             } catch (Exception $e) {
