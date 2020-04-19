@@ -9,7 +9,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 /**
  * Report errors through the default exception handler configured in Laravel.
  */
-class ReportErrorHandler implements ErrorHandler
+class ReportingErrorHandler implements ErrorHandler
 {
     public static function handle(Error $error, Closure $next): array
     {
@@ -18,6 +18,7 @@ class ReportErrorHandler implements ErrorHandler
         // If the Error does not wrap another Error, it is related to a client error
         // and shown in the error response anyway, we don't really need to report it
         if ($previous) {
+            // TODO inject through constructor once handle is non-static
             /** @var \Illuminate\Contracts\Debug\ExceptionHandler $reporter */
             $reporter = app(ExceptionHandler::class);
             $reporter->report($previous);

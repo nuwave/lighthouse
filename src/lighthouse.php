@@ -180,7 +180,7 @@ return [
 
     'error_handlers' => [
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
-        \Nuwave\Lighthouse\Execution\ReportErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
 
     /*
