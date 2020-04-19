@@ -40,10 +40,6 @@ class BroadcastSubscriptionJob implements ShouldQueue
 
     public function handle(BroadcastsSubscriptions $broadcaster): void
     {
-        $broadcaster->broadcast(
-            $this->subscription,
-            $this->fieldName,
-            $this->root
-        );
+        $broadcaster->broadcast($this->subscription, $this->fieldName, $this->root);
     }
 }
