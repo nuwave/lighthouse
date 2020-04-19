@@ -116,3 +116,11 @@ The method will have to change like this:
 -public function purchasedItemsCount($root, array $args)
 +public function purchasedItemsCount(int $year, ?bool $includeReturns)
 ```
+
+### Replace `Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent` with queue job
+
+The event is no longer fired. The queued listener for this event is replaced with a queued job.
+
+If you manually fired the event you should replace it by queing an instance of `Nuwave\Lighthouse\Subscriptions\Job\BroadcastSubscriptionJob` instead.
+
+
