@@ -259,7 +259,7 @@ return [
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
         /*
-         * Default subscription storage time to live.
+         * Default subscription storage time to live in seconds.
          *
          * Indicates how long a subscription can be active before it's automatically removed from storage.
          * Setting this to `null` means the subscriptions are stored forever. This may cause
