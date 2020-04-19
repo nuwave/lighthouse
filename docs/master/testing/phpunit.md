@@ -133,8 +133,9 @@ Make sure to publish the latest [IDE-helper file](/_ide_helper.php) to get prope
 php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=ide-helper
 ```
 
-The provided assertions are prefixed with `assertGraphQL` and offer useful shortcuts to common testing
-tasks. For example, you might want to ensure that validation works properly:
+The provided assertions are prefixed with `assertGraphQL` for easy discovery.
+They offer useful shortcuts to common testing tasks.
+For example, you might want to ensure that validation works properly:
 
 ```php
 $this

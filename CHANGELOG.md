@@ -34,6 +34,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add flag `--json` to `print-schema` to output JSON instead of GraphQL SDL https://github.com/nuwave/lighthouse/pull/1268
 - Add TTL option for subscriptions storage https://github.com/nuwave/lighthouse/pull/1284
+- Provide assertion helpers through `TestResponseMixin` https://github.com/nuwave/lighthouse/pull/1308
 
 ### Fixed
 
@@ -47,6 +48,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
 - Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
 - Report errors that are not client-safe through Laravel's `ExceptionHandler` https://github.com/nuwave/lighthouse/pull/1303
+- Log in subscribers when broadcasting a subscription update, so that calls to `auth()->user()` return
+  the authenticated user instead of `null` https://github.com/nuwave/lighthouse/pull/1306
 
 ## 4.11.0
 

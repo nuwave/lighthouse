@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
@@ -16,6 +17,7 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionListener;
+use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -49,6 +51,21 @@ class SubscriptionServiceProvider extends ServiceProvider
                 [$this->app->make($router), $method],
                 $this->app->make('router')
             );
+        }
+
+        // If authentication is used, we can log in subscribers when broadcasting an update
+        if ($this->app->bound(AuthManager::class)) {
+            config([
+                'auth.guards.'.SubscriptionGuard::GUARD_NAME => [
+                    'driver' => SubscriptionGuard::GUARD_NAME,
+                ],
+            ]);
+
+            $this->app->bind(SubscriptionIterator::class, AuthenticatingSyncIterator::class);
+
+            $this->app->make(AuthManager::class)->extend(SubscriptionGuard::GUARD_NAME, static function () {
+                return new SubscriptionGuard;
+            });
         }
     }
 
