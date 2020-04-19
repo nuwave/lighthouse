@@ -2309,23 +2309,9 @@ type Query {
 }
 ```
 
-Read more in the [validation docs](../security/validation.md#validating-arguments).
+Read more in the [validation docs](../security/validation.md#single-arguments).
 
 ## @rulesForArray
-
-Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
-
-```graphql
-type Mutation {
-  saveIcecream(
-    flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])
-  ): Icecream
-}
-```
-
-Read more in the [validation docs](../security/validation.md#validating-arrays).
-
-### Definition
 
 ```graphql
 """
@@ -2347,6 +2333,18 @@ directive @rulesForArray(
   messages: [RulesMessageMap!]
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
+
+This is typically used to assert a certain number of elements is given in a list.
+
+```graphql
+type Mutation {
+  saveIcecream(
+    flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])
+  ): Icecream
+}
+```
+
+Read more in the [validation docs](../security/validation.md#validating-arrays).
 
 ## @scalar
 
