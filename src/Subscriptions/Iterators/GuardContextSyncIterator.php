@@ -29,12 +29,7 @@ class GuardContextSyncIterator implements SubscriptionIterator
         $this->configRepository = $configRepository;
     }
 
-    /**
-     * Process collection of items.
-     *
-     * @param  \Illuminate\Support\Collection<Subscriber>  $items
-     */
-    public function process(Collection $items, Closure $cb, Closure $error = null): void
+    public function process(Collection $subscribers, Closure $handleSubscriber, Closure $onError = null): void
     {
         // Store the previous default guard name so we can restore it after we're done
         $previousGuardName = $this->configRepository->get('auth.defaults.guard');
@@ -45,20 +40,20 @@ class GuardContextSyncIterator implements SubscriptionIterator
         /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionGuard $guard */
         $guard = $this->authFactory->guard(SubscriptionGuard::GUARD_NAME);
 
-        $items->each(static function (Subscriber $item) use ($cb, $error, $guard): void {
+        $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $onError, $guard): void {
             // If there is an authenticated user set in the context, set that user as the authenticated user
             if ($item->context->user()) {
                 $guard->setUser($item->context->user());
             }
 
             try {
-                $cb($item);
+                $handleSubscriber($item);
             } catch (Exception $e) {
-                if (! $error) {
+                if (! $onError) {
                     throw $e;
                 }
 
-                $error($e);
+                $onError($e);
             } finally {
                 // Unset the authenticated user after each iteration to restore the guard to a unauthenticated state
                 $guard->reset();
