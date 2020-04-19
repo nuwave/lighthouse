@@ -11,8 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Apply `@rules` directive to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
-- Provide assertion helpers through `TestResponseMixin` https://github.com/nuwave/lighthouse/pull/1185
+- Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
 
 ### Changed
 
