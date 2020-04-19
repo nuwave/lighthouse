@@ -124,6 +124,28 @@ public function testOrdersUsersByName(): void
 }
 ```
 
+### TestResponse Assertion Mixins
+
+Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
+Make sure to publish the latest [IDE-helper file](/_ide_helper.php) to get proper autocompletion:
+
+```bash
+php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=ide-helper
+```
+
+The provided assertions are prefixed with `assertGraphQL` and offer useful shortcuts to common testing
+tasks. For example, you might want to ensure that validation works properly:
+
+```php
+$this
+    ->graphQL(/** @lang GraphQL */ '
+    mutation {
+        createUser(email: "invalid email")
+    }
+    ')
+    ->assertGraphQLValidationKeys(['email']);
+```
+
 ## Simulating File Uploads
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
