@@ -124,8 +124,8 @@ class GuardContextSyncIteratorTest extends SubscriptionTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $resolveInfo->operation = (object)[
-            'name' => (object)[
+        $resolveInfo->operation = (object) [
+            'name' => (object) [
                 'value' => 'lighthouse',
             ],
         ];
