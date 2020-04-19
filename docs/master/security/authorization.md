@@ -170,14 +170,14 @@ certain group of users. At the moment, Laravel and Lighthouse offer no canonical
 for this.
 
 A great way to implement something that fits your use case is to create
-[a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware). 
+[a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware).
 Field middleware allows you to intercept field access and conditionally hide them.
 You can hide a field by returning `null` instead of calling the final resolver, or maybe even
 abort execution by throwing an error.
 
 The following directive `@canAccess` is an example implementation, make sure to adapt it to your needs.
 It assumes a simple role system where a `User` has a single attribute `$role`.
- 
+
 ```php
 namespace App\GraphQL\Directives;
 
@@ -242,7 +242,7 @@ Here is how you would use it in your schema:
 
 ```graphql
 type Post {
-    #...
-    secret_admin_note: String @canAccess(requiredRole: "admin")
+  #...
+  secret_admin_note: String @canAccess(requiredRole: "admin")
 }
 ```

@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Exceptions;
 
 class ValidationException extends \Illuminate\Validation\ValidationException implements RendersErrorsExtensions
 {
+    const CATEGORY = 'validation';
+
     /**
      * Returns true when exception message is safe to be displayed to a client.
      *
@@ -21,7 +23,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
      */
     public function getCategory()
     {
-        return 'validation';
+        return self::CATEGORY;
     }
 
     /**
@@ -30,6 +32,6 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
      */
     public function extensionsContent(): array
     {
-        return ['validation' => $this->errors()];
+        return [self::CATEGORY => $this->errors()];
     }
 }

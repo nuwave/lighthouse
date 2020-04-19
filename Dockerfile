@@ -19,4 +19,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin -
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
+RUN echo 'memory_limit=-1' > /usr/local/etc/php/conf.d/lighthouse.ini
+
 RUN echo "alias phpunit='vendor/bin/phpunit'" >> ~/.bashrc

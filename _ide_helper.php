@@ -6,10 +6,43 @@ namespace Illuminate\Foundation\Testing {
         /**
          * Asserts that the response contains an error from a given category.
          *
-         * @param  string  $category
+         * @param  string  $category  The name of the expected error category.
          * @return $this
          */
-        public function assertErrorCategory(string $category): self
+        public function assertGraphQLErrorCategory(string $category): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that the returned result contains exactly the given validation keys.
+         *
+         * @param  array  $keys  The validation keys the result should have.
+         * @return $this
+         */
+        public function assertGraphQLValidationKeys(array $keys): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that a given validation error is present in the response.
+         *
+         * @param  string  $key  The validation key that should be present.
+         * @param  string  $message  The expected validation message.
+         * @return $this
+         */
+        public function assertGraphQLValidationError(string $key, string $message): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that no validation errors are present in the response.
+         *
+         * @return $this
+         */
+        public function assertGraphQLValidationPasses(): self
         {
             return $this;
         }
@@ -20,7 +53,8 @@ namespace Illuminate\Foundation\Testing {
          * @param  string|null  $key
          * @return mixed
          */
-        public function jsonGet(string $key = null) {
+        public function jsonGet(string $key = null)
+        {
             return;
         }
     }
@@ -32,10 +66,43 @@ namespace Illuminate\Testing {
         /**
          * Asserts that the response contains an error from a given category.
          *
-         * @param  string  $category
+         * @param  string  $category  The name of the expected error category.
          * @return $this
          */
-        public function assertErrorCategory(string $category): self
+        public function assertGraphQLErrorCategory(string $category): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that the returned result contains exactly the given validation keys.
+         *
+         * @param  array  $keys  The validation keys the result should have.
+         * @return $this
+         */
+        public function assertGraphQLValidationKeys(array $keys): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that a given validation error is present in the response.
+         *
+         * @param  string  $key  The validation key that should be present.
+         * @param  string  $message  The expected validation message.
+         * @return $this
+         */
+        public function assertGraphQLValidationError(string $key, string $message): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert that no validation errors are present in the response.
+         *
+         * @return $this
+         */
+        public function assertGraphQLValidationPasses(): self
         {
             return $this;
         }
@@ -46,7 +113,8 @@ namespace Illuminate\Testing {
          * @param  string|null  $key
          * @return mixed
          */
-        public function jsonGet(string $key = null) {
+        public function jsonGet(string $key = null)
+        {
             return;
         }
     }
@@ -56,6 +124,8 @@ namespace GraphQL\Type\Definition {
     class ResolveInfo
     {
         /**
+         * We monkey patch this onto here to pass it down the resolver chain.
+         *
          * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
          */
         public $argumentSet;

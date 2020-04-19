@@ -36,10 +36,8 @@ class AttemptAuthentication
 
     /**
      * Attempt to authenticate the user, but don't do anything if they are not.
-     *
-     * @return void
      */
-    protected function attemptAuthentication(array $guards)
+    protected function attemptAuthentication(array $guards): void
     {
         if (empty($guards)) {
             $guards = [null];
@@ -47,7 +45,9 @@ class AttemptAuthentication
 
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
-                return $this->auth->shouldUse($guard);
+                $this->auth->shouldUse($guard);
+
+                return;
             }
         }
     }

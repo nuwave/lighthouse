@@ -13,17 +13,22 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add flag `--json` to `print-schema` to output JSON instead of GraphQL SDL https://github.com/nuwave/lighthouse/pull/1268
 - Add TTL option for subscriptions storage https://github.com/nuwave/lighthouse/pull/1284
+- Provide assertion helpers through `TestResponseMixin` https://github.com/nuwave/lighthouse/pull/1308
 
 ### Fixed
 
 - Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
-- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290Adds
+- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290
+- Replace usage of `resolve()` helper with Lumen-compatible `app()` https://github.com/nuwave/lighthouse/pull/1305
 
 ### Changed
 
 - Remove subscriber reference from topic when deleted https://github.com/nuwave/lighthouse/pull/1288
 - Improve subscription context serializer https://github.com/nuwave/lighthouse/pull/1283
 - Allow replacing the `SubscriptionRegistry` implementation using the container https://github.com/nuwave/lighthouse/pull/1286
+- Report errors that are not client-safe through Laravel's `ExceptionHandler` https://github.com/nuwave/lighthouse/pull/1303
+- Log in subscribers when broadcasting a subscription update, so that calls to `auth()->user()` return
+  the authenticated user instead of `null` https://github.com/nuwave/lighthouse/pull/1306
 - Replace the subscription broadcast queued event handler with a queued job to allow the queue name to be specified https://github.com/nuwave/lighthouse/pull/1301
 
 ## 4.11.0

@@ -110,13 +110,15 @@ class SubscriptionTest extends TestCase
 
     public function testThrowsWithMissingOperationName(): void
     {
-        $this->graphQL('
-        subscription {
-            onPostCreated {
-                body
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            subscription {
+                onPostCreated {
+                    body
+                }
             }
-        }
-        ')->assertErrorCategory('subscription')
+            ')
+            ->assertGraphQLErrorCategory('subscription')
             ->assertJson([
                 'data' => [
                     'onPostCreated' => null,

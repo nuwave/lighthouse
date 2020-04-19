@@ -6,23 +6,13 @@ use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Tests\TestCase;
 
-class StorageManagerTest extends TestCase
+class StorageManagerTest extends SubscriptionTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
      */
     protected $storage;
-
-    protected function getPackageProviders($app)
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
 
     protected function setUp(): void
     {
@@ -37,9 +27,7 @@ class StorageManagerTest extends TestCase
     protected function subscriber(string $queryString): Subscriber
     {
         /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber */
-        $subscriber = $this->getMockBuilder(Subscriber::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $subscriber = $this->createMock(Subscriber::class);
 
         $subscriber->channel = Subscriber::uniqueChannelName();
         $subscriber->query = Parser::parse($queryString);

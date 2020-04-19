@@ -127,12 +127,6 @@ GRAPHQL;
         );
 
         $config->set('app.debug', true);
-
-        if (class_exists('Illuminate\Testing\TestResponse')) {
-            \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());
-        } elseif (class_exists('Illuminate\Foundation\Testing\TestResponse')) {
-            \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
-        }
     }
 
     /**
@@ -142,9 +136,8 @@ GRAPHQL;
      * are fully dumped to the console when making requests.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function resolveApplicationExceptionHandler($app)
+    protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
             if (AppVersion::atLeast(7.0)) {
