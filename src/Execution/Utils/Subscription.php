@@ -14,7 +14,6 @@ class Subscription
     /**
      * Broadcast subscription to client(s).
      *
-     *
      * @throws \InvalidArgumentException
      */
     public static function broadcast(string $subscriptionField, $root, ?bool $shouldQueue = null): void
@@ -35,25 +34,22 @@ class Subscription
         /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
         $broadcaster = app(BroadcastsSubscriptions::class);
 
-        $shouldQueue = $shouldQueue === null
-            ? config('lighthouse.subscriptions.queue_broadcasts', false)
-            : $shouldQueue;
+        // Default to the configuration setting if not specified
+        if ($shouldQueue === null) {
+            $shouldQueue = config('lighthouse.subscriptions.queue_broadcasts', false);
+        }
 
-        $method = $shouldQueue
-            ? 'queueBroadcast'
-            : 'broadcast';
+        $subscription = $registry->subscription($subscriptionField);
 
         try {
-            call_user_func(
-                [$broadcaster, $method],
-                $registry->subscription($subscriptionField),
-                $subscriptionField,
-                $root
-            );
+            if ($shouldQueue) {
+                $broadcaster->queueBroadcast($subscription, $subscriptionField, $root);
+            } else {
+                $broadcaster->broadcast($subscription, $subscriptionField, $root);
+            }
         } catch (Throwable $e) {
             /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler $exceptionHandler */
             $exceptionHandler = app(SubscriptionExceptionHandler::class);
-
             $exceptionHandler->handleBroadcastError($e);
         }
     }
