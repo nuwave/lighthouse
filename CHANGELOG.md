@@ -17,7 +17,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
-- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290Adds
+- Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290
+- Replace usage of `resolve()` helper with Lumen-compatible `app()`
 
 ### Changed
 
