@@ -17,7 +17,7 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionListener;
-use Nuwave\Lighthouse\Subscriptions\Iterators\GuardContextSyncIterator;
+use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -53,7 +53,7 @@ class SubscriptionServiceProvider extends ServiceProvider
             );
         }
 
-        // Test if the auth manager is bound to the container before using it in case the application is not using any authentication
+        // If authentication is used, we can log in subscribers when broadcasting an update
         if ($this->app->bound(AuthManager::class)) {
             config([
                 'auth.guards.'.SubscriptionGuard::GUARD_NAME => [
@@ -61,7 +61,7 @@ class SubscriptionServiceProvider extends ServiceProvider
                 ],
             ]);
 
-            $this->app->bind(SubscriptionIterator::class, GuardContextSyncIterator::class);
+            $this->app->bind(SubscriptionIterator::class, AuthenticatingSyncIterator::class);
 
             $this->app->make(AuthManager::class)->extend(SubscriptionGuard::GUARD_NAME, static function () {
                 return new SubscriptionGuard;
