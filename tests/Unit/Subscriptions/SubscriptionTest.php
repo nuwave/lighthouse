@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Execution\Utils;
+namespace Tests\Unit\Subscriptions;
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -12,9 +12,8 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Prophecy\Argument;
-use Tests\TestCase;
 
-class SubscriptionTest extends TestCase
+class SubscriptionTest extends SubscriptionTestCase
 {
     /**
      * @var string
