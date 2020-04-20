@@ -5,12 +5,14 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ResolveInfo;
+use InvalidArgumentException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
-class TypedArgs
+class ArgumentSetFactory
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
@@ -52,45 +54,40 @@ class TypedArgs
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
         $fieldDefinition = ASTHelper::firstByName($parentDefinition->fields, $fieldName);
 
-        return $this->fromField($args, $fieldDefinition);
+        return $this->wrapArgs($fieldDefinition, $args);
     }
 
     /**
      * Wrap client-given args with type information.
      *
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
+     * @param  mixed[]  $args
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
-    public function fromField(array $args, FieldDefinitionNode $fieldDefinition): ArgumentSet
+    public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $this->directiveFactory->createAssociatedDirectives($fieldDefinition);
-        $argumentSet->arguments = $this->wrapArgs($args, $fieldDefinition->arguments);
+        $argumentSet->directives = $this->directiveFactory->createAssociatedDirectives($definition);
 
-        return $argumentSet;
-    }
+        if ($definition instanceof FieldDefinitionNode) {
+            $argDefinitions = $definition->arguments;
+        } elseif ($definition instanceof InputObjectTypeDefinitionNode) {
+            $argDefinitions = $definition->fields;
+        } else {
+            throw new InvalidArgumentException('Got unexpected node of type '.get_class($definition));
+        }
+        $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
 
-    /**
-     * Wrap client-given args with type information.
-     *
-     * @param  mixed[]  $args
-     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]  $argumentDefinitions
-     * @return \Nuwave\Lighthouse\Execution\Arguments\Argument[]
-     */
-    protected function wrapArgs(array $args, $argumentDefinitions): array
-    {
-        $argumentDefinitionMap = $this->makeDefinitionMap($argumentDefinitions);
-
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument[] $arguments */
-        $arguments = [];
-
-        foreach ($args as $key => $value) {
-            /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
-            $definition = $argumentDefinitionMap[$key];
-
-            $arguments[$key] = $this->wrapInArgument($value, $definition);
+        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
+        foreach ($argumentDefinitionMap as $name => $definition) {
+            if (array_key_exists($name, $args)) {
+                $argumentSet->arguments[$name] = $this->wrapInArgument($args[$name], $definition);
+            } else {
+                $argumentSet->undefined[$name] = $this->wrapInArgument(null, $definition);
+            }
         }
 
-        return $arguments;
+        return $argumentSet;
     }
 
     /**
@@ -137,7 +134,7 @@ class TypedArgs
      */
     protected function wrapWithType($valueOrValues, $type)
     {
-        // We have to do this conversion here and not in the TypeNodeConverter,
+        // We have to do this conversion as we are resolving a client query
         // because the incoming arguments put a bound on recursion depth
         if ($type instanceof ListType) {
             $typeInList = $type->type;
@@ -178,14 +175,10 @@ class TypedArgs
 
         // We recurse down only if the type is an Input
         if ($typeDef instanceof InputObjectTypeDefinitionNode) {
-            $subArgumentSet = new ArgumentSet();
-            $subArgumentSet->directives = $this->directiveFactory->createAssociatedDirectives($typeDef);
-            $subArgumentSet->arguments = $this->wrapArgs($value, $typeDef->fields);
-
-            return $subArgumentSet;
+            return $this->wrapArgs($typeDef, $value);
         }
 
-        // Otherwise, we just return the value as is and are down with that subtree
+        // Otherwise, we just return the value as is and are done with that subtree
         return $value;
     }
 }
