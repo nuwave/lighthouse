@@ -170,3 +170,13 @@ type Mutation {
 + updateUser(id: ID, name: String): User @update @validator
 }
 ```
+
+### `Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent` is no longer fired
+
+The event is no longer fired, and the event class was removed. Lighthouse now uses a queued job instead.
+
+If you manually fired the event, replace it by queuing a `Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob`
+or a call to `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions::queueBroadcast()`.
+
+In case you depend on an event being fired whenever a subscription is queued, you can bind your
+own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions`.

@@ -14,41 +14,17 @@ env:
   LIGHTHOUSE_TEST_DB_PASSWORD: "root"
 
 jobs:
-  coding-standards:
-    name: "Coding Standards"
+  composer-normalize:
+    name: "composer-normalize"
 
     runs-on: "ubuntu-latest"
-
-    strategy:
-      matrix:
-        php-version:
-          - "7.4"
-        laravel-version:
-          - "^7.0"
 
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
-      - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
-        with:
-          coverage: "none"
-          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
-          php-version: "${{ matrix.php-version }}"
-
-      - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
-        with:
-          path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
-
-      - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Run ergebnis/composer-normalize"
-        run: "composer normalize --dry-run"
+      - name: "Run composer normalize"
+        uses: "docker://localheinz/composer-normalize-action:0.5.2"
 
   static-code-analysis:
     name: "Static Code Analysis"
