@@ -2,18 +2,18 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Nuwave\Lighthouse\Schema\Types\Scalars\Date;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
+use Nuwave\Lighthouse\Schema\Types\Scalars\DateTimeTz;
 
-class DateTest extends DateScalarTest
+class DateTimeTzTest extends DateScalarTest
 {
     protected function dateScalar(): DateScalar
     {
-        return new Date();
+        return new DateTimeTz();
     }
 
     protected function validDate(): string
     {
-        return '2020-04-20';
+        return '2020-04-20T16:20:04+04:00';
     }
 }
