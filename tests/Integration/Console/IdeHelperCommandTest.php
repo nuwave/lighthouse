@@ -51,7 +51,7 @@ class IdeHelperCommandTest extends TestCase
         $this->assertContains(UnionDirective::class, $generated);
 
         $this->assertFileEquals(
-            __DIR__ . '/../../../_ide_helper.php',
+            __DIR__.'/../../../_ide_helper.php',
             IdeHelperCommand::phpIdeHelperPath()
         );
     }

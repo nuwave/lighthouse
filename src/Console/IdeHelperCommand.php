@@ -150,7 +150,7 @@ SDL;
     protected function phpIdeHelper(): void
     {
         copy(
-            __DIR__ . '/../../_ide_helper.php',
+            __DIR__.'/../../_ide_helper.php',
             static::phpIdeHelperPath()
         );
     }
