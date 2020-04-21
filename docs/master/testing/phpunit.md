@@ -130,7 +130,7 @@ Lighthouse conveniently provides additional assertions as mixins to the `TestRes
 Make sure to publish the latest [IDE-helper file](/_ide_helper.php) to get proper autocompletion:
 
 ```bash
-php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=ide-helper
+php artisan lighthouse:ide-helper
 ```
 
 The provided assertions are prefixed with `assertGraphQL` for easy discovery.
