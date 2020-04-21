@@ -76,7 +76,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- Remove `@bcrypt` in favour of `@hash` https://github.com/nuwave/lighthouse/pull/1200
+- Remove `@bcrypt` in favor of `@hash` https://github.com/nuwave/lighthouse/pull/1200
 - `@method` will call the underlying method with the arguments as ordered parameters instead
   of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1208
 
@@ -144,7 +144,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favour of modular
+- Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favor of modular
   nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Register the operator enum for `@whereConditions` programmatically and allow
   overwriting it through a service provider https://github.com/nuwave/lighthouse/pull/1099
@@ -415,8 +415,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Removed
 
-- Remove `@group` directive in favour of `@middleware` and `@namespace` https://github.com/nuwave/lighthouse/pull/768
-- Remove the `ArgFilterDirective` interface in favour of the `ArgBuilderDirective` interface https://github.com/nuwave/lighthouse/pull/821
+- Remove `@group` directive in favor of `@middleware` and `@namespace` https://github.com/nuwave/lighthouse/pull/768
+- Remove the `ArgFilterDirective` interface in favor of the `ArgBuilderDirective` interface https://github.com/nuwave/lighthouse/pull/821
 - Remove the old style `@whereBetween` and `@whereNotBetween` directives https://github.com/nuwave/lighthouse/pull/821
 - Use the `@spread` directive instead of the `flatten` argument of `@create`/`@update` https://github.com/nuwave/lighthouse/pull/822
 - Remove `dispatch` aliases `fire` and `class` for dispatching through `@event` https://github.com/nuwave/lighthouse/pull/823
@@ -609,11 +609,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Removed
 
-- Remove the previously broken `@validate` directive in favour of `@rules` https://github.com/nuwave/lighthouse/pull/427
+- Remove the previously broken `@validate` directive in favor of `@rules` https://github.com/nuwave/lighthouse/pull/427
 - Remove broken user mutations from the default schema https://github.com/nuwave/lighthouse/pull/435
 - Remove deprecated methods https://github.com/nuwave/lighthouse/pull/435
 - Limit the `@field` directive to using the `resolver` argument https://github.com/nuwave/lighthouse/pull/435
-- Remove the `@security` directive in favour of defining security options through the config https://github.com/nuwave/lighthouse/pull/435
+- Remove the `@security` directive in favor of defining security options through the config https://github.com/nuwave/lighthouse/pull/435
 - Rename the `resolver` argument of `@interface` and `@union` to `resolveType` https://github.com/nuwave/lighthouse/pull/435
 - Remove deprecated Traits https://github.com/nuwave/lighthouse/pull/435
 
