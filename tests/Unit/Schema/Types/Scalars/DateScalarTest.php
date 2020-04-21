@@ -79,7 +79,7 @@ abstract class DateScalarTest extends TestCase
         $now = now();
         $result = $this->dateScalar()->serialize($now);
 
-        $this->assertIsString($result);
+        $this->assertInternalType('string', $result);
     }
 
     public function testSerializesValidDateString(): void
