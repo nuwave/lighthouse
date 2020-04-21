@@ -15,6 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add TTL option for subscriptions storage https://github.com/nuwave/lighthouse/pull/1284
 - Provide assertion helpers through `TestResponseMixin` https://github.com/nuwave/lighthouse/pull/1308
 - Add scalar `DateTimeTz` https://github.com/nuwave/lighthouse/pull/1311
+- Publish `_lighthouse_ide_helper.php` with `php artisan lighthouse:ide-helper`
 
 ### Fixed
 
