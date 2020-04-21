@@ -19,7 +19,7 @@ abstract class DateScalarTest extends TestCase
     {
         $this->expectException(InvariantViolation::class);
 
-        $this->dateScalar()->serialize($value);
+        $this->scalarInstance()->serialize($value);
     }
 
     /**
@@ -29,7 +29,7 @@ abstract class DateScalarTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        $this->dateScalar()->parseValue($value);
+        $this->scalarInstance()->parseValue($value);
     }
 
     /**
@@ -51,7 +51,7 @@ abstract class DateScalarTest extends TestCase
     {
         $this->assertInstanceOf(
             Carbon::class,
-            $this->dateScalar()->parseValue($this->validDate())
+            $this->scalarInstance()->parseValue($this->validDate())
         );
     }
 
@@ -60,7 +60,7 @@ abstract class DateScalarTest extends TestCase
         $dateLiteral = new StringValueNode(
             ['value' => $this->validDate()]
         );
-        $parsed = $this->dateScalar()->parseLiteral($dateLiteral);
+        $parsed = $this->scalarInstance()->parseLiteral($dateLiteral);
 
         $this->assertInstanceOf(Carbon::class, $parsed);
     }
@@ -69,7 +69,7 @@ abstract class DateScalarTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        $this->dateScalar()->parseLiteral(
+        $this->scalarInstance()->parseLiteral(
             new IntValueNode([])
         );
     }
@@ -77,7 +77,7 @@ abstract class DateScalarTest extends TestCase
     public function testSerializesCarbonInstance(): void
     {
         $now = now();
-        $result = $this->dateScalar()->serialize($now);
+        $result = $this->scalarInstance()->serialize($now);
 
         $this->assertInternalType('string', $result);
     }
@@ -85,12 +85,12 @@ abstract class DateScalarTest extends TestCase
     public function testSerializesValidDateString(): void
     {
         $date = $this->validDate();
-        $result = $this->dateScalar()->serialize($date);
+        $result = $this->scalarInstance()->serialize($date);
 
         $this->assertSame($date, $result);
     }
 
-    abstract protected function dateScalar(): DateScalar;
+    abstract protected function scalarInstance(): DateScalar;
 
     abstract protected function validDate(): string;
 }

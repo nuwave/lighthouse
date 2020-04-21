@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Schema\Types\Scalars\DateTime;
 
 class DateTimeTest extends DateScalarTest
 {
-    protected function dateScalar(): DateScalar
+    protected function scalarInstance(): DateScalar
     {
         return new DateTime();
     }

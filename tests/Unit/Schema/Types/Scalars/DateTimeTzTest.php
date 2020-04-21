@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Schema\Types\Scalars\DateTimeTz;
 
 class DateTimeTzTest extends DateScalarTest
 {
-    protected function dateScalar(): DateScalar
+    protected function scalarInstance(): DateScalar
     {
         return new DateTimeTz();
     }
