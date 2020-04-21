@@ -10,7 +10,7 @@ use GraphQL\Type\Definition\NonNull;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
@@ -55,9 +55,9 @@ class FieldFactory
     protected $fieldValue;
 
     /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory
      */
-    protected $typedArgs;
+    protected $argumentSetFactory;
 
     /**
      * @var array
@@ -89,13 +89,13 @@ class FieldFactory
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
         ValidationFactory $validationFactory,
-        TypedArgs $typedArgs
+        ArgumentSetFactory $argumentSetFactory
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
         $this->validationFactory = $validationFactory;
-        $this->typedArgs = $typedArgs;
+        $this->argumentSetFactory = $argumentSetFactory;
     }
 
     /**
@@ -152,7 +152,7 @@ class FieldFactory
                 // we flush the validation error buffer
                 $this->flushValidationErrorBuffer();
 
-                $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
+                $argumentSet = $this->argumentSetFactory->fromResolveInfo($this->args, $this->resolveInfo);
                 $modifiedArgumentSet = $argumentSet
                     ->spread()
                     ->rename();
