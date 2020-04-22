@@ -22,6 +22,7 @@ use Nuwave\Lighthouse\Console\ScalarCommand;
 use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
+use Nuwave\Lighthouse\Console\ValidatorCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Execution\LighthouseRequest;
@@ -131,8 +132,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
                 {
                     throw new Exception(
-                       'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
-                   );
+                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
+                    );
                 }
             };
         });
@@ -167,6 +168,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 SubscriptionCommand::class,
                 UnionCommand::class,
                 ValidateSchemaCommand::class,
+                ValidatorCommand::class,
             ]);
         }
 
