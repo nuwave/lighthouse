@@ -51,6 +51,8 @@ SDL;
         $this->schemaDirectiveDefinitions($directiveNamespaces);
         $this->phpIdeHelper();
 
+        $this->info("\nIt is recommended to add them to your .gitignore file.");
+
         return 0;
     }
 
@@ -153,6 +155,19 @@ SDL;
             __DIR__.'/../../_ide_helper.php',
             static::phpIdeHelperPath()
         );
+    }
+
+    public static function phpIdeHelperPath(): string
+    {
+        return base_path().'/_lighthouse_ide_helper.php';
+    }
+
+    protected function phpIdeHelper(): void
+    {
+        $filePath = static::phpIdeHelperPath();
+        copy(__DIR__.'/../../_ide_helper.php', $filePath);
+
+        $this->info("Wrote PHP definitions to $filePath.");
     }
 
     public static function phpIdeHelperPath(): string

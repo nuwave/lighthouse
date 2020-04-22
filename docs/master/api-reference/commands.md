@@ -17,10 +17,23 @@ Create a class for a GraphQL directive.
 
 ## ide-helper
 
-Create a schema containing all server-side directives.
-This will allow some IDEs to do code completion in your GraphQL-schema.
+Create IDE helper files to improve type checking and autocompletion.
+This will improve the editing experience when using schema directives, as well
+as the `TestResponse` mixins.
 
     php artisan lighthouse:ide-helper
+
+A great way to keep this is up date to with your current version of Lighthouse
+is to add it to your `composer.json`:
+
+```json
+"scripts": {
+    ...
+    "post-update-cmd": [
+        "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+        "php artisan lighthouse:ide-helper"
+    ],
+```
 
 ## interface
 
