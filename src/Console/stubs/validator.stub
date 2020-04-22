@@ -1,0 +1,14 @@
+<?php
+
+namespace DummyNamespace;
+
+use Nuwave\Lighthouse\Validation\Validator;
+
+class DummyClass extends Validator
+{
+
+    public function rules(): array
+    {
+        return [];
+    }
+}
