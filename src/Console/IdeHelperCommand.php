@@ -151,19 +151,6 @@ SDL;
 
     protected function phpIdeHelper(): void
     {
-        copy(
-            __DIR__.'/../../_ide_helper.php',
-            static::phpIdeHelperPath()
-        );
-    }
-
-    public static function phpIdeHelperPath(): string
-    {
-        return base_path().'/_lighthouse_ide_helper.php';
-    }
-
-    protected function phpIdeHelper(): void
-    {
         $filePath = static::phpIdeHelperPath();
         copy(__DIR__.'/../../_ide_helper.php', $filePath);
 
