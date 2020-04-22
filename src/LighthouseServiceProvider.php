@@ -65,10 +65,6 @@ class LighthouseServiceProvider extends ServiceProvider
             __DIR__.'/../assets/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'schema');
 
-        $this->publishes([
-            __DIR__.'/../_ide_helper.php' => $this->app->make('path.base').'/_lighthouse_ide_helper.php',
-        ], 'ide-helper');
-
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
     }
 

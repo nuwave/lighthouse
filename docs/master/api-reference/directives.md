@@ -251,7 +251,7 @@ Run the `bcrypt` function on the argument it is defined on.
 directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Deprecated in favour of [`@hash`](#hash).
+Deprecated in favor of [`@hash`](#hash).
 
 ## @broadcast
 

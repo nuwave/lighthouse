@@ -97,7 +97,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the AST definition node associated with the current directive.
      *
-     * @deprecated in favour of the plain property
+     * @deprecated in favor of the plain property
      */
     protected function directiveDefinition(): DirectiveNode
     {

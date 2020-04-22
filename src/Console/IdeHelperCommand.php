@@ -31,7 +31,7 @@ SDL;
      *
      * @var string
      */
-    protected $description = 'Gather all schema directive definitions and write them to a file.';
+    protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
     /**
      * Execute the console command.
@@ -48,16 +48,10 @@ SDL;
             return 1;
         }
 
-        $directiveClasses = $this->scanForDirectives(
-            $directiveNamespaces->gather()
-        );
+        $this->schemaDirectiveDefinitions($directiveNamespaces);
+        $this->phpIdeHelper();
 
-        $schema = $this->buildSchemaString($directiveClasses);
-
-        $filePath = static::filePath();
-        file_put_contents($filePath, $schema);
-
-        $this->info("Wrote schema directive definitions to $filePath.");
+        $this->info("\nIt is recommended to add them to your .gitignore file.");
 
         return 0;
     }
@@ -133,8 +127,38 @@ SDL;
             ."directive @{$name}";
     }
 
-    public static function filePath(): string
+    /**
+     * Create and write schema directive definitions to a file.
+     */
+    protected function schemaDirectiveDefinitions(DirectiveNamespacer $directiveNamespaces): void
+    {
+        $directiveClasses = $this->scanForDirectives(
+            $directiveNamespaces->gather()
+        );
+
+        $schema = $this->buildSchemaString($directiveClasses);
+
+        $filePath = static::schemaDirectivesPath();
+        file_put_contents($filePath, $schema);
+
+        $this->info("Wrote schema directive definitions to $filePath.");
+    }
+
+    public static function schemaDirectivesPath(): string
     {
         return base_path().'/schema-directives.graphql';
+    }
+
+    protected function phpIdeHelper(): void
+    {
+        $filePath = static::phpIdeHelperPath();
+        copy(__DIR__.'/../../_ide_helper.php', $filePath);
+
+        $this->info("Wrote PHP definitions to $filePath.");
+    }
+
+    public static function phpIdeHelperPath(): string
+    {
+        return base_path().'/_lighthouse_ide_helper.php';
     }
 }
