@@ -6,14 +6,15 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 class DummyClass extends Validator
 {
-
+    /**
+     * Return the validation rules.
+     *
+     * @return array<string, array<mixed>>
+     */
     public function rules(): array
     {
-        return [];
-    }
-
-    public function messages(): array
-    {
-        return [];
+        return [
+            // TODO Add your validation rules
+        ];
     }
 }

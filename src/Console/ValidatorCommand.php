@@ -1,15 +1,9 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Console;
 
-
-/**
- * Class ValidatorCommand
- */
 class ValidatorCommand extends LighthouseGeneratorCommand
 {
-
     /**
      * The name of the console command.
      *
@@ -31,13 +25,16 @@ class ValidatorCommand extends LighthouseGeneratorCommand
      */
     protected $type = 'Validator';
 
-    protected function getStub()
-    {
-        return __DIR__.'/stubs/validator.stub';
-    }
-
     protected function namespaceConfigKey(): string
     {
         return 'validators';
+    }
+
+    /**
+     * Get the stub file for the generator.
+     */
+    protected function getStub(): string
+    {
+        return __DIR__.'/stubs/validator.stub';
     }
 }
