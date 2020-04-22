@@ -68,7 +68,8 @@
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
-                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider"
+                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
+                "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
             ],
             "aliases": {
                 "graphql": "Nuwave\\Lighthouse\\GraphQL"
