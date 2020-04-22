@@ -11,4 +11,9 @@ class DummyClass extends Validator
     {
         return [];
     }
+
+    public function messages(): array
+    {
+        return [];
+    }
 }
