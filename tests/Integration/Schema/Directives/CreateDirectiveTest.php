@@ -11,8 +11,7 @@ class CreateDirectiveTest extends DBTestCase
 {
     public function testCanCreateFromFieldArguments(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Company {
             id: ID!
             name: String!
@@ -42,8 +41,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateFromInputObject(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Company {
             id: ID!
             name: String!
@@ -79,8 +77,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Mutation {
             createTag(name: String): Tag @create
         }
@@ -114,8 +111,7 @@ class CreateDirectiveTest extends DBTestCase
 
         $this->app['config']->set('app.debug', false);
 
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -182,8 +178,7 @@ class CreateDirectiveTest extends DBTestCase
         $this->app['config']->set('app.debug', false);
         config(['lighthouse.transactional_mutations' => false]);
 
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -249,8 +244,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -313,8 +307,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testNestedArgResolverHasMany(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
@@ -368,8 +361,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testNestedArgResolverForOptionalBelongsTo(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Mutation {
             createTask(input: CreateTaskInput! @spread): Task @create
         }
@@ -421,8 +413,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwice(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -497,7 +488,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwiceWithCreateDirective()
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
