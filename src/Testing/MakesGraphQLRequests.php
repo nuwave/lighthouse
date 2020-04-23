@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
@@ -11,7 +10,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Useful helpers for PHPUnit testing.
+ * Testing helpers for making requests to the GraphQL endpoint.
  *
  * @mixin \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
  */
@@ -23,7 +22,7 @@ trait MakesGraphQLRequests
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Foundation\Testing\TestResponse|null
+     * @var \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse|null
      */
     protected $introspectionResult;
 
@@ -37,12 +36,9 @@ trait MakesGraphQLRequests
     /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param  string  $query
-     * @param  array|null  $variables
-     * @param  array  $extraParams
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
      */
-    protected function graphQL(string $query, array $variables = null, array $extraParams = []): TestResponse
+    protected function graphQL(string $query, array $variables = null, array $extraParams = [])
     {
         $params = ['query' => $query];
 
@@ -60,9 +56,9 @@ trait MakesGraphQLRequests
      *
      * @param  mixed[]  $data
      * @param  mixed[]  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
      */
-    protected function postGraphQL(array $data, array $headers = []): TestResponse
+    protected function postGraphQL(array $data, array $headers = [])
     {
         return $this->postJson(
             $this->graphQLEndpointUrl(),
@@ -79,9 +75,9 @@ trait MakesGraphQLRequests
      *
      * @param  mixed[]  $parameters
      * @param  mixed[]  $files
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
      */
-    protected function multipartGraphQL(array $parameters, array $files): TestResponse
+    protected function multipartGraphQL(array $parameters, array $files)
     {
         return $this->call(
             'POST',
@@ -98,9 +94,9 @@ trait MakesGraphQLRequests
     /**
      * Execute the introspection query on the GraphQL server.
      *
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
      */
-    protected function introspect(): TestResponse
+    protected function introspect()
     {
         if ($this->introspectionResult) {
             return $this->introspectionResult;
@@ -112,7 +108,6 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a type by name, if present.
      *
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectType(string $name): ?array
@@ -123,7 +118,6 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a directive by name, if present.
      *
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectDirective(string $name): ?array
@@ -134,8 +128,6 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a result from the given path by name, if present.
      *
-     * @param  string  $path
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectByName(string $path, string $name): ?array
@@ -152,7 +144,7 @@ trait MakesGraphQLRequests
 
         return Arr::first(
             $results,
-            function (array $result) use ($name): bool {
+            static function (array $result) use ($name): bool {
                 return $result['name'] === $name;
             }
         );
@@ -160,8 +152,6 @@ trait MakesGraphQLRequests
 
     /**
      * Return the full URL to the GraphQL endpoint.
-     *
-     * @return string
      */
     protected function graphQLEndpointUrl(): string
     {
@@ -170,11 +160,6 @@ trait MakesGraphQLRequests
 
     /**
      * Send the query and capture all chunks of the streamed response.
-     *
-     * @param  string  $query
-     * @param  array|null  $variables
-     * @param  array  $extraParams
-     * @return array
      */
     protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
     {
@@ -195,8 +180,6 @@ trait MakesGraphQLRequests
 
     /**
      * Set up the stream to make queries with @defer.
-     *
-     * @return void
      */
     protected function setUpDeferStream(): void
     {

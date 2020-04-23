@@ -10,9 +10,7 @@ class Upload
     /**
      * Return a value for the field.
      *
-     * @param  mixed  $root
      * @param  mixed[]  $args
-     * @return bool
      *
      * @throws Exception
      */

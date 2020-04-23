@@ -9,28 +9,16 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Tests\TestCase;
 
-class BroadcastManagerTest extends TestCase
+class BroadcastManagerTest extends SubscriptionTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcastManager;
 
-    protected function getPackageProviders($app)
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
-
     /**
      * Set up test environment.
-     *
-     * @return void
      */
     protected function setUp(): void
     {

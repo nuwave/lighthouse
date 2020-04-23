@@ -2,36 +2,19 @@
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tests\Utils\LaravelEnums\UserType;
 
 class User extends Authenticatable
 {
-    use CastsEnums;
-
     /**
      * @var mixed[]
      */
     protected $guarded = [];
-
-    protected $enumCasts = [
-        'type' => UserType::class,
-    ];
-
-    public function getTaskCountAsString(): string
-    {
-        if (! $this->relationLoaded('tasks')) {
-            return 'This relation should have been preloaded via @with';
-        }
-
-        return "User has {$this->tasks->count()} tasks.";
-    }
 
     public function company(): BelongsTo
     {
@@ -80,5 +63,24 @@ class User extends Authenticatable
     public function getCompanyNameAttribute()
     {
         return $this->company->name;
+    }
+
+    public function scopeNamed(Builder $query): Builder
+    {
+        return $query->whereNotNull('name');
+    }
+
+    public function tasksLoaded(): bool
+    {
+        return $this->relationLoaded('tasks');
+    }
+
+    public function postsCommentsLoaded(): bool
+    {
+        return $this->relationLoaded('posts')
+            && $this
+                ->posts
+                ->first()
+                ->relationLoaded('comments');
     }
 }

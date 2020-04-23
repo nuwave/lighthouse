@@ -39,13 +39,6 @@ class StartRequest
      */
     public $moment;
 
-    /**
-     * StartRequest constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
-     *
-     * @return void
-     */
     public function __construct(GraphQLRequest $request)
     {
         $this->request = $request;
@@ -78,12 +71,6 @@ class BuildSchemaString
      */
     public $userSchema;
 
-    /**
-     * BuildSchemaString constructor.
-     *
-     * @param  string  $userSchema
-     * @return void
-     */
     public function __construct(string $userSchema)
     {
         $this->userSchema = $userSchema;
@@ -117,12 +104,6 @@ class ManipulateAST
      */
     public $documentAST;
 
-    /**
-     * BuildSchemaString constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     * @return void
-     */
     public function __construct(DocumentAST &$documentAST)
     {
         $this->documentAST = $documentAST;
@@ -175,11 +156,6 @@ class StartExecution
      */
     public $moment;
 
-    /**
-     * StartRequest constructor.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->moment = Carbon::now();
@@ -232,13 +208,6 @@ class ExtensionsResponse
      */
     protected $content;
 
-    /**
-     * ExtensionsResponse constructor.
-     *
-     * @param  string  $key
-     * @param  mixed  $content
-     * @return void
-     */
     public function __construct(string $key, $content)
     {
         $this->key = $key;
@@ -291,12 +260,6 @@ class ManipulateResult
      */
     public $result;
 
-    /**
-     * ManipulateResult constructor.
-     *
-     * @param  \GraphQL\Executor\ExecutionResult  $result
-     * @return void
-     */
     public function __construct(ExecutionResult &$result)
     {
         $this->result = $result;

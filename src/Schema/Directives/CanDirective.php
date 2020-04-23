@@ -3,9 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -13,9 +16,9 @@ use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
@@ -24,11 +27,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
      */
     protected $gate;
 
-    /**
-     * CanDirective constructor.
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
-     * @return void
-     */
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;
@@ -52,6 +50,8 @@ directive @can(
   """
   The name of the argument that is used to find a specific model
   instance against which the permissions should be checked.
+
+  You may pass the string as a dot notation to search in a array.
   """
   find: String
 
@@ -79,10 +79,6 @@ SDL;
 
     /**
      * Ensure the user is authorized to access this field.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -106,44 +102,45 @@ SDL;
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  array  $args
      * @return iterable<Model|string>
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @throws \GraphQL\Error\Error
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
+            $findValue = Arr::get($args, $find);
+            if ($findValue === null) {
+                throw new Error(self::missingKeyToFindModel($find));
+            }
+
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
-                function (Directive $directive): bool {
-                    return $directive instanceof ForceDeleteDirective;
-                }
+                Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
                 $queryBuilder->withTrashed();
             }
 
             $directivesContainsRestore = $argumentSet->directives->contains(
-                function (Directive $directive): bool {
-                    return $directive instanceof RestoreDirective;
-                }
+                Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
                 $queryBuilder->onlyTrashed();
             }
 
-            $modelOrModels = $argumentSet
-                ->enhanceBuilder(
-                    $queryBuilder,
-                    [],
-                    function (Directive $directive): bool {
-                        return $directive instanceof TrashedDirective;
-                    }
-                )
-                ->findOrFail($args[$find]);
+            try {
+                $modelOrModels = $argumentSet
+                    ->enhanceBuilder(
+                        $queryBuilder,
+                        [],
+                        Utils::instanceofMatcher(TrashedDirective::class)
+                    )
+                    ->findOrFail($findValue);
+            } catch (ModelNotFoundException $exception) {
+                throw new Error($exception->getMessage());
+            }
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];
@@ -155,12 +152,14 @@ SDL;
         return [$this->getModelClass()];
     }
 
+    public static function missingKeyToFindModel(string $find): string
+    {
+        return "Got no key to find a model at the expected input path: ${find}.";
+    }
+
     /**
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @param  string|string[]  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array  $arguments
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -180,7 +179,6 @@ SDL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array  $args
      * @return mixed[]
      */
     protected function buildCheckArguments(array $args): array

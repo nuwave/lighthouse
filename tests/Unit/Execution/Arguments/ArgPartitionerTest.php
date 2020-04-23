@@ -6,10 +6,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
+use Tests\Unit\Execution\Arguments\Fixtures\Nested;
 use Tests\Utils\Models\User;
 
 class ArgPartitionerTest extends TestCase
@@ -63,12 +61,5 @@ class ArgPartitionerTest extends TestCase
             ['tasks' => $tasksRelation],
             $hasManyArgs->arguments
         );
-    }
-}
-
-class Nested extends BaseDirective implements ArgResolver, Directive
-{
-    public function __invoke($root, $args)
-    {
     }
 }

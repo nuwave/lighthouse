@@ -10,43 +10,21 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
+  LIGHTHOUSE_TEST_DB_HOST: "127.0.0.1"
+  LIGHTHOUSE_TEST_DB_PASSWORD: "root"
 
 jobs:
-  coding-standards:
-    name: "Coding Standards"
+  composer-normalize:
+    name: "composer-normalize"
 
     runs-on: "ubuntu-latest"
-
-    strategy:
-      matrix:
-        php-version:
-          - "7.4"
-        laravel-version:
-          - "^6.0"
 
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
-      - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@1.7.2"
-        with:
-          coverage: "none"
-          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
-          php-version: "${{ matrix.php-version }}"
-
-      - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
-        with:
-          path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
-
-      - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Run ergebnis/composer-normalize"
-        run: "composer normalize --dry-run"
+      - name: "Run composer normalize"
+        uses: "docker://localheinz/composer-normalize-action:0.5.2"
 
   static-code-analysis:
     name: "Static Code Analysis"
@@ -56,16 +34,28 @@ jobs:
     strategy:
       matrix:
         php-version:
+          - "7.1"
+          - "7.2"
+          - "7.3"
           - "7.4"
         laravel-version:
+          - "5.6.*"
+          - "5.7.*"
+          - "5.8.*"
           - "^6.0"
+          - "^7.0"
+        exclude:
+          - php-version: "7.1"
+            laravel-version: "^6.0"
+          - php-version: "7.1"
+            laravel-version: "^7.0"
 
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@1.7.2"
+        uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "none"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
@@ -80,9 +70,6 @@ jobs:
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Create cache directory for phpstan/phpstan"
-        run: "mkdir -p .build/phpstan"
 
       - name: "Run phpstan/phpstan"
         run: "vendor/bin/phpstan analyse --configuration=phpstan.neon"
@@ -105,9 +92,12 @@ jobs:
           - "5.7.*"
           - "5.8.*"
           - "^6.0"
+          - "^7.0"
         exclude:
           - php-version: "7.1"
             laravel-version: "^6.0"
+          - php-version: "7.1"
+            laravel-version: "^7.0"
           - php-version: "7.4"
             laravel-version: "5.5.*"
 
@@ -116,7 +106,7 @@ jobs:
         uses: "actions/checkout@v2.0.0"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@1.7.2"
+        uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "none"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
@@ -129,15 +119,17 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Remove larastan for Laravel 5.5"
-        if: "matrix.laravel-version == '5.5.*'"
+      - name: "Remove larastan for old Laravel versions"
+        if: "matrix.laravel-version != '^7.0'"
         run: "composer remove --dev nunomaduro/larastan --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Set up the database"
-        run: "mysql --user=root --password=root --execute='CREATE DATABASE test;'"
+        run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
 
       - name: "Run tests with phpunit/phpunit"
         run: "vendor/bin/phpunit --colors=always --verbose"
@@ -152,14 +144,14 @@ jobs:
         php-version:
           - "7.4"
         laravel-version:
-          - "^6.0"
+          - "^7.0"
 
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@1.7.2"
+        uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "pcov"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
@@ -176,7 +168,9 @@ jobs:
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Set up the database"
-        run: "mysql --user=root --password=root --execute='CREATE DATABASE test;'"
+        run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
 
       - name: "Collect code coverage with pcov and phpunit/phpunit"
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
@@ -196,14 +190,14 @@ jobs:
         php-version:
           - "7.4"
         laravel-version:
-          - "^6.0"
+          - "^7.0"
 
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@1.7.2"
+        uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "none"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"

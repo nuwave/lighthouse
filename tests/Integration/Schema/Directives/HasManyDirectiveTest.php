@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -235,7 +236,7 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(3, 5),
             $result->jsonGet('errors.0.message')
         );
     }
@@ -275,7 +276,7 @@ class HasManyDirectiveTest extends DBTestCase
                     'tasks' => null,
                 ],
             ],
-        ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
@@ -311,7 +312,7 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(3, 5),
             $result->jsonGet('errors.0.message')
         );
     }
@@ -347,7 +348,7 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(2, 3),
             $result->jsonGet('errors.0.message')
         );
     }
@@ -385,7 +386,7 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(2, 3),
             $result->jsonGet('errors.0.message')
         );
     }

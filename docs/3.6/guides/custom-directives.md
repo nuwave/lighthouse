@@ -3,7 +3,7 @@
 Lighthouse provides general purpose server side directives.
 
 As you grow your GraphQL schema, you may find the need for more specialized functionality.
-Learn how you can abstract logic in a composable and reusable manner by using custom directives.  
+Learn how you can abstract logic in a composable and reusable manner by using custom directives.
 
 ## Directive Class Naming Convention
 
@@ -14,7 +14,7 @@ The class name of a directive must follow the following pattern:
 
     <Directive name in StudlyCase>Directive
 
-For example the class name of directive `@fooBar` must be `FooBarDirective`. 
+For example the class name of directive `@fooBar` must be `FooBarDirective`.
 
 ## Directive Interfaces
 
@@ -35,7 +35,7 @@ These directives can generally be applied to [type definitions](../the-basics/ty
 ### NodeManipulator
 
 The [`\Nuwave\Lighthouse\Support\Contracts\NodeManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/NodeManipulator.php)
-interface can be used to manipulate the AST. 
+interface can be used to manipulate the AST.
 
 ### NodeMiddleware
 
@@ -60,7 +60,7 @@ It can be a great way to reuse resolver logic within a schema.
 
 ### FieldMiddleware
 
-A [`\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware`](https://github.com/nuwave/lighthouse/tree/master/Support/Contracts/FieldMiddleware.php) directive allows you
+A [`\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldMiddleware.php) directive allows you
 to wrap around the field resolver, just like [Laravel Middleware](https://laravel.com/docs/middleware).
 
 You may use it both to handle incoming values before reaching the final resolver
@@ -69,7 +69,7 @@ as well as the outgoing result of resolving the field.
 ### FieldManipulator
 
 An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
-directive can be used to manipulate the schema AST. 
+directive can be used to manipulate the schema AST.
 
 ## Argument Directives
 
@@ -93,7 +93,7 @@ may be used to return custom rules and messages to use for validation of an argu
 ### ArgTransformerDirective
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
-takes an incoming value an returns a new value. 
+takes an incoming value an returns a new value.
 
 Let's take a look at the built-in `@trim` directive.
 
@@ -172,6 +172,7 @@ type Mutation {
 ```
 
 In the given example, Lighthouse will take the value of the `password` argument and:
+
 1. Trim any whitespace
 1. Run validation on it
 1. Encrypt the password via `bcrypt`
@@ -194,7 +195,7 @@ Take the following schema as an example:
 
 ```graphql
 type User {
-    posts(category: String @eq): [Post!]! @hasMany
+  posts(category: String @eq): [Post!]! @hasMany
 }
 ```
 
@@ -243,23 +244,22 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
 The `handleBuilder` method takes two arguments:
 
 - `$builder`
-The query builder for applying the additional query on to.
+  The query builder for applying the additional query on to.
 - `$value`
-The value of the argument value that the `@eq` was applied on to.
+  The value of the argument value that the `@eq` was applied on to.
 
 If you want to use a more complex value for manipulating a query,
 you can build a `ArgBuilderDirective` to work with lists or nested input objects.
 Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is one example of this.
 
-```graphql        
+```graphql
 type Query {
-    users(
-        createdBetween: [Date!]! @whereBetween(key: "created_at")
-    ): [User!]! @paginate
+  users(createdBetween: [Date!]! @whereBetween(key: "created_at")): [User!]!
+    @paginate
 }
 ```
 
 ### ArgManipulator
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)
-directive can be used to manipulate the schema AST. 
+directive can be used to manipulate the schema AST.

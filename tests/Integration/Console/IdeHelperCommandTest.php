@@ -26,28 +26,33 @@ class IdeHelperCommandTest extends TestCase
     /**
      * This test is pretty slow, so we put it all in one test method.
      */
-    public function testGeneratesSchemaDirectives(): void
+    public function testGeneratesIdeHelperFiles(): void
     {
         $this->artisan('lighthouse:ide-helper');
 
-        $this->assertFileExists(IdeHelperCommand::filePath());
-        $generated = file_get_contents(IdeHelperCommand::filePath());
+        $this->assertFileExists(IdeHelperCommand::schemaDirectivesPath());
+        $generated = file_get_contents(IdeHelperCommand::schemaDirectivesPath());
 
         $this->assertStringStartsWith(IdeHelperCommand::GENERATED_NOTICE, $generated);
         $this->assertStringEndsWith("\n", $generated);
 
-        $this->assertStringContainsString(
+        $this->assertContains(
             FieldDirective::definition(),
             $generated,
             'Generates definition for built-in directives'
         );
-        $this->assertStringContainsString(FieldDirective::class, $generated);
+        $this->assertContains(FieldDirective::class, $generated);
 
-        $this->assertStringContainsString(
+        $this->assertContains(
             UnionDirective::definition(),
             $generated,
             'Overwrites definitions through custom namespaces'
         );
-        $this->assertStringContainsString(UnionDirective::class, $generated);
+        $this->assertContains(UnionDirective::class, $generated);
+
+        $this->assertFileEquals(
+            __DIR__.'/../../../_ide_helper.php',
+            IdeHelperCommand::phpIdeHelperPath()
+        );
     }
 }

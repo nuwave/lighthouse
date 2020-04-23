@@ -21,9 +21,9 @@ makes it easier to evolve APIs over time, and enables powerful developer tools.
   <small>GraphQL Playground</small>
 </div>
 
-GraphQL has been released only as a [*specification*](https://facebook.github.io/graphql/).
+GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql/).
 This means that GraphQL is in fact not more than a long document that describes in detail
-the behaviour of a GraphQL server. 
+the behaviour of a GraphQL server.
 
 GraphQL has its own type system that’s used to define the schema of an API.
 The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51/) or short **SDL**.
@@ -140,6 +140,7 @@ This first part will show you how to set up the models and database migrations
 and does not include any specifics related to GraphQL or Lighthouse.
 
 Our blog follows some simples rules:
+
 - a user can publish multiple posts
 - each post can have multiple comments from anonymous users
 
@@ -186,7 +187,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreatePostsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
@@ -197,7 +198,7 @@ class CreatePostsTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('posts');
     }
@@ -232,7 +233,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateCommentsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
@@ -242,7 +243,7 @@ class CreateCommentsTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('comments');
     }
@@ -292,8 +293,8 @@ We add two queries for retrieving posts to the root Query type:
 
 ```graphql
 type Query {
-    posts: [Post!]! @all
-    post(id: Int! @eq): Post @find
+  posts: [Post!]! @all
+  post(id: Int! @eq): Post @find
 }
 ```
 
@@ -304,35 +305,35 @@ naming - the type name `Post` is also the name of our Model - and the use of ser
 - [`@find`](../master/api-reference/directives.md#find) and [`@eq`](../master/api-reference/directives.md#eq)
   are combined to retrieve a single `Post` by its ID
 
-We add additional type definitions that clearly define the shape of our data: 
+We add additional type definitions that clearly define the shape of our data:
 
 ```graphql
 type Query {
-    posts: [Post!]! @all
-    post(id: Int! @eq): Post @find
+  posts: [Post!]! @all
+  post(id: Int! @eq): Post @find
 }
 
 type User {
-    id: ID!
-    name: String!
-    email: String!
-    created_at: DateTime!
-    updated_at: DateTime!
-    posts: [Post!]! @hasMany
+  id: ID!
+  name: String!
+  email: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  posts: [Post!]! @hasMany
 }
 
 type Post {
-    id: ID!
-    title: String!
-    content: String!
-    author: User! @belongsTo
-    comments: [Comment!]! @hasMany
+  id: ID!
+  title: String!
+  content: String!
+  author: User! @belongsTo
+  comments: [Comment!]! @hasMany
 }
 
 type Comment {
-    id: ID!
-    reply: String!
-    post: Post! @belongsTo
+  id: ID!
+  reply: String!
+  post: Post! @belongsTo
 }
 ```
 
@@ -366,7 +367,7 @@ You should get a list of all the posts in your database,
 together with all of its comments and the name of the author.
 
 Hopefully, this example showed you a glimpse of the power of GraphQL
-and how Lighthouse makes it easy to build your own server with Laravel. 
+and how Lighthouse makes it easy to build your own server with Laravel.
 
 ## Next Steps
 

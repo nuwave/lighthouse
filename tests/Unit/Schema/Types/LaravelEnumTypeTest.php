@@ -6,8 +6,8 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
+use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\LaravelEnums\LocalizedUserType;
-use Tests\Utils\LaravelEnums\UserType;
 
 class LaravelEnumTypeTest extends TestCase
 {
@@ -26,7 +26,7 @@ class LaravelEnumTypeTest extends TestCase
     public function testMakeEnumWithCustomName(): void
     {
         $customName = 'CustomName';
-        $enumType = new LaravelEnumType(UserType::class, $customName);
+        $enumType = new LaravelEnumType(AOrB::class, $customName);
 
         $this->assertSame($customName, $enumType->name);
     }
@@ -42,22 +42,22 @@ class LaravelEnumTypeTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo(bar: UserType): Boolean @mock
+            foo(bar: AOrB): Boolean @mock
         }
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(UserType::class)
+            new LaravelEnumType(AOrB::class)
         );
 
         $this->mockResolver()
             ->with(null, new Callback(function (array $args): bool {
-                return $args['bar'] instanceof UserType;
+                return $args['bar'] instanceof AOrB;
             }));
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            foo(bar: Administrator)
+            foo(bar: A)
         }
         ');
     }

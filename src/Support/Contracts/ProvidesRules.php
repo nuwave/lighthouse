@@ -11,15 +11,11 @@ interface ProvidesRules
 {
     /**
      * Return validation rules for the arguments.
-     *
-     * @return array
      */
     public function rules(): array;
 
     /**
      * Return custom messages for the rules.
-     *
-     * @return array
      */
     public function messages(): array;
 }

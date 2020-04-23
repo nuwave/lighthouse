@@ -98,7 +98,7 @@ class ModelRelationFetcherTest extends DBTestCase
         $this->assertCount($first, $tasks->first()->tags);
     }
 
-    protected function makePaginationArgs(int $first)
+    protected function makePaginationArgs(int $first): PaginationArgs
     {
         $paginatorArgs = new PaginationArgs();
         $paginatorArgs->first = $first;

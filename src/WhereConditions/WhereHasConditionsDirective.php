@@ -68,8 +68,6 @@ SDL;
 
     /**
      * Get the name of the Eloquent relationship that is used for the query.
-     *
-     * @return string
      */
     public function getRelationName(): string
     {
