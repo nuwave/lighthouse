@@ -550,12 +550,12 @@ class CreateDirectiveTest extends DBTestCase
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'name' => 'fooTask'
+                            'name' => 'fooTask',
                         ],
                         [
-                            'name' => 'barTask'
-                        ]
-                    ]
+                            'name' => 'barTask',
+                        ],
+                    ],
                 ],
             ],
         ]);

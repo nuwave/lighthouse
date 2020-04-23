@@ -150,8 +150,6 @@ class UpsertDirectiveTest extends DBTestCase
                     ],
                 ],
             ],
-        ]);;
-
-
+        ]);
     }
 }

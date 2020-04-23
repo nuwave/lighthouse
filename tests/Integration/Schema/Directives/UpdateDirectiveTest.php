@@ -265,7 +265,6 @@ class UpdateDirectiveTest extends DBTestCase
 
     public function testUpdateMultiple()
     {
-
         factory(User::class)->create();
         factory(Task::class)->create([
             'id' => 3,
