@@ -485,4 +485,68 @@ class CreateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testCanCreateTwiceWithCreateDirective(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String
+            tasks: [CreateTaskInput!] @create
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: [
+                    {
+                        name: "fooTask"
+                    },
+                    {
+                        name: "barTask"
+                    }
+                ]
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'name' => 'fooTask',
+                        ],
+                        [
+                            'name' => 'barTask',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
