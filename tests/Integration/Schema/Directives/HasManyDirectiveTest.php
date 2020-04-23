@@ -357,7 +357,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "relay")
         }
