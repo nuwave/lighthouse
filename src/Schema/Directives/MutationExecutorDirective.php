@@ -110,7 +110,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
         return Utils::applyEach(
             static function (ArgumentSet $argumentSet) use ($update, $model) {
-                return $update($model, $argumentSet);
+                return $update($model->newInstance(), $argumentSet);
             },
             $args
         );
