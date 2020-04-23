@@ -54,6 +54,16 @@ extend type Query @guard(with: ["api:admin"]) {
 }
 ```
 
+### Using Laravel Sanctum
+
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) to authenticate users, specify `sanctum` middleware.
+
+```graphql
+type Query {
+  profile: User! @guard(with: "sanctum")
+}
+```
+
 ## Get the current user
 
 Lighthouse provides a really simple way to fetch the information of the currently authenticated user.
