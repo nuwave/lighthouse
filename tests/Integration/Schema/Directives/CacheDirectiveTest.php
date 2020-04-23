@@ -67,7 +67,7 @@ class CacheDirectiveTest extends DBTestCase
             'email' => 'foo@bar.com',
         ]);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String @cache
