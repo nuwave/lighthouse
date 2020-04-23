@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+- Fixed using `@create` and `@update` on nested input object fields that accept an array of input types.  
+  https://github.com/nuwave/lighthouse/pull/1316
+
 ## 4.9.0
 
 ### Added
