@@ -103,6 +103,10 @@ class LighthouseServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
 
+        $this->app->singleton(Factory::class, function ($app) {
+            return app('auth');
+        });
+        
         $this->app->singleton(GraphQL::class);
         $this->app->singleton(ASTBuilder::class);
         $this->app->singleton(DirectiveFactory::class);
