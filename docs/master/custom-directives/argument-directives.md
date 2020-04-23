@@ -151,9 +151,10 @@ So let's take a look at the built-in `@eq` directive.
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective, DefinedDirective
 {
     public static function definition(): string
     {

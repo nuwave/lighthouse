@@ -117,6 +117,27 @@ The method will have to change like this:
 +public function purchasedItemsCount(int $year, ?bool $includeReturns)
 ```
 
+### Implement `ArgDirective` or `ArgDirectiveForArray` explicitly
+
+This affects custom directives that implemented one of the following interfaces:
+
+- `\Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`
+- `\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`
+- `\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`
+
+Whereas those interfaces previously extended `\Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now
+have to choose if you want them to apply to entire lists of arguments, elements within that list, or both.
+Change them as follows to make them behave like in v4:
+
+```diff
++use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+
+-class MyCustomArgDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
++class MyCustomArgDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective, ArgDirective
+```
+
 ### `ArgDirective` run in distinct phases
 
 The application of directives that implement the `ArgDirective` interface is
