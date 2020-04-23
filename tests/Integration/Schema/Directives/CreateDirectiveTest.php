@@ -497,8 +497,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwiceWithCreateDirective()
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
