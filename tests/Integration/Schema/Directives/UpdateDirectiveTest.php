@@ -15,7 +15,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Company {
             id: ID!
             name: String!
@@ -29,7 +29,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */'
         mutation {
             updateCompany(
                 id: 1
@@ -55,7 +55,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Company {
             id: ID!
             name: String!
@@ -99,7 +99,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Category::class)->create(['name' => 'foo']);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */'
         type Category {
             category_id: ID!
             name: String!
@@ -139,8 +139,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Task {
             id: ID!
             name: String!
@@ -203,8 +202,7 @@ class UpdateDirectiveTest extends DBTestCase
             'id' => 3,
         ]);
 
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -273,8 +271,7 @@ class UpdateDirectiveTest extends DBTestCase
             'id' => 4,
         ]);
 
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
