@@ -2,7 +2,7 @@
 
 The entrypoints to any GraphQL API are the fields of the root types `Query`, `Mutation` and `Subscription`.
 
-*Every* field has a function associated with it that is called when the field
+_Every_ field has a function associated with it that is called when the field
 is requested as part of a query. This function is called a **resolver**.
 
 ## Hello World
@@ -14,7 +14,7 @@ with a single field called `hello` that returns a `String`.
 
 ```graphql
 type Query {
-  hello: String! 
+  hello: String!
 }
 ```
 
@@ -68,7 +68,7 @@ This query will return the following response:
 
 ## Fields with arguments
 
-As we learned, *every* field has a resolver function associated with it.
+As we learned, _every_ field has a resolver function associated with it.
 Just like functions, fields can take arguments to control their behaviour.
 
 Let's construct a query that greets the user. We add a required argument `name`
@@ -84,7 +84,7 @@ A minimal implementation of the field could look something like this.
 The skeleton for this class can be created using `php artisan lighthouse:query Greet`.
 
 The second argument of the resolver function is an associative array of the
-arguments that are passed to the query. 
+arguments that are passed to the query.
 
 ```php
 <?php
@@ -123,7 +123,7 @@ and make the `name` optional and provide a default value.
 
 ```graphql
 type Query {
-    greet(name: String = "you"): String
+  greet(name: String = "you"): String
 }
 ```
 

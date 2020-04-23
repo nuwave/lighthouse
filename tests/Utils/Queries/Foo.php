@@ -13,12 +13,10 @@ class Foo
      *
      * @var int
      */
-    const THE_ANSWER = 42;
+    public const THE_ANSWER = 42;
 
     /**
      * Return a value for the field.
-     *
-     * @return int
      */
     public function resolve(): int
     {
@@ -27,8 +25,6 @@ class Foo
 
     /**
      * Calculate the complexity.
-     *
-     * @return int
      */
     public function complexity(): int
     {

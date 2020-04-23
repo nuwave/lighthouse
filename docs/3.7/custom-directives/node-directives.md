@@ -5,7 +5,7 @@ These directives can generally be applied to [type definitions](../the-basics/ty
 ## NodeManipulator
 
 The [`\Nuwave\Lighthouse\Support\Contracts\NodeManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/NodeManipulator.php)
-interface can be used to manipulate the AST. 
+interface can be used to manipulate the AST.
 
 ## NodeMiddleware
 

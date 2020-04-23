@@ -33,7 +33,6 @@ SDL;
     /**
      * Returns the count of a given relationship or model.
      *
-     * @param FieldValue $value
      * @return FieldValue
      */
     public function resolveField(FieldValue $value)

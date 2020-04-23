@@ -35,12 +35,6 @@ class NodeRegistry
      */
     protected $currentType;
 
-    /**
-     * NodeRegistry constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;
@@ -74,8 +68,6 @@ class NodeRegistry
      * Register an Eloquent model that can be resolved as a Node.
      *
      * @deprecated use registerNode
-     * @param  string  $typeName
-     * @param  string  $modelName
      * @return $this
      */
     public function registerModel(string $typeName, string $modelName): self
@@ -92,9 +84,6 @@ class NodeRegistry
      *
      * @param  mixed|null  $rootValue
      * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return mixed
      *
      * @throws \GraphQL\Error\Error
      */
@@ -115,8 +104,6 @@ class NodeRegistry
 
     /**
      * Get the Type for the stashed type.
-     *
-     * @return \GraphQL\Type\Definition\Type
      */
     public function resolveType(): Type
     {

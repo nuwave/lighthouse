@@ -11,9 +11,6 @@ class UnionTest extends DBTestCase
 {
     /**
      * @dataProvider withAndWithoutCustomTypeResolver
-     * @param  string  $schema
-     * @param  string  $query
-     * @return void
      */
     public function testCanResolveUnionTypes(string $schema, string $query): void
     {
@@ -64,7 +61,6 @@ class UnionTest extends DBTestCase
     }
 
     /**
-     * @param  bool  $withCustomTypeResolver
      * @return string[] [string $schema, string $query]
      */
     public function schemaAndQuery(bool $withCustomTypeResolver): array

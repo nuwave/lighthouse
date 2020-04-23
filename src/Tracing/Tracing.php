@@ -41,9 +41,6 @@ class Tracing
 
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
-     *
-     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $manipulateAST
-     * @return void
      */
     public function handleManipulateAST(ManipulateAST $manipulateAST): void
     {
@@ -55,9 +52,6 @@ class Tracing
 
     /**
      * Handle request start.
-     *
-     * @param  \Nuwave\Lighthouse\Events\StartRequest  $startRequest
-     * @return void
      */
     public function handleStartRequest(StartRequest $startRequest): void
     {
@@ -67,9 +61,6 @@ class Tracing
 
     /**
      * Handle batch request start.
-     *
-     * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
-     * @return void
      */
     public function handleStartExecution(StartExecution $startExecution): void
     {
@@ -78,9 +69,6 @@ class Tracing
 
     /**
      * Return additional information for the result.
-     *
-     * @param  \Nuwave\Lighthouse\Events\BuildExtensionsResponse  $buildExtensionsResponse
-     * @return \Nuwave\Lighthouse\Execution\ExtensionsResponse
      */
     public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ExtensionsResponse
     {
@@ -104,10 +92,8 @@ class Tracing
     /**
      * Record resolver execution time.
      *
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @param  float|int  $start
      * @param  float|int  $end
-     * @return void
      */
     public function record(ResolveInfo $resolveInfo, $start, $end): void
     {
@@ -140,7 +126,6 @@ class Tracing
      *
      * @param  float|int  $start
      * @param  float|int  $end
-     * @return int
      */
     protected function diffTimeInNanoseconds($start, $end): int
     {
@@ -157,8 +142,6 @@ class Tracing
 
     /**
      * Test if the current PHP version has the `hrtime` function available to get a nanosecond precision point in time.
-     *
-     * @return bool
      */
     protected function platformSupportsNanoseconds(): bool
     {

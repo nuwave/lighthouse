@@ -550,7 +550,7 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
-    public function existingModelMutations()
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],

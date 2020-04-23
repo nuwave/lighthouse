@@ -7,10 +7,23 @@ it easy for you.
 
 1. Fork the project
 1. Create a new branch
-1. Think about how the changes you are about to make can be tested, write tests before coding 
+1. Think about how the changes you are about to make can be tested, write tests before coding
 1. Run tests, make sure they fail
 1. Write the actual code to make the tests pass
 1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
+
+## Setup
+
+The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/).
+For convenience, common tasks are wrapped up in the [Makefile](Makefile), you will need `make` installed to use it.
+
+Just clone the project and run the following in the project root:
+
+    make
+
+To see the available commands, run:
+
+    make help
 
 ## Testing
 
@@ -24,16 +37,10 @@ back is to write a failing test for it and then make it pass. If you can
 not figure out how to fix it yourself, feel free to submit a PR with a
 failing test.
 
-To run the tests locally, you can use [docker-compose](https://docs.docker.com/compose/install/).
-Just clone the project and run the following in the project root:
-
-    docker-compose up -d
-    make
-
 Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
 
 > Enabling Xdebug slows down tests by an order of magnitude.
-> Stop listening for Debug Connection to speed it back up. 
+> Stop listening for Debug Connection to speed it back up.
 
 Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine as
 seen from the Docker container. This may differ based on your setup: When running
@@ -128,9 +135,9 @@ class Foo
      * @var string
      */
     protected $bar;
-    
+
     /**
-     * Use $this for fluent setters when we expect the exact same object back. 
+     * Use $this for fluent setters when we expect the exact same object back.
      *
      * @param  string  $bar
      * @return $this
@@ -171,7 +178,7 @@ function foo(){
 
 /**
  * No need to annotate the Exception here, even though
- * it is thrown indirectly. 
+ * it is thrown indirectly.
  */
 function bar(){
   foo();

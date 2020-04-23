@@ -1,17 +1,16 @@
 # Validation
 
-## Validating Arguments
-
 Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your
-queries and mutations. The simplest way to leverage the built-in validation rules is to use the
+queries and mutations.
+
+## Single Arguments
+
+The simplest way to leverage the built-in validation rules is to use the
 [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {
-  createUser(
-    name: String @rules(apply: ["required", "min:4"])
-    email: String @rules(apply: ["email"])
-  ): User
+  createUser(email: String @rules(apply: ["email"])): User
 }
 ```
 
@@ -20,7 +19,7 @@ as part of the response.
 
 ```graphql
 mutation {
-  createUser(email: "hans@peter.xyz"){
+  createUser(email: "foobar") {
     id
   }
 }
@@ -41,9 +40,7 @@ mutation {
         }
       ],
       "extensions": {
-        "validation": [
-          "The name field is required."
-        ]
+        "validation": ["The email field must be a valid email."]
       }
     }
   ]
@@ -72,12 +69,12 @@ Rules can be defined upon Input Object Values.
 
 ```graphql
 input CreatePostInput {
-    title: String @rules(apply: ["required"])
-    content: String @rules(apply: ["min:50", "max:150"])
+  title: String @rules(apply: ["required"])
+  content: String @rules(apply: ["min:50", "max:150"])
 }
 ```
 
-Using the [`unique`](https://laravel.com/docs/5.8/validation#rule-unique)
+Using the [`unique`](https://laravel.com/docs/validation#rule-unique)
 validation rule can be a bit tricky.
 
 If the argument is nested within an input object, the argument path will not
@@ -92,11 +89,14 @@ input CreateUserInput {
 ## Validating Arrays
 
 When you are passing in an array as an argument to a field, you might
-want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rules)
+want to apply some validation on the array itself, using [`@rulesForArray`](../api-reference/directives.md#rulesforarray)
 
 ```graphql
 type Mutation {
-  makeIcecream(topping: [Topping!]! @rulesForArray(apply: ["max:3"])): Icecream
+  makeIcecream(
+    "You may add up to three toppings to your icecream."
+    topping: [Topping!] @rulesForArray(apply: ["max:3"])
+  ): Icecream
 }
 ```
 
@@ -107,10 +107,8 @@ For example, you might require a list of at least 3 valid emails to be passed.
 ```graphql
 type Mutation {
   attachEmails(
-    email: [String!]!
-      @rules(apply: ["email"])
-      @rulesForArray(apply: ["min:3"])
-   ): File
+    email: [String!]! @rules(apply: ["email"]) @rulesForArray(apply: ["min:3"])
+  ): File
 }
 ```
 

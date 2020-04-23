@@ -251,3 +251,21 @@ return [
 
 ];
 ```
+
+## CORS
+
+A GraphQL API can be consumed from multiple clients, which may or may not reside
+on the same domain as your server. Make sure you enable [Cross-Origin Resource Sharing (CORS)](https://laravel.com/docs/7.x/routing#cors)
+for your GraphQL endpoint in `config/cors.php`:
+
+```diff
+return [
+-   'paths' => ['api/*'],
++   'paths' => ['api/*', 'graphql'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => explode(',', env('ALLOWED_CORS_ORIGINS', [])),
+    ...
+];
+```
+
+> CORS is built into Laravel starting from version 7, for previous versions use https://github.com/fruitcake/laravel-cors

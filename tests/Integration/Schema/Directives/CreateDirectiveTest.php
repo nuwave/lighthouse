@@ -366,7 +366,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testNestedArgResolverBelongsTo(): void
+    public function testNestedArgResolverForOptionalBelongsTo(): void
     {
         $this->schema .= /** @lang GraphQL */
             '
@@ -497,8 +497,7 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateTwiceWithCreateDirective()
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!

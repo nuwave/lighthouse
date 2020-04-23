@@ -20,29 +20,27 @@ as part of the response.
 
 ```graphql
 mutation {
-  createUser(email: "hans@peter.xyz"){
+  createUser(email: "hans@peter.xyz") {
     id
   }
 }
 ```
 
 ```json
-{  
-  "data":{  
-    "foo":null
+{
+  "data": {
+    "foo": null
   },
-  "errors":[  
-    {  
-      "message":"validation",
-      "locations":[  
-        {  
-          "line":2,
-          "column":13
+  "errors": [
+    {
+      "message": "validation",
+      "locations": [
+        {
+          "line": 2,
+          "column": 13
         }
       ],
-      "validation":[  
-        "The name field is required."
-      ]
+      "validation": ["The name field is required."]
     }
   ]
 }

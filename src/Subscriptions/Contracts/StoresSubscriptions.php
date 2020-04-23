@@ -9,41 +9,36 @@ interface StoresSubscriptions
     /**
      * Get subscriber by request.
      *
-     * @param  array  $input
-     * @param  array  $headers
+     * @deprecated will be removed in favor of subscriberByChannel
+     *
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function subscriberByRequest(array $input, array $headers);
 
     /**
-     * Find subscriber by channel.
+     * Find a subscriber by its channel key.
      *
-     * @param  string  $channel
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function subscriberByChannel(string $channel);
 
     /**
-     * Get collection of subscribers by topic.
+     * Get all subscribers for a topic.
      *
-     * @param  string  $topic
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic);
 
     /**
-     * Store subscription.
+     * Store subscriber for a topic.
      *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  string  $topic
      * @return void
      */
     public function storeSubscriber(Subscriber $subscriber, string $topic);
 
     /**
-     * Delete subscriber.
+     * Delete subscriber by its channel key.
      *
-     * @param  string  $channel
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function deleteSubscriber(string $channel);

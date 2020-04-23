@@ -33,7 +33,6 @@ class ModelRelationFetcher
     /**
      * @param  \Illuminate\Database\Eloquent\Collection  $models  The parent models that relations should be loaded for
      * @param  mixed[]  $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
-     * @return void
      */
     public function __construct(EloquentCollection $models, array $relations)
     {
@@ -46,9 +45,6 @@ class ModelRelationFetcher
 
     /**
      * Load all relations for the model, but constrain the query to the current page.
-     *
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function loadRelationsForPage(PaginationArgs $paginationArgs): EloquentCollection
     {
@@ -61,8 +57,6 @@ class ModelRelationFetcher
 
     /**
      * Reload the models to get the `{relation}_count` attributes of models set.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function reloadModelsWithRelationCount(): EloquentCollection
     {
@@ -90,11 +84,6 @@ class ModelRelationFetcher
      * Load only one page of relations of all the models.
      *
      * The relation will be converted to a `Paginator` instance.
-     *
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
-     * @param  string  $relationName
-     * @param  \Closure  $relationConstraints
-     * @return void
      */
     protected function loadRelationForPage(PaginationArgs $paginationArgs, string $relationName, Closure $relationConstraints): void
     {
@@ -127,8 +116,6 @@ class ModelRelationFetcher
 
     /**
      * Return a fresh instance of a query builder for the underlying model.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function newModelQuery(): EloquentBuilder
     {
@@ -140,8 +127,6 @@ class ModelRelationFetcher
     /**
      * Get queries to fetch relationships.
      *
-     * @param  string  $relationName
-     * @param  \Closure  $relationConstraints
      * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Relations\Relation>
      */
     protected function buildRelationsFromModels(string $relationName, Closure $relationConstraints): Collection
@@ -208,9 +193,6 @@ class ModelRelationFetcher
      * This is the name that Eloquent gives to the attribute that contains the count.
      *
      * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
-     *
-     * @param  string  $relationName
-     * @return string
      */
     protected function getRelationCountName(string $relationName): string
     {
@@ -219,9 +201,6 @@ class ModelRelationFetcher
 
     /**
      * Merge all the relation queries into a single query with UNION ALL.
-     *
-     * @param  \Illuminate\Support\Collection  $relations
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function unionAllRelationQueries(Collection $relations): EloquentBuilder
     {
@@ -238,8 +217,6 @@ class ModelRelationFetcher
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
-     * @param  string  $relationName
      * @return $this
      */
     protected function convertRelationToPaginator(PaginationArgs $paginationArgs, string $relationName): self
@@ -269,8 +246,6 @@ class ModelRelationFetcher
     /**
      * Associate the collection of all fetched relationModels back with their parents.
      *
-     * @param  string  $relationName
-     * @param  \Illuminate\Database\Eloquent\Collection  $relationModels
      * @return $this
      */
     protected function associateRelationModels(string $relationName, EloquentCollection $relationModels): self
@@ -289,7 +264,6 @@ class ModelRelationFetcher
     /**
      * Ensure the pivot relation is hydrated too, if it exists.
      *
-     * @param  string  $relationName
      * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relationModels
      * @return $this
      */
@@ -308,9 +282,6 @@ class ModelRelationFetcher
 
     /**
      * Use the underlying model to instantiate a relation by name.
-     *
-     * @param  string  $relationName
-     * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
     protected function getRelationInstance(string $relationName): Relation
     {

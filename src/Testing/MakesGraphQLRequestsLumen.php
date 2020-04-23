@@ -4,6 +4,10 @@ namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Useful helpers for PHPUnit testing.
@@ -23,11 +27,15 @@ trait MakesGraphQLRequestsLumen
     protected $introspectionResult;
 
     /**
+     * Used to test deferred queries.
+     *
+     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
+     */
+    protected $deferStream;
+
+    /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param  string  $query
-     * @param  array|null  $variables
-     * @param  array  $extraParams
      * @return $this
      */
     protected function graphQL(string $query, array $variables = null, array $extraParams = []): self
@@ -108,7 +116,6 @@ trait MakesGraphQLRequestsLumen
     /**
      * Run introspection and return a type by name, if present.
      *
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectType(string $name): ?array
@@ -119,7 +126,6 @@ trait MakesGraphQLRequestsLumen
     /**
      * Run introspection and return a directive by name, if present.
      *
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectDirective(string $name): ?array
@@ -130,8 +136,6 @@ trait MakesGraphQLRequestsLumen
     /**
      * Run introspection and return a result from the given path by name, if present.
      *
-     * @param  string  $path
-     * @param  string  $name
      * @return mixed[]|null
      */
     protected function introspectByName(string $path, string $name): ?array
@@ -155,11 +159,41 @@ trait MakesGraphQLRequestsLumen
 
     /**
      * Return the full URL to the GraphQL endpoint.
-     *
-     * @return string
      */
     protected function graphQLEndpointUrl(): string
     {
         return config('lighthouse.route.uri');
+    }
+
+    /**
+     * Send the query and capture all chunks of the streamed response.
+     */
+    protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
+    {
+        if ($this->deferStream === null) {
+            $this->setUpDeferStream();
+        }
+
+        $response = $this->graphQL($query, $variables, $extraParams);
+
+        if (! $response->response instanceof StreamedResponse) {
+            Assert::fail('Expected the response to be a streamed response but got a regular response.');
+        }
+
+        $response->response->send();
+
+        return $this->deferStream->chunks;
+    }
+
+    /**
+     * Set up the stream to make queries with @defer.
+     */
+    protected function setUpDeferStream(): void
+    {
+        $this->deferStream = new MemoryStream;
+
+        app()->singleton(CanStreamResponse::class, function (): MemoryStream {
+            return $this->deferStream;
+        });
     }
 }

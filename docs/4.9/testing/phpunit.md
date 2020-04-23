@@ -26,7 +26,7 @@ abstract class TestCase extends BaseTestCase
 
 The most natural way of testing your GraphQL API is to run actual GraphQL queries.
 
-The `graphQL` test helper runs a query on your GraphQL endpoint and returns a `TestResponse`. 
+The `graphQL` test helper runs a query on your GraphQL endpoint and returns a `TestResponse`.
 
 ```php
 public function testQueriesPosts(): void
@@ -171,7 +171,7 @@ The `introspect()` helper method runs the full introspection query against your 
 $introspectionResult = $this->introspect();
 ```
 
-Most often, you will want to look for a specific named type. 
+Most often, you will want to look for a specific named type.
 
 ```php
 $generatedType = $this->introspectType('Generated');

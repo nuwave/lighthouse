@@ -13,15 +13,10 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * @var string
      */
-    const EOL = "\r\n";
+    public const EOL = "\r\n";
 
     /**
      * Stream graphql response.
-     *
-     * @param  array  $data
-     * @param  array  $paths
-     * @param  bool  $final
-     * @return void
      */
     public function stream(array $data, array $paths, bool $final): void
     {
@@ -43,7 +38,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $chunk['errors'] = $errors;
                 }
 
-                $terminating = $final && ($i === $lastKey);
+                $terminating = $final && $i === $lastKey;
 
                 $this->emit(
                     $this->chunk($chunk, $terminating)
@@ -60,17 +55,11 @@ class ResponseStream extends Stream implements CanStreamResponse
         }
     }
 
-    /**
-     * @return string
-     */
     protected function boundary(): string
     {
         return self::EOL.'---'.self::EOL;
     }
 
-    /**
-     * @return string
-     */
     protected function terminatingBoundary(): string
     {
         return self::EOL.'-----'.self::EOL;
@@ -78,10 +67,6 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Format chunked data.
-     *
-     * @param  array  $data
-     * @param  bool  $terminating
-     * @return string
      */
     protected function chunk(array $data, bool $terminating): string
     {
@@ -103,9 +88,6 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Stream chunked data to client.
-     *
-     * @param  string  $chunk
-     * @return void
      */
     protected function emit(string $chunk): void
     {
@@ -120,9 +102,6 @@ class ResponseStream extends Stream implements CanStreamResponse
      * Note: We can run into exceptions when flushing the buffer,
      * these should be safe to ignore.
      * @todo Investigate exceptions that occur on Apache
-     *
-     * @param  \Closure  $flush
-     * @return void
      */
     protected function flush(Closure $flush): void
     {
