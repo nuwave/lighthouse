@@ -85,7 +85,7 @@ class UpsertDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testInsert()
+    public function testNestedInsertOnInputList(): void
     {
         factory(User::class)->create();
         $this->schema .= /** @lang GraphQL */'

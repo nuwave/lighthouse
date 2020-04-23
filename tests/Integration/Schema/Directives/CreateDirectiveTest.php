@@ -486,7 +486,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateTwiceWithCreateDirective()
+    public function testCanCreateTwiceWithCreateDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Task {
@@ -526,8 +526,7 @@ class CreateDirectiveTest extends DBTestCase
                         name: "barTask"
                     }
                 ]
-                }
-            ) {
+            }) {
                 name
                 tasks {
                     name

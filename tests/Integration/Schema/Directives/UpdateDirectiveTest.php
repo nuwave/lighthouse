@@ -261,7 +261,7 @@ class UpdateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testUpdateMultiple()
+    public function testNestedUpdateOnInputList(): void
     {
         factory(User::class)->create();
         factory(Task::class)->create([
