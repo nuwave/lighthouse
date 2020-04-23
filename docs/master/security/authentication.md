@@ -56,7 +56,9 @@ extend type Query @guard(with: ["api:admin"]) {
 
 ### Using Laravel Sanctum
 
-If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) to authenticate users, specify `sanctum` middleware.
+Lighthouse will use your application's default guard, unless specified otherwise.
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) only for your API,
+you can set it when using `@guard`:
 
 ```graphql
 type Query {
