@@ -89,7 +89,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $args
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
      */
     protected function executeMutation(Model $model, $args, ?Relation $parentRelation = null)
