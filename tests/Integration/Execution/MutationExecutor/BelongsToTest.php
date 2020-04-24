@@ -1001,4 +1001,125 @@ GRAPHQL
             ],
         ]);
     }
+
+    public function testCreateMultipleBelongsToThatDontExistYetWithExistingRecords(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type RoleUserPivot {
+            id: ID!
+            meta: String
+            user: User!
+            role: Role!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Role {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createRoleUser(
+                input: RoleUserInput! @spread
+            ): RoleUserPivot @create
+        }
+
+        input RoleUserInput {
+            id: ID
+            meta: String
+            user: UserInput!
+            role: RoleInput!
+        }
+
+        input UserInput {
+            create: CreateUserInput
+        }
+
+        input CreateUserInput {
+            id: ID
+            name: String!
+        }
+
+        input RoleInput {
+            create: CreateRoleInput
+        }
+
+        input CreateRoleInput {
+            id: ID
+            name: String!
+        }
+        '.self::PLACEHOLDER_QUERY;
+
+        $query = /** @lang GraphQL */ '
+        mutation {
+            createRoleUser(input: {
+                meta: "1"
+                user: {
+                    create: {
+                        name: "user 1"
+                    }
+                }
+                role: {
+                    create: {
+                        name: "role 1"
+                    }
+                }
+            }) {
+                id
+                meta
+                user {
+                    id
+                    name
+                }
+                role {
+                    id
+                    name
+                }
+            }
+        }';
+
+
+
+        // first create a user, role_user, and a role, all associated, to allow role_user_creation
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'createRoleUser' => [
+                    'id' => '1',
+                    'meta' => '1',
+                    'user' => [
+                        'id' => '1',
+                        'name' => 'user 1',
+                    ],
+                    'role' => [
+                        'id' => '1',
+                        'name' => 'role 1',
+                    ],
+                ],
+            ],
+        ]);
+
+        // now create a second role_user, the exact same way as previously created.
+        // This should test than an existing rule_user match with the attribute meta,
+        // should not interfere with consequent mutations.
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'createRoleUser' => [
+                    'id' => '2',
+                    'meta' => '1',
+                    'user' => [
+                        'id' => '2',
+                        'name' => 'user 1',
+                    ],
+                    'role' => [
+                        'id' => '2',
+                        'name' => 'role 1',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
