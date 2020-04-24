@@ -804,6 +804,7 @@ GRAPHQL
         }
 
         input UpsertRoleUserPivotInput {
+            id: ID
             role: UpsertRoleBelongsTo
         }
 
@@ -874,6 +875,7 @@ GRAPHQL
                 name: "fooz"
                 rolesPivot: {
                     upsert: [{
+                        id: "1"
                         role: {
                             upsert: {
                                 id: "1"
