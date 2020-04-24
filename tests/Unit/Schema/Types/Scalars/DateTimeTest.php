@@ -15,14 +15,14 @@ class DateTimeTest extends DateScalarTest
     public function validDates(): array
     {
         return [
-            ['2020-04-20 23:51:15']
+            ['2020-04-20 23:51:15'],
         ];
     }
 
     public function canonicalizeDates(): array
     {
         return [
-            ['2020-4-20 23:51:15', '2020-04-20 23:51:15']
+            ['2020-4-20 23:51:15', '2020-04-20 23:51:15'],
         ];
     }
 }
