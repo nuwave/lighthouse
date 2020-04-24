@@ -8,11 +8,11 @@ class DateTimeTz extends DateScalar
 {
     protected function format(Carbon $carbon): string
     {
-        return $carbon->toIso8601String();
+        return $carbon->toJSON();
     }
 
     protected function parse($value): Carbon
     {
-        return Carbon::createFromFormat(Carbon::ISO8601, $value);
+        return Carbon::createFromIsoFormat('YYYY-MM-DDTHH:mm:ss.SSSSSSZ', $value);
     }
 }

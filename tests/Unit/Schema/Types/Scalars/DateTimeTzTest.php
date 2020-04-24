@@ -14,6 +14,6 @@ class DateTimeTzTest extends DateScalarTest
 
     protected function validDate(): string
     {
-        return '2020-04-20T16:20:04+04:00';
+        return '2020-04-20T16:20:04.000000Z';
     }
 }
