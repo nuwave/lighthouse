@@ -47,18 +47,24 @@ abstract class DateScalarTest extends TestCase
         ];
     }
 
-    public function testParsesValueString(): void
+    /**
+     * @dataProvider validDates
+     */
+    public function testParsesValueString(string $date): void
     {
         $this->assertInstanceOf(
             Carbon::class,
-            $this->scalarInstance()->parseValue($this->validDate())
+            $this->scalarInstance()->parseValue($date)
         );
     }
 
-    public function testParsesLiteral(): void
+    /**
+     * @dataProvider validDates
+     */
+    public function testParsesLiteral(string $date): void
     {
         $dateLiteral = new StringValueNode(
-            ['value' => $this->validDate()]
+            ['value' => $date]
         );
         $parsed = $this->scalarInstance()->parseLiteral($dateLiteral);
 
@@ -82,15 +88,19 @@ abstract class DateScalarTest extends TestCase
         $this->assertInternalType('string', $result);
     }
 
-    public function testSerializesValidDateString(): void
+    /**
+     * @dataProvider canonicalizeDates
+     */
+    public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
-        $date = $this->validDate();
         $result = $this->scalarInstance()->serialize($date);
 
-        $this->assertSame($date, $result);
+        $this->assertSame($canonical, $result);
     }
 
     abstract protected function scalarInstance(): DateScalar;
 
-    abstract protected function validDate(): string;
+    abstract public function validDates(): array;
+
+    abstract public function canonicalizeDates(): array;
 }

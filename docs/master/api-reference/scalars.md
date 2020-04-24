@@ -43,6 +43,16 @@ scalar DateTimeTz
 
 Internally represented as an instance of `Carbon\Carbon`.
 
+## DateTimeUtc
+
+```graphql
+"A datetime string in ISO 8601 format in UTC with nanoseconds `YYYY-MM-DDTHH:mm:ss.SSSSSSZ`, e.g. `2020-04-20T16:20:04.000000Z`."
+scalar DateTimeUtc
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeUtc")
+```
+
+Internally represented as an instance of `Carbon\Carbon`.
+
 ## Upload
 
 ```graphql
