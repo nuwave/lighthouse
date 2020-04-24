@@ -3,9 +3,9 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Tests\Utils\Models\Role;
 
 class HasManyTest extends DBTestCase
 {

@@ -1084,8 +1084,6 @@ GRAPHQL
             }
         }';
 
-
-
         // first create a user, role_user, and a role, all associated, to allow role_user_creation
         $this->graphQL($query)->assertJson([
             'data' => [
