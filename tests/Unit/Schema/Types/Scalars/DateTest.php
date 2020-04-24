@@ -22,7 +22,7 @@ class DateTest extends DateScalarTest
     public function canonicalizeDates(): array
     {
         return [
-            ['2020-4-20' => '2020-04-20'],
+            ['2020-4-20', '2020-04-20'],
         ];
     }
 }
