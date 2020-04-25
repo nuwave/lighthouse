@@ -6,6 +6,7 @@ use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\StringValueNode;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Tests\TestCase;
@@ -39,7 +40,7 @@ class PartialParserTest extends TestCase
         type Foo {
             foo: String
         }
-        
+
         type Bar {
             bar: Int
         }
@@ -94,7 +95,7 @@ class PartialParserTest extends TestCase
         type Foo {
             foo: String
         }
-        
+
         type Bar {
             bar: Int
         }
@@ -123,6 +124,12 @@ class PartialParserTest extends TestCase
         );
 
         $this->assertSame('key', $argumentNode->name->value);
-        $this->assertSame('value', $argumentNode->value->value);
+
+        $stringValue = $argumentNode->value;
+
+        $this->assertInstanceOf(StringValueNode::class, $stringValue);
+        /** @var StringValueNode $stringValue */
+
+        $this->assertSame('value', $stringValue->value);
     }
 }

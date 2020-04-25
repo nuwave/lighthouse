@@ -20,6 +20,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $password
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  */
 class User extends Authenticatable
 {

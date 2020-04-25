@@ -5,6 +5,7 @@ namespace Tests;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -24,12 +25,12 @@ trait TestsSerialization
                     return new class implements GraphQLContext {
                         public function user()
                         {
-                            //
+                            return null;
                         }
 
                         public function request()
                         {
-                            //
+                            return new Request();
                         }
                     };
                 }

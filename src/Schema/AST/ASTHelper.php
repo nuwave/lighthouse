@@ -97,7 +97,6 @@ class ASTHelper
     /**
      * Unwrap lists and non-nulls and get the named type within.
      *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
@@ -167,6 +166,7 @@ class ASTHelper
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
+            /** @var \GraphQL\Language\AST\EnumValueNode|\GraphQL\Language\AST\NullValueNode $defaultValue */
             return $argumentType
                 ->getValue($defaultValue->value)
                 ->value;
@@ -187,8 +187,6 @@ class ASTHelper
 
     /**
      * Check if a node has a directive with the given name on it.
-     *
-     * @return \GraphQL\Language\AST\DirectiveNode|null
      */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {

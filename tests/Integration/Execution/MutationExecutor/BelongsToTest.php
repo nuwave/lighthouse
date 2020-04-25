@@ -524,6 +524,7 @@ GRAPHQL
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\Task $task */
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
@@ -559,8 +560,9 @@ GRAPHQL
             'Must not delete the second model.'
         );
 
+        $task->refresh();
         $this->assertNull(
-            $task->refresh()->user_id,
+            $task->user_id,
             'Must disconnect the parent relationship.'
         );
     }
@@ -572,6 +574,7 @@ GRAPHQL
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\Task $task */
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
@@ -608,8 +611,9 @@ GRAPHQL
             'This model should be deleted.'
         );
 
+        $task->refresh();
         $this->assertNull(
-            $task->refresh()->user_id,
+            $task->user_id,
             'Must disconnect the parent relationship.'
         );
     }
@@ -662,6 +666,7 @@ GRAPHQL
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\Task $task */
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
@@ -696,9 +701,10 @@ GRAPHQL
             ],
         ]);
 
+        $task->refresh();
         $this->assertSame(
             $user->id,
-            $task->refresh()->user->id,
+            $task->user->id,
             'The parent relationship remains untouched.'
         );
     }

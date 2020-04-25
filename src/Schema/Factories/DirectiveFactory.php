@@ -166,7 +166,7 @@ class DirectiveFactory
     /**
      * Get all directives that are associated with an AST node.
      *
-     * @return \Illuminate\Support\Collection of type <$directiveClass>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function createAssociatedDirectives(Node $node): Collection
     {
