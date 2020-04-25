@@ -18,6 +18,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $name
  * @property string|null $email
  * @property string|null $password
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class User extends Authenticatable
 {

@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $name
  * @property int|null $creator_id
  * @property string|null $creator_type
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class Color extends Model
 {
