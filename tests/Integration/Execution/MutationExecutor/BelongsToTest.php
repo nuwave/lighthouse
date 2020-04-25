@@ -1059,15 +1059,15 @@ GRAPHQL
         $query = /** @lang GraphQL */ '
         mutation {
             createRoleUser(input: {
-                meta: "1"
+                meta: "asdf"
                 user: {
                     create: {
-                        name: "user 1"
+                        name: "some username"
                     }
                 }
                 role: {
                     create: {
-                        name: "role 1"
+                        name: "some rolename"
                     }
                 }
             }) {
@@ -1084,39 +1084,37 @@ GRAPHQL
             }
         }';
 
-        // first create a user, role_user, and a role, all associated, to allow role_user_creation
+        // This must first create a user, then a role, then attach them to the pivot
         $this->graphQL($query)->assertJson([
             'data' => [
                 'createRoleUser' => [
                     'id' => '1',
-                    'meta' => '1',
+                    'meta' => 'asdf',
                     'user' => [
                         'id' => '1',
-                        'name' => 'user 1',
+                        'name' => 'some username',
                     ],
                     'role' => [
                         'id' => '1',
-                        'name' => 'role 1',
+                        'name' => 'some rolename',
                     ],
                 ],
             ],
         ]);
 
-        // now create a second role_user, the exact same way as previously created.
-        // This should test than an existing rule_user match with the attribute meta,
-        // should not interfere with consequent mutations.
+        // We should be able to repeat this query and create new entries the same way
         $this->graphQL($query)->assertJson([
             'data' => [
                 'createRoleUser' => [
                     'id' => '2',
-                    'meta' => '1',
+                    'meta' => 'asdf',
                     'user' => [
                         'id' => '2',
-                        'name' => 'user 1',
+                        'name' => 'some username',
                     ],
                     'role' => [
                         'id' => '2',
-                        'name' => 'role 1',
+                        'name' => 'some rolename',
                     ],
                 ],
             ],
