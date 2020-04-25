@@ -114,12 +114,14 @@ SDL;
                 throw new Error(self::missingKeyToFindModel($find));
             }
 
+            /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
+                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
                 $queryBuilder->withTrashed();
             }
 
@@ -127,6 +129,7 @@ SDL;
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
+                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
                 $queryBuilder->onlyTrashed();
             }
 

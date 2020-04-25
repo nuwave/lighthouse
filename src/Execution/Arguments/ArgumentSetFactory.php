@@ -94,7 +94,7 @@ class ArgumentSetFactory
      * Make a map with the name as keys.
      *
      * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]  $argumentDefinitions
-     * @return \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode[]
      */
     protected function makeDefinitionMap($argumentDefinitions): array
     {

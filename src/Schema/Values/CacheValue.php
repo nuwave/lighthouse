@@ -12,20 +12,35 @@ class CacheValue
      */
     protected $fieldValue;
 
+    /**
+     * The root that was passed to the query.
+     */
     protected $rootValue;
 
     /**
-     * @var array
+     * The args that were passed to the query.
+     *
+     * @var array<string, mixed>
      */
     protected $args;
 
+    /**
+     * The context that was passed to the query.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
+     */
     protected $context;
 
     /**
+     * The ResolveInfo that was passed to the query.
+     *
      * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
+    /**
+     * The key to use for caching this field.
+     */
     protected $fieldKey;
 
     /**

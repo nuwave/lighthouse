@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Symfony\Component\HttpFoundation\Response;
 
 class BroadcastManagerTest extends SubscriptionTestCase
 {
@@ -43,17 +44,17 @@ class BroadcastManagerTest extends SubscriptionTestCase
         $broadcaster = new class implements Broadcaster {
             public function authorized(Request $request)
             {
-                //
+                return new Response();
             }
 
             public function unauthorized(Request $request)
             {
-                //
+                return new Response();
             }
 
             public function hook(Request $request)
             {
-                //
+                return new Response();
             }
 
             public function broadcast(Subscriber $subscriber, array $data)

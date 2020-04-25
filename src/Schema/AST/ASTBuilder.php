@@ -200,7 +200,6 @@ class ASTBuilder
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
     {
@@ -214,11 +213,7 @@ class ASTBuilder
         );
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
-    protected function extendEnumType(string $typeName, TypeExtensionNode $typeExtension): void
+    protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
     {
         /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName];
@@ -246,6 +241,7 @@ class ASTBuilder
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
+     * @param  \GraphQL\Language\AST\ScalarTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\UnionTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      */
     public static function extensionDoesNotMatchDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): string
     {

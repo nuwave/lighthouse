@@ -108,8 +108,9 @@ class FieldFactory
         $fieldDefinitionNode = $fieldValue->getField();
 
         // Directives have the first priority for defining a resolver for a field
-        /** @var \Nuwave\Lighthouse\Support\Contracts\FieldResolver $resolverDirective */
-        if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
+        /** @var \Nuwave\Lighthouse\Support\Contracts\FieldResolver|null $resolverDirective */
+        $resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class);
+        if ($resolverDirective) {
             $this->fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
             $this->fieldValue = $fieldValue->useDefaultResolver();

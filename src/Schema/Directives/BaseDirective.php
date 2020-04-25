@@ -119,7 +119,7 @@ abstract class BaseDirective implements Directive
      * Get the model class from the `model` argument of the field.
      *
      * @param  string  $argumentName The default argument name "model" may be overwritten
-     * @return string|\Illuminate\Database\Eloquent\Model
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

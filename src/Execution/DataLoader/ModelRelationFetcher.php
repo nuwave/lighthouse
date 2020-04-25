@@ -19,7 +19,7 @@ class ModelRelationFetcher
     /**
      * The parent models that relations should be loaded for.
      *
-     * @var \Illuminate\Database\Eloquent\Collection
+     * @var \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     protected $models;
 
@@ -45,6 +45,8 @@ class ModelRelationFetcher
 
     /**
      * Load all relations for the model, but constrain the query to the current page.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public function loadRelationsForPage(PaginationArgs $paginationArgs): EloquentCollection
     {

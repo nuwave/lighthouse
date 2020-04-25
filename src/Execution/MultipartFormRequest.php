@@ -35,16 +35,12 @@ class MultipartFormRequest extends BaseRequest
             $this->batchIndex = 0;
         }
 
+        /** @var array<string, array<int, string>> $map */
         $map = json_decode($request->input('map'), true);
 
-        /**
-         * @var string
-         * @var array $operationsPaths
-         */
         foreach ($map as $fileKey => $operationsPaths) {
             $file = $request->file($fileKey);
 
-            /** @var string $operationsPath */
             foreach ($operationsPaths as $operationsPath) {
                 Arr::set($this->operations, $operationsPath, $file);
             }

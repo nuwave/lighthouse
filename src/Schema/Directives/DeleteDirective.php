@@ -51,8 +51,8 @@ SDL;
     /**
      * Find one or more models by id.
      *
-     * @param string|\Illuminate\Database\Eloquent\Model $modelClass
-     * @param string|int|string[]|int[] $idOrIds
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     * @param  string|int|string[]|int[]  $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
     protected function find(string $modelClass, $idOrIds)
@@ -88,11 +88,13 @@ SDL;
         $relationIsBelongsToLike = $relation instanceof BelongsTo || $relation instanceof MorphTo;
 
         if ($relationIsHasOneLike || $relationIsBelongsToLike) {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne|\Illuminate\Database\Eloquent\Relations\BelongsTo|\Illuminate\Database\Eloquent\Relations\MorphTo $relation */
             // Only delete if the given value is truthy, since
             // the client might use a variable and always pass the argument.
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo|\Illuminate\Database\Eloquent\Relations\MorphTo $relation */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }

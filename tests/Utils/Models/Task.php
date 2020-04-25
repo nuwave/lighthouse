@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $guard
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Tests\Utils\Models\User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  */
 class Task extends Model
 {

@@ -1,24 +1,52 @@
 includes:
-- vendor/nunomaduro/larastan/extension.neon
 - vendor/bensampo/laravel-enum/extension.neon
+- vendor/nunomaduro/larastan/extension.neon
 parameters:
-  level: 1
+  level: 2
   paths:
   - benchmarks
   - src
   - tests
   excludes_analyse:
-  - %rootDir%/../../../tests/database/*
+  - tests/database/migrations/*
+
   # Compatibility fix because Laravel moved the TestResponse class
-  - %rootDir%/../../../tests/TestCase.php
-  - %rootDir%/../../../tests/Laravel7ExceptionHandler.php
-  - %rootDir%/../../../tests/PreLaravel7ExceptionHandler.php
+  - tests/TestCase.php
+  - tests/Laravel7ExceptionHandler.php
+  - tests/PreLaravel7ExceptionHandler.php
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
   - '#Call to protected static method get\(\) of class Illuminate\\Filesystem\\FilesystemManager\.#'
+  - path: tests/database/factories/*
+    message: '#Undefined variable: \$factory#'
+
+  # This test cheats and uses reflection to make assertions
+  - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
+    message: '#Call to protected method getModelClass\(\) of class Nuwave\\Lighthouse\\Schema\\Directives\\BaseDirective\.#'
+
+  # Can not specify a class-string for traits
+  - path: src/Schema/Directives/SearchDirective.php
+    message: '#PHPDoc tag @var for variable \$modelClass contains unresolvable type\.#'
+
+  # Correctly writing out the union of all the subtypes of AST nodes is too much work
+  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$kind\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$name\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$directives\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$kind\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$name\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeSystemDefinitionNode::\$directives\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeDefinitionNode::\$name\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeExtensionNode::\$name\.#'
+
+  # Should work once we update to a version of graphql-php that has more accurate types
+  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
+  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\FieldDefinitionNode>\.#'
+
+  # This class or an equivalent of it will be present in a Laravel install
+  - '#.* unknown class App\\User\.#'
 
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
@@ -28,6 +56,10 @@ parameters:
 
   # We are monkeypatching that to pass around the query builder
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
+  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
   # TODO remove once we no longer support PHPUnit 7
   - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects\(\) has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
+
+  # TODO remove once we can use phpstan-mockery:0.12
+  - '#Call to an undefined method Mockery.*#'
