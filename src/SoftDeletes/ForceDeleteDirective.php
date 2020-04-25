@@ -50,8 +50,6 @@ SDL;
 
     /**
      * Bring a model in or out of existence.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      */
     protected function modifyExistence(Model $model): void
     {

@@ -25,7 +25,6 @@ trait TestsSerialization
                     return new class implements GraphQLContext {
                         public function user()
                         {
-                            return null;
                         }
 
                         public function request()

@@ -14,8 +14,6 @@ class CacheValue
 
     /**
      * The root that was passed to the query.
-     *
-     * @var mixed
      */
     protected $rootValue;
 
@@ -42,8 +40,6 @@ class CacheValue
 
     /**
      * The key to use for caching this field.
-     *
-     * @var mixed
      */
     protected $fieldKey;
 

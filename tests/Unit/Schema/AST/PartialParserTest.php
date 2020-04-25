@@ -129,7 +129,6 @@ class PartialParserTest extends TestCase
 
         $this->assertInstanceOf(StringValueNode::class, $stringValue);
         /** @var StringValueNode $stringValue */
-
         $this->assertSame('value', $stringValue->value);
     }
 }
