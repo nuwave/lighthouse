@@ -54,6 +54,18 @@ extend type Query @guard(with: ["api:admin"]) {
 }
 ```
 
+### Using Laravel Sanctum
+
+Lighthouse will use your application's default guard, unless specified otherwise.
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) only for your API,
+you can set it when using `@guard`:
+
+```graphql
+type Query {
+  profile: User! @guard(with: "sanctum")
+}
+```
+
 ## Get the current user
 
 Lighthouse provides a really simple way to fetch the information of the currently authenticated user.

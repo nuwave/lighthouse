@@ -29,6 +29,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.12.1
+
+### Fixed
+
+- Fix creating multiple nested BelongsTo relationships on the same level when previous records
+  with matching attributes exist https://github.com/nuwave/lighthouse/pull/1321
+
 ## 4.12.0
 
 ### Added

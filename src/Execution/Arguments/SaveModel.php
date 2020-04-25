@@ -75,7 +75,7 @@ class SaveModel implements ArgResolver
             // If the parent Model does not exist (still to be saved),
             // a save could break any pending belongsTo relations that still
             // needs to be created and associated with the parent model
-            if ($parentModel->exists()) {
+            if ($parentModel->exists) {
                 $parentModel->save();
             }
         }

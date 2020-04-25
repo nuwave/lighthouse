@@ -4,7 +4,7 @@ services:
   php:
     build: .
     volumes:
-      - ./:/workdir:z
+      - ./:/workdir
     depends_on:
       - mysql
     environment:
