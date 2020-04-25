@@ -8,6 +8,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Tests\Utils\Models\User;
 
 trait TestsSerialization
 {
@@ -25,6 +26,7 @@ trait TestsSerialization
                     return new class implements GraphQLContext {
                         public function user()
                         {
+                            return new User();
                         }
 
                         public function request()

@@ -60,3 +60,6 @@ parameters:
 
   # TODO remove once we no longer support PHPUnit 7
   - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects\(\) has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
+
+  # TODO remove once we can use phpstan-mockery:0.12
+  - '#Call to an undefined method Mockery.*#'
