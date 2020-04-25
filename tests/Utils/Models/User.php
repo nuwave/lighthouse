@@ -9,6 +9,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * @property int $id
+ * @property int|null $company_id
+ * @property int|null $team_id
+ * @property int|null $person_id
+ * @property string|null $person_type
+ * @property string|null $name
+ * @property string|null $email
+ * @property string|null $password
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class User extends Authenticatable
 {
     /**
