@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
- * @property boolean $create_post
- * @property boolean $read_post
- * @property boolean $update_post
- * @property boolean $delete_post
+ * @property bool $create_post
+ * @property bool $read_post
+ * @property bool $update_post
+ * @property bool $delete_post
  */
 class ACL extends Model
 {
