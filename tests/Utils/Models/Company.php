@@ -5,6 +5,10 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ */
 class Company extends Model
 {
     protected $guarded = [];

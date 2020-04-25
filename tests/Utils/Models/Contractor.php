@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+/**
+ * @property int $id
+ * @property string $position
+ */
 class Contractor extends Model
 {
     protected $guarded = [];

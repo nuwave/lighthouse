@@ -5,6 +5,11 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $default_string
+ */
 class Tag extends Model
 {
     protected $guarded = [];

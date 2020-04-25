@@ -5,6 +5,12 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property string $comment
+ * @property int $user_id
+ * @property int $post_id
+ */
 class Comment extends Model
 {
     protected $guarded = [];

@@ -5,6 +5,12 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $barcode
+ * @property string $uuid
+ * @property string $name
+ * @property int $color_id
+ */
 class Product extends Model
 {
     /**
