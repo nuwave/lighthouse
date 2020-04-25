@@ -1,7 +1,6 @@
 includes:
 - vendor/bensampo/laravel-enum/extension.neon
 - vendor/nunomaduro/larastan/extension.neon
-- vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
   level: 2
   paths:
@@ -10,12 +9,12 @@ parameters:
   - tests
   excludes_analyse:
   - tests/database/migrations/*
+
   # Compatibility fix because Laravel moved the TestResponse class
   - tests/TestCase.php
   - tests/Laravel7ExceptionHandler.php
   - tests/PreLaravel7ExceptionHandler.php
   ignoreErrors:
-
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
