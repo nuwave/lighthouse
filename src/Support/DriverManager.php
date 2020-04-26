@@ -78,10 +78,11 @@ abstract class DriverManager
     /**
      * Get the driver configuration.
      */
-    protected function getConfig(string $name): ?array
+    protected function getConfig(string $name): array
     {
         return $this->app['config']->get(
-            "{$this->configKey()}.{$name}"
+            "{$this->configKey()}.{$name}",
+            ['driver' => $name]
         );
     }
 
@@ -105,10 +106,6 @@ abstract class DriverManager
     protected function resolve(string $name)
     {
         $config = $this->getConfig($name);
-
-        if ($config === null) {
-            throw new InvalidArgumentException("Driver [{$name}] is not defined.");
-        }
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->validateDriver($this->callCustomCreator($config));

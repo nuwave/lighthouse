@@ -50,7 +50,7 @@ class Defer implements CreatesResponse
     protected $isStreaming = false;
 
     /**
-     * @var float
+     * @var float|int
      */
     protected $maxExecutionTime = 0;
 
@@ -220,6 +220,10 @@ directive @defer(if: Boolean = true) on FIELD
      */
     protected function executionTimeExpired(): bool
     {
+        if ($this->maxExecutionTime === 0) {
+            return false;
+        }
+
         return $this->maxExecutionTime <= microtime(true);
     }
 

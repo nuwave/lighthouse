@@ -288,4 +288,29 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Defer
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the experimental @defer directive support.
+    |
+    */
+
+    'defer' => [
+        /*
+         * Maximum number of nested fields that can be deferred in one query.
+         * Once reached, remaining fields will be resolved synchronously.
+         * 0 means unlimited.
+         */
+        'max_nested_fields' => 0,
+
+        /*
+         * Maximum execution time for deferred queries in milliseconds.
+         * Once reached, remaining fields will be resolved synchronously.
+         * 0 means unlimited.
+         */
+        'max_execution_ms' => 0,
+    ]
+
 ];
