@@ -3,7 +3,7 @@ includes:
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-  level: 4
+  level: 3
   paths:
   - benchmarks
   - src
