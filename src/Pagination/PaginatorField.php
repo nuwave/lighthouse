@@ -33,6 +33,6 @@ class PaginatorField
      */
     public function dataResolver(LengthAwarePaginator $root): Collection
     {
-        return $root->values();
+        return $root->values(); // @phpstan-ignore-line static refers to the wrong class because it is a proxied method call
     }
 }

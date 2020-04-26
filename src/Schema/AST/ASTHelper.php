@@ -182,7 +182,7 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        return self::firstByName($definitionNode->directives, $name);
+        return self::firstByName($definitionNode->directives, $name); // @phpstan-ignore-line Lack of proper generics
     }
 
     /**
@@ -196,11 +196,10 @@ class ASTHelper
     /**
      * Out of a list of nodes, get the first that matches the given name.
      *
-     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\Node[] $nodes
+     * @param  iterable<\GraphQL\Language\AST\Node> $nodes
      */
     public static function firstByName($nodes, string $name): ?Node
     {
-        /** @var \GraphQL\Language\AST\Node $node */
         foreach ($nodes as $node) {
             if ($node->name->value === $name) {
                 return $node;

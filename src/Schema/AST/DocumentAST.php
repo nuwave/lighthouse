@@ -20,7 +20,7 @@ class DocumentAST implements Serializable
      *
      * ['foo' => FooType].
      *
-     * @var NodeList<TypeDefinitionNode>
+     * @var NodeList<TypeDefinitionNode>|array<string, TypeDefinitionNode>
      */
     public $types = [];
 
@@ -30,7 +30,7 @@ class DocumentAST implements Serializable
      * Will NOT be kept after unserialization, as the type
      * extensions are merged with the types before.
      *
-     * ['foo' => [0 => FooExtension, 1 => FooExtension]].
+     * @var array<string, array<int, TypeExtensionNode>>
      */
     public $typeExtensions = [];
 
@@ -39,7 +39,7 @@ class DocumentAST implements Serializable
      *
      * ['foo' => FooDirective].
      *
-     * @var NodeList<DirectiveDefinitionNode>
+     * @var NodeList<DirectiveDefinitionNode>|array<string, DirectiveDefinitionNode>
      */
     public $directives = [];
 
@@ -66,7 +66,7 @@ class DocumentAST implements Serializable
             );
         }
 
-        $instance = new self;
+        $instance = new static;
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {

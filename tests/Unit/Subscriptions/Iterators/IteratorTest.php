@@ -3,6 +3,7 @@
 namespace Tests\Unit\Subscriptions\Iterators;
 
 use Exception;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -60,11 +61,11 @@ abstract class IteratorTest extends SubscriptionTestCase
     {
         $resolveInfo = $this->createMock(ResolveInfo::class);
 
-        $resolveInfo->operation = (object) [
+        $resolveInfo->operation = new OperationDefinitionNode([
             'name' => (object) [
                 'value' => 'lighthouse',
             ],
-        ];
+        ]);
 
         return new Subscriber([], new Context(new Request), $resolveInfo);
     }

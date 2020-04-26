@@ -59,12 +59,15 @@ class ModelRelationFetcher
 
     /**
      * Reload the models to get the `{relation}_count` attributes of models set.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public function reloadModelsWithRelationCount(): EloquentCollection
     {
         $ids = $this->models->modelKeys();
 
-        $this->models = $this
+        /** @var \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $reloadedModels */
+        $reloadedModels = $this
             ->newModelQuery()
             ->withCount($this->relations)
             ->whereKey($ids)
@@ -79,7 +82,7 @@ class ModelRelationFetcher
                 );
             });
 
-        return $this->models;
+        return $this->models = $reloadedModels;
     }
 
     /**
