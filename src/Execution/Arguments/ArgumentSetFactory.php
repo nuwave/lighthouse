@@ -93,12 +93,11 @@ class ArgumentSetFactory
     /**
      * Make a map with the name as keys.
      *
-     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]  $argumentDefinitions
-     * @return \GraphQL\Language\AST\InputValueDefinitionNode[]
+     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $argumentDefinitions
+     * @return array<\GraphQL\Language\AST\InputValueDefinitionNode>
      */
     protected function makeDefinitionMap($argumentDefinitions): array
     {
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode[] $argumentDefinitionMap */
         $argumentDefinitionMap = [];
 
         foreach ($argumentDefinitions as $definition) {

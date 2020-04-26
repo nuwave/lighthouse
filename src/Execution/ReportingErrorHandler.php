@@ -22,7 +22,7 @@ class ReportingErrorHandler implements ErrorHandler
         // TODO inject through constructor once handle is non-static
         /** @var \Illuminate\Contracts\Debug\ExceptionHandler $reporter */
         $reporter = app(ExceptionHandler::class);
-        $reporter->report($error->getPrevious());
+        $reporter->report($error->getPrevious()); // @phpstan-ignore-line TODO remove when supporting Laravel 7 and upwards
 
         return $next($error);
     }

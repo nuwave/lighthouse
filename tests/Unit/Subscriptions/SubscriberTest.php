@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Subscriptions;
 
+use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
@@ -29,9 +30,9 @@ class SubscriberTest extends TestCase
         $resolveInfo = $this->createMock(ResolveInfo::class);
         $operationName = 'baz';
         $resolveInfo->operation = new OperationDefinitionNode([
-            'name' => (object) [
+            'name' => new NameNode([
                 'value' => $operationName,
-            ],
+            ]),
         ]);
         $resolveInfo->fragments = [];
         $context = new Context(new Request());

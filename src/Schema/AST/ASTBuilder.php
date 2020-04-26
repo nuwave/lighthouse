@@ -171,7 +171,7 @@ class ASTBuilder
     protected function applyTypeExtensionManipulators(): void
     {
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
-            /** @var \GraphQL\Language\AST\TypeExtensionNode $typeExtension */
+            /** @var \GraphQL\Language\AST\TypeExtensionNode&\GraphQL\Language\AST\Node $typeExtension */
             foreach ($typeExtensionsList as $typeExtension) {
                 // Before we actually extend the types, we apply the manipulator directives
                 // that are defined on type extensions themselves
@@ -227,6 +227,7 @@ class ASTBuilder
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode  $definition
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

@@ -29,6 +29,7 @@ class ClientDirectiveFactory
         $arguments = [];
         /** @var InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
+            /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->definitionNodeConverter->convert($argument->type);
 
             $fieldArgumentConfig = [
