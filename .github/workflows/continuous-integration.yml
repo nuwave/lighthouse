@@ -26,6 +26,23 @@ jobs:
       - name: "Run composer normalize"
         uses: "docker://localheinz/composer-normalize-action:0.5.2"
 
+  prettier:
+    name: "Prettify docs"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.0.0"
+
+      - name: "Prettify docs"
+        uses: "creyD/prettier_action@v2.2"
+        with:
+          prettier_options: '--write --tab-width=2 docs/**/*.md'
+          branch: "${{ github.head_ref }}"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
   static-code-analysis:
     name: "Static Code Analysis"
 
