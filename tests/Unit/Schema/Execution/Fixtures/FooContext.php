@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Execution\Fixtures;
 
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -19,9 +20,9 @@ class FooContext implements GraphQLContext
         $this->request = $request;
     }
 
-    public function user(): void
+    public function user(): User
     {
-        //
+        return new User();
     }
 
     public function request(): Request

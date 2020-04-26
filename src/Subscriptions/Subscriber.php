@@ -102,7 +102,7 @@ class Subscriber implements Serializable
 
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
-        $this->query = AST::fromArray(
+        $this->query = AST::fromArray( // @phpstan-ignore-line We know this will be exactly a DocumentNode and nothing else
             unserialize($data['query'])
         );
         $this->operationName = $data['operation_name'];

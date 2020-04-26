@@ -61,7 +61,7 @@ abstract class BaseDirective implements Directive
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
-        $this->definitionNode = $definitionNode;
+        $this->definitionNode = $definitionNode; // @phpstan-ignore-line Dealing with union types properly is hard in PHP
 
         return $this;
     }
