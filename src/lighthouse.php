@@ -311,6 +311,6 @@ return [
          * 0 means unlimited.
          */
         'max_execution_ms' => 0,
-    ]
+    ],
 
 ];
