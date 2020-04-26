@@ -213,7 +213,7 @@ class ModelRelationFetcher
             ->reduce(
                 function (EloquentBuilder $builder, Relation $relation) {
                     return $builder->unionAll(
-                        $relation->getQuery()
+                        $relation->getBaseQuery()
                     );
                 },
                 // Use the first query as the initial starting point

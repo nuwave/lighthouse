@@ -49,7 +49,7 @@ abstract class DateScalar extends ScalarType
         if (! $valueNode instanceof StringValueNode) {
             throw new Error(
                 "Query error: Can only parse strings, got {$valueNode->kind}",
-                [$valueNode]
+                $valueNode
             );
         }
 

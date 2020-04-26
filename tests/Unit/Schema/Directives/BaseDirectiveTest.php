@@ -161,7 +161,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * Get a testable instance of the BaseDirective that allows calling protected methods.
      *
-     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
      */
     protected function constructTestDirective($definitionNode): BaseDirective
     {

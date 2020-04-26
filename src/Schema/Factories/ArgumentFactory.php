@@ -11,8 +11,8 @@ class ArgumentFactory
     /**
      * Convert input value definitions to a executable types.
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitionNodes
-     * @return mixed[]
+     * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $definitionNodes
+     * @return array<string, array<string, mixed>>
      */
     public function toTypeMap($definitionNodes): array
     {
@@ -32,12 +32,13 @@ class ArgumentFactory
      * @see \GraphQL\Type\Definition\FieldArgument
      * @see \GraphQL\Type\Definition\InputObjectField
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
         /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $definitionNodeConverter */
         $definitionNodeConverter = app(ExecutableTypeNodeConverter::class);
+        /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $type */
         $type = $definitionNodeConverter->convert($definitionNode->type);
 
         $config = [

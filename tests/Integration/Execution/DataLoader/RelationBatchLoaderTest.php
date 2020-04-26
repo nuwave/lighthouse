@@ -130,7 +130,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
 
                 return $loader->load($args['id']);
             },
@@ -138,7 +138,7 @@ class RelationBatchLoaderTest extends DBTestCase
         );
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
 
                 return $loader->loadMany($args['ids']);
             },

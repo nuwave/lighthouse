@@ -117,7 +117,7 @@ class CacheValue
         return (new Collection($args))
             ->map(function ($value, $key): string {
                 $keyValue = is_array($value)
-                    ? json_encode($value, true)
+                    ? json_encode($value)
                     : $value;
 
                 return "{$key}:{$keyValue}";

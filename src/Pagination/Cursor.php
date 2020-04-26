@@ -36,6 +36,6 @@ class Cursor
      */
     public static function encode(int $offset): string
     {
-        return base64_encode($offset);
+        return base64_encode((string) $offset);
     }
 }

@@ -27,11 +27,8 @@ class ASTHelper
      * when the list is empty, then it is []. This function corrects that inconsistency
      * and allows the rest of our code to not worry about it until it is fixed.
      *
-     * This issue is brought up here https://github.com/webonyx/graphql-php/issues/285
-     * Remove this method (and possibly the entire class) once it is resolved.
-     *
-     * @param  \GraphQL\Language\AST\NodeList|array  $original
-     * @param  \GraphQL\Language\AST\NodeList|array  $addition
+     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $original
+     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $addition
      */
     public static function mergeNodeList($original, $addition): NodeList
     {
@@ -146,6 +143,7 @@ class ASTHelper
 
     /**
      * Return the PHP internal value of an arguments default value.
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {

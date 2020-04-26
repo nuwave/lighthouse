@@ -96,15 +96,16 @@ class ArgumentSetFactoryTest extends TestCase
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
-        $factory = $this->app->make(ArgumentSetFactory::class);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types['Query'];
 
-        return $factory->wrapArgs(
-            ASTHelper::firstByName($queryType->fields, 'foo'),
-            $args
-        );
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fooField */
+        $fooField = ASTHelper::firstByName($queryType->fields, 'foo');
+
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
+        $factory = $this->app->make(ArgumentSetFactory::class);
+
+        return $factory->wrapArgs($fooField, $args);
     }
 }
