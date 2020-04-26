@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Carbon\Carbon;
 use Closure;
 use GraphQL\Deferred;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -126,7 +125,6 @@ SDL;
     /**
      * Set node's cache key.
      *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function setCacheKeyOnParent(TypeValue $typeValue): void
@@ -144,7 +142,7 @@ SDL;
         $typeDefinition = $typeValue->getTypeDefinition();
 
         // First priority: Look for a field with the @cacheKey directive
-        /** @var FieldDefinitionNode $field */
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
         foreach ($typeDefinition->fields as $field) {
             if (ASTHelper::hasDirective($field, 'cacheKey')) {
                 $typeValue->setCacheKey($field->name->value);
@@ -154,10 +152,12 @@ SDL;
         }
 
         // Second priority: Look for a Non-Null field with the ID type
-        /** @var FieldDefinitionNode $field */
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
         foreach ($typeDefinition->fields as $field) {
             if (
+                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 $field->type instanceof NonNullTypeNode
+                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 && $field->type->type instanceof NamedTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {

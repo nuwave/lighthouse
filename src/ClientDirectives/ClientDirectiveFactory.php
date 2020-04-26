@@ -37,7 +37,7 @@ class ClientDirectiveFactory
                 'type' => $argumentType,
             ];
 
-            if ($defaultValue = $argument->defaultValue) {
+            if ($defaultValue = $argument->defaultValue) { // @phpstan-ignore-line TODO remove when fixed https://github.com/webonyx/graphql-php/pull/654
                 $fieldArgumentConfig += [
                     'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $argumentType),
                 ];

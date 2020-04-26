@@ -8,14 +8,14 @@ use Illuminate\Support\Collection;
 class CacheValue
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue|null
      */
     protected $fieldValue;
 
     /**
-     * The root that was passed to the query.
+     * @var mixed|null The root that was passed to the query.
      */
-    protected $rootValue;
+    protected $root;
 
     /**
      * The args that were passed to the query.
@@ -39,7 +39,7 @@ class CacheValue
     protected $resolveInfo;
 
     /**
-     * The key to use for caching this field.
+     * @var mixed The key to use for caching this field.
      */
     protected $fieldKey;
 
@@ -51,7 +51,7 @@ class CacheValue
     public function __construct(array $arguments = [])
     {
         $this->fieldValue = Arr::get($arguments, 'field_value');
-        $this->rootValue = Arr::get($arguments, 'root');
+        $this->root = Arr::get($arguments, 'root');
         $this->args = Arr::get($arguments, 'args');
         $this->context = Arr::get($arguments, 'context');
         $this->resolveInfo = Arr::get($arguments, 'resolve_info');
@@ -131,7 +131,7 @@ class CacheValue
      */
     protected function fieldKey()
     {
-        if (! $this->fieldValue || ! $this->rootValue) {
+        if (! $this->fieldValue || ! $this->root) {
             return;
         }
 
@@ -140,7 +140,7 @@ class CacheValue
             ->getCacheKey();
 
         if ($cacheFieldKey) {
-            return data_get($this->rootValue, $cacheFieldKey);
+            return data_get($this->root, $cacheFieldKey);
         }
     }
 

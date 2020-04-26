@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
@@ -137,25 +136,12 @@ class ASTHelper
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
+        /** @var \GraphQL\Language\AST\ArgumentNode|null $arg */
         $arg = self::firstByName($directive->arguments, $name);
 
         return $arg
-            ? self::argValue($arg, $default)
+            ? AST::valueFromASTUntyped($arg->value)
             : $default;
-    }
-
-    /**
-     * Get the value of an argument node.
-     */
-    public static function argValue(ArgumentNode $arg, $default = null)
-    {
-        $valueNode = $arg->value;
-
-        if (! $valueNode) {
-            return $default;
-        }
-
-        return AST::valueFromASTUntyped($valueNode);
     }
 
     /**
@@ -272,7 +258,7 @@ class ASTHelper
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode|mixed  $objectType
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

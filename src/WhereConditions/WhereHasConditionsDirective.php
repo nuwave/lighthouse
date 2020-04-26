@@ -40,11 +40,6 @@ directive @whereHasConditions(
 SDL;
     }
 
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed[]  $whereConditions
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
     public function handleBuilder($builder, $whereConditions)
     {
         // The value `null` should be allowed but have no effect on the query.

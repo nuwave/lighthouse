@@ -50,7 +50,7 @@ class Defer implements CreatesResponse
     protected $isStreaming = false;
 
     /**
-     * @var float
+     * @var float|int
      */
     protected $maxExecutionTime = 0;
 
@@ -202,7 +202,7 @@ directive @defer(if: Boolean = true) on FIELD
         );
     }
 
-    public function setMaxExecutionTime(int $time): void
+    public function setMaxExecutionTime(float $time): void
     {
         $this->maxExecutionTime = $time;
     }
