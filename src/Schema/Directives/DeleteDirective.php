@@ -85,16 +85,17 @@ SDL;
         // Those types of relations may only have one related model attached to
         // it, so we don't need to use an ID to know which model to delete.
         $relationIsHasOneLike = $relation instanceof HasOne || $relation instanceof MorphOne;
-        $relationIsBelongsToLike = $relation instanceof BelongsTo || $relation instanceof MorphTo;
+        // This includes MorphTo, which is a subclass of BelongsTo
+        $relationIsBelongsToLike = $relation instanceof BelongsTo;
 
         if ($relationIsHasOneLike || $relationIsBelongsToLike) {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne|\Illuminate\Database\Eloquent\Relations\BelongsTo|\Illuminate\Database\Eloquent\Relations\MorphTo $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne|\Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             // Only delete if the given value is truthy, since
             // the client might use a variable and always pass the argument.
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
-                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo|\Illuminate\Database\Eloquent\Relations\MorphTo $relation */
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }

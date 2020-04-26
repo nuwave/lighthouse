@@ -59,15 +59,13 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                     $idOrIds
                 );
 
-                if (! $modelOrModels) {
-                    return;
+                if ($modelOrModels === null) {
+                    return null;
                 }
 
                 if ($modelOrModels instanceof Model) {
                     $this->modifyExistence($modelOrModels);
-                }
-
-                if ($modelOrModels instanceof Collection) {
+                } elseif ($modelOrModels instanceof Collection) {
                     foreach ($modelOrModels as $model) {
                         $this->modifyExistence($model);
                     }
@@ -121,7 +119,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @param  string|int|string[]|int[]  $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
      */
     abstract protected function find(string $modelClass, $idOrIds);
 

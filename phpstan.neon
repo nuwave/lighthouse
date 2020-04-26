@@ -3,7 +3,7 @@ includes:
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-  level: 3
+  level: 4
   paths:
   - benchmarks
   - src
@@ -57,6 +57,7 @@ parameters:
   - '#Property GraphQL\\Language\\AST\\ObjectTypeDefinitionNode::\$fields \(array<GraphQL\\Language\\AST\\FieldDefinitionNode>\|null\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
   - '#Property GraphQL\\Language\\AST\\ObjectTypeDefinitionNode::\$interfaces \(array<GraphQL\\Language\\AST\\NamedTypeNode>\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
   - '#Property GraphQL\\Language\\AST\\DocumentNode::\$definitions \(GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\DefinitionNode>\) does not accept array<GraphQL\\Language\\AST\\FragmentDefinitionNode>\.#'
+  - '#Instanceof between GraphQL\\Language\\AST\\ListTypeNode\|GraphQL\\Language\\AST\\NameNode and GraphQL\\Language\\AST\\NamedTypeNode will always evaluate to false\.#'
 
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'

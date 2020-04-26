@@ -202,7 +202,7 @@ directive @defer(if: Boolean = true) on FIELD
         );
     }
 
-    public function setMaxExecutionTime(int $time): void
+    public function setMaxExecutionTime(float $time): void
     {
         $this->maxExecutionTime = $time;
     }
@@ -220,10 +220,6 @@ directive @defer(if: Boolean = true) on FIELD
      */
     protected function executionTimeExpired(): bool
     {
-        if ($this->maxExecutionTime === 0) {
-            return false;
-        }
-
         return $this->maxExecutionTime <= microtime(true);
     }
 

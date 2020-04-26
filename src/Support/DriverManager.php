@@ -78,11 +78,10 @@ abstract class DriverManager
     /**
      * Get the driver configuration.
      */
-    protected function getConfig(string $name): array
+    protected function getConfig(string $name): ?array
     {
         return $this->app['config']->get(
-            $this->configKey().".{$name}",
-            ['driver' => $name]
+            "{$this->configKey()}.{$name}"
         );
     }
 
@@ -100,7 +99,6 @@ abstract class DriverManager
 
     /**
      * Resolve the given driver.
-     *
      *
      * @throws \InvalidArgumentException
      */
