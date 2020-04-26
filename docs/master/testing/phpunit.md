@@ -2,9 +2,6 @@
 
 Lighthouse makes it easy to add automated tests through PHPUnit.
 
-
-
-
 ## Setup
 
 Lighthouse offers some useful test helpers that make it easy to call your API
