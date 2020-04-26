@@ -10,6 +10,8 @@ parameters:
   - tests
   excludes_analyse:
   - tests/database/migrations/*
+
+  # Indirectly refers to \App\User (maybe through larastan?)
   - tests/Utils/Models/User.php
 
   # Compatibility fix because Laravel moved the TestResponse class
@@ -19,11 +21,13 @@ parameters:
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
-  - '#Function factory invoked with 2 parameters, 0 required\.#'
-  - '#Function factory invoked with 1 parameter, 0 required\.#'
   - '#Call to protected static method get\(\) of class Illuminate\\Filesystem\\FilesystemManager\.#'
   - path: tests/database/factories/*
     message: '#Undefined variable: \$factory#'
+  - path: tests/database/factories/*
+    message: '#Function factory invoked with 2 parameters, 0 required\.#'
+  - path: tests/database/factories/*
+    message: '#Function factory invoked with 1 parameter, 0 required\.#'
 
   # Maybe PHPStan can improve here and recognize what happens in map()
   - '#Method Nuwave\\Lighthouse\\Subscriptions\\StorageManager::subscribersByTopic\(\) should return Illuminate\\Support\\Collection&iterable<Nuwave\\Lighthouse\\Subscriptions\\Subscriber> but returns Illuminate\\Support\\Collection&iterable<string>#'
@@ -54,9 +58,6 @@ parameters:
   - '#Property GraphQL\\Language\\AST\\ObjectTypeDefinitionNode::\$interfaces \(array<GraphQL\\Language\\AST\\NamedTypeNode>\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
   - '#Property GraphQL\\Language\\AST\\DocumentNode::\$definitions \(GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\DefinitionNode>\) does not accept array<GraphQL\\Language\\AST\\FragmentDefinitionNode>\.#'
 
-  # TODO remove once we no longer need PartialParser
-  - '#Method Nuwave\\Lighthouse\\Schema\\AST\\PartialParser::.*\(\) should return GraphQL\\Language\\AST\\.* but returns GraphQL\\Language\\AST\\Node\.#'
-
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'
 
@@ -66,9 +67,12 @@ parameters:
   # Compatibility fix because Laravel moved the TestResponse class
   - '#.*TestResponse.*#'
 
-  # We are monkeypatching that to pass around the query builder
+  # We are monkeypatching ResolveInfo to pass information through resolver middleware
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
+
+  # TODO remove once we no longer need PartialParser
+  - '#Method Nuwave\\Lighthouse\\Schema\\AST\\PartialParser::.*\(\) should return GraphQL\\Language\\AST\\.* but returns GraphQL\\Language\\AST\\Node\.#'
 
   # TODO remove once we no longer support PHPUnit 7
   - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects\(\) has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
