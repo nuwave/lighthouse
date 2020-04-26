@@ -3,7 +3,7 @@ includes:
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-  level: 3
+  level: 4
   paths:
   - benchmarks
   - src
@@ -24,10 +24,10 @@ parameters:
   - '#Call to protected static method get\(\) of class Illuminate\\Filesystem\\FilesystemManager\.#'
   - path: tests/database/factories/*
     message: '#Undefined variable: \$factory#'
-  - path: tests/database/factories/*
-    message: '#Function factory invoked with 2 parameters, 0 required\.#'
-  - path: tests/database/factories/*
-    message: '#Function factory invoked with 1 parameter, 0 required\.#'
+
+  # TODO remove once we depend on Laravel ^7.0
+  - '#Function factory invoked with 2 parameters, 0 required\.#'
+  - '#Function factory invoked with 1 parameter, 0 required\.#'
 
   # Maybe PHPStan can improve here and recognize what happens in map()
   - '#Method Nuwave\\Lighthouse\\Subscriptions\\StorageManager::subscribersByTopic\(\) should return Illuminate\\Support\\Collection&iterable<Nuwave\\Lighthouse\\Subscriptions\\Subscriber> but returns Illuminate\\Support\\Collection&iterable<string>#'
