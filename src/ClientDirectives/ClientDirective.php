@@ -69,7 +69,7 @@ class ClientDirective
         $schema = $graphQL->prepSchema();
 
         /**
-         * TODO remove once graphql-php is accurate
+         * TODO remove once graphql-php is accurate.
          * @var \GraphQL\Type\Definition\Directive|null $definition
          */
         $definition = $schema->getDirective($this->name);
