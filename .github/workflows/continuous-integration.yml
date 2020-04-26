@@ -42,6 +42,7 @@ jobs:
         with:
           prettier_options: '--write --tab-width=2 docs/**/**/*.md'
           branch: "${{ github.head_ref }}"
+          commit_message: "Prettify docs"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
