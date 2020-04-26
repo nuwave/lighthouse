@@ -1,10 +1,8 @@
 # Testing with PHPUnit
 
-Lighthouse makes it easy to add automated tests through PHPUnit. 
+Lighthouse makes it easy to add automated tests through PHPUnit.
 
-
-
-##   Setup
+## Setup
 
 Lighthouse offers some useful test helpers that make it easy to call your API
 from within a PHPUnit test. Just add the `MakesGraphQLRequests` trait to your test class.
