@@ -22,7 +22,7 @@ trait MakesGraphQLRequests
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse|null
+     * @var \Illuminate\Testing\TestResponse|null
      */
     protected $introspectionResult;
 
@@ -36,7 +36,10 @@ trait MakesGraphQLRequests
     /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     * @param  string  $query  The GraphQL query to send
+     * @param  array<string, mixed>|null  $variables  The variables to include in the query
+     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the HTTP payload
+     * @return \Illuminate\Testing\TestResponse
      */
     protected function graphQL(string $query, array $variables = null, array $extraParams = [])
     {
@@ -54,9 +57,9 @@ trait MakesGraphQLRequests
     /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param  mixed[]  $data
-     * @param  mixed[]  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     * @param  array<string, mixed>  $data
+     * @param  array<string, string>  $headers
+     * @return \Illuminate\Testing\TestResponse
      */
     protected function postGraphQL(array $data, array $headers = [])
     {
@@ -73,9 +76,9 @@ trait MakesGraphQLRequests
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
-     * @param  mixed[]  $parameters
-     * @param  mixed[]  $files
-     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     * @param  array<string, mixed>  $parameters
+     * @param  array<string, mixed>  $files
+     * @return \Illuminate\Testing\TestResponse
      */
     protected function multipartGraphQL(array $parameters, array $files)
     {
@@ -94,7 +97,7 @@ trait MakesGraphQLRequests
     /**
      * Execute the introspection query on the GraphQL server.
      *
-     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     * @return \Illuminate\Testing\TestResponse
      */
     protected function introspect()
     {
@@ -108,7 +111,7 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a type by name, if present.
      *
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
     protected function introspectType(string $name): ?array
     {
@@ -118,7 +121,7 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a directive by name, if present.
      *
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
     protected function introspectDirective(string $name): ?array
     {
@@ -128,7 +131,7 @@ trait MakesGraphQLRequests
     /**
      * Run introspection and return a result from the given path by name, if present.
      *
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
     protected function introspectByName(string $path, string $name): ?array
     {
@@ -160,6 +163,11 @@ trait MakesGraphQLRequests
 
     /**
      * Send the query and capture all chunks of the streamed response.
+     *
+     * @param  string  $query  The GraphQL query to send
+     * @param  array<string, mixed>|null  $variables  The variables to include in the query
+     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the HTTP payload
+     * @return array<int, mixed>  The chunked results
      */
     protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
     {
