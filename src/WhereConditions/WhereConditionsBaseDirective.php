@@ -80,9 +80,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
+            $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField, $parentType);
             $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
-            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField);
+            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
             $documentAST
                 ->setTypeDefinition(
@@ -100,18 +100,23 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     /**
      * Create the name for the restricted WhereConditions input.
      *
-     * @example FieldNameArgNameWhereHasConditions
+     * @example ParentNameFieldNameArgNameWhereHasConditions
      */
-    protected function restrictedWhereConditionsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
-    {
-        return Str::studly($parentField->name->value)
+    protected function restrictedWhereConditionsName(
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): string {
+        return Str::studly($parentType->name->value)
+            .Str::studly($parentField->name->value)
             .Str::studly($argDefinition->name->value)
             .'WhereConditions';
     }
 
     /**
-     * Ensure the column name is well formed and prevent SQL injection.
+     * Ensure the column name is well formed.
      *
+     * This prevents SQL injection.
      *
      * @throws \GraphQL\Error\Error
      */
