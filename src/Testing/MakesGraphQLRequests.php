@@ -38,7 +38,7 @@ trait MakesGraphQLRequests
      *
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>|null  $variables  The variables to include in the query
-     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the HTTP payload
+     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the JSON payload
      * @return \Illuminate\Testing\TestResponse
      */
     protected function graphQL(string $query, array $variables = null, array $extraParams = [])
@@ -55,9 +55,12 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Execute a query as if it was sent as a request to the server.
+     * Execute a POST to the GraphQL endpoint.
      *
-     * @param  array<string, mixed>  $data
+     * Use this over graphQL() when you need more control or want to
+     * test how your server behaves on incorrect inputs.
+     *
+     * @param  array<mixed, mixed>  $data
      * @param  array<string, string>  $headers
      * @return \Illuminate\Testing\TestResponse
      */
@@ -77,7 +80,7 @@ trait MakesGraphQLRequests
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
      * @param  array<string, mixed>  $parameters
-     * @param  array<string, mixed>  $files
+     * @param  array<int, \Illuminate\Http\Testing\File>  $files
      * @return \Illuminate\Testing\TestResponse
      */
     protected function multipartGraphQL(array $parameters, array $files)
