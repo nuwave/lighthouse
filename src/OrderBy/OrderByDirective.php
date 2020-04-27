@@ -75,7 +75,7 @@ SDL;
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedOrderByName = $this->restrictedOrderByName($argDefinition, $parentField);
+            $restrictedOrderByName = $this->restrictedOrderByName($argDefinition, $parentField, $parentType);
             $argDefinition->type = PartialParser::listType("[$restrictedOrderByName!]");
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField);
 
@@ -95,11 +95,19 @@ SDL;
     /**
      * Create the name for the restricted OrderByClause input.
      *
-     * @example FieldNameArgNameOrderByClause
+     * We have to make sure it is unique in the schema. Even though
+     * this name becomes a bit verbose, it is also very unlikely to collide
+     * with a random user defined type.
+     *
+     * @example ParentNameFieldNameArgNameOrderByClause
      */
-    protected function restrictedOrderByName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
-    {
-        return Str::studly($parentField->name->value)
+    protected function restrictedOrderByName(
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): string {
+        return Str::studly($parentType->name->value)
+            .Str::studly($parentField->name->value)
             .Str::studly($argDefinition->name->value)
             .'OrderByClause';
     }
