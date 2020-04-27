@@ -2,9 +2,12 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Execution\Arguments\ListType;
+use Nuwave\Lighthouse\Execution\Arguments\NamedType;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
@@ -47,6 +50,79 @@ class ArgumentSetFactoryTest extends TestCase
         $bar = $argumentSet->arguments['bar'];
         $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
+    }
+
+    public function testItsListsAllTheWayDown(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar:
+                # Level 1
+                [
+                    # Level 2
+                    [
+                        # Level 3
+                        [
+                            # Level 4
+                            [
+                                Int
+                            ]!
+                        ]
+                    ]!
+                ]
+            ): Int
+        }
+        ';
+
+        $barValue =
+            // Level 1
+            [
+                // Level 2
+                [
+                    // Level 3
+                    [
+                        // Level 4
+                        [
+                            1, 2,
+                        ],
+                        [
+                            3, null,
+                        ],
+                    ],
+                    null,
+                ],
+            ];
+
+        $argumentSet = $this->rootQueryArgumentSet([
+            'bar' => $barValue,
+        ]);
+
+        $this->assertCount(1, $argumentSet->arguments);
+
+        $bar = $argumentSet->arguments['bar'];
+        $this->assertInstanceOf(Argument::class, $bar);
+        $this->assertSame($barValue, $bar->value);
+
+        $firstLevel = $bar->type;
+        $this->assertInstanceOf(ListType::class, $firstLevel);
+        $this->assertFalse($firstLevel->nonNull);
+
+        $secondLevel = $firstLevel->type;
+        $this->assertInstanceOf(ListType::class, $secondLevel);
+        $this->assertTrue($secondLevel->nonNull);
+
+        $thirdLevel = $secondLevel->type;
+        $this->assertInstanceOf(ListType::class, $thirdLevel);
+        $this->assertFalse($thirdLevel->nonNull);
+
+        $fourthLevel = $thirdLevel->type;
+        $this->assertInstanceOf(ListType::class, $fourthLevel);
+        $this->assertTrue($fourthLevel->nonNull);
+
+        $finalLevel = $fourthLevel->type;
+        $this->assertInstanceOf(NamedType::class, $finalLevel);
+        $this->assertSame(Type::INT, $finalLevel->name);
+        $this->assertFalse($finalLevel->nonNull);
     }
 
     public function testNullableInputObject(): void
