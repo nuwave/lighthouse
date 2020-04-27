@@ -15,6 +15,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Fix converting lists of lists into ArgumentSet https://github.com/nuwave/lighthouse/pull/1335
 
+### Changed
+
+- Make test request helper PHPDocs more accurate for Laravel 7 https://github.com/nuwave/lighthouse/pull/1336
+
 ## 4.12.1
 
 ### Fixed
