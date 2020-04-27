@@ -2001,8 +2001,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{
-                column: "posted_at", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "posted_at", order: ASC }] }) {
     title
   }
 }
