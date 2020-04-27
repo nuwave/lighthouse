@@ -75,21 +75,21 @@ class ArgumentSetFactoryTest extends TestCase
         ';
 
         $barValue =
-            # Level 1
+            // Level 1
             [
-                # Level 2
+                // Level 2
                 [
-                    # Level 3
+                    // Level 3
                     [
-                        # Level 4
+                        // Level 4
                         [
-                            1, 2
+                            1, 2,
                         ],
                         [
-                            3, null
-                        ]
+                            3, null,
+                        ],
                     ],
-                    null
+                    null,
                 ],
             ];
 

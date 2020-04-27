@@ -135,7 +135,7 @@ class ArgumentSetFactory
     {
         // No need to recurse down further if the value is null
         if ($valueOrValues === null) {
-            return null;
+            return;
         }
 
         // We have to do this conversion as we are resolving a client query
