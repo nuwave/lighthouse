@@ -133,22 +133,22 @@ class ArgumentSetFactory
      */
     protected function wrapWithType($valueOrValues, $type)
     {
+        // No need to recurse down further if the value is null
+        if ($valueOrValues === null) {
+            return null;
+        }
+
         // We have to do this conversion as we are resolving a client query
         // because the incoming arguments put a bound on recursion depth
         if ($type instanceof ListType) {
             $typeInList = $type->type;
 
-            if (is_array($valueOrValues)) {
-                $values = [];
-                foreach ($valueOrValues as $singleValue) {
-                    $values [] = $this->wrapWithNamedType($singleValue, $typeInList);
-                }
-
-                return $values;
+            $values = [];
+            foreach ($valueOrValues as $singleValue) {
+                $values [] = $this->wrapWithType($singleValue, $typeInList);
             }
 
-            // This case happens if `null` is passed
-            return $this->wrapWithNamedType($valueOrValues, $typeInList);
+            return $values;
         }
 
         return $this->wrapWithNamedType($valueOrValues, $type);
@@ -162,11 +162,6 @@ class ArgumentSetFactory
      */
     protected function wrapWithNamedType($value, NamedType $namedType)
     {
-        // As GraphQL does not allow empty input objects, we return null as is
-        if ($value === null) {
-            return;
-        }
-
         // This might be null if the type is
         // - created outside of the schema string
         // - one of the built in types
