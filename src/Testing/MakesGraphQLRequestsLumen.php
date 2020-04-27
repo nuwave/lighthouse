@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Useful helpers for PHPUnit testing.
+ * Testing helpers for making requests to the GraphQL endpoint.
  *
  * @mixin \Laravel\Lumen\Testing\Concerns\MakesHttpRequests
  */
