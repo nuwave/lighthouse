@@ -4,6 +4,9 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
+/**
+ * @deprecated
+ */
 class BcryptDirectiveTest extends TestCase
 {
     public function testCanBcryptAnArgument(): void

@@ -25,12 +25,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      */
     protected $globalId;
 
-    /**
-     * DeleteDirective constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
-     * @return void
-     */
     public function __construct(GlobalId $globalId)
     {
         $this->globalId = $globalId;
@@ -38,9 +32,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -68,15 +59,13 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                     $idOrIds
                 );
 
-                if (! $modelOrModels) {
+                if ($modelOrModels === null) {
                     return;
                 }
 
                 if ($modelOrModels instanceof Model) {
                     $this->modifyExistence($modelOrModels);
-                }
-
-                if ($modelOrModels instanceof Collection) {
+                } elseif ($modelOrModels instanceof Collection) {
                     foreach ($modelOrModels as $model) {
                         $this->modifyExistence($model);
                     }
@@ -104,11 +93,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     }
 
     /**
-     * @param  DocumentAST  $documentAST
-     * @param  FieldDefinitionNode  $fieldDefinition
-     * @param  ObjectTypeDefinitionNode  $parentType
-     * @return void
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateFieldDefinition(
@@ -133,17 +117,14 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     /**
      * Find one or more models by id.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model  $modelClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @param  string|int|string[]|int[]  $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
      */
     abstract protected function find(string $modelClass, $idOrIds);
 
     /**
      * Bring a model in or out of existence.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return void
      */
     abstract protected function modifyExistence(Model $model): void;
 }

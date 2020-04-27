@@ -19,12 +19,6 @@ class ManipulateResult
      */
     public $result;
 
-    /**
-     * ManipulateResult constructor.
-     *
-     * @param  \GraphQL\Executor\ExecutionResult  $result
-     * @return void
-     */
     public function __construct(ExecutionResult &$result)
     {
         $this->result = $result;

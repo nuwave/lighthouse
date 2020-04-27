@@ -6,7 +6,7 @@ use Tests\Utils\Models\User;
 
 class UserPolicy
 {
-    const ADMIN = 'admin';
+    public const ADMIN = 'admin';
 
     public function adminOnly(User $user): bool
     {

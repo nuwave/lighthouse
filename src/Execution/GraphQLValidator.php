@@ -11,8 +11,6 @@ class GraphQLValidator extends Validator
 {
     /**
      * Get the root object that was passed to the field that is being validated.
-     *
-     * @return mixed
      */
     public function getRoot()
     {
@@ -21,8 +19,6 @@ class GraphQLValidator extends Validator
 
     /**
      * Get the context that was passed to the field that is being validated.
-     *
-     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function getContext(): GraphQLContext
     {
@@ -31,8 +27,6 @@ class GraphQLValidator extends Validator
 
     /**
      * Get the resolve info that was passed to the field that is being validated.
-     *
-     * @return \GraphQL\Type\Definition\ResolveInfo
      */
     public function getResolveInfo(): ResolveInfo
     {
@@ -41,8 +35,6 @@ class GraphQLValidator extends Validator
 
     /**
      * Return the dot separated path of the field that is being validated.
-     *
-     * @return string
      */
     public function getFieldPath(): string
     {

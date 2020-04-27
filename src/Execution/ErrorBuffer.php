@@ -24,13 +24,6 @@ class ErrorBuffer
      */
     protected $exceptionResolver;
 
-    /**
-     * ErrorBuffer constructor.
-     *
-     * @param  string  $errorType
-     * @param  \Closure|null  $exceptionResolver
-     * @return void
-     */
     public function __construct(string $errorType = 'generic', ?Closure $exceptionResolver = null)
     {
         $this->errorType = $errorType;
@@ -39,8 +32,6 @@ class ErrorBuffer
 
     /**
      * Construct a default exception resolver.
-     *
-     * @return \Closure
      */
     protected function defaultExceptionResolver(): Closure
     {
@@ -54,7 +45,6 @@ class ErrorBuffer
     /**
      * Set the Exception resolver.
      *
-     * @param  \Closure  $exceptionResolver
      * @return $this
      */
     public function setExceptionResolver(Closure $exceptionResolver): self
@@ -68,7 +58,6 @@ class ErrorBuffer
      * Resolve the exception by calling the exception handler with the given args.
      *
      * @param  mixed  ...$args
-     * @return mixed
      */
     protected function resolveException(...$args)
     {
@@ -78,8 +67,6 @@ class ErrorBuffer
     /**
      * Push an error message into the buffer.
      *
-     * @param  string  $errorMessage
-     * @param  string|null  $key
      * @return $this
      */
     public function push(string $errorMessage, ?string $key = null): self
@@ -96,8 +83,6 @@ class ErrorBuffer
     /**
      * Flush the errors.
      *
-     * @param  string  $errorMessage
-     * @return void
      *
      * @throws \Exception
      */
@@ -116,8 +101,6 @@ class ErrorBuffer
 
     /**
      * Reset the errors to an empty array.
-     *
-     * @return void
      */
     public function clearErrors(): void
     {
@@ -126,8 +109,6 @@ class ErrorBuffer
 
     /**
      * Get the error type.
-     *
-     * @return string
      */
     public function errorType(): string
     {
@@ -137,7 +118,6 @@ class ErrorBuffer
     /**
      * Set the error type.
      *
-     * @param  string  $errorType
      * @return $this
      */
     public function setErrorType(string $errorType): self
@@ -149,8 +129,6 @@ class ErrorBuffer
 
     /**
      * Have we encountered any errors yet?
-     *
-     * @return bool
      */
     public function hasErrors(): bool
     {

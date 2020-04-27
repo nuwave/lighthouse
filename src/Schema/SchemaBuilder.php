@@ -20,11 +20,6 @@ class SchemaBuilder
      */
     protected $clientDirectiveFactory;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @param  \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory  $clientDirectiveFactory
-     * @return void
-     */
     public function __construct(
         TypeRegistry $typeRegistry,
         ClientDirectiveFactory $clientDirectiveFactory
@@ -35,9 +30,6 @@ class SchemaBuilder
 
     /**
      * Build an executable schema from AST.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \GraphQL\Type\Schema
      */
     public function build(DocumentAST $documentAST): Schema
     {
@@ -46,25 +38,25 @@ class SchemaBuilder
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Always set Query since it is required
-        $config->setQuery(
-            $this->typeRegistry->get('Query')
-        );
+        /** @var \GraphQL\Type\Definition\ObjectType $query */
+        $query = $this->typeRegistry->get('Query');
+        $config->setQuery($query);
 
-        // Those are optional so only add them if they are present in the schema
+        // Mutation and Subscription are optional, so only add them
+        // if they are present in the schema
         if (isset($documentAST->types['Mutation'])) {
-            $config->setMutation(
-                $this->typeRegistry->get('Mutation')
-            );
+            /** @var \GraphQL\Type\Definition\ObjectType $mutation */
+            $mutation = $this->typeRegistry->get('Mutation');
+            $config->setMutation($mutation);
         }
+
         if (isset($documentAST->types['Subscription'])) {
             /** @var \GraphQL\Type\Definition\ObjectType $subscription */
             $subscription = $this->typeRegistry->get('Subscription');
             // Eager-load the subscription fields to ensure they are registered
             $subscription->getFields();
 
-            $config->setSubscription(
-                $subscription
-            );
+            $config->setSubscription($subscription);
         }
 
         // Use lazy type loading to prevent unnecessary work

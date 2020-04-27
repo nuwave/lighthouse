@@ -9,12 +9,10 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.styleci.yml export-ignore
-/_ide_helper.php export-ignore
 /CHANGELOG.md export-ignore
 /CONTRIBUTING.md export-ignore
 /docker-compose.yml export-ignore
 /Dockerfile export-ignore
-/logo.png export-ignore
 /logo.png export-ignore
 /Makefile export-ignore
 /netlify.toml export-ignore

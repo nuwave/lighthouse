@@ -27,8 +27,6 @@ class Pipeline extends BasePipeline
 
     /**
      * Get a \Closure that represents a slice of the application onion.
-     *
-     * @return \Closure
      */
     protected function carry(): Closure
     {
@@ -49,7 +47,6 @@ class Pipeline extends BasePipeline
     /**
      * Set always variable.
      *
-     * @param  \Closure  $always
      * @return $this
      */
     public function always(Closure $always): self

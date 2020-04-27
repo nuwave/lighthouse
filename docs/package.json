@@ -7,9 +7,13 @@
         "vuepress": "^1.0.3",
         "vuepress-theme-default-prefers-color-scheme": "^1.0.3"
     },
+    "devDependencies": {
+        "prettier": "^2.0.4"
+    },
     "scripts": {
         "start": "vuepress dev .",
         "bump-version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
-        "build": "vuepress build ."
+        "build": "vuepress build .",
+        "prettify": "prettier --write --tab-width=2 **/**/*.md"
     }
 }

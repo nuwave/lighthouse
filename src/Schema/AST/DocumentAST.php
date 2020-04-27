@@ -20,7 +20,7 @@ class DocumentAST implements Serializable
      *
      * ['foo' => FooType].
      *
-     * @var NodeList<TypeDefinitionNode>
+     * @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node>|array<string, \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node>
      */
     public $types = [];
 
@@ -30,9 +30,7 @@ class DocumentAST implements Serializable
      * Will NOT be kept after unserialization, as the type
      * extensions are merged with the types before.
      *
-     * ['foo' => [0 => FooExtension, 1 => FooExtension]].
-     *
-     * @var NodeList<TypeExtensionNode>[]
+     * @var array<string, array<int, \GraphQL\Language\AST\TypeExtensionNode&\GraphQL\Language\AST\Node>>
      */
     public $typeExtensions = [];
 
@@ -41,14 +39,13 @@ class DocumentAST implements Serializable
      *
      * ['foo' => FooDirective].
      *
-     * @var NodeList<DirectiveDefinitionNode>
+     * @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveDefinitionNode>|array<string, \GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public $directives = [];
 
     /**
      * Create a new DocumentAST instance from a schema.
      *
-     * @param  string  $schema
      * @return static
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
@@ -69,7 +66,7 @@ class DocumentAST implements Serializable
             );
         }
 
-        $instance = new self;
+        $instance = new static;
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
@@ -95,8 +92,6 @@ class DocumentAST implements Serializable
      *
      * We exclude the type extensions stored in $typeExtensions,
      * as they are merged with the actual types at this point.
-     *
-     * @return string
      */
     public function serialize(): string
     {
@@ -133,7 +128,6 @@ class DocumentAST implements Serializable
      *
      * This operation will overwrite existing definitions with the same name.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $type
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
@@ -148,7 +142,6 @@ class DocumentAST implements Serializable
      *
      * This operation will overwrite existing definitions with the same name.
      *
-     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode  $directive
      * @return $this
      */
     public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self

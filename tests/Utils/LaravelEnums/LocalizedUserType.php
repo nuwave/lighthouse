@@ -7,8 +7,8 @@ use BenSampo\Enum\Enum;
 
 final class LocalizedUserType extends Enum implements LocalizedEnum
 {
-    const Administrator = 'ADMINISTRATOR';
-    const Moderator = 'MODERATOR';
+    public const Administrator = 'ADMINISTRATOR';
+    public const Moderator = 'MODERATOR';
 
     public static function getDescription($value): string
     {

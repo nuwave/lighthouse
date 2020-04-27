@@ -11,9 +11,6 @@ class ConnectionField
 {
     /**
      * Resolve page info for connection.
-     *
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
-     * @return array
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {
@@ -38,9 +35,6 @@ class ConnectionField
      *
      * @param  \Illuminate\Pagination\LengthAwarePaginator  $paginator
      * @param  array  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \Illuminate\Support\Collection
      */
     public function edgeResolver(LengthAwarePaginator $paginator, $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
@@ -55,6 +49,7 @@ class ConnectionField
 
         $firstItem = $paginator->firstItem();
 
+        // @phpstan-ignore-next-line static refers to the wrong class because it is a proxied method call
         return $paginator
             ->values()
             ->map(function ($item, $index) use ($returnTypeFields, $firstItem): array {

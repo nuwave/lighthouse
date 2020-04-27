@@ -9,9 +9,6 @@ class ExceptionHandler implements SubscriptionExceptionHandler
 {
     /**
      * Handle authentication error.
-     *
-     * @param  \Throwable  $e
-     * @return void
      */
     public function handleAuthError(Throwable $e): void
     {
@@ -20,9 +17,6 @@ class ExceptionHandler implements SubscriptionExceptionHandler
 
     /**
      * Handle broadcast error.
-     *
-     * @param  \Throwable  $e
-     * @return void
      */
     public function handleBroadcastError(Throwable $e): void
     {

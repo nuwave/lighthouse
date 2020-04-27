@@ -17,12 +17,6 @@ class MultipartFormRequest extends BaseRequest
      */
     protected $operations;
 
-    /**
-     * MultipartFormRequest constructor.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
     public function __construct(Request $request)
     {
         if (! $request->has('map')) {
@@ -41,16 +35,12 @@ class MultipartFormRequest extends BaseRequest
             $this->batchIndex = 0;
         }
 
+        /** @var array<string, array<int, string>> $map */
         $map = json_decode($request->input('map'), true);
 
-        /**
-         * @var string
-         * @var array $operationsPaths
-         */
         foreach ($map as $fileKey => $operationsPaths) {
             $file = $request->file($fileKey);
 
-            /** @var string $operationsPath */
             foreach ($operationsPaths as $operationsPath) {
                 Arr::set($this->operations, $operationsPath, $file);
             }
@@ -71,7 +61,6 @@ class MultipartFormRequest extends BaseRequest
      * If we are dealing with a batched request, this gets the
      * contents of the currently resolving batch index.
      *
-     * @param  string  $key
      * @return array|string|null
      */
     protected function fieldValue(string $key)
@@ -83,8 +72,6 @@ class MultipartFormRequest extends BaseRequest
 
     /**
      * Are there more batched queries to process?
-     *
-     * @return bool
      */
     protected function hasMoreBatches(): bool
     {

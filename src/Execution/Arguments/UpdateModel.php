@@ -7,15 +7,14 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class UpdateModel implements ArgResolver
 {
     /**
-     * @var \Closure|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
+     * @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
      */
     private $previous;
 
     /**
-     * ArgResolver constructor.
-     * @param \Closure|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous
+     * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous
      */
-    public function __construct($previous)
+    public function __construct(callable $previous)
     {
         $this->previous = $previous;
     }
@@ -23,7 +22,6 @@ class UpdateModel implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
     public function __invoke($model, $args)
     {

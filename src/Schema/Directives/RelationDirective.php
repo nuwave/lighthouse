@@ -21,9 +21,6 @@ abstract class RelationDirective extends BaseDirective
 {
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $value): FieldValue
     {
@@ -56,18 +53,18 @@ abstract class RelationDirective extends BaseDirective
                             $parent->getKey(),
                             ['parent' => $parent]
                         );
-                } else {
-                    /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-                    $relation = $parent->{$relationName}();
-
-                    $decorateBuilder($relation);
-
-                    if ($paginationArgs) {
-                        $relation = $paginationArgs->applyToBuilder($relation);
-                    }
-
-                    return $relation->getResults();
                 }
+
+                /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+                $relation = $parent->{$relationName}();
+
+                $decorateBuilder($relation);
+
+                if ($paginationArgs) {
+                    $relation = $paginationArgs->applyToBuilder($relation);
+                }
+
+                return $relation->getResults();
             }
         );
 
@@ -108,12 +105,6 @@ abstract class RelationDirective extends BaseDirective
         return $path;
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
-     */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
@@ -148,9 +139,6 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
@@ -170,8 +158,6 @@ abstract class RelationDirective extends BaseDirective
 
     /**
      * Get either the specific max or the global setting.
-     *
-     * @return int|null
      */
     protected function paginateMaxCount(): ?int
     {

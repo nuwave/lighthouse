@@ -3,16 +3,14 @@
 namespace Nuwave\Lighthouse\SoftDeletes;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class TrashedDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
+    public const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
 
     public static function definition(): string
     {
@@ -27,10 +25,7 @@ SDL;
     /**
      * Apply withTrashed, onlyTrashed or withoutTrashed to given $builder if needed.
      *
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
      * @param string|null $value "with", "without" or "only"
-     *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)
     {
@@ -42,11 +37,10 @@ SDL;
             $model = $builder->getModel();
         }
 
-        if (! in_array(SoftDeletes::class, class_uses_recursive($model))) {
-            throw new DefinitionException(
-                self::MODEL_MUST_USE_SOFT_DELETES
-            );
-        }
+        SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
+            get_class($model),
+            self::MODEL_MUST_USE_SOFT_DELETES
+        );
 
         if (! isset($value)) {
             return $builder;

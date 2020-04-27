@@ -11,13 +11,10 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class OrderByServiceProvider extends ServiceProvider
 {
-    const DEFAULT_ORDER_BY_CLAUSE = 'OrderByClause';
+    public const DEFAULT_ORDER_BY_CLAUSE = 'OrderByClause';
 
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
      */
     public function boot(Dispatcher $dispatcher): void
     {

@@ -24,12 +24,12 @@ type Query {
 }
 
 """
-Used for filtering 
+Used for filtering
 """
 enum Trashed {
-    ONLY @enum(value: "only")
-    WITH @enum(value: "with")
-    WITHOUT @enum(value: "without")
+  ONLY @enum(value: "only")
+  WITH @enum(value: "with")
+  WITHOUT @enum(value: "without")
 }
 ```
 
@@ -70,7 +70,7 @@ This mutation will return the restored object.
 
 To truly remove model from database,
 use the [@forceDelete](../api-reference/directives.md#forcedelete) directive.
-Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait. 
+Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait.
 
 ```graphql
 type Mutation {
@@ -82,7 +82,7 @@ Simply call it with the ID of the Flight you want to permanently remove.
 
 ```graphql
 mutation {
-  forceDeleteFlight(id: 5){
+  forceDeleteFlight(id: 5) {
     id
   }
 }

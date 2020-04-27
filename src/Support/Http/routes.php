@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Support\AppVersion;
 
 if ($routeConfig = config('lighthouse.route')) {
     /** @var \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router $router */
     $router = app('router');
 
     $method = 'addRoute';
-    if (Str::startsWith(app()->version(), '5.5.')) {
+    if (AppVersion::below(5.6)) {
         $method = 'match';
     }
 

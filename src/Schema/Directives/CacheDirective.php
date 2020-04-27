@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Carbon\Carbon;
 use Closure;
 use GraphQL\Deferred;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -26,10 +25,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDi
      */
     protected $cacheManager;
 
-    /**
-     * @param  \Illuminate\Cache\CacheManager  $cacheManager
-     * @return void
-     */
     public function __construct(CacheManager $cacheManager)
     {
         $this->cacheManager = $cacheManager;
@@ -60,10 +55,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -96,12 +87,10 @@ SDL;
                 ? $this->cacheManager->tags($cacheValue->getTags())
                 : $this->cacheManager;
 
-            $cacheHasKey = $cache->has($cacheKey);
-
             // We found a matching value in the cache, so we can just return early
             // without actually running the query
-            if ($cacheHasKey) {
-                return $cache->get($cacheKey);
+            if ($value = $cache->get($cacheKey)) {
+                return $value;
             }
 
             $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
@@ -114,7 +103,7 @@ SDL;
                 $cache->forever($cacheKey, $value);
             };
 
-            ($resolvedValue instanceof Deferred)
+            $resolvedValue instanceof Deferred
                 ? $resolvedValue->then(function ($result) use ($storeInCache): void {
                     $storeInCache($result);
                 })
@@ -126,8 +115,6 @@ SDL;
 
     /**
      * Check if tags should be used and are available.
-     *
-     * @return bool
      */
     protected function shouldUseTags(): bool
     {
@@ -137,9 +124,6 @@ SDL;
 
     /**
      * Set node's cache key.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $typeValue
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
@@ -158,7 +142,7 @@ SDL;
         $typeDefinition = $typeValue->getTypeDefinition();
 
         // First priority: Look for a field with the @cacheKey directive
-        /** @var FieldDefinitionNode $field */
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
         foreach ($typeDefinition->fields as $field) {
             if (ASTHelper::hasDirective($field, 'cacheKey')) {
                 $typeValue->setCacheKey($field->name->value);
@@ -168,10 +152,12 @@ SDL;
         }
 
         // Second priority: Look for a Non-Null field with the ID type
-        /** @var FieldDefinitionNode $field */
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
         foreach ($typeDefinition->fields as $field) {
             if (
+                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 $field->type instanceof NonNullTypeNode
+                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 && $field->type->type instanceof NamedTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {
