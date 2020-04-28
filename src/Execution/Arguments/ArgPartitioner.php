@@ -189,7 +189,7 @@ class ArgPartitioner
         }
 
         if (! class_exists($returnType->getName())) {
-            throw new Exception('Class '.$returnType->getName().' does not exist, did you forget to alias the Eloquent relation class?');
+            throw new Exception('Class '.$returnType->getName().' does not exist, did you forget to import the Eloquent relation class?');
         }
 
         return is_a($returnType->getName(), $relationClass, true);
