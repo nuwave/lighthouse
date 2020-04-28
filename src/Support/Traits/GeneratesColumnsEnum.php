@@ -53,7 +53,7 @@ trait GeneratesColumnsEnum
             return $columnsEnum;
         }
 
-        $allowedColumnsEnumName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . 'Column';
+        $allowedColumnsEnumName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).'Column';
 
         $documentAST
             ->setTypeDefinition(

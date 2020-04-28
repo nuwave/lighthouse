@@ -69,7 +69,7 @@ SDL;
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedOrderByName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . 'OrderByClause';
+            $restrictedOrderByName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).'OrderByClause';
             $argDefinition->type = PartialParser::listType("[$restrictedOrderByName!]");
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 

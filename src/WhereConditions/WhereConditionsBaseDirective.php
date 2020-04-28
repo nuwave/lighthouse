@@ -6,7 +6,6 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -81,7 +80,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).$this->generatedInputSuffix();
             $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
