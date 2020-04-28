@@ -12,7 +12,7 @@ class WithoutRelationClassImport extends Model
 {
     protected $guarded = [];
 
-    public function users(): HasMany
+    public function users(): HasMany // @phpstan-ignore-line Missing the import on purpose
     {
         return $this->hasMany(User::class);
     }
