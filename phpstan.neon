@@ -22,6 +22,7 @@ parameters:
   # Will be obsolote in v5
   - src/Schema/Factories/FieldFactory.php
   - src/Schema/AST/PartialParser.php
+  - src/Schema/Directives/MiddlewareDirective.php
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
@@ -33,9 +34,6 @@ parameters:
   # TODO remove once we depend on Laravel ^7.0
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
-
-  # Maybe PHPStan can improve here and recognize what happens in map()
-  - '#Method Nuwave\\Lighthouse\\Subscriptions\\StorageManager::subscribersByTopic\(\) should return Illuminate\\Support\\Collection&iterable<Nuwave\\Lighthouse\\Subscriptions\\Subscriber> but returns Illuminate\\Support\\Collection&iterable<string>#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
