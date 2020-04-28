@@ -14,6 +14,9 @@ parameters:
   # Indirectly refers to \App\User (maybe through larastan?)
   - tests/Utils/Models/User.php
 
+  # Intentionally wrong
+  - tests/Utils/Models/WithoutRelationClassImport.php
+
   # Compatibility fix because Laravel moved the TestResponse class
   - tests/TestCase.php
   - tests/Laravel7ExceptionHandler.php
