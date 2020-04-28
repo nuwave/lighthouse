@@ -92,7 +92,7 @@ trait GeneratesColumnsEnum
             $allowedColumns
         );
 
-        $enumDefinition = "\"Allowed column names for the `{$argDefinition->name->value}` argument on field `{$parentField->name->value}` on type `{$parentType->name->value}.\"\n"
+        $enumDefinition = "\"Allowed column names for the `{$argDefinition->name->value}` argument on field `{$parentField->name->value}` on type `{$parentType->name->value}`.\"\n"
             ."enum $allowedColumnsEnumName {\n";
         foreach ($enumValues as $enumValue) {
             $enumDefinition .= "$enumValue\n";
