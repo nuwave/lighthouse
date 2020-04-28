@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $name
  */
-class WithoutRelationAlias extends Model
+class WithoutRelationClassImport extends Model
 {
     protected $guarded = [];
 
