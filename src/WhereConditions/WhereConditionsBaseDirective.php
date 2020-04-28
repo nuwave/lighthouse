@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -80,7 +81,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField, $parentType);
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
             $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
@@ -98,22 +99,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * Create the name for the restricted WhereConditions input.
-     *
-     * @example ParentNameFieldNameArgNameWhereHasConditions
-     */
-    protected function restrictedWhereConditionsName(
-        InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
-    ): string {
-        return Str::studly($parentType->name->value)
-            .Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value)
-            .'WhereConditions';
-    }
-
-    /**
      * Ensure the column name is well formed.
      *
      * This prevents SQL injection.
@@ -128,4 +113,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             );
         }
     }
+
+    /**
+     * Get the suffix that will be added to generated input types.
+     */
+    abstract protected function generatedInputSuffix(): string;
 }

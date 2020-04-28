@@ -8,6 +8,7 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
@@ -52,7 +53,7 @@ trait GeneratesColumnsEnum
             return $columnsEnum;
         }
 
-        $allowedColumnsEnumName = static::allowedColumnsEnumName($argDefinition, $parentField, $parentType);
+        $allowedColumnsEnumName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . 'Column';
 
         $documentAST
             ->setTypeDefinition(
@@ -66,22 +67,6 @@ trait GeneratesColumnsEnum
             );
 
         return $allowedColumnsEnumName;
-    }
-
-    /**
-     * Create the name for the Enum that holds the allowed columns.
-     *
-     * @example ParentNameFieldNameArgNameColumn
-     */
-    protected function allowedColumnsEnumName(
-        InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
-    ): string {
-        return Str::studly($parentType->name->value)
-            .Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value)
-            .'Column';
     }
 
     /**

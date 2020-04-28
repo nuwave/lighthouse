@@ -74,9 +74,9 @@ Here are the types that will be included in the compiled schema:
 
 ```graphql
 "Dynamic WHERE conditions for the `where` argument on the query `people`."
-input PeopleWhereWhereConditions {
+input QueryPeopleWhereWhereConditions {
   "The column that is used for the condition."
-  column: PeopleWhereColumn
+  column: QueryPeopleWhereColumn
 
   "The operator that is used for the condition."
   operator: SQLOperator = EQ
@@ -85,14 +85,14 @@ input PeopleWhereWhereConditions {
   value: Mixed
 
   "A set of conditions that requires all conditions to match."
-  AND: [PeopleWhereWhereConditions!]
+  AND: [QueryPeopleWhereWhereConditions!]
 
   "A set of conditions that requires at least one condition to match."
-  OR: [PeopleWhereWhereConditions!]
+  OR: [QueryPeopleWhereWhereConditions!]
 }
 
 "Allowed column names for the `where` argument on the query `people`."
-enum PeopleWhereColumn {
+enum QueryPeopleWhereColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
   HAIRCOLOUR @enum(value: "haircolour")
@@ -248,9 +248,9 @@ Again, Lighthouse will auto-generate an `input` and `enum` definition for your q
 
 ```graphql
 "Dynamic WHERE conditions for the `hasRole` argument on the query `people`."
-input PeopleHasRoleWhereConditions {
+input QueryPeopleHasRoleWhereConditions {
   "The column that is used for the condition."
-  column: PeopleHasRoleColumn
+  column: QueryPeopleHasRoleColumn
 
   "The operator that is used for the condition."
   operator: SQLOperator = EQ
@@ -259,14 +259,14 @@ input PeopleHasRoleWhereConditions {
   value: Mixed
 
   "A set of conditions that requires all conditions to match."
-  AND: [PeopleHasRoleWhereConditions!]
+  AND: [QueryPeopleHasRoleWhereConditions!]
 
   "A set of conditions that requires at least one condition to match."
-  OR: [PeopleHasRoleWhereConditions!]
+  OR: [QueryPeopleHasRoleWhereConditions!]
 }
 
 "Allowed column names for the `hasRole` argument on the query `people`."
-enum PeopleHasRoleColumn {
+enum QueryPeopleHasRoleColumn {
   NAME @enum(value: "name")
   ACCESS_LEVEL @enum(value: "access_level")
 }

@@ -38,4 +38,9 @@ SDL;
 
         return $this->handleWhereConditions($builder, $whereConditions);
     }
+
+    protected function generatedInputSuffix(): string
+    {
+        return 'WhereConditions';
+    }
 }

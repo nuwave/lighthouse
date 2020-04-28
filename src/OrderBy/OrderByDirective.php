@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\OrderBy;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -62,12 +62,6 @@ SDL;
         return $builder;
     }
 
-    /**
-     * Validate the input argument definition.
-     *
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
@@ -75,7 +69,7 @@ SDL;
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedOrderByName = $this->restrictedOrderByName($argDefinition, $parentField, $parentType);
+            $restrictedOrderByName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . 'OrderByClause';
             $argDefinition->type = PartialParser::listType("[$restrictedOrderByName!]");
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
@@ -90,25 +84,5 @@ SDL;
         } else {
             $argDefinition->type = PartialParser::listType('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
         }
-    }
-
-    /**
-     * Create the name for the restricted OrderByClause input.
-     *
-     * We have to make sure it is unique in the schema. Even though
-     * this name becomes a bit verbose, it is also very unlikely to collide
-     * with a random user defined type.
-     *
-     * @example ParentNameFieldNameArgNameOrderByClause
-     */
-    protected function restrictedOrderByName(
-        InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
-    ): string {
-        return Str::studly($parentType->name->value)
-            .Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value)
-            .'OrderByClause';
     }
 }
