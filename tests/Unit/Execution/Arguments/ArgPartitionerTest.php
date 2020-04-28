@@ -2,15 +2,15 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use Exception;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Tests\TestCase;
 use Tests\Unit\Execution\Arguments\Fixtures\Nested;
 use Tests\Utils\Models\User;
-use Tests\Utils\Models\WithoutRelationAlias;
+use Tests\Utils\Models\WithoutRelationClassImport;
 
 class ArgPartitionerTest extends TestCase
 {
@@ -72,11 +72,11 @@ class ArgPartitionerTest extends TestCase
         $tasksRelation = new Argument();
         $argumentSet->arguments['users'] = $tasksRelation;
 
-        $this->expectException(Exception::class);
+        $this->expectException(DefinitionException::class);
 
         [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
             $argumentSet,
-            new WithoutRelationAlias(),
+            new WithoutRelationClassImport(),
             HasMany::class
         );
     }

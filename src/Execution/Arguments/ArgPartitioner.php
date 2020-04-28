@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
 use ReflectionClass;
@@ -189,7 +189,7 @@ class ArgPartitioner
         }
 
         if (! class_exists($returnType->getName())) {
-            throw new Exception('Class '.$returnType->getName().' does not exist, did you forget to import the Eloquent relation class?');
+            throw new DefinitionException('Class '.$returnType->getName().' does not exist, did you forget to import the Eloquent relation class?');
         }
 
         return is_a($returnType->getName(), $relationClass, true);
