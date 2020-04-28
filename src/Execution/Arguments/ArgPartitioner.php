@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -185,6 +186,10 @@ class ArgPartitioner
 
         if (! $returnType instanceof ReflectionNamedType) {
             return false;
+        }
+
+        if (! class_exists($returnType->getName())) {
+            throw new Exception('Class '.$returnType->getName().' does not exist, did you forget to alias the Eloquent relation class?');
         }
 
         return is_a($returnType->getName(), $relationClass, true);
