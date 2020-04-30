@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.12.4.
+
+### Fixed
+
+- Fix nesting OR within AND condition when using `@whereConditions` https://github.com/nuwave/lighthouse/pull/1341
+
 ## 4.12.3
 
 ### Changed

@@ -41,7 +41,8 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     foreach ($andConnectedConditions as $condition) {
                         $this->handleWhereConditions($builder, $condition);
                     }
-                }
+                },
+                $boolean
             );
         }
 
@@ -52,7 +53,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                         $this->handleWhereConditions($builder, $condition, 'or');
                     }
                 },
-                'or'
+                $boolean
             );
         }
 
