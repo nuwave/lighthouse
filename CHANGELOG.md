@@ -11,6 +11,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## 4.12.3
 
+### Fixed
+
+- Fix nesting OR within AND condition when using `@whereConditions`
+
+## 4.12.3
+
 ### Changed
 
 - Throw an exception if the return type declaration class for a relation does not exist https://github.com/nuwave/lighthouse/pull/1338
