@@ -19,38 +19,22 @@
 
 [![Get on Slack](https://img.shields.io/badge/slack-join-orange.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
 
-**GraphQL Server for Laravel**
+**A framework for serving GraphQL from Laravel**
 
 </div>
 
-Lighthouse is a PHP package that allows you to serve a GraphQL endpoint from your
-Laravel application. It greatly reduces the boilerplate required to create a schema,
-it integrates well with any Laravel project, and it's highly customizable
-giving you full control over your data.
+Lighthouse is a GraphQL framework that integrates with your Laravel application.
+It takes the best ideas of both and combines them to solve common tasks with ease
+and offer flexibility when you need it.
 
 ## [Documentation](https://lighthouse-php.com/)
 
 The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
 
 A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn/) and is maintained
-over at https://github.com/haxibiao/lighthouse
-
-You can find the markdown source files in [/docs](/docs).
-
-## Get started
-
-If you have an existing Laravel project, all you really need
-to get up and running is a few steps:
-
-1. Install via `composer require nuwave/lighthouse`
-2. Publish the default schema `php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema`
-3. Use something like [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground) to explore your GraphQL endpoint
-
-Check out [the docs](https://lighthouse-php.com/) to learn more.
+over at https://github.com/haxibiao/lighthouse.
 
 ## Get involved
-
-We welcome contributions of any kind.
 
 - Have a question? [Use the laravel-lighthouse tag on Stack Overflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
 - Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
@@ -68,7 +52,7 @@ When upgrading between major versions of Lighthouse, consider [`UPGRADE.MD`](UPG
 
 ## Contributing
 
-See how you can start [`CONTRIBUTING.md`](CONTRIBUTING.md) to this project.
+We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Security Vulnerabilities
 

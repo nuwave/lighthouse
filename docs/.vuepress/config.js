@@ -2,7 +2,7 @@ const versioning = require('./lib/versioning.js')
 
 module.exports = {
     title: 'Lighthouse',
-    description: 'GraphQL server for Laravel',
+    description: 'A framework for serving GraphQL from Laravel',
     head: [
         ['link', {
             rel: 'icon',
