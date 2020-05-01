@@ -66,6 +66,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
+        // TODO replace with a job dispatch
         $this->eventsDispatcher->dispatch(
             new BroadcastSubscriptionEvent($subscription, $fieldName, $root)
         );

@@ -10,7 +10,7 @@ to prevent information leaking. In some cases however, you may want to display a
 explicit error message to the user.
 
 **webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface, that can
-be implemented by Exceptions to control how they are rendered to the client.  
+be implemented by Exceptions to control how they are rendered to the client.
 
 ## Additional Error Information
 
@@ -31,7 +31,7 @@ use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 class CustomException extends Exception implements RendersErrorsExtensions
 {
     /**
-    * @var @string 
+    * @var @string
     */
     private $reason;
 
@@ -98,7 +98,7 @@ class SomeField
 {
     public function resolve($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
-        if ($this->errorConditionIsMet()) {   
+        if ($this->errorConditionIsMet()) {
             throw new CustomException(
                 'This is the error message',
                 'The reason why this error was thrown, is rendered in the extension output.'

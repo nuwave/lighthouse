@@ -129,7 +129,7 @@ EOL
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
         // ever used through its association to an interface
-        /** @var TypeDefinitionNode $typeDefinition */
+        /** @var \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition */
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
@@ -155,8 +155,8 @@ EOL
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                 if ($typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class)) {
+                    /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                     return $typeResolver->resolveNode($value);
                 }
 
@@ -297,6 +297,7 @@ EOL
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
+            'astNode' => $inputDefinition,
             'fields' => function () use ($inputDefinition): array {
                 return $this->argumentFactory->toTypeMap($inputDefinition->fields);
             },

@@ -9,6 +9,16 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Laravel\Scout\Searchable;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property string|null $body
+ * @property int|null $user_id
+ * @property int $task_id
+ * @property int|null $parent_id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class Post extends Model
 {
     use Searchable;

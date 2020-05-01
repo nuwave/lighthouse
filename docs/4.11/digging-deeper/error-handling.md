@@ -33,7 +33,7 @@ use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 class CustomException extends Exception implements RendersErrorsExtensions
 {
     /**
-    * @var @string 
+    * @var @string
     */
     private $reason;
 

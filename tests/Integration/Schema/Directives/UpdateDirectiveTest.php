@@ -15,7 +15,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Company {
             id: ID!
             name: String!
@@ -29,7 +29,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateCompany(
                 id: 1
@@ -55,7 +55,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Company {
             id: ID!
             name: String!
@@ -99,7 +99,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Category::class)->create(['name' => 'foo']);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Category {
             category_id: ID!
             name: String!
@@ -206,23 +206,23 @@ class UpdateDirectiveTest extends DBTestCase
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
-        
+
         type Task {
             id: Int
             name: String!
         }
-        
+
         type User {
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         input UpdateUserInput {
             id: Int
             name: String
             updateTask: UpdateTaskInput @update(relation: "tasks")
         }
-        
+
         input UpdateTaskInput {
             id: Int
             name: String
@@ -254,6 +254,84 @@ class UpdateDirectiveTest extends DBTestCase
                         [
                             'id' => 3,
                             'name' => 'Uniq',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testNestedUpdateOnInputList(): void
+    {
+        factory(User::class)->create();
+        factory(Task::class)->create([
+            'id' => 3,
+        ]);
+        factory(Task::class)->create([
+            'id' => 4,
+        ]);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+        }
+
+        type User {
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            name: String
+            updateTask: [UpdateTaskInput] @update(relation: "tasks")
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateUser(input: {
+                id: 1
+                name: "foo"
+                updateTask: [
+                    {
+                        id: 3
+                        name: "Uniq"
+                    },
+                    {
+                        id: 4,
+                        name: "Foo"
+                    }
+                ]
+            }) {
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => 3,
+                            'name' => 'Uniq',
+                        ], [
+                            'id' => 4,
+                            'name' => 'Foo',
                         ],
                     ],
                 ],

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Execution\Utils;
+namespace Tests\Unit\Subscriptions;
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -11,10 +11,8 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Prophecy\Argument;
-use Tests\TestCase;
 
-class SubscriptionTest extends TestCase
+class SubscriptionTest extends SubscriptionTestCase
 {
     /**
      * @var string
@@ -27,7 +25,7 @@ class SubscriptionTest extends TestCase
     protected $subscriptionRegistry;
 
     /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
+     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster&\PHPUnit\Framework\MockObject\MockObject
      */
     protected $broadcaster;
 
@@ -43,17 +41,20 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $this->schema = "
+        $this->mockResolverExpects($this->any())
+            ->willReturn(self::SUBSCRIPTION_FIELD);
+
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            subscription: String @field(resolver: \"{$this->qualifyTestResolver()}\")
+            subscription: String @mock
         }
-        ";
+        ';
 
         $this->subscriptionRegistry = app(SubscriptionRegistry::class);
         $this->subscriptionRegistry->register($this->subscription(), self::SUBSCRIPTION_FIELD);
 
-        $this->broadcaster = $this->prophesize(SubscriptionBroadcaster::class);
-        $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());
+        $this->broadcaster = $this->createMock(SubscriptionBroadcaster::class);
+        $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster);
     }
 
     public function testCanSendSubscriptionToBroadcaster(): void
@@ -64,26 +65,27 @@ class SubscriptionTest extends TestCase
             ],
         ];
 
-        $this->broadcaster->broadcast(
-            Argument::type(GraphQLSubscription::class),
-            self::SUBSCRIPTION_FIELD,
-            $root
-        )->shouldBeCalled();
+        $this->broadcaster
+            ->expects($this->once())
+            ->method('broadcast')
+            ->with(
+                $this->isInstanceOf(GraphQLSubscription::class),
+                self::SUBSCRIPTION_FIELD,
+                $root
+            );
 
         Subscription::broadcast(self::SUBSCRIPTION_FIELD, $root);
     }
 
     public function testThrowsOnInvalidSubscriptionField(): void
     {
-        $this->broadcaster->broadcast(Argument::any())->shouldNotBeCalled();
+        $this->broadcaster
+            ->expects($this->never())
+            ->method('broadcast');
+
         $this->expectException(InvalidArgumentException::class);
 
         Subscription::broadcast('unknownField', []);
-    }
-
-    public function resolve(): string
-    {
-        return self::SUBSCRIPTION_FIELD;
     }
 
     protected function subscription(): GraphQLSubscription

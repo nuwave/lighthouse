@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Subscriptions;
 
+use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Context;
@@ -25,15 +27,13 @@ class SubscriberTest extends TestCase
     {
         $args = ['foo' => 'bar'];
 
-        $resolveInfo = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolveInfo = $this->createMock(ResolveInfo::class);
         $operationName = 'baz';
-        $resolveInfo->operation = (object) [
-            'name' => (object) [
+        $resolveInfo->operation = new OperationDefinitionNode([
+            'name' => new NameNode([
                 'value' => $operationName,
-            ],
-        ];
+            ]),
+        ]);
         $resolveInfo->fragments = [];
         $context = new Context(new Request());
 

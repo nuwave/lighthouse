@@ -111,9 +111,9 @@ Queries now return meaningful names instead of magic numbers.
 {
   "data": {
     "employees": [
-      {"name": "Hans", "status": "INTERN"},
-      {"name": "Pamela", "status": "EMPLOYEE"},
-      {"name": "Gerhard", "status": "TERMINATED"}
+      { "name": "Hans", "status": "INTERN" },
+      { "name": "Pamela", "status": "EMPLOYEE" },
+      { "name": "Gerhard", "status": "TERMINATED" }
     ]
   }
 }
@@ -253,7 +253,7 @@ type User {
 
 type Mutation {
   createUser(input: CreateUserInput! @spread): User @create
-} 
+}
 ```
 
 ## Interface
@@ -302,9 +302,7 @@ They are similar to interfaces in that they can return different types, but they
 have fields defined.
 
 ```graphql
-union Person
-  = User
-  | Employee
+union Person = User | Employee
 
 type User {
   id: ID!

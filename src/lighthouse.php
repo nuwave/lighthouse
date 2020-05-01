@@ -180,6 +180,7 @@ return [
 
     'error_handlers' => [
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
 
     /*
@@ -247,6 +248,11 @@ return [
         'queue_broadcasts' => env('LIGHTHOUSE_QUEUE_BROADCASTS', true),
 
         /*
+         * Determines the queue to use for broadcasting queue jobs.
+         */
+        'broadcasts_queue_name' => env('LIGHTHOUSE_BROADCASTS_QUEUE_NAME', null),
+
+        /*
          * Default subscription storage.
          *
          * Any Laravel supported cache driver options are available here.
@@ -254,7 +260,7 @@ return [
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
         /*
-         * Default subscription storage time to live.
+         * Default subscription storage time to live in seconds.
          *
          * Indicates how long a subscription can be active before it's automatically removed from storage.
          * Setting this to `null` means the subscriptions are stored forever. This may cause
@@ -280,6 +286,31 @@ return [
                 'connection' => 'pusher',
             ],
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Defer
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the experimental @defer directive support.
+    |
+    */
+
+    'defer' => [
+        /*
+         * Maximum number of nested fields that can be deferred in one query.
+         * Once reached, remaining fields will be resolved synchronously.
+         * 0 means unlimited.
+         */
+        'max_nested_fields' => 0,
+
+        /*
+         * Maximum execution time for deferred queries in milliseconds.
+         * Once reached, remaining fields will be resolved synchronously.
+         * 0 means unlimited.
+         */
+        'max_execution_ms' => 0,
     ],
 
 ];

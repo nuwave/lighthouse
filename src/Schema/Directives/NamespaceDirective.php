@@ -39,6 +39,7 @@ SDL;
      */
     protected function addNamespacesToFields(&$objectType): void
     {
+        /** @var \GraphQL\Language\AST\DirectiveNode $namespaceDirective */
         $namespaceDirective = $this->directiveNode->cloneDeep();
 
         foreach ($objectType->fields as $fieldDefinition) {

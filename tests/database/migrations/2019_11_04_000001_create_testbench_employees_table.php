@@ -14,6 +14,7 @@ class CreateTestbenchEmployeesTable extends Migration
         Schema::create('employees', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('position');
+
             $table->timestamps();
         });
     }

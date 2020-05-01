@@ -32,7 +32,7 @@ class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testPassesAuthIfAuthorized(): void
@@ -157,7 +157,7 @@ class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void

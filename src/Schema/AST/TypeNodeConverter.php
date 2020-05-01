@@ -26,13 +26,15 @@ abstract class TypeNodeConverter
         // Recursively unwrap the type and save the wrappers
         $nodeKind = $node->kind;
         if (in_array($nodeKind, [NodeKind::NON_NULL_TYPE, NodeKind::LIST_TYPE])) {
+            /** @var \GraphQL\Language\AST\NonNullTypeNode|\GraphQL\Language\AST\ListTypeNode $node */
             $wrappers[] = $nodeKind;
 
-            return $this->convertWrappedTypeNode(
+            return $this->convertWrappedTypeNode( // @phpstan-ignore-line TODO remove when upgrading graphql-php
                 $node->type,
                 $wrappers
             );
         }
+        /** @var \GraphQL\Language\AST\NamedTypeNode $node */
 
         // Re-wrap the type by applying the wrappers in the reversed order
         return (new Collection($wrappers))

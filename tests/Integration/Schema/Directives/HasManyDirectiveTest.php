@@ -276,7 +276,7 @@ class HasManyDirectiveTest extends DBTestCase
                     'tasks' => null,
                 ],
             ],
-        ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
@@ -357,7 +357,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "relay")
         }

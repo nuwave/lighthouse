@@ -46,7 +46,7 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
-                    $loader = BatchLoader::instance(
+                    $loader = BatchLoader::instance( // @phpstan-ignore-line TODO remove when updating graphql-php
                         RelationBatchLoader::class,
                         $resolveInfo->path,
                         [

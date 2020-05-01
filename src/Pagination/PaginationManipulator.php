@@ -22,7 +22,7 @@ class PaginationManipulator
      * for a relation, as the model is not required for resolving
      * that directive and the user may choose a different type.
      *
-     * @var string|null
+     * @var class-string<\Illuminate\Database\Eloquent\Model>|null
      */
     protected $modelClass;
 
@@ -34,6 +34,7 @@ class PaginationManipulator
     /**
      * Set the model class to use for code generation.
      *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @return $this
      */
     public function setModelClass(string $modelClass): self

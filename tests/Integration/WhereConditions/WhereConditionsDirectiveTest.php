@@ -286,6 +286,53 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testAddsNestedAndOr(): void
+    {
+        factory(User::class, 5)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    AND: [
+                        {
+                            column: "id"
+                            operator: GT
+                            value: 1
+                        }
+                        {
+                            OR: [
+                                {
+                                    column: "id"
+                                    value: 2
+                                }
+                                {
+                                    column: "id"
+                                    value: 3
+                                }
+                            ]
+
+                        }
+                    ]
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                    [
+                        'id' => '3',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testAddsNot(): void
     {
         $this->markTestSkipped('Kind of works, but breaks down when more nested conditions are added, see https://github.com/nuwave/lighthouse/issues/1124');

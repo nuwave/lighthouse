@@ -20,7 +20,7 @@ required in a single request, it is convenient to attempt authentication once pe
     ],
 ```
 
-Note that the `AttemptAuthentication` middleware does *not* protect any of your fields
+Note that the `AttemptAuthentication` middleware does _not_ protect any of your fields
 by itself, decorate them with [`@guard`](../api-reference/directives.md#guard) as needed.
 
 If you want to guard all your fields against unauthenticated access, you can simply add
@@ -51,6 +51,18 @@ on a `type` or an `extend type` definition. It will be applied to all fields wit
 extend type Query @guard(with: ["api:admin"]) {
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
+}
+```
+
+### Using Laravel Sanctum
+
+Lighthouse will use your application's default guard, unless specified otherwise.
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) only for your API,
+you can set it when using `@guard`:
+
+```graphql
+type Query {
+  profile: User! @guard(with: "sanctum")
 }
 ```
 

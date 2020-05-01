@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Carbon\Carbon;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -61,6 +62,7 @@ class StorageManager implements StoresSubscriptions
 
     public function subscribersByTopic(string $topic): Collection
     {
+        // @phpstan-ignore-next-line filter makes the list contain only non-null elements
         return $this
             ->retrieveTopic(self::topicKey($topic))
             ->map(function (string $channel): ?Subscriber {
@@ -78,7 +80,8 @@ class StorageManager implements StoresSubscriptions
         if ($this->ttl === null) {
             $this->cache->forever($channelKey, $subscriber);
         } else {
-            $this->cache->put($channelKey, $subscriber, $this->ttl);
+            // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
+            $this->cache->put($channelKey, $subscriber, Carbon::now()->addSeconds($this->ttl));
         }
     }
 
@@ -103,7 +106,8 @@ class StorageManager implements StoresSubscriptions
         if ($this->ttl === null) {
             $this->cache->forever($key, $topic);
         } else {
-            $this->cache->put($key, $topic, $this->ttl);
+            // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
+            $this->cache->put($key, $topic, Carbon::now()->addSeconds($this->ttl));
         }
     }
 
