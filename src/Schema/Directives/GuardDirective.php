@@ -80,7 +80,7 @@ SDL;
     protected function authenticate(array $guards): void
     {
         if (empty($guards)) {
-            $guards = [null];
+            $guards = [config('lighthouse.guard', null)];
         }
 
         foreach ($guards as $guard) {

@@ -28,7 +28,7 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retreive the user.
+  Use a particular guard to retrieve the user.
   """
   guard: String
 ) on FIELD_DEFINITION
@@ -41,7 +41,7 @@ SDL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         /** @var string|null $guard */
-        $guard = $this->directiveArgValue('guard');
+        $guard = $this->directiveArgValue('guard', config('lighthouse.guard', null));
 
         return $fieldValue->setResolver(
             function () use ($guard): ?Authenticatable {
