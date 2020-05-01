@@ -67,7 +67,8 @@ class RulesGatherer
         foreach ($directives as $directive) {
             if ($directive instanceof ProvidesRules) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
-                    /** @var HasArgumentValue $directive */
+                    /** @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive */
+                    // @phpstan-ignore-next-line using trait in typehint
                     $directive->setArgumentValue($value);
                 }
 

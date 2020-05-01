@@ -24,7 +24,7 @@ class ValidatorDirective extends BaseDirective implements ArgDirective, Provides
     use HasArgumentValue;
 
     /**
-     * @var \Nuwave\Lighthouse\Validation\Validator
+     * @var \Nuwave\Lighthouse\Validation\Validator|null
      */
     protected $validator;
 
