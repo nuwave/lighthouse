@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
@@ -28,11 +27,8 @@ class ASTHelper
      * when the list is empty, then it is []. This function corrects that inconsistency
      * and allows the rest of our code to not worry about it until it is fixed.
      *
-     * This issue is brought up here https://github.com/webonyx/graphql-php/issues/285
-     * Remove this method (and possibly the entire class) once it is resolved.
-     *
-     * @param  \GraphQL\Language\AST\NodeList|array  $original
-     * @param  \GraphQL\Language\AST\NodeList|array  $addition
+     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $original
+     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $addition
      */
     public static function mergeNodeList($original, $addition): NodeList
     {
@@ -97,7 +93,6 @@ class ASTHelper
     /**
      * Unwrap lists and non-nulls and get the named type within.
      *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
@@ -138,35 +133,24 @@ class ASTHelper
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
+        /** @var \GraphQL\Language\AST\ArgumentNode|null $arg */
         $arg = self::firstByName($directive->arguments, $name);
 
         return $arg
-            ? self::argValue($arg, $default)
+            ? AST::valueFromASTUntyped($arg->value)
             : $default;
     }
 
     /**
-     * Get the value of an argument node.
-     */
-    public static function argValue(ArgumentNode $arg, $default = null)
-    {
-        $valueNode = $arg->value;
-
-        if (! $valueNode) {
-            return $default;
-        }
-
-        return AST::valueFromASTUntyped($valueNode);
-    }
-
-    /**
      * Return the PHP internal value of an arguments default value.
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
+            /** @var \GraphQL\Language\AST\EnumValueNode|\GraphQL\Language\AST\NullValueNode $defaultValue */
             return $argumentType
                 ->getValue($defaultValue->value)
                 ->value;
@@ -182,13 +166,11 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        return self::firstByName($definitionNode->directives, $name);
+        return self::firstByName($definitionNode->directives, $name); // @phpstan-ignore-line Lack of proper generics
     }
 
     /**
      * Check if a node has a directive with the given name on it.
-     *
-     * @return \GraphQL\Language\AST\DirectiveNode|null
      */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
@@ -198,11 +180,10 @@ class ASTHelper
     /**
      * Out of a list of nodes, get the first that matches the given name.
      *
-     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\Node[] $nodes
+     * @param  iterable<\GraphQL\Language\AST\Node> $nodes
      */
     public static function firstByName($nodes, string $name): ?Node
     {
-        /** @var \GraphQL\Language\AST\Node $node */
         foreach ($nodes as $node) {
             if ($node->name->value === $name) {
                 return $node;
@@ -275,7 +256,7 @@ class ASTHelper
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode|mixed  $objectType
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

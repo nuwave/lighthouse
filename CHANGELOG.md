@@ -29,6 +29,32 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Allow passing additional headers to `multipartGraphQL` test helper https://github.com/nuwave/lighthouse/pull/1342
+
+## 4.12.4
+
+### Fixed
+
+- Fix nesting OR within AND condition when using `@whereConditions` https://github.com/nuwave/lighthouse/pull/1341
+
+## 4.12.3
+
+### Changed
+
+- Throw an exception if the return type declaration class for a relation does not exist https://github.com/nuwave/lighthouse/pull/1338
+
+## 4.12.2
+
+### Fixed
+
+- Fix converting lists of lists into ArgumentSet https://github.com/nuwave/lighthouse/pull/1335
+
+### Changed
+
+- Make test request helper PHPDocs more accurate for Laravel 7 https://github.com/nuwave/lighthouse/pull/1336
+
 ## 4.12.1
 
 ### Fixed

@@ -74,6 +74,8 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
+     *
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $typeDefinition
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {

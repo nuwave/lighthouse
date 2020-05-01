@@ -15,9 +15,6 @@ class ResponseStream extends Stream implements CanStreamResponse
      */
     public const EOL = "\r\n";
 
-    /**
-     * Stream graphql response.
-     */
     public function stream(array $data, array $paths, bool $final): void
     {
         if (! empty($paths)) {

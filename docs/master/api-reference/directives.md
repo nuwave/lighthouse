@@ -2188,11 +2188,14 @@ If simply querying Eloquent does not fit your use-case, you can specify a custom
 
 ```graphql
 type Query {
-  posts: [Post!]! @paginate(builder: "App\\Blog@visiblePosts")
+  blogStatistics: [BlogStatistic!]! @paginate(builder: "App\\Blog@statistics")
 }
 ```
 
 Your method receives the typical resolver arguments and has to return an instance of `Illuminate\Database\Query\Builder`.
+
+> If you actually want to query a model and possibly its relations through nested fields,
+> make sure to return an Eloquent builder, e.g. `Post::query()`.
 
 ```php
 <?php
@@ -2206,11 +2209,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Blog
 {
-    public function visiblePosts($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    public function statistics($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         return DB::table('posts')
-            ->where('visible', true)
-            ->where('posted_at', '>', $args['after']);
+            ->leftJoinSub(...)
+            ->groupBy(...);
     }
 }
 ```
@@ -2417,10 +2420,9 @@ type Query {
 The `search()` method of the model is called with the value of the argument,
 using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
 
-Take care when using the `@search` directive in combination with other directives
-that influence the database query. The usual query builder `Eloquent\Builder`
-will be replaced by a `Scout\Builder`, which does not support the same methods and operations.
-Regular filters such as [`@eq`](#eq) or [`@in`](#in) still work, but scopes do not.
+The `@search` directive does not work in combination with other filter directives.
+The usual query builder `Eloquent\Builder` will be replaced by a `Scout\Builder`,
+which does not support the same methods and operations.
 
 ### Definition
 

@@ -156,7 +156,7 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
-        /** @var \Nuwave\Lighthouse\Execution\ExtensionsResponse[] $extensionsResponses */
+        /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
             new BuildExtensionsResponse
         );

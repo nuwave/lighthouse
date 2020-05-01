@@ -4,7 +4,7 @@ about: The issue tracker is not for support questions, use Stack Overflow or Sla
 ---
 
 This repository and the issue tracker are used to advance the development of Lighthouse.
-Issues that are neither detailed bug reports nor well thought-out feature proposals will be closed.
+Issues that are neither detailed bug reports nor well-thought-out feature proposals will be closed.
 
 You can use the following channels to ask support questions:
 

@@ -9,16 +9,10 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 class MemoryStream extends Stream implements CanStreamResponse
 {
     /**
-     * @var mixed[]
+     * @var array<int, mixed>
      */
     public $chunks = [];
 
-    /**
-     * Stream GraphQL response.
-     *
-     * @param  mixed[]  $data
-     * @param  string[]  $paths
-     */
     public function stream(array $data, array $paths, bool $final): void
     {
         if (! empty($paths)) {

@@ -26,6 +26,26 @@ jobs:
       - name: "Run composer normalize"
         uses: "docker://localheinz/composer-normalize-action:0.5.2"
 
+  prettier:
+    name: "Prettify docs"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2.0.0"
+        with:
+          ref: "${{ github.head_ref }}"
+
+      - name: "Prettify docs"
+        uses: "creyD/prettier_action@v2.2"
+        with:
+          prettier_options: '--write --tab-width=2 docs/**/**/*.md'
+          branch: "${{ github.head_ref }}"
+          commit_message: "Prettify docs"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
   static-code-analysis:
     name: "Static Code Analysis"
 
@@ -34,21 +54,12 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - "7.1"
           - "7.2"
           - "7.3"
           - "7.4"
         laravel-version:
-          - "5.6.*"
-          - "5.7.*"
-          - "5.8.*"
           - "^6.0"
           - "^7.0"
-        exclude:
-          - php-version: "7.1"
-            laravel-version: "^6.0"
-          - php-version: "7.1"
-            laravel-version: "^7.0"
 
     steps:
       - name: "Checkout"
@@ -119,9 +130,8 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Remove larastan for old Laravel versions"
-        if: "matrix.laravel-version != '^7.0'"
-        run: "composer remove --dev nunomaduro/larastan --no-update"
+      - name: "Remove PHPStan, it conflicts with old Laravel versions and is not needed here anyways"
+        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"

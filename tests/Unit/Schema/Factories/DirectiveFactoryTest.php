@@ -68,9 +68,9 @@ class DirectiveFactoryTest extends TestCase
                 return 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue, Closure $next): void
+            public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
             {
-                //
+                return $fieldValue;
             }
         };
 

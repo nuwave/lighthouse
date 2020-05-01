@@ -75,7 +75,7 @@ class Subscriber implements Serializable
         $operationName = $resolveInfo->operation->name;
 
         // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
-        if (! $operationName) {
+        if (! $operationName) { // @phpstan-ignore-line TODO remove once the graphql-php type is accurate https://github.com/webonyx/graphql-php/pull/653
             throw new SubscriptionException(self::MISSING_OPERATION_NAME);
         }
         $this->operationName = $operationName->value;
@@ -102,7 +102,7 @@ class Subscriber implements Serializable
 
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
-        $this->query = AST::fromArray(
+        $this->query = AST::fromArray( // @phpstan-ignore-line We know this will be exactly a DocumentNode and nothing else
             unserialize($data['query'])
         );
         $this->operationName = $data['operation_name'];
