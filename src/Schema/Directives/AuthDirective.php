@@ -42,7 +42,7 @@ SDL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         /** @var array<string>|string|null $guard */
-        $guard = $this->directiveArgValue('guard', config('lighthouse.guard', null));
+        $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
 
         return $fieldValue->setResolver(
             function () use ($guard): ?Authenticatable {
