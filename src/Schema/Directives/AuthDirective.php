@@ -28,7 +28,7 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retreive the user.
+  Use a particular guard to retrieve the user.
   """
   guard: String
 ) on FIELD_DEFINITION
