@@ -404,12 +404,7 @@ mutation {
     input: {
       id: 4
       name: "Donald"
-      phone: {
-        update: {
-          id: 92
-          number: "+12 345 6789"
-        }
-      }
+      phone: { update: { id: 92, number: "+12 345 6789" } }
     }
   ) {
     id
