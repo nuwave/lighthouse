@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Allow passing additional headers to `multipartGraphQL` test helper https://github.com/nuwave/lighthouse/pull/1342
+- Configure a default `guard` for all authentication functionality https://github.com/nuwave/lighthouse/pull/1343
 
 ## 4.12.4
 
