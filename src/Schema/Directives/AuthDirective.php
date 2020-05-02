@@ -28,9 +28,10 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retrieve the user.
+  Specify which guards to use, e.g. ["api"].
+  When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guard: [String!]
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -40,7 +41,7 @@ SDL;
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        /** @var string|null $guard */
+        /** @var array<string>|string|null $guard */
         $guard = $this->directiveArgValue('guard', config('lighthouse.guard', null));
 
         return $fieldValue->setResolver(

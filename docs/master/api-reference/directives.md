@@ -58,9 +58,10 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retrieve the user.
+  Specify which guards to use, e.g. ["api"].
+  When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guard: [String!]
 ) on FIELD_DEFINITION
 ```
 
@@ -1065,8 +1066,8 @@ users to still receive partial results.
 """
 directive @guard(
   """
-  Specify which guards to use, e.g. "api".
-  When not defined, the default driver is used.
+  Specify which guards to use, e.g. ["api"].
+  When not defined, the default from `lighthouse.php` is used.
   """
   with: [String!]
 ) on FIELD_DEFINITION | OBJECT
