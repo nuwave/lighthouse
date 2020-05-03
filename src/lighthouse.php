@@ -33,8 +33,7 @@ return [
 
             // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
             // middleware, this delegates auth and permission checks to the field level.
-            // If you want to use another guard, change the suffix (remove for default).
-            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class.':api',
+            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
         ],
 
         /*
@@ -46,12 +45,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authentication Guard
+    |--------------------------------------------------------------------------
+    |
+    | The guard to use for authenticating GraphQL requests, if needed.
+    | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
+    | such as `@guard` and when applying the `AttempAuthentication` middleware.
+    | TODO this setting will default to 'api' in v5
+    |
+    */
+
+    'guard' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Schema Location
     |--------------------------------------------------------------------------
     |
-    | This is a path that points to where your GraphQL schema is located
-    | relative to the app path. You should define your entire GraphQL
-    | schema in this file (additional files may be imported).
+    | Path to your .graphql schema file.
+    | Additional schema files may be imported from within that file.
     |
     */
 

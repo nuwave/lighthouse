@@ -13,6 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Allow passing additional headers to `multipartGraphQL` test helper https://github.com/nuwave/lighthouse/pull/1342
 - Add empty root types automatically when extending them https://github.com/nuwave/lighthouse/pull/1347
+- Configure a default `guard` for all authentication functionality https://github.com/nuwave/lighthouse/pull/1343
 
 ### Changed
 

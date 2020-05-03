@@ -16,7 +16,7 @@ class AuthDirectiveTest extends TestCase
         type User {
             foo: String!
         }
-        
+
         type Query {
             user: User! @auth
         }
@@ -27,7 +27,7 @@ class AuthDirectiveTest extends TestCase
             user {
                 foo
             }
-        }           
+        }
         ')->assertJson([
             'data' => [
                 'user' => [
@@ -43,22 +43,22 @@ class AuthDirectiveTest extends TestCase
 
         $this->app['auth']->guard('api')->setUser($user);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             foo: String!
         }
-        
+
         type Query {
             user: User! @auth(guard: "api")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 foo
             }
-        }           
+        }
         ')->assertJson([
             'data' => [
                 'user' => [

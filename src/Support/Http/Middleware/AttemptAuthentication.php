@@ -40,7 +40,7 @@ class AttemptAuthentication
     protected function attemptAuthentication(array $guards): void
     {
         if (empty($guards)) {
-            $guards = [null];
+            $guards = [config('lighthouse.guard')];
         }
 
         foreach ($guards as $guard) {
