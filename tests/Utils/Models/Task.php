@@ -26,8 +26,6 @@ class Task extends Model
 {
     use SoftDeletes;
 
-    protected $guarded = [];
-
     protected static function boot()
     {
         parent::boot();

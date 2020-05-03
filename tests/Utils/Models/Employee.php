@@ -14,8 +14,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 class Employee extends Model
 {
-    protected $guarded = [];
-
     public function user(): MorphOne
     {
         return $this->morphOne(User::class, 'person');
