@@ -15,7 +15,6 @@ class WithEnum extends Model
 {
     use CastsEnums;
 
-    protected $guarded = [];
     public $timestamps = false;
 
     protected $enumCasts = [

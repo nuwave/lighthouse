@@ -25,11 +25,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    /**
-     * @var mixed[]
-     */
-    protected $guarded = [];
-
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);

@@ -17,8 +17,6 @@ class RoleUserPivot extends Model
 
     public $timestamps = false;
 
-    protected $guarded = [];
-
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);

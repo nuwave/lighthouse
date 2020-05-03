@@ -163,18 +163,6 @@ The newly created user is returned as a result:
 }
 ```
 
-**Note**: Due to Laravel's protections against mass assignment, any arguments used in `@create` or `@update` must be added to the `$fillable` property in your Model. For the above example, we would need the following in `\App\Models\User`:
-
-```php
-class User extends Model
-{
-  // ...
-  protected $fillable = ["name"];
-}
-```
-
-For more information, see the [laravel docs](https://laravel.com/docs/eloquent#mass-assignment).
-
 ## Update
 
 You can update a model with the [@update](../api-reference/directives.md#update) directive.
@@ -228,8 +216,8 @@ type Mutation {
 }
 ```
 
-Since upsert can create or update your data you must have all the minimum fields for a creation as required.
-The `id` is always required and must be marked as fillable in the model.
+Since upsert can create or update your data, your input should mark the minimum required fields as non-nullable.
+The `id` must always be required.
 
 ```graphql
 mutation {

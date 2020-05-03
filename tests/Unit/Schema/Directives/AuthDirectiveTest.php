@@ -9,12 +9,13 @@ class AuthDirectiveTest extends TestCase
 {
     public function testCanResolveAuthenticatedUser(): void
     {
-        $user = new User(['foo' => 'bar']);
+        $user = new User();
+        $user->name = 'foo';
         $this->be($user);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
-            foo: String!
+            name: String!
         }
 
         type Query {
@@ -22,16 +23,16 @@ class AuthDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                foo
+                name
             }
         }
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'foo' => 'bar',
+                    'name' => $user->name,
                 ],
             ],
         ]);
@@ -39,13 +40,14 @@ class AuthDirectiveTest extends TestCase
 
     public function testCanResolveAuthenticatedUserWithGuardArgument(): void
     {
-        $user = new User(['foo' => 'bar']);
+        $user = new User();
+        $user->name = 'foo';
 
         $this->app['auth']->guard('api')->setUser($user);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            foo: String!
+            name: String!
         }
 
         type Query {
@@ -56,13 +58,13 @@ class AuthDirectiveTest extends TestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                foo
+                name
             }
         }
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'foo' => 'bar',
+                    'name' => $user->name,
                 ],
             ],
         ]);

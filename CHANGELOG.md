@@ -18,6 +18,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Changed
 
 - Improve validation error when extending a type that is not defined https://github.com/nuwave/lighthouse/pull/1347
+- Use `forceFill()` when mutating models https://github.com/nuwave/lighthouse/pull/1348
 
 ## 4.12.4
 
