@@ -15,7 +15,7 @@ class RootType
             [
                 self::QUERY,
                 self::MUTATION,
-                self::SUBSCRIPTION
+                self::SUBSCRIPTION,
             ]
         );
     }

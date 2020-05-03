@@ -206,8 +206,8 @@ class ASTBuilder
     {
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|null $extendedObjectLikeType */
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
-        if($extendedObjectLikeType === null) {
-            if(RootType::isRootType($typeName)) {
+        if ($extendedObjectLikeType === null) {
+            if (RootType::isRootType($typeName)) {
                 $extendedObjectLikeType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
             } else {
@@ -227,7 +227,7 @@ class ASTBuilder
     {
         /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName] ?? null;
-        if($extendedEnum === null) {
+        if ($extendedEnum === null) {
             $this->throwDefinitionDoesNotExist($typeName, $typeExtension);
         }
 
@@ -240,8 +240,6 @@ class ASTBuilder
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode  $typeExtensiond
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function throwDefinitionDoesNotExist(string $typeName, TypeExtensionNode $typeExtension): void
@@ -252,8 +250,6 @@ class ASTBuilder
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode  $typeExtensiond
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
 
