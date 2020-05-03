@@ -12,6 +12,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Allow passing additional headers to `multipartGraphQL` test helper https://github.com/nuwave/lighthouse/pull/1342
+- Add empty root types automatically when extending them
+
+### Changed
+
+- Improve validation error when extending a type that is not defined
 
 ## 4.12.4
 
