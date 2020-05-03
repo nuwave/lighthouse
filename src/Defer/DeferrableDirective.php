@@ -10,6 +10,7 @@ use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\ClientDirectives\ClientDirective;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -81,7 +82,7 @@ SDL;
         $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
 
         if ($this->anyFieldHasDefer($defers)) {
-            if ($resolveInfo->parentType->name === 'Mutation') {
+            if ($resolveInfo->parentType->name === RootType::MUTATION) {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
             if ($fieldType instanceof NonNullTypeNode) {
