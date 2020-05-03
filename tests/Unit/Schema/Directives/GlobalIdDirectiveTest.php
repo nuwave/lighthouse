@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -22,19 +23,19 @@ class GlobalIdDirectiveTest extends TestCase
 
     public function testDecodesGlobalId(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: String! @globalId
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             foo
-        }        
+        }
         ')->assertJson([
             'data' => [
-                'foo' => $this->globalId->encode('Query', Foo::THE_ANSWER),
+                'foo' => $this->globalId->encode(RootType::QUERY, Foo::THE_ANSWER),
             ],
         ]);
     }
@@ -49,7 +50,7 @@ class GlobalIdDirectiveTest extends TestCase
                 array: ID! @globalId
             ): Foo @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
-        
+
         type Foo {
             type: String!
             id: ID!
@@ -70,7 +71,7 @@ class GlobalIdDirectiveTest extends TestCase
                 type
                 array
             }
-        }        
+        }
         ")->assertJson([
             'data' => [
                 'foo' => [

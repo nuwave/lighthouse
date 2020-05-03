@@ -97,32 +97,8 @@ extend type Query {
 
 The fields in the `extend type` definition are merged with those of the original type.
 
-### Root Definitions
-
-A valid `Query` type definition with at least one field must be present in the root schema.
-This is because `extend type` needs the original type to get merged into.
-
-You can provide an empty `Query` type (without curly braces) in the root schema:
-
-```graphql
-type Query
-
-#import post.graphql
-```
-
-The same applies for mutations: if you want to use them, you can define
-an empty `Mutation` type (without curly braces) within your root schema:
-
-```graphql
-type Query
-
-type Mutation
-
-#import post.graphql
-```
-
 ### Extending other types
 
-Apart from object types, you can also extend `input`, `interface` and `enum` types.
+Apart from object types `type`, you can also extend `input`, `interface` and `enum` types.
 Lighthouse will merge the fields (or values) with the original definition and always
 produce a single type in the final schema.
