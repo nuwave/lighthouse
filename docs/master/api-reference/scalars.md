@@ -1,7 +1,7 @@
 # Scalars
 
 You can use Lighthouse's built-in scalars by defining them in your schema,
-using [`@scalar`](directives.md#scalar) to point them to a FQCN.
+using [@scalar](directives.md#scalar) to point them to a FQCN.
 
 ```graphql
 "A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."

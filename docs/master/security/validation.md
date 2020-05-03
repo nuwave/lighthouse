@@ -89,7 +89,7 @@ input CreateUserInput {
 ## Validating Arrays
 
 When you are passing in an array as an argument to a field, you might
-want to apply some validation on the array itself, using [`@rulesForArray`](../api-reference/directives.md#rulesforarray)
+want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rulesforarray)
 
 ```graphql
 type Mutation {

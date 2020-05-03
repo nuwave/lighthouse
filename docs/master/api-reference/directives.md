@@ -252,7 +252,7 @@ Run the `bcrypt` function on the argument it is defined on.
 directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Deprecated in favor of [`@hash`](#hash).
+Deprecated in favor of [@hash](#hash).
 
 ## @broadcast
 
@@ -418,7 +418,7 @@ type GithubProfile {
 
 When generating a cached result for a resolver, Lighthouse produces a unique key for each type.
 By default, Lighthouse will look for a field with the `ID` type to generate the key.
-If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+If you'd like to use a different field (i.e., an external API id) you can mark the field with the [@cacheKey](#cachekey) directive.
 
 ### Definition
 
@@ -719,7 +719,7 @@ type Mutation {
 
 ## @deprecated
 
-You can mark fields as deprecated by adding the `@deprecated` directive and providing a
+You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive and providing a
 `reason`. Deprecated fields are not included in introspection queries unless
 requested and they can still be queried by clients.
 
@@ -919,7 +919,7 @@ type Mutation {
 }
 ```
 
-Works very similar to the [`@delete`](#delete) directive.
+Works very similar to the [@delete](#delete) directive.
 
 ## @enum
 
@@ -1073,7 +1073,7 @@ directive @guard(
 ) on FIELD_DEFINITION | OBJECT
 ```
 
-Note that [`@guard`](docs/master/api-reference/directives.md#guard) does not log in users.
+Note that [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
 middleware config, see the [default config](src/lighthouse.php) for an example.
 
@@ -1248,7 +1248,7 @@ directive @include(
 
 ### Examples
 
-The `@include` directive may be provided for fields, fragment spreads, and inline fragments,
+The [@include](#include) directive may be provided for fields, fragment spreads, and inline fragments,
 and allows for conditional inclusion during execution as described by the `if` argument.
 
 In this example experimentalField will only be queried if the variable \$someTest has the value true
@@ -1396,7 +1396,7 @@ directive @lazyLoad(
 ) on FIELD_DEFINITION
 ```
 
-This is often useful when loading relationships with the [`@hasMany`](#hasmany) directive.
+This is often useful when loading relationships with the [@hasMany](#hasmany) directive.
 
 ```graphql
 type Post {
@@ -1475,7 +1475,7 @@ $user->purchasedItemsCount(2017, null)
 ## @middleware
 
 **DEPRECATED**
-Use [`@guard`](#guard) or custom [`FieldMiddleware`](../custom-directives/field-directives.md#fieldmiddleware) instead.
+Use [@guard](#guard) or custom [`FieldMiddleware`](../custom-directives/field-directives.md#fieldmiddleware) instead.
 
 ```graphql
 """
@@ -1546,7 +1546,7 @@ Enable fetching an Eloquent model by its global id through the `node` query.
 directive @model on OBJECT
 ```
 
-**Deprecated** Use [`@node`](#node) for Relay global object identification.
+**Deprecated** Use [@node](#node) for Relay global object identification.
 
 ## @modelClass
 
@@ -1709,7 +1709,7 @@ directive @morphTo(
 Redefine the default namespaces used in other directives.
 
 The following example applies the namespace `App\Blog`
-to the `@field` directive used on the `posts` field.
+to the [@field](#field) directive used on the `posts` field.
 
 ```graphql
 type Query {
@@ -1741,7 +1741,7 @@ extend type Query @namespace(field: "App\\Blog") {
 }
 ```
 
-A `@namespace` directive defined on a field directive wins in case of a conflict.
+A [@namespace](#namespace) directive defined on a field directive wins in case of a conflict.
 
 ## @neq
 
@@ -1986,7 +1986,8 @@ You may pass more than one sorting option to add a secondary ordering.
 
 ### Input Definition Example
 
-The `@orderBy` directive can also be applied inside an input field definition when used in conjunction with the [`@spread`](#spread) directive. See below for example:
+The [@orderBy](#orderby) directive can also be applied inside an input field definition
+when used in conjunction with the [@spread](#spread) directive. See below for example:
 
 ```graphql
 type Query {
@@ -2063,7 +2064,7 @@ type Query {
 ```
 
 > When you want to paginate a relationship, use the to-many relationship
-> directives such as [`@hasMany`](directives.md#hasmany) instead.
+> directives such as [@hasMany](directives.md#hasmany) instead.
 
 The schema definition is automatically transformed to this:
 
@@ -2277,7 +2278,7 @@ type Mutation {
 }
 ```
 
-Works very similar to the [`@delete`](#delete) directive.
+Works very similar to the [@delete](#delete) directive.
 
 ## @rules
 
@@ -2400,7 +2401,7 @@ directive @scope(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-You may use this in combination with field directives such as [`@all`](#all).
+You may use this in combination with field directives such as [@all](#all).
 
 ```graphql
 type Query {
@@ -2421,7 +2422,7 @@ type Query {
 The `search()` method of the model is called with the value of the argument,
 using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
 
-The `@search` directive does not work in combination with other filter directives.
+The [@search](#search) directive does not work in combination with other filter directives.
 The usual query builder `Eloquent\Builder` will be replaced by a `Scout\Builder`,
 which does not support the same methods and operations.
 
@@ -2469,7 +2470,7 @@ directive @skip(
 
 ### Examples
 
-The `@skip` directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
+The [@skip](#skip) directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
 exclusion during execution as described by the if argument.
 
 In this example experimentalField will only be queried if the variable \$someTest has the value `false`.
@@ -2507,7 +2508,7 @@ type Query {
 }
 ```
 
-Find out how the added filter works: [`@trashed`](#trashed)
+Find out how the added filter works: [@trashed](#trashed)
 
 ## @spread
 
@@ -2519,7 +2520,7 @@ when processing the field arguments given by a client.
 directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-You may use `@spread` on field arguments or on input object fields:
+You may use [@spread](#spread) on field arguments or on input object fields:
 
 ```graphql
 type Mutation {
@@ -2536,7 +2537,7 @@ input PostContent {
 }
 ```
 
-The schema does not change, client side usage works as if `@spread` was not there:
+The schema does not change, client side usage works as if [@spread](#spread) was not there:
 
 ```graphql
 mutation {
@@ -2605,7 +2606,7 @@ Allows to filter if trashed elements should be fetched.
 directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-The most convenient way to use this directive is through [`@softDeletes`](#softdeletes).
+The most convenient way to use this directive is through [@softDeletes](#softdeletes).
 
 If you want to add it manually, make sure the argument is of the
 enum type `Trashed`:
@@ -2804,7 +2805,7 @@ directive @upsert(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
+Lighthouse will try to to fetch the model by its primary key, just like [@update](#update).
 If the model doesn't exist, it will be newly created with a given `id`.
 In case no `id` is specified, an auto-generated fresh ID will be used instead.
 

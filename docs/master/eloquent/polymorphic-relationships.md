@@ -28,7 +28,7 @@ type Image {
 
 First, let's go ahead and add the relations to `Image` since they are straightforward.
 The field name should match your relationship method name and be annotated
-with the [`@morphOne`](../api-reference/directives.md#morphone) directive.
+with the [@morphOne](../api-reference/directives.md#morphone) directive.
 
 ```graphql
 type Post {
@@ -56,7 +56,7 @@ union Imageable = Post | User
 ```
 
 Now, reference the union type from a field in your `Image` type.
-You can use the [`@morphTo`](../api-reference/directives.md#morphto) directive
+You can use the [@morphTo](../api-reference/directives.md#morphto) directive
 for performance optimization.
 
 ```graphql
@@ -75,7 +75,7 @@ when dealing with Eloquent models, so your definition should just work.
 Based on the above example, you could change your application to allow
 for a `Post` to have many images attached to it.
 The field `images` now returns a list of `Image` object and is annotated
-with the [`@morphMany`](../api-reference/directives.md#morphmany) directive.
+with the [@morphMany](../api-reference/directives.md#morphmany) directive.
 
 ```graphql
 type Post {

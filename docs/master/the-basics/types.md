@@ -119,7 +119,7 @@ Queries now return meaningful names instead of magic numbers.
 }
 ```
 
-If the internal value of the enum is the same as the field name, `@enum` can be omitted:
+If the internal value of the enum is the same as the field name, [@enum](../api-reference/directives.md#enum) can be omitted:
 
 ```graphql
 enum Role {
