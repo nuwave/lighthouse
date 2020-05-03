@@ -415,7 +415,7 @@ class ASTBuilder
         $globalId = config('lighthouse.global_id_field');
         // Double slashes to escape the slashes in the namespace.
         $this->documentAST->setTypeDefinition(
-            PartialParser::interfaceTypeDefinition(<<<GRAPHQL
+            PartialParser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 "Node global interface"
 interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {
 "Global identifier that can be used to resolve any Node implementation."
@@ -430,7 +430,7 @@ GRAPHQL
         $queryType->fields = ASTHelper::mergeNodeList(
             $queryType->fields,
             [
-                PartialParser::fieldDefinition('
+                PartialParser::fieldDefinition(/** @lang GraphQL */ '
                     node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
                 '),
             ]
