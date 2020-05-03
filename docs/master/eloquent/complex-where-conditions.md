@@ -228,7 +228,7 @@ directive @whereHasConditions(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-This directive works very similar to [`@whereConditions`](#whereconditions), except that
+This directive works very similar to [@whereConditions](#whereconditions), except that
 the conditions are applied to a relation sub query:
 
 ```graphql
@@ -294,7 +294,7 @@ This query would retrieve all persons that have a role:
 }
 ```
 
-Just like with the `@whereCondition` directive, using `null` as argument value does not have any effect on the query.
+Just like with the [@whereCondition](../api-reference/directives.md#whereconditions) directive, using `null` as argument value does not have any effect on the query.
 This query would retrieve all persons, no matter if they have a role or not:
 
 ```graphql

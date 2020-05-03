@@ -120,5 +120,5 @@ class PostUpdated extends GraphQLSubscription
 ```
 
 If the default namespaces are not working with your application structure
-or you want to be more explicit, you can use the [`@subscription`](../api-reference/directives.md#subscription)
+or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription)
 directive to point to a different class.

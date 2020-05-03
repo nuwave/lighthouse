@@ -6,7 +6,7 @@ Lighthouse offers convenient helpers to work with models that utilize
 ## Filter Soft Deleted Models
 
 If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait,
-you can add the [`@softDeletes`](../api-reference/directives.md#softdeletes) directive to a field
+you can add the [@softDeletes](../api-reference/directives.md#softdeletes) directive to a field
 to be able to query `onlyTrashed`, `withTrashed` or `withoutTrashed` elements.
 
 ```graphql
@@ -46,7 +46,7 @@ You can include soft deleted models in your result with a query like this:
 ## Restoring Soft Deleted Models
 
 If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait,
-you can restore your model using the [`@restore`](../api-reference/directives.md#restore) directive.
+you can restore your model using the [@restore](../api-reference/directives.md#restore) directive.
 
 ```graphql
 type Mutation {

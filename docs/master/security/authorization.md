@@ -13,7 +13,7 @@ For example, a user may only be able to see notes they created.
 You can utilize the nested nature of GraphQL queries to naturally limit access to such fields.
 
 Begin with a field that represents the currently authenticated user, commonly called `me` or `viewer`.
-You can resolve that field quite easily by using the [`@auth`](../api-reference/directives.md#auth) directive.
+You can resolve that field quite easily by using the [@auth](../api-reference/directives.md#auth) directive.
 
 ```graphql
 type Query {
@@ -66,7 +66,7 @@ Because of this, Lighthouse does **not** validate that the user is authenticated
 ### Protect mutations
 
 As an example, you might want to allow only admin users of your application to create posts.
-Start out by defining `@can` upon a mutation you want to protect:
+Start out by defining [@can](../api-reference/directives.md#can) upon a mutation you want to protect:
 
 ```graphql
 type Mutation {

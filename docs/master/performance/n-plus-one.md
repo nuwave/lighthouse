@@ -28,7 +28,7 @@ When dealing with Laravel relationships, [eager loading](https://laravel.com/doc
 is commonly used to alleviate the N+1 query problem.
 
 You can leverage eager loading by informing Lighthouse of the relationships between your models,
-using directives such as [`@belongsTo`](../api-reference/directives.md#belongsto) and [`@hasMany`](../api-reference/directives.md#hasmany).
+using directives such as [@belongsTo](../api-reference/directives.md#belongsto) and [@hasMany](../api-reference/directives.md#hasmany).
 
 ```graphql
 type Post {
@@ -45,7 +45,7 @@ type User {
 Under the hood, Lighthouse will batch the relationship queries together in a single database query.
 
 If you require a relation to be loaded for some field, but do not wish to return the relationship itself,
-you can use the [`@with`](../api-reference/directives.md#with) directive.
+you can use the [@with](../api-reference/directives.md#with) directive.
 
 ## Data Loader
 

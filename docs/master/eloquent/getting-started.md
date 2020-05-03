@@ -55,7 +55,7 @@ Will return the following result:
 
 ## Pagination
 
-You can leverage the [`@paginate`](../api-reference/directives.md#paginate) directive to
+You can leverage the [@paginate](../api-reference/directives.md#paginate) directive to
 query a large list of models in chunks.
 
 ```graphql
@@ -139,7 +139,7 @@ type Mutation {
 }
 ```
 
-This will take the arguments that the `createUser` field receives and use them to create a new model instance.
+A create mutation will use the arguments passed to the field to create a new model instance:
 
 ```graphql
 mutation {
@@ -207,8 +207,7 @@ mutation {
 }
 ```
 
-Be aware that while a create operation will always return a result, provided you pass valid data, the update
-may fail to find the model you provided and return `null`:
+The update may fail to find the model you provided and return `null`:
 
 ```json
 {

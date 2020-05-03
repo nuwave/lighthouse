@@ -21,7 +21,7 @@ required in a single request, it is convenient to attempt authentication once pe
 ```
 
 Note that the `AttemptAuthentication` middleware does _not_ protect any of your fields
-by itself, decorate them with [`@guard`](../api-reference/directives.md#guard) as needed.
+by itself, decorate them with [@guard](../api-reference/directives.md#guard) as needed.
 
 If you want to guard all your fields against unauthenticated access, you can simply add
 Laravel's build-in auth middleware. Beware that this approach does not allow any GraphQL
@@ -35,7 +35,7 @@ operations for guest users, so you will have to handle login outside of GraphQL.
 
 ## Guard selected fields
 
-If you want to guard only selected fields, you can use the [`@guard`](../api-reference/directives.md#guard)
+If you want to guard only selected fields, you can use the [@guard](../api-reference/directives.md#guard)
 directive to require authentication for accessing them.
 
 ```graphql
@@ -44,7 +44,7 @@ type Query {
 }
 ```
 
-If you need to guard multiple fields, just use [`@guard`](../api-reference/directives.md#guard)
+If you need to guard multiple fields, just use [@guard](../api-reference/directives.md#guard)
 on a `type` or an `extend type` definition. It will be applied to all fields within that type.
 
 ```graphql
@@ -58,7 +58,7 @@ extend type Query @guard(with: ["api:admin"]) {
 
 Lighthouse will use your application's default guard, unless specified otherwise.
 If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) only for your API,
-you can set it when using `@guard`:
+you can set it when using [@guard](../api-reference/directives.md#guard):
 
 ```graphql
 type Query {
@@ -69,7 +69,7 @@ type Query {
 ## Get the current user
 
 Lighthouse provides a really simple way to fetch the information of the currently authenticated user.
-Just add a field that returns your `User` type and decorate it with the [`@auth`](../api-reference/directives.md#auth) directive.
+Just add a field that returns your `User` type and decorate it with the [@auth](../api-reference/directives.md#auth) directive.
 
 ```graphql
 type Query {
