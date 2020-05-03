@@ -240,6 +240,8 @@ class ASTBuilder
     }
 
     /**
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $typeExtension
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function throwDefinitionDoesNotExist(string $typeName, TypeExtensionNode $typeExtension): void
