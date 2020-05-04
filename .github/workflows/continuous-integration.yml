@@ -24,7 +24,7 @@ jobs:
         uses: "actions/checkout@v2.0.0"
 
       - name: "Run composer normalize"
-        uses: "docker://localheinz/composer-normalize-action:0.5.2"
+        uses: "docker://ergebnis/composer-normalize-action:latest"
 
   prettier:
     name: "Prettify docs"
