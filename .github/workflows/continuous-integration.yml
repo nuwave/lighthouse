@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
+        with:
+          ref: "${{ github.head_ref }}"
 
       - name: "Run composer normalize"
         uses: "docker://ergebnis/composer-normalize-action:0.8.0"
@@ -29,7 +31,7 @@ jobs:
       - uses: "stefanzweifel/git-auto-commit-action@v4.1.6"
         with:
           commit_message: "Normalize composer.json"
-          branch: ${{ github.head_ref }}
+          branch: "${{ github.head_ref }}"
 
   prettier:
     name: "Prettify docs"
