@@ -28,6 +28,11 @@ jobs:
         with:
           args: "--dry-run"
 
+      - uses: "stefanzweifel/git-auto-commit-action@v4.1.6"
+        with:
+          commit_message: "Normalize composer.json"
+          branch: ${{ github.head_ref }}
+
   prettier:
     name: "Prettify docs"
 
