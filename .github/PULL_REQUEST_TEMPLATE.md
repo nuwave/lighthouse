@@ -1,5 +1,5 @@
 - [ ] Added or updated tests
-- [ ] Added Docs for all relevant versions
+- [ ] Documented user facing changes
 - [ ] Updated CHANGELOG.md
 
 <!-- Link to related issues this PR resolves, e.g. "Resolves #236"-->
