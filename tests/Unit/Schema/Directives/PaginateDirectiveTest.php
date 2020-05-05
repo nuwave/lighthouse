@@ -303,7 +303,7 @@ class PaginateDirectiveTest extends TestCase
         $defaultCount = 5;
         config(['lighthouse.paginate_default_count' => $defaultCount]);
 
-        $this->buildSchema(/** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
             type User {
                 id: ID!
                 name: String!
