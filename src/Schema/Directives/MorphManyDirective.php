@@ -44,7 +44,7 @@ directive @morphMany(
   defaultCount: Int
 
   """
-  Limit the maximum amount of items that users can request at once.
+  Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
