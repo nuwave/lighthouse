@@ -322,6 +322,6 @@ class PaginateDirectiveTest extends TestCase
                     }
                 }
             }
-        ')->assertJsonCount($defaultCount);
+        ')->assertJsonCount($defaultCount, 'data.users.data');
     }
 }
