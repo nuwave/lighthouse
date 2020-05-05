@@ -123,7 +123,7 @@ abstract class RelationDirective extends BaseDirective
             $paginationType,
             $fieldDefinition,
             $parentType,
-            $this->directiveArgValue('defaultCount'),
+            $this->directiveArgValue('defaultCount') ?? config('lighthouse.paginate_default_count'),
             $this->paginateMaxCount(),
             $this->edgeType($documentAST)
         );
