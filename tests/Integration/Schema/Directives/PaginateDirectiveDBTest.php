@@ -444,7 +444,9 @@ class PaginateDirectiveDBTest extends DBTestCase
 
     public function testDoesNotRequireDefaultCountArgIfDefinedInConfig(): void
     {
-        $defaultCount = 5;
+        factory(User::class, 3)->create();
+
+        $defaultCount = 2;
         config(['lighthouse.pagination.default_count' => $defaultCount]);
 
         $this->schema = /** @lang GraphQL */ '
