@@ -130,33 +130,39 @@ return [
     |--------------------------------------------------------------------------
     | Pagination
     |--------------------------------------------------------------------------
-    | Pagination related configuration settings.
+    |
+    | Set defaults for the pagination features within Lighthouse, such as
+    | the @paginate directive, or paginated relation directives.
     |
     */
 
     'pagination' => [
-        /**
-         * Set the default count value for the @paginate directive.
-         * A setting of "null" mean that "defaultCount" argument needs to be set
-         * for each paginate directive, or to pass the "first" argument in the request.
+        /*
+         * Allow clients to query paginated lists without specifying the amount of items.
+         * Setting this to `null` means clients have to explicitly ask for the count.
          */
         'default_count' => null,
 
-        /**
-         * Limits the maximum "count" that users may pass as an argument
-         * to fields that are paginated with the @paginate directive.
-         * A setting of "null" means the count is unrestricted.
+        /*
+         * Limit the maximum amount of items that users can request at once.
+         * Setting this to `null` means the count is unrestricted.
          */
         'max_count' => null,
-
-        /**
-         * Set the name to use for the generated argument on paginated fields
-         * that controls how many results are returned.
-         *
-         * DEPRECATED This setting will be removed in v5.
-         */
-        'amount_argument' => 'first',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination Amount Argument
+    |--------------------------------------------------------------------------
+    |
+    | Set the name to use for the generated argument on paginated fields
+    | that controls how many results are returned.
+    |
+    | DEPRECATED This setting will be removed in v5.
+    |
+    */
+
+    'pagination_amount_argument' => 'first',
 
     /*
     |--------------------------------------------------------------------------

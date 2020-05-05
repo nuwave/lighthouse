@@ -33,14 +33,14 @@ directive @hasMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that users can request at once.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 

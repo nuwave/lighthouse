@@ -48,7 +48,7 @@ SDL;
                 $complexity = Arr::get(
                     $args,
                     'first',
-                    Arr::get($args, config('lighthouse.pagination.amount_argument'), 1)
+                    Arr::get($args, config('lighthouse.pagination_amount_argument'), 1)
                 );
 
                 return $childrenComplexity * $complexity;

@@ -110,7 +110,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 5.',
-            $queryType->getField('defaultPaginated')->getArg(config('lighthouse.pagination.amount_argument'))->description
+            $queryType->getField('defaultPaginated')->getArg(config('lighthouse.pagination_amount_argument'))->description
         );
 
         $this->assertSame(
@@ -120,7 +120,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
-            $queryType->getField('customPaginated')->getArg(config('lighthouse.pagination.amount_argument'))->description
+            $queryType->getField('customPaginated')->getArg(config('lighthouse.pagination_amount_argument'))->description
         );
 
         $this->assertSame(
@@ -131,7 +131,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testCanChangePaginationAmountArgument(): void
     {
-        config(['lighthouse.pagination.amount_argument' => 'first']);
+        config(['lighthouse.pagination_amount_argument' => 'first']);
 
         $queryType = $this
             ->buildSchema(/** @lang GraphQL */ '

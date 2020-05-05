@@ -459,13 +459,13 @@ class PaginateDirectiveDBTest extends DBTestCase
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
-            {
-                users {
-                    data {
-                        id
-                    }
+        {
+            users {
+                data {
+                    id
                 }
             }
+        }
         ')->assertJsonCount($defaultCount, 'data.users.data');
     }
 }
