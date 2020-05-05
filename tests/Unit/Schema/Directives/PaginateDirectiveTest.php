@@ -312,7 +312,7 @@ class PaginateDirectiveTest extends TestCase
             type Query {
                 users: [User!] @paginate
             }
-        ');
+        ';
 
         $this->graphQL(/** @lang GraphQL */ '
             {
