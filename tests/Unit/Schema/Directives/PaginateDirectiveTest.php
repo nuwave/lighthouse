@@ -297,4 +297,31 @@ class PaginateDirectiveTest extends TestCase
         }
         ');
     }
+
+    public function testDoesNotRequireDefaultCountArgIfDefinedInConfig() : void
+    {
+        $defaultCount = 5;
+        config(['lighthouse.paginate_default_count' => $defaultCount]);
+
+        $this->buildSchema(/** @lang GraphQL */'
+            type User {
+                id: ID!
+                name: String!
+            }
+
+            type Query {
+                users: [User!] @paginate
+            }
+        ');
+
+        $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    data {
+                        id
+                    }
+                }
+            }
+        ')->assertJsonCount($defaultCount);
+    }
 }
