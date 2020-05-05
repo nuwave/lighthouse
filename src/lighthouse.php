@@ -129,6 +129,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Pagination Default Count
+    |--------------------------------------------------------------------------
+    |
+    | Set the default count value for the @paginate directive.
+    | A setting of "null" mean that "defaultCount" argument needs to be set
+    | for each paginate directive, or to pass the "first" argument in the request.
+    |
+    */
+
+    'pagination_default_count' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Pagination Amount Argument
     |--------------------------------------------------------------------------
     |
