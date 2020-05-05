@@ -91,7 +91,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testHasMaxCountInGeneratedCountDescription(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $queryType = $this
             ->buildSchema(/** @lang GraphQL */ '
@@ -110,7 +110,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 5.',
-            $queryType->getField('defaultPaginated')->getArg(config('lighthouse.pagination_amount_argument'))->description
+            $queryType->getField('defaultPaginated')->getArg(config('lighthouse.pagination.amount_argument'))->description
         );
 
         $this->assertSame(
@@ -120,7 +120,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
-            $queryType->getField('customPaginated')->getArg(config('lighthouse.pagination_amount_argument'))->description
+            $queryType->getField('customPaginated')->getArg(config('lighthouse.pagination.amount_argument'))->description
         );
 
         $this->assertSame(
@@ -131,7 +131,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testCanChangePaginationAmountArgument(): void
     {
-        config(['lighthouse.pagination_amount_argument' => 'first']);
+        config(['lighthouse.pagination.amount_argument' => 'first']);
 
         $queryType = $this
             ->buildSchema(/** @lang GraphQL */ '
@@ -153,7 +153,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $this->schema = /** @lang GraphQL */
             '
@@ -187,7 +187,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -296,32 +296,5 @@ class PaginateDirectiveTest extends TestCase
             users: [Query!] @paginate(builder: "NonexistingClass@notFound")
         }
         ');
-    }
-
-    public function testDoesNotRequireDefaultCountArgIfDefinedInConfig() : void
-    {
-        $defaultCount = 5;
-        config(['lighthouse.paginate_default_count' => $defaultCount]);
-
-        $this->schema = /** @lang GraphQL */ '
-            type User {
-                id: ID!
-                name: String!
-            }
-
-            type Query {
-                users: [User!] @paginate
-            }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-            {
-                users {
-                    data {
-                        id
-                    }
-                }
-            }
-        ')->assertJsonCount($defaultCount, 'data.users.data');
     }
 }

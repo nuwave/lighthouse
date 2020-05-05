@@ -118,41 +118,33 @@ return [
     |--------------------------------------------------------------------------
     | Pagination
     |--------------------------------------------------------------------------
-    |
-    | Limits the maximum "count" that users may pass as an argument
-    | to fields that are paginated with the @paginate directive.
-    | A setting of "null" means the count is unrestricted.
+    | Pagination related configuration settings.
     |
     */
 
-    'paginate_max_count' => null,
+    'pagination' => [
+        /**
+         * Set the default count value for the @paginate directive.
+         * A setting of "null" mean that "defaultCount" argument needs to be set
+         * for each paginate directive, or to pass the "first" argument in the request.
+         */
+        'default_count' => null,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pagination Default Count
-    |--------------------------------------------------------------------------
-    |
-    | Set the default count value for the @paginate directive.
-    | A setting of "null" mean that "defaultCount" argument needs to be set
-    | for each paginate directive, or to pass the "first" argument in the request.
-    |
-    */
+        /**
+         * Limits the maximum "count" that users may pass as an argument
+         * to fields that are paginated with the @paginate directive.
+         * A setting of "null" means the count is unrestricted.
+         */
+        'max_count' => null,
 
-    'pagination_default_count' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Pagination Amount Argument
-    |--------------------------------------------------------------------------
-    |
-    | Set the name to use for the generated argument on paginated fields
-    | that controls how many results are returned.
-    |
-    | DEPRECATED This setting will be removed in v5.
-    |
-    */
-
-    'pagination_amount_argument' => 'first',
+        /**
+         * Set the name to use for the generated argument on paginated fields
+         * that controls how many results are returned.
+         *
+         * DEPRECATED This setting will be removed in v5.
+         */
+        'amount_argument' => 'first',
+    ],
 
     /*
     |--------------------------------------------------------------------------

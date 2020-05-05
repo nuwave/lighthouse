@@ -39,7 +39,7 @@ class PaginationArgs
                 Cursor::decode($args)
             );
         } else {
-            $instance->first = $args[config('lighthouse.pagination_amount_argument')];
+            $instance->first = $args[config('lighthouse.pagination.amount_argument')];
             $instance->page = Arr::get($args, 'page', 1);
         }
 

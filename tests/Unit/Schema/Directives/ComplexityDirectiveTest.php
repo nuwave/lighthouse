@@ -13,7 +13,7 @@ class ComplexityDirectiveTest extends TestCase
         type User {
             posts: [Post!]! @complexity @hasMany
         }
-        
+
         type Post {
             title: String
         }
@@ -26,7 +26,7 @@ class ComplexityDirectiveTest extends TestCase
             ->getComplexityFn();
 
         $this->assertSame(100, $complexityFn(10, ['first' => 10]));
-        $this->assertSame(100, $complexityFn(10, [config('lighthouse.pagination_amount_argument') => 10]));
+        $this->assertSame(100, $complexityFn(10, [config('lighthouse.pagination.amount_argument') => 10]));
     }
 
     public function testCanSetCustomComplexityResolver(): void
@@ -37,7 +37,7 @@ class ComplexityDirectiveTest extends TestCase
                 @complexity(resolver: "'.$this->qualifyTestResolver('complexity').'")
                 @hasMany
         }
-        
+
         type Post {
             title: String
         }

@@ -81,7 +81,8 @@ SDL;
                 $this->paginationType(),
                 $fieldDefinition,
                 $parentType,
-                $this->directiveArgValue('defaultCount') ?? config('lighthouse.paginate_default_count'),
+                $this->directiveArgValue('defaultCount')
+                    ?? config('lighthouse.pagination.default_count'),
                 $this->paginateMaxCount()
             );
     }
@@ -132,6 +133,6 @@ SDL;
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')
-            ?? config('lighthouse.paginate_max_count');
+            ?? config('lighthouse.pagination.max_count');
     }
 }
