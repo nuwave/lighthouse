@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Execution\Arguments\ListType;
 use Nuwave\Lighthouse\Execution\Arguments\NamedType;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
 class ArgumentSetFactoryTest extends TestCase
@@ -174,7 +175,7 @@ class ArgumentSetFactoryTest extends TestCase
         $documentAST = $astBuilder->documentAST();
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types['Query'];
+        $queryType = $documentAST->types[RootType::QUERY];
 
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fooField */
         $fooField = ASTHelper::firstByName($queryType->fields, 'foo');

@@ -5,7 +5,7 @@ Client directives allow clients to change the behaviour of query execution.
 > Client directives must not be used within your schema definition.
 
 The [GraphQL specification](https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives)
-mentions two client directives: [`@skip`](#skip) and [`@include`](#include).
+mentions two client directives: [@skip](#skip) and [@include](#include).
 Both are built-in to Lighthouse and work out-of-the-box.
 
 ## @skip
@@ -13,7 +13,7 @@ Both are built-in to Lighthouse and work out-of-the-box.
 This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
 and is built-in to Lighthouse.
 
-The `@skip` directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
+The [@skip](#skip) directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
 exclusion during execution as described by the `if` argument.
 
 ```graphql
@@ -39,7 +39,7 @@ query myQuery($someTest: Boolean) {
 This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
 and is built-in to Lighthouse.
 
-The `@include` directive may be provided for fields, fragment spreads, and inline fragments,
+The [@include](#include) directive may be provided for fields, fragment spreads, and inline fragments,
 and allows for conditional inclusion during execution as described by the `if` argument.
 
 ```graphql

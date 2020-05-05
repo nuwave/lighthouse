@@ -42,7 +42,7 @@ own mechanism of encoding/decoding global ids.
 ## Input Object Mutations
 
 Lighthouse makes it easy to follow the principle of using a
-single field argument called `input`, just use the [`@spread`](../api-reference/directives.md#spread) directive.
+single field argument called `input`, just use the [@spread](../api-reference/directives.md#spread) directive.
 
 ```graphql
 type Mutation {

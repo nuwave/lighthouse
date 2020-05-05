@@ -42,7 +42,7 @@ class SaveModel implements ArgResolver
         );
 
         // Use all the remaining attributes and fill the model
-        $model->fill($remaining->toArray());
+        $model->forceFill($remaining->toArray());
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */

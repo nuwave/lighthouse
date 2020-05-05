@@ -11,6 +11,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Cache\CacheManager;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
@@ -133,7 +134,7 @@ SDL;
             // The cache key was already set, so we do not have to look again
             $typeValue->getCacheKey()
             // The Query type is exempt from requiring a cache key
-            || $typeValue->getTypeDefinitionName() === 'Query'
+            || $typeValue->getTypeDefinitionName() === RootType::QUERY
         ) {
             return;
         }

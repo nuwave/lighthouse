@@ -30,7 +30,6 @@ To get help on an issue or ask a question, consult Stack Overflow or Slack. -->
 
 </details></br>
 
-**Environment**
+**Lighthouse Version**
 
-Lighthouse Version:
-Laravel Version:
+<!-- When not using the latest version, an upgrade might fix your issue. -->

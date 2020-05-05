@@ -14,6 +14,7 @@ can use introspection to retrieve this schema and save it to a file.
 A simple tool that is also generally useful is [graphql-cli](https://github.com/graphql-cli/graphql-cli).
 
     npm install -g graphql-cli
+    graphql init
     graphql get-schema --endpoint=example.com/graphql --output=schema.graphql
 
 Type definitions that previously done through code can mostly be deduced from

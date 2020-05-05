@@ -10,7 +10,7 @@ A great way to deal with single values is to use an [`ArgTransformerDirective`](
 Lighthouse offers a few built-in options, but it is also really easy to build your own.
 
 Here is how you can remove whitespace of a given input string by using
-the built-in [`@trim`](../api-reference/directives.md#trim) directive:
+the built-in [@trim](../api-reference/directives.md#trim) directive:
 
 ```graphql
 type Mutation {

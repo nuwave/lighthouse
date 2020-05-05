@@ -62,6 +62,7 @@ class StorageManager implements StoresSubscriptions
 
     public function subscribersByTopic(string $topic): Collection
     {
+        // @phpstan-ignore-next-line filter makes the list contain only non-null elements
         return $this
             ->retrieveTopic(self::topicKey($topic))
             ->map(function (string $channel): ?Subscriber {
