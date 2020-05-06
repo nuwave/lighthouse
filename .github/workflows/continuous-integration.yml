@@ -87,6 +87,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Install dependencies with composer"
+        # TODO remove the PHPStan constraint once larastan 0.5.8 is out
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} phpstan/phpstan:0.12.20 --no-interaction --prefer-dist --no-interaction --no-suggest"
 
       - name: "Run phpstan/phpstan"
