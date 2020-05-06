@@ -33,8 +33,7 @@ parameters:
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - path: tests/database/factories/*
     message: '#Undefined variable: \$factory#'
-
-  # TODO remove once we depend on Laravel ^7.0
+  - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::find\(\)\.#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
 
