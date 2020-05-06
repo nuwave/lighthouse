@@ -1073,9 +1073,18 @@ directive @guard(
 ) on FIELD_DEFINITION | OBJECT
 ```
 
-Note that [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
-To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
-middleware config, see the [default config](src/lighthouse.php) for an example.
+Note that [@guard](#guard) does not log in users.
+To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config.
+
+```php
+'middleware' => [
+    ...
+
+    // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
+    // middleware, this delegates auth and permission checks to the field level.
+    \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
+],
+```
 
 ## @hash
 
