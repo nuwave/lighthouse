@@ -17,21 +17,20 @@ jobs:
   composer-normalize:
     name: "composer-normalize"
 
+    if: "github.repository == 'nuwave/lighthouse'"
+
     runs-on: "ubuntu-latest"
 
     steps:
       - name: "Checkout"
-        if: "github.repository == 'nuwave/lighthouse'"
         uses: "actions/checkout@v2.0.0"
         with:
           ref: "${{ github.head_ref }}"
 
       - name: "Run composer normalize"
-        if: "github.repository == 'nuwave/lighthouse'"
         uses: "docker://ergebnis/composer-normalize-action:0.8.0"
 
       - name: "Commit fixed composer.json"
-        if: "github.repository == 'nuwave/lighthouse'"
         uses: "stefanzweifel/git-auto-commit-action@v4.1.6"
         with:
           commit_message: "Normalize composer.json"
@@ -40,17 +39,17 @@ jobs:
   prettier:
     name: "Prettify docs"
 
+    if: "github.repository == 'nuwave/lighthouse'"
+
     runs-on: "ubuntu-latest"
 
     steps:
       - name: "Checkout"
-        if: "github.repository == 'nuwave/lighthouse'"
         uses: "actions/checkout@v2.0.0"
         with:
           ref: "${{ github.head_ref }}"
 
       - name: "Prettify docs"
-        if: "github.repository == 'nuwave/lighthouse'"
         uses: "creyD/prettier_action@v2.2"
         with:
           prettier_options: '--write --tab-width=2 docs/**/**/*.md'
