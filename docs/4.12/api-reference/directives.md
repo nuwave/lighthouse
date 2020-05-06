@@ -1072,9 +1072,9 @@ directive @guard(
 ) on FIELD_DEFINITION | OBJECT
 ```
 
-Note that [`@guard`](docs/master/api-reference/directives.md#guard) does not log in users.
+Note that [`@guard`](#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
-middleware config, see the [default config](src/lighthouse.php) for an example.
+middleware config, see the [default config](https://github.com/nuwave/lighthouse/blob/a6b689a466009645ce24520363e9f8b951cffae1/src/lighthouse.php#L37) for an example.
 
 ## @hash
 
