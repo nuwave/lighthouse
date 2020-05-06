@@ -190,14 +190,14 @@ directive @belongsToMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 
@@ -223,7 +223,7 @@ type User {
 
 When using the connection `type` argument, you may create your own
 [Edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) which
-may have fields that resolve from the model [pivot](https://laravel.com/docs/5.8/eloquent-relationships#many-to-many)
+may have fields that resolve from the model [pivot](https://laravel.com/docs/eloquent-relationships#many-to-many)
 data. You may also add a custom field resolver for fields you want to resolve yourself.
 
 You may either specify the edge using the `edgetype` argument, or it will automatically
@@ -1141,14 +1141,14 @@ directive @hasMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 ) on FIELD_DEFINITION
@@ -1586,25 +1586,9 @@ type Post @modelClass(class: "\\App\\BlogPost") {
 
 ## @morphMany
 
-Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-many-polymorphic-relations).
-
-```graphql
-type Post {
-  images: [Image!] @morphMany
-}
-
-type Image {
-  imagable: Imageable! @morphTo
-}
-
-union Imageable = Post | User
-```
-
-### Definition
-
 ```graphql
 """
-Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphMany(
   """
@@ -1625,14 +1609,14 @@ directive @morphMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 
@@ -1645,13 +1629,9 @@ directive @morphMany(
 ) on FIELD_DEFINITION
 ```
 
-## @morphOne
-
-Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
-
 ```graphql
 type Post {
-  image: Image! @morphOne
+  images: [Image!] @morphMany
 }
 
 type Image {
@@ -1661,11 +1641,11 @@ type Image {
 union Imageable = Post | User
 ```
 
-### Definition
+## @morphOne
 
 ```graphql
 """
-Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphOne(
   """
@@ -1681,11 +1661,11 @@ directive @morphOne(
 ) on FIELD_DEFINITION
 ```
 
-## @morphTo
-
-Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
-
 ```graphql
+type Post {
+  image: Image! @morphOne
+}
+
 type Image {
   imagable: Imageable! @morphTo
 }
@@ -1693,11 +1673,11 @@ type Image {
 union Imageable = Post | User
 ```
 
-### Definition
+## @morphTo
 
 ```graphql
 """
-Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphTo(
   """
@@ -1711,6 +1691,14 @@ directive @morphTo(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
+```
+
+```graphql
+type Image {
+  imagable: Imageable! @morphTo
+}
+
+union Imageable = Post | User
 ```
 
 ## @namespace
@@ -2049,16 +2037,16 @@ directive @paginate(
   scopes: [String!]
 
   """
-  Overwrite the paginate_max_count setting value to limit the
-  amount of items that a user can request per page.
-  """
-  maxCount: Int
-
-  """
-  Use a default value for the amount of returned items
-  in case the client does not request it explicitly
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  """
+  maxCount: Int
 ) on FIELD_DEFINITION
 ```
 

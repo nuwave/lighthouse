@@ -83,15 +83,6 @@ abstract class RelationDirective extends BaseDirective
         };
     }
 
-    protected function paginationArgs(array $args): ?PaginationArgs
-    {
-        if ($paginationType = $this->paginationType()) {
-            return PaginationArgs::extractArgs($args, $paginationType, $this->paginateMaxCount());
-        }
-
-        return null;
-    }
-
     protected function buildPath(ResolveInfo $resolveInfo, Model $parent): array
     {
         $path = $resolveInfo->path;
@@ -123,19 +114,11 @@ abstract class RelationDirective extends BaseDirective
             $paginationType,
             $fieldDefinition,
             $parentType,
-            $this->directiveArgValue('defaultCount'),
+            $this->directiveArgValue('defaultCount')
+                ?? config('lighthouse.pagination.default_count'),
             $this->paginateMaxCount(),
             $this->edgeType($documentAST)
         );
-    }
-
-    protected function paginationType(): ?PaginationType
-    {
-        if ($paginationType = $this->directiveArgValue('type')) {
-            return new PaginationType($paginationType);
-        }
-
-        return null;
     }
 
     /**
@@ -156,12 +139,31 @@ abstract class RelationDirective extends BaseDirective
         return null;
     }
 
+    protected function paginationArgs(array $args): ?PaginationArgs
+    {
+        if ($paginationType = $this->paginationType()) {
+            return PaginationArgs::extractArgs($args, $paginationType, $this->paginateMaxCount());
+        }
+
+        return null;
+    }
+
+    protected function paginationType(): ?PaginationType
+    {
+        if ($paginationType = $this->directiveArgValue('type')) {
+            return new PaginationType($paginationType);
+        }
+
+        return null;
+    }
+
     /**
      * Get either the specific max or the global setting.
      */
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')
+            ?? config('lighthouse.pagination.max_count')
             ?? config('lighthouse.paginate_max_count');
     }
 }

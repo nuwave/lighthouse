@@ -13,7 +13,7 @@ class ComplexityDirectiveTest extends TestCase
         type User {
             posts: [Post!]! @complexity @hasMany
         }
-        
+
         type Post {
             title: String
         }
@@ -37,7 +37,7 @@ class ComplexityDirectiveTest extends TestCase
                 @complexity(resolver: "'.$this->qualifyTestResolver('complexity').'")
                 @hasMany
         }
-        
+
         type Post {
             title: String
         }
