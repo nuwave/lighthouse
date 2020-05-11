@@ -48,6 +48,9 @@ class CacheValue
      */
     protected $isPrivate;
 
+    /**
+     * @param  array<string, mixed>  $arguments
+     */
     public function __construct(array $arguments = [])
     {
         $this->fieldValue = Arr::get($arguments, 'field_value');
@@ -86,6 +89,8 @@ class CacheValue
 
     /**
      * Get cache tags.
+     *
+     * @return array<string>
      */
     public function getTags(): array
     {
@@ -145,7 +150,7 @@ class CacheValue
     }
 
     /**
-     * Implode value to create string.
+     * @param  array<string|int> $items
      */
     protected function implode(array $items): string
     {

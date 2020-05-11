@@ -83,6 +83,9 @@ abstract class RelationDirective extends BaseDirective
         };
     }
 
+    /**
+     * @return array<string|int|class-string>
+     */
     protected function buildPath(ResolveInfo $resolveInfo, Model $parent): array
     {
         $path = $resolveInfo->path;
@@ -139,6 +142,9 @@ abstract class RelationDirective extends BaseDirective
         return null;
     }
 
+    /**
+     * @param  array<string, mixed>  $args
+     */
     protected function paginationArgs(array $args): ?PaginationArgs
     {
         if ($paginationType = $this->paginationType()) {

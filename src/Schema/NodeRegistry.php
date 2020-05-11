@@ -84,6 +84,7 @@ class NodeRegistry
      *
      * @param  mixed|null  $rootValue
      * @param  mixed[]  $args
+     * @return mixed
      *
      * @throws \GraphQL\Error\Error
      */

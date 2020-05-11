@@ -66,12 +66,6 @@ GRAPHQL;
         return 'EQ';
     }
 
-    /**
-     * Apply the conditions to the query builder.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder
-     */
     public function applyConditions($builder, array $whereConditions, string $boolean)
     {
         $column = $whereConditions['column'];

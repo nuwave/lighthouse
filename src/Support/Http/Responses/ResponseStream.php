@@ -64,6 +64,8 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Format chunked data.
+     *
+     * @param  array<mixed>  $data
      */
     protected function chunk(array $data, bool $terminating): string
     {

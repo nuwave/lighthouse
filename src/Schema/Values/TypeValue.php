@@ -52,7 +52,7 @@ class TypeValue
      * Get the underlying type definition fields.
      *
      * @deprecated
-     * @return \GraphQL\Language\AST\NodeList|array
+     * @return iterable<\GraphQL\Language\AST\FieldDefinitionNode>
      */
     public function getTypeDefinitionFields()
     {
