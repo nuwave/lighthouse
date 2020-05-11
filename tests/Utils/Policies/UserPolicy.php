@@ -35,7 +35,6 @@ class UserPolicy
 
     /**
      * @param  array<string, string>  $injectedArgs
-     * @return bool
      */
     public function injectArgs(User $viewer, array $injectedArgs): bool
     {

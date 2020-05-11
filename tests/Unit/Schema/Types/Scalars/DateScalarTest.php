@@ -14,7 +14,6 @@ abstract class DateScalarTest extends TestCase
 {
     /**
      * @dataProvider invalidDateValues
-     * @param  mixed  $value
      */
     public function testThrowsIfSerializingInvalidDates($value): void
     {
@@ -25,7 +24,6 @@ abstract class DateScalarTest extends TestCase
 
     /**
      * @dataProvider invalidDateValues
-     * @param  mixed  $value
      */
     public function testThrowsIfParseValueInvalidDate($value): void
     {
