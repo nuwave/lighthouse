@@ -15,5 +15,4 @@ class ACL extends Model
 {
     public $timestamps = false;
     protected $table = 'acls';
-    protected $guarded = [];
 }

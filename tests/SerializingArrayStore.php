@@ -20,7 +20,7 @@ class SerializingArrayStore extends ArrayStore
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param  string|array<string>  $key
      */
     public function get($key)
     {
