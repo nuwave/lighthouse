@@ -86,6 +86,10 @@ class GlobalIdDirectiveTest extends TestCase
         ]);
     }
 
+    /**
+     * @param  array<string, mixed>  $args
+     * @return array<string, mixed>
+     */
     public function resolve($root, array $args): array
     {
         return $args;

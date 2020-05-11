@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    /**
+     * Indicates if migrations ran.
+     *
+     * @var bool
+     */
     protected static $migrated = false;
 
     protected function setUp(): void

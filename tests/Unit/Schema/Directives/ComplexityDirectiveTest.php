@@ -9,7 +9,7 @@ class ComplexityDirectiveTest extends TestCase
 {
     public function testCanSetDefaultComplexityOnField(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
             posts: [Post!]! @complexity @hasMany
         }
@@ -31,17 +31,18 @@ class ComplexityDirectiveTest extends TestCase
 
     public function testCanSetCustomComplexityResolver(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<GRAPHQL
         type User {
             posts: [Post!]!
-                @complexity(resolver: "'.$this->qualifyTestResolver('complexity').'")
+                @complexity(resolver: "{$this->qualifyTestResolver('complexity')}")
                 @hasMany
         }
 
         type Post {
             title: String
         }
-        ');
+GRAPHQL
+        );
 
         /** @var \GraphQL\Type\Definition\ObjectType $user */
         $user = $schema->getType('User');
@@ -54,7 +55,7 @@ class ComplexityDirectiveTest extends TestCase
 
     public function testResolvesComplexityResolverThroughDefaultNamespace(): void
     {
-        $schema = $this->buildSchema('
+        $schema = $this->buildSchema(/** @lang GraphQL */ '
         type Query {
             foo: Int
                 @complexity(resolver: "Foo@complexity")
@@ -68,6 +69,9 @@ class ComplexityDirectiveTest extends TestCase
         $this->assertSame(42, $complexityFn());
     }
 
+    /**
+     * @param  array<string, int|null>  $args
+     */
     public function complexity(int $childrenComplexity, array $args): int
     {
         return $childrenComplexity * Arr::get($args, 'foo', 0);

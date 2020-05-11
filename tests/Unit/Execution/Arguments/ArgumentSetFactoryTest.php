@@ -168,6 +168,9 @@ class ArgumentSetFactoryTest extends TestCase
         $this->assertNull($bar->value);
     }
 
+    /**
+     * @param  array<string, mixed>  $args
+     */
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */

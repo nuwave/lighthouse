@@ -550,6 +550,9 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
+    /**
+     * @return array<array<string, string>>
+     */
     public function existingModelMutations(): array
     {
         return [

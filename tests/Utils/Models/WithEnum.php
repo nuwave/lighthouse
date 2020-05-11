@@ -17,6 +17,9 @@ class WithEnum extends Model
 
     public $timestamps = false;
 
+    /**
+     * @var array<string, class-string<\BenSampo\Enum\Enum>>
+     */
     protected $enumCasts = [
         'type' => AOrB::class,
     ];
