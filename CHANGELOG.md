@@ -21,7 +21,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Improve validation error when extending a type that is not defined https://github.com/nuwave/lighthouse/pull/1347
 - Use `forceFill()` when mutating models https://github.com/nuwave/lighthouse/pull/1348
 - Namespace pagination related configuration in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1352
-- Fix publishing the config when using Lumen https://github.com/nuwave/lighthouse/pull/2460
+- Fix publishing the config when using Lumen https://github.com/nuwave/lighthouse/pull/1355
 
 ### Deprecated
 
