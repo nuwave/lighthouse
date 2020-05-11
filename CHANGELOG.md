@@ -19,6 +19,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Improve validation error when extending a type that is not defined https://github.com/nuwave/lighthouse/pull/1347
 - Use `forceFill()` when mutating models https://github.com/nuwave/lighthouse/pull/1348
+- Change `$this->app->make('path.config')` to `app()->configPath()` in LighthouseServiceProvider for Lumen compatibility  https://github.com/nuwave/lighthouse/pull/2460
 
 ## 4.12.4
 
