@@ -25,7 +25,7 @@ abstract class DriverManager
     /**
      * The array of resolved drivers.
      *
-     * @var array
+     * @var array<string, object>
      */
     protected $drivers = [];
 
@@ -122,6 +122,8 @@ abstract class DriverManager
 
     /**
      * Call a custom driver creator.
+     *
+     * @param  array<string, mixed>  $config
      */
     protected function callCustomCreator(array $config)
     {
@@ -131,6 +133,8 @@ abstract class DriverManager
     /**
      * Validate driver implements the proper interface.
      *
+     * @param  object  $driver
+     * @return object
      *
      * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
      */
@@ -147,6 +151,8 @@ abstract class DriverManager
 
     /**
      * Dynamically call the default driver instance.
+     *
+     * @param  array<mixed>  $parameters
      */
     public function __call(string $method, array $parameters)
     {

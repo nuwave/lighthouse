@@ -57,16 +57,24 @@ abstract class TypeNodeConverter
 
     /**
      * Wrap or mark the type as non-null.
+     *
+     * @param  mixed  $type The type to wrap.
+     * @return mixed The type wrapped with non-null.
      */
     abstract protected function nonNull($type);
 
     /**
      * Wrap or mark the type as a list.
+     *
+     * @param  mixed  $type The type to wrap.
+     * @return mixed The type wrapped as a list.
      */
     abstract protected function listOf($type);
 
     /**
      * Get the named type for the given node name.
+     *
+     * @return mixed Representation of the type with the given name.
      */
     abstract protected function namedType(string $nodeName);
 }

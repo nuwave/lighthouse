@@ -45,6 +45,8 @@ class Subscriber implements Serializable
 
     /**
      * The root element of the query.
+     *
+     * @var mixed Can be anything.
      */
     public $root;
 

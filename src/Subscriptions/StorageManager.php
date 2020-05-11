@@ -46,6 +46,10 @@ class StorageManager implements StoresSubscriptions
         $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     * @param  array<mixed>  $headers
+     */
     public function subscriberByRequest(array $input, array $headers): ?Subscriber
     {
         $channel = Arr::get($input, 'channel_name');
@@ -138,7 +142,7 @@ class StorageManager implements StoresSubscriptions
     /**
      * Remove the subscriber from the topic they are subscribed to.
      */
-    protected function removeSubscriberFromTopic(Subscriber $subscriber)
+    protected function removeSubscriberFromTopic(Subscriber $subscriber): void
     {
         $topicKey = self::topicKey($subscriber->topic);
         $channelKeyToRemove = self::channelKey($subscriber->channel);

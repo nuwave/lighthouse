@@ -8,12 +8,15 @@ use Illuminate\Support\Collection;
 
 class Pipeline extends BasePipeline
 {
+    /**
+     * @var \Closure|null
+     */
     protected $always = null;
 
     /**
      * Set the array of pipes.
      *
-     * @param  \Illuminate\Support\Collection|array  $pipes
+     * @param  \Illuminate\Support\Collection<mixed>|array<mixed>  $pipes
      * @return $this
      */
     public function through($pipes)

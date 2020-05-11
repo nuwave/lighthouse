@@ -102,6 +102,7 @@ SDL;
     }
 
     /**
+     * @param  array<string, mixed>  $args
      * @return iterable<Model|string>
      *
      * @throws \GraphQL\Error\Error
@@ -163,6 +164,7 @@ SDL;
     /**
      * @param  string|string[]  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
+     * @param  array<mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -182,6 +184,7 @@ SDL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
+     * @param  array<mixed>  $args
      * @return mixed[]
      */
     protected function buildCheckArguments(array $args): array
