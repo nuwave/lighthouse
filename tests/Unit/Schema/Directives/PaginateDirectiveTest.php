@@ -91,7 +91,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testHasMaxCountInGeneratedCountDescription(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $queryType = $this
             ->buildSchema(/** @lang GraphQL */ '
@@ -153,7 +153,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $this->schema = /** @lang GraphQL */
             '
@@ -187,7 +187,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {

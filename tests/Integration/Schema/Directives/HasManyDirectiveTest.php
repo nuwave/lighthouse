@@ -207,7 +207,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 1]);
+        config(['lighthouse.pagination.max_count' => 1]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -281,7 +281,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 1]);
+        config(['lighthouse.pagination.max_count' => 1]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -319,7 +319,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testPaginatorTypeIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 2]);
+        config(['lighthouse.pagination.max_count' => 2]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -355,7 +355,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testRelayTypeIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 2]);
+        config(['lighthouse.pagination.max_count' => 2]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {

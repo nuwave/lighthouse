@@ -131,13 +131,24 @@ return [
     | Pagination
     |--------------------------------------------------------------------------
     |
-    | Limits the maximum "count" that users may pass as an argument
-    | to fields that are paginated with the @paginate directive.
-    | A setting of "null" means the count is unrestricted.
+    | Set defaults for the pagination features within Lighthouse, such as
+    | the @paginate directive, or paginated relation directives.
     |
     */
 
-    'paginate_max_count' => null,
+    'pagination' => [
+        /*
+         * Allow clients to query paginated lists without specifying the amount of items.
+         * Setting this to `null` means clients have to explicitly ask for the count.
+         */
+        'default_count' => null,
+
+        /*
+         * Limit the maximum amount of items that clients can request from paginated lists.
+         * Setting this to `null` means the count is unrestricted.
+         */
+        'max_count' => null,
+    ],
 
     /*
     |--------------------------------------------------------------------------

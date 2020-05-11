@@ -14,12 +14,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow passing additional headers to `multipartGraphQL` test helper https://github.com/nuwave/lighthouse/pull/1342
 - Add empty root types automatically when extending them https://github.com/nuwave/lighthouse/pull/1347
 - Configure a default `guard` for all authentication functionality https://github.com/nuwave/lighthouse/pull/1343
+- Configure the default amount of items in paginated lists with `pagination.default_count` https://github.com/nuwave/lighthouse/pull/1352
 
 ### Changed
 
 - Improve validation error when extending a type that is not defined https://github.com/nuwave/lighthouse/pull/1347
 - Use `forceFill()` when mutating models https://github.com/nuwave/lighthouse/pull/1348
-- Change `$this->app->make('path.config')` to `app()->configPath()` in LighthouseServiceProvider for Lumen compatibility  https://github.com/nuwave/lighthouse/pull/2460
+- Namespace pagination related configuration in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1352
+- Fix publishing the config when using Lumen https://github.com/nuwave/lighthouse/pull/2460
+
+### Deprecated
+
+- The setting `paginate_max_count` will change to `pagination.max_count` https://github.com/nuwave/lighthouse/pull/1352
 
 ## 4.12.4
 

@@ -441,4 +441,33 @@ class PaginateDirectiveDBTest extends DBTestCase
             ],
         ])->assertJsonCount(2, 'data.users.data');
     }
+
+    public function testDoesNotRequireDefaultCountArgIfDefinedInConfig(): void
+    {
+        factory(User::class, 3)->create();
+
+        $defaultCount = 2;
+        config(['lighthouse.pagination.default_count' => $defaultCount]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount($defaultCount, 'data.users.data');
+    }
 }
