@@ -136,7 +136,7 @@ class ASTBuilder
         $this->applyFieldManipulators();
         $this->applyArgManipulators();
 
-        // TODO seperate out into modules
+        // TODO separate out into modules
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
 
