@@ -31,7 +31,7 @@ SDL;
     public function handleBuilder($builder, $value)
     {
         /**
-         * TODO make class-string once PHPStan can handle it
+         * TODO make class-string once PHPStan can handle it.
          * @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $modelClass
          */
         $modelClass = get_class($builder->getModel());
