@@ -21,6 +21,9 @@ class ValidationTest extends DBTestCase
             list: [String]
                 @rules(apply: ["required", "email"])
                 @rulesForArray(apply: ["max:2"])
+            foo: String @rules(apply: ["confirmed", "same:baz"])
+            fooConfirmation: String @rename(attribute: "foo_confirmation")
+            bar: String @rename(attribute: "baz")
         ): Int
 
         password(
@@ -519,6 +522,38 @@ class ValidationTest extends DBTestCase
             }
         }
         ')->assertJsonCount(2, 'errors.0.extensions.validation.bar');
+    }
+
+    public function testRenamesAttributeBeforeSameValidation(): void
+    {
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(
+                foo: "foobar"
+                bar: "foobar"
+            )
+        }
+        ');
+
+        $this->assertValidationKeysSame([
+            'required',
+        ], $result);
+    }
+
+    public function testRenamesAttributeBeforeConfirmedValidation(): void
+    {
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(
+                foo: "foobar"
+                fooConfirmation: "foobar"
+            )
+        }
+        ');
+
+        $this->assertValidationKeysSame([
+            'required',
+        ], $result);
     }
 
     /**
