@@ -64,6 +64,8 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Format chunked data.
+     *
+     * @param  array<mixed>  $data
      */
     protected function chunk(array $data, bool $terminating): string
     {
@@ -96,9 +98,9 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Flush buffer cache.
-     * Note: We can run into exceptions when flushing the buffer,
-     * these should be safe to ignore.
-     * @todo Investigate exceptions that occur on Apache
+     *
+     * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore.
+     * TODO Investigate exceptions that occur on Apache
      */
     protected function flush(Closure $flush): void
     {

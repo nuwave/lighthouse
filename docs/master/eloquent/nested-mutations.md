@@ -1,6 +1,6 @@
 # Nested Mutations
 
-Lighthouse allows you to create, update or delete models and their associated relationships
+Lighthouse allows you to create, update or delete models and their associated relationships,
 all in one single mutation. This is enabled by the [nested arg resolvers mechanism](../concepts/arg-resolvers.md).
 
 ## Return Types Required
@@ -13,14 +13,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Post extends Model
 {
-    // WORKS
-    public function user(): BelongsTo
+    public function user(): BelongsTo // WORKS
     {
         return $this->belongsTo(User::class);
     }
 
-    // DOES NOT WORK
-    public function comments()
+    public function comments() // DOES NOT WORK
     {
         return $this->hasMany(Comment::class);
     }
@@ -35,7 +33,19 @@ and no changes are written to the database.
 
 You can change this setting [in the configuration](../getting-started/configuration.md).
 
-## Belongs To
+## Polymorphic Relation Limitations
+
+Because the GraphQL Specification does not support polymorphic Input types (yet),
+the available functionality is limited.
+
+It is not possible to have an argument that can contain different types, which
+would be necessary to pass the attributes the different related models might have.
+For now, we can only support cases where the input type does not change across related
+models, e.g. connecting through an ID, disconnecting or deleting the relation.
+
+See [this issue](https://github.com/nuwave/lighthouse/issues/900) for further discussion.
+
+## BelongsTo
 
 We will start of by defining a mutation to create a post.
 
@@ -241,10 +251,175 @@ mutation UpdatePost($disconnectAuthor: Boolean) {
 }
 ```
 
-## Has Many
+## MorphTo
 
-The counterpart to a `BelongsTo` relationship is `HasMany`. We will start
-off by defining a mutation to create an `User`.
+The basic structure of this nested mutation type is similar to [BelongsTo](#belongsto),
+the main difference being that the `connect` operation requires an input type with both
+the `id` and `type` of the related model.
+
+```graphql
+type Task {
+  name: String
+}
+
+type Image {
+  url: String
+  imageable: Task @morphTo
+}
+
+type Mutation {
+  updateImage(input: UpdateImageInput! @spread): Image @update
+}
+
+input UpdateImageInput {
+  id: ID!
+  url: String
+  imageable: UpdateImageableMorphTo
+}
+
+input UpdateImageableMorphTo {
+  connect: ConnectImageableInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input ConnectImageableInput {
+  type: String!
+  id: ID!
+}
+```
+
+You can use `connect` to associate existing models.
+
+```graphql
+mutation {
+  createImage(
+    input: {
+      url: "https://cats.example/cute"
+      imageable: { connect: { type: "App\\Models\\Task", id: 1 } }
+    }
+  ) {
+    id
+    url
+    imageable {
+      id
+      name
+    }
+  }
+}
+```
+
+The `disconnect` operations allows you to detach the currently associated model.
+
+```graphql
+mutation {
+  updateImage(
+    input: {
+      id: 1
+      url: "https://dogs.example/supercute"
+      imageable: { disconnect: true }
+    }
+  ) {
+    url
+    imageable {
+      id
+      name
+    }
+  }
+}
+```
+
+The `delete` operation both detaches and deletes the currently associated model.
+
+```graphql
+mutation {
+  upsertImage(
+    input: {
+      id: 1
+      url: "https://bizniz.example/serious"
+      imageable: { delete: true }
+    }
+  ) {
+    url
+    imageable {
+      id
+      name
+    }
+  }
+}
+```
+
+## HasOne
+
+The counterpart to a `BelongsTo` relationship can be `HasOne`.
+We will start off by defining a mutation to update a `User`.
+
+```graphql
+type Mutation {
+  updateUser(input: UpdateeUserInput! @spread): User @update
+}
+```
+
+This mutation takes a single argument `input` that contains values
+of the `User` itself and its associated `Phone` model.
+
+```graphql
+input UpdateUserInput {
+  id: ID!
+  name: String
+  phone: UpdatePhoneHasOne
+}
+```
+
+Now, we can expose operations that allows us to update the users phone.
+
+```graphql
+input UpdatePhoneHasOne {
+  create: CreatePhoneInput
+  update: UpdatePhoneInput
+  upsert: UpsertPhoneInput
+  delete: ID
+}
+
+input CreatePhoneInput {
+  number: String!
+}
+
+input UpdatePhoneInput {
+  id: ID!
+  number: String
+}
+
+input UpsertPhoneInput {
+  id: ID
+  number: String
+}
+```
+
+We can now update the `User` and their phone in one request.
+
+```graphql
+mutation {
+  updateUser(
+    input: {
+      id: 4
+      name: "Donald"
+      phone: { update: { id: 92, number: "+12 345 6789" } }
+    }
+  ) {
+    id
+  }
+}
+```
+
+## MorphOne
+
+Works exactly like [HasOne](#hasone)
+
+## HasMany
+
+Another possible counterpart to a `BelongsTo` relationship is `HasMany`.
+We will start off by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
@@ -378,7 +553,11 @@ mutation {
 The behaviour for `upsert` is a mix between updating and creating,
 it will produce the needed action regardless of whether the model exists or not.
 
-## Belongs To Many
+## MorphMany
+
+Works exactly like [Has Many](#hasmany).
+
+## BelongsToMany
 
 A belongs to many relation allows you to create new related models as well
 as attaching existing ones.
@@ -560,7 +739,7 @@ mutation {
 }
 ```
 
-And you will get the following response:
+You will get the following response:
 
 ```json
 {
@@ -588,198 +767,6 @@ And you will get the following response:
 
 It is also possible to use the `sync` and `syncWithoutDetach` operations.
 
-## MorphTo
+## MorphToMany
 
-**The GraphQL Specification does not support Input Union types,
-for now we are limiting this implementation to `connect`, `disconnect` and `delete` operations.
-See https://github.com/nuwave/lighthouse/issues/900 for further discussion.**
-
-```graphql
-type Task {
-  id: ID
-  name: String
-}
-
-type Image {
-  id: ID
-  url: String
-  imageable: Task
-}
-
-type Mutation {
-  createImage(input: CreateImageInput! @spread): Image @create
-  updateImage(input: UpdateImageInput! @spread): Image @update
-  upsertImage(input: UpsertImageInput! @spread): Image @upsert
-}
-
-input CreateImageInput {
-  url: String
-  imageable: CreateImageableMorphTo
-}
-
-input UpdateImageInput {
-  id: ID!
-  url: String
-  imageable: UpdateImageableMorphTo
-}
-
-input UpsertImageInput {
-  id: ID!
-  url: String
-  imageable: UpsertImageableMorphTo
-}
-
-input CreateImageableMorphTo {
-  connect: ConnectImageableInput
-}
-
-input UpdateImageableMorphTo {
-  connect: ConnectImageableInput
-  disconnect: Boolean
-  delete: Boolean
-}
-
-input UpsertImageableMorphTo {
-  connect: ConnectImageableInput
-  disconnect: Boolean
-  delete: Boolean
-}
-
-input ConnectImageableInput {
-  type: String!
-  id: ID!
-}
-```
-
-You can use `connect` to associate existing models.
-
-```graphql
-mutation {
-  createImage(
-    input: {
-      url: "https://cats.example/cute"
-      imageable: { connect: { type: "App\\Models\\Task", id: 1 } }
-    }
-  ) {
-    id
-    url
-    imageable {
-      id
-      name
-    }
-  }
-}
-```
-
-The `disconnect` operations allows you to detach the currently associated model.
-
-```graphql
-mutation {
-  updateImage(
-    input: {
-      id: 1
-      url: "https://dogs.example/supercute"
-      imageable: { disconnect: true }
-    }
-  ) {
-    url
-    imageable {
-      id
-      name
-    }
-  }
-}
-```
-
-The `delete` operation both detaches and deletes the currently associated model.
-
-```graphql
-mutation {
-  upsertImage(
-    input: {
-      id: 1
-      url: "https://bizniz.example/serious"
-      imageable: { delete: true }
-    }
-  ) {
-    url
-    imageable {
-      id
-      name
-    }
-  }
-}
-```
-
-## Morph To Many
-
-A morph to many relation allows you to create new related models as well
-as attaching existing ones.
-
-```graphql
-type Mutation {
-  createTask(input: CreateTaskInput! @spread): Task @create
-}
-
-input CreateTaskInput {
-  name: String!
-  tags: CreateTagMorphToMany
-}
-
-input CreateTagMorphToMany {
-  create: [CreateTagInput!]
-  upsert: [UpsertTagInput!]
-  sync: [ID!]
-  connect: [ID!]
-}
-
-input CreateTagInput {
-  name: String!
-}
-
-input UpsertTagInput {
-  id: ID!
-  name: String!
-}
-
-type Task {
-  id: ID!
-  name: String!
-  tags: [Tag!]!
-}
-
-type Tag {
-  id: ID!
-  name: String!
-}
-```
-
-In this example, the tag with id `1` already exists in the database. The query connects this tag to the task using the `MorphToMany` relationship.
-
-```graphql
-mutation {
-  createTask(input: { name: "Loundry", tags: { connect: [1] } }) {
-    tags {
-      id
-      name
-    }
-  }
-}
-```
-
-You can either use `connect` or `sync` during creation.
-
-When you want to create a new tag while creating the task,
-you need to use the `create` operation to provide an array of `CreateTagInput`
-or use the `upsert` operation to provide an array of `UpsertTagInput`:
-
-```graphql
-mutation {
-  createTask(input: { name: "Loundry", tags: { create: [{ name: "home" }] } }) {
-    tags {
-      id
-      name
-    }
-  }
-}
-```
+Works exactly like [BelongsToMany](#belongstomany).

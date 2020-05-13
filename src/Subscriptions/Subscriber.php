@@ -45,6 +45,8 @@ class Subscriber implements Serializable
 
     /**
      * The root element of the query.
+     *
+     * @var mixed Can be anything.
      */
     public $root;
 
@@ -75,7 +77,7 @@ class Subscriber implements Serializable
         $operationName = $resolveInfo->operation->name;
 
         // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
-        if (! $operationName) { // @phpstan-ignore-line TODO remove once the graphql-php type is accurate https://github.com/webonyx/graphql-php/pull/653
+        if (! $operationName) { // @phpstan-ignore-line TODO remove when upgrading graphql-php
             throw new SubscriptionException(self::MISSING_OPERATION_NAME);
         }
         $this->operationName = $operationName->value;

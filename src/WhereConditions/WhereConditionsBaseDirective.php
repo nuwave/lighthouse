@@ -31,6 +31,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  array<string, mixed>  $whereConditions
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')

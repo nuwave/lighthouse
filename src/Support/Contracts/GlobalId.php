@@ -17,7 +17,7 @@ interface GlobalId
     /**
      * Decode a Global ID into the type and the id it contains.
      *
-     * @return array Contains [$type, $id], e.g. ['User', '123']
+     * @return array<string, mixed> Contains [$type, $id], e.g. ['User', '123']
      */
     public function decode(string $globalID): array;
 

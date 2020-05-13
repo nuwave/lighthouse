@@ -14,6 +14,8 @@ class Utils
      *
      * If the class itself exists, it is simply returned as is.
      * Else, the given namespaces are tried in order.
+     *
+     * @param  array<string>  $namespacesToTry
      */
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
     {

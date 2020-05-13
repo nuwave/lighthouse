@@ -42,7 +42,7 @@ In the given example, Lighthouse will take the value of the `password` argument 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgSanitizerDirective.php)
 takes an incoming value and returns a new value.
 
-Let's take a look at the built-in `@trim` directive.
+Let's take a look at the built-in [@trim](../api-reference/directives.md#trim) directive.
 
 ```php
 <?php
@@ -126,11 +126,14 @@ modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use the defined filters for resolving the query:
 
-- `@all`
-- `@paginate`
-- `@find`
-- `@first`
-- `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
+- [@all](../api-reference/directives.md#all)
+- [@paginate](../api-reference/directives.md#paginate)
+- [@find](../api-reference/directives.md#find)
+- [@first](../api-reference/directives.md#first)
+- [@hasMany](../api-reference/directives.md#hasmany)
+- [@hasOne](../api-reference/directives.md#hasone)
+- [@belongsTo](../api-reference/directives.md#belongsto)
+- [@belongsToMany](../api-reference/directives.md#belongstomany)
 
 Take the following schema as an example:
 
@@ -143,7 +146,7 @@ type User {
 Passing the `category` argument will select only the user's posts
 where the `category` column is equal to the value of the `category` argument.
 
-So let's take a look at the built-in `@eq` directive.
+So let's take a look at the built-in [@eq](../api-reference/directives.md#eq) directive.
 
 ```php
 <?php
@@ -191,11 +194,11 @@ The `handleBuilder` method takes two arguments:
 - `$builder`
   The query builder for applying the additional query on to.
 - `$value`
-  The value of the argument value that the `@eq` was applied on to.
+  The value of the argument value that [@eq](../api-reference/directives.md#eq) was applied on to.
 
 If you want to use a more complex value for manipulating a query,
 you can build a `ArgBuilderDirective` to work with lists or nested input objects.
-Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is one example of this.
+Lighthouse's [@whereBetween](../api-reference/directives.md#wherebetween) is one example of this.
 
 ```graphql
 type Query {

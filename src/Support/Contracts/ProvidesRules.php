@@ -2,19 +2,24 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+/**
+ * Provide rules and custom messages for field validation.
+ *
+ * https://laravel.com/docs/validation
+ */
 interface ProvidesRules
 {
     /**
-     * Return validation rules for multiple arguments.
+     * Return validation rules for the arguments.
      *
-     * array<string, mixed>
+     * @return array<string, mixed>
      */
     public function rules(): array;
 
     /**
      * Return custom messages for the rules.
      *
-     * array<string, mixed>
+     * @return array<string, mixed>
      */
     public function messages(): array;
 }

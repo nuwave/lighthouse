@@ -3,9 +3,9 @@
 Assuming you read through the previous chapters, you should be familiar with the basics
 of schema definition by now.
 
-You might have seen some funky extra bits in the schema definitions such as `@paginate`,
-`@rules` or `@hasMany`. Those are called _directives_ and are the primary way
-to add functionality to your GraphQL schema.
+You might have seen some funky extra bits in the schema definitions such as [@paginate](../api-reference/directives.md#paginate),
+[@rules](../api-reference/directives.md#rules) or [@hasMany](../api-reference/directives.md#hasmany).
+Those are called _directives_ and are the primary way to add functionality to your GraphQL schema.
 
 ## Definition
 

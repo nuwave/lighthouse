@@ -13,15 +13,20 @@ class LogBroadcaster implements Broadcaster
     /**
      * The user-defined configuration options.
      *
-     * @var mixed[]
+     * @var array<mixed>
      */
     protected $config = [];
 
     /**
      * A map from channel names to data.
+     *
+     * @var array<string, array<mixed>>
      */
     protected $broadcasts = [];
 
+    /**
+     * @param  array<mixed>  $config
+     */
     public function __construct(array $config = [])
     {
         $this->config = $config;
@@ -61,6 +66,8 @@ class LogBroadcaster implements Broadcaster
 
     /**
      * Get the data that is being broadcast.
+     *
+     * @return array<mixed>|null
      */
     public function broadcasts(?string $key = null): ?array
     {

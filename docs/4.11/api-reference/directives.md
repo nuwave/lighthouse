@@ -58,7 +58,7 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retreive the user.
+  Use a particular guard to retrieve the user.
   """
   guard: String
 ) on FIELD_DEFINITION
@@ -1072,9 +1072,9 @@ directive @guard(
 ) on FIELD_DEFINITION | OBJECT
 ```
 
-Note that [`@guard`](docs/master/api-reference/directives.md#guard) does not log in users.
+Note that [`@guard`](#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
-middleware config, see the [default config](src/lighthouse.php) for an example.
+middleware config, see the [default config](https://github.com/nuwave/lighthouse/blob/7d7941fff14e9ff21c2bca6cd6f4f0c951b67cd6/src/lighthouse.php#L37) for an example.
 
 ## @hash
 

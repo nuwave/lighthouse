@@ -58,7 +58,7 @@ class LighthouseServiceProvider extends ServiceProvider
     public function boot(ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__.'/lighthouse.php' => $this->app->make('path.config').'/lighthouse.php',
+            __DIR__.'/lighthouse.php' => $this->app->configPath().'/lighthouse.php',
         ], 'config');
 
         $this->publishes([

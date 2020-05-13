@@ -12,11 +12,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $url
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read Task|User $imageable
  */
 class Image extends Model
 {
-    protected $guarded = [];
-
     public function imageable(): MorphTo
     {
         return $this->morphTo();

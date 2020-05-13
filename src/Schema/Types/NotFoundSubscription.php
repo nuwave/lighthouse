@@ -28,8 +28,7 @@ class NotFoundSubscription extends GraphQLSubscription
     /**
      * Resolve the subscription.
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
-        //
     }
 }

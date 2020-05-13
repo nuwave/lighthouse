@@ -8,7 +8,7 @@ namespace Tests\Unit\Schema\Directives\Fixtures;
  */
 class Foo
 {
-    public function bar()
+    public function bar(): void
     {
     }
 }

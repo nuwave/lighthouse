@@ -5,7 +5,7 @@ when the underlying data has changed.
 
 ## Broadcast Directive
 
-The [`@broadcast`](../api-reference/directives.md#broadcast)
+The [@broadcast](../api-reference/directives.md#broadcast)
 directive will broadcast all updates to the `Post` model to the `postUpdated` subscription.
 
 ```graphql

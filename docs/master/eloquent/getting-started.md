@@ -55,7 +55,7 @@ Will return the following result:
 
 ## Pagination
 
-You can leverage the [`@paginate`](../api-reference/directives.md#paginate) directive to
+You can leverage the [@paginate](../api-reference/directives.md#paginate) directive to
 query a large list of models in chunks.
 
 ```graphql
@@ -139,7 +139,7 @@ type Mutation {
 }
 ```
 
-This will take the arguments that the `createUser` field receives and use them to create a new model instance.
+A create mutation will use the arguments passed to the field to create a new model instance:
 
 ```graphql
 mutation {
@@ -162,18 +162,6 @@ The newly created user is returned as a result:
   }
 }
 ```
-
-**Note**: Due to Laravel's protections against mass assignment, any arguments used in `@create` or `@update` must be added to the `$fillable` property in your Model. For the above example, we would need the following in `\App\Models\User`:
-
-```php
-class User extends Model
-{
-  // ...
-  protected $fillable = ["name"];
-}
-```
-
-For more information, see the [laravel docs](https://laravel.com/docs/eloquent#mass-assignment).
 
 ## Update
 
@@ -207,8 +195,7 @@ mutation {
 }
 ```
 
-Be aware that while a create operation will always return a result, provided you pass valid data, the update
-may fail to find the model you provided and return `null`:
+The update may fail to find the model you provided and return `null`:
 
 ```json
 {
@@ -229,8 +216,8 @@ type Mutation {
 }
 ```
 
-Since upsert can create or update your data you must have all the minimum fields for a creation as required.
-The `id` is always required and must be marked as fillable in the model.
+Since upsert can create or update your data, your input should mark the minimum required fields as non-nullable.
+The `id` must always be required.
 
 ```graphql
 mutation {

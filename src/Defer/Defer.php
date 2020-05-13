@@ -175,7 +175,6 @@ directive @defer(if: Boolean = true) on FIELD
                     $this->maxExecutionTime = microtime(true) + $executionTime * 1000;
                 }
 
-                // TODO: Allow nested_levels to be set in config to break out of loop early.
                 while (
                     count($this->deferred)
                     && ! $this->executionTimeExpired()
@@ -195,7 +194,6 @@ directive @defer(if: Boolean = true) on FIELD
             },
             200,
             [
-                // TODO: Allow headers to be set in config
                 'X-Accel-Buffering' => 'no',
                 'Content-Type' => 'multipart/mixed; boundary="-"',
             ]

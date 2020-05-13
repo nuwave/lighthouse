@@ -26,8 +26,6 @@ class Task extends Model
 {
     use SoftDeletes;
 
-    protected $guarded = [];
-
     protected static function boot()
     {
         parent::boot();
@@ -53,7 +51,10 @@ class Task extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    public function scopeFoo(Builder $query, $args): Builder
+    /**
+     * @param  array<string, int>  $args
+     */
+    public function scopeFoo(Builder $query, array $args): Builder
     {
         return $query->limit($args['foo']);
     }
@@ -68,7 +69,10 @@ class Task extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function scopeWhereTags(Builder $query, $tags): Builder
+    /**
+     * @param  array<string>  $tags
+     */
+    public function scopeWhereTags(Builder $query, array $tags): Builder
     {
         return $query->whereHas('tags', function (Builder $query) use ($tags) {
             $query->whereIn('name', $tags);

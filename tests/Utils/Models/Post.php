@@ -23,8 +23,6 @@ class Post extends Model
 {
     use Searchable;
 
-    protected $guarded = [];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

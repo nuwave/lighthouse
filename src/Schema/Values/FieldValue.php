@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -79,7 +80,7 @@ class FieldValue
      */
     public function useDefaultResolver(): self
     {
-        $this->resolver = $this->getParentName() === 'Subscription'
+        $this->resolver = $this->getParentName() === RootType::SUBSCRIPTION
             ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
             : app(ProvidesResolver::class)->provideResolver($this);
 
@@ -161,11 +162,11 @@ class FieldValue
     public function defaultNamespacesForParent(): array
     {
         switch ($this->getParentName()) {
-            case 'Query':
+            case RootType::QUERY:
                 return (array) config('lighthouse.namespaces.queries');
-            case 'Mutation':
+            case RootType::MUTATION:
                 return (array) config('lighthouse.namespaces.mutations');
-            case 'Subscription':
+            case RootType::SUBSCRIPTION:
                 return (array) config('lighthouse.namespaces.subscriptions');
             default:
                return [];
@@ -200,9 +201,6 @@ class FieldValue
      */
     public function parentIsRootType(): bool
     {
-        return in_array(
-            $this->getParentName(),
-            ['Query', 'Mutation', 'Subscription']
-        );
+        return RootType::isRootType($this->getParentName());
     }
 }
