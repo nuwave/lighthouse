@@ -37,6 +37,13 @@ use Nuwave\Lighthouse\Support\Utils;
 class TypeRegistry
 {
     /**
+     * Resolved types.
+     *
+     * @var array<string, \GraphQL\Type\Definition\Type>
+     */
+    protected $types;
+
+    /**
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
@@ -50,11 +57,6 @@ class TypeRegistry
      * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
      */
     protected $argumentFactory;
-
-    /**
-     * @var \GraphQL\Type\Definition\Type[]
-     */
-    protected $types;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
@@ -84,27 +86,30 @@ class TypeRegistry
     /**
      * Get the given GraphQL type by name.
      *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function get(string $name): Type
     {
-        if (! isset($this->types[$name])) {
-            $typeDefinition = $this->documentAST->types[$name] ?? null;
-            if (! $typeDefinition) {
-                throw new DefinitionException(<<<EOL
+        if (! $this->has($name)) {
+            throw new DefinitionException(<<<EOL
 Lighthouse failed while trying to load a type: $name
 
 Make sure the type is present in your schema definition.
 
 EOL
-                );
-            }
-
-            $this->types[$name] = $this->handle($typeDefinition);
+            );
         }
 
         return $this->types[$name];
+    }
+
+    /**
+     * Is a type with the given name present?
+     */
+    public function has(string $name): bool
+    {
+        return isset($this->types[$name])
+            || $this->fromAST($name) instanceof Type;
     }
 
     /**
@@ -117,6 +122,50 @@ EOL
         $this->types[$type->name] = $type;
 
         return $this;
+    }
+
+    /**
+     * Register a type, overwriting if it exists already.
+     *
+     * @return $this
+     */
+    public function overwrite(Type $type): self
+    {
+        return $this->register($type);
+    }
+
+    /**
+     * Register a new type, throw if the name is already registered.
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @deprecated just use register() for this behavior
+     * TODO remove in v5
+     * @return $this
+     */
+    public function registerNew(Type $type): self
+    {
+        $name = $type->name;
+        if($this->has($name)) {
+            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+        }
+
+        $this->types[$name] = $type;
+
+        return $this;
+    }
+
+    /**
+     * Attempt to make a type of the given name from the AST.
+     */
+    protected function fromAST(string $name): ?Type
+    {
+        $typeDefinition = $this->documentAST->types[$name] ?? null;
+        if ($typeDefinition === null) {
+            return null;
+        }
+
+        return $this->types[$name] = $this->handle($typeDefinition);
     }
 
     /**
@@ -318,7 +367,7 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.interfaces')
                 )
-                ?: static::typeResolverFallback();
+                ?: $this->typeResolverFallback();
         }
 
         return new InterfaceType([
@@ -371,7 +420,7 @@ EOL
      * field is a class that is named just like the concrete Object Type
      * that is supposed to be returned.
      */
-    public function typeResolverFallback(): Closure
+    protected function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
             return $this->get(class_basename($rootValue));
@@ -392,7 +441,7 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.unions')
                 )
-                ?: static::typeResolverFallback();
+                ?: $this->typeResolverFallback();
         }
 
         return new UnionType([

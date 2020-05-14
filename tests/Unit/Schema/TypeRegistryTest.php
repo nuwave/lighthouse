@@ -32,7 +32,7 @@ class TypeRegistryTest extends TestCase
 
     public function testSetsEnumValueThroughDirective(): void
     {
-        $enumNode = PartialParser::enumTypeDefinition('
+        $enumNode = PartialParser::enumTypeDefinition(/** @lang GraphQL */ '
         enum Role {
             ADMIN @enum(value: 123)
         }
@@ -47,7 +47,7 @@ class TypeRegistryTest extends TestCase
 
     public function testDefaultsEnumValueToItsName(): void
     {
-        $enumNode = PartialParser::enumTypeDefinition('
+        $enumNode = PartialParser::enumTypeDefinition(/** @lang GraphQL */ '
         enum Role {
             EMPLOYEE
         }
@@ -62,7 +62,7 @@ class TypeRegistryTest extends TestCase
 
     public function testCanTransformScalars(): void
     {
-        $scalarNode = PartialParser::scalarTypeDefinition('
+        $scalarNode = PartialParser::scalarTypeDefinition(/** @lang GraphQL */ '
         scalar Email
         ');
         /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
@@ -74,7 +74,7 @@ class TypeRegistryTest extends TestCase
 
     public function testCanPointToScalarClassThroughDirective(): void
     {
-        $scalarNode = PartialParser::scalarTypeDefinition('
+        $scalarNode = PartialParser::scalarTypeDefinition(/** @lang GraphQL */ '
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
         ');
         /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
@@ -86,7 +86,7 @@ class TypeRegistryTest extends TestCase
 
     public function testCanPointToScalarClassThroughDirectiveWithoutNamespace(): void
     {
-        $scalarNode = PartialParser::scalarTypeDefinition('
+        $scalarNode = PartialParser::scalarTypeDefinition(/** @lang GraphQL */ '
         scalar SomeEmail @scalar(class: "Email")
         ');
         /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
@@ -98,7 +98,7 @@ class TypeRegistryTest extends TestCase
 
     public function testCanTransformInterfaces(): void
     {
-        $interfaceNode = PartialParser::interfaceTypeDefinition('
+        $interfaceNode = PartialParser::interfaceTypeDefinition(/** @lang GraphQL */ '
         interface Foo {
             bar: String
         }
@@ -113,7 +113,7 @@ class TypeRegistryTest extends TestCase
 
     public function testResolvesInterfaceThoughNamespace(): void
     {
-        $interfaceNode = PartialParser::interfaceTypeDefinition('
+        $interfaceNode = PartialParser::interfaceTypeDefinition(/** @lang GraphQL */ '
         interface Nameable {
             bar: String
         }
@@ -127,7 +127,7 @@ class TypeRegistryTest extends TestCase
 
     public function testResolvesInterfaceThoughSecondaryNamespace(): void
     {
-        $interfaceNode = PartialParser::interfaceTypeDefinition('
+        $interfaceNode = PartialParser::interfaceTypeDefinition(/** @lang GraphQL */ '
         interface Bar {
             bar: String
         }
@@ -141,7 +141,7 @@ class TypeRegistryTest extends TestCase
 
     public function testCanTransformUnions(): void
     {
-        $unionNode = PartialParser::unionTypeDefinition('
+        $unionNode = PartialParser::unionTypeDefinition(/** @lang GraphQL */ '
         union Foo = Bar
         ');
         /** @var \GraphQL\Type\Definition\UnionType $unionType */
@@ -154,7 +154,7 @@ class TypeRegistryTest extends TestCase
 
     public function testCanTransformObjectTypes(): void
     {
-        $objectTypeNode = PartialParser::objectTypeDefinition('
+        $objectTypeNode = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
         type User {
             foo(bar: String! @hash): String!
         }
@@ -169,7 +169,7 @@ class TypeRegistryTest extends TestCase
 
     public function testCanTransformInputObjectTypes(): void
     {
-        $inputNode = PartialParser::inputObjectTypeDefinition('
+        $inputNode = PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ '
         input UserInput {
             foo: String!
         }
@@ -182,9 +182,28 @@ class TypeRegistryTest extends TestCase
         $this->assertArrayHasKey('foo', $inputObjectType->getFields());
     }
 
-    public function testThrowsWhenMissingType(): void
+    public function testGetThrowsWhenMissingType(): void
     {
         $this->expectException(DefinitionException::class);
         $this->typeRegistry->get('ThisTypeDoesNotExist');
+    }
+
+    public function testDeterminesIfHasType(): void
+    {
+        $fooName = 'Foo';
+        $this->assertFalse($this->typeRegistry->has($fooName));
+
+        $foo = new ObjectType(['name' => $fooName]);
+        $this->typeRegistry->register($foo);
+        $this->assertTrue($this->typeRegistry->has($fooName));
+    }
+
+    public function testThrowsWhenRegisteringExistingType(): void
+    {
+        $foo = new ObjectType(['name' => 'Foo']);
+        $this->typeRegistry->registerNew($foo);
+
+        $this->expectException(DefinitionException::class);
+        $this->typeRegistry->registerNew($foo);
     }
 }
