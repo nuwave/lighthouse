@@ -146,7 +146,7 @@ EOL
     public function registerNew(Type $type): self
     {
         $name = $type->name;
-        if($this->has($name)) {
+        if ($this->has($name)) {
             throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
         }
 
