@@ -16,7 +16,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Configure a default `guard` for all authentication functionality https://github.com/nuwave/lighthouse/pull/1343
 - Configure the default amount of items in paginated lists with `pagination.default_count` https://github.com/nuwave/lighthouse/pull/1352
 - Add new methods `has()`, `overwrite()` and `registerNew()` to `TypeRegistry` to control if types should
-  be overwritten when registering duplicates
+  be overwritten when registering duplicates https://github.com/nuwave/lighthouse/pull/1361
 
 ### Changed
 
@@ -29,7 +29,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - The setting `paginate_max_count` will change to `pagination.max_count` https://github.com/nuwave/lighthouse/pull/1352
 - The `registerNew()` method of `TypeRegistry` will be removed in favor of `register()`, which will change
-  its behavior to throw when registering duplicates
+  its behavior to throw when registering duplicates https://github.com/nuwave/lighthouse/pull/1361
 
 ## 4.12.4
 
