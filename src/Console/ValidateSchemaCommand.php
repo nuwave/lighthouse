@@ -29,7 +29,8 @@ class ValidateSchemaCommand extends Command
         // Clear the cache so this always validates the current schema
         $cache->forget(config('lighthouse.cache.key'));
 
-        $graphQL->prepSchema()->assertValid();
+        $schema = $graphQL->prepSchema();
+        $schema->assertValid();
 
         $this->info('The defined schema is valid.');
     }
