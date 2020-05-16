@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Product;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
@@ -47,21 +48,21 @@ class BelongsToDirectiveTest extends DBTestCase
     {
         $this->be($this->user);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
         }
-        
+
         type User {
             company: Company @belongsTo
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 company {
@@ -84,21 +85,21 @@ class BelongsToDirectiveTest extends DBTestCase
     {
         $this->be($this->user);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
         }
-        
+
         type User {
             account: Company @belongsTo(relation: "company")
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 account {
@@ -121,26 +122,26 @@ class BelongsToDirectiveTest extends DBTestCase
     {
         $this->be($this->user);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
         }
-        
+
         type Team {
             name: String!
         }
-        
+
         type User {
             company: Company @belongsTo
             team: Team @belongsTo
         }
-        
+
         type Query {
             user: User @auth
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 company {
@@ -171,12 +172,12 @@ class BelongsToDirectiveTest extends DBTestCase
 
         $products = factory(Product::class, 2)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Color {
             id: ID!
             name: String
         }
-                
+
         type Product {
             barcode: String!
             uuid: String!
@@ -184,15 +185,15 @@ class BelongsToDirectiveTest extends DBTestCase
             color: Color @belongsTo
 
         }
-            
+
         type Query {
             products: [Product] @paginate
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            products(first: 2) {     
+            products(first: 2) {
                 data{
                     barcode
                     uuid
@@ -201,7 +202,7 @@ class BelongsToDirectiveTest extends DBTestCase
                         id
                         name
                     }
-                }                           
+                }
             }
         }
         ')->assertJson([
@@ -222,5 +223,55 @@ class BelongsToDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testBelongsToItself(): void
+    {
+        /** @var \Tests\Utils\Models\Post $parent */
+        $parent = factory(Post::class)->create();
+
+        /** @var \Tests\Utils\Models\Post $child */
+        $child = factory(Post::class)->make();
+        $child->parent()->associate($parent);
+        $child->save();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: Int!
+            parent: Post @belongsTo
+        }
+
+        type Query {
+            posts: [Post!]! @all
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                posts {
+                    id
+                    parent {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'posts' => [
+                        [
+                            'id' => $parent->id,
+                            'parent' => null,
+                        ],
+                        [
+                            'id' => $child->id,
+                            'parent' => [
+                                'id' => $parent->id,
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
     }
 }
