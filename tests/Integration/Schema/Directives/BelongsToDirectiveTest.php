@@ -268,10 +268,10 @@ class BelongsToDirectiveTest extends DBTestCase
                             'id' => $child->id,
                             'parent' => [
                                 'id' => $parent->id,
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ]);
     }
 }
