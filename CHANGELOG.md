@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.13.0
+
 ### Added
 
 - Allow passing additional headers to `multipartGraphQL` test helper https://github.com/nuwave/lighthouse/pull/1342
