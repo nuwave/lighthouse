@@ -48,6 +48,78 @@ class RulesDirectiveTest extends TestCase
             ->assertGraphQLValidationKeys(['required']);
     }
 
+    public function testDifferentDates(): void
+    {
+        $this->markTestSkipped('Not working right now, not sure how it can be fixed.');
+
+        $this->schema = /** @lang GraphQL */ '
+        "A date string with format `Y-m-d`, e.g. `2011-05-23`."
+        scalar Date @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Date")
+
+        type Query {
+            foo(
+                bar: Date @rules(apply: ["different:baz"])
+                baz: Date
+            ): Int
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(bar: "2020-05-15", baz: "1999-12-01")
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(bar: "2020-05-15", baz: "2020-05-15")
+            }
+            ')
+            ->assertGraphQLValidationKeys(['bar']);
+    }
+
+    public function testDateBefore(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        "A date string with format `Y-m-d`, e.g. `2011-05-23`."
+        scalar Date @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Date")
+
+        type Query {
+            foo(
+                early: Date @rules(apply: ["before:late"])
+                late: Date
+            ): Int
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(early: "1999-12-01", late: "2020-05-15")
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(early: "2020-05-15", late: "1999-05-15")
+            }
+            ')
+            ->assertGraphQLValidationKeys(['early']);
+    }
+
     public function testCustomMessage(): void
     {
         $this->schema = /** @lang GraphQL */ '
