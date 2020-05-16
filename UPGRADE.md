@@ -126,3 +126,16 @@ or a call to `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions:
 
 In case you depend on an event being fired whenever a subscription is queued, you can bind your
 own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions`.
+
+### `TypeRegistry` does not register duplicates by default
+
+Calling `register()` on the `\Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing
+a type that was already registered, as this most likely is an error.
+
+If you want to previous behaviour of overwriting existing types, use `overwrite()` instead.
+
+```diff
+$typeRegistry = app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);
+-$typeRegistry->register($someType);
++$typeRegistry->overwrite($someType);
+```
