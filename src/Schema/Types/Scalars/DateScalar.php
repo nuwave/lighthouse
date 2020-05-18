@@ -75,7 +75,15 @@ abstract class DateScalar extends ScalarType
         }
     }
 
+    /**
+     * Serialize the Carbon instance.
+     */
     abstract protected function format(Carbon $carbon): string;
 
+    /**
+     * Try turning a client value into a Carbon instance.
+     *
+     * @param  mixed  $value A possibly faulty client value.
+     */
     abstract protected function parse($value): Carbon;
 }

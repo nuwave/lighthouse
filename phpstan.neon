@@ -3,7 +3,7 @@ includes:
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-  level: 5
+  level: 6
   paths:
   - benchmarks
   - src
@@ -61,13 +61,10 @@ parameters:
   # Should work once we update to a version of graphql-php that has more accurate types
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\FieldDefinitionNode>\.#'
-  - '#Property GraphQL\\Language\\AST\\InputObjectTypeDefinitionNode::\$fields \(array<GraphQL\\Language\\AST\\InputValueDefinitionNode>\|null\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
-  - '#Property GraphQL\\Language\\AST\\ObjectTypeDefinitionNode::\$fields \(array<GraphQL\\Language\\AST\\FieldDefinitionNode>\|null\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
-  - '#Property GraphQL\\Language\\AST\\ObjectTypeDefinitionNode::\$interfaces \(array<GraphQL\\Language\\AST\\NamedTypeNode>\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
+  - '#.* does not accept GraphQL\\Language\\AST\\NodeList.*#'
+  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList.*#'
   - '#Property GraphQL\\Language\\AST\\DocumentNode::\$definitions \(GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\DefinitionNode>\) does not accept array<GraphQL\\Language\\AST\\FragmentDefinitionNode>\.#'
   - '#Instanceof between GraphQL\\Language\\AST\\ListTypeNode\|GraphQL\\Language\\AST\\NameNode and GraphQL\\Language\\AST\\NamedTypeNode will always evaluate to false\.#'
-  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\Node>, GraphQL\\Language\\AST\\NodeList\|iterable<GraphQL\\Language\\AST\\Node> given\.#'
-  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\Node>, array<int, GraphQL\\Language\\AST\\DirectiveNode> given\.#'
 
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'
@@ -77,6 +74,7 @@ parameters:
 
   # Compatibility fix because Laravel moved the TestResponse class
   - '#.*TestResponse.*#'
+  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
 
   # We are monkeypatching ResolveInfo to pass information through resolver middleware
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'

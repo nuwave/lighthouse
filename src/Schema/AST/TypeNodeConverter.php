@@ -10,6 +10,8 @@ abstract class TypeNodeConverter
 {
     /**
      * Convert an AST type to an executable type.
+     *
+     * @return mixed The executable type.
      */
     public function convert(TypeNode $node)
     {
@@ -20,6 +22,7 @@ abstract class TypeNodeConverter
      * Convert an AST type and apply wrapping types.
      *
      * @param  string[]  $wrappers
+     * @return mixed The wrapped type.
      */
     protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])
     {

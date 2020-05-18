@@ -11,6 +11,8 @@ class ConnectionField
 {
     /**
      * Resolve page info for connection.
+     *
+     * @return array<string, mixed>
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {
@@ -33,10 +35,10 @@ class ConnectionField
     /**
      * Resolve edges for connection.
      *
-     * @param  \Illuminate\Pagination\LengthAwarePaginator  $paginator
-     * @param  array  $args
+     * @param  \Illuminate\Pagination\LengthAwarePaginator<mixed>  $paginator
+     * @param  array<string, mixed>  $args
      */
-    public function edgeResolver(LengthAwarePaginator $paginator, $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
+    public function edgeResolver(LengthAwarePaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
         // We know this must be a list, as it is constructed this way during schema manipulation
         /** @var \GraphQL\Type\Definition\ListOfType $listOfType */

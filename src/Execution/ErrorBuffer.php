@@ -58,6 +58,7 @@ class ErrorBuffer
      * Resolve the exception by calling the exception handler with the given args.
      *
      * @param  mixed  ...$args
+     * @return \Throwable
      */
     protected function resolveException(...$args)
     {
@@ -83,8 +84,7 @@ class ErrorBuffer
     /**
      * Flush the errors.
      *
-     *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function flush(string $errorMessage): void
     {

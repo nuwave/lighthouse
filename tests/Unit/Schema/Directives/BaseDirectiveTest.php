@@ -170,6 +170,7 @@ class BaseDirectiveTest extends TestCase
              * Allow to call protected methods from the test.
              *
              * @param  mixed[]  $args
+             * @return mixed Whatever the method returns.
              */
             public function __call(string $method, array $args)
             {

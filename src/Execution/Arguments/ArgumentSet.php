@@ -13,14 +13,14 @@ class ArgumentSet
     /**
      * An associative array from argument names to arguments.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument[]
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public $arguments = [];
 
     /**
      * An associative array of arguments that were not given.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument[]
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public $undefined = [];
 
@@ -36,6 +36,8 @@ class ArgumentSet
 
     /**
      * Get a plain array representation of this ArgumentSet.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -201,6 +203,7 @@ class ArgumentSet
      * Works just like the Laravel Arr::add() function.
      * @see \Illuminate\Support\Arr
      *
+     * @param  mixed  $value Any value to inject.
      * @return $this
      */
     public function addValue(string $path, $value): self
@@ -233,7 +236,7 @@ class ArgumentSet
     /**
      * The contained arguments, including all that were not passed.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument[]
+     * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public function argumentsWithUndefined(): array
     {

@@ -27,8 +27,9 @@ class ASTHelper
      * when the list is empty, then it is []. This function corrects that inconsistency
      * and allows the rest of our code to not worry about it until it is fixed.
      *
-     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $original
-     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $addition
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $original
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $addition
+     * @return \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>
      */
     public static function mergeNodeList($original, $addition): NodeList
     {
@@ -42,10 +43,11 @@ class ASTHelper
     /**
      * Merge two lists of AST nodes.
      *
-     * @param  \GraphQL\Language\AST\NodeList|array  $original
-     * @param  \GraphQL\Language\AST\NodeList|array  $addition
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $original
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $addition
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
+     * @return \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -130,6 +132,9 @@ class ASTHelper
 
     /**
      * Extract a named argument from a given directive node.
+     *
+     * @param  mixed  $default Is returned if the directive does not have the argument.
+     * @return mixed The value given to the directive.
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
@@ -143,7 +148,9 @@ class ASTHelper
 
     /**
      * Return the PHP internal value of an arguments default value.
+     *
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
+     * @return mixed The plain PHP value.
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
