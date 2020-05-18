@@ -91,6 +91,7 @@ abstract class BatchLoader
     /**
      * Schedule a result to be loaded.
      *
+     * @param  array<string>|string  $key
      * @param  array<mixed>  $metaInfo
      */
     public function load($key, array $metaInfo = []): Deferred
@@ -138,6 +139,8 @@ abstract class BatchLoader
      * Build a key out of one or more given keys, supporting composite keys.
      *
      * E.g.: $primaryKey = ['key1', 'key2'];.
+     *
+     * @param  array<string>|string  $key
      */
     protected function buildKey($key): string
     {

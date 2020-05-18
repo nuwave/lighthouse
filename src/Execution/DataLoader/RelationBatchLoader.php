@@ -88,6 +88,8 @@ class RelationBatchLoader extends BatchLoader
 
     /**
      * Extract the relation that was loaded.
+     *
+     * @return mixed The model's relation.
      */
     protected function extractRelation(Model $model)
     {

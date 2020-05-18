@@ -74,7 +74,6 @@ SDL;
     /**
      * Determine if field should be deferred.
      *
-     *
      * @throws \GraphQL\Error\Error
      */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $resolveInfo): bool
@@ -115,6 +114,9 @@ SDL;
         return true;
     }
 
+    /**
+     * @param  array<array<string, mixed>|null>  $defers
+     */
     protected function anyFieldHasDefer(array $defers): bool
     {
         foreach ($defers as $defer) {

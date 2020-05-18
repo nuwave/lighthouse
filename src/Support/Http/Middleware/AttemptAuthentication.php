@@ -24,6 +24,7 @@ class AttemptAuthentication
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string[]  ...$guards
+     * @return mixed Some response
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */

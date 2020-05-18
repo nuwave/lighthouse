@@ -47,22 +47,11 @@ class MultipartFormRequest extends BaseRequest
         }
     }
 
-    /**
-     * Get the given variables for the query.
-     *
-     * @return mixed[]
-     */
     public function variables(): array
     {
         return $this->fieldValue('variables') ?? [];
     }
 
-    /**
-     * If we are dealing with a batched request, this gets the
-     * contents of the currently resolving batch index.
-     *
-     * @return array|string|null
-     */
     protected function fieldValue(string $key)
     {
         return $this->isBatched()

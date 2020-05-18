@@ -73,11 +73,11 @@ class Defer implements CreatesResponse
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            PartialParser::directive('@deferrable')
+            PartialParser::directive(/** @lang GraphQL */ '@deferrable')
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
-            PartialParser::directiveDefinition('
+            PartialParser::directiveDefinition(/** @lang GraphQL */ '
 """
 Use this directive on expensive or slow fields to resolve them asynchronously.
 Must not be placed upon:
@@ -96,6 +96,8 @@ directive @defer(if: Boolean = true) on FIELD
 
     /**
      * Register deferred field.
+     *
+     * @return mixed The data if it is already available.
      */
     public function defer(Closure $resolver, string $path)
     {
@@ -108,8 +110,12 @@ directive @defer(if: Boolean = true) on FIELD
         }
 
         $this->deferred[$path] = $resolver;
+        return null;
     }
 
+    /**
+     * @return mixed The loaded data.
+     */
     public function findOrResolve(Closure $originalResolver, string $path)
     {
         if (! $this->hasData($path)) {
@@ -125,6 +131,8 @@ directive @defer(if: Boolean = true) on FIELD
 
     /**
      * Resolve field with data or resolver.
+     *
+     * @return mixed The result of calling the resolver.
      */
     public function resolve(Closure $originalResolver, string $path)
     {

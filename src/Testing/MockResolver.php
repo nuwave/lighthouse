@@ -8,6 +8,9 @@ namespace Nuwave\Lighthouse\Testing;
  */
 class MockResolver
 {
+    /**
+     * @return mixed|void Anything whatsoever.
+     */
     public function __invoke()
     {
     }
