@@ -7,6 +7,7 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class CacheStorageManager implements StoresSubscriptions
 {
@@ -41,7 +42,7 @@ class CacheStorageManager implements StoresSubscriptions
     public function __construct(CacheManager $cacheManager)
     {
         $this->cache = $cacheManager->store(
-            config('lighthouse.subscriptions.storage', 'redis')
+            config('lighthouse.subscriptions.storage', 'file')
         );
         $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
     }
