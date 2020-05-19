@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
-class StorageManager implements StoresSubscriptions
+class CacheStorageManager implements StoresSubscriptions
 {
     /**
      * The cache key for topics.
