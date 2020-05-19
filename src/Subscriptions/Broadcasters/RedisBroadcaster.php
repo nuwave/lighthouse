@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class RedisBroadcaster implements Broadcaster
 {
     /**
-     * @var \Illuminate\Contracts\Broadcasting\Broadcaster
+     * @var BroadcastManager
      */
     private $broadcaster;
 
@@ -59,9 +59,15 @@ class RedisBroadcaster implements Broadcaster
         return new JsonResponse(['message' => 'Unauthorized'], 403);
     }
 
+    /**
+     * @param Request $request
+     * @return Response
+     */
     public function hook(Request $request)
     {
         // Does nothing.
         // The redis broadcaster has the lighthouse:subscribe command to take care of cleaning vacant channels.
+
+        return new JsonResponse(['message' => 'okay'], 200);
     }
 }
