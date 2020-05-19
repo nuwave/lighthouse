@@ -38,9 +38,13 @@ class Authorizer implements AuthorizesSubscriptions
 
     /**
      * Authorize subscription request.
+     * @param Request $request
+     * @return bool
      */
     public function authorize(Request $request): bool
     {
+        $this->sanitizeInput($request);
+
         try {
             $subscriber = $this->storage->subscriberByRequest(
                 $request->input(),
@@ -74,6 +78,22 @@ class Authorizer implements AuthorizesSubscriptions
             $this->exceptionHandler->handleAuthError($e);
 
             return false;
+        }
+    }
+
+    /**
+     * Removes unwanted data from the given request.
+     * @param Request $request
+     */
+    private function sanitizeInput(Request $request)
+    {
+        // Laravel echo presence channels will prefix the subscriber with "presence-",
+        // so we need to get rid of that prefix to be able to identify the subscriber.
+        if (
+            isset($request['channel_name']) &&
+            strpos($request['channel_name'], 'presence-') === 0
+        ) {
+            $request['channel_name'] = substr($request['channel_name'], 9);
         }
     }
 }
