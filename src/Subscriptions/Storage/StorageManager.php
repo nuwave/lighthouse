@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Subscriptions;
+namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Carbon\Carbon;
 use Illuminate\Cache\CacheManager;
