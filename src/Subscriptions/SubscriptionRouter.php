@@ -23,4 +23,15 @@ class SubscriptionRouter
             'uses' => SubscriptionController::class.'@webhook',
         ]);
     }
+
+    /**
+     * @param   \Illuminate\Routing\Router  $router
+     */
+    public function redis($router)
+    {
+        $router->post('graphql/subscriptions/auth', [
+            'as' => 'lighthouse.subscriptions.auth',
+            'uses' => SubscriptionController::class . '@authorize',
+        ]);
+    }
 }

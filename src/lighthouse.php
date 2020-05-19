@@ -1,5 +1,7 @@
 <?php
 
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRouter;
+
 return [
 
     /*
@@ -305,9 +307,14 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
+                'routes' => SubscriptionRouter::class . '@pusher',
                 'connection' => 'pusher',
             ],
+            'redis' => [
+                'driver' => 'redis',
+                'connection' => env('LIGHTHOUSE_REDIS_CONNECTION', 'default'),
+                'routes' => SubscriptionRouter::class . '@routes',
+            ]
         ],
     ],
 
