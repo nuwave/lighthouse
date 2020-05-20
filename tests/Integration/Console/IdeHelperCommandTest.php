@@ -41,7 +41,7 @@ class IdeHelperCommandTest extends TestCase
                 'FEMALE' => [
                     'value' => 'F',
                 ],
-            ]
+            ],
         ]);
         $typeRegistry->register($genderEnumType);
 
