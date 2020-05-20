@@ -112,7 +112,7 @@ SDL;
         }
 
         // append programmatically registered types
-        $typeRegistry = resolve(TypeRegistry::class);
+        $typeRegistry = app(TypeRegistry::class);
         $typeRegistry->setDocumentAST(new DocumentAST);
         $programmaticallyRegisteredTypes = $typeRegistry->possibleTypes();
         foreach ($programmaticallyRegisteredTypes as $type) {
