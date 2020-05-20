@@ -2,8 +2,11 @@
 
 namespace Tests\Integration\Console;
 
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Utils\SchemaPrinter;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
 class IdeHelperCommandTest extends TestCase
@@ -28,6 +31,20 @@ class IdeHelperCommandTest extends TestCase
      */
     public function testGeneratesIdeHelperFiles(): void
     {
+        $typeRegistry = resolve(TypeRegistry::class);
+        $genderEnumType = new EnumType([
+            'name' => 'Gender',
+            'values' => [
+                'MALE' => [
+                    'value' => 'M',
+                ],
+                'FEMALE' => [
+                    'value' => 'F',
+                ],
+            ]
+        ]);
+        $typeRegistry->register($genderEnumType);
+
         $this->artisan('lighthouse:ide-helper');
 
         $this->assertFileExists(IdeHelperCommand::schemaDirectivesPath());
@@ -49,6 +66,13 @@ class IdeHelperCommandTest extends TestCase
             'Overwrites definitions through custom namespaces'
         );
         $this->assertContains(UnionDirective::class, $generated);
+
+        $this->assertContains(
+            SchemaPrinter::printType($genderEnumType),
+            $generated,
+            'Generates schema types for programmatically registered types'
+        );
+        $this->assertContains(FieldDirective::class, $generated);
 
         $this->assertFileEquals(
             __DIR__.'/../../../_ide_helper.php',

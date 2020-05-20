@@ -41,7 +41,7 @@ class TypeRegistry
      *
      * @var array<string, \GraphQL\Type\Definition\Type>
      */
-    protected $types;
+    protected $types = [];
 
     /**
      * @var \Nuwave\Lighthouse\Support\Pipeline

@@ -2,11 +2,15 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
@@ -106,6 +110,14 @@ SDL;
             $schema .= "\n"
                 ."# Directive class: $directiveClass\n"
                 .$definition."\n";
+        }
+
+        // append programmatically registered types
+        $typeRegistry = resolve(TypeRegistry::class);
+        $typeRegistry->setDocumentAST(new DocumentAST);
+        $programmaticallyRegisteredTypes = $typeRegistry->possibleTypes();
+        foreach ($programmaticallyRegisteredTypes as $type) {
+            $schema .= "\n".SchemaPrinter::printType($type)."\n";
         }
 
         return $schema;
