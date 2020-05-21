@@ -3,11 +3,13 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Tests\Utils\Models\UserCustomPrimaryKey;
 
 class UpdateDirectiveTest extends DBTestCase
 {
@@ -337,5 +339,53 @@ class UpdateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testCanUpdateWhenPrimaryKeyIsRenamed()
+    {
+        $user = factory(UserCustomPrimaryKey::class)->create([
+            'name' => 'foo',
+        ]);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            updateUser(
+                id: ID!
+                name: String!
+            ): UserCustomPrimaryKey @update
+        }
+
+        type UserCustomPrimaryKey {
+            id: ID! @rename(attribute: "uuid")
+            name: String!
+        }
+        ';
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        mutation (
+            $id: ID!
+            $name: String!
+        ) {
+            updateUser(
+                id: $id
+                name: $name
+            ) {
+                name
+            }
+        }
+        ', [
+            'id' => $user->uuid,
+            'name' => 'bar',
+        ]);
+
+//        ->assertExactJson([
+//            'data' => [
+//                'updateUser' => [
+//                    'name' => 'bar',
+//                ],
+//            ],
+//        ]);
+
+        dd($response->json());
     }
 }
