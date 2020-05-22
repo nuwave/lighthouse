@@ -2753,7 +2753,8 @@ Client libraries such as Apollo base their caching mechanism on that assumption.
 
 ```graphql
 type Mutation {
-  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post @update
+  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post
+    @update
 }
 ```
 
