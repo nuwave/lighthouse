@@ -75,7 +75,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateCompany(input: {
                 id: 1
@@ -115,7 +115,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateCategory(
                 category_id: 1
@@ -341,7 +341,7 @@ class UpdateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateWhenPrimaryKeyIsRenamed()
+    public function testCanUpdateWhenPrimaryKeyIsRenamed(): void
     {
         $user = factory(UserCustomPrimaryKey::class)->create([
             'name' => 'foo',
@@ -350,7 +350,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             updateUser(
-                id: ID!
+                id: ID! @rename(attribute: "uuid")
                 name: String!
             ): UserCustomPrimaryKey @update
         }
@@ -361,7 +361,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         mutation (
             $id: ID!
             $name: String!
@@ -376,16 +376,13 @@ class UpdateDirectiveTest extends DBTestCase
         ', [
             'id' => $user->uuid,
             'name' => 'bar',
+        ])
+        ->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'name' => 'bar',
+                ],
+            ],
         ]);
-
-//        ->assertExactJson([
-//            'data' => [
-//                'updateUser' => [
-//                    'name' => 'bar',
-//                ],
-//            ],
-//        ]);
-
-        dd($response->json());
     }
 }
