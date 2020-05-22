@@ -2748,18 +2748,12 @@ type Mutation {
 }
 ```
 
-Lighthouse uses the argument `id` to fetch the model by its primary key.
-This will work even if your model has a differently named primary key,
-so you can keep your schema simple and independent of your database structure.
-
-If you want your schema to directly reflect your database schema,
-you can also use the name of the underlying primary key.
-This is not recommended as it makes client-side caching more difficult
-and couples your schema to the underlying implementation.
+If the primary key of your model is not called `id`, it is recommended to rename it.
+Client libraries such as Apollo base their caching mechanism on that assumption.
 
 ```graphql
 type Mutation {
-  updatePost(post_id: ID!, content: String): Post @update
+  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post @update
 }
 ```
 
