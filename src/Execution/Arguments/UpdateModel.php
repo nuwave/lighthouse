@@ -33,7 +33,7 @@ class UpdateModel implements ArgResolver
             ?? Arr::pull($args->arguments, $model->getKeyName())
             ?? null;
 
-        if($id === null) {
+        if ($id === null) {
             throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
         }
 

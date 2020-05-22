@@ -118,8 +118,8 @@ class UpdateDirectiveTest extends DBTestCase
             'errors' => [
                 [
                     'message' => UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
