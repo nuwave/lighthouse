@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Pull primary key from arguments in `@update` before force filling them into the Model https://github.com/nuwave/lighthouse/pull/1377
+
 ## 4.13.0
 
 ### Added
