@@ -199,6 +199,6 @@ SDL;
 
     protected function writeGeneratedFile(string $filePath, string $schema): void
     {
-        file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
+        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
     }
 }
