@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
@@ -169,7 +170,9 @@ SDL;
         }
 
         $schema = $types
-            ->map([SchemaPrinter::class, 'printType'])
+            ->map(function (Type $type): string {
+                return SchemaPrinter::printType($type);
+            })
             ->join("\n");
 
         $this->writeGeneratedFile($filePath, $schema);
