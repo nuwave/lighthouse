@@ -22,8 +22,9 @@ Create IDE helper files to improve type checking and autocompletion.
     php artisan lighthouse:ide-helper
 
 This will create the following files:
+
 - `schema-directives.graphql`: Schema definitions for directives you can use in your schema
-- `programmatic-types.graphql`: Schema definitions for programmatically registered types, if you have any 
+- `programmatic-types.graphql`: Schema definitions for programmatically registered types, if you have any
 - `_lighthouse_ide_helper.php`: Class definitions for some magical PHP, such as the `TestResponse` mixin
 
 A great way to keep up to date with your current version of Lighthouse
