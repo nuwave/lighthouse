@@ -164,6 +164,7 @@ SDL;
 
         if ($types->isEmpty()) {
             unlink($filePath);
+
             return;
         }
 
