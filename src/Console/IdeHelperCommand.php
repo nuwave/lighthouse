@@ -188,7 +188,7 @@ SDL;
     protected function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
-        $contents = file_get_contents($filePath);
+        $contents = file_get_contents(__DIR__.'/../../_ide_helper.php');
 
         $this->writeGeneratedFile($filePath, $contents);
 
