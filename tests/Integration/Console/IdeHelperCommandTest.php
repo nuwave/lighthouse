@@ -48,10 +48,8 @@ class IdeHelperCommandTest extends TestCase
          * Schema directives
          */
 
-        $this->assertFileExists(IdeHelperCommand::schemaDirectivesPath());
         $schemaDirectives = file_get_contents(IdeHelperCommand::schemaDirectivesPath());
 
-        $this->assertStringStartsWith(IdeHelperCommand::GENERATED_NOTICE, $schemaDirectives);
         $this->assertStringEndsWith("\n", $schemaDirectives);
 
         $this->assertContains(
@@ -72,7 +70,6 @@ class IdeHelperCommandTest extends TestCase
          * Programmatic types
          */
 
-        $this->assertFileExists(IdeHelperCommand::programmaticTypesPath());
         $programmaticTypes = file_get_contents(IdeHelperCommand::programmaticTypesPath());
 
         $this->assertContains(
@@ -85,9 +82,11 @@ class IdeHelperCommandTest extends TestCase
          * PHP Ide Helper
          */
 
-        $this->assertFileEquals(
+        $ideHelper = file_get_contents(IdeHelperCommand::phpIdeHelperPath());
+
+        $this->assertContains(
             __DIR__.'/../../../_ide_helper.php',
-            IdeHelperCommand::phpIdeHelperPath()
+            $ideHelper
         );
     }
 }

@@ -102,7 +102,7 @@ SDL;
      */
     protected function buildSchemaString(array $directiveClasses): string
     {
-        $schema = self::GENERATED_NOTICE;
+        $schema = '';
 
         foreach ($directiveClasses as $name => $directiveClass) {
             $definition = $this->define($name, $directiveClass);
@@ -143,7 +143,7 @@ SDL;
         $schema = $this->buildSchemaString($directiveClasses);
 
         $filePath = static::schemaDirectivesPath();
-        file_put_contents($filePath, $schema);
+        $this->writeGeneratedFile($filePath, $schema);
 
         $this->info("Wrote schema directive definitions to $filePath.");
     }
@@ -172,7 +172,7 @@ SDL;
             ->map([SchemaPrinter::class, 'printType'])
             ->join("\n");
 
-        file_put_contents($filePath, $schema);
+        $this->writeGeneratedFile($filePath, $schema);
 
         $this->info("Wrote definitions for programmatically registered types to $filePath.");
     }
@@ -185,7 +185,9 @@ SDL;
     protected function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
-        copy(__DIR__.'/../../_ide_helper.php', $filePath);
+        $contents = file_get_contents($filePath);
+
+        $this->writeGeneratedFile($filePath, $contents);
 
         $this->info("Wrote PHP definitions to $filePath.");
     }
@@ -193,5 +195,10 @@ SDL;
     public static function phpIdeHelperPath(): string
     {
         return base_path().'/_lighthouse_ide_helper.php';
+    }
+
+    protected function writeGeneratedFile(string $filePath, string $schema): void
+    {
+        file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
     }
 }
