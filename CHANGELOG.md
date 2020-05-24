@@ -9,9 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-### Changed
+### Added
 
-- Add programmatically registered types to schema when running `lighthouse:ide-helper` https://github.com/nuwave/lighthouse/pull/1371
+- Write definitions for programmatically registered types to `programmatic-types.graphql`
+  when running the `lighthouse:ide-helper` artisan command https://github.com/nuwave/lighthouse/pull/1371
 
 ## 4.13.1
 

@@ -171,7 +171,7 @@ EOL
     /**
      * Return all possible types that are registered.
      *
-     * @return \GraphQL\Type\Definition\Type[]
+     * @return array<string, \GraphQL\Type\Definition\Type>
      */
     public function possibleTypes(): array
     {
@@ -187,6 +187,19 @@ EOL
             }
         }
 
+        return $this->types;
+    }
+
+    /**
+     * Get the types that are currently resolved.
+     *
+     * Note that this does not all possible types, only those that
+     * are programmatically registered or already resolved.
+     *
+     * @return array<string, \GraphQL\Type\Definition\Type>
+     */
+    public function resolvedTypes(): array
+    {
         return $this->types;
     }
 
@@ -215,7 +228,6 @@ EOL
 
     /**
      * The default type transformations.
-     *
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -303,7 +315,7 @@ EOL
         return new ObjectType([
             'name' => $objectDefinition->name->value,
             'description' => data_get($objectDefinition->description, 'value'),
-            'fields' => $this->resolveFieldsFunction($objectDefinition),
+            'fields' => $this->makeFieldsLoader($objectDefinition),
             'interfaces' => function () use ($objectDefinition): array {
                 $interfaces = [];
 
@@ -322,7 +334,7 @@ EOL
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
      */
-    protected function resolveFieldsFunction($typeDefinition): Closure
+    protected function makeFieldsLoader($typeDefinition): Closure
     {
         return function () use ($typeDefinition): array {
             $typeValue = new TypeValue($typeDefinition);
@@ -373,7 +385,7 @@ EOL
         return new InterfaceType([
             'name' => $nodeName,
             'description' => data_get($interfaceDefinition->description, 'value'),
-            'fields' => $this->resolveFieldsFunction($interfaceDefinition),
+            'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
         ]);
     }

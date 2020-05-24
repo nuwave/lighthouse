@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Console;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
@@ -39,7 +39,7 @@ SDL;
     /**
      * Execute the console command.
      */
-    public function handle(DirectiveNamespacer $directiveNamespaces): int
+    public function handle(DirectiveNamespacer $directiveNamespaces, TypeRegistry $typeRegistry): int
     {
         if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
             $this->error(
@@ -52,6 +52,7 @@ SDL;
         }
 
         $this->schemaDirectiveDefinitions($directiveNamespaces);
+        $this->programmaticTypes($typeRegistry);
         $this->phpIdeHelper();
 
         $this->info("\nIt is recommended to add them to your .gitignore file.");
@@ -111,14 +112,6 @@ SDL;
                 .$definition."\n";
         }
 
-        // append programmatically registered types
-        $typeRegistry = app(TypeRegistry::class);
-        $typeRegistry->setDocumentAST(new DocumentAST);
-        $programmaticallyRegisteredTypes = $typeRegistry->possibleTypes();
-        foreach ($programmaticallyRegisteredTypes as $type) {
-            $schema .= "\n".SchemaPrinter::printType($type)."\n";
-        }
-
         return $schema;
     }
 
@@ -158,6 +151,34 @@ SDL;
     public static function schemaDirectivesPath(): string
     {
         return base_path().'/schema-directives.graphql';
+    }
+
+    protected function programmaticTypes(TypeRegistry $typeRegistry): void
+    {
+        // Users may register types programmatically, e.g. in service providers
+        // In order to allow referencing those in the schema, it is useful to print
+        // those types to a helper schema, excluding types the user defined in the schema
+        $types = new Collection($typeRegistry->resolvedTypes());
+
+        $filePath = static::programmaticTypesPath();
+
+        if ($types->isEmpty()) {
+            unlink($filePath);
+            return;
+        }
+
+        $schema = $types
+            ->map([SchemaPrinter::class, 'printType'])
+            ->join("\n");
+
+        file_put_contents($filePath, $schema);
+
+        $this->info("Wrote definitions for programmatically registered types to $filePath.");
+    }
+
+    public static function programmaticTypesPath(): string
+    {
+        return base_path().'/programmatic-types.graphql';
     }
 
     protected function phpIdeHelper(): void
