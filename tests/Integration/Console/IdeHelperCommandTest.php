@@ -85,7 +85,7 @@ class IdeHelperCommandTest extends TestCase
         $ideHelper = file_get_contents(IdeHelperCommand::phpIdeHelperPath());
 
         $this->assertContains(
-            __DIR__.'/../../../_ide_helper.php',
+            file_get_contents(__DIR__.'/../../../_ide_helper.php'),
             $ideHelper
         );
     }
