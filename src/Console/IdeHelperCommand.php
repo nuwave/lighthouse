@@ -173,7 +173,7 @@ SDL;
             ->map(function (Type $type): string {
                 return SchemaPrinter::printType($type);
             })
-            ->join("\n");
+            ->implode("\n");
 
         $this->writeGeneratedFile($filePath, $schema);
 
