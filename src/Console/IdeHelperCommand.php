@@ -209,7 +209,7 @@ SDL;
             if ($pos !== false) {
                 $schema = substr_replace($schema, '', $pos, strlen($openingPhpTag));
             }
-            $openingLine = $isPhpFile ? "<?php\n" : "";
+            $openingLine = "<?php\n";
         }
 
         file_put_contents($filePath,  $openingLine.self::GENERATED_NOTICE.$schema);
