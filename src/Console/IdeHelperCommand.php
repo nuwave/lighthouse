@@ -190,7 +190,7 @@ SDL;
         $filePath = static::phpIdeHelperPath();
         $contents = file_get_contents(__DIR__.'/../../_ide_helper.php');
 
-        $this->writeGeneratedFile($filePath, $contents);
+        $this->writeGeneratedFile($filePath, $contents, true);
 
         $this->info("Wrote PHP definitions to $filePath.");
     }
@@ -200,8 +200,18 @@ SDL;
         return base_path().'/_lighthouse_ide_helper.php';
     }
 
-    protected function writeGeneratedFile(string $filePath, string $schema): void
+    protected function writeGeneratedFile(string $filePath, string $schema, bool $isPhpFile = false): void
     {
-        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+        $openingLine = "";
+        if ($isPhpFile) {
+            $openingPhpTag = "<?php\n";
+            $pos = strpos($schema, $openingPhpTag);
+            if ($pos !== false) {
+                $schema = substr_replace($schema, '', $pos, strlen($openingPhpTag));
+            }
+            $openingLine = $isPhpFile ? "<?php\n" : "";
+        }
+
+        file_put_contents($filePath,  $openingLine.self::GENERATED_NOTICE.$schema);
     }
 }
