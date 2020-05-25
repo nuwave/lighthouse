@@ -83,7 +83,7 @@ SDL;
 
             $cacheKey = $cacheValue->getKey();
 
-            if($this->shouldUseTags()) {
+            if ($this->shouldUseTags()) {
                 // @phpstan-ignore-next-line We know this method exists because we checked for it
                 $cache = $this->cacheRepository->tags($cacheValue->getTags());
             } else {
@@ -103,9 +103,9 @@ SDL;
                 ? function ($value) use ($cacheKey, $maxAge, $cache) {
                     $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
                 }
-                : function ($value) use ($cacheKey, $cache) {
-                    $cache->forever($cacheKey, $value);
-                };
+            : function ($value) use ($cacheKey, $cache) {
+                $cache->forever($cacheKey, $value);
+            };
 
             $resolvedValue instanceof Deferred
                 ? $resolvedValue->then(function ($result) use ($storeInCache): void {
