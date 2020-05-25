@@ -146,7 +146,7 @@ SDL;
         $schema = $this->buildSchemaString($directiveClasses);
 
         $filePath = static::schemaDirectivesPath();
-        file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
+        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
 
         $this->info("Wrote schema directive definitions to $filePath.");
     }
@@ -177,7 +177,7 @@ SDL;
             })
             ->implode("\n");
 
-        file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
+        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
 
         $this->info("Wrote definitions for programmatically registered types to $filePath.");
     }
