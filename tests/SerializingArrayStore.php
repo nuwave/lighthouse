@@ -26,7 +26,7 @@ class SerializingArrayStore extends ArrayStore
     public function get($key)
     {
         if (! isset($this->storage[$key])) {
-            return null;
+            return;
         }
 
         $item = $this->storage[$key];
@@ -36,7 +36,7 @@ class SerializingArrayStore extends ArrayStore
         if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
             $this->forget($key);
 
-            return null;
+            return;
         }
 
         return unserialize($item['value']);
@@ -48,7 +48,6 @@ class SerializingArrayStore extends ArrayStore
      * @param  string  $key
      * @param  mixed  $value Some storable value
      * @param  int  $seconds
-     * @return bool
      */
     public function put($key, $value, $seconds): bool
     {

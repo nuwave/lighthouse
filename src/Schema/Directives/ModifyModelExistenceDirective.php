@@ -63,7 +63,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 );
 
                 if ($modelOrModels === null) {
-                    return null;
+                    return;
                 }
 
                 if ($modelOrModels instanceof Model) {

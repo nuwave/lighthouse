@@ -89,7 +89,7 @@ abstract class RelationDirective extends BaseDirective
     protected function buildPath(ResolveInfo $resolveInfo, Model $parent): array
     {
         /**
-         * TODO remove when fixed in graphql-php
+         * TODO remove when fixed in graphql-php.
          * @var array<string> $path
          */
         $path = $resolveInfo->path;

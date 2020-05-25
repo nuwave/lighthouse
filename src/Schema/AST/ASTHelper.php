@@ -156,7 +156,7 @@ class ASTHelper
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
         if ($defaultValue instanceof NullValueNode) {
-            return null;
+            return;
         }
 
         // webonyx/graphql-php expects the internal value here, whereas the

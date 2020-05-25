@@ -37,7 +37,7 @@ SDL;
         } elseif ($builder instanceof EloquentBuilder) {
             $model = $builder->getModel();
         } else {
-            throw new \Exception("Can not get model from builder of class: " . get_class($builder));
+            throw new \Exception('Can not get model from builder of class: '.get_class($builder));
         }
 
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(

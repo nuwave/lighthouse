@@ -75,9 +75,6 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesSubscriptionResolver::class, SubscriptionResolverProvider::class);
     }
 
-    /**
-     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
-     */
     protected function registerBroadcasterRoutes(ConfigRepository $configRepository): void
     {
         $broadcaster = $configRepository->get('lighthouse.subscriptions.broadcaster');
