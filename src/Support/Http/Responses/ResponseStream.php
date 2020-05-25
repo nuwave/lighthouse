@@ -69,7 +69,12 @@ class ResponseStream extends Stream implements CanStreamResponse
      */
     protected function chunk(array $data, bool $terminating): string
     {
-        $json = json_encode($data, 0);
+        $json = json_encode($data);
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while sending response stream: '.json_last_error_msg());
+        }
+
         $length = $terminating
             ? strlen($json)
             : strlen($json.self::EOL);

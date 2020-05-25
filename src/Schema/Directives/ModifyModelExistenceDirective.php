@@ -37,12 +37,14 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     {
         return $fieldValue->setResolver(
             function ($root, array $args) {
-                /** @var string|int|string[]|int[] $idOrIds */
+                /** @var string|int|array<string>|array<int> $idOrIds */
                 $idOrIds = reset($args);
 
                 if ($this->directiveArgValue('globalId', false)) {
+                    /** @var string|array<string> */
                     // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
                     if ($this->idArgument()->type instanceof ListTypeNode) {
+                        /** @var array<string> $idOrIds */
                         $idOrIds = array_map(
                             function (string $id): string {
                                 return $this->globalId->decodeID($id);
@@ -50,6 +52,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                             $idOrIds
                         );
                     } else {
+                        /** @var string $idOrIds */
                         $idOrIds = $this->globalId->decodeID($idOrIds);
                     }
                 }
@@ -60,7 +63,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 );
 
                 if ($modelOrModels === null) {
-                    return;
+                    return null;
                 }
 
                 if ($modelOrModels instanceof Model) {
@@ -101,7 +104,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         ObjectTypeDefinitionNode &$parentType
     ): void {
         // Ensure there is only a single argument defined on the field.
-        if (count($this->definitionNode->arguments) !== 1) {
+        if (count($fieldDefinition->arguments) !== 1) {
             throw new DefinitionException(
                 'The @'.static::name()." directive requires the field {$this->nodeName()} to only contain a single argument."
             );

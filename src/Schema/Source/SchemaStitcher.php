@@ -59,7 +59,7 @@ class SchemaStitcher implements SchemaSourceProvider
                 if (! Str::contains($importFileName, '*')) {
                     $realPath = realpath($importFilePath);
 
-                    if (! $realPath) {
+                    if ($realPath === false) {
                         self::throwFileNotFoundException($importFilePath);
                     }
 

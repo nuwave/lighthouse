@@ -40,18 +40,7 @@ class SubscriptionServiceProvider extends ServiceProvider
             SubscriptionRegistry::class.'@handleBuildExtensionsResponse'
         );
 
-        // Register the routes for the configured broadcaster. The specific
-        // method that is used can be changed, so we retrieve its name
-        // dynamically and then call it with an instance of 'router'.
-        $broadcaster = $configRepository->get('lighthouse.subscriptions.broadcaster');
-        if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
-            [$router, $method] = Str::parseCallback($routesMethod, 'pusher');
-
-            call_user_func(
-                [$this->app->make($router), $method],
-                $this->app->make('router')
-            );
-        }
+        $this->registerBroadcasterRoutes($configRepository);
 
         // If authentication is used, we can log in subscribers when broadcasting an update
         if ($this->app->bound(AuthManager::class)) {
@@ -84,5 +73,22 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
         $this->app->bind(BroadcastsSubscriptions::class, SubscriptionBroadcaster::class);
         $this->app->bind(ProvidesSubscriptionResolver::class, SubscriptionResolverProvider::class);
+    }
+
+    /**
+     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
+     */
+    protected function registerBroadcasterRoutes(ConfigRepository $configRepository): void
+    {
+        $broadcaster = $configRepository->get('lighthouse.subscriptions.broadcaster');
+
+        if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
+            [$routesProviderClass, $method] = Str::parseCallback($routesMethod, 'pusher');
+
+            $routesProvider = $this->app->make($routesProviderClass);
+            $router = $this->app->make('router');
+
+            $routesProvider->{$method}($router);
+        }
     }
 }

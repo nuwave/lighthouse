@@ -174,7 +174,7 @@ class BaseDirectiveTest extends TestCase
              */
             public function __call(string $method, array $args)
             {
-                return call_user_func_array([$this, $method], $args);
+                return $this->{$method}(...$args);
             }
         };
 

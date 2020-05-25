@@ -74,6 +74,6 @@ GRAPHQL
      */
     public function complexity(int $childrenComplexity, array $args): int
     {
-        return $childrenComplexity * Arr::get($args, 'foo', 0);
+        return $childrenComplexity * (int) Arr::get($args, 'foo', 0);
     }
 }

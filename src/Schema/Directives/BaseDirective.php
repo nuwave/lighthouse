@@ -165,6 +165,7 @@ abstract class BaseDirective implements Directive
      *
      * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch
+     * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -234,6 +235,8 @@ abstract class BaseDirective implements Directive
 
     /**
      * Try adding the default model namespace and ensure the given class is a model.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {

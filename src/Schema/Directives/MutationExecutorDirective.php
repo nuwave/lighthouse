@@ -50,12 +50,13 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
                 $model = new $modelClass;
 
                 $executeMutation = function () use ($model, $resolveInfo): Model {
-                    return $this
-                        ->executeMutation(
-                            $model,
-                            $resolveInfo->argumentSet
-                        )
-                        ->refresh();
+                    /** @var \Illuminate\Database\Eloquent\Model $mutated */
+                    $mutated = $this->executeMutation(
+                        $model,
+                        $resolveInfo->argumentSet
+                    );
+
+                    return $mutated->refresh();
                 };
 
                 return config('lighthouse.transactional_mutations', true)
@@ -83,6 +84,8 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
         $relation = $parent->{$relationName}();
+
+        /** @var \Illuminate\Database\Eloquent\Model $related */
         $related = $relation->make();
 
         return $this->executeMutation($related, $args, $relation);

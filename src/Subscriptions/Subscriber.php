@@ -121,7 +121,7 @@ class Subscriber implements Serializable
      */
     public function serialize(): string
     {
-        return json_encode([
+        $serialized = json_encode([
             'channel' => $this->channel,
             'topic' => $this->topic,
             'query' => serialize(
@@ -131,6 +131,13 @@ class Subscriber implements Serializable
             'args' => $this->args,
             'context' => $this->contextSerializer()->serialize($this->context),
         ]);
+
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while serializing subscriber data: '.json_last_error_msg());
+        }
+
+        return $serialized;
     }
 
     /**

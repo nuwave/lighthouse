@@ -69,7 +69,12 @@ class PrintSchemaCommand extends Command
             Introspection::getIntrospectionQuery()
         );
 
-        // TODO use safe-php
-        return json_encode($introspectionResult->data);
+        $json = json_encode($introspectionResult->data);
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while converting schema: '.json_last_error_msg());
+        }
+
+        return $json;
     }
 }

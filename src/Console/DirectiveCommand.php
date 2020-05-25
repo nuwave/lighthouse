@@ -27,7 +27,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getNameInput(): string
     {
-        return ucfirst($this->argument('name')).'Directive';
+        return parent::getNameInput().'Directive';
     }
 
     protected function namespaceConfigKey(): string

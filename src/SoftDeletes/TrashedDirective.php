@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -33,8 +34,10 @@ SDL;
             $model = $builder->getRelated();
         } elseif ($builder instanceof ScoutBuilder) {
             $model = $builder->model;
-        } else {
+        } elseif ($builder instanceof EloquentBuilder) {
             $model = $builder->getModel();
+        } else {
+            throw new \Exception("Can not get model from builder of class: " . get_class($builder));
         }
 
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(

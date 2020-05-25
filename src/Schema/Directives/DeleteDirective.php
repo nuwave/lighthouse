@@ -103,6 +103,7 @@ SDL;
                 $relation->delete();
             }
         } else {
+            /** @var \Illuminate\Database\Eloquent\Model $related */
             $related = $relation->make();
             $related::destroy($idOrIds);
         }

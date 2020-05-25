@@ -54,13 +54,13 @@ class ConnectionField
         // @phpstan-ignore-next-line static refers to the wrong class because it is a proxied method call
         return $paginator
             ->values()
-            ->map(function ($item, $index) use ($returnTypeFields, $firstItem): array {
+            ->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
                 $data = [];
 
                 foreach ($returnTypeFields as $field) {
                     switch ($field->name) {
                         case 'cursor':
-                            $data['cursor'] = Cursor::encode($firstItem + $index);
+                            $data['cursor'] = Cursor::encode((int) $firstItem + $index);
                             break;
 
                         case 'node':

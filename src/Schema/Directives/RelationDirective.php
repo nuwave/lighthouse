@@ -61,10 +61,10 @@ abstract class RelationDirective extends BaseDirective
                 $decorateBuilder($relation);
 
                 if ($paginationArgs) {
-                    $relation = $paginationArgs->applyToBuilder($relation);
+                    return $paginationArgs->applyToBuilder($relation);
+                } else {
+                    return $relation->getResults();
                 }
-
-                return $relation->getResults();
             }
         );
 
@@ -84,10 +84,14 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @return array<string|int|class-string>
+     * @return array<string|class-string<\Illuminate\Database\Eloquent\Model>>
      */
     protected function buildPath(ResolveInfo $resolveInfo, Model $parent): array
     {
+        /**
+         * TODO remove when fixed in graphql-php
+         * @var array<string> $path
+         */
         $path = $resolveInfo->path;
 
         // When dealing with polymorphic relations, we might have a case where

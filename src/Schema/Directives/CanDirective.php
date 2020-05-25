@@ -135,13 +135,17 @@ SDL;
             }
 
             try {
-                $modelOrModels = $argumentSet
-                    ->enhanceBuilder(
-                        $queryBuilder,
-                        [],
-                        Utils::instanceofMatcher(TrashedDirective::class)
-                    )
-                    ->findOrFail($findValue);
+                /**
+                 * TODO use generics
+                 * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
+                 */
+                $enhancedBuilder = $argumentSet->enhanceBuilder(
+                    $queryBuilder,
+                    [],
+                    Utils::instanceofMatcher(TrashedDirective::class)
+                );
+
+                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {
                 throw new Error($exception->getMessage());
             }

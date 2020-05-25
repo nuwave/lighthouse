@@ -150,7 +150,7 @@ class CacheValue
     }
 
     /**
-     * @param  array<string|int> $items
+     * @param  array<mixed|null> $items
      */
     protected function implode(array $items): string
     {
