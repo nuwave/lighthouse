@@ -202,7 +202,7 @@ SDL;
 
     protected function writeGeneratedFile(string $filePath, string $schema, bool $isPhpFile = false): void
     {
-        $openingLine = "";
+        $openingLine = '';
         if ($isPhpFile) {
             $openingPhpTag = "<?php\n";
             $pos = strpos($schema, $openingPhpTag);
@@ -212,6 +212,6 @@ SDL;
             $openingLine = "<?php\n";
         }
 
-        file_put_contents($filePath,  $openingLine.self::GENERATED_NOTICE.$schema);
+        file_put_contents($filePath, $openingLine.self::GENERATED_NOTICE.$schema);
     }
 }
