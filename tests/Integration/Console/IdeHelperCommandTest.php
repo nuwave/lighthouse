@@ -83,14 +83,9 @@ class IdeHelperCommandTest extends TestCase
          */
 
         $ideHelper = file_get_contents(IdeHelperCommand::phpIdeHelperPath());
-        $shouldContain = file_get_contents(__DIR__.'/../../../_ide_helper.php');
-        $openingPhpTag = "<?php\n";
-        $pos = strpos($shouldContain, $openingPhpTag);
-        if ($pos !== false) {
-            $shouldContain = substr_replace($shouldContain, '', $pos, strlen($openingPhpTag));
-        }
+
         $this->assertContains(
-            $shouldContain,
+            IdeHelperCommand::OPENING_PHP_TAG.IdeHelperCommand::GENERATED_NOTICE,
             $ideHelper
         );
     }
