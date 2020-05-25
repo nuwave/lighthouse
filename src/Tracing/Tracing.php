@@ -130,7 +130,7 @@ class Tracing
     protected function diffTimeInNanoseconds($start, $end): int
     {
         if ($this->platformSupportsNanoseconds()) {
-            return (int) $end - $start;
+            return (int) ($end - $start);
         }
 
         // Difference is in seconds (with microsecond precision)

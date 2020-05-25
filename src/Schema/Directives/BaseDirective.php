@@ -240,6 +240,7 @@ abstract class BaseDirective implements Directive
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
+        // @phpstan-ignore-next-line The callback ensures we get a Model class
         return $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),

@@ -136,6 +136,7 @@ class Subscriber implements Serializable
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('Tried to encode invalid JSON while serializing subscriber data: '.json_last_error_msg());
         }
+        /** @var string $serialized */
 
         return $serialized;
     }

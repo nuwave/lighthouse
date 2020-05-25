@@ -83,10 +83,13 @@ SDL;
 
             $cacheKey = $cacheValue->getKey();
 
+            if($this->shouldUseTags()) {
+                // @phpstan-ignore-next-line We know this method exists because we checked for it
+                $cache = $this->cacheRepository->tags($cacheValue->getTags());
+            } else {
+                $cache = $this->cacheRepository;
+            }
             /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
-            $cache = $this->shouldUseTags()
-                ? $this->cacheRepository->tags($cacheValue->getTags())
-                : $this->cacheRepository;
 
             // We found a matching value in the cache, so we can just return early
             // without actually running the query
@@ -100,9 +103,9 @@ SDL;
                 ? function ($value) use ($cacheKey, $maxAge, $cache) {
                     $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
                 }
-            : function ($value) use ($cacheKey, $cache) {
-                $cache->forever($cacheKey, $value);
-            };
+                : function ($value) use ($cacheKey, $cache) {
+                    $cache->forever($cacheKey, $value);
+                };
 
             $resolvedValue instanceof Deferred
                 ? $resolvedValue->then(function ($result) use ($storeInCache): void {

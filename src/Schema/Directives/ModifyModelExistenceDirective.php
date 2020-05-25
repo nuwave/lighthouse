@@ -41,20 +41,8 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 $idOrIds = reset($args);
 
                 if ($this->directiveArgValue('globalId', false)) {
-                    /** @var string|array<string> */
-                    // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-                    if ($this->idArgument()->type instanceof ListTypeNode) {
-                        /** @var array<string> $idOrIds */
-                        $idOrIds = array_map(
-                            function (string $id): string {
-                                return $this->globalId->decodeID($id);
-                            },
-                            $idOrIds
-                        );
-                    } else {
-                        /** @var string $idOrIds */
-                        $idOrIds = $this->globalId->decodeID($idOrIds);
-                    }
+                    // @phpstan-ignore-next-line We know that global ids must be strings
+                    $idOrIds = $this->decodeIdOrIds($idOrIds);
                 }
 
                 $modelOrModels = $this->find(
@@ -114,6 +102,27 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
             throw new DefinitionException(
                 'The @'.static::name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
             );
+        }
+    }
+
+    /**
+     * @param  string|array<string>  $idOrIds
+     * @return string|array<string>
+     */
+    protected function decodeIdOrIds($idOrIds)
+    {
+        // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
+        if ($this->idArgument()->type instanceof ListTypeNode) {
+            /** @var array<string> $idOrIds */
+            return array_map(
+                function (string $id): string {
+                    return $this->globalId->decodeID($id);
+                },
+                $idOrIds
+            );
+        } else {
+            /** @var string $idOrIds */
+            return $this->globalId->decodeID($idOrIds);
         }
     }
 

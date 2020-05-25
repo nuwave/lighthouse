@@ -75,6 +75,7 @@ class ErrorBuffer
         if ($key === null) {
             $this->errors[] = $errorMessage;
         } else {
+            // @phpstan-ignore-next-line sigh...
             $this->errors[$key][] = $errorMessage;
         }
 

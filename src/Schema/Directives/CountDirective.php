@@ -48,7 +48,9 @@ SDL;
                 // Else we try to fetch by model.
                 $modelArg = $this->directiveArgValue('model');
                 if (! is_null($modelArg)) {
-                    return $this->namespaceModelClass($modelArg)::count();
+                    return $this->namespaceModelClass($modelArg)
+                        ::query()
+                        ->count();
                 }
 
                 throw new DirectiveException(

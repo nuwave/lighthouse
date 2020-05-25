@@ -74,7 +74,7 @@ SDL;
         $directives = [];
 
         foreach ($directiveNamespaces as $directiveNamespace) {
-            /** @var array<class-string<object>> $classesInNamespace */
+            /** @var array<class-string> $classesInNamespace */
             $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
 
             foreach ($classesInNamespace as $class) {
@@ -86,6 +86,7 @@ SDL;
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
+                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
 
                 $name = DirectiveFactory::directiveName($class);
 

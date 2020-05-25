@@ -41,14 +41,13 @@ SDL;
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
      * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  The modified builder.
+     * @return \Illuminate\Database\Eloquent\Builder  The modified builder.
      */
     public function handleBuilder($builder, $whereConditions)
     {
         // The value `null` should be allowed but have no effect on the query.
-        // Just return the unmodified Builder instance.
         if (is_null($whereConditions)) {
             return $builder;
         }

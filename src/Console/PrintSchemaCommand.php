@@ -74,6 +74,7 @@ class PrintSchemaCommand extends Command
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('Tried to encode invalid JSON while converting schema: '.json_last_error_msg());
         }
+        /** @var string $json */
 
         return $json;
     }

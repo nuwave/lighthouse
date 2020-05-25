@@ -62,6 +62,7 @@ class SchemaStitcher implements SchemaSourceProvider
                     if ($realPath === false) {
                         self::throwFileNotFoundException($importFilePath);
                     }
+                    /** @var string $realPath */
 
                     return self::gatherSchemaImportsRecursively($realPath);
                 }
