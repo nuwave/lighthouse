@@ -18,13 +18,17 @@ Create a class for a GraphQL directive.
 ## ide-helper
 
 Create IDE helper files to improve type checking and autocompletion.
-This will improve the editing experience when using schema directives, as well
-as the `TestResponse` mixins.
 
     php artisan lighthouse:ide-helper
 
-A great way to keep this is up date to with your current version of Lighthouse
-is to add it to your `composer.json`:
+This will create the following files:
+
+- `schema-directives.graphql`: Schema definitions for directives you can use in your schema
+- `programmatic-types.graphql`: Schema definitions for programmatically registered types, if you have any
+- `_lighthouse_ide_helper.php`: Class definitions for some magical PHP, such as the `TestResponse` mixin
+
+A great way to keep up to date with your current version of Lighthouse
+is to add this script to your `composer.json`:
 
 ```json
 "scripts": {
