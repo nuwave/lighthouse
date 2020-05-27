@@ -8,8 +8,6 @@ class MorphToDirective extends RelationDirective implements FieldResolver
 {
     /**
      * SDL definition of the directive.
-     *
-     * @return string
      */
     public static function definition(): string
     {

@@ -9,8 +9,6 @@ class MorphManyDirective extends RelationDirective implements FieldResolver, Fie
 {
     /**
      * SDL definition of the directive.
-     *
-     * @return string
      */
     public static function definition(): string
     {
