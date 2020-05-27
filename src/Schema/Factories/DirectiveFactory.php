@@ -188,6 +188,7 @@ class DirectiveFactory
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
+     * TODO rename to exclusiveDirective
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
