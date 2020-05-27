@@ -48,7 +48,7 @@ class IdeHelperCommandTest extends TestCase
          * Schema directives
          */
 
-        $schemaDirectives = file_get_contents(IdeHelperCommand::schemaDirectivesPath());
+        $schemaDirectives = \Safe\file_get_contents(IdeHelperCommand::schemaDirectivesPath());
 
         $this->assertStringEndsWith("\n", $schemaDirectives);
 
@@ -70,7 +70,7 @@ class IdeHelperCommandTest extends TestCase
          * Programmatic types
          */
 
-        $programmaticTypes = file_get_contents(IdeHelperCommand::programmaticTypesPath());
+        $programmaticTypes = \Safe\file_get_contents(IdeHelperCommand::programmaticTypesPath());
 
         $this->assertContains(
             SchemaPrinter::printType($programmaticType),
@@ -82,7 +82,7 @@ class IdeHelperCommandTest extends TestCase
          * PHP Ide Helper
          */
 
-        $ideHelper = file_get_contents(IdeHelperCommand::phpIdeHelperPath());
+        $ideHelper = \Safe\file_get_contents(IdeHelperCommand::phpIdeHelperPath());
 
         $this->assertContains(
             IdeHelperCommand::OPENING_PHP_TAG.IdeHelperCommand::GENERATED_NOTICE,

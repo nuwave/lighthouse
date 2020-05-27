@@ -25,7 +25,7 @@ SDL;
     /**
      * Apply a scout search to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return \Laravel\Scout\Builder
      */
     public function handleBuilder($builder, $value)

@@ -62,6 +62,7 @@ class Argument
         }
 
         if (is_array($value)) {
+            // @phpstan-ignore-next-line This callable works just fine
             return array_map([static::class, 'toPlainRecursive'], $value);
         }
 

@@ -8,7 +8,7 @@ use GraphQL\Deferred;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
@@ -22,13 +22,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
-     * @var \Illuminate\Cache\CacheManager|\Illuminate\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Repository
      */
-    protected $cacheManager;
+    protected $cacheRepository;
 
-    public function __construct(CacheManager $cacheManager)
+    public function __construct(CacheRepository $cacheRepository)
     {
-        $this->cacheManager = $cacheManager;
+        $this->cacheRepository = $cacheRepository;
     }
 
     public static function definition(): string
@@ -83,10 +83,13 @@ SDL;
 
             $cacheKey = $cacheValue->getKey();
 
-            /** @var \Illuminate\Cache\Repository|\Illuminate\Cache\TaggedCache $cache */
-            $cache = $this->shouldUseTags()
-                ? $this->cacheManager->tags($cacheValue->getTags())
-                : $this->cacheManager;
+            if ($this->shouldUseTags()) {
+                // @phpstan-ignore-next-line We know this method exists because we checked for it
+                $cache = $this->cacheRepository->tags($cacheValue->getTags());
+            } else {
+                $cache = $this->cacheRepository;
+            }
+            /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
 
             // We found a matching value in the cache, so we can just return early
             // without actually running the query
@@ -120,7 +123,7 @@ SDL;
     protected function shouldUseTags(): bool
     {
         return config('lighthouse.cache.tags', false)
-            && method_exists($this->cacheManager->store(), 'tags');
+            && method_exists($this->cacheRepository->getStore(), 'tags');
     }
 
     /**

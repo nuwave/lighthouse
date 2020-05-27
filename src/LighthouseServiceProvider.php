@@ -118,10 +118,9 @@ class LighthouseServiceProvider extends ServiceProvider
             /** @var \Illuminate\Http\Request $request */
             $request = $app->make('request');
 
-            $isMultipartFormRequest = Str::startsWith(
-                $request->header('Content-Type'),
-                'multipart/form-data'
-            );
+            /** @var string $contentType */
+            $contentType = $request->header('Content-Type') ?? '';
+            $isMultipartFormRequest = Str::startsWith($contentType, 'multipart/form-data');
 
             return $isMultipartFormRequest
                 ? new MultipartFormRequest($request)

@@ -16,10 +16,12 @@ class Utils
      * Else, the given namespaces are tried in order.
      *
      * @param  array<string>  $namespacesToTry
+     * @return class-string|null
      */
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
     {
         if ($determineMatch($classCandidate)) {
+            /** @var class-string $classCandidate */
             return $classCandidate;
         }
 
@@ -29,6 +31,7 @@ class Utils
             $className = array_shift($namespacesToTry).'\\'.$classCandidate;
 
             if ($determineMatch($className)) {
+                /** @var class-string $className */
                 return $className;
             }
         }

@@ -10,7 +10,7 @@ class ErrorBuffer
     /**
      * The gathered error messages.
      *
-     * @var string[]|string[][]
+     * @var array<string>|array<string, array<string>>
      */
     protected $errors = [];
 
@@ -75,6 +75,7 @@ class ErrorBuffer
         if ($key === null) {
             $this->errors[] = $errorMessage;
         } else {
+            // @phpstan-ignore-next-line sigh...
             $this->errors[$key][] = $errorMessage;
         }
 

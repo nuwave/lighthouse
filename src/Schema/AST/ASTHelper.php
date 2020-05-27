@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
@@ -154,10 +155,14 @@ class ASTHelper
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
+        if ($defaultValue instanceof NullValueNode) {
+            return;
+        }
+
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
-            /** @var \GraphQL\Language\AST\EnumValueNode|\GraphQL\Language\AST\NullValueNode $defaultValue */
+            /** @var \GraphQL\Language\AST\EnumValueNode $defaultValue */
             return $argumentType
                 ->getValue($defaultValue->value)
                 ->value;

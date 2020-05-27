@@ -67,13 +67,14 @@ SDL;
      * Scan the given namespaces for directive classes.
      *
      * @param  string[]  $directiveNamespaces
-     * @return string[]
+     * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected function scanForDirectives(array $directiveNamespaces): array
     {
         $directives = [];
 
         foreach ($directiveNamespaces as $directiveNamespace) {
+            /** @var array<class-string> $classesInNamespace */
             $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
 
             foreach ($classesInNamespace as $class) {
@@ -85,7 +86,7 @@ SDL;
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
-
+                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
                 $name = DirectiveFactory::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
@@ -101,7 +102,7 @@ SDL;
     }
 
     /**
-     * @param string[] $directiveClasses
+     * @param  array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>  $directiveClasses
      */
     protected function buildSchemaString(array $directiveClasses): string
     {
@@ -191,6 +192,9 @@ SDL;
     {
         $filePath = static::phpIdeHelperPath();
         $contents = file_get_contents(__DIR__.'/../../_ide_helper.php');
+        if ($contents === false) {
+            throw new \Exception('Could not load the contents of _ide_helper.php. Try deleting /vendor and run composer install again.');
+        }
 
         file_put_contents($filePath, $this->withGeneratedNotice($contents));
 

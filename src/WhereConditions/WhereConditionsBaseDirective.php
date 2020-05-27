@@ -114,12 +114,13 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     /**
      * Ensure the column name is well formed and prevent SQL injection.
      *
-     *
      * @throws \GraphQL\Error\Error
      */
     protected static function assertValidColumnName(string $column): void
     {
-        if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
+        // TODO use safe
+        $match = preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column);
+        if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
             );

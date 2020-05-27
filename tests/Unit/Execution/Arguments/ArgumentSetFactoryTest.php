@@ -100,26 +100,32 @@ class ArgumentSetFactoryTest extends TestCase
 
         $this->assertCount(1, $argumentSet->arguments);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $bar */
         $bar = $argumentSet->arguments['bar'];
         $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame($barValue, $bar->value);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $firstLevel */
         $firstLevel = $bar->type;
         $this->assertInstanceOf(ListType::class, $firstLevel);
         $this->assertFalse($firstLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $secondLevel */
         $secondLevel = $firstLevel->type;
         $this->assertInstanceOf(ListType::class, $secondLevel);
         $this->assertTrue($secondLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $thirdLevel */
         $thirdLevel = $secondLevel->type;
         $this->assertInstanceOf(ListType::class, $thirdLevel);
         $this->assertFalse($thirdLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $fourthLevel */
         $fourthLevel = $thirdLevel->type;
         $this->assertInstanceOf(ListType::class, $fourthLevel);
         $this->assertTrue($fourthLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\NamedType $finalLevel */
         $finalLevel = $fourthLevel->type;
         $this->assertInstanceOf(NamedType::class, $finalLevel);
         $this->assertSame(Type::INT, $finalLevel->name);

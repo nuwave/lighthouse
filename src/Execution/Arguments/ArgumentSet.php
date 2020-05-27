@@ -148,7 +148,7 @@ class ArgumentSet
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
 
         foreach ($scopes as $scope) {
-            call_user_func([$builder, $scope], $this->toArray());
+            $builder->{$scope}($this->toArray());
         }
 
         return $builder;

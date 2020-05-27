@@ -28,10 +28,14 @@ directive @whereConditions(
 SDL;
     }
 
+    /**
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  array<string, mixed>|null  $whereConditions
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
     public function handleBuilder($builder, $whereConditions)
     {
         // The value `null` should be allowed but have no effect on the query.
-        // Just return the unmodified Builder instance.
         if (is_null($whereConditions)) {
             return $builder;
         }
