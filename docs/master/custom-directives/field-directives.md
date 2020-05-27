@@ -56,7 +56,7 @@ GRAPHQL;
 
         // Keep the chain of adding field middleware going by calling the next handler.
         // Calling this before or after ->setResolver() allows you to control the
-        // order in which middleware is wrapped around the field. 
+        // order in which middleware is wrapped around the field.
         return $next($fieldValue);
     }
 }
