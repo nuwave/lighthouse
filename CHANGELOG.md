@@ -14,6 +14,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Write definitions for programmatically registered types to `programmatic-types.graphql`
   when running the `lighthouse:ide-helper` artisan command https://github.com/nuwave/lighthouse/pull/1371
 
+### Deprecated
+
+- `\Nuwave\Lighthouse\Support\Contracts\DefinedDirective::definition()` will be moved to `\Nuwave\Lighthouse\Support\Contracts\Directive`
+  and replace its `name()` method. This requires all directives to have an SDL definition.
+
 ## 4.13.1
 
 ### Fixed
