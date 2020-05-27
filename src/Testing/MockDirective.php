@@ -15,10 +15,6 @@ class MockDirective extends BaseDirective implements FieldResolver
 
     /**
      * Register a mock resolver that will be called through this resolver.
-     *
-     * @param  callable  $mock
-     * @param  string  $key
-     * @return void
      */
     public function register(callable $mock, string $key): void
     {
@@ -27,8 +23,6 @@ class MockDirective extends BaseDirective implements FieldResolver
 
     /**
      * SDL definition of the directive.
-     *
-     * @return string
      */
     public static function definition(): string
     {
@@ -50,9 +44,6 @@ SDL;
      *
      * This must call $fieldValue->setResolver() before returning
      * the FieldValue.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {

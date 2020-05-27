@@ -65,10 +65,12 @@ class DirectiveFactoryTest extends TestCase
         $directive = new class implements FieldMiddleware {
             public static function definition(): string
             {
+                return 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue, Closure $next): void
+            public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
             {
+                return $fieldValue;
             }
         };
 

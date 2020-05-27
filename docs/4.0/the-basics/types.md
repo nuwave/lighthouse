@@ -111,9 +111,9 @@ Queries now return meaningful names instead of magic numbers.
 {
   "data": {
     "employees": [
-      {"name": "Hans", "status": "INTERN"},
-      {"name": "Pamela", "status": "EMPLOYEE"},
-      {"name": "Gerhard", "status": "TERMINATED"}
+      { "name": "Hans", "status": "INTERN" },
+      { "name": "Pamela", "status": "EMPLOYEE" },
+      { "name": "Gerhard", "status": "TERMINATED" }
     ]
   }
 }
@@ -180,10 +180,10 @@ use BenSampo\Enum\Enum;
 
 final class UserType extends Enum
 {
-    const Administrator = 0;
-    const Moderator = 1;
-    const Subscriber = 2;
-    const SuperAdministrator = 3;
+    public const Administrator = 0;
+    public const Moderator = 1;
+    public const Subscriber = 2;
+    public const SuperAdministrator = 3;
 }
 ```
 
@@ -239,7 +239,7 @@ type User {
 
 type Mutation {
   createUser(input: CreateUserInput! @spread): User @create
-} 
+}
 ```
 
 ## Interface
@@ -288,9 +288,7 @@ They are similar to interfaces in that they can return different types, but they
 have fields defined.
 
 ```graphql
-union Person
-  = User
-  | Employee
+union Person = User | Employee
 
 type User {
   id: ID!

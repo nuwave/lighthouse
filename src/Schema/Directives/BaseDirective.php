@@ -44,6 +44,7 @@ abstract class BaseDirective implements Directive
     /**
      * Returns the name of the used directive.
      *
+     * TODO: Change to a strongly typed hint in v5
      * @return string
      */
     public function name(): string
@@ -54,23 +55,18 @@ abstract class BaseDirective implements Directive
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
-     * @param  \GraphQL\Language\AST\DirectiveNode  $directiveNode
-     * @param  \GraphQL\Language\AST\Node  $definitionNode
      * @return $this
      */
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
-        $this->definitionNode = $definitionNode;
+        $this->definitionNode = $definitionNode; // @phpstan-ignore-line Dealing with union types properly is hard in PHP
 
         return $this;
     }
 
     /**
      * Get a Closure that is defined through an argument on the directive.
-     *
-     * @param  string  $argumentName
-     * @return \Closure
      */
     public function getResolverFromArgument(string $argumentName): Closure
     {
@@ -83,9 +79,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Does the current directive have an argument with the given name?
-     *
-     * @param  string  $name
-     * @return bool
      */
     public function directiveHasArgument(string $name): bool
     {
@@ -94,8 +87,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * The name of the node the directive is defined upon.
-     *
-     * @return string
      */
     protected function nodeName(): string
     {
@@ -105,8 +96,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the AST definition node associated with the current directive.
      *
-     * @deprecated in favour of the plain property
-     * @return \GraphQL\Language\AST\DirectiveNode
+     * @deprecated in favor of the plain property
      */
     protected function directiveDefinition(): DirectiveNode
     {
@@ -116,7 +106,6 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param  string  $name
      * @param  mixed|null  $default
      * @return mixed|null
      */
@@ -129,7 +118,7 @@ abstract class BaseDirective implements Directive
      * Get the model class from the `model` argument of the field.
      *
      * @param  string  $argumentName The default argument name "model" may be overwritten
-     * @return string|\Illuminate\Database\Eloquent\Model
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -174,10 +163,9 @@ abstract class BaseDirective implements Directive
     /**
      * Find a class name in a set of given namespaces.
      *
-     * @param  string  $classCandidate
      * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch
-     * @return string
+     * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -218,7 +206,6 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @param  string  $argumentName
      * @return string[] Contains two entries: [string $className, string $methodName]
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -249,11 +236,11 @@ abstract class BaseDirective implements Directive
     /**
      * Try adding the default model namespace and ensure the given class is a model.
      *
-     * @param  string  $modelClassCandidate
-     * @return string
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
+        // @phpstan-ignore-next-line The callback ensures we get a Model class
         return $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),

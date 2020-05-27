@@ -46,7 +46,7 @@ SDL;
      * Apply an "ORDER BY" clause.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  string[]  $value
+     * @param  array<array<string, string>>  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)
@@ -65,11 +65,6 @@ SDL;
     /**
      * Validate the input argument definition.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode $argDefinition
-     * @param \GraphQL\Language\AST\FieldDefinitionNode $parentField
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -101,10 +96,6 @@ SDL;
      * Create the name for the restricted OrderByClause input.
      *
      * @example FieldNameArgNameOrderByClause
-     *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @return string
      */
     protected function restrictedOrderByName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
     {

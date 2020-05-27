@@ -12,13 +12,13 @@ class CountDirectiveDBTest extends DBTestCase
     {
         factory(User::class)->times(3)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             users: Int! @count(model: "User")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users
         }
@@ -40,7 +40,7 @@ class CountDirectiveDBTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             taskCount: Int! @count(relation: "tasks")
         }
@@ -50,7 +50,7 @@ class CountDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 taskCount

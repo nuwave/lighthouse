@@ -14,6 +14,7 @@ class CreateTestbenchContractorsTable extends Migration
         Schema::create('contractors', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('position');
+
             $table->timestamps();
         });
     }

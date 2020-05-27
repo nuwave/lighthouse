@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -54,13 +55,6 @@ class FieldValue
      */
     protected $complexity;
 
-    /**
-     * Create new field value instance.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $parent
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
-     * @return void
-     */
     public function __construct(TypeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
@@ -70,7 +64,6 @@ class FieldValue
     /**
      * Overwrite the current/default resolver.
      *
-     * @param  callable  $resolver
      * @return $this
      */
     public function setResolver(callable $resolver): self
@@ -87,7 +80,7 @@ class FieldValue
      */
     public function useDefaultResolver(): self
     {
-        $this->resolver = $this->getParentName() === 'Subscription'
+        $this->resolver = $this->getParentName() === RootType::SUBSCRIPTION
             ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
             : app(ProvidesResolver::class)->provideResolver($this);
 
@@ -97,7 +90,6 @@ class FieldValue
     /**
      * Define a closure that is used to determine the complexity of the field.
      *
-     * @param  \Closure  $complexity
      * @return $this
      */
     public function setComplexity(Closure $complexity): self
@@ -110,7 +102,6 @@ class FieldValue
     /**
      * Set deprecation reason for field.
      *
-     * @param  string  $deprecationReason
      * @return $this
      */
     public function setDeprecationReason(string $deprecationReason): self
@@ -122,8 +113,6 @@ class FieldValue
 
     /**
      * Get an instance of the return type of the field.
-     *
-     * @return \GraphQL\Type\Definition\Type
      */
     public function getReturnType(): Type
     {
@@ -144,9 +133,6 @@ class FieldValue
         return $this->parent;
     }
 
-    /**
-     * @return string
-     */
     public function getParentName(): string
     {
         return $this->getParent()->getTypeDefinitionName();
@@ -154,8 +140,6 @@ class FieldValue
 
     /**
      * Get the underlying AST definition for the field.
-     *
-     * @return \GraphQL\Language\AST\FieldDefinitionNode
      */
     public function getField(): FieldDefinitionNode
     {
@@ -164,8 +148,6 @@ class FieldValue
 
     /**
      * Get field resolver.
-     *
-     * @return callable|null
      */
     public function getResolver(): ?callable
     {
@@ -180,20 +162,17 @@ class FieldValue
     public function defaultNamespacesForParent(): array
     {
         switch ($this->getParentName()) {
-            case 'Query':
+            case RootType::QUERY:
                 return (array) config('lighthouse.namespaces.queries');
-            case 'Mutation':
+            case RootType::MUTATION:
                 return (array) config('lighthouse.namespaces.mutations');
-            case 'Subscription':
+            case RootType::SUBSCRIPTION:
                 return (array) config('lighthouse.namespaces.subscriptions');
             default:
                return [];
         }
     }
 
-    /**
-     * @return \GraphQL\Language\AST\StringValueNode|null
-     */
     public function getDescription(): ?StringValueNode
     {
         return $this->field->description;
@@ -201,25 +180,17 @@ class FieldValue
 
     /**
      * Get current complexity.
-     *
-     * @return \Closure|null
      */
     public function getComplexity(): ?Closure
     {
         return $this->complexity;
     }
 
-    /**
-     * @return string
-     */
     public function getFieldName(): string
     {
         return $this->field->name->value;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDeprecationReason(): ?string
     {
         return $this->deprecationReason;
@@ -227,14 +198,9 @@ class FieldValue
 
     /**
      * Is the parent of this field one of the root types?
-     *
-     * @return bool
      */
     public function parentIsRootType(): bool
     {
-        return in_array(
-            $this->getParentName(),
-            ['Query', 'Mutation', 'Subscription']
-        );
+        return RootType::isRootType($this->getParentName());
     }
 }

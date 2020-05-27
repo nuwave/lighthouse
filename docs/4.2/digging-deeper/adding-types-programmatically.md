@@ -13,7 +13,7 @@ event and add in schema definitions as a simple string.
 While Lighthouse is an SDL-first GraphQL server, you can also use native PHP type definitions.
 
 Check out the [webonyx/graphql-php documentation](http://webonyx.github.io/graphql-php/type-system/)
-on how to define types.  
+on how to define types.
 
 Note that you will not have access to a large portion of Lighthouse functionality
 that is provided through server-side directives and the definition is much more verbose.
@@ -21,6 +21,7 @@ that is provided through server-side directives and the definition is much more 
 Because of this, we do not recommend you use native PHP types for complex object types.
 
 However, it can be advantageous to use native types for two use cases:
+
 - [Enum types](http://webonyx.github.io/graphql-php/type-system/enum-types/):
   Allows you to reuse existing constants in your code
 - [Custom Scalar types](http://webonyx.github.io/graphql-php/type-system/scalar-types/#writing-custom-scalar-types).

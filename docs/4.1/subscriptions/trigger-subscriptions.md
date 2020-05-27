@@ -10,13 +10,13 @@ directive will broadcast all updates to the `Post` model to the `postUpdated` su
 
 ```graphql
 type Mutation {
-    updatePost(input: UpdatePostInput!): Post
-        @broadcast(subscription: "postUpdated")
+  updatePost(input: UpdatePostInput!): Post
+    @broadcast(subscription: "postUpdated")
 }
 ```
 
 You can reference the same subscription from multiple fields, or vice-versa
-trigger multiple subscriptions from a single field. 
+trigger multiple subscriptions from a single field.
 
 ## Fire Subscriptions From Code
 

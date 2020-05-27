@@ -37,7 +37,7 @@ The following query:
     id
     name
   }
-}  
+}
 ```
 
 Will return the following result:
@@ -46,8 +46,8 @@ Will return the following result:
 {
   "data": {
     "users": [
-      {"id": 1, "name": "James Bond"},
-      {"id": 2, "name": "Madonna"}
+      { "id": 1, "name": "James Bond" },
+      { "id": 2, "name": "Madonna" }
     ]
   }
 }
@@ -60,7 +60,7 @@ query a large list of models in chunks.
 
 ```graphql
 type Query {
-    posts: [Post!]! @paginate
+  posts: [Post!]! @paginate
 }
 ```
 
@@ -68,12 +68,12 @@ The schema definition is automatically transformed to this:
 
 ```graphql
 type Query {
-    posts(count: Int!, page: Int): PostPaginator
+  posts(count: Int!, page: Int): PostPaginator
 }
 
 type PostPaginator {
-    data: [Post!]!
-    paginatorInfo: PaginatorInfo!
+  data: [Post!]!
+  paginatorInfo: PaginatorInfo!
 }
 ```
 
@@ -81,16 +81,16 @@ And can be queried like this:
 
 ```graphql
 {
-    posts(count: 10) {
-        data {
-            id
-            title
-        }
-        paginatorInfo {
-            currentPage
-            lastPage
-        }
+  posts(count: 10) {
+    data {
+      id
+      title
     }
+    paginatorInfo {
+      currentPage
+      lastPage
+    }
+  }
 }
 ```
 
@@ -111,7 +111,7 @@ You can query this field like this:
 
 ```graphql
 {
-  user(id: 69){
+  user(id: 69) {
     name
   }
 }
@@ -143,7 +143,7 @@ This will take the arguments that the `createUser` field receives and use them t
 
 ```graphql
 mutation {
-  createUser(name: "Donald"){
+  createUser(name: "Donald") {
     id
     name
   }
@@ -177,7 +177,7 @@ Since GraphQL allows you to update just parts of your data, it is best to have a
 
 ```graphql
 mutation {
-  updateUser(id: "123" name: "Hillary"){
+  updateUser(id: "123", name: "Hillary") {
     id
     name
   }
@@ -220,7 +220,7 @@ Simply call it with the ID of the user you want to delete.
 
 ```graphql
 mutation {
-  deleteUser(id: "123"){
+  deleteUser(id: "123") {
     secret
   }
 }

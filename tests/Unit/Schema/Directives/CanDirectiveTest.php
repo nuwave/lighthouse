@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
@@ -31,7 +32,7 @@ class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testPassesAuthIfAuthorized(): void
@@ -70,7 +71,7 @@ class CanDirectiveTest extends TestCase
 
     public function testAcceptsGuestUser(): void
     {
-        if ((float) $this->app->version() < 5.7) {
+        if (AppVersion::below(5.7)) {
             $this->markTestSkipped('Version less than 5.7 do not support guest user.');
         }
 
@@ -156,7 +157,7 @@ class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void

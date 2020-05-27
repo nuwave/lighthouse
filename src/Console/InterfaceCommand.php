@@ -32,8 +32,6 @@ class InterfaceCommand extends LighthouseGeneratorCommand
 
     /**
      * Get the stub file for the generator.
-     *
-     * @return string
      */
     protected function getStub(): string
     {

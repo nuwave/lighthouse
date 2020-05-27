@@ -53,7 +53,7 @@ SDL;
         // resolve any given rule where a corresponding class exists.
         foreach ($rules as $key => $rule) {
             if (class_exists($rule)) {
-                $rules[$key] = resolve($rule);
+                $rules[$key] = app($rule);
             }
         }
 

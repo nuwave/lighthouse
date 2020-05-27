@@ -11,5 +11,5 @@ namespace Tests;
  */
 class Constants
 {
-    const TAGS_DEFAULT_STRING = 'this is the default string';
+    public const TAGS_DEFAULT_STRING = 'this is the default string';
 }

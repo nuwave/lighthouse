@@ -26,9 +26,6 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
      */
     protected $auth;
 
-    /**
-     * @param  \Illuminate\Contracts\Auth\Factory  $auth
-     */
     public function __construct(AuthFactory $auth)
     {
         $this->auth = $auth;
@@ -44,8 +41,8 @@ users to still receive partial results.
 """
 directive @guard(
   """
-  Specify which guards to use, e.g. "api".
-  When not defined, the default driver is used.
+  Specify which guards to use, e.g. ["api"].
+  When not defined, the default from `lighthouse.php` is used.
   """
   with: [String!]
 ) on FIELD_DEFINITION | OBJECT
@@ -54,10 +51,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -80,14 +73,13 @@ SDL;
      * Determine if the user is logged in to any of the given guards.
      *
      * @param  string[]  $guards
-     * @return void
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function authenticate(array $guards): void
     {
         if (empty($guards)) {
-            $guards = [null];
+            $guards = [config('lighthouse.guard')];
         }
 
         foreach ($guards as $guard) {
@@ -105,7 +97,6 @@ SDL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
-     * @return void
      */
     protected function unauthenticated(array $guards): void
     {

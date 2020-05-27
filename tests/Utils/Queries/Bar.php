@@ -4,7 +4,7 @@ namespace Tests\Utils\Queries;
 
 class Bar
 {
-    const RESULT = 'foobaz';
+    public const RESULT = 'foobaz';
 
     public function __invoke(): string
     {

@@ -20,7 +20,6 @@ SDL;
      * Remove whitespace from the beginning and end of a given input.
      *
      * @param  string  $argumentValue
-     * @return string
      */
     public function transform($argumentValue): string
     {

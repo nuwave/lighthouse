@@ -4,6 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
+/**
+ * @deprecated in favor of @hash
+ * @see \Nuwave\Lighthouse\Schema\Directives\HashDirective
+ */
 class BcryptDirective extends BaseDirective implements ArgTransformerDirective
 {
     public static function definition(): string
@@ -11,6 +15,8 @@ class BcryptDirective extends BaseDirective implements ArgTransformerDirective
         return /** @lang GraphQL */ <<<'SDL'
 """
 Run the `bcrypt` function on the argument it is defined on.
+
+@deprecated(reason: "Use @hash instead. This directive will be removed in v5.")
 """
 directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
@@ -22,7 +28,6 @@ SDL;
      * Useful for hashing passwords before inserting them into the database.
      *
      * @param  string  $argumentValue
-     * @return string
      */
     public function transform($argumentValue): string
     {

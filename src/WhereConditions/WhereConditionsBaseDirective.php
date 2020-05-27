@@ -23,12 +23,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     protected $operator;
 
-    /**
-     * WhereConditions constructor.
-     *
-     * @param  \Nuwave\Lighthouse\WhereConditions\Operator  $operator
-     * @return void
-     */
     public function __construct(Operator $operator)
     {
         $this->operator = $operator;
@@ -36,8 +30,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array  $whereConditions
-     * @param  string  $boolean
+     * @param  array<string, mixed>  $whereConditions
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')
@@ -48,7 +41,8 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     foreach ($andConnectedConditions as $condition) {
                         $this->handleWhereConditions($builder, $condition);
                     }
-                }
+                },
+                $boolean
             );
         }
 
@@ -59,7 +53,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                         $this->handleWhereConditions($builder, $condition, 'or');
                     }
                 },
-                'or'
+                $boolean
             );
         }
 
@@ -79,12 +73,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * Manipulate the AST.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
      */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
@@ -114,10 +102,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * Create the name for the restricted WhereConditions input.
      *
      * @example FieldNameArgNameWhereHasConditions
-     *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @return string
      */
     protected function restrictedWhereConditionsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
     {
@@ -129,14 +113,13 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     /**
      * Ensure the column name is well formed and prevent SQL injection.
      *
-     * @param  string  $column
-     * @return void
-     *
      * @throws \GraphQL\Error\Error
      */
     protected static function assertValidColumnName(string $column): void
     {
-        if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
+        // TODO use safe
+        $match = preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column);
+        if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
             );

@@ -15,7 +15,7 @@ class MorphOneDirective extends RelationDirective implements FieldResolver
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphOne(
   """

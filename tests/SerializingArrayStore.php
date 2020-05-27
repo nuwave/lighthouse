@@ -3,20 +3,25 @@
 namespace Tests;
 
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Support\InteractsWithTime;
 
 /**
  * A cache store used for testing.
  *
  * Works like Laravel's usual "array" store, expect
  * it actually serializes/unserializes the values.
+ *
+ * TODO remove once we only support Laravel 7.x plus https://github.com/laravel/framework/pull/31295
  */
 class SerializingArrayStore extends ArrayStore
 {
+    use InteractsWithTime;
+
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
-     * @return mixed
+     * @param  string  $key
+     * @return mixed The value or null
      */
     public function get($key)
     {
@@ -41,11 +46,10 @@ class SerializingArrayStore extends ArrayStore
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value Some storable value
      * @param  int  $seconds
-     * @return bool
      */
-    public function put($key, $value, $seconds)
+    public function put($key, $value, $seconds): bool
     {
         $this->storage[$key] = [
             'value' => serialize($value),
@@ -53,5 +57,27 @@ class SerializingArrayStore extends ArrayStore
         ];
 
         return true;
+    }
+
+    /**
+     * Get the expiration time of the key.
+     *
+     * @param  int  $seconds
+     */
+    protected function calculateExpiration($seconds): int
+    {
+        return $this->toTimestamp($seconds);
+    }
+
+    /**
+     * Get the UNIX timestamp for the given number of seconds.
+     *
+     * @param  int  $seconds
+     */
+    protected function toTimestamp($seconds): int
+    {
+        return $seconds > 0
+            ? $this->availableAt($seconds)
+            : 0;
     }
 }

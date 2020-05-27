@@ -16,10 +16,6 @@ class ClientDirectiveFactory
      */
     protected $definitionNodeConverter;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter  $definitionNodeConverter
-     * @return void
-     */
     public function __construct(ExecutableTypeNodeConverter $definitionNodeConverter)
     {
         $this->definitionNodeConverter = $definitionNodeConverter;
@@ -27,15 +23,13 @@ class ClientDirectiveFactory
 
     /**
      * Transform node to type.
-     *
-     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode  $directive
-     * @return \GraphQL\Type\Definition\Directive
      */
     public function handle(DirectiveDefinitionNode $directive): Directive
     {
         $arguments = [];
         /** @var InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
+            /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->definitionNodeConverter->convert($argument->type);
 
             $fieldArgumentConfig = [
@@ -44,7 +38,7 @@ class ClientDirectiveFactory
                 'type' => $argumentType,
             ];
 
-            if ($defaultValue = $argument->defaultValue) {
+            if ($defaultValue = $argument->defaultValue) { // @phpstan-ignore-line TODO remove when fixed https://github.com/webonyx/graphql-php/pull/654
                 $fieldArgumentConfig += [
                     'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $argumentType),
                 ];

@@ -8,13 +8,14 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
 class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
     {
-        $documentAST = DocumentAST::fromSource('
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
         type Query {
             foo: Int
         }
@@ -22,7 +23,7 @@ class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            $documentAST->types['Query']
+            $documentAST->types[RootType::QUERY]
         );
     }
 
@@ -36,13 +37,13 @@ class DocumentASTTest extends TestCase
 
     public function testOverwritesDefinitionWithSameName(): void
     {
-        $documentAST = DocumentAST::fromSource('
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
         type Query {
             foo: Int
         }
         ');
 
-        $overwrite = PartialParser::objectTypeDefinition('
+        $overwrite = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
         type Query {
             bar: Int
         }
@@ -52,13 +53,13 @@ class DocumentASTTest extends TestCase
 
         $this->assertSame(
             $overwrite,
-            $documentAST->types['Query']
+            $documentAST->types[RootType::QUERY]
         );
     }
 
     public function testCanBeSerialized(): void
     {
-        $documentAST = DocumentAST::fromSource('
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
         type Query {
             foo: Int
         }
@@ -66,13 +67,13 @@ class DocumentASTTest extends TestCase
         directive @foo on FIELD
         ');
 
-        /** @var DocumentAST $reserialized */
+        /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $reserialized */
         $reserialized = unserialize(
             serialize($documentAST)
         );
 
-        /** @var ObjectTypeDefinitionNode $queryType */
-        $queryType = $reserialized->types['Query'];
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
+        $queryType = $reserialized->types[RootType::QUERY];
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $queryType

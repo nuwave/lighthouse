@@ -8,13 +8,36 @@ are namespaced under `lighthouse`.
 Clear the cache for the GraphQL AST.
 
     php artisan lighthouse:clear-cache
-   
+
+## directive
+
+Create a class for a GraphQL directive.
+
+    php artisan lighthouse:directive
+
 ## ide-helper
 
-Create a schema containing all server-side directives.
-This will allow some IDEs to do code completion in your GraphQL-schema.
+Create IDE helper files to improve type checking and autocompletion.
 
-    php artisan lighthouse:ide-helper 
+    php artisan lighthouse:ide-helper
+
+This will create the following files:
+
+- `schema-directives.graphql`: Schema definitions for directives you can use in your schema
+- `programmatic-types.graphql`: Schema definitions for programmatically registered types, if you have any
+- `_lighthouse_ide_helper.php`: Class definitions for some magical PHP, such as the `TestResponse` mixin
+
+A great way to keep up to date with your current version of Lighthouse
+is to add this script to your `composer.json`:
+
+```json
+"scripts": {
+    ...
+    "post-update-cmd": [
+        "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+        "php artisan lighthouse:ide-helper"
+    ],
+```
 
 ## interface
 
@@ -40,6 +63,8 @@ may influence the final schema.
 
 Use the `-W` / `--write` option to output the schema to the default file storage
 (usually `storage/app`) as `lighthouse-schema.graphql`.
+
+You can output your schema in JSON format by using the `--json` flag.
 
 ## query
 

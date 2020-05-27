@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 
 class ForceDeleteDirective extends ModifyModelExistenceDirective
 {
-    const MODEL_NOT_USING_SOFT_DELETES = 'Use the @forceDelete directive only for Model classes that use the SoftDeletes trait.';
+    public const MODEL_NOT_USING_SOFT_DELETES = 'Use the @forceDelete directive only for Model classes that use the SoftDeletes trait.';
 
     public static function definition(): string
     {
@@ -38,33 +38,27 @@ SDL;
     /**
      * Find one or more models by id.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes  $modelClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @param  string|int|string[]|int[]  $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
     protected function find(string $modelClass, $idOrIds)
     {
+        /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $modelClass */
         return $modelClass::withTrashed()->find($idOrIds);
     }
 
     /**
      * Bring a model in or out of existence.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes  $model
-     * @return void
      */
     protected function modifyExistence(Model $model): void
     {
+        /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $model */
         $model->forceDelete();
     }
 
     /**
      * Manipulate the AST based on a field definition.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
      */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,

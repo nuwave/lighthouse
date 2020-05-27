@@ -1,7 +1,7 @@
 # Implementing Your Own Directives
 
 As you grow your GraphQL schema, you may find the need for more specialized functionality.
-Learn how you can abstract logic in a composable and reusable manner by using custom directives.  
+Learn how you can abstract logic in a composable and reusable manner by using custom directives.
 
 Directives are implemented as PHP classes, each directive available
 in the schema corresponds to a single class.
@@ -13,13 +13,13 @@ The class name of a directive must follow the following pattern:
 
     <DirectiveName>Directive
 
-As an example, the directive `@upperCase` will have to be in a class called `UpperCaseDirective`.
+Let's implement a simple `@upperCase` directive as a part of this introduction.
+Use the artisan generator command to create it:
 
-## Class Definition
+    php artisan lighthouse:directive upperCase
 
-Each directive has to implement the interface `\Nuwave\Lighthouse\Support\Contracts\Directive`, with
-the single method `definition`. For convenience, it is recommended to extend the abstract class
-`\Nuwave\Lighthouse\Schema\Directives\BaseDirective` which includes useful helper functions.
+That will create a class called `UpperCaseDirective` that extends the
+abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
 <?php

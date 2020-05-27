@@ -18,12 +18,6 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      */
     protected $globalId;
 
-    /**
-     * GlobalIdDirective constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
-     * @return void
-     */
     public function __construct(GlobalId $globalId)
     {
         $this->globalId = $globalId;
@@ -50,10 +44,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
