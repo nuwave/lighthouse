@@ -14,6 +14,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Write definitions for programmatically registered types to `programmatic-types.graphql`
   when running the `lighthouse:ide-helper` artisan command https://github.com/nuwave/lighthouse/pull/1371
 
+### Fixed
+
+- Fix the error message when using multiple exclusive directives on a single node https://github.com/nuwave/lighthouse/pull/1387
+
 ## 4.13.1
 
 ### Fixed
