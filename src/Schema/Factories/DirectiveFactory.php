@@ -198,7 +198,7 @@ class DirectiveFactory
         if ($directives->count() > 1) {
             $directiveNames = $directives
                 ->map(function (Directive $directive): string {
-                    return '@' . $directive->name();
+                    return '@'.$directive->name();
                 })
                 ->implode(', ');
 
