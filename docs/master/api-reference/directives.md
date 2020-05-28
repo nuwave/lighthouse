@@ -2999,3 +2999,35 @@ but rather used for resolving other fields.
 
 If you just want to return the relation itself as-is,
 look into [handling Eloquent relationships](../eloquent/relationships.md).
+
+## @withCount
+
+Eager-load an Eloquent relation count.
+
+```graphql
+type User {
+  tasks_count: Int! @withCount
+}
+```
+
+### Definition
+
+```graphql
+"""
+Eager-load a count of an Eloquent relation.
+"""
+directive @withCount(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+This can be a useful optimization for fields that are use to count relationships.
