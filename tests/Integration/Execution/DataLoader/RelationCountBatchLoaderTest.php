@@ -78,8 +78,22 @@ class RelationCountBatchLoaderTest extends DBTestCase
                 ],
             ])
             ->assertJsonCount(2)
-            ->assertJsonPath('0.data.user.tasks_count', 3)
-            ->assertJsonPath('1.data.user.tasks_count', 3);
+            ->assertJson([
+                [
+                    'data' => [
+                        'user' =>  [
+                            'tasks_count' => 3,
+                        ],
+                    ],
+                ],
+                [
+                    'data' => [
+                        'user' =>  [
+                            'tasks_count' => 3,
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     public function testCanResolveFieldsByCustomBatchLoader(): void
@@ -154,8 +168,20 @@ class RelationCountBatchLoaderTest extends DBTestCase
                 ],
             ])
             ->assertJsonCount(2, 'data.manyUsers')
-            ->assertJsonPath('data.manyUsers.0.tasks_count', 2)
-            ->assertJsonPath('data.manyUsers.1.tasks_count', 3)
-            ->assertJsonPath('data.user.tasks_count', 1);
+            ->assertJson([
+                'data' => [
+                    'manyUsers' => [
+                        [
+                            'tasks_count' => 2,
+                        ],
+                        [
+                            'tasks_count' => 3,
+                        ],
+                    ],
+                    'user' => [
+                        'tasks_count' => 1,
+                    ],
+                ],
+            ]);
     }
 }
