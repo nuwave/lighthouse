@@ -64,7 +64,7 @@ SDL;
     /**
      * Create an instance of RelationCountBatchLoader loader to apply counts.
      */
-    protected function loader($resolveInfo)
+    protected function loader(ResolveInfo $resolveInfo): RelationCountBatchLoader
     {
         return BatchLoader::instance( // @phpstan-ignore-line TODO remove when updating graphql-php
             RelationCountBatchLoader::class,

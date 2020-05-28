@@ -82,7 +82,9 @@ class RelationCountBatchLoaderTest extends DBTestCase
         $users = factory(User::class, 3)
             ->create()
             ->each(function (User $user, $index): void {
-                factory(Task::class, $index + 1)->create([
+                $count = $index + 1;
+
+                factory(Task::class, $count)->create([
                     'user_id' => $user->getKey(),
                 ]);
             });
