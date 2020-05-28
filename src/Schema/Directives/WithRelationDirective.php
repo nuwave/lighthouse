@@ -19,11 +19,11 @@ abstract class WithRelationDirective extends BaseDirective
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $resolver = $fieldValue->getResolver();
-
         return $next(
             $fieldValue->setResolver(
-                $this->deferResolver($resolver)
+                $this->deferResolver(
+                    $fieldValue->getResolver()
+                )
             )
         );
     }
@@ -85,7 +85,7 @@ abstract class WithRelationDirective extends BaseDirective
     /**
      * The the name of the relation to be loaded.
      */
-    protected function relationName(): string
+    public function relationName(): string
     {
         return $this->directiveArgValue('relation', $this->nodeName());
     }

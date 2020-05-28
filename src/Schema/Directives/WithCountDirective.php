@@ -41,7 +41,7 @@ SDL;
     /**
      * The the name of the relation to be loaded.
      */
-    protected function relationName(): string
+    public function relationName(): string
     {
         $relation = $this->directiveArgValue('relation');
 
