@@ -10,6 +10,10 @@ class WithCountDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelationCount(): void
     {
+        if (AppVersion::below(5.7)) {
+            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        }
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User @first

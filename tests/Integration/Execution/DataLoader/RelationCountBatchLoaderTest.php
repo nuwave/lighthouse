@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
@@ -49,6 +50,10 @@ class RelationCountBatchLoaderTest extends DBTestCase
 
     public function testCanResolveBatchedCountsFromBatchedRequests(): void
     {
+        if (AppVersion::below(5.7)) {
+            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        }
+
         $query = /** @lang GraphQL */ '
         query User($id: ID!) {
             user(id: $id) {
@@ -79,6 +84,10 @@ class RelationCountBatchLoaderTest extends DBTestCase
 
     public function testCanResolveFieldsByCustomBatchLoader(): void
     {
+        if (AppVersion::below(5.7)) {
+            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        }
+
         $users = factory(User::class, 3)
             ->create()
             ->each(function (User $user, $index): void {
