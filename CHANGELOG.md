@@ -18,6 +18,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Fix the error message when using multiple exclusive directives on a single node https://github.com/nuwave/lighthouse/pull/1387
 
+### Deprecated
+
+- `\Nuwave\Lighthouse\Support\Contracts\DefinedDirective::definition()` will be moved to `\Nuwave\Lighthouse\Support\Contracts\Directive`
+  and replace its `name()` method. This requires all directives to have an SDL definition.
+
 ## 4.13.1
 
 ### Fixed
