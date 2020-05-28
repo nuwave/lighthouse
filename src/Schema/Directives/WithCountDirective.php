@@ -90,7 +90,7 @@ SDL;
     {
         $relation = $this->directiveArgValue('relation');
 
-        if (!$relation && Str::endsWith($this->nodeName(), '_count')) {
+        if (! $relation && Str::endsWith($this->nodeName(), '_count')) {
             return str_replace('_count', '', $this->nodeName());
         }
 

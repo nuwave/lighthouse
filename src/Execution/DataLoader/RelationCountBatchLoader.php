@@ -22,7 +22,6 @@ class RelationCountBatchLoader extends BatchLoader
 
     /**
      * @param  \Closure  $decorateBuilder
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      */
     public function __construct(
         string $relationName,
