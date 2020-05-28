@@ -9,11 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Resolver;
 
 abstract class WithRelationDirective extends BaseDirective
 {
-
     /**
      * Eager load a relation on the parent instance.
      */
@@ -47,12 +45,11 @@ abstract class WithRelationDirective extends BaseDirective
     }
 
     /**
-     *
      * Return a new deferred resolver.
      *
      * @param  callable $resolver
      */
-    protected function deferResolver($resolver)
+    protected function deferResolver($resolver): Closure
     {
         return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
             return new Deferred(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
