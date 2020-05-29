@@ -29,11 +29,13 @@ directive @with(
 SDL;
     }
 
-    /**
-     * The name of the batch loader to use.
-     */
-    public function batchLoaderName(): string
+    public function batchLoaderClass(): string
     {
         return RelationBatchLoader::class;
+    }
+
+    public function relationName(): string
+    {
+        return $this->directiveArgValue('relation', $this->nodeName());
     }
 }

@@ -3002,24 +3002,18 @@ look into [handling Eloquent relationships](../eloquent/relationships.md).
 
 ## @withCount
 
-Eager-load an Eloquent relation count.
-
-```graphql
-type User {
-  tasks_count: Int! @withCount
-}
-```
-
-### Definition
-
 ```graphql
 """
-Eager-load a count of an Eloquent relation.
+Eager-load the count of an Eloquent relation.
+
+The name of the field is assumed to be `${RELATION}_count`,
+for example if the relation is called `foo`, the name of the
+field should be `foo_count`.
 """
 directive @withCount(
   """
   Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  if the field name does not match the convention `${RELATION}_count`.
   """
   relation: String
 
@@ -3030,4 +3024,10 @@ directive @withCount(
 ) on FIELD_DEFINITION
 ```
 
-This can be a useful optimization for fields that are use to count relationships.
+This can be a useful optimization for fields that return the count of a relation.
+
+```graphql
+type User {
+  tasks_count: Int! @withCount
+}
+```

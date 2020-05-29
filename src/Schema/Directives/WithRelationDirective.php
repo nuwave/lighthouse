@@ -13,6 +13,18 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 abstract class WithRelationDirective extends BaseDirective
 {
     /**
+     * The fully-qualified class name of the batch loader to use.
+     *
+     * @return class-string<\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader>
+     */
+    abstract protected function batchLoaderClass(): string;
+
+    /**
+     * The name of the relation to be loaded.
+     */
+    abstract protected function relationName(): string;
+
+    /**
      * Eager load a relation on the parent instance.
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
@@ -25,11 +37,6 @@ abstract class WithRelationDirective extends BaseDirective
             )
         );
     }
-
-    /**
-     * The name of the batch loader to use.
-     */
-    abstract public function batchLoaderName(): string;
 
     /**
      * Decorate the builder used to fetch the models.
@@ -47,7 +54,7 @@ abstract class WithRelationDirective extends BaseDirective
     /**
      * Return a new deferred resolver.
      *
-     * @param  callable $resolver
+     * @param  callable  $resolver
      */
     protected function deferResolver($resolver): Closure
     {
@@ -70,20 +77,12 @@ abstract class WithRelationDirective extends BaseDirective
     protected function loader(ResolveInfo $resolveInfo): BatchLoader
     {
         return BatchLoader::instance( // @phpstan-ignore-line TODO remove when updating graphql-php
-            $this->batchLoaderName(),
+            $this->batchLoaderClass(),
             $resolveInfo->path,
             [
                 'relationName' => $this->relationName(),
                 'decorateBuilder' => $this->decorateBuilder($resolveInfo),
             ]
         );
-    }
-
-    /**
-     * The the name of the relation to be loaded.
-     */
-    public function relationName(): string
-    {
-        return $this->directiveArgValue('relation', $this->nodeName());
     }
 }

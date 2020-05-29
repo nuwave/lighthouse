@@ -55,7 +55,7 @@ class RelationCountBatchLoaderTest extends DBTestCase
         }
 
         $query = /** @lang GraphQL */ '
-        query User($id: ID!) {
+        query ($id: ID!) {
             user(id: $id) {
                 tasks_count
             }
@@ -104,10 +104,8 @@ class RelationCountBatchLoaderTest extends DBTestCase
 
         $users = factory(User::class, 3)
             ->create()
-            ->each(function (User $user, $index): void {
-                $count = (int) $index + 1;
-
-                factory(Task::class, $count)->create([
+            ->each(function (User $user, int $index): void {
+                factory(Task::class, $index + 1)->create([
                     'user_id' => $user->getKey(),
                 ]);
             });
@@ -147,7 +145,7 @@ class RelationCountBatchLoaderTest extends DBTestCase
         ';
 
         $query = /** @lang GraphQL */ '
-        query User($id: ID!, $ids: [ID!]!) {
+        query ($id: ID!, $ids: [ID!]!) {
             user(id: $id) {
                 email
                 tasks_count

@@ -33,9 +33,9 @@ class RelationCountBatchLoader extends BatchLoader
     }
 
     /**
-     * Resolve the counts on the models.
+     * Eager-load the relation count.
      *
-     * @return mixed[]
+     * @return array<\Illuminate\Database\Eloquent\Model>
      */
     public function resolve(): array
     {

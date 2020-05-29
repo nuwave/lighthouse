@@ -13,12 +13,16 @@ class WithCountDirective extends WithRelationDirective implements FieldMiddlewar
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Eager-load a count of an Eloquent relation.
+Eager-load the count of an Eloquent relation.
+
+The name of the field is assumed to be `${RELATION}_count`,
+for example if the relation is called `foo`, the name of the
+field should be `foo_count`.
 """
 directive @withCount(
   """
   Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  if the field name does not match the convention `${RELATION}_count`.
   """
   relation: String
 
@@ -30,25 +34,17 @@ directive @withCount(
 SDL;
     }
 
-    /**
-     * The name of the batch loader to use.
-     */
-    public function batchLoaderName(): string
+    public function batchLoaderClass(): string
     {
         return RelationCountBatchLoader::class;
     }
 
-    /**
-     * The the name of the relation to be loaded.
-     */
     public function relationName(): string
     {
-        $relation = $this->directiveArgValue('relation');
-
-        if (! $relation && Str::endsWith($this->nodeName(), '_count')) {
-            return str_replace('_count', '', $this->nodeName());
+        if ($relation = $this->directiveArgValue('relation')) {
+            return $relation;
         }
 
-        return "{$relation} as {$this->nodeName()}";
+        return Str::before($this->nodeName(), '_count');
     }
 }
