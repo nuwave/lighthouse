@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $user_id
  * @property string $name
  * @property string|null $guard
+ * @property \Carbon\Carbon $completed_at
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  *
@@ -49,6 +50,11 @@ class Task extends Model
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->whereNotNull('completed_at');
     }
 
     /**
