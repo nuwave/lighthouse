@@ -60,13 +60,13 @@ class WithCountDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'count_tasks' => 3
+                        'count_tasks' => 3,
                     ],
                     [
-                        'count_tasks' => 3
+                        'count_tasks' => 3,
                     ],
                     [
-                        'count_tasks' => 3
+                        'count_tasks' => 3,
                     ],
                 ],
             ],
@@ -90,13 +90,13 @@ class WithCountDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'tasks_count' => 3
+                        'tasks_count' => 3,
                     ],
                     [
-                        'tasks_count' => 3
+                        'tasks_count' => 3,
                     ],
                     [
-                        'tasks_count' => 3
+                        'tasks_count' => 3,
                     ],
                 ],
             ],
@@ -131,7 +131,7 @@ class WithCountDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'user' => [
-                    'completed_tasks' => 1
+                    'completed_tasks' => 1,
                 ],
             ],
         ]);
