@@ -36,7 +36,6 @@ class WithCountDirectiveTest extends DBTestCase
             $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
         }
 
-        /** @var \Tests\Utils\Models\User $user */
         factory(User::class, 3)->create()
             ->each(function ($user) {
                 factory(Task::class, 3)->create([
@@ -143,10 +142,10 @@ class WithCountDirectiveTest extends DBTestCase
             $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
         }
 
-        /** @var \Tests\Utils\Models\User $user */
         factory(User::class)->create();
 
         $this->expectException(BadMethodCallException::class);
+
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
