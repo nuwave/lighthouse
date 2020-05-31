@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ACL extends Model
 {
-    public $timestamps = false;
     protected $table = 'acls';
+
+    /** @var bool */
+    public $timestamps = false;
 }
