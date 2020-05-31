@@ -46,7 +46,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Resolve the keys.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function resolve(): array
     {
@@ -64,6 +64,9 @@ class RelationBatchLoader extends BatchLoader
 
         return $models
             ->mapWithKeys(
+                /**
+                 * @return array<string, mixed>
+                 */
                 function (Model $model): array {
                     return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
                 }

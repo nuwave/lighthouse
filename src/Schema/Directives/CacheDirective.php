@@ -100,12 +100,12 @@ SDL;
             $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
-                ? function ($value) use ($cacheKey, $maxAge, $cache) {
+                ? function ($value) use ($cacheKey, $maxAge, $cache): void {
                     $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
                 }
-            : function ($value) use ($cacheKey, $cache) {
-                $cache->forever($cacheKey, $value);
-            };
+                : function ($value) use ($cacheKey, $cache): void {
+                    $cache->forever($cacheKey, $value);
+                };
 
             $resolvedValue instanceof Deferred
                 ? $resolvedValue->then(function ($result) use ($storeInCache): void {
@@ -146,7 +146,6 @@ SDL;
         $typeDefinition = $typeValue->getTypeDefinition();
 
         // First priority: Look for a field with the @cacheKey directive
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
         foreach ($typeDefinition->fields as $field) {
             if (ASTHelper::hasDirective($field, 'cacheKey')) {
                 $typeValue->setCacheKey($field->name->value);
@@ -156,7 +155,6 @@ SDL;
         }
 
         // Second priority: Look for a Non-Null field with the ID type
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
         foreach ($typeDefinition->fields as $field) {
             if (
                 // @phpstan-ignore-next-line TODO remove once graphql-php is accurate

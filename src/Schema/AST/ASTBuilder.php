@@ -172,7 +172,6 @@ class ASTBuilder
     protected function applyTypeExtensionManipulators(): void
     {
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
-            /** @var \GraphQL\Language\AST\TypeExtensionNode&\GraphQL\Language\AST\Node $typeExtension */
             foreach ($typeExtensionsList as $typeExtension) {
                 // Before we actually extend the types, we apply the manipulator directives
                 // that are defined on type extensions themselves

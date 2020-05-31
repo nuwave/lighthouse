@@ -79,7 +79,6 @@ class ArgumentSetFactory
         }
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
 
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
         foreach ($argumentDefinitionMap as $name => $definition) {
             if (array_key_exists($name, $args)) {
                 $argumentSet->arguments[$name] = $this->wrapInArgument($args[$name], $definition);

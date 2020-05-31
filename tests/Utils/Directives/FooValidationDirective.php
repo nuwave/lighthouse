@@ -6,9 +6,6 @@ use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
 
 class FooValidationDirective extends ValidationDirective
 {
-    /**
-     * @return mixed[]
-     */
     public function rules(): array
     {
         return [
@@ -16,9 +13,6 @@ class FooValidationDirective extends ValidationDirective
         ];
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
         return [];

@@ -100,7 +100,7 @@ class ArgPartitioner
         }
 
         if (isset($model)) {
-            $isRelation = static function (string $relationClass) use ($model, $name) {
+            $isRelation = static function (string $relationClass) use ($model, $name): bool {
                 return static::methodReturnsRelation($model, $name, $relationClass);
             };
 

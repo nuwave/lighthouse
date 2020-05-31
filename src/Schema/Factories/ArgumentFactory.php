@@ -32,7 +32,7 @@ class ArgumentFactory
      * @see \GraphQL\Type\Definition\FieldArgument
      * @see \GraphQL\Type\Definition\InputObjectField
      *
-     * @return array<string, mixed>
+     * @return array<string, mixed> The configuration to construct an \GraphQL\Type\Definition\InputObjectField|\GraphQL\Type\Definition\FieldArgument
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {

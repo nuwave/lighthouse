@@ -87,6 +87,7 @@ SDL;
                     continue;
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
+
                 $name = DirectiveFactory::directiveName($class);
 
                 // The directive was already found, so we do not add it twice

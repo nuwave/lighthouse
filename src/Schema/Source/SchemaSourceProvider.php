@@ -8,7 +8,7 @@ interface SchemaSourceProvider
      * Set schema root path.
      *
      * @deprecated will be removed in v5.
-     * @return \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
+     * @return $this
      */
     public function setRootPath(string $path);
 
