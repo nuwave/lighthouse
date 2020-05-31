@@ -17,7 +17,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Fix the error message when using multiple exclusive directives on a single node https://github.com/nuwave/lighthouse/pull/1387
-- Allow passing additional headers to `multipartGraphQL` Lumen test helper too
+- Allow passing additional headers to `multipartGraphQL` Lumen test helper too https://github.com/nuwave/lighthouse/pull/1395
 
 ### Deprecated
 
