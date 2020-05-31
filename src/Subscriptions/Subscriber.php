@@ -96,7 +96,6 @@ class Subscriber implements Serializable
      * Unserialize subscription from a JSON string.
      *
      * @param  string  $subscription
-     * @return void
      */
     public function unserialize($subscription): void
     {
