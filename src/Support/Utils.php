@@ -110,7 +110,7 @@ class Utils
     /**
      * Construct a callback that checks if its input is a given class.
      */
-    public static function instanceofMatcher(string $classLike): \Closure
+    public static function instanceofMatcher(string $classLike): Closure
     {
         return function ($object) use ($classLike): bool {
             return $object instanceof $classLike;

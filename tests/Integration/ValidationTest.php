@@ -525,7 +525,7 @@ class ValidationTest extends DBTestCase
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
      * @param  array<string>  $keys
-     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $result
+     * @param  \Illuminate\Testing\TestResponse  $result
      */
     protected function assertValidationKeysSame(array $keys, $result): void
     {

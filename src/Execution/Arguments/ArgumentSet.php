@@ -55,7 +55,6 @@ class ArgumentSet
      */
     public function has(string $key): bool
     {
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
         $argument = $this->arguments[$key] ?? null;
 
         if ($argument === null) {

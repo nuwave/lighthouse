@@ -112,6 +112,8 @@ class CacheValue
 
     /**
      * Convert input arguments to keys.
+     *
+     * @return \Illuminate\Support\Collection<string>
      */
     protected function argKeys(): Collection
     {

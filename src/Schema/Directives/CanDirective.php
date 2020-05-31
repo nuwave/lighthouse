@@ -103,7 +103,7 @@ SDL;
 
     /**
      * @param  array<string, mixed>  $args
-     * @return iterable<Model|string>
+     * @return iterable<\Illuminate\Database\Eloquent\Model|string>
      *
      * @throws \GraphQL\Error\Error
      */
@@ -115,7 +115,6 @@ SDL;
                 throw new Error(self::missingKeyToFindModel($find));
             }
 
-            /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
@@ -189,7 +188,7 @@ SDL;
      * Additional arguments that are passed to `Gate::check`.
      *
      * @param  array<mixed>  $args
-     * @return mixed[]
+     * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
     {

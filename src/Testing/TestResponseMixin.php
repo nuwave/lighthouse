@@ -6,7 +6,7 @@ use Closure;
 use PHPUnit\Framework\Assert;
 
 /**
- * @mixin \Illuminate\Foundation\Testing\TestResponse
+ * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
 {
