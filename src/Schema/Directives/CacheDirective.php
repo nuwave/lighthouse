@@ -103,9 +103,9 @@ SDL;
                 ? function ($value) use ($cacheKey, $maxAge, $cache): void {
                     $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
                 }
-                : function ($value) use ($cacheKey, $cache): void {
-                    $cache->forever($cacheKey, $value);
-                };
+            : function ($value) use ($cacheKey, $cache): void {
+                $cache->forever($cacheKey, $value);
+            };
 
             $resolvedValue instanceof Deferred
                 ? $resolvedValue->then(function ($result) use ($storeInCache): void {
