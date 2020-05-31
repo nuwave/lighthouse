@@ -26,8 +26,8 @@ use Nuwave\Lighthouse\Exceptions\ParseException;
 class PartialParser
 {
     /**
-     * @param  string[]  $objectTypes
-     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode[]
+     * @param  array<string>  $objectTypes
+     * @return array<\GraphQL\Language\AST\ObjectTypeDefinitionNode>
      */
     public static function objectTypeDefinitions(array $objectTypes): array
     {
@@ -75,8 +75,8 @@ class PartialParser
     }
 
     /**
-     * @param  string[]  $argumentDefinitions
-     * @return \GraphQL\Language\AST\ArgumentNode[]
+     * @param  array<string>  $argumentDefinitions
+     * @return array<\GraphQL\Language\AST\ArgumentNode>
      */
     public static function arguments(array $argumentDefinitions): array
     {
@@ -125,8 +125,8 @@ class PartialParser
     }
 
     /**
-     * @param  string[]  $directives
-     * @return \GraphQL\Language\AST\DirectiveNode[]
+     * @param  array<string>  $directives
+     * @return array<\GraphQL\Language\AST\DirectiveNode>
      */
     public static function directives(array $directives): array
     {
@@ -147,8 +147,8 @@ class PartialParser
     }
 
     /**
-     * @param  string[]  $directiveDefinitions
-     * @return \GraphQL\Language\AST\DirectiveDefinitionNode[]
+     * @param  array<string>  $directiveDefinitions
+     * @return array<\GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public static function directiveDefinitions(array $directiveDefinitions): array
     {

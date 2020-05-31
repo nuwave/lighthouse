@@ -141,7 +141,7 @@ GRAPHQL;
     }
 
     /**
-     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     * @return \Illuminate\Testing\TestResponse
      */
     protected function subscribe()
     {

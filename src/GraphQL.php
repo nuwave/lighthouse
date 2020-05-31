@@ -214,7 +214,7 @@ class GraphQL
     /**
      * Construct the validation rules with values given in the config.
      *
-     * @return \GraphQL\Validator\Rules\ValidationRule[]
+     * @return array<class-string<\GraphQL\Validator\Rules\ValidationRule>, \GraphQL\Validator\Rules\ValidationRule>
      */
     protected function getValidationRules(): array
     {

@@ -51,7 +51,7 @@ class FieldValue
     /**
      * A closure that determines the complexity of executing the field.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected $complexity;
 

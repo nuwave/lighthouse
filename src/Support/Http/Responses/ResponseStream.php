@@ -18,6 +18,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     public function stream(array $data, array $paths, bool $final): void
     {
         if (! empty($paths)) {
+            $chunk = [];
             $lastKey = count($paths) - 1;
 
             foreach ($paths as $i => $path) {
