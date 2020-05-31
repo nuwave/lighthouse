@@ -96,9 +96,9 @@ class Subscriber implements Serializable
      * Unserialize subscription from a JSON string.
      *
      * @param  string  $subscription
-     * @return $this
+     * @return void
      */
-    public function unserialize($subscription): self
+    public function unserialize($subscription): void
     {
         $data = json_decode($subscription, true);
 
@@ -112,8 +112,6 @@ class Subscriber implements Serializable
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
-
-        return $this;
     }
 
     /**

@@ -126,7 +126,7 @@ class GraphQL
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
      * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  mixed[]  $variables
+     * @param  array<mixed>|null  $variables
      * @param  mixed|null  $rootValue
      */
     public function executeQuery(

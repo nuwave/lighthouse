@@ -164,7 +164,7 @@ abstract class BaseDirective implements Directive
      * Find a class name in a set of given namespaces.
      *
      * @param  string[]  $namespacesToTry
-     * @param  callable  $determineMatch
+     * @param  callable|null  $determineMatch
      * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException

@@ -22,7 +22,8 @@ class MemoryStream extends Stream implements CanStreamResponse
                      * @return array<string, array<string, mixed>>
                      */
                     function (string $path) use ($data): array {
-                        $response['data'] = Arr::get($data, "data.{$path}", []);
+                        $response = ['data' => Arr::get($data, "data.{$path}", [])];
+
                         $errors = $this->chunkError($path, $data);
                         if (! empty($errors)) {
                             $response['errors'] = $errors;
