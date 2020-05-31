@@ -84,9 +84,10 @@ trait MakesGraphQLRequestsLumen
      *
      * @param  array<string, mixed>  $parameters
      * @param  array<int, \Illuminate\Http\Testing\File>  $files
+     * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      * @return $this
      */
-    protected function multipartGraphQL(array $parameters, array $files): self
+    protected function multipartGraphQL(array $parameters, array $files, array $headers = []): self
     {
         $this->call(
             'POST',
@@ -94,9 +95,12 @@ trait MakesGraphQLRequestsLumen
             $parameters,
             [],
             $files,
-            $this->transformHeadersToServerVars([
-                'Content-Type' => 'multipart/form-data',
-            ])
+            $this->transformHeadersToServerVars(array_merge(
+                [
+                    'Content-Type' => 'multipart/form-data',
+                ],
+                $headers
+            ))
         );
 
         return $this;
