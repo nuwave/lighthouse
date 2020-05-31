@@ -47,7 +47,6 @@ class TypeRegistryTest extends TestCase
         $enumValueDefinition = $enumType->getValue('ADMIN');
         $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
         /** @var \GraphQL\Type\Definition\EnumValueDefinition $enumValueDefinition */
-
         $this->assertSame(123, $enumValueDefinition->value);
     }
 
@@ -67,7 +66,6 @@ class TypeRegistryTest extends TestCase
         $enumValueDefinition = $enumType->getValue('EMPLOYEE');
         $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
         /** @var \GraphQL\Type\Definition\EnumValueDefinition $enumValueDefinition */
-
         $this->assertSame('EMPLOYEE', $enumValueDefinition->value);
     }
 

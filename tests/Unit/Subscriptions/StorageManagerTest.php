@@ -95,7 +95,6 @@ class StorageManagerTest extends SubscriptionTestCase
     {
         $this->assertNotNull($actual);
         /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $actual */
-
         $this->assertSame(
             AST::toArray($expected->query),
             AST::toArray($actual->query)

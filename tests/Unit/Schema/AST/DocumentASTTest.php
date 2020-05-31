@@ -81,8 +81,7 @@ class DocumentASTTest extends TestCase
 
         $fields = $queryType->fields;
         $this->assertIsArray($fields);
-        /** @var  array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
         $this->assertInstanceOf(
             FieldDefinitionNode::class,
             $fields[0]

@@ -82,7 +82,6 @@ class SchemaBuilderTest extends TestCase
         $enumValueDefinition = $enumType->getValue('ADMIN');
         $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
         /** @var \GraphQL\Type\Definition\EnumValueDefinition $enumValueDefinition */
-
         $this->assertSame('Company administrator.', $enumValueDefinition->description);
     }
 
@@ -122,19 +121,16 @@ class SchemaBuilderTest extends TestCase
         $foo = $schema->getType('Foo');
         $this->assertInstanceOf(ObjectType::class, $foo);
         /** @var \GraphQL\Type\Definition\ObjectType $foo */
-
         $this->assertSame('Foo', $foo->name);
 
         $bar = $foo->getField('bar');
         $this->assertInstanceOf(FieldDefinition::class, $bar);
         /** @var \GraphQL\Type\Definition\FieldDefinition $bar */
-
         $this->assertSame('bar attribute of Foo', $bar->description);
 
         $baz = $bar->getArg('baz');
         $this->assertInstanceOf(FieldArgument::class, $baz);
         /** @var \GraphQL\Type\Definition\FieldArgument $baz */
-
         $this->assertSame('arg', $baz->description);
         $this->assertTrue($baz->defaultValueExists());
         $this->assertFalse($baz->defaultValue);
