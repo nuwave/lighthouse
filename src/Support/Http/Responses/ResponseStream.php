@@ -84,9 +84,9 @@ class ResponseStream extends Stream implements CanStreamResponse
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
             'Content-Length: '.$length,
-            null,
+            '',
             $json,
-            null,
+            '',
         ]);
 
         return $this->boundary().$chunk;

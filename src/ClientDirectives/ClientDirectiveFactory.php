@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\ClientDirectives;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\FieldArgument;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -27,7 +26,7 @@ class ClientDirectiveFactory
     public function handle(DirectiveDefinitionNode $directive): Directive
     {
         $arguments = [];
-        /** @var InputValueDefinitionNode $argument */
+        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
             /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->definitionNodeConverter->convert($argument->type);
