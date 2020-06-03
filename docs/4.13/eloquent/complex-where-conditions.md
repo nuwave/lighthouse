@@ -46,7 +46,7 @@ directive @whereConditions(
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
 
 You can apply this directive on any field that performs an Eloquent query:
@@ -225,7 +225,7 @@ directive @whereHasConditions(
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
 
 This directive works very similar to [@whereConditions](#whereconditions), except that

@@ -72,9 +72,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: $column";
     }
 
-    /**
-     * Manipulate the AST.
-     */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
