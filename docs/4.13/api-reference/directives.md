@@ -1906,7 +1906,7 @@ directive @orderBy(
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
 
 Use it on a field argument of an Eloquent query. The type of the argument
