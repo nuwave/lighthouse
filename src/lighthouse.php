@@ -244,7 +244,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | ForceFill Models
+    | Mass Assignment Protection
     |--------------------------------------------------------------------------
     |
     | If set to true, mutations will use forceFill() over fill() when populating

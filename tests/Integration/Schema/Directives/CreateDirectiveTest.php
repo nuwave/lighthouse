@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Tests\Constants;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -548,5 +549,30 @@ class CreateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testTurnOnMassAssignment(): void
+    {
+        config(['lighthouse.force_fill' => false]);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Company {
+            name: String!
+        }
+
+        type Mutation {
+            createCompany(name: String): Company @create
+        }
+        ';
+
+        $this->expectException(MassAssignmentException::class);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createCompany(name: "foo") {
+                name
+            }
+        }
+        ');
     }
 }
