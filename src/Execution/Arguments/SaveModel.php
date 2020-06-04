@@ -41,8 +41,14 @@ class SaveModel implements ArgResolver
             BelongsTo::class
         );
 
+        $argsToFill = $remaining->toArray();
+
         // Use all the remaining attributes and fill the model
-        $model->forceFill($remaining->toArray());
+        if (config('lighthouse.force_fill')) {
+            $model->forceFill($argsToFill);
+        } else {
+            $model->fill($argsToFill);
+        }
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */

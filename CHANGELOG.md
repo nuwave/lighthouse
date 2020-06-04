@@ -19,6 +19,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix the error message when using multiple exclusive directives on a single node https://github.com/nuwave/lighthouse/pull/1387
 - Allow passing additional headers to `multipartGraphQL` Lumen test helper too https://github.com/nuwave/lighthouse/pull/1395
 - Rectify that `@orderBy`, `@whereConditions` and `@whereHasConditions` only work on field arguments https://github.com/nuwave/lighthouse/pull/1402
+- Make mass assignment behavior configurable through `force_fill` option in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1405
 
 ### Deprecated
 
