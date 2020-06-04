@@ -44,7 +44,7 @@ class SaveModel implements ArgResolver
         $argsToFill = $remaining->toArray();
 
         // Use all the remaining attributes and fill the model
-        if(config('lighthouse.force_fill')) {
+        if (config('lighthouse.force_fill')) {
             $model->forceFill($argsToFill);
         } else {
             $model->fill($argsToFill);
