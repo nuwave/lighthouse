@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.14.0
+
 ### Added
 
 - Write definitions for programmatically registered types to `programmatic-types.graphql`
