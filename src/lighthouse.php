@@ -244,6 +244,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | ForceFill Models
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, mutations will use forceFill() over fill() when populating
+    | a model with arguments in mutation directives. Since GraphQL limits args
+    | clients can pass in by design, mass assignment protection is not needed.
+    |
+    | Will default to true in v5.
+    |
+    */
+
+    'force_fill' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Batchload Relations
     |--------------------------------------------------------------------------
     |
