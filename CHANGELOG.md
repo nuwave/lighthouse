@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.14.1
+
+### Fixed
+
+- Safeguard deletion of `programmatic-types.graphql` in `artisan lighthouse:ide-helper`
+
 ## 4.14.0
 
 ### Added

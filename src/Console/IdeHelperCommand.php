@@ -166,7 +166,7 @@ SDL;
 
         $filePath = static::programmaticTypesPath();
 
-        if ($types->isEmpty()) {
+        if ($types->isEmpty() && file_exists($filePath)) {
             unlink($filePath);
 
             return;
