@@ -34,6 +34,8 @@ services:
     security_opt:
       - label:disable
     working_dir: /app
+    environment:
+      - NODE_OPTIONS="--max-old-space-size=8192"
     ports:
       - 8080:8080
     tty: true
