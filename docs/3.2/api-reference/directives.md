@@ -789,9 +789,10 @@ belongs to. Lighthouse provides a default implementation, but you can override
 it if the need arises.
 
 ```graphql
-type User @node(
-  resolver: "App\\GraphQL\\NodeResolver@resolveUser"
-  typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
+type User
+  @node(
+    resolver: "App\\GraphQL\\NodeResolver@resolveUser"
+    typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
   ) {
   name: String!
 }
