@@ -830,7 +830,7 @@ The `typeResolver` is responsible for determining the GraphQL type the result
 belongs to. Lighthouse provides a default implementation, but you can override
 it if the need arises.
 
-```grapqhl
+```graphql
 type User @node(
   resolver: "App\\GraphQL\\NodeResolver@resolveUser"
   typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
