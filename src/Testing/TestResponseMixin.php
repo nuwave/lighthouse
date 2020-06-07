@@ -6,10 +6,12 @@ use Closure;
 use PHPUnit\Framework\Assert;
 
 /**
- * @mixin \Illuminate\Foundation\Testing\TestResponse
+ * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
 {
+    const EXPECTED_VALIDATION_KEYS = 'Expected the query to return validation errors for specific fields.';
+
     public function assertGraphQLValidationError(): Closure
     {
         return function (string $key, ?string $message) {
@@ -36,10 +38,15 @@ class TestResponseMixin
         return function (array $keys) {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
+            Assert::assertIsArray($validation, self::EXPECTED_VALIDATION_KEYS);
+
+            $extensions = $validation['extensions'];
+            Assert::assertIsArray($extensions, self::EXPECTED_VALIDATION_KEYS);
+
             Assert::assertSame(
                 $keys,
-                array_keys($validation['extensions']['validation']),
-                'Expected the query to return validation errors for specific fields.'
+                array_keys($extensions['validation']),
+                self::EXPECTED_VALIDATION_KEYS
             );
 
             return $this;
@@ -51,10 +58,7 @@ class TestResponseMixin
         return function () {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
-            Assert::assertNull(
-                $validation,
-                'Expected the query to have no validation errors.'
-            );
+            Assert::assertNull($validation, 'Expected the query to have no validation errors.');
 
             return $this;
         };

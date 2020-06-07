@@ -50,7 +50,7 @@ return [
     |
     | The guard to use for authenticating GraphQL requests, if needed.
     | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
-    | such as `@guard` and when applying the `AttempAuthentication` middleware.
+    | such as `@guard` and when applying the `AttemptAuthentication` middleware.
     | TODO this setting will default to 'api' in v5
     |
     */
@@ -241,6 +241,21 @@ return [
     */
 
     'transactional_mutations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mass Assignment Protection
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, mutations will use forceFill() over fill() when populating
+    | a model with arguments in mutation directives. Since GraphQL constrains
+    | allowed inputs by design, mass assignment protection is not needed.
+    |
+    | Will default to true in v5.
+    |
+    */
+
+    'force_fill' => false,
 
     /*
     |--------------------------------------------------------------------------

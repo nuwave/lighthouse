@@ -15,7 +15,7 @@ class IntrospectionTest extends TestCase
     protected $typeRegistry;
 
     /**
-     * @var \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse|null
+     * @var \Illuminate\Testing\TestResponse|null
      */
     protected $introspectionResult;
 

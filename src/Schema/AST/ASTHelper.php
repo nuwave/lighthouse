@@ -285,7 +285,6 @@ class ASTHelper
             );
         }
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
         foreach ($objectType->fields as $fieldDefinition) {
             // If the field already has the same directive defined, skip over it.
             // Field directives are more specific than those defined on a type.

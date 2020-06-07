@@ -182,3 +182,16 @@ $typeRegistry = app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);
 -$typeRegistry->register($someType);
 +$typeRegistry->overwrite($someType);
 ```
+
+### Mass assignment protection is disabled by default
+
+Since GraphQL constrains allowed inputs by design, mass assignment protection is not needed.
+By default, Lighthouse will use `forceFill()` when populating a model with arguments in mutation directives.
+This allows you to use mass assignment protection for other cases where it is actually useful.
+
+If you need to revert to the old behavior of using `fill()`, you can change your `lighthouse.php`:
+
+```diff
+-   'force_fill' => true,
++   'force_fill' => false,
+```

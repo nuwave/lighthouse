@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.14.1
+
+### Fixed
+
+- Safeguard deletion of `programmatic-types.graphql` in `artisan lighthouse:ide-helper`
+
+## 4.14.0
+
 ### Added
 
 - Write definitions for programmatically registered types to `programmatic-types.graphql`
@@ -18,6 +26,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Fix the error message when using multiple exclusive directives on a single node https://github.com/nuwave/lighthouse/pull/1387
+- Allow passing additional headers to `multipartGraphQL` Lumen test helper too https://github.com/nuwave/lighthouse/pull/1395
+- Rectify that `@orderBy`, `@whereConditions` and `@whereHasConditions` only work on field arguments https://github.com/nuwave/lighthouse/pull/1402
+- Make mass assignment behavior configurable through `force_fill` option in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1405
 
 ### Deprecated
 

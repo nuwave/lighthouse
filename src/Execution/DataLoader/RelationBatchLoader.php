@@ -46,7 +46,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Eager-load the relation.
      *
-     * @return array<\Illuminate\Database\Eloquent\Model>
+     * @return array<string, mixed>
      */
     public function resolve(): array
     {
@@ -63,9 +63,14 @@ class RelationBatchLoader extends BatchLoader
         }
 
         return $models
-            ->mapWithKeys(function (Model $model): array {
-                return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
-            })
+            ->mapWithKeys(
+                /**
+                 * @return array<string, mixed>
+                 */
+                function (Model $model): array {
+                    return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
+                }
+            )
             ->all();
     }
 
