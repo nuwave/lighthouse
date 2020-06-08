@@ -72,7 +72,7 @@ SDL;
         return RelationCountBatchLoader::class;
     }
 
-    protected function countModel(string $modelName)
+    protected function countModel(string $modelName): int
     {
         $scopesArg = $this->directiveArgValue('scopes');
 
