@@ -31,6 +31,10 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testCanResolveCountByRelation(): void
     {
+        if (AppVersion::below(5.7)) {
+            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        }
+
         /** @var User $user */
         $user = factory(User::class)->create();
 
