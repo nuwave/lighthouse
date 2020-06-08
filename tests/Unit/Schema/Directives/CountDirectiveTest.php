@@ -61,7 +61,9 @@ class CountDirectiveTest extends DBTestCase
     public function testItCanCountAModelWithScopes(): void
     {
         factory(Task::class, 3)->create();
-        factory(Task::class, 2)->state('completed')->create();
+        factory(Task::class, 2)->create([
+            'completed_at' => now(),
+        ]);
 
         $this->graphQL('
         {
