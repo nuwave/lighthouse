@@ -14,10 +14,6 @@ class WithCountDirective extends WithRelationDirective implements FieldMiddlewar
         return /** @lang GraphQL */ <<<'SDL'
 """
 Eager-load the count of an Eloquent relation.
-
-The name of the field is assumed to be `${RELATION}_count`,
-for example if the relation is called `foo`, the name of the
-field should be `foo_count`.
 """
 directive @withCount(
   """
