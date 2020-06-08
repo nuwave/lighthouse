@@ -31,7 +31,7 @@ abstract class WithRelationDirective extends BaseDirective
     {
         return $next(
             $fieldValue->setResolver(
-                $this->deferResolver(
+                $this->deferredRelationResolver(
                     $fieldValue->getResolver()
                 )
             )
@@ -56,10 +56,14 @@ abstract class WithRelationDirective extends BaseDirective
      *
      * @param  callable  $resolver
      */
-    protected function deferResolver($resolver): Closure
+    protected function deferredRelationResolver($resolver): Closure
     {
-        return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
+        return function (?Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
             return new Deferred(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
+                if (is_null($parent)) {
+                    return $resolver($parent, $args, $context, $resolveInfo);
+                }
+
                 return $this->loader($resolveInfo)
                     ->load($parent->getKey(), ['parent' => $parent])
                     ->then(
@@ -72,7 +76,7 @@ abstract class WithRelationDirective extends BaseDirective
     }
 
     /**
-     * Create an instance of RelationBatchLoader loader to apply counts.
+     * Create an instance of RelationBatchLoader loader.
      */
     protected function loader(ResolveInfo $resolveInfo): BatchLoader
     {

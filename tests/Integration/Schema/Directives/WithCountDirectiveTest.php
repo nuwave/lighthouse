@@ -22,10 +22,8 @@ class WithCountDirectiveTest extends DBTestCase
         }
 
         type User {
-            completed_tasks: Int! @withCount(relation: "tasks", scopes: ["completed"])
-            count_tasks: Int! @count(relation: "tasks") # Used to compare queries
             tasks_count: Int! @withCount
-            no_relation: Int! @withCount # Used to prove failing test
+            count_tasks: Int! @withCount # Used to prove failing test
         }
         ';
     }
@@ -43,40 +41,10 @@ class WithCountDirectiveTest extends DBTestCase
                 ]);
             });
 
-        $lazyQueries = 0;
+        $queries = 0;
 
-        DB::listen(function () use (&$lazyQueries): void {
-            $lazyQueries++;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                count_tasks
-            }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'count_tasks' => 3,
-                    ],
-                    [
-                        'count_tasks' => 3,
-                    ],
-                    [
-                        'count_tasks' => 3,
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assertEquals(4, $lazyQueries);
-
-        $eagerQueries = 0;
-
-        DB::listen(function () use (&$eagerQueries): void {
-            $eagerQueries++;
+        DB::listen(function () use (&$queries): void {
+            $queries++;
         });
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -101,39 +69,7 @@ class WithCountDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertEquals(2, $eagerQueries);
-        $this->assertTrue($eagerQueries < $lazyQueries);
-    }
-
-    public function testItEagerLoadsRelationCountWithScope(): void
-    {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
-        }
-
-        /** @var \Tests\Utils\Models\User $user */
-        $user = factory(User::class)->create();
-        factory(Task::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
-
-        factory(Task::class)->state('completed')->create([
-            'user_id' => $user->getKey(),
-        ]);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                completed_tasks
-            }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'user' => [
-                    'completed_tasks' => 1,
-                ],
-            ],
-        ]);
+        $this->assertEquals(2, $queries);
     }
 
     public function testItFailsToEagerLoadRelationCountWithoutRelation(): void
@@ -149,7 +85,7 @@ class WithCountDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                no_relation
+                count_tasks
             }
         }
         ');

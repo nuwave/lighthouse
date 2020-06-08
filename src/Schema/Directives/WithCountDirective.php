@@ -41,18 +41,8 @@ SDL;
 
     public function relationName(): string
     {
-        $relation = $this->directiveArgValue('relation');
-
-        // Without a provided relation, the node name is assummed to be an actual
-        // relation on the model.
-        if (! $relation) {
-            return Str::before($this->nodeName(), '_count');
-        }
-
-        // With a provided relation and differing node name, Laravel should alias
-        // the relation as the node name when querying th database.
-        if ($relation && $relation !== $this->nodeName()) {
-            return "{$relation} as {$this->nodeName()}";
+        if ($relation = $this->directiveArgValue('relation')) {
+            return $relation;
         }
 
         return Str::before($this->nodeName(), '_count');
