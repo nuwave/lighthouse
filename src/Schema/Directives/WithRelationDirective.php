@@ -56,7 +56,7 @@ abstract class WithRelationDirective extends BaseDirective
      *
      * @param  callable  $resolver
      */
-    protected function deferredRelationResolver($resolver): Closure
+    protected function deferredRelationResolver(callable $resolver): Closure
     {
         return function (?Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
             return new Deferred(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
