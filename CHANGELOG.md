@@ -21,7 +21,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Write definitions for programmatically registered types to `programmatic-types.graphql`
   when running the `lighthouse:ide-helper` artisan command https://github.com/nuwave/lighthouse/pull/1371
-- Add `@withCount` directive to allow eager loading relationship counts https://github.com/nuwave/lighthouse/pull/1390
+- Add `@withCount` directive to allow eager loading relationship counts and eager load relationships for the `@count` direcitve https://github.com/nuwave/lighthouse/pull/1390
 
 ### Fixed
 

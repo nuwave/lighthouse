@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -79,7 +78,7 @@ SDL;
 
         return $this->namespaceModelClass($modelName)
             ::query()
-            ->when(!is_null($scopesArg), function (Builder $query) use ($scopesArg) {
+            ->when(! is_null($scopesArg), function (Builder $query) use ($scopesArg) {
                 return $query->scopes($scopesArg);
             })
             ->count();
@@ -90,6 +89,5 @@ SDL;
         $relation = $this->directiveArgValue('relation');
 
         return "{$relation} as {$this->nodeName()}";
-        ;
     }
 }
