@@ -53,8 +53,6 @@ abstract class WithRelationDirective extends BaseDirective
 
     /**
      * Return a new deferred resolver.
-     *
-     * @param  callable  $resolver
      */
     protected function deferredRelationResolver(callable $resolver): Closure
     {
