@@ -84,7 +84,6 @@ SDL;
             $cacheKey = $cacheValue->getKey();
 
             if ($this->shouldUseTags()) {
-                // @phpstan-ignore-next-line We know this method exists because we checked for it
                 $cache = $this->cacheRepository->tags($cacheValue->getTags());
             } else {
                 $cache = $this->cacheRepository;
