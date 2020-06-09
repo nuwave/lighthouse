@@ -51,7 +51,6 @@ class ConnectionField
 
         $firstItem = $paginator->firstItem();
 
-        // @phpstan-ignore-next-line static refers to the wrong class because it is a proxied method call
         return $paginator
             ->values()
             ->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
