@@ -41,7 +41,7 @@ SDL;
     public function relationName(): string
     {
         $relation = $this->directiveArgValue('relation');
-        if( ! $relation) {
+        if (! $relation) {
             throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
         }
 
