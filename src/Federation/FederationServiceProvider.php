@@ -20,10 +20,6 @@ class FederationServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher $dispatcher
-     *
-     * @return void
      */
     public function boot(Dispatcher $dispatcher): void
     {
@@ -40,11 +36,6 @@ class FederationServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * @param \Nuwave\Lighthouse\Events\ManipulateAST $manipulateAST
-     *
-     * @return void
-     */
     public function addFederationAdjustments(ManipulateAST $manipulateAST): void
     {
         if (config('lighthouse.federation.type') === 'service') {
@@ -77,8 +68,6 @@ class FederationServiceProvider extends ServiceProvider
 
     /**
      * Add federation specific directives to the AST.
-     *
-     * @param ManipulateAST $manipulateAST
      */
     protected function addDirectives(ManipulateAST &$manipulateAST): void
     {
@@ -91,10 +80,6 @@ class FederationServiceProvider extends ServiceProvider
 
     /**
      * Add federation specific scalars to the AST.
-     *
-     * @param ManipulateAST $manipulateAST
-     *
-     * @return void
      */
     protected function addScalars(ManipulateAST &$manipulateAST): void
     {
@@ -116,7 +101,6 @@ class FederationServiceProvider extends ServiceProvider
      * Retrieve all object types from AST which uses the @key directive (no matter if native or extended type) and
      * combine those types into the _Entity union.
      *
-     * @param ManipulateAST $manipulateAST
      *
      * @throws FederationException
      */

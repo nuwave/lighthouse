@@ -7,7 +7,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 class ProvidesDirective extends BaseDirective
 {
     /**
-     * @return string
      * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
      */
     public static function definition(): string
@@ -39,8 +38,6 @@ SDL;
 
     /**
      * Name of the directive.
-     *
-     * @return string
      */
     public function name(): string
     {

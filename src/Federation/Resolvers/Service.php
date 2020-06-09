@@ -14,11 +14,6 @@ class Service
     const FEDERATION_DIRECTIVES = ['key', 'extends', 'external', 'extends', 'requires', 'provides'];
 
     /**
-     * @param mixed                                               $rootValue
-     * @param array                                               $args
-     * @param \Nuwave\Lighthouse\Support\Contracts\GraphQLContext $context
-     * @param \GraphQL\Type\Definition\ResolveInfo                $resolveInfo
-     *
      * @return array
      */
     public function resolveSdl($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
