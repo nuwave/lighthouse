@@ -36,7 +36,7 @@ class CountDirectiveTest extends DBTestCase
     public function testItRequiresARelationOrModelArgument(): void
     {
         $this->expectException(DirectiveException::class);
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             tasks
         }
@@ -47,7 +47,7 @@ class CountDirectiveTest extends DBTestCase
     {
         factory(Task::class, 3)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             tasks_count
         }
@@ -65,7 +65,7 @@ class CountDirectiveTest extends DBTestCase
             'completed_at' => now(),
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             completed_tasks
         }
@@ -76,23 +76,20 @@ class CountDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testItCountsARelationAndEagerLoadsTheCount()
+    public function testItCountsARelationAndEagerLoadsTheCount(): void
     {
         if (AppVersion::below(5.7)) {
             $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
         }
 
         factory(User::class, 3)->create()
-            ->each(function ($user, $index) {
-                $count = 3 - $index;
-
-                factory(Task::class, $count)->create([
+            ->each(function (User $user, int $index): void {
+                factory(Task::class, 3 - $index)->create([
                     'user_id' => $user->getKey(),
                 ]);
             });
 
         $queries = 0;
-
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
@@ -122,7 +119,7 @@ class CountDirectiveTest extends DBTestCase
         $this->assertEquals(2, $queries);
     }
 
-    public function testItCountsARelationThatIsNotSuffixedWithCount()
+    public function testItCountsARelationThatIsNotSuffixedWithCount(): void
     {
         if (AppVersion::below(5.7)) {
             $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
