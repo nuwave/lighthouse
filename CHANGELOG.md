@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `@withCount` directive to eager load relationship counts on field access https://github.com/nuwave/lighthouse/pull/1390
+
+### Changed
+
+- Eager load relationship count in `@count` directive https://github.com/nuwave/lighthouse/pull/1390
+
 ## 4.14.1
 
 ### Fixed

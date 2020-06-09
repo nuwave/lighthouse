@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -31,6 +32,10 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testCanResolveCountByRelation(): void
     {
+        if (AppVersion::below(5.7)) {
+            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        }
+
         /** @var User $user */
         $user = factory(User::class)->create();
 
