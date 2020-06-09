@@ -8,7 +8,7 @@ directive with the pagination type `connection`.
 
 ```graphql
 type Query {
-    users: [User] @paginate(type: "connection")
+  users: [User] @paginate(type: "connection")
 }
 ```
 
@@ -19,8 +19,8 @@ in Eloquent. Use the [@hasMany](../api-reference/directives.md#hasmany) directiv
 
 ```graphql
 type User {
-    name: String
-    posts: [Post] @hasMany(type: "connection")
+  name: String
+  posts: [Post] @hasMany(type: "connection")
 }
 ```
 

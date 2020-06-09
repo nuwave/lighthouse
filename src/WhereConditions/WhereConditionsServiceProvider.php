@@ -8,16 +8,13 @@ use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class WhereConditionsServiceProvider extends ServiceProvider
 {
-    const DEFAULT_WHERE_CONDITIONS = 'WhereConditions';
+    public const DEFAULT_WHERE_CONDITIONS = 'WhereConditions';
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -26,12 +23,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
      */
-    public function boot(DirectiveFactory $directiveFactory, Dispatcher $dispatcher): void
+    public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,

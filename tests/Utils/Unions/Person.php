@@ -12,24 +12,16 @@ class Person
      */
     protected $typeRegistry;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;
     }
 
     /**
-     * @param  mixed  $value
-     * @return \GraphQL\Type\Definition\Type
+     * @param  array<string, mixed>  $value
      */
-    public function resolveType($value): Type
+    public function resolveType(array $value): Type
     {
-        // The return type can be a string either,
-        // because the upstream lib `webonyx/graphql-php` allows us to give a string
-        // which in this case you can just return the `$type` it self.
         $type = isset($value['id'])
             ? 'User'
             : 'Employee';

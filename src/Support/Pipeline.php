@@ -8,12 +8,15 @@ use Illuminate\Support\Collection;
 
 class Pipeline extends BasePipeline
 {
+    /**
+     * @var \Closure|null
+     */
     protected $always = null;
 
     /**
      * Set the array of pipes.
      *
-     * @param  \Illuminate\Support\Collection|array  $pipes
+     * @param  \Illuminate\Support\Collection<mixed>|array<mixed>  $pipes
      * @return $this
      */
     public function through($pipes)
@@ -27,8 +30,6 @@ class Pipeline extends BasePipeline
 
     /**
      * Get a \Closure that represents a slice of the application onion.
-     *
-     * @return \Closure
      */
     protected function carry(): Closure
     {
@@ -49,7 +50,6 @@ class Pipeline extends BasePipeline
     /**
      * Set always variable.
      *
-     * @param  \Closure  $always
      * @return $this
      */
     public function always(Closure $always): self

@@ -13,11 +13,13 @@ class CreateTestbenchTasksTable extends Migration
     {
         Schema::create('tasks', function (Blueprint $table): void {
             $table->increments('id');
-            $table->unsignedInteger('user_id')->nullable();
             $table->string('name')->unique();
-            // Properties which collide with native model method names
-            $table->string('guard')->nullable();
-            // -------------------------------------------------------
+            $table->string('guard')
+                ->nullable()
+                ->comment('The purpose of this property is to collide with a native model method name');
+
+            $table->unsignedInteger('user_id')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

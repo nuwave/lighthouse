@@ -29,9 +29,9 @@ php artisan lighthouse:ide-helper
 
 We recommend the following plugins:
 
-|IDE|Plugin|
-|---|---|
-|PhpStorm|https://plugins.jetbrains.com/plugin/8097-js-graphql|
+| IDE      | Plugin                                               |
+| -------- | ---------------------------------------------------- |
+| PhpStorm | https://plugins.jetbrains.com/plugin/8097-js-graphql |
 
 ## Install GraphQL DevTools
 
@@ -43,4 +43,4 @@ composer require mll-lab/laravel-graphql-playground
 ```
 
 You can use any GraphQL client with Lighthouse, make sure to point it to the URL defined in
-the config. By default, the endpoint lives at `/graphql`. 
+the config. By default, the endpoint lives at `/graphql`.

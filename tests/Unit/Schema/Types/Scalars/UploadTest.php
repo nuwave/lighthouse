@@ -21,7 +21,7 @@ class UploadTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Upload)->parseLiteral('');
+        (new Upload)->parseLiteral(''); // @phpstan-ignore-line Error is on purpose
     }
 
     public function testThrowsIfParsingValueNotFile(): void

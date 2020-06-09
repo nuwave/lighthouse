@@ -21,7 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  */
 class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeExtensionManipulator, DefinedDirective
 {
-    const NAME = 'namespace';
+    public const NAME = 'namespace';
 
     public static function definition(): string
     {
@@ -36,10 +36,10 @@ SDL;
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     * @return void
      */
     protected function addNamespacesToFields(&$objectType): void
     {
+        /** @var \GraphQL\Language\AST\DirectiveNode $namespaceDirective */
         $namespaceDirective = $this->directiveNode->cloneDeep();
 
         foreach ($objectType->fields as $fieldDefinition) {
@@ -53,10 +53,6 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return void
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
@@ -67,10 +63,6 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
-     *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\TypeExtensionNode $typeExtension
-     * @return void
      */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {

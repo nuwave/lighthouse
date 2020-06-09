@@ -14,6 +14,7 @@ class CreateTestbenchCategoriesTable extends Migration
         Schema::create('categories', function (Blueprint $table): void {
             $table->increments('category_id');
             $table->string('name');
+
             $table->timestamps();
         });
     }

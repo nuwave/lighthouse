@@ -42,14 +42,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
      */
     private $middlewareAdapter;
 
-    /**
-     * Create a new middleware directive instance.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
-     * @param  \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter  $middlewareAdapter
-     * @return void
-     */
     public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareAdapter $middlewareAdapter)
     {
         $this->pipeline = $pipeline;
@@ -77,10 +69,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -126,10 +114,6 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return void
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
@@ -138,7 +122,6 @@ SDL;
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
@@ -158,10 +141,6 @@ SDL;
 
     /**
      * Apply manipulations from a type definition node.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtension
-     * @return void
      */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {

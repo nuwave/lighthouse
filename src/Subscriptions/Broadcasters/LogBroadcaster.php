@@ -13,20 +13,19 @@ class LogBroadcaster implements Broadcaster
     /**
      * The user-defined configuration options.
      *
-     * @var mixed[]
+     * @var array<mixed>
      */
     protected $config = [];
 
     /**
      * A map from channel names to data.
      *
-     * @var mixed
+     * @var array<string, array<mixed>>
      */
     protected $broadcasts = [];
 
     /**
-     * @param  array  $config
-     * @return void
+     * @param  array<mixed>  $config
      */
     public function __construct(array $config = [])
     {
@@ -35,9 +34,6 @@ class LogBroadcaster implements Broadcaster
 
     /**
      * Authorize subscription request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function authorized(Request $request): JsonResponse
     {
@@ -46,9 +42,6 @@ class LogBroadcaster implements Broadcaster
 
     /**
      * Handle unauthorized subscription request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function unauthorized(Request $request): JsonResponse
     {
@@ -57,9 +50,6 @@ class LogBroadcaster implements Broadcaster
 
     /**
      * Handle subscription web hook.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function hook(Request $request): JsonResponse
     {
@@ -68,10 +58,6 @@ class LogBroadcaster implements Broadcaster
 
     /**
      * Send data to subscriber.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  array  $data
-     * @return void
      */
     public function broadcast(Subscriber $subscriber, array $data): void
     {
@@ -81,8 +67,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * Get the data that is being broadcast.
      *
-     * @param  string|null  $key
-     * @return array|null
+     * @return array<mixed>|null
      */
     public function broadcasts(?string $key = null): ?array
     {

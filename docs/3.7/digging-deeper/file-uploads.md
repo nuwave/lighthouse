@@ -8,8 +8,9 @@ as defined in [graphql-multipart-request-spec](https://github.com/jaydenseric/gr
 In order to accept file uploads, you must add the `Upload` scalar to your schema.
 
 ```graphql
-"Can be used as an argument to upload files using https://github.com/jaydenseric/graphql-multipart-request-spec" 
-scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
+"Can be used as an argument to upload files using https://github.com/jaydenseric/graphql-multipart-request-spec"
+scalar Upload
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 ```
 
 Once the scalar is added, you can add it to a mutation.

@@ -6,7 +6,6 @@ use Closure;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentSet
@@ -14,9 +13,16 @@ class ArgumentSet
     /**
      * An associative array from argument names to arguments.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument[]
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public $arguments = [];
+
+    /**
+     * An associative array of arguments that were not given.
+     *
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    public $undefined = [];
 
     /**
      * A list of directives.
@@ -31,7 +37,7 @@ class ArgumentSet
     /**
      * Get a plain array representation of this ArgumentSet.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -46,13 +52,9 @@ class ArgumentSet
 
     /**
      * Check if the ArgumentSet has a non-null value with the given key.
-     *
-     * @param  string  $key
-     * @return bool
      */
     public function has(string $key): bool
     {
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
         $argument = $this->arguments[$key] ?? null;
 
         if ($argument === null) {
@@ -64,8 +66,6 @@ class ArgumentSet
 
     /**
      * Apply the @spread directive and return a new, modified instance.
-     *
-     * @return self
      */
     public function spread(): self
     {
@@ -75,14 +75,14 @@ class ArgumentSet
         foreach ($this->arguments as $name => $argument) {
             $value = $argument->value;
 
+            // In this case, we do not care about argument sets nested within
+            // lists, spreading only makes sense for single nested inputs.
             if ($value instanceof self) {
                 // Recurse down first, as that resolves the more deeply nested spreads first
                 $value = $value->spread();
 
                 if ($argument->directives->contains(
-                    function (Directive $directive): bool {
-                        return $directive instanceof SpreadDirective;
-                    }
+                    Utils::instanceofMatcher(SpreadDirective::class)
                 )) {
                     $argumentSet->arguments += $value->arguments;
                     continue;
@@ -97,8 +97,6 @@ class ArgumentSet
 
     /**
      * Apply the @rename directive and return a new, modified instance.
-     *
-     * @return self
      */
     public function rename(): self
     {
@@ -146,7 +144,27 @@ class ArgumentSet
      */
     public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
-        foreach ($this->arguments as $argument) {
+        self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
+
+        foreach ($scopes as $scope) {
+            $builder->{$scope}($this->toArray());
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Recursively apply the ArgBuilderDirectives onto the builder.
+     *
+     * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
+     * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
+     *
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     */
+    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null): void
+    {
+        foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
 
             // TODO switch to instanceof when we require bensampo/laravel-enum
@@ -157,9 +175,7 @@ class ArgumentSet
 
             $filteredDirectives = $argument
                 ->directives
-                ->filter(function (Directive $directive): bool {
-                    return $directive instanceof ArgBuilderDirective;
-                });
+                ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
             if (! empty($directiveFilter)) {
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
@@ -169,14 +185,15 @@ class ArgumentSet
                 $builder = $argBuilderDirective->handleBuilder($builder, $value);
             });
 
-            // TODO recurse deeper into the input to allow nested input objects to add filters
+            Utils::applyEach(
+                function ($value) use (&$builder, $directiveFilter) {
+                    if ($value instanceof self) {
+                        self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
+                    }
+                },
+                $argument->value
+            );
         }
-
-        foreach ($scopes as $scope) {
-            call_user_func([$builder, $scope], $this->toArray());
-        }
-
-        return $builder;
     }
 
     /**
@@ -185,8 +202,7 @@ class ArgumentSet
      * Works just like the Laravel Arr::add() function.
      * @see \Illuminate\Support\Arr
      *
-     * @param  string  $path
-     * @param  mixed  $value
+     * @param  mixed  $value Any value to inject.
      * @return $this
      */
     public function addValue(string $path, $value): self
@@ -214,5 +230,18 @@ class ArgumentSet
         $argumentSet->arguments[array_shift($keys)] = $argument;
 
         return $this;
+    }
+
+    /**
+     * The contained arguments, including all that were not passed.
+     *
+     * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    public function argumentsWithUndefined(): array
+    {
+        return array_merge(
+            $this->arguments,
+            $this->undefined
+        );
     }
 }

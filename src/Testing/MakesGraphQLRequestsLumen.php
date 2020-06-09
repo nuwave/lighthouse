@@ -4,9 +4,13 @@ namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Useful helpers for PHPUnit testing.
+ * Testing helpers for making requests to the GraphQL endpoint.
  *
  * @mixin \Laravel\Lumen\Testing\Concerns\MakesHttpRequests
  */
@@ -23,14 +27,21 @@ trait MakesGraphQLRequestsLumen
     protected $introspectionResult;
 
     /**
+     * Used to test deferred queries.
+     *
+     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
+     */
+    protected $deferStream;
+
+    /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param  string  $query
-     * @param  array|null  $variables
-     * @param  array  $extraParams
+     * @param  string  $query  The GraphQL query to send
+     * @param  array<string, mixed>  $variables  The variables to include in the query
+     * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @return $this
      */
-    protected function graphQL(string $query, array $variables = null, array $extraParams = []): MakesGraphQLRequestsLumen
+    protected function graphQL(string $query, array $variables = [], array $extraParams = []): self
     {
         $params = ['query' => $query];
 
@@ -45,13 +56,16 @@ trait MakesGraphQLRequestsLumen
     }
 
     /**
-     * Execute a query as if it was sent as a request to the server.
+     * Execute a POST to the GraphQL endpoint.
      *
-     * @param  mixed[]  $data
-     * @param  mixed[]  $headers
+     * Use this over graphQL() when you need more control or want to
+     * test how your server behaves on incorrect inputs.
+     *
+     * @param  array<mixed, mixed>  $data
+     * @param  array<string, string>  $headers
      * @return $this
      */
-    protected function postGraphQL(array $data, array $headers = []): MakesGraphQLRequestsLumen
+    protected function postGraphQL(array $data, array $headers = []): self
     {
         $this->post(
             $this->graphQLEndpointUrl(),
@@ -68,11 +82,12 @@ trait MakesGraphQLRequestsLumen
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
-     * @param  mixed[]  $parameters
-     * @param  mixed[]  $files
+     * @param  array<string, mixed>  $parameters
+     * @param  array<int, \Illuminate\Http\Testing\File>  $files
+     * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      * @return $this
      */
-    protected function multipartGraphQL(array $parameters, array $files): MakesGraphQLRequestsLumen
+    protected function multipartGraphQL(array $parameters, array $files, array $headers = []): self
     {
         $this->call(
             'POST',
@@ -80,9 +95,12 @@ trait MakesGraphQLRequestsLumen
             $parameters,
             [],
             $files,
-            $this->transformHeadersToServerVars([
-                'Content-Type' => 'multipart/form-data',
-            ])
+            $this->transformHeadersToServerVars(array_merge(
+                [
+                    'Content-Type' => 'multipart/form-data',
+                ],
+                $headers
+            ))
         );
 
         return $this;
@@ -93,7 +111,7 @@ trait MakesGraphQLRequestsLumen
      *
      * @return $this
      */
-    protected function introspect(): MakesGraphQLRequestsLumen
+    protected function introspect(): self
     {
         if ($this->introspectionResult) {
             return $this;
@@ -108,8 +126,7 @@ trait MakesGraphQLRequestsLumen
     /**
      * Run introspection and return a type by name, if present.
      *
-     * @param  string  $name
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
     protected function introspectType(string $name): ?array
     {
@@ -119,8 +136,7 @@ trait MakesGraphQLRequestsLumen
     /**
      * Run introspection and return a directive by name, if present.
      *
-     * @param  string  $name
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
     protected function introspectDirective(string $name): ?array
     {
@@ -130,9 +146,7 @@ trait MakesGraphQLRequestsLumen
     /**
      * Run introspection and return a result from the given path by name, if present.
      *
-     * @param  string  $path
-     * @param  string  $name
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
     protected function introspectByName(string $path, string $name): ?array
     {
@@ -140,15 +154,14 @@ trait MakesGraphQLRequestsLumen
             $this->introspect();
         }
 
-        // TODO Replace with ->json() once we remove support for Laravel 5.5
         $results = data_get(
-            $this->introspectionResult->decodeResponseJson(),
+            json_decode($this->introspectionResult->getContent(), true),
             $path
         );
 
         return Arr::first(
             $results,
-            function (array $result) use ($name): bool {
+            static function (array $result) use ($name): bool {
                 return $result['name'] === $name;
             }
         );
@@ -156,11 +169,46 @@ trait MakesGraphQLRequestsLumen
 
     /**
      * Return the full URL to the GraphQL endpoint.
-     *
-     * @return string
      */
     protected function graphQLEndpointUrl(): string
     {
         return config('lighthouse.route.uri');
+    }
+
+    /**
+     * Send the query and capture all chunks of the streamed response.
+     *
+     * @param  string  $query  The GraphQL query to send
+     * @param  array<string, mixed>  $variables  The variables to include in the query
+     * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
+     * @return array<int, mixed>  The chunked results
+     */
+    protected function streamGraphQL(string $query, array $variables = [], array $extraParams = []): array
+    {
+        if ($this->deferStream === null) {
+            $this->setUpDeferStream();
+        }
+
+        $response = $this->graphQL($query, $variables, $extraParams);
+
+        if (! $response->response instanceof StreamedResponse) {
+            Assert::fail('Expected the response to be a streamed response but got a regular response.');
+        }
+
+        $response->response->send();
+
+        return $this->deferStream->chunks;
+    }
+
+    /**
+     * Set up the stream to make queries with @defer.
+     */
+    protected function setUpDeferStream(): void
+    {
+        $this->deferStream = new MemoryStream;
+
+        app()->singleton(CanStreamResponse::class, function (): MemoryStream {
+            return $this->deferStream;
+        });
     }
 }

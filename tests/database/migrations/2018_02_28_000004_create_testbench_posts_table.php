@@ -15,9 +15,11 @@ class CreateTestbenchPostsTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->string('body')->nullable();
-            $table->unsignedInteger('user_id')->nullable();
+
             $table->unsignedInteger('task_id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('parent_id')->nullable();
+
             $table->timestamps();
         });
 
