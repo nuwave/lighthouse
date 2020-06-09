@@ -53,10 +53,13 @@ SDL;
         }
 
         return $this->handleWhereConditions($builder, [
-            'relation'  => $this->getRelationName(),
-            'operator'  => WhereConditionsServiceProvider::DEFAULT_HAS_OPERATOR,
-            'amount'    => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
-            'condition' => $whereConditions
+            'HAS' => [
+                'relation'  => $this->getRelationName(),
+                // TODO: There should be a way to convert operator to its value from the code; WhereConditionsServiceProvider::DEFAULT_HAS_OPERATOR
+                'operator'  => ">=",
+                'amount'    => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
+                'condition' => $whereConditions
+            ]
         ]);
     }
 
