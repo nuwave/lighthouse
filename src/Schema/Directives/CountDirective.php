@@ -39,10 +39,8 @@ SDL;
 
     /**
      * Returns the count of a given relationship or model.
-     *
-     * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         return $value->setResolver(
             $this->deferredRelationResolver(

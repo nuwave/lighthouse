@@ -84,6 +84,11 @@ class User extends Authenticatable
         return $this->relationLoaded('tasks');
     }
 
+    public function tasksCountLoaded(): bool
+    {
+        return isset($this->attributes['tasks_count']);
+    }
+
     public function postsCommentsLoaded(): bool
     {
         return $this->relationLoaded('posts')

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -13,14 +14,17 @@ class WithCountDirective extends WithRelationDirective implements FieldMiddlewar
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Eager-load the count of an Eloquent relation.
+Eager-load the count of an Eloquent relation if the field is queried.
+
+Not that this does not return a value for the field, the count is simply
+prefetched, assuming it is used to compute the field value. Use `@count`
+if the field should simply return the relation count.
 """
 directive @withCount(
   """
-  Specify the relationship method name in the model class,
-  if the field name does not match the convention `${RELATION}_count`.
+  Specify the relationship method name in the model class.
   """
-  relation: String
+  relation: String!
 
   """
   Apply scopes to the underlying query.
@@ -37,10 +41,11 @@ SDL;
 
     public function relationName(): string
     {
-        if ($relation = $this->directiveArgValue('relation')) {
-            return $relation;
+        $relation = $this->directiveArgValue('relation');
+        if( ! $relation) {
+            throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
         }
 
-        return Str::before($this->nodeName(), '_count');
+        return $relation;
     }
 }

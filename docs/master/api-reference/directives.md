@@ -3004,18 +3004,17 @@ look into [handling Eloquent relationships](../eloquent/relationships.md).
 
 ```graphql
 """
-Eager-load the count of an Eloquent relation.
+Eager-load the count of an Eloquent relation if the field is queried.
 
-The name of the field is assumed to be `${RELATION}_count`,
-for example if the relation is called `foo`, the name of the
-field should be `foo_count`.
+Not that this does not return a value for the field, the count is simply
+prefetched, assuming it is used to compute the field value. Use `@count`
+if the field should simply return the relation count.
 """
 directive @withCount(
   """
-  Specify the relationship method name in the model class,
-  if the field name does not match the convention `${RELATION}_count`.
+  Specify the relationship method name in the model class.
   """
-  relation: String
+  relation: String!
 
   """
   Apply scopes to the underlying query.
@@ -3024,10 +3023,12 @@ directive @withCount(
 ) on FIELD_DEFINITION
 ```
 
-This can be a useful optimization for fields that return the count of a relation.
+This can be a useful optimization for fields that use the count to compute a result.
 
 ```graphql
 type User {
-  tasks_count: Int! @withCount
+  activityStatistics: ActivityStatistics! @withCount(relation: "posts")
 }
 ```
+
+If you just want to return the count itself as-is, use [`@count`](#count).
