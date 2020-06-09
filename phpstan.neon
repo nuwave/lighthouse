@@ -26,11 +26,16 @@ parameters:
   - src/Schema/Factories/FieldFactory.php
   - src/Schema/AST/PartialParser.php
   - src/Schema/Directives/MiddlewareDirective.php
+
+  # As long as we support multiple Laravel versions at once, there will be some dead spots
+  reportUnmatchedIgnoredIrrors: false
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
+  - '#Function factory invoked with 2 parameters, 0 required\.#'
+  - '#Function factory invoked with 1 parameter, 0 required\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -66,6 +71,7 @@ parameters:
 
   # Compatibility fix because Laravel moved the TestResponse class
   - '#.*TestResponse.*#'
+  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
 
   # We are monkeypatching ResolveInfo to pass information through resolver middleware
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
