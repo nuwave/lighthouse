@@ -52,17 +52,12 @@ SDL;
             return $builder;
         }
 
-        return $builder->whereHas(
-            $this->getRelationName(),
-            function ($builder) use ($whereConditions): void {
-                // This extra nesting is required for the `OR` condition to work correctly.
-                $builder->whereNested(
-                    function ($builder) use ($whereConditions): void {
-                        $this->handleWhereConditions($builder, $whereConditions);
-                    }
-                );
-            }
-        );
+        return $this->handleWhereConditions($builder, [
+            'relation'  => $this->getRelationName(),
+            'operator'  => WhereConditionsServiceProvider::DEFAULT_HAS_OPERATOR,
+            'amount'    => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
+            'condition' => $whereConditions
+        ]);
     }
 
     /**

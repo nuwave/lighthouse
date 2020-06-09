@@ -6,7 +6,9 @@ use Nuwave\Lighthouse\WhereConditions\SQLOperator;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsDirective;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class WhereConditionsDirectiveTest extends DBTestCase
@@ -328,6 +330,338 @@ class WhereConditionsDirectiveTest extends DBTestCase
                     [
                         'id' => '3',
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasMixed(): void
+    {
+        factory(User::class, 9)->create()->each( function( $user ) {
+            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        });
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 3
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 7,
+            'user_id' => 2,
+            'comment' => 'test'
+        ]);
+
+        factory(Comment::class, 5)->create([
+            'post_id' => 9,
+            'user_id' => 2,
+            'comment' => 'test'
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 11,
+            'user_id' => 1,
+            'comment' => 'test'
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 14,
+            'user_id' => 2
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 15,
+            'user_id' => 2
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    column: "id"
+                    operator: LT
+                    value: 8
+                    AND: [{
+                        column: "id"
+                        operator: GT
+                        value: 2
+                        HAS: {
+                            relation  : "posts.comments"
+                            operator  : GT
+                            amount    : 4
+                            condition : {
+                               column : "comment",
+                               value  : "test"
+                               HAS    : {
+                                    relation  : "user.posts.comments"
+                               }
+                            }
+                        }
+                    }]
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '5',
+                    ]
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasRelation(): void
+    {
+        factory(User::class, 5)->create()->each( function( $user ) {
+            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        });
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 3
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 7
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation: "posts.comments"
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                    [
+                        'id' => '4',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasAmount(): void
+    {
+        factory(User::class, 5)->create()->each( function( $user ) {
+            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        });
+
+        factory(Comment::class, 5)->create([
+            'post_id' => 3
+        ]);
+
+        factory(Comment::class, 2)->create([
+            'post_id' => 7
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation : "posts.comments"
+                        amount   : 3
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ]
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasOperator(): void
+    {
+        factory(User::class, 5)->create()->each( function( $user ) {
+            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        });
+
+        factory(Comment::class, 5)->create([
+            'post_id' => 3
+        ]);
+
+        factory(Comment::class, 6)->create([
+            'post_id' => 7
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation : "posts.comments"
+                        amount   : 5
+                        operator : EQ
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ]
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasCondition(): void
+    {
+        factory(User::class, 5)->create()->each( function( $user ) {
+            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        });
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 3,
+            'comment' => 'test'
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 7
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation  : "posts.comments"
+                        condition : {
+                           column : "comment",
+                           value  : "test"
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ]
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasRecursive(): void
+    {
+        factory(User::class, 7)->create()->each( function( $user ) {
+            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        });
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 7
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 11
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    column: "id"
+                    operator: LT
+                    value: 6
+                    AND: [{
+                        HAS: {
+                            relation  : "posts.comments"
+                        }
+                    }]
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '4',
+                    ]
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasNested(): void
+    {
+        factory(User::class, 5)->create()->each( function( $user ) {
+            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        });
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 3,
+            'user_id' => 3,
+        ]);
+
+        factory(Comment::class, 1)->create([
+            'post_id' => 7,
+            'user_id' => 2,
+        ]);
+
+        factory(Task::class, 1)->create([
+            'user_id' => 2,
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation  : "posts.comments"
+                        condition : {
+                           HAS: {
+                               relation  : "user.posts.comments"
+                               condition : {
+                                   HAS: {
+                                       relation  : "post.user.tasks"
+                                   }
+                               }
+                           }
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '4',
+                    ]
                 ],
             ],
         ]);

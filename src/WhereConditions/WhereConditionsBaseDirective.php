@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -31,16 +32,22 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array<string, mixed>  $whereConditions
+     * @param  array<string, mixed> $whereConditions
+     * @param  Model                $model
+     * @param  string               $boolean
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')
+    public function handleWhereConditions($builder, array $whereConditions, Model $model = null, string $boolean = 'and')
     {
+        if( $builder instanceof \Illuminate\Database\Eloquent\Builder ) {
+            $model = $builder->getModel();
+        }
+
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($andConnectedConditions): void {
+                function ($builder) use ($andConnectedConditions, $model): void {
                     foreach ($andConnectedConditions as $condition) {
-                        $this->handleWhereConditions($builder, $condition);
+                        $this->handleWhereConditions($builder, $condition, $model);
                     }
                 },
                 $boolean
@@ -49,10 +56,38 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
         if ($orConnectedConditions = $whereConditions['OR'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($orConnectedConditions): void {
+                function ($builder) use ($orConnectedConditions, $model): void {
                     foreach ($orConnectedConditions as $condition) {
-                        $this->handleWhereConditions($builder, $condition, 'or');
+                        $this->handleWhereConditions($builder, $condition, $model, 'or');
                     }
+                },
+                $boolean
+            );
+        }
+
+        if ($hasConnectedConditions = $whereConditions['HAS'] ?? null) {
+            $builder->whereNested(
+                function ($builder) use ($hasConnectedConditions, $model): void {
+                    $related_model  = $model->getModel();
+                    $relation_array = explode(".", $hasConnectedConditions['relation']);
+
+                    // TODO: temporary solution for getting model of nested relation, until laravel has native support for it
+                    array_walk($relation_array, function ($relation) use (&$related_model) {
+                        $related_model = $related_model->{$relation}()->getRelated();
+                    });
+
+                    $query = $model->getModel()->whereHas(
+                        $hasConnectedConditions['relation'],
+                        function ($builder) use ($hasConnectedConditions, $model, $related_model): void {
+                            if (array_key_exists('condition', $hasConnectedConditions)) {
+                                $this->handleWhereConditions($builder, $hasConnectedConditions['condition'], $related_model);
+                            }
+                        },
+                        $hasConnectedConditions['operator'],
+                        $hasConnectedConditions['amount']
+                    );
+
+                    $builder->mergeWheres($query->getQuery()->wheres, $query->getBindings());
                 },
                 $boolean
             );
@@ -89,6 +124,12 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                         $restrictedWhereConditionsName,
                         "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
                         $allowedColumnsEnumName
+                    )
+                )
+                ->setTypeDefinition(
+                    WhereConditionsServiceProvider::createHasConditionsInputType(
+                        $restrictedWhereConditionsName,
+                        "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`."
                     )
                 );
         } else {
