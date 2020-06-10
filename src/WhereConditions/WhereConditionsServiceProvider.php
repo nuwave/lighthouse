@@ -116,8 +116,8 @@ GRAPHQL
     public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
     {
         $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
-        $default_has_operator = WhereConditionsServiceProvider::DEFAULT_HAS_OPERATOR;
-        $default_has_amount = WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT;
+        $default_has_operator = self::DEFAULT_HAS_OPERATOR;
+        $default_has_amount = self::DEFAULT_HAS_AMOUNT;
 
         $operatorName = PartialParser::enumTypeDefinition(
             app(Operator::class)->enumDefinition()

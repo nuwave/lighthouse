@@ -337,8 +337,8 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasMixed(): void
     {
-        factory(User::class, 9)->create()->each( function( $user ) {
-            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        factory(User::class, 9)->create()->each(function ($user) {
+            $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
         factory(Comment::class, 1)->create([
@@ -415,7 +415,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRelation(): void
     {
-        factory(User::class, 5)->create()->each( function ($user) {
+        factory(User::class, 5)->create()->each(function ($user) {
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
@@ -455,7 +455,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasAmount(): void
     {
-        factory(User::class, 5)->create()->each( function ($user) {
+        factory(User::class, 5)->create()->each(function ($user) {
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
@@ -493,7 +493,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasOperator(): void
     {
-        factory(User::class, 5)->create()->each( function ($user) {
+        factory(User::class, 5)->create()->each(function ($user) {
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
@@ -532,7 +532,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasCondition(): void
     {
-        factory(User::class, 5)->create()->each( function ($user) {
+        factory(User::class, 5)->create()->each(function ($user) {
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
@@ -574,7 +574,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRecursive(): void
     {
-        factory(User::class, 7)->create()->each( function ($user) {
+        factory(User::class, 7)->create()->each(function ($user) {
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
@@ -616,7 +616,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasNested(): void
     {
-        factory(User::class, 5)->create()->each( function ($user) {
+        factory(User::class, 5)->create()->each(function ($user) {
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 

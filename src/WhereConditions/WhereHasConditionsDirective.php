@@ -59,7 +59,7 @@ SDL;
                 'operator'  => '>=',
                 'amount'    => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
                 'condition' => $whereConditions,
-            ]
+            ],
         ]);
     }
 
