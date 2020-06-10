@@ -342,35 +342,35 @@ class WhereConditionsDirectiveTest extends DBTestCase
         });
 
         factory(Comment::class, 1)->create([
-            'post_id' => 3
+            'post_id' => 3,
         ]);
 
         factory(Comment::class, 1)->create([
             'post_id' => 7,
             'user_id' => 2,
-            'comment' => 'test'
+            'comment' => 'test',
         ]);
 
         factory(Comment::class, 5)->create([
             'post_id' => 9,
             'user_id' => 2,
-            'comment' => 'test'
+            'comment' => 'test',
         ]);
 
         factory(Comment::class, 1)->create([
             'post_id' => 11,
             'user_id' => 1,
-            'comment' => 'test'
+            'comment' => 'test',
         ]);
 
         factory(Comment::class, 1)->create([
             'post_id' => 14,
-            'user_id' => 2
+            'user_id' => 2,
         ]);
 
         factory(Comment::class, 1)->create([
             'post_id' => 15,
-            'user_id' => 2
+            'user_id' => 2,
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -407,7 +407,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'users' => [
                     [
                         'id' => '5',
-                    ]
+                    ],
                 ],
             ],
         ]);
@@ -415,16 +415,16 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRelation(): void
     {
-        factory(User::class, 5)->create()->each( function( $user ) {
-            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        factory(User::class, 5)->create()->each( function ($user) {
+            $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
         factory(Comment::class, 1)->create([
-            'post_id' => 3
+            'post_id' => 3,
         ]);
 
         factory(Comment::class, 1)->create([
-            'post_id' => 7
+            'post_id' => 7,
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -455,16 +455,16 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasAmount(): void
     {
-        factory(User::class, 5)->create()->each( function( $user ) {
-            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        factory(User::class, 5)->create()->each( function ($user) {
+            $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
         factory(Comment::class, 5)->create([
-            'post_id' => 3
+            'post_id' => 3,
         ]);
 
         factory(Comment::class, 2)->create([
-            'post_id' => 7
+            'post_id' => 7,
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -485,7 +485,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'users' => [
                     [
                         'id' => '2',
-                    ]
+                    ],
                 ],
             ],
         ]);
@@ -493,16 +493,16 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasOperator(): void
     {
-        factory(User::class, 5)->create()->each( function( $user ) {
-            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        factory(User::class, 5)->create()->each( function ($user) {
+            $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
         factory(Comment::class, 5)->create([
-            'post_id' => 3
+            'post_id' => 3,
         ]);
 
         factory(Comment::class, 6)->create([
-            'post_id' => 7
+            'post_id' => 7,
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -524,7 +524,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'users' => [
                     [
                         'id' => '2',
-                    ]
+                    ],
                 ],
             ],
         ]);
@@ -532,17 +532,17 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasCondition(): void
     {
-        factory(User::class, 5)->create()->each( function( $user ) {
-            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        factory(User::class, 5)->create()->each( function ($user) {
+            $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
         factory(Comment::class, 1)->create([
             'post_id' => 3,
-            'comment' => 'test'
+            'comment' => 'test',
         ]);
 
         factory(Comment::class, 1)->create([
-            'post_id' => 7
+            'post_id' => 7,
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -566,7 +566,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'users' => [
                     [
                         'id' => '2',
-                    ]
+                    ],
                 ],
             ],
         ]);
@@ -574,16 +574,16 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRecursive(): void
     {
-        factory(User::class, 7)->create()->each( function( $user ) {
-            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        factory(User::class, 7)->create()->each( function ($user) {
+            $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
         factory(Comment::class, 1)->create([
-            'post_id' => 7
+            'post_id' => 7,
         ]);
 
         factory(Comment::class, 1)->create([
-            'post_id' => 11
+            'post_id' => 11,
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -608,7 +608,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'users' => [
                     [
                         'id' => '4',
-                    ]
+                    ],
                 ],
             ],
         ]);
@@ -616,8 +616,8 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasNested(): void
     {
-        factory(User::class, 5)->create()->each( function( $user ) {
-            $user->posts()->saveMany( factory(Post::class, 2)->create() );
+        factory(User::class, 5)->create()->each( function ($user) {
+            $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
         factory(Comment::class, 1)->create([
@@ -661,7 +661,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'users' => [
                     [
                         'id' => '4',
-                    ]
+                    ],
                 ],
             ],
         ]);

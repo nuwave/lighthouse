@@ -56,9 +56,9 @@ SDL;
             'HAS' => [
                 'relation'  => $this->getRelationName(),
                 // TODO: There should be a way to convert operator to its value from the code; WhereConditionsServiceProvider::DEFAULT_HAS_OPERATOR
-                'operator'  => ">=",
+                'operator'  => '>=',
                 'amount'    => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
-                'condition' => $whereConditions
+                'condition' => $whereConditions,
             ]
         ]);
     }

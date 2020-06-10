@@ -39,7 +39,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     public function handleWhereConditions($builder, array $whereConditions, Model $model = null, string $boolean = 'and')
     {
-        if( $builder instanceof \Illuminate\Database\Eloquent\Builder ) {
+        if ($builder instanceof \Illuminate\Database\Eloquent\Builder) {
             $model = $builder->getModel();
         }
 
@@ -68,8 +68,8 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         if ($hasConnectedConditions = $whereConditions['HAS'] ?? null) {
             $builder->whereNested(
                 function ($builder) use ($hasConnectedConditions, $model): void {
-                    $related_model  = $model->getModel();
-                    $relation_array = explode(".", $hasConnectedConditions['relation']);
+                    $related_model = $model->getModel();
+                    $relation_array = explode('.', $hasConnectedConditions['relation']);
 
                     // TODO: temporary solution for getting model of nested relation, until laravel has native support for it
                     array_walk($relation_array, function ($relation) use (&$related_model) {
