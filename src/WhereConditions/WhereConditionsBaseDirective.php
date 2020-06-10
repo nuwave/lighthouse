@@ -67,18 +67,20 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
         if ($hasConnectedConditions = $whereConditions['HAS'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($hasConnectedConditions, $model): void {
-                    $related_model = $model->getModel();
-                    $relation_array = explode('.', $hasConnectedConditions['relation']);
-
-                    // TODO: temporary solution for getting model of nested relation, until laravel has native support for it
-                    array_walk($relation_array, function ($relation) use (&$related_model) {
-                        $related_model = $related_model->{$relation}()->getRelated();
-                    });
-
+                function ($builder) use ($hasConnectedConditions, $model): void
+                {
                     $query = $model->getModel()->whereHas(
                         $hasConnectedConditions['relation'],
-                        function ($builder) use ($hasConnectedConditions, $model, $related_model): void {
+                        function ($builder) use ($hasConnectedConditions, $model): void
+                        {
+                            $relation_array = explode('.', $hasConnectedConditions['relation']);
+                            $related_model = $model->getModel();
+
+                            // TODO: temporary solution for getting model of nested relation, until laravel has native support for it
+                            array_walk($relation_array, function ($relation) use (&$related_model) {
+                                $related_model = $related_model->{$relation}()->getRelated();
+                            });
+
                             if (array_key_exists('condition', $hasConnectedConditions)) {
                                 $this->handleWhereConditions($builder, $hasConnectedConditions['condition'], $related_model);
                             }
