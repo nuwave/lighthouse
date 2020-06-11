@@ -146,7 +146,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CreateDirective extends BaseDirective implements FieldResolver
 {
-    public function resolveField(FieldValue $fieldValue)
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
@@ -187,7 +187,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
-    public function resolveField(FieldValue $fieldValue) { ... }
+    public function resolveField(FieldValue $fieldValue): FieldValue { ... }
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
