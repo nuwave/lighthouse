@@ -89,7 +89,7 @@ abstract class GraphQLSubscription
      *
      * @return ?string
      */
-    public function getChannelName(array $args)
+    public function getChannelName(?array $args = [])
     {
         return null;
     }
