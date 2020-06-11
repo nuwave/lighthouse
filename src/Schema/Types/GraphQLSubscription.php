@@ -81,6 +81,7 @@ abstract class GraphQLSubscription
      */
     public function getQueryString()
     {
+        return '';
     }
 
     /**
@@ -90,6 +91,6 @@ abstract class GraphQLSubscription
      */
     public function getChannelName(?array $args = [])
     {
-        return null;
+        return '';
     }
 }
