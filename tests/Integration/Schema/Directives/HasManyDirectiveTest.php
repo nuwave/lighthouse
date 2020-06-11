@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -206,7 +207,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 1]);
+        config(['lighthouse.pagination.max_count' => 1]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -235,7 +236,7 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(3, 5),
             $result->jsonGet('errors.0.message')
         );
     }
@@ -275,12 +276,12 @@ class HasManyDirectiveTest extends DBTestCase
                     'tasks' => null,
                 ],
             ],
-        ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 1]);
+        config(['lighthouse.pagination.max_count' => 1]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -311,14 +312,14 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(3, 5),
             $result->jsonGet('errors.0.message')
         );
     }
 
     public function testPaginatorTypeIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 2]);
+        config(['lighthouse.pagination.max_count' => 2]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -347,16 +348,16 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(2, 3),
             $result->jsonGet('errors.0.message')
         );
     }
 
     public function testRelayTypeIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 2]);
+        config(['lighthouse.pagination.max_count' => 2]);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: "relay")
         }
@@ -385,7 +386,7 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            PaginationArgs::requestedTooManyItems(2, 3),
             $result->jsonGet('errors.0.message')
         );
     }

@@ -8,60 +8,56 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedBelongsTo implements ArgResolver
 {
     /**
-     * @var string
+     * @var \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    private $relationName;
+    protected $relation;
 
-    public function __construct(string $relationName)
+    public function __construct(BelongsTo $relation)
     {
-        $this->relationName = $relationName;
+        $this->relation = $relation;
     }
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
     public function __invoke($parent, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
-        $relation = $parent->{$this->relationName}();
-
         if ($args->has('create')) {
-            $saveModel = new ResolveNested(new SaveModel($relation));
+            $saveModel = new ResolveNested(new SaveModel($this->relation));
 
             $related = $saveModel(
-                $relation->make(),
+                $this->relation->make(),
                 $args->arguments['create']->value
             );
-            $relation->associate($related);
+            $this->relation->associate($related);
         }
 
         if ($args->has('connect')) {
-            $relation->associate($args->arguments['connect']->value);
+            $this->relation->associate($args->arguments['connect']->value);
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($this->relation)));
 
             $related = $updateModel(
-                $relation->make(),
+                $this->relation->make(),
                 $args->arguments['update']->value
             );
-            $relation->associate($related);
+            $this->relation->associate($related);
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($this->relation)));
 
             $related = $upsertModel(
-                $relation->make(),
+                $this->relation->make(),
                 $args->arguments['upsert']->value
             );
-            $relation->associate($related);
+            $this->relation->associate($related);
         }
 
-        self::disconnectOrDelete($relation, $args);
+        self::disconnectOrDelete($this->relation, $args);
     }
 
     public static function disconnectOrDelete(BelongsTo $relation, ArgumentSet $args): void

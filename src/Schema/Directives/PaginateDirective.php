@@ -49,26 +49,20 @@ directive @paginate(
   scopes: [String!]
 
   """
-  Overwrite the paginate_max_count setting value to limit the
-  amount of items that a user can request per page.
-  """
-  maxCount: Int
-
-  """
-  Use a default value for the amount of returned items
-  in case the client does not request it explicitly
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  """
+  maxCount: Int
 ) on FIELD_DEFINITION
 SDL;
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
-     */
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
@@ -87,16 +81,14 @@ SDL;
                 $this->paginationType(),
                 $fieldDefinition,
                 $parentType,
-                $this->directiveArgValue('defaultCount'),
+                $this->directiveArgValue('defaultCount')
+                    ?? config('lighthouse.pagination.default_count'),
                 $this->paginateMaxCount()
             );
     }
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -137,12 +129,12 @@ SDL;
 
     /**
      * Get either the specific max or the global setting.
-     *
-     * @return int|null
      */
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')
+            ?? config('lighthouse.pagination.max_count')
+            // TODO remove in v5
             ?? config('lighthouse.paginate_max_count');
     }
 }

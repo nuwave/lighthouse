@@ -27,7 +27,6 @@ class ArgumentTypeNodeConverter extends TypeNodeConverter
     }
 
     /**
-     * @param  string  $nodeName
      * @return \Nuwave\Lighthouse\Execution\Arguments\NamedType
      */
     protected function namedType(string $nodeName): NamedType

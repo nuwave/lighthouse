@@ -21,7 +21,7 @@ type Query {
 ```
 
 This assumes your model has the same name as the type you are returning and is defined
-in the default model namespace `App\Models`. [You can change this configuration](../getting-started/configuration.md). 
+in the default model namespace `App\Models`. [You can change this configuration](../getting-started/configuration.md).
 
 If you need to use a different model for a single field, you can pass a class name as the `model` argument.
 
@@ -51,7 +51,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model 
+class Post extends Model
 {
     public function author(): BelongsTo
     {
@@ -89,7 +89,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Model 
+class User extends Model
 {
     public function roles(): BelongsToMany
     {
@@ -279,7 +279,6 @@ type Mutation {
 }
 ```
 
-
 ## @field
 
 Specify a custom resolver function for a single field.
@@ -307,7 +306,7 @@ type Query {
 }
 ```
 
-Be aware that resolvers are not limited to root fields. A resolver can be used for basic tasks 
+Be aware that resolvers are not limited to root fields. A resolver can be used for basic tasks
 such as transforming the value of scalar fields, e.g. reformat a date.
 
 ```graphql
@@ -364,6 +363,7 @@ type User {
   postsByCategory(category: String @eq): [Post] @hasMany
 }
 ```
+
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
 
@@ -498,7 +498,8 @@ You can point Lighthouse to a custom type resolver.
 Set the `resolver` argument to a function that returns the implementing Object Type.
 
 ```graphql
-interface Commentable @interface(resolver: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
+interface Commentable
+  @interface(resolver: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
   id: ID!
 }
 ```
@@ -523,10 +524,6 @@ class Commentable
      */
     protected $typeRegistry;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;
@@ -577,13 +574,10 @@ class name, an alias or a middleware group - or any combination of them.
 
 ```graphql
 type Query {
-  users: [User!]! @middleware(
-    checks: [
-        "auth:api",
-        "App\\Http\\Middleware\\MyCustomAuth",
-        "api"
-    ]
-  )
+  users: [User!]!
+    @middleware(
+      checks: ["auth:api", "App\\Http\\Middleware\\MyCustomAuth", "api"]
+    )
 }
 ```
 
@@ -609,9 +603,9 @@ to particular fields and not failing an entire request if a middleware fails.
 There are a few caveats to field middleware though:
 
 - The Request object is shared between fields.
-If the middleware of one field modifies the Request, this does influence other fields.
+  If the middleware of one field modifies the Request, this does influence other fields.
 - They not receive the complete Response object when calling `$next($request)`,
-but rather the slice of data that the particular field returned.
+  but rather the slice of data that the particular field returned.
 - The `terminate` method of field middleware is not called.
 
 If the middleware needs to be aware of GraphQL specifics, such as the resolver arguments,
@@ -659,10 +653,11 @@ The `typeResolver` is responsible for determining the GraphQL type the result
 belongs to. Lighthouse provides a default implementation, but you can override
 it if the need arises.
 
-```grapqhl
-type User @node(
-  resolver: "App\\GraphQL\\NodeResolver@resolveUser"
-  typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
+```graphql
+type User
+  @node(
+    resolver: "App\\GraphQL\\NodeResolver@resolveUser"
+    typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
   ) {
   name: String!
 }
@@ -714,7 +709,6 @@ type Query {
 
 If simply querying Eloquent does not fit your use-case, you can specify a custom `builder`.
 
-
 ```graphql
 type Query {
   posts: [Post!]! @paginate(builder: "App\\Blog@visiblePosts")
@@ -760,9 +754,7 @@ Can be defined on Field Arguments and Input Object Values.
 
 ```graphql
 type Query {
-  users(
-    countryCode: String @rules(apply: ["string", "size:2"])
-  ): User
+  users(countryCode: String @rules(apply: ["string", "size:2"])): User
 }
 
 input CreatePostInput {
@@ -798,7 +790,8 @@ scalar DateTime @scalar(class: "DateTimeScalar")
 If your class is not in the default namespace, pass a fully qualified class name.
 
 ```graphql
-scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+scalar DateTime
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
 ## @search
@@ -816,7 +809,7 @@ type Query {
 }
 ```
 
-Normally the search will be performed using the index specified by the model's `searchableAs` method. 
+Normally the search will be performed using the index specified by the model's `searchableAs` method.
 However, in some situation a custom index might be needed, this can be achieved by using the argument `within`.
 
 ```graphql
@@ -839,8 +832,7 @@ If the name of the Eloquent model does not match the return type of the field, s
 
 ```graphql
 type Mutation {
-  updateAuthor(id: ID!, name: String): Author
-    @update(model: "App\\User")
+  updateAuthor(id: ID!, name: String): Author @update(model: "App\\User")
 }
 ```
 
@@ -861,8 +853,8 @@ type Employee {
   employeeId: ID!
 }
 
-union Person @union(resolver: "App\\GraphQL\\UnionResolver@person")
-  = User
+union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
+    User
   | Employee
 ```
 
@@ -886,10 +878,6 @@ class Person
      */
     protected $typeRegistry;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;

@@ -2,8 +2,11 @@
 
 namespace Tests\Integration\Console;
 
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Utils\SchemaPrinter;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
 class IdeHelperCommandTest extends TestCase
@@ -26,28 +29,64 @@ class IdeHelperCommandTest extends TestCase
     /**
      * This test is pretty slow, so we put it all in one test method.
      */
-    public function testGeneratesSchemaDirectives(): void
+    public function testGeneratesIdeHelperFiles(): void
     {
+        $typeRegistry = app(TypeRegistry::class);
+        $programmaticType = new EnumType([
+            'name' => 'Foo',
+            'values' => [
+                'BAR' => [
+                    'value' => 'bar',
+                ],
+            ],
+        ]);
+        $typeRegistry->register($programmaticType);
+
         $this->artisan('lighthouse:ide-helper');
 
-        $this->assertFileExists(IdeHelperCommand::filePath());
-        $generated = file_get_contents(IdeHelperCommand::filePath());
+        /*
+         * Schema directives
+         */
 
-        $this->assertStringStartsWith(IdeHelperCommand::GENERATED_NOTICE, $generated);
-        $this->assertStringEndsWith("\n", $generated);
+        $schemaDirectives = \Safe\file_get_contents(IdeHelperCommand::schemaDirectivesPath());
+
+        $this->assertStringEndsWith("\n", $schemaDirectives);
 
         $this->assertContains(
             FieldDirective::definition(),
-            $generated,
+            $schemaDirectives,
             'Generates definition for built-in directives'
         );
-        $this->assertContains(FieldDirective::class, $generated);
+        $this->assertContains(FieldDirective::class, $schemaDirectives);
 
         $this->assertContains(
             UnionDirective::definition(),
-            $generated,
+            $schemaDirectives,
             'Overwrites definitions through custom namespaces'
         );
-        $this->assertContains(UnionDirective::class, $generated);
+        $this->assertContains(UnionDirective::class, $schemaDirectives);
+
+        /*
+         * Programmatic types
+         */
+
+        $programmaticTypes = \Safe\file_get_contents(IdeHelperCommand::programmaticTypesPath());
+
+        $this->assertContains(
+            SchemaPrinter::printType($programmaticType),
+            $programmaticTypes,
+            'Generates definitions for programmatically registered types'
+        );
+
+        /*
+         * PHP Ide Helper
+         */
+
+        $ideHelper = \Safe\file_get_contents(IdeHelperCommand::phpIdeHelperPath());
+
+        $this->assertContains(
+            IdeHelperCommand::OPENING_PHP_TAG.IdeHelperCommand::GENERATED_NOTICE,
+            $ideHelper
+        );
     }
 }

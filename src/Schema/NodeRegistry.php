@@ -35,12 +35,6 @@ class NodeRegistry
      */
     protected $currentType;
 
-    /**
-     * NodeRegistry constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;
@@ -74,8 +68,6 @@ class NodeRegistry
      * Register an Eloquent model that can be resolved as a Node.
      *
      * @deprecated use registerNode
-     * @param  string  $typeName
-     * @param  string  $modelName
      * @return $this
      */
     public function registerModel(string $typeName, string $modelName): self
@@ -90,15 +82,12 @@ class NodeRegistry
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param  mixed|null  $rootValue
-     * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return mixed
+     * @param  array<string, mixed>  $args
+     * @return mixed The result of calling the resolver.
      *
      * @throws \GraphQL\Error\Error
      */
-    public function resolve($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         [$decodedType, $decodedId] = $args['id'];
 
@@ -115,8 +104,6 @@ class NodeRegistry
 
     /**
      * Get the Type for the stashed type.
-     *
-     * @return \GraphQL\Type\Definition\Type
      */
     public function resolveType(): Type
     {
