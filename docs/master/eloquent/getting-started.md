@@ -129,6 +129,39 @@ And, if a result is found, receive a result like this:
 }
 ```
 
+## Local Scopes
+
+[Local scopes](https://laravel.com/docs/eloquent#local-scopes) are commonly used in Eloquent ,odels
+to specify reusable query constraints.
+
+```php
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    public function scopeVerified(Builder $query): Builder
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
+}
+```
+
+Directives that query models, such as [@all](../api-reference/directives.md#all)
+or [@first](../api-reference/directives.md#first), allow you to re-use those scopes:
+
+```graphql
+type Query {
+    users: [User]! @all(scopes: ["verified"])
+}
+```
+
+This query will produce the following SQL:
+
+```sql
+SELECT * FROM `users` WHERE `email_verified_at` IS NOT NULL
+```
+
 ## Create
 
 The easiest way to create data on your server is to use the [@create](../api-reference/directives.md#create) directive.
@@ -139,7 +172,7 @@ type Mutation {
 }
 ```
 
-A create mutation will use the arguments passed to the field to create a new model instance:
+This mutation will use the arguments passed to the field to create a new model instance:
 
 ```graphql
 mutation {
@@ -271,44 +304,4 @@ This mutation will return the deleted object, so you will have a last chance to 
     }
   }
 }
-```
-
-## Local Scopes
-
-You may easily re-use your local scopes defined on your model. For example, you frequently need to retrieve all users which are considered "verified".
-
-```php
-<?php
-
-namespace App;
-
-use Illuminate\Database\Eloquent\Model;
-
-class User extends Model
-{
-    /**
-     * Scope a query to only include verified users.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeVerified($query)
-    {
-        return $query->whereNotNull('email_verified_at');
-    }
-}
-```
-
-Now we can utilize the scope with the [@all](../api-reference/directives.md#all) directive, for example:
-
-```graphql
-type Query {
-    users: [User]! @all(scopes: ["verified"])
-}
-```
-
-After adding the scope it will produce following SQL:
-
-```sql
-select * from `users` where `email_verified_at` is not null
 ```
