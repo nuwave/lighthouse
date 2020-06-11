@@ -38,7 +38,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getNameInput(): string
     {
-        return ucfirst($this->argument('name')).'Directive';
+        return parent::getNameInput().'Directive';
     }
 
     protected function namespaceConfigKey(): string
@@ -176,8 +176,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     /**
      * Get the stub file for the generator.
-     *
-     * @return string
      */
     protected function getStub(): string
     {

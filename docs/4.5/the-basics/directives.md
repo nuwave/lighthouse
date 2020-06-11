@@ -4,7 +4,7 @@ Assuming you read through the previous chapters, you should be familiar with the
 of schema definition by now.
 
 You might have seen some funky extra bits in the schema definitions such as `@paginate`,
-`@rules` or `@hasMany`. Those are called *directives* and are the primary way
+`@rules` or `@hasMany`. Those are called _directives_ and are the primary way
 to add functionality to your GraphQL schema.
 
 ## Definition
@@ -46,7 +46,7 @@ directives are capable of.
 type Query {
   "Return a list of posts"
   posts(
-    "Place an exact match filter (=) on the data" 
+    "Place an exact match filter (=) on the data"
     postedAt: Date @eq
     "Show only posts that match one of the given topics"
     topics: [String!] @in(key: "topic")

@@ -18,7 +18,7 @@ class SearchDirectiveTest extends DBTestCase
     protected $engineManager;
 
     /**
-     * @var \Mockery\Mock
+     * @var \Mockery\MockInterface
      */
     protected $engine;
 

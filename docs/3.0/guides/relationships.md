@@ -20,7 +20,7 @@ class Post extends Model
     {
         return $this->hasMany(Comment::class);
     }
-    
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -130,7 +130,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model 
+class Post extends Model
 {
     public function user(): BelongsTo
     {
@@ -150,7 +150,7 @@ can detect them.
 ```php
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model 
+class Post extends Model
 {
     // WORKS
     public function user(): BelongsTo
@@ -161,7 +161,7 @@ class Post extends Model
     // DOES NOT WORK
     public function comments()
     {
-        return $this->hasMany(Comment::class);        
+        return $this->hasMany(Comment::class);
     }
 }
 ```
@@ -206,6 +206,7 @@ input CreateAuthorRelation {
 ```
 
 There are 3 possible operations that you can expose on a `BelongsTo` relationship when creating:
+
 - `connect` it to an existing model
 - `create` a new related model and attach it
 - `update` an existing model and attach it
@@ -223,12 +224,7 @@ just pass the ID of the model you want to associate.
 
 ```graphql
 mutation {
-  createPost(input: {
-    title: "My new Post"
-    author: {
-      connect: 123
-    }
-  }){
+  createPost(input: { title: "My new Post", author: { connect: 123 } }) {
     id
     author {
       name
@@ -257,14 +253,9 @@ create a new one.
 
 ```graphql
 mutation {
-  createPost(input: {
-    title: "My new Post"
-    author: {
-      create: {
-        name: "Gina"
-      }  
-    }
-  }){
+  createPost(
+    input: { title: "My new Post", author: { create: { name: "Gina" } } }
+  ) {
     id
     author {
       id
@@ -314,13 +305,13 @@ This structure was chosen as it is consistent with updating `BelongsToMany` rela
 and allows the query string to be mostly static, taking a variable value to control its behaviour.
 
 ```graphql
-mutation UpdatePost($disconnectAuthor: Boolean){
-  updatePost(input: {
-    title: "An updated title"
-    author: {
-      disconnect: $disconnectAuthor
+mutation UpdatePost($disconnectAuthor: Boolean) {
+  updatePost(
+    input: {
+      title: "An updated title"
+      author: { disconnect: $disconnectAuthor }
     }
-  }){
+  ) {
     title
     author {
       name
@@ -381,19 +372,17 @@ You can now create a `User` and some posts with it in one request.
 
 ```graphql
 mutation {
-  createUser(input: {
-    name: "Phil"
-    posts: {
-      create: [
-        {
-          title: "Phils first post"
-        },
-        {
-          title: "Awesome second post"
-        }
-      ]  
+  createUser(
+    input: {
+      name: "Phil"
+      posts: {
+        create: [
+          { title: "Phils first post" }
+          { title: "Awesome second post" }
+        ]
+      }
     }
-  }){
+  ) {
     id
     posts {
       id
@@ -455,26 +444,17 @@ input UpdatePostInput {
 
 ```graphql
 mutation {
-  updateUser(input: {
-    id: 3,
-    name: "Phillip"
-    posts: {
-      create: [
-        {
-          title: "A new post"
-        }
-      ],
-      update: [
-        {
-          id: 45,
-          title: "This post is updated"
-        }
-      ],
-      delete: [
-        8,
-      ]
+  updateUser(
+    input: {
+      id: 3
+      name: "Phillip"
+      posts: {
+        create: [{ title: "A new post" }]
+        update: [{ id: 45, title: "This post is updated" }]
+        delete: [8]
+      }
     }
-  }){
+  ) {
     id
     posts {
       id
@@ -513,19 +493,12 @@ to create a new relation.
 
 ```graphql
 mutation {
-  createPost(input: {
-    title: "My new Post"
-    authors: {
-      create: [
-        {
-          name: "Herbert"
-        }
-      ]
-      connect: [
-        123
-      ]
+  createPost(
+    input: {
+      title: "My new Post"
+      authors: { create: [{ name: "Herbert" }], connect: [123] }
     }
-  }){
+  ) {
     id
     authors {
       name

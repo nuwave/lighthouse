@@ -59,9 +59,7 @@ class ValidationTest extends DBTestCase
     ';
 
     /**
-     * @param  mixed  $root
-     * @param  mixed[]  $args
-     * @return string
+     * @param  array<string, string>  $args
      */
     public function resolvePassword($root, array $args): string
     {
@@ -69,9 +67,7 @@ class ValidationTest extends DBTestCase
     }
 
     /**
-     * @param  mixed  $root
      * @param  mixed[]  $args
-     * @return string
      */
     public function resolveEmail($root, array $args): string
     {
@@ -528,9 +524,8 @@ class ValidationTest extends DBTestCase
     /**
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
-     * @param  array  $keys
-     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $result
-     * @return void
+     * @param  array<string>  $keys
+     * @param  \Illuminate\Testing\TestResponse  $result
      */
     protected function assertValidationKeysSame(array $keys, $result): void
     {

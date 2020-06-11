@@ -11,7 +11,7 @@ can detect them.
 ```php
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model 
+class Post extends Model
 {
     // WORKS
     public function user(): BelongsTo
@@ -22,7 +22,7 @@ class Post extends Model
     // DOES NOT WORK
     public function comments()
     {
-        return $this->hasMany(Comment::class);        
+        return $this->hasMany(Comment::class);
     }
 }
 ```
@@ -70,6 +70,7 @@ input CreateAuthorRelation {
 ```
 
 There are 3 possible operations that you can expose on a `BelongsTo` relationship when creating:
+
 - `connect` it to an existing model
 - `create` a new related model and attach it
 - `update` an existing model and attach it
@@ -87,12 +88,7 @@ just pass the ID of the model you want to associate.
 
 ```graphql
 mutation {
-  createPost(input: {
-    title: "My new Post"
-    author: {
-      connect: 123
-    }
-  }){
+  createPost(input: { title: "My new Post", author: { connect: 123 } }) {
     id
     author {
       name
@@ -121,14 +117,9 @@ create a new one.
 
 ```graphql
 mutation {
-  createPost(input: {
-    title: "My new Post"
-    author: {
-      create: {
-        name: "Gina"
-      }  
-    }
-  }){
+  createPost(
+    input: { title: "My new Post", author: { create: { name: "Gina" } } }
+  ) {
     id
     author {
       id
@@ -178,13 +169,13 @@ This structure was chosen as it is consistent with updating `BelongsToMany` rela
 and allows the query string to be mostly static, taking a variable value to control its behaviour.
 
 ```graphql
-mutation UpdatePost($disconnectAuthor: Boolean){
-  updatePost(input: {
-    title: "An updated title"
-    author: {
-      disconnect: $disconnectAuthor
+mutation UpdatePost($disconnectAuthor: Boolean) {
+  updatePost(
+    input: {
+      title: "An updated title"
+      author: { disconnect: $disconnectAuthor }
     }
-  }){
+  ) {
     title
     author {
       name
@@ -245,19 +236,17 @@ You can now create a `User` and some posts with it in one request.
 
 ```graphql
 mutation {
-  createUser(input: {
-    name: "Phil"
-    posts: {
-      create: [
-        {
-          title: "Phils first post"
-        },
-        {
-          title: "Awesome second post"
-        }
-      ]  
+  createUser(
+    input: {
+      name: "Phil"
+      posts: {
+        create: [
+          { title: "Phils first post" }
+          { title: "Awesome second post" }
+        ]
+      }
     }
-  }){
+  ) {
     id
     posts {
       id
@@ -319,26 +308,17 @@ input UpdatePostInput {
 
 ```graphql
 mutation {
-  updateUser(input: {
-    id: 3,
-    name: "Phillip"
-    posts: {
-      create: [
-        {
-          title: "A new post"
-        }
-      ],
-      update: [
-        {
-          id: 45,
-          title: "This post is updated"
-        }
-      ],
-      delete: [
-        8,
-      ]
+  updateUser(
+    input: {
+      id: 3
+      name: "Phillip"
+      posts: {
+        create: [{ title: "A new post" }]
+        update: [{ id: 45, title: "This post is updated" }]
+        delete: [8]
+      }
     }
-  }){
+  ) {
     id
     posts {
       id
@@ -378,19 +358,12 @@ to create a new relation.
 
 ```graphql
 mutation {
-  createPost(input: {
-    title: "My new Post"
-    authors: {
-      create: [
-        {
-          name: "Herbert"
-        }
-      ]
-      connect: [
-        123
-      ]
+  createPost(
+    input: {
+      title: "My new Post"
+      authors: { create: [{ name: "Herbert" }], connect: [123] }
     }
-  }){
+  ) {
     id
     authors {
       name
@@ -426,14 +399,7 @@ will be contained withing the relation.
 
 ```graphql
 mutation {
-  createPost(input: {
-    title: "My new Post"
-    authors: {
-      sync: [
-        123
-      ]
-    }
-  }){
+  createPost(input: { title: "My new Post", authors: { sync: [123] } }) {
     id
     authors {
       name
@@ -557,15 +523,10 @@ type Tag {
 ```
 
 In this example, the tag with id `1` already exists in the database. The query connects this tag to the task using the `MorphToMany` relationship.
- 
+
 ```graphql
 mutation {
-  createTask(input: {
-    name: "Loundry"
-    tags: {
-      connect: [1]
-    }
-  }) {
+  createTask(input: { name: "Loundry", tags: { connect: [1] } }) {
     tags {
       id
       name
@@ -574,27 +535,18 @@ mutation {
 }
 ```
 
-You can either use `connect` or `sync` during creation. 
+You can either use `connect` or `sync` during creation.
 
 When you want to create a new tag while creating the task,
 you need use the `create` operation to provide an array of `CreateTagInput`:
 
 ```graphql
 mutation {
-  createTask(input: {
-    name: "Loundry"
-      tags: {
-        create: [
-          {
-            name: "home"
-          }
-        ]
-      }
-  }) {
+  createTask(input: { name: "Loundry", tags: { create: [{ name: "home" }] } }) {
     tags {
       id
       name
     }
   }
 }
-``` 
+```

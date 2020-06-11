@@ -14,15 +14,15 @@ function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolve
 ```
 
 1. `$rootValue`: The result that was returned from the parent field.
-When resolving a field that sits on one of the root types (`Query`, `Mutation`) this is `null`.
+   When resolving a field that sits on one of the root types (`Query`, `Mutation`) this is `null`.
 2. `array $args`: The arguments that were passed into the field.
-For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
+   For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
 3. `GraphQLContext $context`: Arbitrary data that is shared between all fields of a single query.
-Lighthouse passes in an instance of `Nuwave\Lighthouse\Schema\Context` by default.
+   Lighthouse passes in an instance of `Nuwave\Lighthouse\Schema\Context` by default.
 4. `ResolveInfo $resolveInfo`: Information about the query itself,
-such as the execution state, the field name, path to the field from the root, and more.
+   such as the execution state, the field name, path to the field from the root, and more.
 
-The return value of this must fit the return type defined for the corresponding field from the schema. 
+The return value of this must fit the return type defined for the corresponding field from the schema.
 
 ## Complexity function signature
 
@@ -34,8 +34,8 @@ function (int $childrenComplexity, array $args): int
 ```
 
 1. `$childrenComplexity`: The complexity of the children of the field. In case you expect to return
-multiple children, it can be useful to do some maths on this.
+   multiple children, it can be useful to do some maths on this.
 2. `array $args`: The arguments that were passed into the field.
-For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
+   For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
 
 Read more about query complexity in the [webonyx/graphql-php docs](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)

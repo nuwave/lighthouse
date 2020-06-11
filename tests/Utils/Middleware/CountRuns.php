@@ -17,6 +17,7 @@ class CountRuns
      */
     public static $runCounter = 0;
 
+    // @phpstan-ignore-next-line will be removed soon anyways
     public function handle(Request $request, Closure $next)
     {
         self::$runCounter++;

@@ -82,9 +82,6 @@ class RelationBatchLoaderTest extends DBTestCase
 
     /**
      * @dataProvider batchloadRelationsSetting
-     *
-     * @param  bool  $batchloadRelations
-     * @param  int  $expectedQueryCount
      */
     public function testBatchloadRelations(bool $batchloadRelations, int $expectedQueryCount): void
     {
@@ -113,6 +110,9 @@ class RelationBatchLoaderTest extends DBTestCase
         $this->assertSame($expectedQueryCount, $queryCount);
     }
 
+    /**
+     * @return array<array<bool|int>>
+     */
     public function batchloadRelationsSetting(): array
     {
         return [
@@ -133,7 +133,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
 
                 return $loader->load($args['id']);
             },
@@ -141,7 +141,7 @@ class RelationBatchLoaderTest extends DBTestCase
         );
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
 
                 return $loader->loadMany($args['ids']);
             },

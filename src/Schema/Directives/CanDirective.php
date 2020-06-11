@@ -27,11 +27,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
      */
     protected $gate;
 
-    /**
-     * CanDirective constructor.
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
-     * @return void
-     */
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;
@@ -84,10 +79,6 @@ SDL;
 
     /**
      * Ensure the user is authorized to access this field.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -111,9 +102,8 @@ SDL;
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  array  $args
-     * @return iterable<Model|string>
+     * @param  array<string, mixed>  $args
+     * @return iterable<\Illuminate\Database\Eloquent\Model|string>
      *
      * @throws \GraphQL\Error\Error
      */
@@ -131,6 +121,7 @@ SDL;
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
+                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
                 $queryBuilder->withTrashed();
             }
 
@@ -138,17 +129,22 @@ SDL;
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
+                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
                 $queryBuilder->onlyTrashed();
             }
 
             try {
-                $modelOrModels = $argumentSet
-                    ->enhanceBuilder(
-                        $queryBuilder,
-                        [],
-                        Utils::instanceofMatcher(TrashedDirective::class)
-                    )
-                    ->findOrFail($findValue);
+                /**
+                 * TODO use generics.
+                 * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
+                 */
+                $enhancedBuilder = $argumentSet->enhanceBuilder(
+                    $queryBuilder,
+                    [],
+                    Utils::instanceofMatcher(TrashedDirective::class)
+                );
+
+                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {
                 throw new Error($exception->getMessage());
             }
@@ -169,11 +165,9 @@ SDL;
     }
 
     /**
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @param  string|string[]  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array  $arguments
-     * @return void
+     * @param  array<mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -193,8 +187,8 @@ SDL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array  $args
-     * @return mixed[]
+     * @param  array<mixed>  $args
+     * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
     {

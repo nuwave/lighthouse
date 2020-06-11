@@ -3,8 +3,11 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 /**
- * @deprecated will be integrated into
+ * @deprecated The method definition() will be moved to
  * @see \Nuwave\Lighthouse\Support\Contracts\Directive
+ *
+ * Keep using this interface for now.
+ * When upgrading to the upcoming v5, just remove it.
  */
 interface DefinedDirective
 {

@@ -27,7 +27,7 @@ Think of queries as REST resources which can take arguments and return a fixed r
 type Query {
   me: User
   users: [User!]!
-  userById(id: ID): User 
+  userById(id: ID): User
 }
 ```
 

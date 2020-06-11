@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Support\Utils;
 
 class SubscriptionRegistry
@@ -22,7 +23,7 @@ class SubscriptionRegistry
     protected $serializer;
 
     /**
-     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
      */
     protected $storage;
 
@@ -45,13 +46,7 @@ class SubscriptionRegistry
      */
     protected $subscriptions = [];
 
-    /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @return void
-     */
-    public function __construct(ContextSerializer $serializer, StorageManager $storage, GraphQL $graphQL)
+    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, GraphQL $graphQL)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
@@ -61,8 +56,6 @@ class SubscriptionRegistry
     /**
      * Add subscription to registry.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
-     * @param  string  $field
      * @return $this
      */
     public function register(GraphQLSubscription $subscription, string $field): self
@@ -74,9 +67,6 @@ class SubscriptionRegistry
 
     /**
      * Check if subscription is registered.
-     *
-     * @param  string  $key
-     * @return bool
      */
     public function has(string $key): bool
     {
@@ -86,7 +76,7 @@ class SubscriptionRegistry
     /**
      * Get subscription keys.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function keys(): array
     {
@@ -95,9 +85,6 @@ class SubscriptionRegistry
 
     /**
      * Get instance of subscription.
-     *
-     * @param  string  $key
-     * @return \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
      */
     public function subscription(string $key): GraphQLSubscription
     {
@@ -108,15 +95,11 @@ class SubscriptionRegistry
      * Add subscription to registry.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  string  $channel
      * @return $this
      */
-    public function subscriber(Subscriber $subscriber, string $channel): self
+    public function subscriber(Subscriber $subscriber, string $topic): self
     {
-        if ($subscriber->channel) {
-            $this->storage->storeSubscriber($subscriber, $channel);
-        }
-
+        $this->storage->storeSubscriber($subscriber, $topic);
         $this->subscribers[$subscriber->operationName] = $subscriber->channel;
 
         return $this;
@@ -126,7 +109,7 @@ class SubscriptionRegistry
      * Get registered subscriptions.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {
@@ -159,9 +142,6 @@ class SubscriptionRegistry
 
     /**
      * Reset the collection of subscribers when a new execution starts.
-     *
-     * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
-     * @return void
      */
     public function handleStartExecution(StartExecution $startExecution): void
     {
@@ -170,8 +150,6 @@ class SubscriptionRegistry
 
     /**
      * Get all current subscribers.
-     *
-     * @return \Nuwave\Lighthouse\Execution\ExtensionsResponse
      */
     public function handleBuildExtensionsResponse(): ExtensionsResponse
     {

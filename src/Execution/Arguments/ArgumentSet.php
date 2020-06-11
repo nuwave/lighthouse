@@ -13,9 +13,16 @@ class ArgumentSet
     /**
      * An associative array from argument names to arguments.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument[]
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public $arguments = [];
+
+    /**
+     * An associative array of arguments that were not given.
+     *
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    public $undefined = [];
 
     /**
      * A list of directives.
@@ -30,7 +37,7 @@ class ArgumentSet
     /**
      * Get a plain array representation of this ArgumentSet.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -45,13 +52,9 @@ class ArgumentSet
 
     /**
      * Check if the ArgumentSet has a non-null value with the given key.
-     *
-     * @param  string  $key
-     * @return bool
      */
     public function has(string $key): bool
     {
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $argument */
         $argument = $this->arguments[$key] ?? null;
 
         if ($argument === null) {
@@ -63,8 +66,6 @@ class ArgumentSet
 
     /**
      * Apply the @spread directive and return a new, modified instance.
-     *
-     * @return self
      */
     public function spread(): self
     {
@@ -96,8 +97,6 @@ class ArgumentSet
 
     /**
      * Apply the @rename directive and return a new, modified instance.
-     *
-     * @return self
      */
     public function rename(): self
     {
@@ -148,7 +147,7 @@ class ArgumentSet
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
 
         foreach ($scopes as $scope) {
-            call_user_func([$builder, $scope], $this->toArray());
+            $builder->{$scope}($this->toArray());
         }
 
         return $builder;
@@ -162,9 +161,8 @@ class ArgumentSet
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
-     * @param  \Closure|null  $directiveFilter
      */
-    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null)
+    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null): void
     {
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
@@ -204,8 +202,7 @@ class ArgumentSet
      * Works just like the Laravel Arr::add() function.
      * @see \Illuminate\Support\Arr
      *
-     * @param  string  $path
-     * @param  mixed  $value
+     * @param  mixed  $value Any value to inject.
      * @return $this
      */
     public function addValue(string $path, $value): self
@@ -233,5 +230,18 @@ class ArgumentSet
         $argumentSet->arguments[array_shift($keys)] = $argument;
 
         return $this;
+    }
+
+    /**
+     * The contained arguments, including all that were not passed.
+     *
+     * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    public function argumentsWithUndefined(): array
+    {
+        return array_merge(
+            $this->arguments,
+            $this->undefined
+        );
     }
 }

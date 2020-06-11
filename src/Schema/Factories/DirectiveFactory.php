@@ -43,12 +43,6 @@ class DirectiveFactory
      */
     protected $directiveNamespacer;
 
-    /**
-     * DirectiveFactory constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespacer  $directiveNamespacer
-     * @return void
-     */
     public function __construct(DirectiveNamespacer $directiveNamespacer)
     {
         $this->directiveNamespacer = $directiveNamespacer;
@@ -56,9 +50,6 @@ class DirectiveFactory
 
     /**
      * Create a directive by the given directive name.
-     *
-     * @param  string  $directiveName
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive
      */
     public function create(string $directiveName): Directive
     {
@@ -70,8 +61,6 @@ class DirectiveFactory
     /**
      * Resolve the class for a given directive name.
      *
-     * @param  string  $directiveName
-     * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
@@ -104,9 +93,6 @@ class DirectiveFactory
 
     /**
      * Returns the expected class name for a directive name.
-     *
-     * @param  string  $directiveName
-     * @return string
      */
     protected static function className(string $directiveName): string
     {
@@ -115,9 +101,6 @@ class DirectiveFactory
 
     /**
      * Returns the expected directive name for a class name.
-     *
-     * @param  string  $className
-     * @return string
      */
     public static function directiveName(string $className): string
     {
@@ -132,8 +115,6 @@ class DirectiveFactory
      * @deprecated use the RegisterDirectiveNamespaces event instead, this method will be removed as of v5
      * @see \Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces
      *
-     * @param  string  $directiveName
-     * @param  string  $className
      * @return $this
      */
     public function addResolved(string $directiveName, string $className): self
@@ -150,8 +131,6 @@ class DirectiveFactory
     }
 
     /**
-     * @param  string  $directiveName
-     * @param  string  $className
      * @return $this
      */
     public function setResolved(string $directiveName, string $className): self
@@ -175,9 +154,7 @@ class DirectiveFactory
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @param  string  $directiveClass
-     * @return \Illuminate\Support\Collection of type <$directiveClass>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> of type <$directiveClass>
      */
     public function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
@@ -189,8 +166,7 @@ class DirectiveFactory
     /**
      * Get all directives that are associated with an AST node.
      *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @return \Illuminate\Support\Collection of type <$directiveClass>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function createAssociatedDirectives(Node $node): Collection
     {
@@ -212,9 +188,7 @@ class DirectiveFactory
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @param  string  $directiveClass
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive|null
+     * TODO rename to exclusiveDirective
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
@@ -223,10 +197,14 @@ class DirectiveFactory
         $directives = $this->createAssociatedDirectivesOfType($node, $directiveClass);
 
         if ($directives->count() > 1) {
-            $directiveNames = $directives->implode(', ');
+            $directiveNames = $directives
+                ->map(function (Directive $directive): string {
+                    return '@'.$directive->name();
+                })
+                ->implode(', ');
 
             throw new DirectiveException(
-                "Node [{$node->name->value}] can only have one directive of type [{$directiveClass}] but found [{$directiveNames}]"
+                "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."
             );
         }
 

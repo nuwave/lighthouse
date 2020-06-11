@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property int $id
+ * @property int|null $acl_id
+ * @property string $name
+ */
 class Role extends Model
 {
     public $timestamps = false;
-
-    protected $guarded = [];
 
     public function users(): BelongsToMany
     {

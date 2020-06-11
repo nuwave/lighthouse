@@ -15,10 +15,6 @@ class TracingServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @return void
      */
     public function boot(DirectiveFactory $directiveFactory, EventsDispatcher $eventsDispatcher): void
     {
@@ -52,8 +48,6 @@ class TracingServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {

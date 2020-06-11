@@ -13,9 +13,9 @@ interface ErrorHandler
      * Always call $next($error) to keep the Pipeline going. Multiple such Handlers may be registered
      * as an array in the config.
      *
-     * @param  \GraphQL\Error\Error  $error
-     * @param  \Closure  $next
-     * @return array
+     * TODO change to non-static in v5
+     *
+     * @return array<string, mixed>
      */
     public static function handle(Error $error, Closure $next): array;
 }

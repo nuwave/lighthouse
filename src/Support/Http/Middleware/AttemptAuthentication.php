@@ -14,12 +14,6 @@ class AttemptAuthentication
      */
     protected $auth;
 
-    /**
-     * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Auth\Factory  $auth
-     * @return void
-     */
     public function __construct(Auth $auth)
     {
         $this->auth = $auth;
@@ -29,9 +23,8 @@ class AttemptAuthentication
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string[]  ...$guards
-     * @return mixed
+     * @param  array<string>  ...$guards
+     * @return mixed Some response
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -45,18 +38,19 @@ class AttemptAuthentication
     /**
      * Attempt to authenticate the user, but don't do anything if they are not.
      *
-     * @param  array  $guards
-     * @return void
+     * @param  array<string>  ...$guards
      */
-    protected function attemptAuthentication(array $guards)
+    protected function attemptAuthentication(array $guards): void
     {
         if (empty($guards)) {
-            $guards = [null];
+            $guards = [config('lighthouse.guard')];
         }
 
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
-                return $this->auth->shouldUse($guard);
+                $this->auth->shouldUse($guard);
+
+                return;
             }
         }
     }

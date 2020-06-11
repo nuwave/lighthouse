@@ -10,9 +10,6 @@ class TestingServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
      */
     public function boot(Dispatcher $dispatcher): void
     {
@@ -27,5 +24,11 @@ class TestingServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(MockDirective::class);
+
+        if (class_exists('Illuminate\Testing\TestResponse')) {
+            \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());
+        } elseif (class_exists('Illuminate\Foundation\Testing\TestResponse')) {
+            \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
+        }
     }
 }

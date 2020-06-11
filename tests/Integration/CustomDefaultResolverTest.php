@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class CustomDefaultResolverTest extends TestCase
 {
-    const CUSTOM_RESOLVER_RESULT = 123;
+    public const CUSTOM_RESOLVER_RESULT = 123;
 
     public function testCanSpecifyACustomDefaultResolver(): void
     {
