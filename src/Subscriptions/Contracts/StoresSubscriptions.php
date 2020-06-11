@@ -42,4 +42,18 @@ interface StoresSubscriptions
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function deleteSubscriber(string $channel);
+
+    /**
+     * Store main / single subscriber on a public topic
+     *
+     * @return void
+     */
+    public function storeSubscriberPublic(Subscriber $subscriber, string $public_topic_name);
+
+    /**
+     * Get the one and only subscriber for a public topic, if any
+     *
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
+     */
+    public function publicSubscriberForTopic(string $channel);
 }

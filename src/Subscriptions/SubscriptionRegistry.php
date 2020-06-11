@@ -133,7 +133,7 @@ class SubscriptionRegistry
         try{
             $field_name = $this->getSubscriptionFieldNameFromSubscriberQuery($subscriber);
             $subscription =  $this->subscription($field_name);
-            if($subscription && $subscription->IS_PUBLIC){
+            if($subscription->IS_PUBLIC === true){
                 // use "public" channel name, not subscriber->channel's unique channel
                 $channel_name = $subscription->getChannelName($subscriber->args);
                 if($channel_name){

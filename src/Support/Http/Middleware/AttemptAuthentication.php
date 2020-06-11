@@ -38,7 +38,7 @@ class AttemptAuthentication
     /**
      * Attempt to authenticate the user, but don't do anything if they are not.
      *
-     * @param  array<string>  ...$guards
+     * @param  array<mixed>  ...$guards
      */
     protected function attemptAuthentication(array $guards): void
     {

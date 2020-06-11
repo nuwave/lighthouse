@@ -70,9 +70,26 @@ abstract class GraphQLSubscription
     abstract public function filter(Subscriber $subscriber, $root);
 
     /**
+     * Boolean flag for public subscriptions
+     *
+     * @var bool
+     */
+    public $IS_PUBLIC = false;
+
+    /**
      * @return ?string
      */
     public function getQueryString()
+    {
+        return null;
+    }
+
+    /**
+     * @param array<mixed> $args
+     *
+     * @return ?string
+     */
+    public function getChannelName(array $args)
     {
         return null;
     }

@@ -47,6 +47,11 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     protected $eventsDispatcher;
 
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
+     */
+    protected $createsContext;
+
     public function __construct(
         GraphQL $graphQL,
         AuthorizesSubscriptions $auth,
@@ -119,7 +124,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $subscriber = $this->storage->publicSubscriberForTopic($topic);
         if(!$subscriber){
             throw new \Exception("no subscribers for public channel $topic $fieldName");
-            return;
         }
         $channel_name = $subscription->getChannelName($subscriber->args);
         $data = $this->graphQL->executeQuery(
