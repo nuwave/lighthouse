@@ -52,7 +52,7 @@ GRAPHQL;
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return string[]
+     * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
     {

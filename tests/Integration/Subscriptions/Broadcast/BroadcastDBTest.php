@@ -11,7 +11,7 @@ use Tests\Utils\Models\Task;
 
 class BroadcastDBTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!

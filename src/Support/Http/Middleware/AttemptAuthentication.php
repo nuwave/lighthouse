@@ -23,7 +23,7 @@ class AttemptAuthentication
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array<string>  ...$guards
+     * @param  string  ...$guards
      * @return mixed Some response
      *
      * @throws \Illuminate\Auth\AuthenticationException
