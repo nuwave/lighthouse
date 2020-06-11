@@ -40,12 +40,6 @@ class LighthouseController
 
     /**
      * Inject middleware into request.
-     *
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesResponse  $createsResponse
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \Laragraph\LaravelGraphQLUtils\RequestParser  $requestParser
      */
     public function __construct(
         GraphQL $graphQL,
