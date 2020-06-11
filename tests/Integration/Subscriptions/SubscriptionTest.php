@@ -28,14 +28,24 @@ class SubscriptionTest extends TestCase
             body: String
         }
 
+        enum PostStatus {
+            PUBLISHED @enum(value: "published")
+            DELETED @enum(value: "deleted")
+        }
+
         type Subscription {
             onPostCreated: Post
+            onPostUpdated(status: PostStatus!): Post
         }
 
         type Mutation {
             createPost(post: String!): Post
                 @field(resolver: "{$this->qualifyTestResolver()}")
                 @broadcast(subscription: "onPostCreated")
+
+            updatePost(post: String!): Post
+                @field(resolver: "{$this->qualifyTestResolver()}")
+                @broadcast(subscription: "onPostUpdated")
         }
 
         type Query {
@@ -46,7 +56,7 @@ GRAPHQL;
 
     public function testSendsSubscriptionChannelInResponse(): void
     {
-        $response = $this->subscribe();
+        $response = $this->subscribeToOnPostCreatedSubscription();
         $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
@@ -90,7 +100,7 @@ GRAPHQL;
 
     public function testCanBroadcastSubscriptions(): void
     {
-        $this->subscribe();
+        $this->subscribeToOnPostCreatedSubscription();
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createPost(post: "Foobar") {
@@ -131,6 +141,39 @@ GRAPHQL;
             ]);
     }
 
+    public function testSubscriptionWithEnumInputCorrectlyResolves(): void
+    {
+        $this->postGraphQL([
+            'query' => /** @lang GraphQL */ '
+                subscription OnPostUpdated($status: PostStatus!) {
+                    onPostUpdated(status: $status) {
+                        body
+                    }
+                }
+            ',
+            'variables' => [
+                'status' => 'DELETED',
+            ],
+            'operationName' => 'OnPostUpdated',
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updatePost(post: "Foobar") {
+                body
+            }
+        }
+        ');
+
+        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
+        $log = app(BroadcastManager::class)->driver();
+        $this->assertCount(1, $log->broadcasts());
+
+        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertArrayHasKey('onPostUpdated', $broadcasted);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostUpdated']);
+    }
+
     /**
      * @param  mixed[]  $args
      * @return mixed[]
@@ -143,7 +186,7 @@ GRAPHQL;
     /**
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function subscribe()
+    protected function subscribeToOnPostCreatedSubscription()
     {
         return $this->postGraphQL([
             'query' => /** @lang GraphQL */ '
