@@ -70,7 +70,7 @@ abstract class GraphQLSubscription
     abstract public function filter(Subscriber $subscriber, $root);
 
     /**
-     * Boolean flag for public subscriptions
+     * Boolean flag for public subscriptions.
      *
      * @var bool
      */
@@ -81,7 +81,6 @@ abstract class GraphQLSubscription
      */
     public function getQueryString()
     {
-        return null;
     }
 
     /**

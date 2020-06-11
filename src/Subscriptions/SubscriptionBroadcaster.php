@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
@@ -88,8 +87,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     {
         $topic = $subscription->decodeTopic($fieldName, $root);
 
-        if($subscription->IS_PUBLIC){
+        if ($subscription->IS_PUBLIC) {
             $this->broadcastPublic($subscription, $fieldName, $root);
+
             return;
         }
 
@@ -122,7 +122,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     {
         $topic = $subscription->decodeTopic($fieldName, $root);
         $subscriber = $this->storage->publicSubscriberForTopic($topic);
-        if(!$subscriber){
+        if (! $subscriber) {
             throw new \Exception("no subscribers for public channel $topic $fieldName");
         }
         $channel_name = $subscription->getChannelName($subscriber->args);

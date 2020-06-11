@@ -101,7 +101,8 @@ class SubscriptionRegistry
     /**
      * @return ?string
      */
-    public function getSubscriptionFieldNameFromSubscriberQuery(Subscriber $subscriber){
+    public function getSubscriptionFieldNameFromSubscriberQuery(Subscriber $subscriber)
+    {
         //$subscriber->query->definitions[0]->selectionSet->selections->nodes[0]->name->value;
         return (new Collection($subscriber->query->definitions))
             ->filter(
@@ -130,21 +131,20 @@ class SubscriptionRegistry
         $this->storage->storeSubscriber($subscriber, $topic);
         $this->subscribers[$subscriber->operationName] = $subscriber->channel;
 
-        try{
+        try {
             $field_name = $this->getSubscriptionFieldNameFromSubscriberQuery($subscriber);
-            $subscription =  $this->subscription($field_name);
-            if($subscription->IS_PUBLIC === true){
+            $subscription = $this->subscription($field_name);
+            if ($subscription->IS_PUBLIC === true) {
                 // use "public" channel name, not subscriber->channel's unique channel
                 $channel_name = $subscription->getChannelName($subscriber->args);
-                if($channel_name){
+                if ($channel_name) {
                     $this->subscribers_public[$subscriber->operationName] = $channel_name;
                     $this->storage->storeSubscriberPublic($subscriber, $topic);
                 }
             }
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             \Log::error($e);
         }
-
 
         return $this;
     }
@@ -198,12 +198,14 @@ class SubscriptionRegistry
     public function handleBuildExtensionsResponse(): ExtensionsResponse
     {
         $channels = $this->subscribers;
-        $channels = collect($channels)->map(function($channel, $operation_name){
-            if(array_key_exists($operation_name,$this->subscribers_public)){
+        $channels = collect($channels)->map(function ($channel, $operation_name) {
+            if (array_key_exists($operation_name, $this->subscribers_public)) {
                 return $this->subscribers_public[$operation_name];
             }
+
             return $channel;
         })->toArray();
+
         return new ExtensionsResponse(
             'lighthouse_subscriptions',
             [
