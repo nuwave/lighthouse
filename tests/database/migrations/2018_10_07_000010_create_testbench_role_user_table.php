@@ -12,10 +12,11 @@ class CreateTestbenchRoleUserTable extends Migration
     public function up(): void
     {
         Schema::create('role_user', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('meta')->nullable();
+
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('role_id');
-            $table->primary(['user_id', 'role_id']);
-            $table->string('meta')->nullable();
         });
     }
 

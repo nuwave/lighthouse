@@ -3,17 +3,22 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
@@ -22,11 +27,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
      */
     protected $gate;
 
-    /**
-     * CanDirective constructor.
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
-     * @return void
-     */
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;
@@ -34,7 +34,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
@@ -50,13 +50,22 @@ directive @can(
   """
   The name of the argument that is used to find a specific model
   instance against which the permissions should be checked.
+
+  You may pass the string as a dot notation to search in a array.
   """
   find: String
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
   """
   Pass along the client given input data as arguments to `Gate::check`.
   """
   injectArgs: Boolean = false
+
   """
   Statically defined arguments that are passed to `Gate::check`.
 
@@ -70,10 +79,6 @@ SDL;
 
     /**
      * Ensure the user is authorized to access this field.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -97,24 +102,52 @@ SDL;
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  array  $args
-     * @return iterable<Model|string>
+     * @param  array<string, mixed>  $args
+     * @return iterable<\Illuminate\Database\Eloquent\Model|string>
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @throws \GraphQL\Error\Error
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
-            $modelOrModels = $argumentSet
-                ->enhanceBuilder(
-                    $this->getModelClass()::query(),
+            $findValue = Arr::get($args, $find);
+            if ($findValue === null) {
+                throw new Error(self::missingKeyToFindModel($find));
+            }
+
+            $queryBuilder = $this->getModelClass()::query();
+
+            $directivesContainsForceDelete = $argumentSet->directives->contains(
+                Utils::instanceofMatcher(ForceDeleteDirective::class)
+            );
+            if ($directivesContainsForceDelete) {
+                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                $queryBuilder->withTrashed();
+            }
+
+            $directivesContainsRestore = $argumentSet->directives->contains(
+                Utils::instanceofMatcher(RestoreDirective::class)
+            );
+            if ($directivesContainsRestore) {
+                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                $queryBuilder->onlyTrashed();
+            }
+
+            try {
+                /**
+                 * TODO use generics.
+                 * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
+                 */
+                $enhancedBuilder = $argumentSet->enhanceBuilder(
+                    $queryBuilder,
                     [],
-                    function (Directive $directive): bool {
-                        return $directive instanceof TrashedDirective;
-                    }
-                )
-                ->findOrFail($args[$find]);
+                    Utils::instanceofMatcher(TrashedDirective::class)
+                );
+
+                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
+            } catch (ModelNotFoundException $exception) {
+                throw new Error($exception->getMessage());
+            }
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];
@@ -126,12 +159,15 @@ SDL;
         return [$this->getModelClass()];
     }
 
+    public static function missingKeyToFindModel(string $find): string
+    {
+        return "Got no key to find a model at the expected input path: ${find}.";
+    }
+
     /**
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @param  string|string[]  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array  $arguments
-     * @return void
+     * @param  array<mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -151,8 +187,8 @@ SDL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array  $args
-     * @return mixed[]
+     * @param  array<mixed>  $args
+     * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
     {

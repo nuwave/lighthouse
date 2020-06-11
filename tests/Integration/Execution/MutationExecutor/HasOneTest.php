@@ -8,7 +8,7 @@ use Tests\Utils\Models\Task;
 
 class HasOneTest extends DBTestCase
 {
-    protected $schema = /* @lang GraphQL */ '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
@@ -217,6 +217,42 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
+    public function testAllowsNullOperations(): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    create: null
+                    update: null
+                    upsert: null
+                    delete: null
+                }
+            }) {
+                name
+                post {
+                    id
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'name' => 'foo',
+                    'post' => null,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @return array<array<string, string>>
+     */
     public function existingModelMutations(): array
     {
         return [

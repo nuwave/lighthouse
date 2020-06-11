@@ -23,9 +23,6 @@ class ClearCacheCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
      */
     public function handle(Repository $cache): void
     {

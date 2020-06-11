@@ -29,7 +29,7 @@ class NestedOneToMany implements ArgResolver
 
         static::createUpdateUpsert($args, $relation);
 
-        if (isset($args->arguments['delete'])) {
+        if ($args->has('delete')) {
             $relation->getRelated()::destroy(
                 $args->arguments['delete']->toPlain()
             );
@@ -38,11 +38,10 @@ class NestedOneToMany implements ArgResolver
 
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
      */
     public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
     {
-        if (isset($args->arguments['create'])) {
+        if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 
             foreach ($args->arguments['create']->value as $childArgs) {
@@ -50,7 +49,7 @@ class NestedOneToMany implements ArgResolver
             }
         }
 
-        if (isset($args->arguments['update'])) {
+        if ($args->has('update')) {
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             foreach ($args->arguments['update']->value as $childArgs) {
@@ -58,7 +57,7 @@ class NestedOneToMany implements ArgResolver
             }
         }
 
-        if (isset($args->arguments['upsert'])) {
+        if ($args->has('upsert')) {
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {

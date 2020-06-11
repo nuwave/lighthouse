@@ -25,7 +25,7 @@ class BaseDirectiveTest extends TestCase
 {
     public function testGetsModelClassFromDirective(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type User @modelClass(class: "Team") {
             id: ID
         }
@@ -51,7 +51,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testDefaultsToFieldTypeForTheModelClass(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type User {
             id: ID
         }
@@ -75,7 +75,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testThrowsIfTheClassIsNotAModel(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type Exception {
             id: ID
         }
@@ -89,7 +89,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testResolvesAModelThatIsNamedLikeABaseClass(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type Closure {
             id: ID
         }
@@ -105,7 +105,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testPrefersThePrimaryModelNamespace(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type Category {
             id: ID
         }
@@ -121,7 +121,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testAllowsOverwritingTheDefaultModel(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type OnlyHere {
             id: ID
         }
@@ -137,7 +137,7 @@ class BaseDirectiveTest extends TestCase
 
     public function testResolvesFromTheSecondaryModelNamespace(): void
     {
-        $this->schema .= /* @lang GraphQL */'
+        $this->schema .= /** @lang GraphQL */ '
         type OnlyHere {
             id: ID
         }
@@ -161,8 +161,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * Get a testable instance of the BaseDirective that allows calling protected methods.
      *
-     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
-     * @return \Nuwave\Lighthouse\Schema\Directives\BaseDirective
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
      */
     protected function constructTestDirective($definitionNode): BaseDirective
     {
@@ -170,13 +169,12 @@ class BaseDirectiveTest extends TestCase
             /**
              * Allow to call protected methods from the test.
              *
-             * @param  string  $method
              * @param  mixed[]  $args
-             * @return mixed
+             * @return mixed Whatever the method returns.
              */
             public function __call(string $method, array $args)
             {
-                return call_user_func_array([$this, $method], $args);
+                return $this->{$method}(...$args);
             }
         };
 

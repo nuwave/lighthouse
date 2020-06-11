@@ -9,7 +9,7 @@ class NotInDirective extends BaseDirective implements ArgBuilderDirective, Defin
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Filter a column by an array using a `whereNotIn` clause.
 """
@@ -27,7 +27,6 @@ SDL;
      * Apply a simple "WHERE NOT IN $values" clause.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $values
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $values)

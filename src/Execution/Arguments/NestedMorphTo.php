@@ -2,18 +2,19 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedMorphTo implements ArgResolver
 {
     /**
-     * @var string
+     * @var \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    private $relationName;
+    private $relation;
 
-    public function __construct(string $relationName)
+    public function __construct(MorphTo $relation)
     {
-        $this->relationName = $relationName;
+        $this->relation = $relation;
     }
 
     /**
@@ -23,15 +24,12 @@ class NestedMorphTo implements ArgResolver
      */
     public function __invoke($parent, $args)
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $relation */
-        $relation = $parent->{$this->relationName}();
-
         // TODO implement create and update once we figure out how to do polymorphic input types https://github.com/nuwave/lighthouse/issues/900
 
-        if (isset($args->arguments['connect'])) {
+        if ($args->has('connect')) {
             $connectArgs = $args->arguments['connect']->value;
 
-            $morphToModel = $relation->createModelByType(
+            $morphToModel = $this->relation->createModelByType(
                 (string) $connectArgs->arguments['type']->value
             );
             $morphToModel->setAttribute(
@@ -39,9 +37,9 @@ class NestedMorphTo implements ArgResolver
                 $connectArgs->arguments['id']->value
             );
 
-            $relation->associate($morphToModel);
+            $this->relation->associate($morphToModel);
         }
 
-        NestedBelongsTo::disconnectOrDelete($relation, $args);
+        NestedBelongsTo::disconnectOrDelete($this->relation, $args);
     }
 }

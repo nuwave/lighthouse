@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory;
 
 class SchemaBuilder
 {
@@ -16,15 +16,10 @@ class SchemaBuilder
     protected $typeRegistry;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory
+     * @var \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory
      */
     protected $clientDirectiveFactory;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @param  \Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory  $clientDirectiveFactory
-     * @return void
-     */
     public function __construct(
         TypeRegistry $typeRegistry,
         ClientDirectiveFactory $clientDirectiveFactory
@@ -35,9 +30,6 @@ class SchemaBuilder
 
     /**
      * Build an executable schema from AST.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \GraphQL\Type\Schema
      */
     public function build(DocumentAST $documentAST): Schema
     {
@@ -46,25 +38,25 @@ class SchemaBuilder
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Always set Query since it is required
-        $config->setQuery(
-            $this->typeRegistry->get('Query')
-        );
+        /** @var \GraphQL\Type\Definition\ObjectType $query */
+        $query = $this->typeRegistry->get(RootType::QUERY);
+        $config->setQuery($query);
 
-        // Those are optional so only add them if they are present in the schema
-        if (isset($documentAST->types['Mutation'])) {
-            $config->setMutation(
-                $this->typeRegistry->get('Mutation')
-            );
+        // Mutation and Subscription are optional, so only add them
+        // if they are present in the schema
+        if (isset($documentAST->types[RootType::MUTATION])) {
+            /** @var \GraphQL\Type\Definition\ObjectType $mutation */
+            $mutation = $this->typeRegistry->get(RootType::MUTATION);
+            $config->setMutation($mutation);
         }
-        if (isset($documentAST->types['Subscription'])) {
+
+        if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
             /** @var \GraphQL\Type\Definition\ObjectType $subscription */
-            $subscription = $this->typeRegistry->get('Subscription');
+            $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
             // Eager-load the subscription fields to ensure they are registered
             $subscription->getFields();
 
-            $config->setSubscription(
-                $subscription
-            );
+            $config->setSubscription($subscription);
         }
 
         // Use lazy type loading to prevent unnecessary work

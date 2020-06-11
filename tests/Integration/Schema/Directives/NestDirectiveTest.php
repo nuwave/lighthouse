@@ -8,7 +8,7 @@ class NestDirectiveTest extends DBTestCase
 {
     public function testNestDelegates(): void
     {
-        $this->schema .= /* @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             createUser(
                 name: String
@@ -34,7 +34,7 @@ class NestDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(
                 name: "foo"

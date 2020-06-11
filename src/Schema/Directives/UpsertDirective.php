@@ -10,14 +10,14 @@ class UpsertDirective extends MutationExecutorDirective
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Create or update an Eloquent model with the input values of the field.
 """
 directive @upsert(
   """
   Specify the class name of the model to use.
-  This is only needed when the default model resolution does not work.
+  This is only needed when the default model detection does not work.
   """
   model: String
 

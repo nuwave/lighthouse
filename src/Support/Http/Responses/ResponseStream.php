@@ -13,46 +13,39 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * @var string
      */
-    const EOL = "\r\n";
+    public const EOL = "\r\n";
 
-    /**
-     * Stream graphql response.
-     *
-     * @param  array  $data
-     * @param  array  $paths
-     * @param  bool  $final
-     * @return void
-     */
     public function stream(array $data, array $paths, bool $final): void
     {
         if (! empty($paths)) {
-            $paths = new Collection($paths);
-            $lastKey = $paths->count() - 1;
+            $chunk = [];
+            $lastKey = count($paths) - 1;
 
-            $paths
-                ->map(function (string $path, int $i) use ($data, $final, $lastKey): string {
-                    $terminating = $final && ($i === $lastKey);
-                    $chunk['data'] = Arr::get($data, "data.{$path}");
-                    $chunk['path'] = (new Collection(explode('.', $path)))
-                        ->map(function ($partial) {
-                            return is_numeric($partial)
-                                ? (int) $partial
-                                : $partial;
-                        })
-                        ->all();
+            foreach ($paths as $i => $path) {
+                $chunk['data'] = Arr::get($data, "data.{$path}");
+                $chunk['path'] = (new Collection(explode('.', $path)))
+                    ->map(function ($partial) {
+                        return is_numeric($partial)
+                            ? (int) $partial
+                            : $partial;
+                    })
+                    ->all();
 
-                    $errors = $this->chunkError($path, $data);
-                    if (! empty($errors)) {
-                        $chunk['errors'] = $errors;
-                    }
+                $errors = $this->chunkError($path, $data);
+                if (! empty($errors)) {
+                    $chunk['errors'] = $errors;
+                }
 
-                    return $this->chunk($chunk, $terminating);
-                })
-                ->each(function (string $chunk) {
-                    $this->emit($chunk);
-                });
+                $terminating = $final && $i === $lastKey;
+
+                $this->emit(
+                    $this->chunk($chunk, $terminating)
+                );
+            }
         } else {
-            $this->emit($this->chunk($data, $final));
+            $this->emit(
+                $this->chunk($data, $final)
+            );
         }
 
         if ($final) {
@@ -60,17 +53,11 @@ class ResponseStream extends Stream implements CanStreamResponse
         }
     }
 
-    /**
-     * @return string
-     */
     protected function boundary(): string
     {
         return self::EOL.'---'.self::EOL;
     }
 
-    /**
-     * @return string
-     */
     protected function terminatingBoundary(): string
     {
         return self::EOL.'-----'.self::EOL;
@@ -79,13 +66,17 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * Format chunked data.
      *
-     * @param  array  $data
-     * @param  bool  $terminating
-     * @return string
+     * @param  array<mixed>  $data
      */
     protected function chunk(array $data, bool $terminating): string
     {
-        $json = json_encode($data, 0);
+        /** @var string $json */
+        $json = json_encode($data);
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while sending response stream: '.json_last_error_msg());
+        }
+
         $length = $terminating
             ? strlen($json)
             : strlen($json.self::EOL);
@@ -93,9 +84,9 @@ class ResponseStream extends Stream implements CanStreamResponse
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
             'Content-Length: '.$length,
-            null,
+            '',
             $json,
-            null,
+            '',
         ]);
 
         return $this->boundary().$chunk;
@@ -103,9 +94,6 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Stream chunked data to client.
-     *
-     * @param  string  $chunk
-     * @return void
      */
     protected function emit(string $chunk): void
     {
@@ -117,12 +105,9 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Flush buffer cache.
-     * Note: We can run into exceptions when flushing the buffer,
-     * these should be safe to ignore.
-     * @todo Investigate exceptions that occur on Apache
      *
-     * @param  \Closure  $flush
-     * @return void
+     * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore.
+     * TODO Investigate exceptions that occur on Apache
      */
     protected function flush(Closure $flush): void
     {

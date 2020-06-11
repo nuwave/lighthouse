@@ -16,7 +16,7 @@ class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArr
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
@@ -38,9 +38,6 @@ directive @rulesForArray(
 SDL;
     }
 
-    /**
-     * @return mixed[]
-     */
     public function rules(): array
     {
         $rules = $this->directiveArgValue('apply');
@@ -54,24 +51,26 @@ SDL;
         // resolve any given rule where a corresponding class exists.
         foreach ($rules as $key => $rule) {
             if (class_exists($rule)) {
-                $rules[$key] = resolve($rule);
+                $rules[$key] = app($rule);
             }
         }
 
         return [$this->argumentPathAsDotNotation() => $rules];
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
         return (new Collection($this->directiveArgValue('messages')))
-            ->mapWithKeys(function (string $message, string $rule): array {
-                $argumentPath = $this->argumentPathAsDotNotation();
+            ->mapWithKeys(
+                /**
+                 * @return array<string, string>
+                 */
+                function (string $message, string $rule): array {
+                    $argumentPath = $this->argumentPathAsDotNotation();
 
-                return ["{$argumentPath}.{$rule}" => $message];
-            })
+                    return ["{$argumentPath}.{$rule}" => $message];
+                }
+            )
             ->all();
     }
 }

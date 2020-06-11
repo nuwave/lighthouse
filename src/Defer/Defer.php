@@ -50,7 +50,7 @@ class Defer implements CreatesResponse
     protected $isStreaming = false;
 
     /**
-     * @var float
+     * @var float|int
      */
     protected $maxExecutionTime = 0;
 
@@ -59,11 +59,6 @@ class Defer implements CreatesResponse
      */
     protected $maxNestedFields = 0;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse  $stream
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @return void
-     */
     public function __construct(CanStreamResponse $stream, GraphQL $graphQL)
     {
         $this->stream = $stream;
@@ -73,19 +68,16 @@ class Defer implements CreatesResponse
 
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
-     *
-     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $manipulateAST
-     * @return void
      */
     public function handleManipulateAST(ManipulateAST $manipulateAST): void
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            PartialParser::directive('@deferrable')
+            PartialParser::directive(/** @lang GraphQL */ '@deferrable')
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
-            PartialParser::directiveDefinition('
+            PartialParser::directiveDefinition(/** @lang GraphQL */ '
 """
 Use this directive on expensive or slow fields to resolve them asynchronously.
 Must not be placed upon:
@@ -97,9 +89,6 @@ directive @defer(if: Boolean = true) on FIELD
         );
     }
 
-    /**
-     * @return bool
-     */
     public function isStreaming(): bool
     {
         return $this->isStreaming;
@@ -108,9 +97,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Register deferred field.
      *
-     * @param  \Closure  $resolver
-     * @param  string  $path
-     * @return mixed
+     * @return mixed The data if it is already available.
      */
     public function defer(Closure $resolver, string $path)
     {
@@ -126,9 +113,7 @@ directive @defer(if: Boolean = true) on FIELD
     }
 
     /**
-     * @param  \Closure  $originalResolver
-     * @param  string  $path
-     * @return mixed
+     * @return mixed The loaded data.
      */
     public function findOrResolve(Closure $originalResolver, string $path)
     {
@@ -146,9 +131,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Resolve field with data or resolver.
      *
-     * @param  \Closure  $originalResolver
-     * @param  string  $path
-     * @return mixed
+     * @return mixed The result of calling the resolver.
      */
     public function resolve(Closure $originalResolver, string $path)
     {
@@ -166,19 +149,11 @@ directive @defer(if: Boolean = true) on FIELD
         return $resolver();
     }
 
-    /**
-     * @param  string  $path
-     * @return bool
-     */
     public function isDeferred(string $path): bool
     {
         return isset($this->deferred[$path]);
     }
 
-    /**
-     * @param  string  $path
-     * @return bool
-     */
     public function hasData(string $path): bool
     {
         return Arr::has($this->result, "data.{$path}");
@@ -204,10 +179,9 @@ directive @defer(if: Boolean = true) on FIELD
                 $this->stream->stream($result, [], empty($this->deferred));
 
                 if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
-                    $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
+                    $this->maxExecutionTime = microtime(true) + $executionTime * 1000;
                 }
 
-                // TODO: Allow nested_levels to be set in config to break out of loop early.
                 while (
                     count($this->deferred)
                     && ! $this->executionTimeExpired()
@@ -227,27 +201,19 @@ directive @defer(if: Boolean = true) on FIELD
             },
             200,
             [
-                // TODO: Allow headers to be set in config
                 'X-Accel-Buffering' => 'no',
                 'Content-Type' => 'multipart/mixed; boundary="-"',
             ]
         );
     }
 
-    /**
-     * @param  int  $time
-     * @return void
-     */
-    public function setMaxExecutionTime(int $time): void
+    public function setMaxExecutionTime(float $time): void
     {
         $this->maxExecutionTime = $time;
     }
 
     /**
      * Override max nested fields.
-     *
-     * @param  int  $max
-     * @return void
      */
     public function setMaxNestedFields(int $max): void
     {
@@ -256,8 +222,6 @@ directive @defer(if: Boolean = true) on FIELD
 
     /**
      * Check if the maximum execution time has expired.
-     *
-     * @return bool
      */
     protected function executionTimeExpired(): bool
     {
@@ -270,9 +234,6 @@ directive @defer(if: Boolean = true) on FIELD
 
     /**
      * Check if the maximum number of nested field has been resolved.
-     *
-     * @param  int  $nested
-     * @return bool
      */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
@@ -285,8 +246,6 @@ directive @defer(if: Boolean = true) on FIELD
 
     /**
      * Execute deferred fields.
-     *
-     * @return void
      */
     protected function executeDeferred(): void
     {

@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 class PaginationManipulator
 {
     /**
-     * @var DocumentAST
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
@@ -22,7 +22,7 @@ class PaginationManipulator
      * for a relation, as the model is not required for resolving
      * that directive and the user may choose a different type.
      *
-     * @var string|null
+     * @var class-string<\Illuminate\Database\Eloquent\Model>|null
      */
     protected $modelClass;
 
@@ -34,7 +34,7 @@ class PaginationManipulator
     /**
      * Set the model class to use for code generation.
      *
-     * @param  string  $modelClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @return $this
      */
     public function setModelClass(string $modelClass): self
@@ -51,12 +51,6 @@ class PaginationManipulator
      * The types in between are automatically generated and applied to the schema.
      *
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
-     * @return void
      */
     public function transformToPaginatedField(
         PaginationType $paginationType,
@@ -75,13 +69,6 @@ class PaginationManipulator
 
     /**
      * Register connection with schema.
-     *
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
-     * @return  void
      */
     protected function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
@@ -104,7 +91,7 @@ class PaginationManipulator
 
         $connectionType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName edges."
-            type $connectionTypeName {$this->modelClassDirective()} {
+            type $connectionTypeName {
                 "Pagination information about the list of edges."
                 pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
@@ -113,6 +100,7 @@ class PaginationManipulator
             }
 GRAPHQL
         );
+        $this->addPaginationWrapperType($connectionType);
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
@@ -127,6 +115,7 @@ GRAPHQL
                 }
 GRAPHQL
             );
+        $this->documentAST->setTypeDefinition($connectionEdge);
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),
@@ -138,19 +127,32 @@ GRAPHQL
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
+    }
 
-        $this->documentAST->setTypeDefinition($connectionType);
-        $this->documentAST->setTypeDefinition($connectionEdge);
+    /**
+     * Add the wrapping type for paginated results.
+     *
+     * This merges preexisting definitions to preserve maximum information.
+     */
+    protected function addPaginationWrapperType(ObjectTypeDefinitionNode $objectType): void
+    {
+        // If the type already exists, we use that instead
+        if (isset($this->documentAST->types[$objectType->name->value])) {
+            $objectType = $this->documentAST->types[$objectType->name->value];
+        }
+
+        if ($this->modelClass) {
+            $objectType->directives = ASTHelper::mergeNodeList(
+                $objectType->directives,
+                [PartialParser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
+            );
+        }
+
+        $this->documentAST->setTypeDefinition($objectType);
     }
 
     /**
      * Register paginator with schema.
-     *
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @return void
      */
     protected function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
@@ -164,7 +166,7 @@ GRAPHQL
 
         $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName items."
-            type $paginatorTypeName {$this->modelClassDirective()} {
+            type $paginatorTypeName {
                 "Pagination information about the list of items."
                 paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
@@ -173,6 +175,7 @@ GRAPHQL
             }
 GRAPHQL
         );
+        $this->addPaginationWrapperType($paginatorType);
 
         $inputValueDefinitions = [
             self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
@@ -184,17 +187,10 @@ GRAPHQL
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
-
-        $this->documentAST->setTypeDefinition($paginatorType);
     }
 
     /**
      * Build the count argument definition string, considering default and max values.
-     *
-     * @param  string  $argumentName
-     * @param  int|null  $defaultCount
-     * @param  int|null  $maxCount
-     * @return string
      */
     protected static function countArgument(string $argumentName, ?int $defaultCount = null, ?int $maxCount = null): string
     {
@@ -211,19 +207,5 @@ GRAPHQL
             );
 
         return $description.$definition;
-    }
-
-    /**
-     * Get the definition for the @modelClass directive if needed.
-     *
-     * This will be empty when not applicable.
-     *
-     * @return string
-     */
-    protected function modelClassDirective(): string
-    {
-        return $this->modelClass
-            ? '@modelClass(class: "'.addslashes($this->modelClass).'")'
-            : '';
     }
 }

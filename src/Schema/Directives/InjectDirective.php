@@ -15,7 +15,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware, DefinedD
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 directive @inject(
   """
   A path to the property of the context that will be injected.
@@ -37,9 +37,6 @@ SDL;
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */

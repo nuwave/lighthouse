@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Defer;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
@@ -13,15 +12,6 @@ use Tests\Utils\Models\User;
 
 class DeferDBTest extends DBTestCase
 {
-    use SetUpDefer;
-
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $this->setUpDefer($app);
-    }
-
     protected function getPackageProviders($app)
     {
         return array_merge(
@@ -37,11 +27,9 @@ class DeferDBTest extends DBTestCase
             'company_id' => $company->getKey(),
         ]);
 
-        $this->mockResolver(function () use ($user): User {
-            return $user;
-        });
+        $this->mockResolver($user);
 
-        $this->schema = /* @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
         }
@@ -61,7 +49,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -92,11 +80,9 @@ class DeferDBTest extends DBTestCase
         ]);
         $user = $users[0];
 
-        $this->mockResolver(function () use ($user): User {
-            return $user;
-        });
+        $this->mockResolver($user);
 
-        $this->schema = /* @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
             users: [User] @hasMany
@@ -117,7 +103,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -168,11 +154,9 @@ class DeferDBTest extends DBTestCase
                 ]);
             });
 
-        $this->mockResolver(function () use ($companies): Collection {
-            return $companies;
-        });
+        $this->mockResolver($companies);
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
             users: [User] @hasMany
@@ -193,7 +177,7 @@ class DeferDBTest extends DBTestCase
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks(/* @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             companies {
                 name
@@ -242,11 +226,9 @@ class DeferDBTest extends DBTestCase
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
 
-            $this->assertTrue(
-                in_array(
-                    $item['name'],
-                    $companies->pluck('name')->all()
-                )
+            $this->assertContains(
+                $item['name'],
+                $companies->pluck('name')->all()
             );
         });
     }

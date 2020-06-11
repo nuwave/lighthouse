@@ -11,13 +11,13 @@ class ASTHelperTest extends TestCase
 {
     public function testThrowsWhenMergingUniqueNodeListWithCollision(): void
     {
-        $objectType1 = PartialParser::objectTypeDefinition('
+        $objectType1 = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
         type User {
             email: String
         }
         ');
 
-        $objectType2 = PartialParser::objectTypeDefinition('
+        $objectType2 = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
         type User {
             email(bar: String): Int
         }
@@ -33,14 +33,14 @@ class ASTHelperTest extends TestCase
 
     public function testMergesUniqueNodeListsWithOverwrite(): void
     {
-        $objectType1 = PartialParser::objectTypeDefinition('
+        $objectType1 = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
         type User {
             first_name: String
             email: String
         }
         ');
 
-        $objectType2 = PartialParser::objectTypeDefinition('
+        $objectType2 = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
         type User {
             first_name: String @foo
             last_name: String
@@ -55,6 +55,7 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(3, $objectType1->fields);
 
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $firstNameField */
         $firstNameField = ASTHelper::firstByName($objectType1->fields, 'first_name');
 
         $this->assertCount(1, $firstNameField->directives);
@@ -62,7 +63,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractStringArguments(): void
     {
-        $directive = PartialParser::directive('@foo(bar: "baz")');
+        $directive = PartialParser::directive(/** @lang GraphQL */ '@foo(bar: "baz")');
         $this->assertSame(
             'baz',
             ASTHelper::directiveArgValue($directive, 'bar')
@@ -71,7 +72,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractBooleanArguments(): void
     {
-        $directive = PartialParser::directive('@foo(bar: true)');
+        $directive = PartialParser::directive(/** @lang GraphQL */ '@foo(bar: true)');
         $this->assertTrue(
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -79,7 +80,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractArrayArguments(): void
     {
-        $directive = PartialParser::directive('@foo(bar: ["one", "two"])');
+        $directive = PartialParser::directive(/** @lang GraphQL */ '@foo(bar: ["one", "two"])');
         $this->assertSame(
             ['one', 'two'],
             ASTHelper::directiveArgValue($directive, 'bar')
@@ -88,7 +89,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractObjectArguments(): void
     {
-        $directive = PartialParser::directive('@foo(bar: { baz: "foobar" })');
+        $directive = PartialParser::directive(/** @lang GraphQL */ '@foo(bar: { baz: "foobar" })');
         $this->assertSame(
             ['baz' => 'foobar'],
             ASTHelper::directiveArgValue($directive, 'bar')
@@ -97,7 +98,7 @@ class ASTHelperTest extends TestCase
 
     public function testReturnsNullForNonExistingArgumentOnDirective(): void
     {
-        $directive = PartialParser::directive('@foo');
+        $directive = PartialParser::directive(/** @lang GraphQL */ '@foo');
         $this->assertNull(
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -105,12 +106,66 @@ class ASTHelperTest extends TestCase
 
     public function testChecksWhetherTypeImplementsInterface(): void
     {
-        $type = PartialParser::objectTypeDefinition('
-            type Foo implements Bar {
-                baz: String
-            }
+        $type = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+        type Foo implements Bar {
+            baz: String
+        }
         ');
         $this->assertTrue(ASTHelper::typeImplementsInterface($type, 'Bar'));
         $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
+    }
+
+    public function testThrowsWhenDefinedOnInvalidTypes(): void
+    {
+        $notAnObject = PartialParser::scalarTypeDefinition(/** @lang GraphQL */ '
+        scalar NotAnObject
+        ');
+        $directive = PartialParser::directive(/** @lang GraphQL */ '@foo');
+
+        $this->expectException(DefinitionException::class);
+        ASTHelper::addDirectiveToFields($directive, $notAnObject);
+    }
+
+    public function testAddDirectiveToFields(): void
+    {
+        $object = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+        type Query {
+            foo: Int
+        }
+        ');
+
+        ASTHelper::addDirectiveToFields(
+            PartialParser::directive(/** @lang GraphQL */ '@guard'),
+            $object
+        );
+
+        $this->assertSame(
+            'guard',
+            $object->fields[0]->directives[0]->name->value
+        );
+    }
+
+    public function testPrefersFieldDirectivesOverTypeDirectives(): void
+    {
+        $object = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+        type Query {
+            foo: Int @guard(with: "api")
+            bar: String
+        }
+        ');
+
+        ASTHelper::addDirectiveToFields(
+            PartialParser::directive(/** @lang GraphQL */ '@guard'),
+            $object
+        );
+
+        $guardOnFooArguments = $object->fields[0]->directives[0];
+        $fieldGuard = ASTHelper::directiveArgValue($guardOnFooArguments, 'with');
+
+        $this->assertSame('api', $fieldGuard);
+        $this->assertSame(
+            'guard',
+            $object->fields[1]->directives[0]->name->value
+        );
     }
 }

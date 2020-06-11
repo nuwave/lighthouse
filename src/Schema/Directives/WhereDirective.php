@@ -9,7 +9,7 @@ class WhereDirective extends BaseDirective implements ArgBuilderDirective, Defin
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
 """
@@ -37,7 +37,6 @@ SDL;
      * Add any "WHERE" clause to the builder.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)

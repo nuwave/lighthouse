@@ -9,11 +9,24 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Laravel\Scout\Searchable;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property string|null $body
+ * @property int|null $user_id
+ * @property int $task_id
+ * @property int|null $parent_id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class Post extends Model
 {
     use Searchable;
 
-    protected $guarded = [];
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function comments(): HasMany
     {
@@ -40,8 +53,8 @@ class Post extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    public function hours(): MorphMany
+    public function images(): MorphMany
     {
-        return $this->morphMany(Hour::class, 'hourable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 }

@@ -12,8 +12,7 @@ class ConnectionField
     /**
      * Resolve page info for connection.
      *
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
-     * @return array
+     * @return array<string, mixed>
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {
@@ -36,13 +35,10 @@ class ConnectionField
     /**
      * Resolve edges for connection.
      *
-     * @param  \Illuminate\Pagination\LengthAwarePaginator  $paginator
-     * @param  array  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \Illuminate\Support\Collection
+     * @param  \Illuminate\Pagination\LengthAwarePaginator<mixed>  $paginator
+     * @param  array<string, mixed>  $args
      */
-    public function edgeResolver(LengthAwarePaginator $paginator, $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
+    public function edgeResolver(LengthAwarePaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
         // We know this must be a list, as it is constructed this way during schema manipulation
         /** @var \GraphQL\Type\Definition\ListOfType $listOfType */
@@ -57,13 +53,13 @@ class ConnectionField
 
         return $paginator
             ->values()
-            ->map(function ($item, $index) use ($returnTypeFields, $firstItem): array {
+            ->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
                 $data = [];
 
                 foreach ($returnTypeFields as $field) {
                     switch ($field->name) {
                         case 'cursor':
-                            $data['cursor'] = Cursor::encode($firstItem + $index);
+                            $data['cursor'] = Cursor::encode((int) $firstItem + $index);
                             break;
 
                         case 'node':

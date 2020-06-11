@@ -13,7 +13,7 @@ class RouteRegistrationTest extends TestCase
      * @param  \Illuminate\Foundation\Application  $app
      * @return string[]
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             LighthouseServiceProvider::class,
@@ -34,7 +34,7 @@ class RouteRegistrationTest extends TestCase
 
     public function testRegisterRouteWithCustomConfig(): void
     {
-        /** @var \Illuminate\Routing\Router|\Laravel\Lumen\Routing\Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = app('router');
         $routes = $router->getRoutes();
 

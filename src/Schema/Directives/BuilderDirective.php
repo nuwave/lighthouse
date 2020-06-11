@@ -9,7 +9,7 @@ class BuilderDirective extends BaseDirective implements ArgBuilderDirective, Def
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use an argument to modify the query builder for a field.
 """
@@ -28,7 +28,6 @@ SDL;
      * Dynamically call a user-defined method to enhance the builder.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)

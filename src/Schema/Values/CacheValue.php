@@ -8,32 +8,38 @@ use Illuminate\Support\Collection;
 class CacheValue
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue|null
      */
     protected $fieldValue;
 
     /**
-     * @var mixed
+     * @var mixed|null The root that was passed to the query.
      */
-    protected $rootValue;
+    protected $root;
 
     /**
-     * @var array
+     * The args that were passed to the query.
+     *
+     * @var array<string, mixed>
      */
     protected $args;
 
     /**
-     * @var mixed
+     * The context that was passed to the query.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     protected $context;
 
     /**
+     * The ResolveInfo that was passed to the query.
+     *
      * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
     /**
-     * @var mixed
+     * @var mixed The key to use for caching this field.
      */
     protected $fieldKey;
 
@@ -43,15 +49,12 @@ class CacheValue
     protected $isPrivate;
 
     /**
-     * Create instance of cache value.
-     *
-     * @param  array  $arguments
-     * @return void
+     * @param  array<string, mixed>  $arguments
      */
     public function __construct(array $arguments = [])
     {
         $this->fieldValue = Arr::get($arguments, 'field_value');
-        $this->rootValue = Arr::get($arguments, 'root');
+        $this->root = Arr::get($arguments, 'root');
         $this->args = Arr::get($arguments, 'args');
         $this->context = Arr::get($arguments, 'context');
         $this->resolveInfo = Arr::get($arguments, 'resolve_info');
@@ -62,8 +65,6 @@ class CacheValue
 
     /**
      * Resolve key from root value.
-     *
-     * @return string
      */
     public function getKey(): string
     {
@@ -89,7 +90,7 @@ class CacheValue
     /**
      * Get cache tags.
      *
-     * @return array
+     * @return array<string>
      */
     public function getTags(): array
     {
@@ -112,7 +113,7 @@ class CacheValue
     /**
      * Convert input arguments to keys.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<string>
      */
     protected function argKeys(): Collection
     {
@@ -123,7 +124,7 @@ class CacheValue
         return (new Collection($args))
             ->map(function ($value, $key): string {
                 $keyValue = is_array($value)
-                    ? json_encode($value, true)
+                    ? json_encode($value)
                     : $value;
 
                 return "{$key}:{$keyValue}";
@@ -137,7 +138,7 @@ class CacheValue
      */
     protected function fieldKey()
     {
-        if (! $this->fieldValue || ! $this->rootValue) {
+        if (! $this->fieldValue || ! $this->root) {
             return;
         }
 
@@ -146,15 +147,12 @@ class CacheValue
             ->getCacheKey();
 
         if ($cacheFieldKey) {
-            return data_get($this->rootValue, $cacheFieldKey);
+            return data_get($this->root, $cacheFieldKey);
         }
     }
 
     /**
-     * Implode value to create string.
-     *
-     * @param  array  $items
-     * @return string
+     * @param  array<mixed|null> $items
      */
     protected function implode(array $items): string
     {

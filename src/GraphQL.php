@@ -67,16 +67,6 @@ class GraphQL
      */
     protected $createsContext;
 
-    /**
-     * GraphQL constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
-     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
-     * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
-     * @return void
-     */
     public function __construct(
         SchemaBuilder $schemaBuilder,
         Pipeline $pipeline,
@@ -94,7 +84,6 @@ class GraphQL
     /**
      * Execute a request against the schema and return a serializable result array.
      *
-     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return mixed[]
      */
     public function executeRequest(GraphQLRequest $request): array
@@ -115,7 +104,6 @@ class GraphQL
     /**
      * Apply the debug settings from the config and get the result as an array.
      *
-     * @param  \GraphQL\Executor\ExecutionResult  $result
      * @return mixed[]
      */
     public function applyDebugSettings(ExecutionResult $result): array
@@ -137,11 +125,8 @@ class GraphQL
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
      * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  mixed[]  $variables
+     * @param  array<mixed>|null  $variables
      * @param  mixed|null  $rootValue
-     * @param  string|null  $operationName
-     * @return \GraphQL\Executor\ExecutionResult
      */
     public function executeQuery(
         $query,
@@ -170,7 +155,7 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
-        /** @var \Nuwave\Lighthouse\Execution\ExtensionsResponse[] $extensionsResponses */
+        /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
             new BuildExtensionsResponse
         );
@@ -213,8 +198,6 @@ class GraphQL
 
     /**
      * Ensure an executable GraphQL schema is present.
-     *
-     * @return \GraphQL\Type\Schema
      */
     public function prepSchema(): Schema
     {
@@ -230,7 +213,7 @@ class GraphQL
     /**
      * Construct the validation rules with values given in the config.
      *
-     * @return \GraphQL\Validator\Rules\ValidationRule[]
+     * @return array<class-string<\GraphQL\Validator\Rules\ValidationRule>, \GraphQL\Validator\Rules\ValidationRule>
      */
     protected function getValidationRules(): array
     {
@@ -243,8 +226,6 @@ class GraphQL
 
     /**
      * Clean up after executing a query.
-     *
-     * @return void
      */
     protected function cleanUp(): void
     {
@@ -255,7 +236,6 @@ class GraphQL
      * Get instance of DocumentAST.
      *
      * @deprecated use ASTBuilder instead
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function documentAST(): DocumentAST
     {

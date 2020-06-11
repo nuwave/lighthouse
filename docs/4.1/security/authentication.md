@@ -1,8 +1,7 @@
 # Authentication
 
-You can use standard Laravel mechanisms to authenticate users of your GraphQL API.
-The [API Authentication](https://laravel.com/docs/api-authentication) is especially
-suited because of its stateless nature.
+You can use [standard Laravel mechanisms](https://laravel.com/docs/authentication)
+to authenticate users of your GraphQL API. Stateless guards are recommended for most use cases.
 
 ## Get the current user
 
@@ -45,7 +44,7 @@ If you need to apply middleware to multiple fields, just use [@middleware](../ap
 on a `type` or an `extend type` definition.
 
 ```graphql
-extend type Query @middleware(checks: ["auth:admin"]){
+extend type Query @middleware(checks: ["auth:admin"]) {
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
 }

@@ -16,34 +16,34 @@ class UpsertDirectiveTest extends DBTestCase
             'name' => 'old',
         ]);
 
-        $this->schema .= /* @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
-        
+
         type Task {
             id: Int
             name: String!
         }
-        
+
         type User {
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         input UpdateUserInput {
             id: Int
             name: String
             tasks: [UpdateTaskInput!] @upsert(relation: "tasks")
         }
-        
+
         input UpdateTaskInput {
             id: Int
             name: String
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateUser(input: {
                 id: 1
@@ -78,6 +78,72 @@ class UpsertDirectiveTest extends DBTestCase
                         [
                             'id' => 2,
                             'name' => 'new',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testNestedInsertOnInputList(): void
+    {
+        factory(User::class)->create();
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+        }
+
+        type User {
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            name: String
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks")
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateUser(input: {
+                id: 1
+                name: "foo"
+                tasks: [
+                    {
+                        name: "foo"
+                    }
+                    {
+                        name: "bar"
+                    }
+                ]
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }')->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'name' => 'foo',
+                        ],
+                        [
+                            'name' => 'bar',
                         ],
                     ],
                 ],

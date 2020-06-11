@@ -37,7 +37,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testHydratesBaseDirectives(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             foo: String @field
         ');
 
@@ -58,7 +58,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testSkipsHydrationForNonBaseDirectives(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             foo: String @foo
         ');
 
@@ -68,9 +68,9 @@ class DirectiveFactoryTest extends TestCase
                 return 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue, Closure $next): void
+            public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
             {
-                //
+                return $fieldValue;
             }
         };
 
@@ -93,7 +93,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testCanCreateSingleDirective(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             foo: [Foo!]! @hasMany
         ');
 
@@ -104,8 +104,9 @@ class DirectiveFactoryTest extends TestCase
     public function testThrowsExceptionWhenMultipleFieldResolverDirectives(): void
     {
         $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessage("Node bar can only have one directive of type Nuwave\Lighthouse\Support\Contracts\FieldResolver but found [@hasMany, @belongsTo].");
 
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             bar: [Bar!]! @hasMany @belongsTo
         ');
 
@@ -114,7 +115,7 @@ class DirectiveFactoryTest extends TestCase
 
     public function testCanCreateMultipleDirectives(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/* @lang GraphQL */ '
+        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             bar: String @can(if: ["viewBar"]) @event
         ');
 

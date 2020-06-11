@@ -12,34 +12,39 @@ trait MocksResolvers
     /**
      * Create and register a PHPUnit mock to be called through the @mock directive.
      *
-     * @param  callable|null  $resolver
-     * @param  string  $key
-     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
+     * @param  callable|mixed|null  $resolverOrValue
      */
-    protected function mockResolver(callable $resolver = null, string $key = 'default'): InvocationMocker
+    protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
     {
-        $mock = $this->getMockBuilder(MockResolver::class)
-            ->getMock();
+        $method = $this->mockResolverExpects($this->atLeastOnce(), $key);
 
-        $this->registerMockResolver($mock, $key);
-
-        $method = $mock
-            ->expects($this->any())
-            ->method('__invoke');
-
-        if ($resolver) {
-            $method->willReturnCallback($resolver);
+        if (is_callable($resolverOrValue)) {
+            $method->willReturnCallback($resolverOrValue);
+        } else {
+            $method->willReturn($resolverOrValue);
         }
 
         return $method;
     }
 
     /**
-     * Register a mock resolver that will be called through the @mock directive.
+     * Register a resolver for @mock.
      *
-     * @param  callable  $mock
-     * @param  string  $key
-     * @return void
+     * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
+     */
+    protected function mockResolverExpects(/* TODO add strong type hint when bumping PHPUnit */ $invocationOrder, string $key = 'default'): InvocationMocker
+    {
+        $mock = $this->createMock(MockResolver::class);
+
+        $this->registerMockResolver($mock, $key);
+
+        return $mock
+            ->expects($invocationOrder)
+            ->method('__invoke');
+    }
+
+    /**
+     * Register a mock resolver that will be called through the @mock directive.
      */
     protected function registerMockResolver(callable $mock, string $key): void
     {

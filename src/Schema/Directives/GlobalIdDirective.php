@@ -19,12 +19,6 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      */
     protected $globalId;
 
-    /**
-     * GlobalIdDirective constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
-     * @return void
-     */
     public function __construct(GlobalId $globalId)
     {
         $this->globalId = $globalId;
@@ -32,7 +26,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Converts between IDs/types and global IDs.
 When used upon a field, it encodes,
@@ -51,10 +45,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {

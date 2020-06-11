@@ -9,7 +9,7 @@ class ModelClassDirective extends BaseDirective implements DefinedDirective, Dir
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Map a model class to an object type.
 This can be used when the name of the model differs from the name of the type.

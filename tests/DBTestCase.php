@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    /**
+     * Indicates if migrations ran.
+     *
+     * @var bool
+     */
     protected static $migrated = false;
 
     protected function setUp(): void
@@ -38,9 +43,10 @@ abstract class DBTestCase extends TestCase
         $app['config']->set('database.default', 'mysql');
         $app['config']->set('database.connections.mysql', [
             'driver' => 'mysql',
-            'database' => 'test',
-            'host' => env('TRAVIS') ? '127.0.0.1' : 'mysql',
-            'username' => 'root',
+            'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
+            'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
+            'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
+            'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
         ]);
     }
 }
