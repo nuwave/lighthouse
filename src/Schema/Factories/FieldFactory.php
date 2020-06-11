@@ -334,7 +334,6 @@ class FieldFactory
 
     /**
      * @param  string[]  $argumentPath
-     * @return bool
      */
     protected function argValueExists(array $argumentPath): bool
     {
@@ -343,7 +342,6 @@ class FieldFactory
 
     /**
      * @param  string[]  $argumentPath
-     * @param  mixed  $value
      * @return mixed[]
      */
     protected function setArgValue(array $argumentPath, $value): array
@@ -353,7 +351,6 @@ class FieldFactory
 
     /**
      * @param  string[]  $argumentPath
-     * @return mixed
      */
     protected function argValue(array $argumentPath)
     {

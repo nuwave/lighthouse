@@ -10,8 +10,6 @@ class FooBar
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
     public function __invoke(): string
     {
