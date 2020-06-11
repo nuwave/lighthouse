@@ -194,7 +194,7 @@ class CreateDirective extends BaseDirective implements FieldResolver, ArgResolve
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $argsList
      * @return \Illuminate\Database\Eloquent\Model[]
      */
-    public function __invoke($parent, $argsList)
+    public function __invoke($parent, $argsList):
     {
         $relationName = $this->getRelationName();
 
