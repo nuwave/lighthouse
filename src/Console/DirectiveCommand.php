@@ -183,6 +183,9 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         return __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub';
     }
 
+    /**
+     * @return array<array<mixed>>
+     */
     protected function getOptions(): array
     {
         return [
