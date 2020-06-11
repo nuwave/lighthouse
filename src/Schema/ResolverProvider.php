@@ -52,8 +52,6 @@ class ResolverProvider implements ProvidesResolver
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return void
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function throwMissingResolver(FieldValue $fieldValue): void
