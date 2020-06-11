@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Removed
 
-- Remove fallback for `lighthouse.cache.ttl` setting
+- Remove fallback for `lighthouse.cache.ttl` setting https://github.com/nuwave/lighthouse/pull/1423
 
 ## Unreleased
 
