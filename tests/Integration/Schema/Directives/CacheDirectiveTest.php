@@ -17,7 +17,7 @@ class CacheDirectiveTest extends DBTestCase
      */
     protected $cache;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 

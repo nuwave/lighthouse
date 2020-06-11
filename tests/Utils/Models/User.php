@@ -69,7 +69,7 @@ class User extends Authenticatable
         });
     }
 
-    public function getCompanyNameAttribute()
+    public function getCompanyNameAttribute(): string
     {
         return $this->company->name;
     }
