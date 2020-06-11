@@ -29,7 +29,7 @@ class ExecutableTypeNodeConverter extends TypeNodeConverter
         return Type::listOf($type);
     }
 
-    protected function namedType(string $nodeName)
+    protected function namedType(string $nodeName): Type
     {
         return Type::getStandardTypes()[$nodeName]
             ?? $this->typeRegistry->get($nodeName);
