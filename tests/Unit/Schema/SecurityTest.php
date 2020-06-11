@@ -13,7 +13,7 @@ class SecurityTest extends TestCase
     {
         config(['lighthouse.security.max_query_complexity' => 1]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User @first
         }
@@ -30,7 +30,7 @@ class SecurityTest extends TestCase
     {
         config(['lighthouse.security.max_query_depth' => 1]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User @first
         }
@@ -53,7 +53,7 @@ class SecurityTest extends TestCase
 
     protected function assertMaxQueryComplexityIs1(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -69,7 +69,7 @@ class SecurityTest extends TestCase
 
     protected function assertMaxQueryDepthIs1(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 user {
@@ -89,7 +89,7 @@ class SecurityTest extends TestCase
 
     protected function assertIntrospectionIsDisabled(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             __schema {
                 queryType {

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
+use Tests\Unit\Schema\Execution\Fixtures\FooContext;
 
 class ContextFactoryTest extends TestCase
 {
@@ -17,32 +18,7 @@ class ContextFactoryTest extends TestCase
             return new class implements CreatesContext {
                 public function generate(Request $request)
                 {
-                    return new class($request) implements GraphQLContext {
-                        /**
-                         * @var \Illuminate\Http\Request
-                         */
-                        protected $request;
-
-                        public function __construct(Request $request)
-                        {
-                            $this->request = $request;
-                        }
-
-                        public function user(): void
-                        {
-                            //
-                        }
-
-                        public function request(): Request
-                        {
-                            return $this->request;
-                        }
-
-                        public function foo(): string
-                        {
-                            return 'custom.context';
-                        }
-                    };
+                    return new FooContext($request);
                 }
             };
         });
@@ -50,25 +26,27 @@ class ContextFactoryTest extends TestCase
 
     public function testCanGenerateCustomContext(): void
     {
-        $this->schema = "
-        type Query {
-            context: String @field(resolver:\"{$this->qualifyTestResolver()}\")
-        }
-        ";
+        $this->mockResolver(
+            function ($root, array $args, GraphQLContext $context): string {
+                /** @var FooContext $context */
+                return $context->foo();
+            }
+        );
 
-        $this->graphQL('
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            context: String @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             context
         }
         ')->assertJson([
             'data' => [
-                'context' => 'custom.context',
+                'context' => FooContext::FROM_FOO_CONTEXT,
             ],
         ]);
-    }
-
-    public function resolve($root, array $args, GraphQLContext $context): string
-    {
-        return $context->foo();
     }
 }

@@ -148,7 +148,8 @@ class GraphQLTest extends TestCase
                         'message' => $message,
                     ],
                 ],
-            ]);
+            ])
+            ->assertStatus(200);
     }
 
     public function testIgnoresInvalidJSONVariables(): void

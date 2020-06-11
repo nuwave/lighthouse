@@ -3,71 +3,96 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class WithDirectiveTest extends DBTestCase
 {
-    /**
-     * The currently authenticated user.
-     *
-     * @var \Tests\Utils\Models\User
-     */
-    protected $user;
-
-    /**
-     * The user's tasks.
-     *
-     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Task>
-     */
-    protected $tasks;
-
-    protected function setUp(): void
+    public function testEagerLoadsRelation(): void
     {
-        parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->tasks = factory(Task::class, 3)->create([
-            'user_id' => $this->user->getKey(),
-        ]);
-
-        $this->be($this->user);
-    }
-
-    public function testCanQueryARelationship(): void
-    {
-        $this->schema = '
-        type User {
-            task_count_string: String!
-                @with(relation: "tasks")
-                @method(name: "getTaskCountAsString")
-        }
-        
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            user: User @auth
+            user: User @first
+        }
+
+        type User {
+            tasksLoaded: Boolean!
+                @with(relation: "tasks")
+                @method
         }
         ';
 
         /** @var \Tests\Utils\Models\User $user */
-        $user = auth()->user();
-
-        $this->assertFalse(
-            $user->relationLoaded('tasks')
-        );
-
-        $this->graphQL('
-        {
-            user {
-                task_count_string
-            }
-        }
-        ')->assertJsonFragment([
-            'task_count_string' => 'User has 3 tasks.',
+        $user = factory(User::class)->create();
+        factory(Task::class, 3)->create([
+            'user_id' => $user->getKey(),
         ]);
 
-        $this->assertCount(
-            3,
-            $user->tasks
+        // Sanity check
+        $this->assertFalse(
+            $user->tasksLoaded()
         );
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                tasksLoaded
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'user' => [
+                    'tasksLoaded' => true,
+                ],
+            ],
+        ]);
+    }
+
+    public function testEagerLoadsNestedRelation(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users: User @first
+        }
+
+        type User {
+            postsCommentsLoaded: Boolean!
+                @with(relation: "posts.comments")
+                @method
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+        $posts = factory(Post::class, 2)->create([
+            'user_id' => $user->id,
+        ]);
+        foreach ($posts as $post) {
+            factory(Comment::class)->create([
+                'post_id' => $post->id,
+                'user_id' => $user->id,
+            ]);
+        }
+
+        // Sanity check
+        $this->assertFalse(
+            $user->postsCommentsLoaded()
+        );
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                postsCommentsLoaded
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'postsCommentsLoaded' => true,
+                ],
+            ],
+        ]);
     }
 }

@@ -50,7 +50,7 @@ class FieldDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args:["foo.baz"])
+            bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args: ["foo.baz"])
         }
         ';
 

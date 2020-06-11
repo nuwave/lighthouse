@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Type\Introspection;
+use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Cache\Repository;
 use Illuminate\Console\Command;
@@ -10,6 +12,9 @@ use Nuwave\Lighthouse\GraphQL;
 
 class PrintSchemaCommand extends Command
 {
+    public const GRAPHQL_FILENAME = 'lighthouse-schema.graphql';
+    public const JSON_FILENAME = 'lighthouse-schema.json';
+
     /**
      * The name and signature of the console command.
      *
@@ -18,6 +23,7 @@ class PrintSchemaCommand extends Command
     protected $signature = '
         lighthouse:print-schema
         {--W|write : Write the output to a file}
+        {--json : Output JSON instead of GraphQL SDL}
     ';
 
     /**
@@ -29,26 +35,47 @@ class PrintSchemaCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  \Illuminate\Cache\Repository  $cache
-     * @param  \Illuminate\Contracts\Filesystem\Filesystem  $storage
-     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @return void
      */
     public function handle(Repository $cache, Filesystem $storage, GraphQL $graphQL): void
     {
         // Clear the cache so this always gets the current schema
         $cache->forget(config('lighthouse.cache.key'));
 
-        $schema = SchemaPrinter::doPrint(
-            $graphQL->prepSchema()
-        );
+        $schema = $graphQL->prepSchema();
+        if ($this->option('json')) {
+            $filename = self::JSON_FILENAME;
+            $schemaString = $this->schemaJson($schema);
+        } else {
+            $filename = self::GRAPHQL_FILENAME;
+            $schemaString = SchemaPrinter::doPrint($schema);
+        }
 
         if ($this->option('write')) {
-            $storage->put('lighthouse-schema.graphql', $schema);
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
+            $storage->put($filename, $schemaString);
+            $this->info('Wrote schema to the default file storage (usually storage/app) as "'.$filename.'".');
         } else {
-            $this->info($schema);
+            $this->info($schemaString);
         }
+    }
+
+    /**
+     * Convert the given schema to a JSON string.
+     */
+    protected function schemaJson(Schema $schema): string
+    {
+        // TODO simplify once https://github.com/webonyx/graphql-php/pull/539 is released
+        $introspectionResult = \GraphQL\GraphQL::executeQuery(
+            $schema,
+            Introspection::getIntrospectionQuery()
+        );
+
+        $json = json_encode($introspectionResult->data);
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while converting schema: '.json_last_error_msg());
+        }
+        /** @var string $json */
+
+        return $json;
     }
 }

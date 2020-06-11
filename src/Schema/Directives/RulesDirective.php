@@ -46,9 +46,6 @@ directive @rules(
 SDL;
     }
 
-    /**
-     * @return mixed[]
-     */
     public function rules(): array
     {
         $rules = $this->directiveArgValue('apply');
@@ -58,24 +55,26 @@ SDL;
         // resolve any given rule where a corresponding class exists.
         foreach ($rules as $key => $rule) {
             if (class_exists($rule)) {
-                $rules[$key] = resolve($rule);
+                $rules[$key] = app($rule);
             }
         }
 
         return [$this->argumentPathAsDotNotation() => $rules];
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
         return (new Collection($this->directiveArgValue('messages')))
-            ->mapWithKeys(function (string $message, string $rule): array {
-                $argumentPath = $this->argumentPathAsDotNotation();
+            ->mapWithKeys(
+                /**
+                 * @return array<string, string>
+                 */
+                function (string $message, string $rule): array {
+                    $argumentPath = $this->argumentPathAsDotNotation();
 
-                return ["{$argumentPath}.{$rule}" => $message];
-            })
+                    return ["{$argumentPath}.{$rule}" => $message];
+                }
+            )
             ->all();
     }
 

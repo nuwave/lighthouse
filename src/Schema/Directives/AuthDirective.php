@@ -15,12 +15,6 @@ class AuthDirective extends BaseDirective implements DefinedDirective, FieldReso
      */
     protected $authFactory;
 
-    /**
-     * AuthDirective constructor.
-     *
-     * @param  \Illuminate\Contracts\Auth\Factory  $authFactory
-     * @return void
-     */
     public function __construct(AuthFactory $authFactory)
     {
         $this->authFactory = $authFactory;
@@ -34,7 +28,8 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retreive the user.
+  Specify which guard to use, e.g. "api".
+  When not defined, the default from `lighthouse.php` is used.
   """
   guard: String
 ) on FIELD_DEFINITION
@@ -43,14 +38,11 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         /** @var string|null $guard */
-        $guard = $this->directiveArgValue('guard');
+        $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
 
         return $fieldValue->setResolver(
             function () use ($guard): ?Authenticatable {
