@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
@@ -11,6 +12,7 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionBroadcaster implements BroadcastsSubscriptions
@@ -51,7 +53,8 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         StoresSubscriptions $storage,
         SubscriptionIterator $iterator,
         BroadcastManager $broadcastManager,
-        EventsDispatcher $eventsDispatcher
+        EventsDispatcher $eventsDispatcher,
+        CreatesContext $createsContext
     ) {
         $this->graphQL = $graphQL;
         $this->auth = $auth;
@@ -59,6 +62,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $this->iterator = $iterator;
         $this->broadcastManager = $broadcastManager;
         $this->eventsDispatcher = $eventsDispatcher;
+        $this->createsContext = $createsContext;
     }
 
     /**
@@ -78,6 +82,11 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
         $topic = $subscription->decodeTopic($fieldName, $root);
+
+        if($subscription->IS_PUBLIC){
+            $this->broadcastPublic($subscription, $fieldName, $root);
+            return;
+        }
 
         $subscribers = $this->storage
             ->subscribersByTopic($topic)
@@ -101,6 +110,32 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                     $data->jsonSerialize()
                 );
             }
+        );
+    }
+
+    public function broadcastPublic(GraphQLSubscription $subscription, string $fieldName, $root): void
+    {
+        $topic = $subscription->decodeTopic($fieldName, $root);
+        $subscriber = $this->storage->publicSubscriberForTopic($topic);
+        if(!$subscriber){
+            throw new \Exception("no subscribers for public channel $topic $fieldName");
+            return;
+        }
+        $channel_name = $subscription->getChannelName($subscriber->args);
+        $data = $this->graphQL->executeQuery(
+            $subscriber->query,
+            $subscriber->context,
+            $subscriber->args,
+            $subscriber->setRoot($root),
+            $subscriber->operationName
+        );
+
+        // swap public channel name in place of subscriber's private channel name
+        $subscriber->channel = $channel_name;
+
+        $this->broadcastManager->broadcast(
+            $subscriber,
+            $data->jsonSerialize()
         );
     }
 

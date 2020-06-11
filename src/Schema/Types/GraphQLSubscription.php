@@ -68,4 +68,12 @@ abstract class GraphQLSubscription
      * @return bool
      */
     abstract public function filter(Subscriber $subscriber, $root);
+
+    /**
+     * @return ?string
+     */
+    public function getQueryString()
+    {
+        return null;
+    }
 }

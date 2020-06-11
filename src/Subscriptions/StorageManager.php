@@ -25,6 +25,13 @@ class StorageManager implements StoresSubscriptions
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
     /**
+     * The cache key for public topics.
+     *
+     * @var string
+     */
+    public const PUBLIC_TOPIC_KEY = 'graphql.public_topic';
+
+    /**
      * The cache to store channels and topics.
      *
      * @var \Illuminate\Contracts\Cache\Repository
@@ -88,6 +95,24 @@ class StorageManager implements StoresSubscriptions
             // @phpstan-ignore-next-line
             $this->cache->put($channelKey, $subscriber, Carbon::now()->addSeconds($this->ttl));
         }
+    }
+
+    public function storeSubscriberPublic(Subscriber $subscriber, string $public_topic_name): void
+    {
+        $publicTopicKey = self::publicTopicKey($public_topic_name);
+        if ($this->ttl === null) {
+            $this->cache->forever($publicTopicKey, $subscriber);
+        } else {
+            // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
+            // @phpstan-ignore-next-line
+            $this->cache->put($publicTopicKey, $subscriber, Carbon::now()->addSeconds($this->ttl));
+        }
+        $this->storeSubscriber($subscriber, $public_topic_name);
+    }
+
+    public function publicSubscriberForTopic(string $topic): ?Subscriber
+    {
+        return $this->cache->get(self::publicTopicKey($topic));
     }
 
     public function deleteSubscriber(string $channel): ?Subscriber
@@ -172,5 +197,10 @@ class StorageManager implements StoresSubscriptions
     protected static function topicKey(string $topic): string
     {
         return self::TOPIC_KEY.".{$topic}";
+    }
+
+    protected static function publicTopicKey(string $topic): string
+    {
+        return self::PUBLIC_TOPIC_KEY.".{$topic}";
     }
 }

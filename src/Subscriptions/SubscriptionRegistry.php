@@ -40,6 +40,13 @@ class SubscriptionRegistry
     protected $subscribers = [];
 
     /**
+     * A map from operation names to public channel names.
+     *
+     * @var string[]
+     */
+    protected $subscribers_public = [];
+
+    /**
      * Active subscription fields of the schema.
      *
      * @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription[]
@@ -92,6 +99,27 @@ class SubscriptionRegistry
     }
 
     /**
+     * @return ?string
+     */
+    public function getSubscriptionFieldNameFromSubscriberQuery(Subscriber $subscriber){
+        //$subscriber->query->definitions[0]->selectionSet->selections->nodes[0]->name->value;
+        return (new Collection($subscriber->query->definitions))
+            ->filter(
+                Utils::instanceofMatcher(OperationDefinitionNode::class)
+            )
+            ->filter(function (OperationDefinitionNode $node): bool {
+                return $node->operation === 'subscription';
+            })
+            ->flatMap(function (OperationDefinitionNode $node): array {
+                return (new Collection($node->selectionSet->selections))
+                    ->map(function (FieldNode $field): string {
+                        return $field->name->value;
+                    })
+                    ->all();
+            })->first();
+    }
+
+    /**
      * Add subscription to registry.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
@@ -101,6 +129,22 @@ class SubscriptionRegistry
     {
         $this->storage->storeSubscriber($subscriber, $topic);
         $this->subscribers[$subscriber->operationName] = $subscriber->channel;
+
+        try{
+            $field_name = $this->getSubscriptionFieldNameFromSubscriberQuery($subscriber);
+            $subscription =  $this->subscription($field_name);
+            if($subscription && $subscription->IS_PUBLIC){
+                // use "public" channel name, not subscriber->channel's unique channel
+                $channel_name = $subscription->getChannelName($subscriber->args);
+                if($channel_name){
+                    $this->subscribers_public[$subscriber->operationName] = $channel_name;
+                    $this->storage->storeSubscriberPublic($subscriber, $topic);
+                }
+            }
+        }catch(\Exception $e){
+            \Log::error($e);
+        }
+
 
         return $this;
     }
@@ -153,11 +197,18 @@ class SubscriptionRegistry
      */
     public function handleBuildExtensionsResponse(): ExtensionsResponse
     {
+        $channels = $this->subscribers;
+        $channels = collect($channels)->map(function($channel, $operation_name){
+            if(array_key_exists($operation_name,$this->subscribers_public)){
+                return $this->subscribers_public[$operation_name];
+            }
+            return $channel;
+        })->toArray();
         return new ExtensionsResponse(
             'lighthouse_subscriptions',
             [
                 'version' => 1,
-                'channels' => $this->subscribers,
+                'channels' => $channels,
             ]
         );
     }
