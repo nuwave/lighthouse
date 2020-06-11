@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add `@withCount` directive to eager load relationship counts on field access https://github.com/nuwave/lighthouse/pull/1390
+- Extend `lighthouse:directive` artisan command to allow choosing interfaces https://github.com/nuwave/lighthouse/pull/1251
 
 ### Changed
 

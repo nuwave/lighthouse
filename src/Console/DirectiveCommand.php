@@ -2,6 +2,10 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputOption;
+
 class DirectiveCommand extends LighthouseGeneratorCommand
 {
     /**
@@ -16,7 +20,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a class for a directive.';
+    protected $description = 'Create a class for a custom schema directive.';
 
     /**
      * The type of class being generated.
@@ -24,6 +28,13 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      * @var string
      */
     protected $type = 'Directive';
+
+    /**
+     * The imports required by the various interfaces, if any.
+     *
+     * @var \Illuminate\Support\Collection<string>
+     */
+    protected $imports;
 
     protected function getNameInput(): string
     {
@@ -36,10 +47,151 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * Get the stub file for the generator.
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
+    protected function buildClass($name): string
+    {
+        $this->imports = new Collection();
+
+        $stub = parent::buildClass($name);
+
+        if ($this->option('type')) {
+            $this->askForInterfaces($stub, [
+                'TypeManipulator',
+                'TypeMiddleware',
+                'TypeResolver',
+                'TypeExtensionManipulator',
+            ]);
+        }
+
+        if ($this->option('field')) {
+            $this->askForInterfaces($stub, [
+                'FieldResolver',
+                'FieldMiddleware',
+                'FieldManipulator',
+            ]);
+        }
+
+        if ($this->option('argument')) {
+            // Arg directives always either implement ArgDirective or ArgDirectiveForArray.
+            if ($this->confirm('Will your argument directive apply to a list of items?')) {
+                $this->implementInterface($stub, 'ArgDirectiveForArray', false);
+            } else {
+                $this->implementInterface($stub, 'ArgDirective', false);
+            }
+
+            $this->askForInterfaces($stub, [
+                'ArgTransformerDirective',
+                'ArgBuilderDirective',
+                'ArgResolver',
+                'ArgManipulator',
+            ]);
+        }
+
+        if ($this->imports->isNotEmpty()) {
+            $stub = str_replace(
+                '{{ imports }}',
+                $this->imports
+                    ->filter()
+                    ->unique()
+                    ->implode("\n"),
+                $stub
+            );
+        }
+
+        $this->cleanupTemplatePlaceholders($stub);
+
+        return $stub;
+    }
+
+    /**
+     * Ask the user if the directive should implement any of the given interfaces.
+     *
+     * @param  array<string> $interfaces
+     */
+    protected function askForInterfaces(string &$stub, array $interfaces): void
+    {
+        foreach ($interfaces as $interface) {
+            if ($this->confirm('Should the directive implement the '.$interface.' middleware?')) {
+                $this->implementInterface($stub, $interface);
+            }
+        }
+    }
+
+    protected function implementInterface(string &$stub, string $interface, bool $withMethods = true): void
+    {
+        $stub = str_replace(
+            '{{ imports }}',
+            'use Nuwave\\Lighthouse\\Support\\Contracts\\'.$interface.";\n{{ imports }}",
+            $stub
+        );
+
+        $stub = str_replace(
+            '{{ implements }}',
+            $interface.', {{ implements }}',
+            $stub
+        );
+
+        if (! $withMethods) {
+            // No need to implement methods for this interface, so return early.
+            return;
+        }
+
+        $imports = $this->files->get($this->getStubForInterfaceImports($interface));
+        $imports = explode("\n", $imports);
+
+        $this->imports->push(...$imports);
+
+        $stub = str_replace(
+            '{{ methods }}',
+            $this->files->get($this->getStubForInterfaceMethods($interface))."\n\n{{ methods }}",
+            $stub
+        );
+    }
+
+    protected function cleanupTemplatePlaceholders(string &$stub): void
+    {
+        // If one or more interfaces are enabled, we are left with ", {{ implements }}".
+        $stub = str_replace(', {{ implements }}', '', $stub);
+
+        // If no interfaces were enabled, we are left with "implements {{ implements }}".
+        $stub = str_replace('implements {{ implements }}', '', $stub);
+
+        // When no imports were made, the {{ imports }} is still there.
+        $stub = str_replace("{{ imports }}\n", '', $stub);
+
+        // Whether or not methods were implemented, the {{ methods }} is still there.
+        $stub = str_replace("\n\n{{ methods }}", '', $stub);
+    }
+
     protected function getStub(): string
     {
         return __DIR__.'/stubs/directive.stub';
+    }
+
+    protected function getStubForInterfaceMethods(string $interface): string
+    {
+        return __DIR__.'/stubs/directives/'.Str::snake($interface).'.stub';
+    }
+
+    protected function getStubForInterfaceImports(string $interface): string
+    {
+        return __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub';
+    }
+
+    /**
+     * @return array<array<mixed>>
+     */
+    protected function getOptions(): array
+    {
+        return [
+            ['type', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to types.'],
+            ['field', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to fields.'],
+            ['argument', null, InputOption::VALUE_NONE, 'Create a directive that can be applied to arguments.'],
+        ];
     }
 }

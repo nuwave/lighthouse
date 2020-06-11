@@ -1,0 +1,9 @@
+    /**
+     * @param  mixed  $root  The result of the parent resolver.
+     * @param  mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $value  The slice of arguments that belongs to this nested resolver.
+     * @return mixed
+     */
+    public function __invoke($root, $value)
+    {
+        // TODO implement the arg resolver
+    }
