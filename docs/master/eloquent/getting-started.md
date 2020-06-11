@@ -152,7 +152,7 @@ or [@first](../api-reference/directives.md#first), allow you to re-use those sco
 
 ```graphql
 type Query {
-    users: [User]! @all(scopes: ["verified"])
+  users: [User]! @all(scopes: ["verified"])
 }
 ```
 
