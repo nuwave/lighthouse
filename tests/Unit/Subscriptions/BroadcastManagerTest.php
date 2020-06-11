@@ -9,29 +9,15 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Tests\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 
-class BroadcastManagerTest extends TestCase
+class BroadcastManagerTest extends SubscriptionTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcastManager;
 
-    protected function getPackageProviders($app): void
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
-
-    /**
-     * Set up test environment.
-     *
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -55,14 +41,17 @@ class BroadcastManagerTest extends TestCase
         $broadcaster = new class implements Broadcaster {
             public function authorized(Request $request)
             {
+                return new Response();
             }
 
             public function unauthorized(Request $request)
             {
+                return new Response();
             }
 
             public function hook(Request $request)
             {
+                return new Response();
             }
 
             public function broadcast(Subscriber $subscriber, array $data)

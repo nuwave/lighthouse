@@ -11,7 +11,7 @@ class MorphToDirective extends RelationDirective implements FieldResolver, Defin
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphTo(
   """

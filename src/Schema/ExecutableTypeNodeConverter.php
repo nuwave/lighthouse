@@ -14,10 +14,6 @@ class ExecutableTypeNodeConverter extends TypeNodeConverter
      */
     protected $typeRegistry;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;

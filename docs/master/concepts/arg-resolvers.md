@@ -47,13 +47,8 @@ mutation CreateTaskWithNotes {
     id: 45
     name: "Do something"
     notes: [
-      {
-        content: "Foo bar",
-        link: "http://foo.bar"
-      },
-      {
-        content: "Awesome note"
-      }
+      { content: "Foo bar", link: "http://foo.bar" }
+      { content: "Awesome note" }
     ]
   ) {
     id
@@ -131,7 +126,7 @@ input CreateNoteInput {
 }
 ```
 
-The `@create` directive will behave differently, based on the context where it is used.
+The [@create](../api-reference/directives.md#create) directive will behave differently, based on the context where it is used.
 
 On the `createTask` field, it will create a `Task` model with the given `name`, save it
 to the database and return that instance to Lighthouse.
@@ -176,7 +171,7 @@ The arguments that are nested within `notes` will be handled as a nested argumen
 For each `CreateNoteInput`, the resolver will be called with the previously created `Task`
 and create and attach a related `Note` model.
 
-We can extend our previous implementation of `@create` by allowing it to be used as an `ArgResolver`:
+We can extend our previous implementation of [@create](../api-reference/directives.md#create) by allowing it to be used as an `ArgResolver`:
 
 ```php
 <?php

@@ -4,7 +4,7 @@ Lighthouse offers various extension points which can be utilized by package deve
 as well as end users.
 
 ## The Event System
-   
+
 Lighthouse offers a unified way of hooking into the complete execution lifecycle
 through [Laravel's event system](https://laravel.com/docs/events).
 You may use any Service Provider to register listeners.
@@ -12,7 +12,7 @@ You may use any Service Provider to register listeners.
 You can find a complete list of all dispatched events [in the events API reference](../api-reference/events.md).
 
 ## Adding Directives
-   
+
 You can add your custom directives to Lighthouse by listening for the
 [`RegisterDirectiveNamespaces`](../api-reference/events.md#registerdirectivenamespaces) event.
 
@@ -33,7 +33,7 @@ Lighthouse's default implementation looks for a class with the capitalized name
 of the field in the configured default location.
 
 Non-root fields fall back to [webonyx's default resolver](http://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver).
-You may overwrite this by passing a `callable` to `\GraphQL\Executor\Executor::setDefaultFieldResolver`. 
+You may overwrite this by passing a `callable` to `\GraphQL\Executor\Executor::setDefaultFieldResolver`.
 
 When the field is defined on the root `Subscription` type, the [`\Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesSubscriptionResolver.php)
 interface is used instead.

@@ -13,43 +13,59 @@ use Serializable;
 
 class Subscriber implements Serializable
 {
-    const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
+    public const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
 
     /**
+     * A unique key for the subscriber.
+     *
      * @var string
      */
     public $channel;
 
     /**
-     * @var mixed
+     * The topic subscribed to.
+     *
+     * @var string
      */
-    public $root;
+    public $topic;
 
     /**
-     * @var array
-     */
-    public $args;
-
-    /**
-     * @var mixed
-     */
-    public $context;
-
-    /**
+     * The contents of the query.
+     *
      * @var \GraphQL\Language\AST\DocumentNode
      */
     public $query;
 
     /**
+     * The name of the queried operation.
+     *
      * @var string
      */
     public $operationName;
 
     /**
+     * The root element of the query.
+     *
+     * @var mixed Can be anything.
+     */
+    public $root;
+
+    /**
+     * The args passed to the subscription query.
+     *
+     * @var mixed[]
+     */
+    public $args;
+
+    /**
+     * The context passed to the query.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
+     */
+    public $context;
+
+    /**
      * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
      */
@@ -59,10 +75,10 @@ class Subscriber implements Serializable
         ResolveInfo $resolveInfo
     ) {
         $operationName = $resolveInfo->operation->name;
-        if (! $operationName) {
-            throw new SubscriptionException(
-                self::MISSING_OPERATION_NAME
-            );
+
+        // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
+        if (! $operationName) { // @phpstan-ignore-line TODO remove when upgrading graphql-php
+            throw new SubscriptionException(self::MISSING_OPERATION_NAME);
         }
         $this->operationName = $operationName->value;
 
@@ -80,48 +96,51 @@ class Subscriber implements Serializable
      * Unserialize subscription from a JSON string.
      *
      * @param  string  $subscription
-     * @return $this
      */
-    public function unserialize($subscription): self
+    public function unserialize($subscription): void
     {
         $data = json_decode($subscription, true);
 
-        $this->operationName = $data['operation_name'];
         $this->channel = $data['channel'];
+        $this->topic = $data['topic'];
+        $this->query = AST::fromArray( // @phpstan-ignore-line We know this will be exactly a DocumentNode and nothing else
+            unserialize($data['query'])
+        );
+        $this->operationName = $data['operation_name'];
         $this->args = $data['args'];
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
-        $this->query = AST::fromArray(
-            unserialize($data['query'])
-        );
-
-        return $this;
     }
 
     /**
      * Convert this into a JSON string.
-     *
-     * @return string
      */
     public function serialize(): string
     {
-        // TODO use safe-php
-        return json_encode([
-            'operation_name' => $this->operationName,
+        $serialized = json_encode([
             'channel' => $this->channel,
-            'args' => $this->args,
-            'context' => $this->contextSerializer()->serialize($this->context),
+            'topic' => $this->topic,
             'query' => serialize(
                 AST::toArray($this->query)
             ),
+            'operation_name' => $this->operationName,
+            'args' => $this->args,
+            'context' => $this->contextSerializer()->serialize($this->context),
         ]);
+
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while serializing subscriber data: '.json_last_error_msg());
+        }
+        /** @var string $serialized */
+
+        return $serialized;
     }
 
     /**
      * Set root data.
      *
-     * @param  mixed  $root
      * @return $this
      */
     public function setRoot($root): self
@@ -133,17 +152,12 @@ class Subscriber implements Serializable
 
     /**
      * Generate a unique private channel name.
-     *
-     * @return string
      */
     public static function uniqueChannelName(): string
     {
         return 'private-lighthouse-'.Str::random(32).'-'.time();
     }
 
-    /**
-     * @return \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer
-     */
     protected function contextSerializer(): ContextSerializer
     {
         return app(ContextSerializer::class);

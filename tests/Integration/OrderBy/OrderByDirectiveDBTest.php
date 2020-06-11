@@ -169,7 +169,6 @@ class OrderByDirectiveDBTest extends DBTestCase
 
     /**
      * @deprecated will be removed in v5
-     * @return void
      */
     public function testConfigureColumnArg(): void
     {

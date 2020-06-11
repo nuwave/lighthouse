@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -14,11 +14,9 @@ class CanDirectiveDBTest extends DBTestCase
 {
     public function testQueriesForSpecificModel(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
         $user = factory(User::class)->create([
             'name' => 'foo',
@@ -54,17 +52,15 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testFailsToFindSpecificModel(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
         $this->mockResolverExpects(
             $this->never()
         );
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", find: "id")
@@ -77,27 +73,110 @@ class CanDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->expectException(ModelNotFoundException::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
             user(id: "not-present") {
                 name
             }
         }
-        ');
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => 'No query results for model [Tests\Utils\Models\User] not-present',
+                ],
+            ],
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+    }
+
+    public function testThrowsIfFindValueIsNotGiven(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID): User
+                @can(ability: "view", find: "some.path")
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => CanDirective::missingKeyToFindModel('some.path'),
+                ],
+            ],
+        ]);
+    }
+
+    public function testFindUsingNestedInputWithDotNotation(): void
+    {
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(input: FindUserInput): User
+                @can(ability: "view", find: "input.id")
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        input FindUserInput {
+          id: ID
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID){
+            user(input: {
+              id: $id
+            }) {
+                name
+            }
+        }
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
     }
 
     public function testThrowsIfNotAuthorized(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
-        $userB = User::create([
-            'name' => 'foo',
-        ]);
+        $userB = new User();
+        $userB->name = 'foo';
+        $userB->save();
 
         $postB = factory(Post::class)->create([
             'user_id' => $userB->getKey(),
@@ -127,14 +206,13 @@ class CanDirectiveDBTest extends DBTestCase
                 title
             }
         }
-        ")->assertErrorCategory(AuthorizationException::CATEGORY);
+        ")->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testCanHandleMultipleModels(): void
     {
-        $user = User::create([
-            'name' => UserPolicy::ADMIN,
-        ]);
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
         $postA = factory(Post::class)->create([
@@ -181,11 +259,9 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testWorksWithSoftDeletes(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
         $task = factory(Task::class)->create();
         $task->delete();

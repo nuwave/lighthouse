@@ -1,7 +1,7 @@
 # Implementing Your Own Directives
 
 As you grow your GraphQL schema, you may find the need for more specialized functionality.
-Learn how you can abstract logic in a composable and reusable manner by using custom directives.  
+Learn how you can abstract logic in a composable and reusable manner by using custom directives.
 
 ## Naming Conventions
 

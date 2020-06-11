@@ -24,7 +24,6 @@ class PaginationArgs
      *
      * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType|null  $paginationType
-     * @param  int|null  $paginateMaxCount
      * @return static
      *
      * @throws \GraphQL\Error\Error
@@ -46,7 +45,7 @@ class PaginationArgs
 
         if ($instance->first <= 0) {
             throw new Error(
-                "Requested pagination amount must be more than 0, got $instance->first"
+                self::requestedZeroOrLessItems($instance->first)
             );
         }
 
@@ -56,20 +55,25 @@ class PaginationArgs
             && $instance->first > $paginateMaxCount
         ) {
             throw new Error(
-                "Maximum number of {$paginateMaxCount} requested items exceeded. Fetch smaller chunks."
+                self::requestedTooManyItems($paginateMaxCount, $instance->first)
             );
         }
 
         return $instance;
     }
 
+    public static function requestedZeroOrLessItems(int $amount): string
+    {
+        return "Requested pagination amount must be more than 0, got {$amount}.";
+    }
+
+    public static function requestedTooManyItems(int $maxCount, int $actualCount): string
+    {
+        return "Maximum number of {$maxCount} requested items exceeded, got {$actualCount}. Fetch smaller chunks.";
+    }
+
     /**
      * Calculate the current page to inform the user about the pagination state.
-     *
-     * @param  int  $first
-     * @param  int  $after
-     * @param  int  $defaultPage
-     * @return int
      */
     protected static function calculateCurrentPage(int $first, int $after, int $defaultPage = 1): int
     {
@@ -81,8 +85,7 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder $builder
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder
      */
     public function applyToBuilder(object $builder): LengthAwarePaginator
     {

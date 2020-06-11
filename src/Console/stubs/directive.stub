@@ -1,0 +1,10 @@
+<?php
+
+namespace DummyNamespace;
+
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+
+class DummyClass extends BaseDirective
+{
+    // TODO implement the directive https://lighthouse-php.com/master/custom-directives/getting-started.html
+}

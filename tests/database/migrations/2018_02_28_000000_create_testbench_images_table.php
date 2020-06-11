@@ -13,9 +13,10 @@ class CreateTestbenchImagesTable extends Migration
     {
         Schema::create('images', function (Blueprint $table): void {
             $table->increments('id');
-            $table->string('imageable_type')->nullable();
-            $table->unsignedInteger('imageable_id')->nullable();
             $table->string('url')->nullable();
+
+            $table->unsignedInteger('imageable_id')->nullable();
+            $table->string('imageable_type')->nullable();
 
             $table->timestamps();
         });

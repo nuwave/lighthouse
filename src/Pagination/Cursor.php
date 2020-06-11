@@ -22,8 +22,7 @@ class Cursor
      * this will return 0. That will effectively reset pagination, so the user gets the
      * first slice.
      *
-     * @param  array  $args
-     * @return int
+     * @param  array<string, mixed>  $args
      */
     public static function decode(array $args): int
     {
@@ -36,12 +35,9 @@ class Cursor
 
     /**
      * Encode the given offset to make the implementation opaque.
-     *
-     * @param  int  $offset
-     * @return string
      */
     public static function encode(int $offset): string
     {
-        return base64_encode($offset);
+        return base64_encode((string) $offset);
     }
 }

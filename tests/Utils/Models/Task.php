@@ -11,11 +11,21 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $name
+ * @property string|null $guard
+ * @property \Carbon\Carbon $completed_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Tests\Utils\Models\User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ */
 class Task extends Model
 {
     use SoftDeletes;
-
-    protected $guarded = [];
 
     protected static function boot(): void
     {
@@ -42,7 +52,15 @@ class Task extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    public function scopeFoo(Builder $query, $args): Builder
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->whereNotNull('completed_at');
+    }
+
+    /**
+     * @param  array<string, int>  $args
+     */
+    public function scopeFoo(Builder $query, array $args): Builder
     {
         return $query->limit($args['foo']);
     }
@@ -57,6 +75,9 @@ class Task extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
+    /**
+     * @param  iterable<string>  $tags
+     */
     public function scopeWhereTags(Builder $query, iterable $tags): Builder
     {
         return $query->whereHas('tags', function (Builder $query) use ($tags) {

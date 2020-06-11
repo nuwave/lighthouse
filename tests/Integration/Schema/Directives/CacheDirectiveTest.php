@@ -13,7 +13,7 @@ use Tests\Utils\Models\User;
 class CacheDirectiveTest extends DBTestCase
 {
     /**
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var \Illuminate\Cache\TaggedCache
      */
     protected $cache;
 
@@ -67,7 +67,7 @@ class CacheDirectiveTest extends DBTestCase
             'email' => 'foo@bar.com',
         ]);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String @cache
@@ -353,7 +353,9 @@ class CacheDirectiveTest extends DBTestCase
 
         $firstResponse = $this->graphQL($query);
 
-        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:first:3");
+        $posts = $this->cache
+            ->tags($tags)
+            ->get("user:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 

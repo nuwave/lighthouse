@@ -10,7 +10,6 @@ class SubscriptionRouter
      * Register the routes for pusher based subscriptions.
      *
      * @param  \Illuminate\Routing\Router  $router
-     * @return void
      */
     public function pusher($router): void
     {
@@ -20,7 +19,7 @@ class SubscriptionRouter
         ]);
 
         $router->post('graphql/subscriptions/webhook', [
-            'as' => 'lighthouse.subscriptions.auth',
+            'as' => 'lighthouse.subscriptions.webhook',
             'uses' => SubscriptionController::class.'@webhook',
         ]);
     }

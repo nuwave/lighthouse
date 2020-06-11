@@ -3,12 +3,15 @@
 namespace Nuwave\Lighthouse\Testing;
 
 /**
- * TODO remove in favour of ->getMockBuilder(\stdClass::class)->addMethods(['__invoke'])
+ * TODO remove in favor of ->getMockBuilder(\stdClass::class)->addMethods(['__invoke'])
  * once we no longer support PHPUnit 7.
  */
 class MockResolver
 {
-    public function __invoke(): void
+    /**
+     * @return mixed|void Anything whatsoever.
+     */
+    public function __invoke()
     {
     }
 }
