@@ -272,3 +272,43 @@ This mutation will return the deleted object, so you will have a last chance to 
   }
 }
 ```
+
+## Local Scopes
+
+You may easily re-use your local scopes defined on your model. For example, you frequently need to retrieve all users which are considered "verified".
+
+```php
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    /**
+     * Scope a query to only include verified users.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
+}
+```
+
+Now we can utilize the scope with the [@all](../api-reference/directives.md#all) directive, for example:
+
+```graphql
+type Query {
+    users: [User]! @all(scopes: ["verified"])
+}
+```
+
+After adding the scope it will produce following SQL:
+
+```sql
+select * from `users` where `email_verified_at` is not null
+```
