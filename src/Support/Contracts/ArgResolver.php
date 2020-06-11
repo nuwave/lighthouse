@@ -9,7 +9,7 @@ interface ArgResolver
     /**
      * @param  mixed  $root  The result of the parent resolver.
      * @param  mixed|ArgumentSet|ArgumentSet[]  $value  The slice of arguments that belongs to this nested resolver.
-     * @return mixed
+     * @return mixed|null May return the modified $root
      */
     public function __invoke($root, $value);
 }

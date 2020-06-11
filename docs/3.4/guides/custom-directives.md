@@ -1,7 +1,7 @@
 # Custom Directives
 
 Lighthouse provides various convenient server side directives that can be applied to a lots of generic use cases.
-However you are free to create your own directives depending upon your needs. 
+However you are free to create your own directives depending upon your needs.
 
 ## Directive Types
 
@@ -19,7 +19,7 @@ The class name of directive must follow the following pattern:
 
     <Directive name in StudlyCase>Directive
 
-For example the class name of directive `@fooBar` must be `FooBarDirective`. 
+For example the class name of directive `@fooBar` must be `FooBarDirective`.
 
 ## Node Directives
 
@@ -37,11 +37,9 @@ There are 3 types of argument directives in Lighthouse.
 
 ### ArgValidationDirective
 
-
-
 ### ArgTransformerDirective
 
-The `ArgTransformerDirective` takes an incoming value an returns a new value. 
+The `ArgTransformerDirective` takes an incoming value an returns a new value.
 
 Let's take a look at the built-in `@trim` directive.
 
@@ -127,7 +125,7 @@ Take the following schema as an example:
 
 ```graphql
 type User {
-    posts(category: String @eq): [Post!]! @hasMany
+  posts(category: String @eq): [Post!]! @hasMany
 }
 ```
 
@@ -176,19 +174,18 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
 The `handleBuilder` method takes two arguments:
 
 - `$builder`
-The query builder for applying the additional query on to.
+  The query builder for applying the additional query on to.
 - `$value`
-The value of the argument value that the `@eq` was applied on to.
+  The value of the argument value that the `@eq` was applied on to.
 
 If you want to use a more complex value for manipulating a query,
 you can build a `ArgBuilderDirective` to work with lists or nested input objects.
 Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is one example of this.
 
-```graphql        
+```graphql
 type Query {
-    users(
-        createdBetween: [Date!]! @whereBetween(key: "created_at")
-    ): [User!]! @paginate
+  users(createdBetween: [Date!]! @whereBetween(key: "created_at")): [User!]!
+    @paginate
 }
 ```
 
@@ -207,7 +204,7 @@ type Mutation {
 Notice the order how the argument directives were written.
 
 The evaluation process of the above example written in pseudo code can be:
- 
+
 ```php
 $trimedValue = trim($password);
 // validate with the rules ["min:10,max:20"] ...

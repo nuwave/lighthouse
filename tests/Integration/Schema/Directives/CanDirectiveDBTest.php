@@ -14,11 +14,9 @@ class CanDirectiveDBTest extends DBTestCase
 {
     public function testQueriesForSpecificModel(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
         $user = factory(User::class)->create([
             'name' => 'foo',
@@ -54,11 +52,10 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testFailsToFindSpecificModel(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
         $this->mockResolverExpects(
             $this->never()
         );
@@ -96,11 +93,9 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testThrowsIfFindValueIsNotGiven(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -175,15 +170,13 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testThrowsIfNotAuthorized(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
-        $userB = User::create([
-            'name' => 'foo',
-        ]);
+        $userB = new User();
+        $userB->name = 'foo';
+        $userB->save();
 
         $postB = factory(Post::class)->create([
             'user_id' => $userB->getKey(),
@@ -213,14 +206,13 @@ class CanDirectiveDBTest extends DBTestCase
                 title
             }
         }
-        ")->assertErrorCategory(AuthorizationException::CATEGORY);
+        ")->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testCanHandleMultipleModels(): void
     {
-        $user = User::create([
-            'name' => UserPolicy::ADMIN,
-        ]);
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
         $postA = factory(Post::class)->create([
@@ -267,11 +259,9 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testWorksWithSoftDeletes(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
         $task = factory(Task::class)->create();
         $task->delete();

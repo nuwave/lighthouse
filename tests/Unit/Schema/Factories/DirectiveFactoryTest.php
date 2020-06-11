@@ -68,9 +68,9 @@ class DirectiveFactoryTest extends TestCase
                 return 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue, Closure $next): void
+            public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
             {
-                //
+                return $fieldValue;
             }
         };
 
@@ -104,6 +104,7 @@ class DirectiveFactoryTest extends TestCase
     public function testThrowsExceptionWhenMultipleFieldResolverDirectives(): void
     {
         $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessage("Node bar can only have one directive of type Nuwave\Lighthouse\Support\Contracts\FieldResolver but found [@hasMany, @belongsTo].");
 
         $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
             bar: [Bar!]! @hasMany @belongsTo

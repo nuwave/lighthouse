@@ -13,12 +13,12 @@ class SchemaStitcherTest extends TestCase
     /**
      * @var string
      */
-    const SCHEMA_PATH = __DIR__.'/schema/';
+    public const SCHEMA_PATH = __DIR__.'/schema/';
 
     /**
      * @var string
      */
-    const ROOT_SCHEMA_FILENAME = 'root-schema';
+    public const ROOT_SCHEMA_FILENAME = 'root-schema';
 
     /**
      * @var \League\Flysystem\Filesystem

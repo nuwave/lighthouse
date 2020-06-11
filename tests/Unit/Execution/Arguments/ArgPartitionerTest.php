@@ -3,14 +3,14 @@
 namespace Tests\Unit\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
+use Tests\Unit\Execution\Arguments\Fixtures\Nested;
 use Tests\Utils\Models\User;
+use Tests\Utils\Models\WithoutRelationClassImport;
 
 class ArgPartitionerTest extends TestCase
 {
@@ -64,11 +64,20 @@ class ArgPartitionerTest extends TestCase
             $hasManyArgs->arguments
         );
     }
-}
 
-class Nested extends BaseDirective implements ArgResolver, Directive
-{
-    public function __invoke($root, $args)
+    public function testPartitionArgsExceptionBadRelationType(): void
     {
+        $argumentSet = new ArgumentSet();
+
+        $tasksRelation = new Argument();
+        $argumentSet->arguments['users'] = $tasksRelation;
+
+        $this->expectException(DefinitionException::class);
+
+        [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
+            $argumentSet,
+            new WithoutRelationClassImport(),
+            HasMany::class
+        );
     }
 }

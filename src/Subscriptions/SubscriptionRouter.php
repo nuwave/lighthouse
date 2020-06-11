@@ -10,7 +10,6 @@ class SubscriptionRouter
      * Register the routes for pusher based subscriptions.
      *
      * @param  \Illuminate\Routing\Router  $router
-     * @return void
      */
     public function pusher($router): void
     {

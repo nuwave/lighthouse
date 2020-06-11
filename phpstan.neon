@@ -1,32 +1,80 @@
 includes:
-- vendor/nunomaduro/larastan/extension.neon
 - vendor/bensampo/laravel-enum/extension.neon
+- vendor/nunomaduro/larastan/extension.neon
+- vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-  level: 1
+  level: 7
   paths:
   - benchmarks
   - src
   - tests
   excludes_analyse:
-  - %rootDir%/../../../tests/database/*
+  - tests/database/migrations/*
+
+  # Indirectly refers to \App\User (maybe through larastan?)
+  - tests/Utils/Models/User.php
+
+  # Intentionally wrong
+  - tests/Utils/Models/WithoutRelationClassImport.php
+
   # Compatibility fix because Laravel moved the TestResponse class
-  - %rootDir%/../../../tests/TestCase.php
-  - %rootDir%/../../../tests/Laravel7ExceptionHandler.php
-  - %rootDir%/../../../tests/PreLaravel7ExceptionHandler.php
+  - tests/TestCase.php
+  - tests/Laravel7ExceptionHandler.php
+  - tests/PreLaravel7ExceptionHandler.php
+
+  # Will be obsolote in v5
+  - src/Schema/Factories/FieldFactory.php
+  - src/Schema/AST/PartialParser.php
+  - src/Schema/Directives/MiddlewareDirective.php
+
+  # As long as we support multiple Laravel versions at once, there will be some dead spots
+  reportUnmatchedIgnoredErrors: false
   ignoreErrors:
   # Some parts of Laravel are just really magical
-  - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
+  - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
+  - path: tests/database/factories/*
+    message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
+
+  # This test cheats and uses reflection to make assertions
+  - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
+    message: '#Call to protected method getModelClass\(\) of class Nuwave\\Lighthouse\\Schema\\Directives\\BaseDirective\.#'
+
+  # Can not specify a class-string for traits
+  - path: src/Schema/Directives/SearchDirective.php
+    message: '#PHPDoc tag @var for variable \$modelClass contains unresolvable type\.#'
+
+  # Correctly writing out the union of all the subtypes of AST nodes is too much work
+  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$kind\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$name\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$directives\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$kind\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeDefinitionNode::\$name\.#'
+  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeExtensionNode::\$name\.#'
+  - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
+  - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\ValueNode given\.#'
+
+  # Should work once we update to a version of graphql-php that has more accurate types
+  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
+  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\FieldDefinitionNode>\.#'
+  - '#.* does not accept GraphQL\\Language\\AST\\NodeList.*#'
+  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList.*#'
+  - '#Property GraphQL\\Language\\AST\\DocumentNode::\$definitions \(GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\DefinitionNode>\) does not accept array<GraphQL\\Language\\AST\\FragmentDefinitionNode>\.#'
+  - '#Instanceof between GraphQL\\Language\\AST\\ListTypeNode\|GraphQL\\Language\\AST\\NameNode and GraphQL\\Language\\AST\\NamedTypeNode will always evaluate to false\.#'
+
+  # This class or an equivalent of it will be present in a Laravel install
+  - '#.* unknown class App\\User\.#'
 
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
 
   # Compatibility fix because Laravel moved the TestResponse class
   - '#.*TestResponse.*#'
+  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
 
-  # We are monkeypatching that to pass around the query builder
-  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
+  # We are monkeypatching ResolveInfo to pass information through resolver middleware
+  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
-  # TODO remove once we no longer support PHPUnit 7
-  - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects\(\) has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
+  # This just has no type in root resolvers
+  - '#Method .* has parameter \$root with no typehint specified\.#'

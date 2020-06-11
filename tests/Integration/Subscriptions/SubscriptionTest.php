@@ -23,7 +23,7 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             body: String
         }
@@ -34,14 +34,14 @@ class SubscriptionTest extends TestCase
 
         type Mutation {
             createPost(post: String!): Post
-                @field(resolver: \"{$this->qualifyTestResolver()}\")
-                @broadcast(subscription: \"onPostCreated\")
+                @field(resolver: "{$this->qualifyTestResolver()}")
+                @broadcast(subscription: "onPostCreated")
         }
 
         type Query {
             foo: String
         }
-        ";
+GRAPHQL;
     }
 
     public function testSendsSubscriptionChannelInResponse(): void
@@ -60,7 +60,7 @@ class SubscriptionTest extends TestCase
     {
         $response = $this->postGraphQL([
             [
-                'query' => '
+                'query' => /** @lang GraphQL */ '
                     subscription OnPostCreatedV1 {
                         onPostCreated {
                             body
@@ -69,7 +69,7 @@ class SubscriptionTest extends TestCase
                     ',
             ],
             [
-                'query' => '
+                'query' => /** @lang GraphQL */ '
                     subscription OnPostCreatedV2 {
                         onPostCreated {
                             body
@@ -91,7 +91,7 @@ class SubscriptionTest extends TestCase
     public function testCanBroadcastSubscriptions(): void
     {
         $this->subscribe();
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createPost(post: "Foobar") {
                 body
@@ -110,13 +110,15 @@ class SubscriptionTest extends TestCase
 
     public function testThrowsWithMissingOperationName(): void
     {
-        $this->graphQL('
-        subscription {
-            onPostCreated {
-                body
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            subscription {
+                onPostCreated {
+                    body
+                }
             }
-        }
-        ')->assertErrorCategory('subscription')
+            ')
+            ->assertGraphQLErrorCategory('subscription')
             ->assertJson([
                 'data' => [
                     'onPostCreated' => null,
@@ -130,7 +132,6 @@ class SubscriptionTest extends TestCase
     }
 
     /**
-     * @param  mixed  $root
      * @param  mixed[]  $args
      * @return mixed[]
      */
@@ -140,12 +141,12 @@ class SubscriptionTest extends TestCase
     }
 
     /**
-     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     * @return \Illuminate\Testing\TestResponse
      */
     protected function subscribe()
     {
         return $this->postGraphQL([
-            'query' => '
+            'query' => /** @lang GraphQL */ '
                 subscription OnPostCreated {
                     onPostCreated {
                         body
@@ -159,8 +160,6 @@ class SubscriptionTest extends TestCase
     /**
      * Build the expectation for the first subscription reponse.
      *
-     * @param  string  $channelName
-     * @param  string  $channel
      * @return mixed[]
      */
     protected function buildResponse(string $channelName, string $channel): array

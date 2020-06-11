@@ -6,6 +6,7 @@ use GraphQL\Language\AST\NodeKind;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
 class ASTBuilderTest extends TestCase
@@ -41,7 +42,38 @@ class ASTBuilderTest extends TestCase
 
         $this->assertCount(
             3,
-            $documentAST->types['Query']->fields
+            $documentAST->types[RootType::QUERY]->fields
+        );
+    }
+
+    public function testAllowsExtendingUndefinedRootTypes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        extend type Query {
+            foo: ID
+        }
+
+        extend type Mutation {
+            bar: ID
+        }
+
+        extend type Subscription {
+            baz: ID
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $this->assertCount(
+            1,
+            $documentAST->types[RootType::QUERY]->fields
+        );
+        $this->assertCount(
+            1,
+            $documentAST->types[RootType::MUTATION]->fields
+        );
+        $this->assertCount(
+            1,
+            $documentAST->types[RootType::SUBSCRIPTION]->fields
         );
     }
 
@@ -113,6 +145,23 @@ class ASTBuilderTest extends TestCase
             4,
             $documentAST->types['MyEnum']->values
         );
+    }
+
+    public function testDoesNotAllowExtendingUndefinedTypes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: String
+        }
+
+        extend type Foo {
+            foo: Int
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Could not find a base definition Foo of kind '.NodeKind::OBJECT_TYPE_EXTENSION.' to extend.');
+        $this->astBuilder->documentAST();
     }
 
     public function testDoesNotAllowDuplicateFieldsOnTypeExtensions(): void

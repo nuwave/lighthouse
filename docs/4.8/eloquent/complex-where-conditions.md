@@ -3,7 +3,7 @@
 Adding query conditions ad-hoc can be cumbersome and limiting when you require
 many different ways to filter query results.
 Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients
-and allow them to apply complex, dynamic WHERE conditions to queries. 
+and allow them to apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
@@ -33,29 +33,29 @@ with advanced filter capabilities.
 Add a dynamically client-controlled WHERE condition to a fields query.
 """
 directive @whereConditions(
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    """
-    columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  """
+  columns: [String!]
+) on ARGUMENT_DEFINITION
 ```
 
 You can apply this directive on any field that performs an Eloquent query:
 
 ```graphql
 type Query {
-    people(
-        where: _ @whereConditions(columns: ["age", "type", "haircolour", "height"])
-    ): [Person!]! @all
+  people(
+    where: _ @whereConditions(columns: ["age", "type", "haircolour", "height"])
+  ): [Person!]! @all
 }
 
 type Person {
-    id: ID!
-    age: Int!
-    height: Int!
-    type: String!
-    hair_colour: String!
+  id: ID!
+  age: Int!
+  height: Int!
+  type: String!
+  hair_colour: String!
 }
 ```
 
@@ -67,28 +67,28 @@ Here are the types that will be included in the compiled schema:
 ```graphql
 "Dynamic WHERE conditions for the `where` argument on the query `people`."
 input PeopleWhereWhereConditions {
-    "The column that is used for the condition."
-    column: PeopleWhereColumn
+  "The column that is used for the condition."
+  column: PeopleWhereColumn
 
-    "The operator that is used for the condition."
-    operator: SQLOperator = EQ
+  "The operator that is used for the condition."
+  operator: SQLOperator = EQ
 
-    "The value that is used for the condition."
-    value: Mixed
+  "The value that is used for the condition."
+  value: Mixed
 
-    "A set of conditions that requires all conditions to match."
-    AND: [PeopleWhereWhereConditions!]
+  "A set of conditions that requires all conditions to match."
+  AND: [PeopleWhereWhereConditions!]
 
-    "A set of conditions that requires at least one condition to match."
-    OR: [PeopleWhereWhereConditions!]
+  "A set of conditions that requires at least one condition to match."
+  OR: [PeopleWhereWhereConditions!]
 }
 
 "Allowed column names for the `where` argument on the query `people`."
 enum PeopleWhereColumn {
-    AGE @enum(value: "age")
-    TYPE @enum(value: "type")
-    HAIRCOLOUR @enum(value: "haircolour")
-    HEIGHT @enum(value: "height")
+  AGE @enum(value: "age")
+  TYPE @enum(value: "type")
+  HAIRCOLOUR @enum(value: "haircolour")
+  HEIGHT @enum(value: "height")
 }
 ```
 
@@ -100,9 +100,7 @@ A simple query for a person who is exactly 42 years old would look like this:
 
 ```graphql
 {
-  people(
-    where: { column: AGE, operator: EQ, value: 42 }
-  ) {
+  people(where: { column: AGE, operator: EQ, value: 42 }) {
     name
   }
 }
@@ -157,9 +155,7 @@ This query would retrieve all persons without any condition:
 
 ```graphql
 {
-  people(
-    where: null
-  ) {
+  people(where: null) {
     name
   }
 }
@@ -173,21 +169,21 @@ Allows clients to filter a query based on the existence of a related model, usin
 a dynamically controlled `WHERE` condition that applies to the relationship.
 """
 directive @whereHasConditions(
-    """
-    The Eloquent relationship that the conditions will be applied to.
+  """
+  The Eloquent relationship that the conditions will be applied to.
 
-    This argument can be omitted if the argument name follows the naming
-    convention `has{$RELATION}`. For example, if the Eloquent relationship
-    is named `posts`, the argument name must be `hasPosts`.
-    """
-    relation: String
+  This argument can be omitted if the argument name follows the naming
+  convention `has{$RELATION}`. For example, if the Eloquent relationship
+  is named `posts`, the argument name must be `hasPosts`.
+  """
+  relation: String
 
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    """
-    columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  """
+  columns: [String!]
+) on ARGUMENT_DEFINITION
 ```
 
 This directive works very similar to [`@whereConditions`](#whereconditions), except that
@@ -195,14 +191,14 @@ the conditions are applied to a relation sub query:
 
 ```graphql
 type Query {
-    people(
-        hasRole: _ @whereHasConditions(columns: ["name", "access_level"])
-    ): [Person!]! @all
+  people(
+    hasRole: _ @whereHasConditions(columns: ["name", "access_level"])
+  ): [Person!]! @all
 }
 
 type Role {
-    name: String!
-    access_level: Int
+  name: String!
+  access_level: Int
 }
 ```
 
@@ -211,26 +207,26 @@ Again, Lighthouse will auto-generate an `input` and `enum` definition for your q
 ```graphql
 "Dynamic WHERE conditions for the `hasRole` argument on the query `people`."
 input PeopleHasRoleWhereConditions {
-    "The column that is used for the condition."
-    column: PeopleHasRoleColumn
+  "The column that is used for the condition."
+  column: PeopleHasRoleColumn
 
-    "The operator that is used for the condition."
-    operator: SQLOperator = EQ
+  "The operator that is used for the condition."
+  operator: SQLOperator = EQ
 
-    "The value that is used for the condition."
-    value: Mixed
+  "The value that is used for the condition."
+  value: Mixed
 
-    "A set of conditions that requires all conditions to match."
-    AND: [PeopleHasRoleWhereConditions!]
+  "A set of conditions that requires all conditions to match."
+  AND: [PeopleHasRoleWhereConditions!]
 
-    "A set of conditions that requires at least one condition to match."
-    OR: [PeopleHasRoleWhereConditions!]
+  "A set of conditions that requires at least one condition to match."
+  OR: [PeopleHasRoleWhereConditions!]
 }
 
 "Allowed column names for the `hasRole` argument on the query `people`."
 enum PeopleHasRoleColumn {
-    NAME @enum(value: "name")
-    ACCESS_LEVEL @enum(value: "access_level")
+  NAME @enum(value: "name")
+  ACCESS_LEVEL @enum(value: "access_level")
 }
 ```
 
@@ -239,9 +235,7 @@ their roles, looks like this:
 
 ```graphql
 {
-  people(
-    hasRole: { column: ACCESS_LEVEL, operator: GTE, value: 5 }
-  ) {
+  people(hasRole: { column: ACCESS_LEVEL, operator: GTE, value: 5 }) {
     name
   }
 }
@@ -252,9 +246,7 @@ This query would retrieve all persons that have a role:
 
 ```graphql
 {
-  people(
-    hasRole: {}
-  ) {
+  people(hasRole: {}) {
     name
   }
 }
@@ -265,14 +257,11 @@ This query would retrieve all persons, no matter if they have a role or not:
 
 ```graphql
 {
-  people(
-    hasRole: null
-  ) {
+  people(hasRole: null) {
     name
   }
 }
 ```
-
 
 ## Custom operator
 

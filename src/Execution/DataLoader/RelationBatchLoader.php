@@ -29,12 +29,12 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationArgs;
 
     /**
-     * @param  string  $relationName
      * @param  \Closure  $decorateBuilder
      * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      */
     public function __construct(
         string $relationName,
+        // Not using a type-hint to avoid resolving those params through the container
         $decorateBuilder,
         $paginationArgs = null
     ) {
@@ -44,9 +44,9 @@ class RelationBatchLoader extends BatchLoader
     }
 
     /**
-     * Resolve the keys.
+     * Eager-load the relation.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function resolve(): array
     {
@@ -64,6 +64,9 @@ class RelationBatchLoader extends BatchLoader
 
         return $models
             ->mapWithKeys(
+                /**
+                 * @return array<string, mixed>
+                 */
                 function (Model $model): array {
                     return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
                 }
@@ -73,8 +76,6 @@ class RelationBatchLoader extends BatchLoader
 
     /**
      * Get the parents from the keys that are present on the BatchLoader.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function getParentModels(): EloquentCollection
     {
@@ -91,8 +92,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Extract the relation that was loaded.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed
+     * @return mixed The model's relation.
      */
     protected function extractRelation(Model $model)
     {

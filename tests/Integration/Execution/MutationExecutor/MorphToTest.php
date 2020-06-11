@@ -177,7 +177,10 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    public function existingModelMutations()
+    /**
+     * @return array<array<string, string>>
+     */
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -192,15 +195,18 @@ class MorphToTest extends DBTestCase
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
-        $task->image()->create([
-            'url' => 'bar',
-        ]);
 
-        $this->graphQL("
+        /** @var \Tests\Utils\Models\Image $image */
+        $image = $task->image()->make();
+        $image->url = 'bar';
+        $image->save();
+
+        $field = "${action}Image";
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Image(input: {
+            {$field}(input: {
                 id: 1
-                url: \"foo\"
+                url: "foo"
                 imageable: {
                     disconnect: true
                 }
@@ -212,9 +218,10 @@ class MorphToTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
-                "${action}Image" => [
+                $field => [
                     'url' => 'foo',
                     'imageable' => null,
                 ],
@@ -229,15 +236,18 @@ class MorphToTest extends DBTestCase
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
-        $task->image()->create([
-            'url' => 'bar',
-        ]);
 
-        $this->graphQL(/** @lang GraphQL */ "
+        /** @var \Tests\Utils\Models\Image $image */
+        $image = $task->image()->make();
+        $image->url = 'bar';
+        $image->save();
+
+        $field = "${action}Image";
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Image(input: {
+            {$field}(input: {
                 id: 1
-                url: \"foo\"
+                url: "foo"
                 imageable: {
                     delete: true
                 }
@@ -249,18 +259,17 @@ class MorphToTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+
+GRAPHQL
+        )->assertJson([
             'data' => [
-                "${action}Image" => [
+                $field => [
                     'url' => 'foo',
                     'imageable' => null,
                 ],
             ],
         ]);
 
-        $this->assertSame(
-            0,
-            Task::count()
-        );
+        $this->assertSame(0, Task::count());
     }
 }

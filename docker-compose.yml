@@ -2,14 +2,21 @@ version: '3.7'
 
 services:
   php:
-    build: .
+    build:
+      context: .
+      dockerfile: php.dockerfile
+      args:
+        USER: $USER
     volumes:
-    - ./:/var/www
+      - ./:/workdir
+    security_opt:
+      - label:disable
     depends_on:
       - mysql
     environment:
       XDEBUG_CONFIG: "remote_enable=1 remote_mode=req remote_port=9000 remote_host=$XDEBUG_REMOTE_HOST remote_connect_back=0"
       PHP_IDE_CONFIG: "serverName=lighthouse"
+    tty: true
 
   mysql:
     image: mysql:5.7
@@ -19,10 +26,16 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   node:
-    image: node:12
+    build:
+      context: .
+      dockerfile: node.dockerfile
     volumes:
-    - ./docs:/app
+      - ./docs:/app
+    security_opt:
+      - label:disable
     working_dir: /app
+    environment:
+      - NODE_OPTIONS="--max-old-space-size=8192"
     ports:
-    - 8080:8080
+      - 8080:8080
     tty: true

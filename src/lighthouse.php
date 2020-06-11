@@ -33,8 +33,7 @@ return [
 
             // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
             // middleware, this delegates auth and permission checks to the field level.
-            // If you want to use another guard, change the suffix (remove for default).
-            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class.':api',
+            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
         ],
 
         /*
@@ -46,12 +45,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authentication Guard
+    |--------------------------------------------------------------------------
+    |
+    | The guard to use for authenticating GraphQL requests, if needed.
+    | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
+    | such as `@guard` and when applying the `AttemptAuthentication` middleware.
+    | TODO this setting will default to 'api' in v5
+    |
+    */
+
+    'guard' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Schema Location
     |--------------------------------------------------------------------------
     |
-    | This is a path that points to where your GraphQL schema is located
-    | relative to the app path. You should define your entire GraphQL
-    | schema in this file (additional files may be imported).
+    | Path to your .graphql schema file.
+    | Additional schema files may be imported from within that file.
     |
     */
 
@@ -119,13 +131,24 @@ return [
     | Pagination
     |--------------------------------------------------------------------------
     |
-    | Limits the maximum "count" that users may pass as an argument
-    | to fields that are paginated with the @paginate directive.
-    | A setting of "null" means the count is unrestricted.
+    | Set defaults for the pagination features within Lighthouse, such as
+    | the @paginate directive, or paginated relation directives.
     |
     */
 
-    'paginate_max_count' => null,
+    'pagination' => [
+        /*
+         * Allow clients to query paginated lists without specifying the amount of items.
+         * Setting this to `null` means clients have to explicitly ask for the count.
+         */
+        'default_count' => null,
+
+        /*
+         * Limit the maximum amount of items that clients can request from paginated lists.
+         * Setting this to `null` means the count is unrestricted.
+         */
+        'max_count' => null,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -180,6 +203,7 @@ return [
 
     'error_handlers' => [
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
 
     /*
@@ -220,6 +244,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Mass Assignment Protection
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, mutations will use forceFill() over fill() when populating
+    | a model with arguments in mutation directives. Since GraphQL constrains
+    | allowed inputs by design, mass assignment protection is not needed.
+    |
+    | Will default to true in v5.
+    |
+    */
+
+    'force_fill' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Batchload Relations
     |--------------------------------------------------------------------------
     |
@@ -247,11 +286,25 @@ return [
         'queue_broadcasts' => env('LIGHTHOUSE_QUEUE_BROADCASTS', true),
 
         /*
+         * Determines the queue to use for broadcasting queue jobs.
+         */
+        'broadcasts_queue_name' => env('LIGHTHOUSE_BROADCASTS_QUEUE_NAME', null),
+
+        /*
          * Default subscription storage.
          *
          * Any Laravel supported cache driver options are available here.
          */
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
+
+        /*
+         * Default subscription storage time to live in seconds.
+         *
+         * Indicates how long a subscription can be active before it's automatically removed from storage.
+         * Setting this to `null` means the subscriptions are stored forever. This may cause
+         * stale subscriptions to linger indefinitely in case cleanup fails for any reason.
+         */
+        'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
 
         /*
          * Default subscription broadcaster.
@@ -271,6 +324,31 @@ return [
                 'connection' => 'pusher',
             ],
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Defer
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the experimental @defer directive support.
+    |
+    */
+
+    'defer' => [
+        /*
+         * Maximum number of nested fields that can be deferred in one query.
+         * Once reached, remaining fields will be resolved synchronously.
+         * 0 means unlimited.
+         */
+        'max_nested_fields' => 0,
+
+        /*
+         * Maximum execution time for deferred queries in milliseconds.
+         * Once reached, remaining fields will be resolved synchronously.
+         * 0 means unlimited.
+         */
+        'max_execution_ms' => 0,
     ],
 
 ];
