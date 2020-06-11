@@ -5,6 +5,7 @@ namespace Tests\Unit\Schema\Directives;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 use Tests\Utils\Middleware\Authenticate;
 use Tests\Utils\Middleware\CountRuns;
@@ -16,9 +17,6 @@ class MiddlewareDirectiveTest extends TestCase
 {
     /**
      * @dataProvider fooMiddlewareQueries
-     *
-     * @param  string  $query
-     * @return void
      */
     public function testCallsFooMiddleware(string $query): void
     {
@@ -187,7 +185,7 @@ class MiddlewareDirectiveTest extends TestCase
         $astBuilder = app(ASTBuilder::class);
         $document = $astBuilder->documentAST();
 
-        $queryType = $document->types['Query'];
+        $queryType = $document->types[RootType::QUERY];
 
         $middlewareOnFooArguments = $queryType->fields[0]->directives[0];
         $fieldMiddlewares = ASTHelper::directiveArgValue($middlewareOnFooArguments, 'checks');
@@ -214,7 +212,7 @@ class MiddlewareDirectiveTest extends TestCase
         $astBuilder = app(ASTBuilder::class);
         $document = $astBuilder->documentAST();
 
-        $queryType = $document->types['Query'];
+        $queryType = $document->types[RootType::QUERY];
 
         $middlewareOnFooArguments = $queryType->fields[0]->directives[0];
         $fieldMiddlewares = ASTHelper::directiveArgValue($middlewareOnFooArguments, 'checks');

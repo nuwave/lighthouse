@@ -24,7 +24,7 @@ type Query {
 #import user.graphql
 ```
 
-Imports always begin on a separate line with `#import `, followed by the relative path
+Imports always begin on a separate line with `#import`, followed by the relative path
 to the imported file. The contents of `user.graphql` are pasted in the final schema.
 
 ```graphql
@@ -33,7 +33,7 @@ type Query {
 }
 
 type User {
-    name: String!
+  name: String!
 }
 ```
 
@@ -41,6 +41,7 @@ The import statements are followed recursively, so it is easy to organize even t
 
 You can also import multiple files using wildcard import syntax.
 For example, if you have your schema files like this:
+
 ```
 graphql/
   |-- schema.graphql
@@ -78,9 +79,9 @@ type Query {
 }
 ```
 
-__Attention__: A valid `Query` type definition with at least one field
+**Attention**: A valid `Query` type definition with at least one field
 must be present in the root schema.
-This is because `extend type` needs the original type to get merged into. 
+This is because `extend type` needs the original type to get merged into.
 
 Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
 in your main file, but that spreads the definition apart, and could also grow quite large over time.

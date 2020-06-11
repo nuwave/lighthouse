@@ -15,12 +15,6 @@ class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDi
      */
     protected $eventsDispatcher;
 
-    /**
-     * Construct EventDirective.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @return void
-     */
     public function __construct(EventsDispatcher $eventsDispatcher)
     {
         $this->eventsDispatcher = $eventsDispatcher;
@@ -45,10 +39,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {

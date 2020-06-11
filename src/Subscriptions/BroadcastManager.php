@@ -20,8 +20,6 @@ class BroadcastManager extends DriverManager
 {
     /**
      * Get configuration key.
-     *
-     * @return string
      */
     protected function configKey(): string
     {
@@ -30,8 +28,6 @@ class BroadcastManager extends DriverManager
 
     /**
      * Get configuration driver key.
-     *
-     * @return string
      */
     protected function driverKey(): string
     {
@@ -40,8 +36,6 @@ class BroadcastManager extends DriverManager
 
     /**
      * The interface the driver should implement.
-     *
-     * @return string
      */
     protected function interface(): string
     {
@@ -52,7 +46,6 @@ class BroadcastManager extends DriverManager
      * Create instance of pusher driver.
      *
      * @param  mixed[]  $config
-     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster
      * @throws \Pusher\PusherException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
@@ -78,7 +71,6 @@ class BroadcastManager extends DriverManager
      * Create instance of log driver.
      *
      * @param  mixed[]  $config
-     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster
      */
     protected function createLogDriver(array $config): LogBroadcaster
     {

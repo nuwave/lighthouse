@@ -1,9 +1,8 @@
 {
     "name": "nuwave/lighthouse",
     "type": "library",
-    "description": "Lighthouse is a schema first GraphQL package for Laravel applications.",
+    "description": "A framework for serving GraphQL from Laravel",
     "keywords": [
-        "api",
         "graphql",
         "laravel",
         "laravel-graphql"
@@ -25,26 +24,32 @@
     "require": {
         "php": ">= 7.1",
         "ext-json": "*",
-        "illuminate/contracts": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
-        "illuminate/http": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
-        "illuminate/pagination": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
-        "illuminate/routing": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
-        "illuminate/support": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
-        "illuminate/validation": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "illuminate/auth": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/bus": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/contracts": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/http": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/pagination": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/queue": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/routing": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/support": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "illuminate/validation": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "nesbot/carbon": "^1.26.0 || ^2.0",
         "webonyx/graphql-php": "^0.13.2"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "^1.28",
+        "bensampo/laravel-enum": "^1.28.3",
         "ergebnis/composer-normalize": "^2.2.2",
-        "haydenpierce/class-finder": "^0.4.0",
-        "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
+        "haydenpierce/class-finder": "^0.4",
+        "laravel/framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
+        "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "laravel/scout": "^4.0 || ^5.0 || ^6.0 || ^7.0",
         "mll-lab/graphql-php-scalars": "^2.1",
         "mockery/mockery": "^1.0",
-        "nunomaduro/larastan": "^0.4.1",
-        "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0",
-        "orchestra/testbench": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0",
+        "nunomaduro/larastan": "dev-master",
+        "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
+        "orchestra/testbench": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
         "phpbench/phpbench": "@dev",
+        "phpstan/phpstan-mockery": "^0.12.5",
         "phpunit/phpunit": "^6.5 || ^7.5 || ^8.4",
         "pusher/pusher-php-server": "^3.2"
     },
@@ -62,8 +67,8 @@
         "laravel": {
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
-                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
-                "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider"
+                "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
+                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider"
             ],
             "aliases": {
                 "graphql": "Nuwave\\Lighthouse\\GraphQL"

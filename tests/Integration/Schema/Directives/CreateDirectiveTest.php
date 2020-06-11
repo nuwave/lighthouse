@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Tests\Constants;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -359,7 +360,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testNestedArgResolverBelongsTo(): void
+    public function testNestedArgResolverForOptionalBelongsTo(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
@@ -484,5 +485,94 @@ class CreateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testCanCreateTwiceWithCreateDirective(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String
+            tasks: [CreateTaskInput!] @create
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: [
+                    {
+                        name: "fooTask"
+                    },
+                    {
+                        name: "barTask"
+                    }
+                ]
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'name' => 'fooTask',
+                        ],
+                        [
+                            'name' => 'barTask',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testTurnOnMassAssignment(): void
+    {
+        config(['lighthouse.force_fill' => false]);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Company {
+            name: String!
+        }
+
+        type Mutation {
+            createCompany(name: String): Company @create
+        }
+        ';
+
+        $this->expectException(MassAssignmentException::class);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createCompany(name: "foo") {
+                name
+            }
+        }
+        ');
     }
 }

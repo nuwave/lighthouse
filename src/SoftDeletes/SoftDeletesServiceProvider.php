@@ -9,36 +9,26 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Support\Utils;
 
 class SoftDeletesServiceProvider extends ServiceProvider
 {
     /**
      * Ensure a model uses the SoftDeletes trait.
      *
-     * @param  string  $modelClass
-     * @param  string  $exceptionMessage
-     * @return void
-     *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      * @see \Illuminate\Database\Eloquent\SoftDeletes
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
     {
-        if (
-            ! in_array(
-                SoftDeletes::class,
-                class_uses_recursive($modelClass)
-            )
-        ) {
+        if (! Utils::classUsesTrait($modelClass, SoftDeletes::class)) {
             throw new DefinitionException($exceptionMessage);
         }
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return void
      */
     public function boot(Dispatcher $dispatcher): void
     {

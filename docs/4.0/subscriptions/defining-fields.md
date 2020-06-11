@@ -4,7 +4,7 @@ Define your subscriptions as field on the root `Subscription` type in your schem
 
 ```graphql
 type Subscription {
-    postUpdated(author: ID): Post
+  postUpdated(author: ID): Post
 }
 ```
 

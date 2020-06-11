@@ -2,37 +2,29 @@
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tests\Utils\LaravelEnums\UserType;
 
+/**
+ * @property int $id
+ * @property int|null $company_id
+ * @property int|null $team_id
+ * @property int|null $person_id
+ * @property string|null $person_type
+ * @property string|null $name
+ * @property string|null $email
+ * @property string|null $password
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
+ */
 class User extends Authenticatable
 {
-    use CastsEnums;
-
-    /**
-     * @var mixed[]
-     */
-    protected $guarded = [];
-
-    protected $enumCasts = [
-        'type' => UserType::class,
-    ];
-
-    public function getTaskCountAsString(): string
-    {
-        if (! $this->relationLoaded('tasks')) {
-            return 'This relation should have been preloaded via @with';
-        }
-
-        return "User has {$this->tasks->count()} tasks.";
-    }
-
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -80,5 +72,29 @@ class User extends Authenticatable
     public function getCompanyNameAttribute()
     {
         return $this->company->name;
+    }
+
+    public function scopeNamed(Builder $query): Builder
+    {
+        return $query->whereNotNull('name');
+    }
+
+    public function tasksLoaded(): bool
+    {
+        return $this->relationLoaded('tasks');
+    }
+
+    public function tasksCountLoaded(): bool
+    {
+        return isset($this->attributes['tasks_count']);
+    }
+
+    public function postsCommentsLoaded(): bool
+    {
+        return $this->relationLoaded('posts')
+            && $this
+                ->posts
+                ->first()
+                ->relationLoaded('comments');
     }
 }

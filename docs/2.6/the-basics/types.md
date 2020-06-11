@@ -60,7 +60,6 @@ Enums are types with a restricted set of values (similar to `enum` found in data
 They are defined as a list of `UPPERCASE` string keys. You can define the actual values through
 the [@enum](../api-reference/directives.md#enum) directive.
 
-
 ```graphql
 enum EmploymentStatus {
   INTERN @enum(value: 0)
@@ -109,9 +108,9 @@ Queries now return meaningful names instead of magic numbers.
 {
   "data": {
     "employees": [
-      {"name": "Hans", "status": "INTERN"},
-      {"name": "Pamela", "status": "EMPLOYEE"},
-      {"name": "Gerhard", "status": "TERMINATED"}
+      { "name": "Hans", "status": "INTERN" },
+      { "name": "Pamela", "status": "EMPLOYEE" },
+      { "name": "Gerhard", "status": "TERMINATED" }
     ]
   }
 }
@@ -147,7 +146,7 @@ type User {
 
 type Mutation {
   createUser(input: CreateUserInput!): User
-} 
+}
 ```
 
 ## Interface
@@ -196,9 +195,7 @@ They are similar to interfaces in that they can return different types, but they
 have fields defined.
 
 ```graphql
-union Person
-  = User
-  | Employee
+union Person = User | Employee
 
 type User {
   id: ID!

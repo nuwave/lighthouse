@@ -16,6 +16,7 @@ class CreateTestbenchTagsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('default_string')->default(Constants::TAGS_DEFAULT_STRING);
+
             $table->timestamps();
         });
     }

@@ -60,7 +60,6 @@ abstract class BatchLoader
      * Generate a unique key for the instance, using the path in the query.
      *
      * @param  array<int|string>  $path
-     * @return string
      */
     public static function instanceKey(array $path): string
     {
@@ -83,8 +82,6 @@ abstract class BatchLoader
      *
      * This is called after Lighthouse has resolved a query, so multiple
      * queries can be handled in a single request/session.
-     *
-     * @return void
      */
     public static function forgetInstances(): void
     {
@@ -94,9 +91,8 @@ abstract class BatchLoader
     /**
      * Schedule a result to be loaded.
      *
-     * @param  mixed  $key
+     * @param  array<string>|string  $key
      * @param  array<mixed>  $metaInfo
-     * @return \GraphQL\Deferred
      */
     public function load($key, array $metaInfo = []): Deferred
     {
@@ -144,8 +140,7 @@ abstract class BatchLoader
      *
      * E.g.: $primaryKey = ['key1', 'key2'];.
      *
-     * @param  mixed  $key
-     * @return string
+     * @param  array<string>|string  $key
      */
     protected function buildKey($key): string
     {

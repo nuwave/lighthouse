@@ -21,10 +21,6 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
      */
     protected $validationFactory;
 
-    /**
-     * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
-     * @return void
-     */
     public function __construct(ValidationFactory $validationFactory)
     {
         $this->validationFactory = $validationFactory;
@@ -32,10 +28,6 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -69,11 +61,6 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
         );
     }
 
-    /**
-     * Return custom messages for the rules.
-     *
-     * @return array
-     */
     public function messages(): array
     {
         return [];

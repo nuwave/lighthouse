@@ -50,8 +50,6 @@ class MorphOneDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Task {
@@ -74,8 +72,6 @@ class MorphOneDirectiveTest extends DBTestCase
                 name
                 image {
                     id
-                    from
-                    to
                 }
             }
         }
@@ -88,8 +84,6 @@ class MorphOneDirectiveTest extends DBTestCase
                     'name' => $this->task->name,
                     'image' => [
                         'id' => $this->image->id,
-                        'from' => $this->image->from,
-                        'to' => $this->image->to,
                     ],
                 ],
             ],
@@ -101,8 +95,6 @@ class MorphOneDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Task {
@@ -125,8 +117,6 @@ class MorphOneDirectiveTest extends DBTestCase
                 name
                 customImage {
                     id
-                    from
-                    to
                 }
             }
         }
@@ -139,8 +129,6 @@ class MorphOneDirectiveTest extends DBTestCase
                     'name' => $this->task->name,
                     'customImage' => [
                         'id' => $this->image->id,
-                        'from' => $this->image->from,
-                        'to' => $this->image->to,
                     ],
                 ],
             ],
