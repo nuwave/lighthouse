@@ -50,7 +50,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      * Build the class with the given name.
      *
      * @param  string  $name
-     * @return string
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -97,10 +96,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     /**
      * Ask the user if the directive should implement any of the given interfaces.
-     *
-     * @param  string  $stub
-     * @param  array  $interfaces
-     * @return void
      */
     protected function askForInterfaces(string &$stub, array $interfaces): void
     {
@@ -116,11 +111,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      *
      * Adds the use statement to the
      * top of the stub and the interface itself in the implements statement.
-     *
-     * @param  string  $stub
-     * @param  string  $interface
-     * @param  bool  $withMethods
-     * @return void
      */
     protected function insertInterface(string &$stub, string $interface, bool $withMethods = true): void
     {
@@ -155,9 +145,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     /**
      * Remove any leftover template helper strings in the stub.
-     *
-     * @param  string  $stub
-     * @return void
      */
     protected function cleanup(string &$stub): void
     {
@@ -184,9 +171,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     /**
      * Get the stub file for the methods required by an interface.
-     *
-     * @param  string  $interface
-     * @return string
      */
     protected function getStubForInterfaceMethods(string $interface): string
     {
@@ -195,9 +179,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     /**
      * Get the stub file for the imports required by an interface.
-     *
-     * @param  string  $interface
-     * @return string
      */
     protected function getStubForInterfaceImports(string $interface): string
     {
@@ -206,8 +187,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     /**
      * Get the console command options.
-     *
-     * @return array
      */
     protected function getOptions(): array
     {
