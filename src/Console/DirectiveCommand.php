@@ -60,22 +60,36 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $stub = parent::buildClass($name);
 
         if ($this->option('type')) {
-            $this->askForInterfaces($stub, ['TypeManipulator', 'TypeMiddleware', 'TypeResolver', 'TypeExtensionManipulator']);
+            $this->askForInterfaces($stub, [
+                'TypeManipulator',
+                'TypeMiddleware',
+                'TypeResolver',
+                'TypeExtensionManipulator',
+            ]);
         }
 
         if ($this->option('field')) {
-            $this->askForInterfaces($stub, ['FieldResolver', 'FieldMiddleware', 'FieldManipulator']);
+            $this->askForInterfaces($stub, [
+                'FieldResolver',
+                'FieldMiddleware',
+                'FieldManipulator',
+            ]);
         }
 
         if ($this->option('argument')) {
             // Arg directives always either implement ArgDirective or ArgDirectiveForArray.
             if ($this->confirm('Will your argument directive apply to a list of items?')) {
-                $this->insertInterface($stub, 'ArgDirectiveForArray', false);
+                $this->implementInterface($stub, 'ArgDirectiveForArray', false);
             } else {
-                $this->insertInterface($stub, 'ArgDirective', false);
+                $this->implementInterface($stub, 'ArgDirective', false);
             }
 
-            $this->askForInterfaces($stub, ['ArgTransformerDirective', 'ArgBuilderDirective', 'ArgResolver', 'ArgManipulator']);
+            $this->askForInterfaces($stub, [
+                'ArgTransformerDirective',
+                'ArgBuilderDirective',
+                'ArgResolver',
+                'ArgManipulator',
+            ]);
         }
 
         if ($this->imports->isNotEmpty()) {
@@ -89,30 +103,26 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             );
         }
 
-        $this->cleanup($stub);
+        $this->cleanupTemplatePlaceholders($stub);
 
         return $stub;
     }
 
     /**
      * Ask the user if the directive should implement any of the given interfaces.
+     *
+     * @param  array<string> $interfaces
      */
     protected function askForInterfaces(string &$stub, array $interfaces): void
     {
         foreach ($interfaces as $interface) {
             if ($this->confirm('Should the directive implement the '.$interface.' middleware?')) {
-                $this->insertInterface($stub, $interface);
+                $this->implementInterface($stub, $interface);
             }
         }
     }
 
-    /**
-     * Insert an interface into a directive stub.
-     *
-     * Adds the use statement to the
-     * top of the stub and the interface itself in the implements statement.
-     */
-    protected function insertInterface(string &$stub, string $interface, bool $withMethods = true): void
+    protected function implementInterface(string &$stub, string $interface, bool $withMethods = true): void
     {
         $stub = str_replace(
             '{{ imports }}',
@@ -143,10 +153,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         );
     }
 
-    /**
-     * Remove any leftover template helper strings in the stub.
-     */
-    protected function cleanup(string &$stub): void
+    protected function cleanupTemplatePlaceholders(string &$stub): void
     {
         // If one or more interfaces are enabled, we are left with ", {{ implements }}".
         $stub = str_replace(', {{ implements }}', '', $stub);
@@ -161,33 +168,21 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $stub = str_replace("\n\n{{ methods }}", '', $stub);
     }
 
-    /**
-     * Get the stub file for the generator.
-     */
     protected function getStub(): string
     {
         return __DIR__.'/stubs/directive.stub';
     }
 
-    /**
-     * Get the stub file for the methods required by an interface.
-     */
     protected function getStubForInterfaceMethods(string $interface): string
     {
         return __DIR__.'/stubs/directives/'.Str::snake($interface).'.stub';
     }
 
-    /**
-     * Get the stub file for the imports required by an interface.
-     */
     protected function getStubForInterfaceImports(string $interface): string
     {
         return __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub';
     }
 
-    /**
-     * Get the console command options.
-     */
     protected function getOptions(): array
     {
         return [
