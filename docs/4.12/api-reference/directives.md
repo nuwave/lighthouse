@@ -837,6 +837,8 @@ directive @find(
 This throws when more then one result is returned.
 Use [@first](#first) if you can not ensure that.
 
+#### Overwrite Default Model Detection
+
 If your model does not sit in the default namespace, you can overwrite it.
 
 ```graphql
@@ -844,6 +846,35 @@ type Query {
   userById(id: ID! @eq): User @find(model: "App\\Authentication\\User")
 }
 ```
+
+#### Adding Local Scopes
+
+You may easily re-use your local scopes defined on your Model. Look at following example:
+
+```php
+class User extends Model
+{
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
+}
+```
+
+Now we can use the local scope in our query like this:
+
+```graphql
+type Query {
+  userById(id: ID! @eq): User @find(scopes: ["verified"])
+}
+```
+
+After adding the local scope to the directive it will produce following SQL:
+
+```sql
+select * from `users` where `id` = ? and `email_verified_at` is not null
+```
+
 
 ## @first
 
