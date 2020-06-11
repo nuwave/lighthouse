@@ -77,14 +77,6 @@ abstract class GraphQLSubscription
     public $IS_PUBLIC = false;
 
     /**
-     * @return ?string
-     */
-    public function getQueryString()
-    {
-        return '';
-    }
-
-    /**
      * @param array<mixed> $args
      *
      * @return ?string
