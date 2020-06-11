@@ -80,11 +80,4 @@ class TestResponseMixin
             return $this;
         };
     }
-
-    public function jsonGet(): Closure
-    {
-        return function (string $key = null) {
-            return data_get($this->decodeResponseJson(), $key);
-        };
-    }
 }

@@ -266,7 +266,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedZeroOrLessItems(0),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
