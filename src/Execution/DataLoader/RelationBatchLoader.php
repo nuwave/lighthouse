@@ -44,7 +44,7 @@ class RelationBatchLoader extends BatchLoader
     }
 
     /**
-     * Resolve the keys.
+     * Eager-load the relation.
      *
      * @return array<string, mixed>
      */
