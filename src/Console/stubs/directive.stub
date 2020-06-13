@@ -9,5 +9,4 @@ class DummyClass extends BaseDirective implements {{ implements }}
 {
     // TODO implement the directive https://lighthouse-php.com/master/custom-directives/getting-started.html
 
-{{ methods }}
-}
+{{ methods }}}
