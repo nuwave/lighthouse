@@ -203,3 +203,14 @@ If you need to revert to the old behavior of using `fill()`, you can change your
 -   'force_fill' => true,
 +   'force_fill' => false,
 ```
+
+### Use native `TestResponse::json()`
+
+The `TestResponse::jsonGet()` mixin was removed in favor of the `->json()` method,
+natively supported by Laravel starting from version 5.6.
+
+```diff
+$response = $this->graphQL(...);
+-$response->jsonGet(...);
++$response->json(...);
+```
