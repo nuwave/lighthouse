@@ -181,7 +181,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $shortName = $this->shortName($interface);
         $this->implements->push($shortName);
 
-        $this->imports->push("use $interface};");
+        $this->imports->push("use {$interface};");
         if ($imports = $this->interfaceImports($shortName)) {
             $imports = explode("\n", $imports);
             $this->imports->push(...$imports);
