@@ -151,12 +151,12 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $this->interfaces->push($interface);
 
         $this->imports->push("use Nuwave\\Lighthouse\\Support\\Contracts\\{$interface};");
-        if($imports = $this->interfaceImports($interface)) {
+        if ($imports = $this->interfaceImports($interface)) {
             $imports = explode("\n", $imports);
             $this->imports->push(...$imports);
         }
 
-        if($methods = $this->interfaceMethods($interface)) {
+        if ($methods = $this->interfaceMethods($interface)) {
             $this->methods->push($methods);
         }
     }
@@ -182,7 +182,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getFileIfExists(string $path): ?string
     {
-        if(! $this->files->exists($path)) {
+        if (! $this->files->exists($path)) {
             return null;
         }
 
