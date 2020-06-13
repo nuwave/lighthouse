@@ -103,6 +103,8 @@ SDL;
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
+
+                $relation->delete();
             }
         } else {
             /** @var \Illuminate\Database\Eloquent\Model $related */
