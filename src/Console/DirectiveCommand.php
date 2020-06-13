@@ -169,7 +169,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     protected function interfaceMethods(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__.'/stubs/directives/'.Str::snake($interface).'.stub'
+            __DIR__.'/stubs/directives/'.Str::snake($interface).'_methods.stub'
         );
     }
 
