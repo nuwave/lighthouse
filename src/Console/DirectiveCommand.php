@@ -41,7 +41,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      *
      * @var \Illuminate\Support\Collection<string>
      */
-    protected $interfaces;
+    protected $implements;
 
     /**
      * The method stubs.
@@ -70,7 +70,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     protected function buildClass($name): string
     {
         $this->imports = new Collection();
-        $this->interfaces = new Collection();
+        $this->implements = new Collection();
         $this->methods = new Collection();
 
         $stub = parent::buildClass($name);
@@ -125,7 +125,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
         $stub = str_replace(
             '{{ implements }}',
-            $this->interfaces->implode("\n"),
+            $this->implements->implode(", "),
             $stub
         );
 
@@ -148,7 +148,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function implementInterface(string $interface): void
     {
-        $this->interfaces->push($interface);
+        $this->implements->push($interface);
 
         $this->imports->push("use Nuwave\\Lighthouse\\Support\\Contracts\\{$interface};");
         if ($imports = $this->interfaceImports($interface)) {
