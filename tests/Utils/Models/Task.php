@@ -27,7 +27,7 @@ class Task extends Model
 {
     use SoftDeletes;
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
@@ -76,9 +76,9 @@ class Task extends Model
     }
 
     /**
-     * @param  array<string>  $tags
+     * @param  iterable<string>  $tags
      */
-    public function scopeWhereTags(Builder $query, array $tags): Builder
+    public function scopeWhereTags(Builder $query, iterable $tags): Builder
     {
         return $query->whereHas('tags', function (Builder $query) use ($tags) {
             $query->whereIn('name', $tags);

@@ -20,9 +20,8 @@ class NestedMorphTo implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): void
     {
         // TODO implement create and update once we figure out how to do polymorphic input types https://github.com/nuwave/lighthouse/issues/900
 
