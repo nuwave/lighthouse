@@ -212,7 +212,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getFileIfExists(string $path): ?string
     {
-        if (!$this->files->exists($path)) {
+        if (! $this->files->exists($path)) {
             return null;
         }
 
