@@ -45,10 +45,10 @@
         "laravel/scout": "^7.0",
         "mll-lab/graphql-php-scalars": "^2.1",
         "mockery/mockery": "^1.0",
-        "nunomaduro/larastan": "dev-master",
+        "nunomaduro/larastan": "^0.6.0",
         "orchestra/database": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
         "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
-        "phpbench/phpbench": "@dev",
+        "phpbench/phpbench": "^0.17.0",
         "phpstan/phpstan-mockery": "^0.12.5",
         "phpunit/phpunit": "^7.5 || ^8.4",
         "pusher/pusher-php-server": "^3.2"

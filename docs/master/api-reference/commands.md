@@ -15,6 +15,11 @@ Create a class for a GraphQL directive.
 
     php artisan lighthouse:directive
 
+Use the `--type`, `--field` and `--argument` options to create type, field and
+argument directives, respectively. The command will then ask you which
+interfaces the directive should implement and add the required method stubs and
+imports for you.
+
 ## ide-helper
 
 Create IDE helper files to improve type checking and autocompletion.
