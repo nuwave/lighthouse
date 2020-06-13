@@ -178,15 +178,16 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     protected function implementInterface(string $interface): void
     {
-        $this->implements->push($this->shortName($interface));
+        $shortName = $this->shortName($interface);
+        $this->implements->push($shortName);
 
-        $this->imports->push("use Nuwave\\Lighthouse\\Support\\Contracts\\{$interface};");
-        if ($imports = $this->interfaceImports($interface)) {
+        $this->imports->push("use $interface};");
+        if ($imports = $this->interfaceImports($shortName)) {
             $imports = explode("\n", $imports);
             $this->imports->push(...$imports);
         }
 
-        if ($methods = $this->interfaceMethods($interface)) {
+        if ($methods = $this->interfaceMethods($shortName)) {
             $this->methods->push($methods);
         }
     }
