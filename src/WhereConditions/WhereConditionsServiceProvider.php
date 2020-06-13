@@ -34,7 +34,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            function (RegisterDirectiveNamespaces $_): string {
                 return __NAMESPACE__;
             }
         );
@@ -80,12 +80,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = PartialParser
-            ::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
-            ->name
-            ->value;
+        $operatorName = self::operatorName($operator);
         $operatorDefault = $operator->default();
 
         return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
@@ -116,12 +111,12 @@ GRAPHQL
     public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
     {
         $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
-        $default_has_operator = self::DEFAULT_HAS_OPERATOR;
-        $default_has_amount = self::DEFAULT_HAS_AMOUNT;
+        $defaultHasOperator = self::DEFAULT_HAS_OPERATOR;
+        $defaultHasAount = self::DEFAULT_HAS_AMOUNT;
 
-        $operatorName = PartialParser::enumTypeDefinition(
-            app(Operator::class)->enumDefinition()
-        )->name->value;
+        /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
+        $operator = app(Operator::class);
+        $operatorName = self::operatorName($operator);
 
         return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
@@ -129,16 +124,26 @@ GRAPHQL
                 "The relation that is checked."
                 relation: String!
 
-                "The comparision operator to test aginst the amount."
-                operator: $operatorName = $default_has_operator
+                "The comparision operator to test against the amount."
+                operator: $operatorName = $defaultHasOperator
 
                 "The amount to test."
-                amount: Int = $default_has_amount
+                amount: Int = $defaultHasAount
 
                 "Additional condition logic."
                 condition: $name
             }
 GRAPHQL
         );
+    }
+
+    protected static function operatorName(Operator $operator): string
+    {
+        return PartialParser
+            ::enumTypeDefinition(
+                $operator->enumDefinition()
+            )
+            ->name
+            ->value;
     }
 }

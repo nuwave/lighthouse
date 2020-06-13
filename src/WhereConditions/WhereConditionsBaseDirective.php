@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -32,13 +33,12 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array<string, mixed> $whereConditions
-     * @param  Model                $model
+     * @param  array<string, mixed>  $whereConditions
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleWhereConditions($builder, array $whereConditions, Model $model = null, string $boolean = 'and')
     {
-        if ($builder instanceof \Illuminate\Database\Eloquent\Builder) {
+        if ($builder instanceof EloquentBuilder) {
             $model = $builder->getModel();
         }
 
@@ -64,29 +64,23 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             );
         }
 
-        if ($hasConnectedConditions = $whereConditions['HAS'] ?? null) {
+        if ($hasRelationConditions = $whereConditions['HAS'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($hasConnectedConditions, $model): void {
-                    $query = $model->getModel()->whereHas(
-                        $hasConnectedConditions['relation'],
-                        function ($builder) use ($hasConnectedConditions, $model): void {
-                            $relation_array = explode('.', $hasConnectedConditions['relation']);
-                            $related_model = $model->getModel();
-
-                            // TODO: temporary solution for getting model of nested relation, until laravel has native support for it
-                            array_walk($relation_array, function ($relation) use (&$related_model) {
-                                $related_model = $related_model->{$relation}()->getRelated();
-                            });
-
-                            if (array_key_exists('condition', $hasConnectedConditions)) {
-                                $this->handleWhereConditions($builder, $hasConnectedConditions['condition'], $related_model);
+                function ($builder) use ($hasRelationConditions, $model): void {
+                    $relation = $hasRelationConditions['relation'];
+                    $whereHasQuery = $model->whereHas(
+                        $relation,
+                        function ($builder) use ($relation, $hasRelationConditions, $model): void {
+                            if (array_key_exists('condition', $hasRelationConditions)) {
+                                $relatedModel = $this->nestedRelatedModel($relation, $model);
+                                $this->handleWhereConditions($builder, $hasRelationConditions['condition'], $relatedModel);
                             }
                         },
-                        $hasConnectedConditions['operator'],
-                        $hasConnectedConditions['amount']
+                        $hasRelationConditions['operator'],
+                        $hasRelationConditions['amount']
                     );
 
-                    $builder->mergeWheres($query->getQuery()->wheres, $query->getBindings());
+                    $builder->mergeWheres($whereHasQuery->getQuery()->wheres, $whereHasQuery->getBindings());
                 },
                 $boolean
             );
@@ -155,12 +149,24 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     protected static function assertValidColumnName(string $column): void
     {
-        // TODO use safe
+        // TODO use safe-php
         $match = preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column);
         if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
             );
         }
+    }
+
+    protected function nestedRelatedModel(Model $model, string $nestedRelationPath): Model
+    {
+        $relations = explode('.', $nestedRelationPath);
+        $relatedModel = $model->newInstance();
+
+        array_walk($relations, static function (string $relation) use (&$relatedModel): void {
+            $relatedModel = $relatedModel->{$relation}()->getRelated();
+        });
+
+        return $relatedModel;
     }
 }
