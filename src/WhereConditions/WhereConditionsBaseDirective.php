@@ -72,8 +72,11 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                         $relation,
                         function ($builder) use ($relation, $hasRelationConditions, $model): void {
                             if (array_key_exists('condition', $hasRelationConditions)) {
-                                $relatedModel = $this->nestedRelatedModel($relation, $model);
-                                $this->handleWhereConditions($builder, $hasRelationConditions['condition'], $relatedModel);
+                                $this->handleWhereConditions(
+                                    $builder,
+                                    $hasRelationConditions['condition'],
+                                    $this->nestedRelatedModel($model, $relation)
+                                );
                             }
                         },
                         $hasRelationConditions['operator'],
