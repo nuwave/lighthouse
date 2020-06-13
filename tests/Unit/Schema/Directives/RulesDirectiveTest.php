@@ -8,7 +8,7 @@ use Tests\Utils\Rules\FooBarRule;
 
 class RulesDirectiveTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 

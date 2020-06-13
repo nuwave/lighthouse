@@ -6,12 +6,12 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
 {
     const CATEGORY = 'validation';
 
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
 
-    public function getCategory()
+    public function getCategory(): string
     {
         return self::CATEGORY;
     }

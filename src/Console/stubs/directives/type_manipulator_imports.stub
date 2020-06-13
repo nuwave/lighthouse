@@ -1,0 +1,2 @@
+use GraphQL\Language\AST\TypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
