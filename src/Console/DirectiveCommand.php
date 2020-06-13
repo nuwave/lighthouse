@@ -30,11 +30,25 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     protected $type = 'Directive';
 
     /**
-     * The imports required by the various interfaces, if any.
+     * The required imports.
      *
      * @var \Illuminate\Support\Collection<string>
      */
     protected $imports;
+
+    /**
+     * The implemented interfaces.
+     *
+     * @var \Illuminate\Support\Collection<string>
+     */
+    protected $interfaces;
+
+    /**
+     * The method stubs.
+     *
+     * @var \Illuminate\Support\Collection<string>
+     */
+    protected $methods;
 
     protected function getNameInput(): string
     {
@@ -56,6 +70,8 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     protected function buildClass($name): string
     {
         $this->imports = new Collection();
+        $this->interfaces = new Collection();
+        $this->methods = new Collection();
 
         $stub = parent::buildClass($name);
 
@@ -79,9 +95,9 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         if ($this->option('argument')) {
             // Arg directives always either implement ArgDirective or ArgDirectiveForArray.
             if ($this->confirm('Will your argument directive apply to a list of items?')) {
-                $this->implementInterface($stub, 'ArgDirectiveForArray', false);
+                $this->implementInterface('ArgDirectiveForArray');
             } else {
-                $this->implementInterface($stub, 'ArgDirective', false);
+                $this->implementInterface('ArgDirective');
             }
 
             $this->askForInterfaces($stub, [
@@ -92,18 +108,26 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             ]);
         }
 
-        if ($this->imports->isNotEmpty()) {
-            $stub = str_replace(
-                '{{ imports }}',
-                $this->imports
-                    ->filter()
-                    ->unique()
-                    ->implode("\n"),
-                $stub
-            );
-        }
+        $stub = str_replace(
+            '{{ imports }}',
+            $this->imports
+                ->filter()
+                ->unique()
+                ->implode("\n"),
+            $stub
+        );
 
-        $this->cleanupTemplatePlaceholders($stub);
+        $stub = str_replace(
+            '{{ methods }}',
+            $this->methods->implode("\n"),
+            $stub
+        );
+
+        $stub = str_replace(
+            '{{ implements }}',
+            $this->interfaces->implode("\n"),
+            $stub
+        );
 
         return $stub;
     }
@@ -113,59 +137,28 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      *
      * @param  array<string> $interfaces
      */
-    protected function askForInterfaces(string &$stub, array $interfaces): void
+    protected function askForInterfaces(array $interfaces): void
     {
         foreach ($interfaces as $interface) {
             if ($this->confirm('Should the directive implement the '.$interface.' middleware?')) {
-                $this->implementInterface($stub, $interface);
+                $this->implementInterface($interface);
             }
         }
     }
 
-    protected function implementInterface(string &$stub, string $interface, bool $withMethods = true): void
+    protected function implementInterface(string $interface): void
     {
-        $stub = str_replace(
-            '{{ imports }}',
-            'use Nuwave\\Lighthouse\\Support\\Contracts\\'.$interface.";\n{{ imports }}",
-            $stub
-        );
+        $this->interfaces->push($interface);
 
-        $stub = str_replace(
-            '{{ implements }}',
-            $interface.', {{ implements }}',
-            $stub
-        );
-
-        if (! $withMethods) {
-            // No need to implement methods for this interface, so return early.
-            return;
+        $this->imports->push("use Nuwave\\Lighthouse\\Support\\Contracts\\{$interface};");
+        if($imports = $this->interfaceImports($interface)) {
+            $imports = explode("\n", $imports);
+            $this->imports->push(...$imports);
         }
 
-        $imports = $this->files->get($this->getStubForInterfaceImports($interface));
-        $imports = explode("\n", $imports);
-
-        $this->imports->push(...$imports);
-
-        $stub = str_replace(
-            '{{ methods }}',
-            $this->files->get($this->getStubForInterfaceMethods($interface))."\n\n{{ methods }}",
-            $stub
-        );
-    }
-
-    protected function cleanupTemplatePlaceholders(string &$stub): void
-    {
-        // If one or more interfaces are enabled, we are left with ", {{ implements }}".
-        $stub = str_replace(', {{ implements }}', '', $stub);
-
-        // If no interfaces were enabled, we are left with "implements {{ implements }}".
-        $stub = str_replace('implements {{ implements }}', '', $stub);
-
-        // When no imports were made, the {{ imports }} is still there.
-        $stub = str_replace("{{ imports }}\n", '', $stub);
-
-        // Whether or not methods were implemented, the {{ methods }} is still there.
-        $stub = str_replace("\n\n{{ methods }}", '', $stub);
+        if($methods = $this->interfaceMethods($interface)) {
+            $this->methods->push($methods);
+        }
     }
 
     protected function getStub(): string
@@ -173,14 +166,27 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         return __DIR__.'/stubs/directive.stub';
     }
 
-    protected function getStubForInterfaceMethods(string $interface): string
+    protected function interfaceMethods(string $interface): ?string
     {
-        return __DIR__.'/stubs/directives/'.Str::snake($interface).'.stub';
+        return $this->getFileIfExists(
+            __DIR__.'/stubs/directives/'.Str::snake($interface).'.stub'
+        );
     }
 
-    protected function getStubForInterfaceImports(string $interface): string
+    protected function interfaceImports(string $interface): ?string
     {
-        return __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub';
+        return $this->getFileIfExists(
+            __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub'
+        );
+    }
+
+    protected function getFileIfExists(string $path): ?string
+    {
+        if(! $this->files->exists($path)) {
+            return null;
+        }
+
+        return $this->files->get($path);
     }
 
     /**
