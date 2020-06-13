@@ -32,7 +32,7 @@ trait MocksResolvers
      *
      * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
      */
-    protected function mockResolverExpects(InvocationOrder $invocationOrder, string $key = 'default'): InvocationMocker
+    protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
     {
         $mock = $this->createMock(MockResolver::class);
 
