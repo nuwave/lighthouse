@@ -4,10 +4,43 @@ namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
 use Symfony\Component\Console\Input\InputOption;
 
 class DirectiveCommand extends LighthouseGeneratorCommand
 {
+    const ARGUMENT_INTERFACES = [
+        ArgTransformerDirective::class,
+        ArgBuilderDirective::class,
+        ArgResolver::class,
+        ArgManipulator::class,
+    ];
+
+    const FIELD_INTERFACES = [
+        FieldResolver::class,
+        FieldMiddleware::class,
+        FieldManipulator::class,
+    ];
+
+    const TYPE_INTERFACES = [
+        TypeManipulator::class,
+        TypeMiddleware::class,
+        TypeResolver::class,
+        TypeExtensionManipulator::class,
+    ];
+
     /**
      * The name of the console command.
      *
@@ -76,36 +109,22 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $stub = parent::buildClass($name);
 
         if ($this->option('type')) {
-            $this->askForInterfaces($stub, [
-                'TypeManipulator',
-                'TypeMiddleware',
-                'TypeResolver',
-                'TypeExtensionManipulator',
-            ]);
+            $this->askForInterfaces(self::TYPE_INTERFACES);
         }
 
         if ($this->option('field')) {
-            $this->askForInterfaces($stub, [
-                'FieldResolver',
-                'FieldMiddleware',
-                'FieldManipulator',
-            ]);
+            $this->askForInterfaces(self::FIELD_INTERFACES);
         }
 
         if ($this->option('argument')) {
             // Arg directives always either implement ArgDirective or ArgDirectiveForArray.
             if ($this->confirm('Will your argument directive apply to a list of items?')) {
-                $this->implementInterface('ArgDirectiveForArray');
+                $this->implementInterface(ArgDirectiveForArray::class);
             } else {
-                $this->implementInterface('ArgDirective');
+                $this->implementInterface(ArgDirective::class);
             }
 
-            $this->askForInterfaces($stub, [
-                'ArgTransformerDirective',
-                'ArgBuilderDirective',
-                'ArgResolver',
-                'ArgManipulator',
-            ]);
+            $this->askForInterfaces(self::ARGUMENT_INTERFACES);
         }
 
         $stub = str_replace(
@@ -135,20 +154,31 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<string> $interfaces
+     * @param  array<class-string> $interfaces
      */
     protected function askForInterfaces(array $interfaces): void
     {
         foreach ($interfaces as $interface) {
-            if ($this->confirm('Should the directive implement the '.$interface.' middleware?')) {
+            if ($this->confirm("Should the directive implement the {$this->shortName($interface)} middleware?")) {
                 $this->implementInterface($interface);
             }
         }
     }
 
+    /**
+     * @param  class-string  $interface
+     */
+    protected function shortName(string $interface): string
+    {
+        return Str::afterLast($interface, '\\');
+    }
+
+    /**
+     * @param  class-string  $interface
+     */
     protected function implementInterface(string $interface): void
     {
-        $this->implements->push($interface);
+        $this->implements->push($this->shortName($interface));
 
         $this->imports->push("use Nuwave\\Lighthouse\\Support\\Contracts\\{$interface};");
         if ($imports = $this->interfaceImports($interface)) {
@@ -182,7 +212,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getFileIfExists(string $path): ?string
     {
-        if (! $this->files->exists($path)) {
+        if (!$this->files->exists($path)) {
             return null;
         }
 
