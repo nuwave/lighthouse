@@ -11,12 +11,32 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
+- Add `@withCount` directive to eager load relationship counts on field access https://github.com/nuwave/lighthouse/pull/1390
+- Extend `lighthouse:directive` artisan command to allow choosing interfaces https://github.com/nuwave/lighthouse/pull/1251
+
+### Changed
+
+- Eager load relationship count in `@count` directive https://github.com/nuwave/lighthouse/pull/1390
+
+## 4.14.1
+
+### Fixed
+
+- Safeguard deletion of `programmatic-types.graphql` in `artisan lighthouse:ide-helper`
+
+## 4.14.0
+
+### Added
+
 - Write definitions for programmatically registered types to `programmatic-types.graphql`
   when running the `lighthouse:ide-helper` artisan command https://github.com/nuwave/lighthouse/pull/1371
 
 ### Fixed
 
 - Fix the error message when using multiple exclusive directives on a single node https://github.com/nuwave/lighthouse/pull/1387
+- Allow passing additional headers to `multipartGraphQL` Lumen test helper too https://github.com/nuwave/lighthouse/pull/1395
+- Rectify that `@orderBy`, `@whereConditions` and `@whereHasConditions` only work on field arguments https://github.com/nuwave/lighthouse/pull/1402
+- Make mass assignment behavior configurable through `force_fill` option in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1405
 
 ### Deprecated
 

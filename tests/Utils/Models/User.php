@@ -69,7 +69,7 @@ class User extends Authenticatable
         });
     }
 
-    public function getCompanyNameAttribute()
+    public function getCompanyNameAttribute(): string
     {
         return $this->company->name;
     }
@@ -82,6 +82,11 @@ class User extends Authenticatable
     public function tasksLoaded(): bool
     {
         return $this->relationLoaded('tasks');
+    }
+
+    public function tasksCountLoaded(): bool
+    {
+        return isset($this->attributes['tasks_count']);
     }
 
     public function postsCommentsLoaded(): bool

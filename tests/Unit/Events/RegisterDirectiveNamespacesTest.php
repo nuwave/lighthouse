@@ -15,7 +15,7 @@ class RegisterDirectiveNamespacesTest extends TestCase
      */
     protected $directiveFactory;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         $app->make('events')->listen(
             RegisterDirectiveNamespaces::class,

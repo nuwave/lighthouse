@@ -26,14 +26,14 @@ parameters:
   - src/Schema/Factories/FieldFactory.php
   - src/Schema/AST/PartialParser.php
   - src/Schema/Directives/MiddlewareDirective.php
+
+  # As long as we support multiple Laravel versions at once, there will be some dead spots
+  reportUnmatchedIgnoredErrors: false
   ignoreErrors:
   # Some parts of Laravel are just really magical
-  - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
-  - '#Call to protected static method get\(\) of class Illuminate\\Filesystem\\FilesystemManager\.#'
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - path: tests/database/factories/*
-    message: '#Undefined variable: \$factory#'
-  - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::find\(\)\.#'
+    message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
 
@@ -50,13 +50,10 @@ parameters:
   - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$name\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$directives\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$kind\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$name\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeSystemDefinitionNode::\$directives\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeDefinitionNode::\$name\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeExtensionNode::\$name\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\ValueNode given\.#'
-  - '#.* expects GraphQL\\Type\\Definition\\Type, GraphQL\\Type\\Definition\\InputType given\.#'
 
   # Should work once we update to a version of graphql-php that has more accurate types
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
@@ -77,17 +74,10 @@ parameters:
   - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
 
   # We are monkeypatching ResolveInfo to pass information through resolver middleware
-  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
   # This just has no type in root resolvers
   - '#Method .* has parameter \$root with no typehint specified\.#'
-
-  # TODO remove once we no longer need PartialParser
-  - '#Method Nuwave\\Lighthouse\\Schema\\AST\\PartialParser::.*\(\) should return GraphQL\\Language\\AST\\.* but returns GraphQL\\Language\\AST\\Node\.#'
-
-  # TODO remove once we no longer support PHPUnit 7
-  - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects\(\) has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
 
   # The typehint is defined in the trait UsesTestSchema
   - '#Property .*::\$schema has no typehint specified\.#'

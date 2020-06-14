@@ -1909,7 +1909,7 @@ directive @orderBy(
   If not given, the column names can be passed as a String by clients.
   """
   columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
 
 Use it on a field argument of an Eloquent query. The type of the argument
