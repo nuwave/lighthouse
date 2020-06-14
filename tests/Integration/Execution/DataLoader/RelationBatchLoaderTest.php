@@ -13,7 +13,7 @@ use Tests\Utils\Models\User;
 
 class RelationBatchLoaderTest extends DBTestCase
 {
-    protected $schema = /* @lang GraphQL */ '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID
         name: String
@@ -49,7 +49,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
     public function testCanResolveBatchedFieldsFromBatchedRequests(): void
     {
-        $query = /* @lang GraphQL */ '
+        $query = /** @lang GraphQL */ '
         query User($id: ID!) {
             user(id: $id) {
                 email
@@ -82,9 +82,6 @@ class RelationBatchLoaderTest extends DBTestCase
 
     /**
      * @dataProvider batchloadRelationsSetting
-     *
-     * @param  bool  $batchloadRelations
-     * @param  int  $expectedQueryCount
      */
     public function testBatchloadRelations(bool $batchloadRelations, int $expectedQueryCount): void
     {
@@ -96,7 +93,7 @@ class RelationBatchLoaderTest extends DBTestCase
         });
 
         $this
-            ->graphQL(/* @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ '
             {
                 users {
                     email
@@ -113,6 +110,9 @@ class RelationBatchLoaderTest extends DBTestCase
         $this->assertSame($expectedQueryCount, $queryCount);
     }
 
+    /**
+     * @return array<array<bool|int>>
+     */
     public function batchloadRelationsSetting(): array
     {
         return [
@@ -133,7 +133,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
 
                 return $loader->load($args['id']);
             },
@@ -141,14 +141,14 @@ class RelationBatchLoaderTest extends DBTestCase
         );
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
 
                 return $loader->loadMany($args['ids']);
             },
             'many'
         );
 
-        $this->schema = /* @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             name: String
         }
@@ -164,7 +164,7 @@ class RelationBatchLoaderTest extends DBTestCase
         }
         ';
 
-        $query = /* @lang GraphQL */ '
+        $query = /** @lang GraphQL */ '
         query User($id: ID!, $ids: [ID!]!) {
             user(id: $id) {
                 email
@@ -198,7 +198,7 @@ class RelationBatchLoaderTest extends DBTestCase
     public function testTwoBatchloadedQueriesWithDifferentResults(): void
     {
         $this
-            ->graphQL(/* @lang GraphQL */'
+            ->graphQL(/** @lang GraphQL */ '
             {
                 user(id: 1) {
                     tasks {
@@ -226,7 +226,7 @@ class RelationBatchLoaderTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/* @lang GraphQL */'
+            ->graphQL(/** @lang GraphQL */ '
             {
                 user(id: 2) {
                     tasks {

@@ -17,11 +17,7 @@ class ResolveNested implements ArgResolver
     protected $argPartitioner;
 
     /**
-     * ArgResolver constructor.
-     *
      * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver|null  $previous
-     * @param  callable|null  $argPartitioner
-     * @return void
      */
     public function __construct(callable $previous = null, callable $argPartitioner = null)
     {
@@ -30,9 +26,7 @@ class ResolveNested implements ArgResolver
     }
 
     /**
-     * @param  mixed  $root
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return mixed
      */
     public function __invoke($root, $args)
     {
@@ -44,6 +38,7 @@ class ResolveNested implements ArgResolver
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $nested */
         foreach ($nestedArgs->arguments as $nested) {
+            // @phpstan-ignore-next-line we know the resolver is there because we partitioned for it
             ($nested->resolver)($root, $nested->value);
         }
 

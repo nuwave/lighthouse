@@ -8,7 +8,7 @@ use Tests\Utils\Rules\FooBarRule;
 
 class RulesDirectiveTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -20,16 +20,7 @@ class RulesDirectiveTest extends TestCase
     {
         parent::setUp();
 
-        $this->mockResolver(function (): array {
-            return [
-                'first_name' => 'John',
-                'last_name' => 'Doe',
-                'full_name' => 'John Doe',
-                'input_object' => true,
-            ];
-        });
-
-        $this->schema = /* @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: String @rules(apply: ["required"])): User @mock
         }
@@ -45,7 +36,6 @@ class RulesDirectiveTest extends TestCase
 
         type User {
             first_name: String
-            last_name: String
             full_name(
                 formatted: Boolean
                     @rules(
@@ -82,8 +72,12 @@ class RulesDirectiveTest extends TestCase
 
     public function testCanValidateQueryRootFieldArguments(): void
     {
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
         $this
-            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     foo {
         first_name
@@ -118,7 +112,7 @@ GRAPHQL
             ])
             ->assertJson(
                 $this
-                    ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+                    ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 mutation {
     foo {
         first_name
@@ -132,12 +126,16 @@ GRAPHQL
 
     public function testCanReturnValidFieldsAndErrorMessagesForInvalidFields(): void
     {
+        $this->mockResolver([
+            'first_name' => 'John',
+            'full_name' => 'John Doe',
+        ]);
+
         $this
-            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "foo") {
         first_name
-        last_name
         full_name
     }
 }
@@ -147,7 +145,6 @@ GRAPHQL
                 'data' => [
                     'foo' => [
                         'first_name' => 'John',
-                        'last_name' => 'Doe',
                         'full_name' => null,
                     ],
                 ],
@@ -167,11 +164,10 @@ GRAPHQL
             ])
             ->assertJson(
                 $this
-                    ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+                    ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "foo") {
         first_name
-        last_name
         full_name
     }
 }
@@ -183,12 +179,14 @@ GRAPHQL
 
     public function testCanValidateRootMutationFieldArgs(): void
     {
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
         $this
-            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 mutation {
     foo {
-        first_name
-        last_name
         full_name
     }
 }
@@ -202,11 +200,9 @@ GRAPHQL
             ->assertJsonCount(1, 'errors')
             ->assertJson(
                 $this
-                    ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+                    ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     foo {
-        first_name
-        last_name
         full_name
     }
 }
@@ -218,8 +214,13 @@ GRAPHQL
 
     public function testCanValidateArrayType(): void
     {
+        $this->mockResolver([
+            'input_object' => true,
+            'first_name' => 'John',
+        ]);
+
         $this
-            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "got it") {
         input_object(
@@ -282,8 +283,13 @@ GRAPHQL
 
     public function testCanReturnCorrectValidationForInputObjects(): void
     {
+        $this->mockResolver([
+            'input_object' => true,
+            'first_name' => 'John',
+        ]);
+
         $this
-            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     foo(bar: "got it") {
         input_object(
@@ -308,8 +314,8 @@ GRAPHQL
             ->assertJson([
                 'data' => [
                     'foo' => [
-                        'first_name' => 'John',
                         'input_object' => null,
+                        'first_name' => 'John',
                     ],
                 ],
                 'errors' => [
@@ -334,8 +340,12 @@ GRAPHQL
 
     public function testUsesCustomRuleClass(): void
     {
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
         $this
-            ->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 mutation {
     withCustomRuleClass(
         rules: "baz"
@@ -359,7 +369,7 @@ GRAPHQL
     public function testRulesHaveToBeArray(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->buildSchema(/* @lang GraphQL */'
+        $this->buildSchema(/** @lang GraphQL */ '
         type Query {
             foo(bar: ID @rules(apply: 123)): ID
         }

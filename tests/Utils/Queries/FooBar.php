@@ -4,24 +4,20 @@ namespace Tests\Utils\Queries;
 
 class FooBar
 {
-    const INVOKE_RESULT = 'foobaz';
-    const RESOLVE_RESULT = 'foobar';
-    const CUSTOM_RESOLVE_RESULT = 'barbaz';
+    public const INVOKE_RESULT = 'foobaz';
+    public const RESOLVE_RESULT = 'foobar';
+    public const CUSTOM_RESOLVE_RESULT = 'barbaz';
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
-    public function __invoke()
+    public function __invoke(): string
     {
         return self::INVOKE_RESULT;
     }
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
     public function resolve(): string
     {
@@ -30,8 +26,6 @@ class FooBar
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
     public function customResolve(): string
     {

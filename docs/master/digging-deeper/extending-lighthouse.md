@@ -33,7 +33,7 @@ Lighthouse's default implementation looks for a class with the capitalized name
 of the field in the configured default location and calls its `__invoke` method.
 
 Non-root fields fall back to [webonyx's default resolver](http://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver).
-You may overwrite this by passing a `callable` to `\GraphQL\Executor\Executor::setDefaultFieldResolver`. 
+You may overwrite this by passing a `callable` to `\GraphQL\Executor\Executor::setDefaultFieldResolver`.
 
 When the field is defined on the root `Subscription` type, the [`\Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesSubscriptionResolver.php)
 interface is used instead.
@@ -52,6 +52,7 @@ The following example is just a starting point of what you can do:
 namespace Nuwave\Lighthouse\Schema;
 
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MyContext implements GraphQLContext
@@ -63,12 +64,6 @@ class MyContext implements GraphQLContext
      */
     public $request;
 
-    /**
-     * Create new context.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -91,7 +86,7 @@ class MyContext implements GraphQLContext
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function user()
+    public function user(): ?Authenticatable
     {
         // TODO implement yourself
     }
@@ -128,7 +123,7 @@ class MyContextFactory implements CreatesContext
 Rebind the interface in a service provider (e.g. your `AppServiceProvider` or a new `GraphQLServiceProvider`):
 
 ```php
-public function register()
+public function register(): void
 {
     $this->app->bind(
         \Nuwave\Lighthouse\Support\Contracts\CreatesContext::class,

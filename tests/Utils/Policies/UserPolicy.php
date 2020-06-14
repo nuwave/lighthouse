@@ -6,7 +6,7 @@ use Tests\Utils\Models\User;
 
 class UserPolicy
 {
-    const ADMIN = 'admin';
+    public const ADMIN = 'admin';
 
     public function adminOnly(User $user): bool
     {
@@ -18,7 +18,7 @@ class UserPolicy
         return true;
     }
 
-    public function guestOnly($viewer = null): bool
+    public function guestOnly(User $viewer = null): bool
     {
         return $viewer === null;
     }
@@ -28,17 +28,24 @@ class UserPolicy
         return true;
     }
 
-    public function dependingOnArg($viewer, bool $pass): bool
+    public function dependingOnArg(User $viewer, bool $pass): bool
     {
         return $pass;
     }
 
-    public function injectArgs($user, array $injectedArgs): bool
+    /**
+     * @param  array<string, string>  $injectedArgs
+     */
+    public function injectArgs(User $viewer, array $injectedArgs): bool
     {
         return $injectedArgs === ['foo' => 'bar'];
     }
 
-    public function argsWithInjectedArgs($user, array $injectedArgs, array $staticArgs): bool
+    /**
+     * @param  array<string, string>  $injectedArgs
+     * @param  array<string, string>  $staticArgs
+     */
+    public function argsWithInjectedArgs(User $viewer, array $injectedArgs, array $staticArgs): bool
     {
         return $injectedArgs === ['foo' => 'dynamic']
             && $staticArgs === ['foo' => 'static'];

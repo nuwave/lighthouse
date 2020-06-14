@@ -2,7 +2,7 @@ const versioning = require('./lib/versioning.js')
 
 module.exports = {
     title: 'Lighthouse',
-    description: 'GraphQL server for Laravel',
+    description: 'A framework for serving GraphQL from Laravel',
     head: [
         ['link', {
             rel: 'icon',
@@ -24,7 +24,6 @@ module.exports = {
         defaultTheme: 'light',
         logo: '/logo.svg',
         editLinks: true, //  "Edit this page" at the bottom of each page
-        lastUpdated: 'Last Updated', //  "Last Updated" at the bottom of each page
         repo: 'nuwave/lighthouse', //  Github repo
         docsDir: 'docs/', //  Github repo docs folder
         versions: {
@@ -48,7 +47,15 @@ module.exports = {
             {
                 text: 'Users',
                 link: '/users/'
-            }
+            },
+            {
+                text: 'Changelog',
+                link: 'https://github.com/nuwave/lighthouse/blob/master/CHANGELOG.md'
+            },
+            {
+                text: 'Upgrade Guide',
+                link: 'https://github.com/nuwave/lighthouse/blob/master/UPGRADE.md'
+            },
         ],
         sidebar: versioning.sidebars
     },

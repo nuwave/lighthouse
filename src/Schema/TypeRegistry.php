@@ -37,6 +37,13 @@ use Nuwave\Lighthouse\Support\Utils;
 class TypeRegistry
 {
     /**
+     * Resolved types.
+     *
+     * @var array<string, \GraphQL\Type\Definition\Type>
+     */
+    protected $types = [];
+
+    /**
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
@@ -52,21 +59,10 @@ class TypeRegistry
     protected $argumentFactory;
 
     /**
-     * @var \GraphQL\Type\Definition\Type[]
-     */
-    protected $types;
-
-    /**
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
-    /**
-     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
-     * @return void
-     */
     public function __construct(
         Pipeline $pipeline,
         DirectiveFactory $directiveFactory,
@@ -78,7 +74,6 @@ class TypeRegistry
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return $this
      */
     public function setDocumentAST(DocumentAST $documentAST): self
@@ -91,35 +86,35 @@ class TypeRegistry
     /**
      * Get the given GraphQL type by name.
      *
-     * @param  string  $name
-     * @return \GraphQL\Type\Definition\Type
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function get(string $name): Type
     {
-        if (! isset($this->types[$name])) {
-            $typeDefinition = $this->documentAST->types[$name] ?? null;
-            if (! $typeDefinition) {
-                throw new DefinitionException(<<<EOL
+        if (! $this->has($name)) {
+            throw new DefinitionException(<<<EOL
 Lighthouse failed while trying to load a type: $name
 
 Make sure the type is present in your schema definition.
 
 EOL
-                );
-            }
-
-            $this->types[$name] = $this->handle($typeDefinition);
+            );
         }
 
         return $this->types[$name];
     }
 
     /**
+     * Is a type with the given name present?
+     */
+    public function has(string $name): bool
+    {
+        return isset($this->types[$name])
+            || $this->fromAST($name) instanceof Type;
+    }
+
+    /**
      * Register an executable GraphQL type.
      *
-     * @param  \GraphQL\Type\Definition\Type  $type
      * @return $this
      */
     public function register(Type $type): self
@@ -130,16 +125,60 @@ EOL
     }
 
     /**
+     * Register a type, overwriting if it exists already.
+     *
+     * @return $this
+     */
+    public function overwrite(Type $type): self
+    {
+        return $this->register($type);
+    }
+
+    /**
+     * Register a new type, throw if the name is already registered.
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @deprecated just use register() for this behavior
+     * TODO remove in v5
+     * @return $this
+     */
+    public function registerNew(Type $type): self
+    {
+        $name = $type->name;
+        if ($this->has($name)) {
+            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+        }
+
+        $this->types[$name] = $type;
+
+        return $this;
+    }
+
+    /**
+     * Attempt to make a type of the given name from the AST.
+     */
+    protected function fromAST(string $name): ?Type
+    {
+        $typeDefinition = $this->documentAST->types[$name] ?? null;
+        if ($typeDefinition === null) {
+            return null;
+        }
+
+        return $this->types[$name] = $this->handle($typeDefinition);
+    }
+
+    /**
      * Return all possible types that are registered.
      *
-     * @return \GraphQL\Type\Definition\Type[]
+     * @return array<string, \GraphQL\Type\Definition\Type>
      */
     public function possibleTypes(): array
     {
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
         // ever used through its association to an interface
-        /** @var TypeDefinitionNode $typeDefinition */
+        /** @var \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition */
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
@@ -152,10 +191,20 @@ EOL
     }
 
     /**
-     * Transform a definition node to an executable type.
+     * Get the types that are currently resolved.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
-     * @return \GraphQL\Type\Definition\Type
+     * Note that this does not all possible types, only those that
+     * are programmatically registered or already resolved.
+     *
+     * @return array<string, \GraphQL\Type\Definition\Type>
+     */
+    public function resolvedTypes(): array
+    {
+        return $this->types;
+    }
+
+    /**
+     * Transform a definition node to an executable type.
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -168,8 +217,8 @@ EOL
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                 if ($typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class)) {
+                    /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                     return $typeResolver->resolveNode($value);
                 }
 
@@ -179,9 +228,6 @@ EOL
 
     /**
      * The default type transformations.
-     *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return \GraphQL\Type\Definition\Type
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -208,13 +254,12 @@ EOL
         }
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\EnumTypeDefinitionNode  $enumDefinition
-     * @return \GraphQL\Type\Definition\EnumType
-     */
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
     {
+        /** @var array<string, array<string, mixed>> $values */
         $values = [];
+
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($enumDefinition->values as $enumValue) {
             /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
             $enumDirective = $this->directiveFactory->createSingleDirectiveOfType($enumValue, EnumDirective::class);
@@ -236,9 +281,6 @@ EOL
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ScalarTypeDefinitionNode  $scalarDefinition
-     * @return \GraphQL\Type\Definition\ScalarType
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function resolveScalarType(ScalarTypeDefinitionNode $scalarDefinition): ScalarType
@@ -271,26 +313,26 @@ EOL
         ]);
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectDefinition
-     * @return \GraphQL\Type\Definition\ObjectType
-     */
     protected function resolveObjectType(ObjectTypeDefinitionNode $objectDefinition): ObjectType
     {
         return new ObjectType([
             'name' => $objectDefinition->name->value,
             'description' => data_get($objectDefinition->description, 'value'),
-            'fields' => $this->resolveFieldsFunction($objectDefinition),
-            'interfaces' => function () use ($objectDefinition): array {
-                $interfaces = [];
+            'fields' => $this->makeFieldsLoader($objectDefinition),
+            'interfaces' =>
+                /**
+                 * @return array<\GraphQL\Type\Definition\Type>
+                 */
+                function () use ($objectDefinition): array {
+                    $interfaces = [];
 
-                // Might be a NodeList, so we can not use array_map()
-                foreach ($objectDefinition->interfaces as $interface) {
-                    $interfaces [] = $this->get($interface->name->value);
-                }
+                    // Might be a NodeList, so we can not use array_map()
+                    foreach ($objectDefinition->interfaces as $interface) {
+                        $interfaces [] = $this->get($interface->name->value);
+                    }
 
-                return $interfaces;
-            },
+                    return $interfaces;
+                },
         ]);
     }
 
@@ -298,46 +340,48 @@ EOL
      * Returns a closure that lazy loads the fields for a constructed type.
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
-     * @return \Closure
      */
-    protected function resolveFieldsFunction($typeDefinition): Closure
+    protected function makeFieldsLoader($typeDefinition): Closure
     {
-        return function () use ($typeDefinition): array {
-            $typeValue = new TypeValue($typeDefinition);
-            $fields = [];
+        return
+            /**
+             * @return array<string, array>
+             */
+            function () use ($typeDefinition): array {
+                $typeValue = new TypeValue($typeDefinition);
+                $fields = [];
 
-            // Might be a NodeList, so we can not use array_map()
-            foreach ($typeDefinition->fields as $fieldDefinition) {
-                /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
-                $fieldFactory = app(FieldFactory::class);
-                $fieldValue = new FieldValue($typeValue, $fieldDefinition);
+                // Might be a NodeList, so we can not use array_map()
+                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
+                    $fieldFactory = app(FieldFactory::class);
+                    $fieldValue = new FieldValue($typeValue, $fieldDefinition);
 
-                $fields[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
-            }
+                    $fields[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
+                }
 
-            return $fields;
-        };
+                return $fields;
+            };
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $inputDefinition
-     * @return \GraphQL\Type\Definition\InputObjectType
-     */
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
-            'fields' => function () use ($inputDefinition): array {
-                return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-            },
+            'astNode' => $inputDefinition,
+            'fields' =>
+                /**
+                 * @return array<string, array<string, mixed>>
+                 */
+                function () use ($inputDefinition): array {
+                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+                    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+                },
         ]);
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\InterfaceTypeDefinitionNode  $interfaceDefinition
-     * @return \GraphQL\Type\Definition\InterfaceType
-     */
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
     {
         $nodeName = $interfaceDefinition->name->value;
@@ -352,17 +396,20 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.interfaces')
                 )
-                ?: static::typeResolverFallback();
+                ?: $this->typeResolverFallback();
         }
 
         return new InterfaceType([
             'name' => $nodeName,
             'description' => data_get($interfaceDefinition->description, 'value'),
-            'fields' => $this->resolveFieldsFunction($interfaceDefinition),
+            'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
         ]);
     }
 
+    /**
+     * @param  array<string>  $namespaces
+     */
     protected function findTypeResolverClass(string $nodeName, array $namespaces): ?Closure
     {
         // TODO use only __invoke in v5
@@ -401,20 +448,14 @@ EOL
      * We just assume that the rootValue that shall be returned from the
      * field is a class that is named just like the concrete Object Type
      * that is supposed to be returned.
-     *
-     * @return \Closure
      */
-    public function typeResolverFallback(): Closure
+    protected function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
             return $this->get(class_basename($rootValue));
         };
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\UnionTypeDefinitionNode  $unionDefinition
-     * @return \GraphQL\Type\Definition\UnionType
-     */
     protected function resolveUnionType(UnionTypeDefinitionNode $unionDefinition): UnionType
     {
         $nodeName = $unionDefinition->name->value;
@@ -429,22 +470,27 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.unions')
                 )
-                ?: static::typeResolverFallback();
+                ?: $this->typeResolverFallback();
         }
 
         return new UnionType([
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
-            'types' => function () use ($unionDefinition): array {
-                $types = [];
+            'types' =>
+                /**
+                 * @return array<\GraphQL\Type\Definition\Type>
+                 */
+                function () use ($unionDefinition): array {
+                    $types = [];
 
-                // Might be a NodeList, so we can not use array_map()
-                foreach ($unionDefinition->types as $type) {
-                    $types[] = $this->get($type->name->value);
-                }
+                    // Might be a NodeList, so we can not use array_map()
+                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+                    foreach ($unionDefinition->types as $type) {
+                        $types[] = $this->get($type->name->value);
+                    }
 
-                return $types;
-            },
+                    return $types;
+                },
             'resolveType' => $typeResolver,
         ]);
     }

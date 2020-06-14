@@ -20,7 +20,7 @@ type User {
 
 ## The Root Types
 
-There can be up to 3 special *root types* in a GraphQL schema.
+There can be up to 3 special _root types_ in a GraphQL schema.
 They define the root fields that a query may have. While they are
 all [Object Types](types.md#object-type), they differ in functionality.
 
@@ -33,7 +33,7 @@ Think of queries as REST resources which can take arguments and return a fixed r
 type Query {
   me: User
   users: [User!]!
-  userById(id: ID): User 
+  userById(id: ID): User
 }
 ```
 

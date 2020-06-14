@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
@@ -13,25 +14,25 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "adminOnly")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
             }
         }
-        ')->assertErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testPassesAuthIfAuthorized(): void
@@ -40,19 +41,20 @@ class CanDirectiveTest extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->schema = '
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "adminOnly")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -69,23 +71,24 @@ class CanDirectiveTest extends TestCase
 
     public function testAcceptsGuestUser(): void
     {
-        if ((float) $this->app->version() < 5.7) {
+        if (AppVersion::below(5.7)) {
             $this->markTestSkipped('Version less than 5.7 do not support guest user.');
         }
 
-        $this->schema = '
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "guestOnly")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -106,19 +109,20 @@ class CanDirectiveTest extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->schema = '
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: ["adminOnly", "alwaysTrue"])
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -135,43 +139,45 @@ class CanDirectiveTest extends TestCase
 
     public function testProcessesTheArgsArgument(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
                 @can(ability: "dependingOnArg", args: [false])
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
             }
         }
-        ')->assertErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void
     {
         $this->be(new User);
-        $this->schema = /* @lang GraphQL */'
+
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!
                 @can(ability:"injectArgs", injectArgs: true)
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(foo: "bar"){
                 name
@@ -189,7 +195,9 @@ class CanDirectiveTest extends TestCase
     public function testInjectedArgsAndStaticArgs(): void
     {
         $this->be(new User);
-        $this->schema = /* @lang GraphQL */'
+
+        $this->mockResolver([$this, 'resolveUser']);
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!
                 @can(
@@ -197,15 +205,15 @@ class CanDirectiveTest extends TestCase
                     args: { foo: "static" }
                     injectArgs: true
                 )
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             name: String
         }
         ';
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(foo: "dynamic"){
                 name

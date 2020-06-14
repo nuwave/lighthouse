@@ -21,16 +21,10 @@ class Context implements GraphQLContext
      */
     public $user;
 
-    /**
-     * Create new context.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->user = $request->user();
+        $this->user = $request->user(config('lighthouse.guard'));
     }
 
     /**
@@ -47,8 +41,6 @@ class Context implements GraphQLContext
 
     /**
      * Get instance of request.
-     *
-     * @return \Illuminate\Http\Request
      */
     public function request(): Request
     {

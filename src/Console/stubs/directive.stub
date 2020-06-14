@@ -1,0 +1,12 @@
+<?php
+
+namespace DummyNamespace;
+
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+{{ imports }}
+
+class DummyClass extends BaseDirective implements {{ implements }}
+{
+    // TODO implement the directive https://lighthouse-php.com/master/custom-directives/getting-started.html
+
+{{ methods }}}

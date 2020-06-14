@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
@@ -104,7 +105,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyPaginator(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "paginator")
         }
@@ -151,7 +152,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyRelayConnection(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay")
         }
@@ -196,7 +197,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
         }
@@ -247,7 +248,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
         }
@@ -282,7 +283,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay")
         }
@@ -336,7 +337,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testCanQueryBelongsToManyNestedRelationships(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
             roles: [Role!]! @belongsToMany(type: "relay")
@@ -420,6 +421,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ');
 
         $type = $schema->getType('User');
+
+        $this->assertInstanceOf(Type::class, $type);
+        /** @var \GraphQL\Type\Definition\Type $type */
         $type->config['fields']();
     }
 }

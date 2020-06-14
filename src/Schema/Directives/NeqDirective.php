@@ -9,7 +9,7 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective, Defined
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Place a not equals operator `!=` on an Eloquent query.
 """
@@ -27,7 +27,6 @@ SDL;
      * Apply a "WHERE <> $value" clause.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)

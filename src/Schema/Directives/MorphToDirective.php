@@ -7,16 +7,11 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class MorphToDirective extends RelationDirective implements FieldResolver, DefinedDirective
 {
-    /**
-     * SDL definition of the directive.
-     *
-     * @return string
-     */
-    public static function definition()
+    public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
-Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphTo(
   """

@@ -16,12 +16,12 @@ class GenericException extends Error
     /**
      * Set the contents that will be rendered under the "extensions" key of the error response.
      *
-     * @param  mixed  $extensions
+     * @param  array<mixed, mixed>  $extensions
      * @return $this
      */
-    public function setExtensions($extensions): self
+    public function setExtensions(array $extensions): self
     {
-        $this->extensions = (array) $extensions;
+        $this->extensions = $extensions;
 
         return $this;
     }
@@ -29,7 +29,6 @@ class GenericException extends Error
     /**
      * Set the category that will be rendered under the "extensions" key of the error response.
      *
-     * @param  string  $category
      * @return $this
      */
     public function setCategory(string $category): self

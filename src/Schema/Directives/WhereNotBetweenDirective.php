@@ -9,7 +9,7 @@ class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirect
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Verify that a column\'s value lies outside of two values.
 The type of the input value this is defined upon should be
@@ -29,7 +29,6 @@ SDL;
      * Apply a "WHERE NOT BETWEEN" clause.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $values
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $values)

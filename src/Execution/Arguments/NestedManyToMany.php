@@ -20,20 +20,19 @@ class NestedManyToMany implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
         $relation = $parent->{$this->relationName}();
 
-        if (isset($args->arguments['sync'])) {
+        if ($args->has('sync')) {
             $relation->sync(
                 $this->generateRelationArray($args->arguments['sync'])
             );
         }
 
-        if (isset($args->arguments['syncWithoutDetaching'])) {
+        if ($args->has('syncWithoutDetaching')) {
             $relation->syncWithoutDetaching(
                 $this->generateRelationArray($args->arguments['syncWithoutDetaching'])
             );
@@ -41,20 +40,20 @@ class NestedManyToMany implements ArgResolver
 
         NestedOneToMany::createUpdateUpsert($args, $relation);
 
-        if (isset($args->arguments['delete'])) {
+        if ($args->has('delete')) {
             $ids = $args->arguments['delete']->toPlain();
 
             $relation->detach($ids);
             $relation->getRelated()::destroy($ids);
         }
 
-        if (isset($args->arguments['connect'])) {
+        if ($args->has('connect')) {
             $relation->attach(
                 $this->generateRelationArray($args->arguments['connect'])
             );
         }
 
-        if (isset($args->arguments['disconnect'])) {
+        if ($args->has('disconnect')) {
             $relation->detach(
                 $args->arguments['disconnect']->toPlain()
             );

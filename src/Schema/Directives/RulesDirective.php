@@ -21,15 +21,18 @@ class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRule
 
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
-Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
+Validate an argument using [Laravel validation](https://laravel.com/docs/validation).
 """
 directive @rules(
   """
   Specify the validation rules to apply to the field.
-  This can either be a reference to any of Laravel\'s built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
+  This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules),
   or the fully qualified class name of a custom validation rule.
+
+  Rules that mutate the incoming arguments, such as `exclude_if`, are not supported
+  by Lighthouse. Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
   """
   apply: [String!]!
 
@@ -43,9 +46,6 @@ directive @rules(
 SDL;
     }
 
-    /**
-     * @return mixed[]
-     */
     public function rules(): array
     {
         $rules = $this->directiveArgValue('apply');
@@ -55,24 +55,26 @@ SDL;
         // resolve any given rule where a corresponding class exists.
         foreach ($rules as $key => $rule) {
             if (class_exists($rule)) {
-                $rules[$key] = resolve($rule);
+                $rules[$key] = app($rule);
             }
         }
 
         return [$this->argumentPathAsDotNotation() => $rules];
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
         return (new Collection($this->directiveArgValue('messages')))
-            ->mapWithKeys(function (string $message, string $rule): array {
-                $argumentPath = $this->argumentPathAsDotNotation();
+            ->mapWithKeys(
+                /**
+                 * @return array<string, string>
+                 */
+                function (string $message, string $rule): array {
+                    $argumentPath = $this->argumentPathAsDotNotation();
 
-                return ["{$argumentPath}.{$rule}" => $message];
-            })
+                    return ["{$argumentPath}.{$rule}" => $message];
+                }
+            )
             ->all();
     }
 

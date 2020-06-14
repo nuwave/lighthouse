@@ -13,7 +13,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware, Defi
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Customize the calculation of a fields complexity score before execution.
 """
@@ -30,10 +30,6 @@ SDL;
 
     /**
      * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldFieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldFieldValue, Closure $next): FieldValue
     {

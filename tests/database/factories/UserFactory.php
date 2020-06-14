@@ -5,7 +5,7 @@ use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(User::class, function (Faker $faker): array {
     return [
         'company_id' => function () {

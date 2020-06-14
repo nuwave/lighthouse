@@ -1,5 +1,5 @@
 - [ ] Added or updated tests
-- [ ] Added Docs for all relevant versions
+- [ ] Documented user facing changes
 - [ ] Updated CHANGELOG.md
 
 <!-- Link to related issues this PR resolves, e.g. "Resolves #236"-->
@@ -10,5 +10,5 @@
 
 **Breaking changes**
 
-<!-- If there are any breaking changes, list them here.
-Make sure to mention them in UPGRADE.md. -->
+<!-- Are existing use cases affected and require changes when upgrading? 
+If so, describe the necessary changes in UPGRADE.md. -->

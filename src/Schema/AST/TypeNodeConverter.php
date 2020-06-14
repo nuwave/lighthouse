@@ -11,8 +11,7 @@ abstract class TypeNodeConverter
     /**
      * Convert an AST type to an executable type.
      *
-     * @param  \GraphQL\Language\AST\TypeNode  $node
-     * @return mixed
+     * @return mixed The executable type.
      */
     public function convert(TypeNode $node)
     {
@@ -22,22 +21,23 @@ abstract class TypeNodeConverter
     /**
      * Convert an AST type and apply wrapping types.
      *
-     * @param  \GraphQL\Language\AST\TypeNode  $node
      * @param  string[]  $wrappers
-     * @return mixed
+     * @return mixed The wrapped type.
      */
     protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])
     {
         // Recursively unwrap the type and save the wrappers
         $nodeKind = $node->kind;
         if (in_array($nodeKind, [NodeKind::NON_NULL_TYPE, NodeKind::LIST_TYPE])) {
+            /** @var \GraphQL\Language\AST\NonNullTypeNode|\GraphQL\Language\AST\ListTypeNode $node */
             $wrappers[] = $nodeKind;
 
-            return $this->convertWrappedTypeNode(
+            return $this->convertWrappedTypeNode( // @phpstan-ignore-line TODO remove when upgrading graphql-php
                 $node->type,
                 $wrappers
             );
         }
+        /** @var \GraphQL\Language\AST\NamedTypeNode $node */
 
         // Re-wrap the type by applying the wrappers in the reversed order
         return (new Collection($wrappers))
@@ -61,24 +61,23 @@ abstract class TypeNodeConverter
     /**
      * Wrap or mark the type as non-null.
      *
-     * @param  mixed  $type
-     * @return mixed
+     * @param  mixed  $type The type to wrap.
+     * @return mixed The type wrapped with non-null.
      */
     abstract protected function nonNull($type);
 
     /**
      * Wrap or mark the type as a list.
      *
-     * @param  mixed  $type
-     * @return mixed
+     * @param  mixed  $type The type to wrap.
+     * @return mixed The type wrapped as a list.
      */
     abstract protected function listOf($type);
 
     /**
      * Get the named type for the given node name.
      *
-     * @param  string $nodeName
-     * @return mixed
+     * @return mixed Representation of the type with the given name.
      */
     abstract protected function namedType(string $nodeName);
 }
