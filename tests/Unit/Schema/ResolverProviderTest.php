@@ -104,10 +104,10 @@ class ResolverProviderTest extends TestCase
 
         $typeValue = new TypeValue($queryType);
 
-        $fields = $queryType->fields;
-        $this->assertIsArray($fields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-
-        return new FieldValue($typeValue, $fields[0]);
+        return new FieldValue(
+            $typeValue,
+            // @phpstan-ignore-next-line can not be null
+            $queryType->fields[0]
+        );
     }
 }
