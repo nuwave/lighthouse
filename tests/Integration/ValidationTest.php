@@ -521,6 +521,38 @@ class ValidationTest extends DBTestCase
         ')->assertJsonCount(2, 'errors.0.extensions.validation.bar');
     }
 
+    public function testRequiredWithout(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            createNew(input: [TheMutationArgs!]!):Boolean @create
+        }
+        
+        input TheMutationArgs {
+            id: ID @rules(apply: ["required_without:input.*.is_new"])
+            is_new: Boolean @rules(apply: ["required_without:input.*.id"])
+        }
+        ';
+
+       $query =  $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createNew(input: [
+                # should be valid
+                {id: "55"}
+                # should be valid
+                {is_new: true}
+                # should be valid
+                {is_new: true, id:"33"}
+                # should be INVALID / 2 errors should occurs here
+                {}
+            ])
+        }
+        ');
+
+        // should be 2 error, but got 4
+        $query->assertJsonCount(2, 'errors.0.extensions.validation');
+    }
+
     /**
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
