@@ -235,13 +235,14 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        $this->assertSame(
-            'internal',
-            $schema
-                ->getQueryType()
-                ->getField('foo')
-                ->getArg('bar')
-                ->defaultValue
-        );
+        $barArg = $schema
+            ->getQueryType()
+            ->getField('foo')
+            ->getArg('bar');
+
+        $this->assertInstanceOf(FieldArgument::class, $barArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $barArg */
+
+        $this->assertSame('internal', $barArg->defaultValue);
     }
 }

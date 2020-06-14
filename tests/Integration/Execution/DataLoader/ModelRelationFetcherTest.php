@@ -87,7 +87,7 @@ class ModelRelationFetcherTest extends DBTestCase
             factory(Task::class, $initialCount)->make()
         );
 
-        Task::first()->delete();
+        Task::firstOrFail()->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage($this->makePaginationArgs(4));
