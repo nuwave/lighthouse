@@ -81,8 +81,10 @@ class SubscriptionServiceProvider extends ServiceProvider
 
         if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
             [$routesProviderClass, $method] = Str::parseCallback($routesMethod, 'pusher');
+            /** @var class-string $routesProviderClass */
+            /** @var string $method */
 
-            $routesProvider = $this->app->make($routesProviderClass);
+            $routesProvider = $this->app->make($routesProviderClass); // @phpstan-ignore-line
             $router = $this->app->make('router');
 
             $routesProvider->{$method}($router);
