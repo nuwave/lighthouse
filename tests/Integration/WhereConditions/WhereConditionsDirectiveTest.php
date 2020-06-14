@@ -464,7 +464,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $expectedEnumName = 'WhitelistedColumnsWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
-        $this->assertIsArray($enum);
+        $this->assertNotNull($enum);
         /** @var array<string, mixed> $enum */
         $this->assertArraySubset(
             [

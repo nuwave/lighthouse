@@ -103,7 +103,7 @@ GRAPHQL;
         $log = app(BroadcastManager::class)->driver();
         $broadcasts = $log->broadcasts();
 
-        $this->assertIsArray($broadcasts);
+        $this->assertNotNull($broadcasts);
         /** @var array<mixed> $broadcasts */
         $this->assertCount(1, $broadcasts);
 

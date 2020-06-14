@@ -425,7 +425,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $user = $this->introspectType('User');
 
-        $this->assertIsArray($user);
+        $this->assertNotNull($user);
         /** @var array<string, mixed> $user */
         $tasks = Arr::first(
             $user['fields'], // @phpstan-ignore-line
