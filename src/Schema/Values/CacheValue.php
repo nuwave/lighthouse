@@ -52,10 +52,7 @@ class CacheValue
     /**
      * @param  mixed|null  $root The root that was passed to the query.
      * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  bool  $isPrivate
      */
     public function __construct(
         $root,
@@ -74,7 +71,6 @@ class CacheValue
 
         $this->fieldKey = $this->fieldKey();
     }
-
 
     /**
      * Resolve key from root value.
