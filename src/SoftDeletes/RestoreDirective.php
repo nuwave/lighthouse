@@ -37,22 +37,12 @@ directive @restore(
 SDL;
     }
 
-    /**
-     * Find one or more models by id.
-     *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @param  string|int|string[]|int[]  $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
-     */
     protected function find(string $modelClass, $idOrIds)
     {
         /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $modelClass */
         return $modelClass::withTrashed()->find($idOrIds);
     }
 
-    /**
-     * Bring a model in or out of existence.
-     */
     protected function modifyExistence(Model $model): void
     {
         /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $model */

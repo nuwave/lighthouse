@@ -513,12 +513,12 @@ GRAPHQL
         ]);
 
         $this->assertTrue(
-            User::find(1)->exists,
+            User::findOrFail(1)->exists,
             'Must not delete the second model.'
         );
 
         $this->assertNull(
-            Task::find(1)->user,
+            Task::findOrFail(1)->user,
             'Must disconnect the parent relationship.'
         );
     }
@@ -559,7 +559,7 @@ GRAPHQL
         ]);
 
         $this->assertTrue(
-            User::find($user->id)->exists,
+            User::findOrFail($user->id)->exists,
             'Must not delete the second model.'
         );
 
@@ -657,7 +657,7 @@ GRAPHQL
         );
 
         $this->assertNull(
-            Task::find(1)->user,
+            Task::findOrFail(1)->user,
             'Must disconnect the parent relationship.'
         );
     }
@@ -871,7 +871,7 @@ GRAPHQL
         ]);
 
         // The first User has the first Role.
-        $role = Role::first();
+        $role = Role::firstOrFail();
         $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.

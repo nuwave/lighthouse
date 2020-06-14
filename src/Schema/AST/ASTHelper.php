@@ -163,9 +163,11 @@ class ASTHelper
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
             /** @var \GraphQL\Language\AST\EnumValueNode $defaultValue */
-            return $argumentType
-                ->getValue($defaultValue->value)
-                ->value;
+
+            /** @var \GraphQL\Type\Definition\EnumValueDefinition $internalValue */
+            $internalValue = $argumentType->getValue($defaultValue->value); // @phpstan-ignore-line
+
+            return $internalValue->value;
         }
 
         return AST::valueFromAST($defaultValue, $argumentType);
@@ -229,7 +231,9 @@ class ASTHelper
     {
         foreach ($documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                foreach ($typeDefinition->fields as $fieldDefinition) {
+                /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+                $fieldDefinitions = $typeDefinition->fields;
+                foreach ($fieldDefinitions as $fieldDefinition) {
                     $fieldDefinition->directives = $fieldDefinition->directives->merge([$directive]);
                 }
             }
@@ -254,7 +258,10 @@ class ASTHelper
         $globalIdFieldDefinition = PartialParser::fieldDefinition(
             config('lighthouse.global_id_field').': ID! @globalId'
         );
-        $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
+
+        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\FieldDefinitionNode> $originalFields */
+        $originalFields = $objectType->fields;
+        $objectType->fields = $originalFields->merge([$globalIdFieldDefinition]);
 
         return $objectType;
     }
@@ -285,7 +292,9 @@ class ASTHelper
             );
         }
 
-        foreach ($objectType->fields as $fieldDefinition) {
+        /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+        $fieldDefinitions = $objectType->fields;
+        foreach ($fieldDefinitions as $fieldDefinition) {
             // If the field already has the same directive defined, skip over it.
             // Field directives are more specific than those defined on a type.
             if (self::hasDirective($fieldDefinition, $name)) {

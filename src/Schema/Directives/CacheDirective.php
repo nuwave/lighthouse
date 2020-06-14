@@ -72,14 +72,14 @@ SDL;
         $isPrivate = $this->directiveArgValue('private', false);
 
         return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
-            $cacheValue = new CacheValue([
-                'field_value' => $fieldValue,
-                'root' => $root,
-                'args' => $args,
-                'context' => $context,
-                'resolve_info' => $resolveInfo,
-                'is_private' => $isPrivate,
-            ]);
+            $cacheValue = new CacheValue(
+                $root,
+                $args,
+                $context,
+                $resolveInfo,
+                $fieldValue,
+                $isPrivate
+            );
 
             $cacheKey = $cacheValue->getKey();
 
@@ -144,8 +144,11 @@ SDL;
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $typeDefinition */
         $typeDefinition = $typeValue->getTypeDefinition();
 
+        /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+        $fieldDefinitions = $typeDefinition->fields;
+
         // First priority: Look for a field with the @cacheKey directive
-        foreach ($typeDefinition->fields as $field) {
+        foreach ($fieldDefinitions as $field) {
             if (ASTHelper::hasDirective($field, 'cacheKey')) {
                 $typeValue->setCacheKey($field->name->value);
 
@@ -154,7 +157,7 @@ SDL;
         }
 
         // Second priority: Look for a Non-Null field with the ID type
-        foreach ($typeDefinition->fields as $field) {
+        foreach ($fieldDefinitions as $field) {
             if (
                 // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 $field->type instanceof NonNullTypeNode
