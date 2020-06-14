@@ -86,7 +86,13 @@ class TestResponseMixin
     public function jsonGet(): Closure
     {
         return function (string $key = null) {
-            return data_get($this->decodeResponseJson(), $key);
+            $json = $this->decodeResponseJson();
+
+            if ($key === null) {
+                return $json;
+            }
+
+            return data_get($json, $key);
         };
     }
 }
