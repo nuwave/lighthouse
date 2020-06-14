@@ -178,11 +178,11 @@ class ModelRelationFetcher
      */
     protected function loadDefaultWith(EloquentCollection $collection): self
     {
-        if ($collection->isEmpty()) {
+        $model = $collection->first();
+        if ($model === null) {
             return $this;
         }
 
-        $model = $collection->first();
         $reflection = new ReflectionClass($model);
         $withProperty = $reflection->getProperty('with');
         $withProperty->setAccessible(true);

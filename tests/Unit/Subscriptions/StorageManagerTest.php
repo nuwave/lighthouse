@@ -91,8 +91,10 @@ class StorageManagerTest extends SubscriptionTestCase
         $this->assertCount(0, $this->storage->subscribersByTopic($topic));
     }
 
-    protected function assertSubscriberIsSame(Subscriber $expected, Subscriber $actual): void
+    protected function assertSubscriberIsSame(Subscriber $expected, ?Subscriber $actual): void
     {
+        $this->assertNotNull($actual);
+        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $actual */
         $this->assertSame(
             AST::toArray($expected->query),
             AST::toArray($actual->query)
