@@ -427,7 +427,6 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertIsArray($user);
         /** @var array<string, mixed> $user */
-
         $tasks = Arr::first(
             $user['fields'], // @phpstan-ignore-line
             function (array $field): bool {
@@ -714,7 +713,6 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertInstanceOf(Type::class, $type);
         /** @var \GraphQL\Type\Definition\Type $type */
-
         $type->config['fields']();
     }
 

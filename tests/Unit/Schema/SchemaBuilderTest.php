@@ -242,7 +242,6 @@ class SchemaBuilderTest extends TestCase
 
         $this->assertInstanceOf(FieldArgument::class, $barArg);
         /** @var \GraphQL\Type\Definition\FieldArgument $barArg */
-
         $this->assertSame('internal', $barArg->defaultValue);
     }
 }

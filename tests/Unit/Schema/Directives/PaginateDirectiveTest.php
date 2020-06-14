@@ -114,7 +114,6 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertInstanceOf(FieldArgument::class, $defaultPaginatedAmountArg);
         /** @var \GraphQL\Type\Definition\FieldArgument $defaultPaginatedAmountArg */
-
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 5.',
             $defaultPaginatedAmountArg->description
@@ -126,7 +125,6 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertInstanceOf(FieldArgument::class, $defaultRelayFirstArg);
         /** @var \GraphQL\Type\Definition\FieldArgument $defaultRelayFirstArg */
-
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 5.',
             $defaultRelayFirstArg->description
@@ -138,7 +136,6 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertInstanceOf(FieldArgument::class, $customPaginatedAmountArg);
         /** @var \GraphQL\Type\Definition\FieldArgument $customPaginatedAmountArg */
-
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
             $customPaginatedAmountArg->description
@@ -150,7 +147,6 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertInstanceOf(FieldArgument::class, $customRelayFirstArg);
         /** @var \GraphQL\Type\Definition\FieldArgument $customRelayFirstArg */
-
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
             $customRelayFirstArg->description

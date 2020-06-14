@@ -424,7 +424,6 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
         $this->assertInstanceOf(Type::class, $type);
         /** @var \GraphQL\Type\Definition\Type $type */
-
         $type->config['fields']();
     }
 }

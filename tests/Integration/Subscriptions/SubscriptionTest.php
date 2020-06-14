@@ -105,7 +105,6 @@ GRAPHQL;
 
         $this->assertIsArray($broadcasts);
         /** @var array<mixed> $broadcasts */
-
         $this->assertCount(1, $broadcasts);
 
         $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);

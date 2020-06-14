@@ -51,7 +51,6 @@ class SerializerTest extends DBTestCase
         $unserializedUser = $unserialized->user();
         $this->assertInstanceOf(User::class, $unserializedUser);
         /** @var \Tests\Utils\Models\User $unserializedUser */
-
         $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }
 
@@ -101,7 +100,6 @@ class SerializerTest extends DBTestCase
         $unserializedUser = $unserialized->user();
         $this->assertInstanceOf(User::class, $unserializedUser);
         /** @var \Tests\Utils\Models\User $unserializedUser */
-
         $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }
 }

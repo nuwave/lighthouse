@@ -466,7 +466,6 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
         $this->assertIsArray($enum);
         /** @var array<string, mixed> $enum */
-
         $this->assertArraySubset(
             [
                 'kind' => 'ENUM',
