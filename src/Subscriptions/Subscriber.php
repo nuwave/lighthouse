@@ -113,6 +113,7 @@ class Subscriber implements Serializable
             unserialize($data['query'])
         );
         $this->operationName = $data['operation_name'];
+        // TODO ensure we properly unserialize enum's
         $this->args = $data['args'];
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
