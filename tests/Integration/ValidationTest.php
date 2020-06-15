@@ -523,20 +523,20 @@ class ValidationTest extends DBTestCase
 
     public function testRequiredWithout(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type Mutation {
-            createNew(input: [TheMutationArgs!]!):Boolean @create
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            mutate(input: [MutateInput!]!): Boolean @create
         }
 
-        input TheMutationArgs {
+        input MutateInput {
             id: ID @rules(apply: ["required_without:input.*.is_new"])
             is_new: Boolean @rules(apply: ["required_without:input.*.id"])
         }
         ';
 
-        $query = $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            createNew(input: [
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            mutate(input: [
                 # should be valid
                 {id: "55"}
                 {is_new: true}
@@ -545,9 +545,7 @@ class ValidationTest extends DBTestCase
                 {}
             ])
         }
-        ');
-
-        $query->assertJsonCount(2, 'errors.0.extensions.validation');
+        ')->dump()->assertJsonCount(2, 'errors.0.extensions.validation');
     }
 
     /**
