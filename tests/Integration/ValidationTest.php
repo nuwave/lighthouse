@@ -534,7 +534,7 @@ class ValidationTest extends DBTestCase
         }
         ';
 
-       $query =  $this->graphQL(/** @lang GraphQL */ '
+        $query = $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createNew(input: [
                 # should be valid
