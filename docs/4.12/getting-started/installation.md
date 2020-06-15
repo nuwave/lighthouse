@@ -44,3 +44,5 @@ composer require mll-lab/laravel-graphql-playground
 
 You can use any GraphQL client with Lighthouse, make sure to point it to the URL defined in
 the config. By default, the endpoint lives at `/graphql`.
+
+To view the graphql client after installing the package navigate to `/graphql-playground` in your installation.
