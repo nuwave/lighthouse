@@ -32,4 +32,24 @@ trait HasArgumentPath
 
         return $this;
     }
+
+    /**
+     * @return string[]
+     */
+    public function argumentPathWithStarIndices(): string
+    {
+        return implode(
+            '.',
+                array_map(
+                function ($path): string {
+                    if (is_int($path)) {
+                        return '*';
+                    }
+
+                    return $path;
+                },
+                $this->argumentPath
+            )
+        );
+    }
 }

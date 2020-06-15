@@ -527,7 +527,7 @@ class ValidationTest extends DBTestCase
         type Mutation {
             createNew(input: [TheMutationArgs!]!):Boolean @create
         }
-        
+
         input TheMutationArgs {
             id: ID @rules(apply: ["required_without:input.*.is_new"])
             is_new: Boolean @rules(apply: ["required_without:input.*.id"])
@@ -539,17 +539,14 @@ class ValidationTest extends DBTestCase
             createNew(input: [
                 # should be valid
                 {id: "55"}
-                # should be valid
                 {is_new: true}
-                # should be valid
-                {is_new: true, id:"33"}
-                # should be INVALID / 2 errors should occurs here
+                {is_new: true, id: "33"}
+                # triggers 2 errors
                 {}
             ])
         }
         ');
 
-        // should be 2 error, but got 4
         $query->assertJsonCount(2, 'errors.0.extensions.validation');
     }
 

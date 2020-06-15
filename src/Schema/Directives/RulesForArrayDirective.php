@@ -55,7 +55,7 @@ SDL;
             }
         }
 
-        return [$this->argumentPathAsDotNotation() => $rules];
+        return [$this->argumentPathWithStarIndices() => $rules];
     }
 
     public function messages(): array
@@ -66,7 +66,7 @@ SDL;
                  * @return array<string, string>
                  */
                 function (string $message, string $rule): array {
-                    $argumentPath = $this->argumentPathAsDotNotation();
+                    $argumentPath = $this->argumentPathWithStarIndices();
 
                     return ["{$argumentPath}.{$rule}" => $message];
                 }
