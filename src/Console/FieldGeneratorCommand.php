@@ -21,7 +21,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
     protected function getOptions(): array
     {
         return [
-            ['full', 'F', InputOption::VALUE_OPTIONAL, 'Include the seldomly needed resolver arguments $context and $resolveInfo', false],
+            ['full', 'F', InputOption::VALUE_OPTIONAL, 'Include the seldom needed resolver arguments $context and $resolveInfo', false],
         ];
     }
 }
