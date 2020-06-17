@@ -446,7 +446,7 @@ directive @can(
   """
   If your policy checks against specific model instances, specify
   the name of the field argument that contains its primary key(s).
-  
+
   You may pass the string in dot notation to use nested inputs.
   """
   find: String
