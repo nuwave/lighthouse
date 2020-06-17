@@ -5,7 +5,7 @@ namespace DummyNamespace;
 class DummyClass
 {
     /**
-     * @param  null  $_ Always `null`.
+     * @param  null  $_
      * @param  array<string, mixed>  $args The arguments that were passed into the field.
      */
     public function __invoke($_, array $args)
