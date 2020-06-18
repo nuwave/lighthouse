@@ -56,6 +56,8 @@ Create a class for a single field on the root Mutation type.
 
     php artisan lighthouse:mutation <name>
 
+Use the option `--full` to include the seldom needed resolver arguments `$context` and `$resolveInfo`.
+
 ## print-schema
 
 Compile the final GraphQL schema and print the result.
@@ -76,6 +78,8 @@ You can output your schema in JSON format by using the `--json` flag.
 Create a class for a single field on the root Query type.
 
     php artisan lighthouse:query <name>
+
+Use the option `--full` to include the seldom needed resolver arguments `$context` and `$resolveInfo`.
 
 ## scalar
 
