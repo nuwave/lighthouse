@@ -83,22 +83,22 @@ return [
     */
 
     'cache' => [
-        /**
+        /*
          * Setting to true enables schema caching.
          */
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
 
-        /**
+        /*
          * The name of the cache item for the schema cache.
          */
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
 
-        /**
+        /*
          * Allows using a specific cache store, uses the app's default if set to null.
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
 
-        /**
+        /*
          * Indicates how long the schema should remain cached. A null value
          * ensures the schema is cached forever or until cleared.
          */
