@@ -1975,7 +1975,7 @@ Querying a field that has an `orderBy` argument looks like this:
 
 ```graphql
 {
-  posts(orderBy: [{ column: POSTED_AT, order: ASC }]) {
+  posts(orderBy: [{ field: POSTED_AT, order: ASC }]) {
     title
   }
 }
