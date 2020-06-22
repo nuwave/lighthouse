@@ -22,6 +22,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property \Carbon\Carbon $updated_at
  *
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
  */
 class User extends Authenticatable
 {
