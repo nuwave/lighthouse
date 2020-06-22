@@ -6,30 +6,16 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
 {
     const CATEGORY = 'validation';
 
-    /**
-     * Returns true when exception message is safe to be displayed to a client.
-     *
-     * @return bool
-     */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
 
-    /**
-     * Returns string describing a category of the error.
-     *
-     * @return string
-     */
-    public function getCategory()
+    public function getCategory(): string
     {
         return self::CATEGORY;
     }
 
-    /**
-     * Return the content that is put in the "extensions" part
-     * of the returned error.
-     */
     public function extensionsContent(): array
     {
         return [self::CATEGORY => $this->errors()];

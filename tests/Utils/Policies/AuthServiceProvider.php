@@ -8,6 +8,9 @@ use Tests\Utils\Models\User;
 
 class AuthServiceProvider extends \Illuminate\Foundation\Support\Providers\AuthServiceProvider
 {
+    /**
+     * @var array<class-string<\Illuminate\Database\Eloquent\Model>, class-string>
+     */
     protected $policies = [
         User::class => UserPolicy::class,
         Post::class => PostPolicy::class,

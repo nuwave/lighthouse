@@ -100,7 +100,9 @@ class DocumentAST implements Serializable
         };
 
         return serialize([
+            // @phpstan-ignore-next-line Before serialization, those are arrays
             'types' => array_map($nodeToArray, $this->types),
+            // @phpstan-ignore-next-line Before serialization, those are arrays
             'directives' => array_map($nodeToArray, $this->directives),
         ]);
     }

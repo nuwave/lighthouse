@@ -20,7 +20,7 @@ abstract class BaseRequest implements GraphQLRequest
      *
      * This is expected to take batched requests into consideration.
      *
-     * @return array|string|null
+     * @return mixed The value of the field
      */
     abstract protected function fieldValue(string $key);
 

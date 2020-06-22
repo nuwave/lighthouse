@@ -58,7 +58,7 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retreive the user.
+  Use a particular guard to retrieve the user.
   """
   guard: String
 ) on FIELD_DEFINITION
@@ -467,8 +467,8 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
   """
   find: String
 

@@ -76,7 +76,7 @@ class SubscriptionRegistry
     /**
      * Get subscription keys.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function keys(): array
     {
@@ -109,6 +109,7 @@ class SubscriptionRegistry
      * Get registered subscriptions.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {

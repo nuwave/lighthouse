@@ -1,3 +1,6 @@
+USER_ID=$(id -u)
+GROUP_ID=$(id -g)
+
 .PHONY: it
 it: up vendor stan test ## Run useful checks before commits
 
@@ -5,13 +8,13 @@ it: up vendor stan test ## Run useful checks before commits
 help: ## Displays this list of targets with descriptions
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: setup
+setup: ## Setup the local environment
+	docker-compose build --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
+
 .PHONY: up
 up: ## Bring up the docker-compose stack
 	docker-compose up -d
-
-.PHONY: shell
-shell: up ## Open an interactive shell into the php container
-	docker-compose exec php bash
 
 .PHONY: stan
 stan: up ## Runs a static analysis with phpstan
@@ -29,3 +32,11 @@ vendor: up composer.json ## Install composer dependencies
 	docker-compose exec php composer validate --strict
 	docker-compose exec php composer install
 	docker-compose exec php composer normalize
+
+.PHONY: php
+php: up ## Open an interactive shell into the php container
+	docker-compose exec php bash
+
+.PHONY: node
+node: up ## Open an interactive shell into the node container
+	docker-compose exec node bash

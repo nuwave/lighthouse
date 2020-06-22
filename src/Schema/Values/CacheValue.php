@@ -2,16 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CacheValue
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue|null
-     */
-    protected $fieldValue;
-
     /**
      * @var mixed|null The root that was passed to the query.
      */
@@ -39,23 +35,39 @@ class CacheValue
     protected $resolveInfo;
 
     /**
-     * @var mixed The key to use for caching this field.
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    protected $fieldKey;
+    protected $fieldValue;
 
     /**
      * @var bool
      */
     protected $isPrivate;
 
-    public function __construct(array $arguments = [])
-    {
-        $this->fieldValue = Arr::get($arguments, 'field_value');
-        $this->root = Arr::get($arguments, 'root');
-        $this->args = Arr::get($arguments, 'args');
-        $this->context = Arr::get($arguments, 'context');
-        $this->resolveInfo = Arr::get($arguments, 'resolve_info');
-        $this->isPrivate = Arr::get($arguments, 'is_private');
+    /**
+     * @var mixed The key to use for caching this field.
+     */
+    protected $fieldKey;
+
+    /**
+     * @param  mixed|null  $root The root that was passed to the query.
+     * @param  array<string, mixed>  $args
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     */
+    public function __construct(
+        $root,
+        array $args,
+        GraphQLContext $context,
+        ResolveInfo $resolveInfo,
+        FieldValue $fieldValue,
+        bool $isPrivate
+    ) {
+        $this->root = $root;
+        $this->args = $args;
+        $this->context = $context;
+        $this->resolveInfo = $resolveInfo;
+        $this->fieldValue = $fieldValue;
+        $this->isPrivate = $isPrivate;
 
         $this->fieldKey = $this->fieldKey();
     }
@@ -86,6 +98,8 @@ class CacheValue
 
     /**
      * Get cache tags.
+     *
+     * @return array<string>
      */
     public function getTags(): array
     {
@@ -107,6 +121,8 @@ class CacheValue
 
     /**
      * Convert input arguments to keys.
+     *
+     * @return \Illuminate\Support\Collection<string>
      */
     protected function argKeys(): Collection
     {
@@ -131,7 +147,7 @@ class CacheValue
      */
     protected function fieldKey()
     {
-        if (! $this->fieldValue || ! $this->root) {
+        if ($this->root === null) {
             return;
         }
 
@@ -145,7 +161,7 @@ class CacheValue
     }
 
     /**
-     * Implode value to create string.
+     * @param  array<mixed|null> $items
      */
     protected function implode(array $items): string
     {

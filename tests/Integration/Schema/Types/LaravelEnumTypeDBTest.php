@@ -87,7 +87,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
             new LaravelEnumType(AOrB::class)
         );
 
-        $encodedType = json_encode([AOrB::A]);
+        $encodedType = \Safe\json_encode([AOrB::A]);
 
         $withEnum = new WithEnum();
         $withEnum->name = $encodedType;

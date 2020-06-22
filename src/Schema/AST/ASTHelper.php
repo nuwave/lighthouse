@@ -8,6 +8,7 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
@@ -29,8 +30,9 @@ class ASTHelper
      * when the list is empty, then it is []. This function corrects that inconsistency
      * and allows the rest of our code to not worry about it until it is fixed.
      *
-     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $original
-     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\Node>  $addition
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $original
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $addition
+     * @return \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>
      */
     public static function mergeNodeList($original, $addition): NodeList
     {
@@ -44,10 +46,11 @@ class ASTHelper
     /**
      * Merge two lists of AST nodes.
      *
-     * @param  \GraphQL\Language\AST\NodeList|array  $original
-     * @param  \GraphQL\Language\AST\NodeList|array  $addition
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $original
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $addition
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
+     * @return \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -132,6 +135,9 @@ class ASTHelper
 
     /**
      * Extract a named argument from a given directive node.
+     *
+     * @param  mixed  $default Is returned if the directive does not have the argument.
+     * @return mixed The value given to the directive.
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
@@ -145,17 +151,25 @@ class ASTHelper
 
     /**
      * Return the PHP internal value of an arguments default value.
+     *
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
+     * @return mixed The plain PHP value.
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
+        if ($defaultValue instanceof NullValueNode) {
+            return;
+        }
+
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
-            /** @var \GraphQL\Language\AST\EnumValueNode|\GraphQL\Language\AST\NullValueNode $defaultValue */
-            return $argumentType
-                ->getValue($defaultValue->value)
-                ->value;
+            /** @var \GraphQL\Language\AST\EnumValueNode $defaultValue */
+
+            /** @var \GraphQL\Type\Definition\EnumValueDefinition $internalValue */
+            $internalValue = $argumentType->getValue($defaultValue->value); // @phpstan-ignore-line
+
+            return $internalValue->value;
         }
 
         return AST::valueFromAST($defaultValue, $argumentType);
@@ -219,7 +233,9 @@ class ASTHelper
     {
         foreach ($documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                foreach ($typeDefinition->fields as $fieldDefinition) {
+                /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+                $fieldDefinitions = $typeDefinition->fields;
+                foreach ($fieldDefinitions as $fieldDefinition) {
                     $fieldDefinition->directives = $fieldDefinition->directives->merge([$directive]);
                 }
             }
@@ -244,7 +260,10 @@ class ASTHelper
         $globalIdFieldDefinition = PartialParser::fieldDefinition(
             config('lighthouse.global_id_field').': ID! @globalId'
         );
-        $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
+
+        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\FieldDefinitionNode> $originalFields */
+        $originalFields = $objectType->fields;
+        $objectType->fields = $originalFields->merge([$globalIdFieldDefinition]);
 
         return $objectType;
     }
@@ -275,8 +294,9 @@ class ASTHelper
             );
         }
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
-        foreach ($objectType->fields as $fieldDefinition) {
+        /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+        $fieldDefinitions = $objectType->fields;
+        foreach ($fieldDefinitions as $fieldDefinition) {
             // If the field already has the same directive defined, skip over it.
             // Field directives are more specific than those defined on a type.
             if (self::hasDirective($fieldDefinition, $name)) {

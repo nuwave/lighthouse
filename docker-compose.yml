@@ -2,9 +2,15 @@ version: '3.7'
 
 services:
   php:
-    build: .
+    build:
+      context: .
+      dockerfile: php.dockerfile
+      args:
+        USER: $USER
     volumes:
       - ./:/workdir
+    security_opt:
+      - label:disable
     depends_on:
       - mysql
     environment:
@@ -20,10 +26,16 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   node:
-    image: node:slim
+    build:
+      context: .
+      dockerfile: node.dockerfile
     volumes:
       - ./docs:/app
+    security_opt:
+      - label:disable
     working_dir: /app
+    environment:
+      - NODE_OPTIONS="--max-old-space-size=8192"
     ports:
       - 8080:8080
     tty: true

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
@@ -420,6 +421,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ');
 
         $type = $schema->getType('User');
+
+        $this->assertInstanceOf(Type::class, $type);
+        /** @var \GraphQL\Type\Definition\Type $type */
         $type->config['fields']();
     }
 }

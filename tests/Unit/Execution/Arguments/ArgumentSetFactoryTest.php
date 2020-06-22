@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Execution\Arguments\ListType;
 use Nuwave\Lighthouse\Execution\Arguments\NamedType;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
 class ArgumentSetFactoryTest extends TestCase
@@ -99,26 +100,32 @@ class ArgumentSetFactoryTest extends TestCase
 
         $this->assertCount(1, $argumentSet->arguments);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $bar */
         $bar = $argumentSet->arguments['bar'];
         $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame($barValue, $bar->value);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $firstLevel */
         $firstLevel = $bar->type;
         $this->assertInstanceOf(ListType::class, $firstLevel);
         $this->assertFalse($firstLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $secondLevel */
         $secondLevel = $firstLevel->type;
         $this->assertInstanceOf(ListType::class, $secondLevel);
         $this->assertTrue($secondLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $thirdLevel */
         $thirdLevel = $secondLevel->type;
         $this->assertInstanceOf(ListType::class, $thirdLevel);
         $this->assertFalse($thirdLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $fourthLevel */
         $fourthLevel = $thirdLevel->type;
         $this->assertInstanceOf(ListType::class, $fourthLevel);
         $this->assertTrue($fourthLevel->nonNull);
 
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\NamedType $finalLevel */
         $finalLevel = $fourthLevel->type;
         $this->assertInstanceOf(NamedType::class, $finalLevel);
         $this->assertSame(Type::INT, $finalLevel->name);
@@ -167,6 +174,9 @@ class ArgumentSetFactoryTest extends TestCase
         $this->assertNull($bar->value);
     }
 
+    /**
+     * @param  array<string, mixed>  $args
+     */
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
@@ -174,10 +184,13 @@ class ArgumentSetFactoryTest extends TestCase
         $documentAST = $astBuilder->documentAST();
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types['Query'];
+        $queryType = $documentAST->types[RootType::QUERY];
+
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
+        $fields = $queryType->fields;
 
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fooField */
-        $fooField = ASTHelper::firstByName($queryType->fields, 'foo');
+        $fooField = ASTHelper::firstByName($fields, 'foo');
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
         $factory = $this->app->make(ArgumentSetFactory::class);

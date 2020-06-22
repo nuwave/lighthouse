@@ -22,7 +22,7 @@ class BroadcastSubscriptionEvent
      */
     public $fieldName;
 
-    public $root;
+    public $root; // @phpstan-ignore-line
 
     public function __construct(GraphQLSubscription $subscription, string $fieldName, $root)
     {

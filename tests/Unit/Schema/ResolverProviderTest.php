@@ -6,6 +6,7 @@ use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
@@ -93,9 +94,9 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = 'Query'): FieldValue
+    protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
     {
-        $queryType = PartialParser::objectTypeDefinition("
+        $queryType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ "
         type {$parentTypeName} {
             {$fieldDefinition}
         }
@@ -103,6 +104,10 @@ class ResolverProviderTest extends TestCase
 
         $typeValue = new TypeValue($queryType);
 
-        return new FieldValue($typeValue, $queryType->fields[0]);
+        return new FieldValue(
+            $typeValue,
+            // @phpstan-ignore-next-line can not be null
+            $queryType->fields[0]
+        );
     }
 }

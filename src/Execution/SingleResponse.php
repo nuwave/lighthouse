@@ -7,11 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SingleResponse implements CreatesResponse
 {
-    /**
-     * Create a HTTP response from the final result.
-     *
-     * @param  mixed[]  $result
-     */
     public function createResponse(array $result): Response
     {
         return response($result);

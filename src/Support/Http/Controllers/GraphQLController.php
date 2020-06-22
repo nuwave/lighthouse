@@ -71,7 +71,7 @@ class GraphQLController extends Controller
     /**
      * Loop through the individual batched queries and collect the results.
      *
-     * @return mixed[]
+     * @return array<int, mixed>
      */
     protected function executeBatched(GraphQLRequest $request): array
     {

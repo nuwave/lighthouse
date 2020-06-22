@@ -5,12 +5,12 @@ namespace Nuwave\Lighthouse\Support\Traits;
 trait HasArgumentPath
 {
     /**
-     * @var mixed[]
+     * @var array<string|int>
      */
     protected $argumentPath;
 
     /**
-     * @return mixed[]
+     * @return array<string|int>
      */
     public function argumentPath(): array
     {
@@ -23,7 +23,7 @@ trait HasArgumentPath
     }
 
     /**
-     * @param  mixed[]  $argumentPath
+     * @param  array<string|int>  $argumentPath
      * @return $this
      */
     public function setArgumentPath(array $argumentPath): self

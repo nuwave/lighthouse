@@ -23,7 +23,8 @@ class AttemptAuthentication
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string[]  ...$guards
+     * @param  string  ...$guards
+     * @return mixed Some response
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -36,11 +37,13 @@ class AttemptAuthentication
 
     /**
      * Attempt to authenticate the user, but don't do anything if they are not.
+     *
+     * @param  array<string>  ...$guards
      */
     protected function attemptAuthentication(array $guards): void
     {
         if (empty($guards)) {
-            $guards = [null];
+            $guards = [config('lighthouse.guard')];
         }
 
         foreach ($guards as $guard) {

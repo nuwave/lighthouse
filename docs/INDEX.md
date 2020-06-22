@@ -1,5 +1,6 @@
 ---
 home: true
+title: Lighthouse - A framework for serving GraphQL from Laravel
 heroImage: /logo.svg
 actionText: Get Started  →
 actionLink: /docs/latest

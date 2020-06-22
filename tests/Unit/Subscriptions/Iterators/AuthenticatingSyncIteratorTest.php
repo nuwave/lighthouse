@@ -55,6 +55,7 @@ class AuthenticatingSyncIteratorTest extends IteratorTest
             });
         });
 
+        /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $this->app->make(AuthManager::class);
 
         $authManager->extend(SubscriptionGuard::GUARD_NAME, static function () use ($guard) {

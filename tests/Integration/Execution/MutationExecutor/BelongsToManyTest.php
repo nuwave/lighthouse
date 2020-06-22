@@ -550,6 +550,9 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
+    /**
+     * @return array<array<string, string>>
+     */
     public function existingModelMutations(): array
     {
         return [
@@ -668,7 +671,7 @@ GRAPHQL
         ]);
 
         /** @var Role $role */
-        $role = Role::first();
+        $role = Role::firstOrFail();
         $this->assertCount(1, $role->users()->get());
         $this->assertSame('is_user', $role->name);
 
@@ -722,7 +725,7 @@ GRAPHQL
         ]);
 
         /** @var Role $role */
-        $role = Role::first();
+        $role = Role::firstOrFail();
         $this->assertCount(2, $role->users()->get());
     }
 
@@ -772,7 +775,7 @@ GRAPHQL
         ]);
 
         /** @var Role $role */
-        $role = Role::first();
+        $role = Role::firstOrFail();
         $this->assertCount(2, $role->users()->get());
     }
 
@@ -817,7 +820,7 @@ GRAPHQL
         ]);
 
         /** @var Role $role */
-        $role = Role::first();
+        $role = Role::firstOrFail();
         $this->assertCount(1, $role->users()->get());
 
         $this->assertNotNull(User::find(1));

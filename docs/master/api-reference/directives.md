@@ -58,7 +58,8 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retreive the user.
+  Specify which guard to use, e.g. "api".
+  When not defined, the default from `lighthouse.php` is used.
   """
   guard: String
 ) on FIELD_DEFINITION
@@ -189,14 +190,14 @@ directive @belongsToMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 
@@ -222,7 +223,7 @@ type User {
 
 When using the connection `type` argument, you may create your own
 [Edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) which
-may have fields that resolve from the model [pivot](https://laravel.com/docs/5.8/eloquent-relationships#many-to-many)
+may have fields that resolve from the model [pivot](https://laravel.com/docs/eloquent-relationships#many-to-many)
 data. You may also add a custom field resolver for fields you want to resolve yourself.
 
 You may either specify the edge using the `edgetype` argument, or it will automatically
@@ -251,7 +252,7 @@ Run the `bcrypt` function on the argument it is defined on.
 directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Deprecated in favor of [`@hash`](#hash).
+Deprecated in favor of [@hash](#hash).
 
 ## @broadcast
 
@@ -417,7 +418,7 @@ type GithubProfile {
 
 When generating a cached result for a resolver, Lighthouse produces a unique key for each type.
 By default, Lighthouse will look for a field with the `ID` type to generate the key.
-If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+If you'd like to use a different field (i.e., an external API id) you can mark the field with the [@cacheKey](#cachekey) directive.
 
 ### Definition
 
@@ -444,8 +445,10 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
+
+  You may pass the string in dot notation to use nested inputs.
   """
   find: String
 
@@ -718,7 +721,7 @@ type Mutation {
 
 ## @deprecated
 
-You can mark fields as deprecated by adding the `@deprecated` directive and providing a
+You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive and providing a
 `reason`. Deprecated fields are not included in introspection queries unless
 requested and they can still be queried by clients.
 
@@ -918,7 +921,7 @@ type Mutation {
 }
 ```
 
-Works very similar to the [`@delete`](#delete) directive.
+Works very similar to the [@delete](#delete) directive.
 
 ## @enum
 
@@ -1065,16 +1068,25 @@ users to still receive partial results.
 """
 directive @guard(
   """
-  Specify which guards to use, e.g. "api".
-  When not defined, the default driver is used.
+  Specify which guards to use, e.g. ["api"].
+  When not defined, the default from `lighthouse.php` is used.
   """
   with: [String!]
 ) on FIELD_DEFINITION | OBJECT
 ```
 
-Note that [`@guard`](docs/master/api-reference/directives.md#guard) does not log in users.
-To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
-middleware config, see the [default config](src/lighthouse.php) for an example.
+Note that [@guard](#guard) does not log in users.
+To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config.
+
+```php
+'middleware' => [
+    ...
+
+    // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
+    // middleware, this delegates auth and permission checks to the field level.
+    \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
+],
+```
 
 ## @hash
 
@@ -1131,14 +1143,14 @@ directive @hasMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 ) on FIELD_DEFINITION
@@ -1247,7 +1259,7 @@ directive @include(
 
 ### Examples
 
-The `@include` directive may be provided for fields, fragment spreads, and inline fragments,
+The [@include](#include) directive may be provided for fields, fragment spreads, and inline fragments,
 and allows for conditional inclusion during execution as described by the `if` argument.
 
 In this example experimentalField will only be queried if the variable \$someTest has the value true
@@ -1395,7 +1407,7 @@ directive @lazyLoad(
 ) on FIELD_DEFINITION
 ```
 
-This is often useful when loading relationships with the [`@hasMany`](#hasmany) directive.
+This is often useful when loading relationships with the [@hasMany](#hasmany) directive.
 
 ```graphql
 type Post {
@@ -1474,7 +1486,7 @@ $user->purchasedItemsCount(2017, null)
 ## @middleware
 
 **DEPRECATED**
-Use [`@guard`](#guard) or custom [`FieldMiddleware`](../custom-directives/field-directives.md#fieldmiddleware) instead.
+Use [@guard](#guard) or custom [`FieldMiddleware`](../custom-directives/field-directives.md#fieldmiddleware) instead.
 
 ```graphql
 """
@@ -1545,7 +1557,7 @@ Enable fetching an Eloquent model by its global id through the `node` query.
 directive @model on OBJECT
 ```
 
-**Deprecated** Use [`@node`](#node) for Relay global object identification.
+**Deprecated** Use [@node](#node) for Relay global object identification.
 
 ## @modelClass
 
@@ -1576,25 +1588,9 @@ type Post @modelClass(class: "\\App\\BlogPost") {
 
 ## @morphMany
 
-Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-many-polymorphic-relations).
-
-```graphql
-type Post {
-  images: [Image!] @morphMany
-}
-
-type Image {
-  imagable: Imageable! @morphTo
-}
-
-union Imageable = Post | User
-```
-
-### Definition
-
 ```graphql
 """
-Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphMany(
   """
@@ -1615,14 +1611,14 @@ directive @morphMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 
@@ -1635,13 +1631,9 @@ directive @morphMany(
 ) on FIELD_DEFINITION
 ```
 
-## @morphOne
-
-Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
-
 ```graphql
 type Post {
-  image: Image! @morphOne
+  images: [Image!] @morphMany
 }
 
 type Image {
@@ -1651,11 +1643,11 @@ type Image {
 union Imageable = Post | User
 ```
 
-### Definition
+## @morphOne
 
 ```graphql
 """
-Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphOne(
   """
@@ -1671,11 +1663,11 @@ directive @morphOne(
 ) on FIELD_DEFINITION
 ```
 
-## @morphTo
-
-Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
-
 ```graphql
+type Post {
+  image: Image! @morphOne
+}
+
 type Image {
   imagable: Imageable! @morphTo
 }
@@ -1683,11 +1675,11 @@ type Image {
 union Imageable = Post | User
 ```
 
-### Definition
+## @morphTo
 
 ```graphql
 """
-Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphTo(
   """
@@ -1703,12 +1695,20 @@ directive @morphTo(
 ) on FIELD_DEFINITION
 ```
 
+```graphql
+type Image {
+  imagable: Imageable! @morphTo
+}
+
+union Imageable = Post | User
+```
+
 ## @namespace
 
 Redefine the default namespaces used in other directives.
 
 The following example applies the namespace `App\Blog`
-to the `@field` directive used on the `posts` field.
+to the [@field](#field) directive used on the `posts` field.
 
 ```graphql
 type Query {
@@ -1740,7 +1740,7 @@ extend type Query @namespace(field: "App\\Blog") {
 }
 ```
 
-A `@namespace` directive defined on a field directive wins in case of a conflict.
+A [@namespace](#namespace) directive defined on a field directive wins in case of a conflict.
 
 ## @neq
 
@@ -1908,8 +1908,10 @@ directive @orderBy(
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
+
+**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
 
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
@@ -1985,7 +1987,8 @@ You may pass more than one sorting option to add a secondary ordering.
 
 ### Input Definition Example
 
-The `@orderBy` directive can also be applied inside an input field definition when used in conjunction with the [`@spread`](#spread) directive. See below for example:
+The [@orderBy](#orderby) directive can also be applied inside an input field definition
+when used in conjunction with the [@spread](#spread) directive. See below for example:
 
 ```graphql
 type Query {
@@ -2038,16 +2041,16 @@ directive @paginate(
   scopes: [String!]
 
   """
-  Overwrite the paginate_max_count setting value to limit the
-  amount of items that a user can request per page.
-  """
-  maxCount: Int
-
-  """
-  Use a default value for the amount of returned items
-  in case the client does not request it explicitly
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  """
+  maxCount: Int
 ) on FIELD_DEFINITION
 ```
 
@@ -2062,7 +2065,7 @@ type Query {
 ```
 
 > When you want to paginate a relationship, use the to-many relationship
-> directives such as [`@hasMany`](directives.md#hasmany) instead.
+> directives such as [@hasMany](directives.md#hasmany) instead.
 
 The schema definition is automatically transformed to this:
 
@@ -2188,11 +2191,14 @@ If simply querying Eloquent does not fit your use-case, you can specify a custom
 
 ```graphql
 type Query {
-  posts: [Post!]! @paginate(builder: "App\\Blog@visiblePosts")
+  blogStatistics: [BlogStatistic!]! @paginate(builder: "App\\Blog@statistics")
 }
 ```
 
 Your method receives the typical resolver arguments and has to return an instance of `Illuminate\Database\Query\Builder`.
+
+> If you actually want to query a model and possibly its relations through nested fields,
+> make sure to return an Eloquent builder, e.g. `Post::query()`.
 
 ```php
 <?php
@@ -2206,11 +2212,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Blog
 {
-    public function visiblePosts($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    public function statistics($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         return DB::table('posts')
-            ->where('visible', true)
-            ->where('posted_at', '>', $args['after']);
+            ->leftJoinSub(...)
+            ->groupBy(...);
     }
 }
 ```
@@ -2273,7 +2279,7 @@ type Mutation {
 }
 ```
 
-Works very similar to the [`@delete`](#delete) directive.
+Works very similar to the [@delete](#delete) directive.
 
 ## @rules
 
@@ -2396,7 +2402,7 @@ directive @scope(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-You may use this in combination with field directives such as [`@all`](#all).
+You may use this in combination with field directives such as [@all](#all).
 
 ```graphql
 type Query {
@@ -2417,10 +2423,9 @@ type Query {
 The `search()` method of the model is called with the value of the argument,
 using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
 
-Take care when using the `@search` directive in combination with other directives
-that influence the database query. The usual query builder `Eloquent\Builder`
-will be replaced by a `Scout\Builder`, which does not support the same methods and operations.
-Regular filters such as [`@eq`](#eq) or [`@in`](#in) still work, but scopes do not.
+The [@search](#search) directive does not work in combination with other filter directives.
+The usual query builder `Eloquent\Builder` will be replaced by a `Scout\Builder`,
+which does not support the same methods and operations.
 
 ### Definition
 
@@ -2466,7 +2471,7 @@ directive @skip(
 
 ### Examples
 
-The `@skip` directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
+The [@skip](#skip) directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
 exclusion during execution as described by the if argument.
 
 In this example experimentalField will only be queried if the variable \$someTest has the value `false`.
@@ -2504,7 +2509,7 @@ type Query {
 }
 ```
 
-Find out how the added filter works: [`@trashed`](#trashed)
+Find out how the added filter works: [@trashed](#trashed)
 
 ## @spread
 
@@ -2516,7 +2521,7 @@ when processing the field arguments given by a client.
 directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-You may use `@spread` on field arguments or on input object fields:
+You may use [@spread](#spread) on field arguments or on input object fields:
 
 ```graphql
 type Mutation {
@@ -2533,7 +2538,7 @@ input PostContent {
 }
 ```
 
-The schema does not change, client side usage works as if `@spread` was not there:
+The schema does not change, client side usage works as if [@spread](#spread) was not there:
 
 ```graphql
 mutation {
@@ -2602,7 +2607,7 @@ Allows to filter if trashed elements should be fetched.
 directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-The most convenient way to use this directive is through [`@softDeletes`](#softdeletes).
+The most convenient way to use this directive is through [@softDeletes](#softdeletes).
 
 If you want to add it manually, make sure the argument is of the
 enum type `Trashed`:
@@ -2747,18 +2752,13 @@ type Mutation {
 }
 ```
 
-Lighthouse uses the argument `id` to fetch the model by its primary key.
-This will work even if your model has a differently named primary key,
-so you can keep your schema simple and independent of your database structure.
-
-If you want your schema to directly reflect your database schema,
-you can also use the name of the underlying primary key.
-This is not recommended as it makes client-side caching more difficult
-and couples your schema to the underlying implementation.
+If the primary key of your model is not called `id`, it is recommended to rename it.
+Client libraries such as Apollo base their caching mechanism on that assumption.
 
 ```graphql
 type Mutation {
-  updatePost(post_id: ID!, content: String): Post @update
+  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post
+    @update
 }
 ```
 
@@ -2801,7 +2801,7 @@ directive @upsert(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
+Lighthouse will try to to fetch the model by its primary key, just like [@update](#update).
 If the model doesn't exist, it will be newly created with a given `id`.
 In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
@@ -3003,3 +3003,36 @@ but rather used for resolving other fields.
 
 If you just want to return the relation itself as-is,
 look into [handling Eloquent relationships](../eloquent/relationships.md).
+
+## @withCount
+
+```graphql
+"""
+Eager-load the count of an Eloquent relation if the field is queried.
+
+Not that this does not return a value for the field, the count is simply
+prefetched, assuming it is used to compute the field value. Use `@count`
+if the field should simply return the relation count.
+"""
+directive @withCount(
+  """
+  Specify the relationship method name in the model class.
+  """
+  relation: String!
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+This can be a useful optimization for fields that use the count to compute a result.
+
+```graphql
+type User {
+  activityStatistics: ActivityStatistics! @withCount(relation: "posts")
+}
+```
+
+If you just want to return the count itself as-is, use [`@count`](#count).

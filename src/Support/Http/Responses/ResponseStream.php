@@ -18,6 +18,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     public function stream(array $data, array $paths, bool $final): void
     {
         if (! empty($paths)) {
+            $chunk = [];
             $lastKey = count($paths) - 1;
 
             foreach ($paths as $i => $path) {
@@ -64,10 +65,18 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Format chunked data.
+     *
+     * @param  array<mixed>  $data
      */
     protected function chunk(array $data, bool $terminating): string
     {
-        $json = json_encode($data, 0);
+        /** @var string $json */
+        $json = json_encode($data);
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while sending response stream: '.json_last_error_msg());
+        }
+
         $length = $terminating
             ? strlen($json)
             : strlen($json.self::EOL);
@@ -75,9 +84,9 @@ class ResponseStream extends Stream implements CanStreamResponse
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
             'Content-Length: '.$length,
-            null,
+            '',
             $json,
-            null,
+            '',
         ]);
 
         return $this->boundary().$chunk;
@@ -96,9 +105,9 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     /**
      * Flush buffer cache.
-     * Note: We can run into exceptions when flushing the buffer,
-     * these should be safe to ignore.
-     * @todo Investigate exceptions that occur on Apache
+     *
+     * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore.
+     * TODO Investigate exceptions that occur on Apache
      */
     protected function flush(Closure $flush): void
     {

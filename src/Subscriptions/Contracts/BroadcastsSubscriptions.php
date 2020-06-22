@@ -9,6 +9,8 @@ interface BroadcastsSubscriptions
 {
     /**
      * Push subscription data to subscribers.
+     *
+     * @return void
      */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root);
 

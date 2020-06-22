@@ -37,11 +37,11 @@ trait MakesGraphQLRequests
      * Execute a query as if it was sent as a request to the server.
      *
      * @param  string  $query  The GraphQL query to send
-     * @param  array<string, mixed>|null  $variables  The variables to include in the query
-     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the JSON payload
+     * @param  array<string, mixed>  $variables  The variables to include in the query
+     * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function graphQL(string $query, array $variables = null, array $extraParams = [])
+    protected function graphQL(string $query, array $variables = [], array $extraParams = [])
     {
         $params = ['query' => $query];
 
@@ -81,9 +81,10 @@ trait MakesGraphQLRequests
      *
      * @param  array<string, mixed>  $parameters
      * @param  array<int, \Illuminate\Http\Testing\File>  $files
+     * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function multipartGraphQL(array $parameters, array $files)
+    protected function multipartGraphQL(array $parameters, array $files, array $headers = [])
     {
         return $this->call(
             'POST',
@@ -91,9 +92,12 @@ trait MakesGraphQLRequests
             $parameters,
             [],
             $files,
-            $this->transformHeadersToServerVars([
-                'Content-Type' => 'multipart/form-data',
-            ])
+            $this->transformHeadersToServerVars(array_merge(
+                [
+                    'Content-Type' => 'multipart/form-data',
+                ],
+                $headers
+            ))
         );
     }
 
@@ -168,11 +172,11 @@ trait MakesGraphQLRequests
      * Send the query and capture all chunks of the streamed response.
      *
      * @param  string  $query  The GraphQL query to send
-     * @param  array<string, mixed>|null  $variables  The variables to include in the query
-     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the HTTP payload
+     * @param  array<string, mixed>  $variables  The variables to include in the query
+     * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
      * @return array<int, mixed>  The chunked results
      */
-    protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
+    protected function streamGraphQL(string $query, array $variables = [], array $extraParams = []): array
     {
         if ($this->deferStream === null) {
             $this->setUpDeferStream();

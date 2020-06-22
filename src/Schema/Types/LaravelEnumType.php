@@ -37,6 +37,9 @@ class LaravelEnumType extends EnumType
         parent::__construct([
             'name' => $name ?? class_basename($enumClass),
             'values' => array_map(
+                /**
+                 * @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition
+                 */
                 function (Enum $enum): array {
                     return [
                         'name' => $enum->key,

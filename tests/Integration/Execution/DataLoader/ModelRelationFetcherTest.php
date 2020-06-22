@@ -34,7 +34,7 @@ class ModelRelationFetcherTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
-        /** @var \Illuminate\Pagination\LengthAwarePaginator $tasksPaginator */
+        /** @var \Illuminate\Pagination\LengthAwarePaginator<\Tests\Utils\Models\Task> $tasksPaginator */
         $tasksPaginator = $firstUser->tasks;
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
         $this->assertSame($pageSize, $tasksPaginator->count());
@@ -87,7 +87,7 @@ class ModelRelationFetcherTest extends DBTestCase
             factory(Task::class, $initialCount)->make()
         );
 
-        Task::first()->delete();
+        Task::firstOrFail()->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage($this->makePaginationArgs(4));

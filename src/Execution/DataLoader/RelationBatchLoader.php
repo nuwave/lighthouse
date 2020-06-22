@@ -24,7 +24,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Optionally, a relation may be paginated.
      *
-     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs
+     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs|null
      */
     protected $paginationArgs;
 
@@ -44,9 +44,9 @@ class RelationBatchLoader extends BatchLoader
     }
 
     /**
-     * Resolve the keys.
+     * Eager-load the relation.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function resolve(): array
     {
@@ -64,6 +64,9 @@ class RelationBatchLoader extends BatchLoader
 
         return $models
             ->mapWithKeys(
+                /**
+                 * @return array<string, mixed>
+                 */
                 function (Model $model): array {
                     return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
                 }
@@ -88,6 +91,8 @@ class RelationBatchLoader extends BatchLoader
 
     /**
      * Extract the relation that was loaded.
+     *
+     * @return mixed The model's relation.
      */
     protected function extractRelation(Model $model)
     {

@@ -28,6 +28,8 @@ class BroadcastSubscriptionJob implements ShouldQueue
 
     /**
      * The root element to be passed when resolving the subscription.
+     *
+     * @var mixed User defined.
      */
     public $root;
 

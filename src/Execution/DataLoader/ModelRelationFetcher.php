@@ -26,7 +26,7 @@ class ModelRelationFetcher
     /**
      * The relations to be loaded. Same format as the `with` method in Eloquent builder.
      *
-     * @var mixed[]
+     * @var array<string, mixed>
      */
     protected $relations;
 
@@ -124,9 +124,13 @@ class ModelRelationFetcher
      */
     protected function newModelQuery(): EloquentBuilder
     {
-        return $this->models
-            ->first()
-            ->newModelQuery();
+        /** @var \Illuminate\Database\Eloquent\Model $anyModelInstance */
+        $anyModelInstance = $this->models->first();
+
+        /** @var \Illuminate\Database\Eloquent\Builder $newModelQuery */
+        $newModelQuery = $anyModelInstance->newModelQuery();
+
+        return $newModelQuery;
     }
 
     /**
@@ -174,11 +178,11 @@ class ModelRelationFetcher
      */
     protected function loadDefaultWith(EloquentCollection $collection): self
     {
-        if ($collection->isEmpty()) {
+        $model = $collection->first();
+        if ($model === null) {
             return $this;
         }
 
-        $model = $collection->first();
         $reflection = new ReflectionClass($model);
         $withProperty = $reflection->getProperty('with');
         $withProperty->setAccessible(true);

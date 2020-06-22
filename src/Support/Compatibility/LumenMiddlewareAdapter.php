@@ -20,7 +20,7 @@ class LumenMiddlewareAdapter implements MiddlewareAdapter
     /**
      * Get all of the defined middleware short-hand names.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getMiddleware(): array
     {
@@ -34,7 +34,7 @@ class LumenMiddlewareAdapter implements MiddlewareAdapter
     /**
      * Get all of the defined middleware groups.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getMiddlewareGroups(): array
     {

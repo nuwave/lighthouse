@@ -12,7 +12,7 @@ class DeferIncludeSkipTest extends TestCase
     directive @skip(if: Boolean!) on FIELD
     '.self::PLACEHOLDER_QUERY;
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
