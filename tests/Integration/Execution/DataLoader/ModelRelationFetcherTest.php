@@ -102,23 +102,25 @@ class ModelRelationFetcherTest extends DBTestCase
 
     public function testCanHandleSoftDeletes(): void
     {
-        /** @var \Tests\Utils\Models\User $user2 */
+        /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
 
         $tasksUser1 = 3;
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks1 */
         $tasks1 = $user1->tasks()->saveMany(
             factory(Task::class, $tasksUser1)->make()
         );
-        $tasks1->first()->delete();
+        $tasks1[0]->delete();
 
         /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
 
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks2 */
         $tasksUser2 = 4;
         $tasks2 = $user2->tasks()->saveMany(
             factory(Task::class, $tasksUser2)->make()
         );
-        $tasks2->first()->delete();
+        $tasks2[0]->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage($this->makePaginationArgs(4));
