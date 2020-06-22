@@ -106,21 +106,25 @@ class ModelRelationFetcherTest extends DBTestCase
         $user1 = factory(User::class)->create();
 
         $tasksUser1 = 3;
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks1 */
-        $tasks1 = $user1->tasks()->saveMany(
+        $user1->tasks()->saveMany(
             factory(Task::class, $tasksUser1)->make()
         );
-        $tasks1[0]->delete();
+
+        $softDeletedTaskUser1 = factory(Task::class)->make();
+        $user1->tasks()->save($softDeletedTaskUser1);
+        $softDeletedTaskUser1->delete();
 
         /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks2 */
         $tasksUser2 = 4;
-        $tasks2 = $user2->tasks()->saveMany(
+        $user2->tasks()->saveMany(
             factory(Task::class, $tasksUser2)->make()
         );
-        $tasks2[0]->delete();
+
+        $softDeletedTaskUser2 = factory(Task::class)->make();
+        $user2->tasks()->save($softDeletedTaskUser2);
+        $softDeletedTaskUser2->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage($this->makePaginationArgs(4));
@@ -128,12 +132,12 @@ class ModelRelationFetcherTest extends DBTestCase
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
         $this->assertTrue($firstUser->relationLoaded('tasks'));
-        $this->assertCount($tasksUser1 - 1, $firstUser->tasks);
+        $this->assertCount($tasksUser1, $firstUser->tasks);
 
         /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
         $this->assertTrue($secondUser->relationLoaded('tasks'));
-        $this->assertCount($tasksUser2 - 1, $secondUser->tasks);
+        $this->assertCount($tasksUser2, $secondUser->tasks);
     }
 
     public function testGetsPolymorphicRelationship(): void
