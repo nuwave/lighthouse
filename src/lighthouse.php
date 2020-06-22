@@ -98,8 +98,8 @@ return [
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
 
-        /*
-         * Indicates how long the schema should remain cached. A null value
+        /**
+         * Duration in seconds the schema should remain cached, null means forever.
          * ensures the schema is cached forever or until cleared.
          */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
