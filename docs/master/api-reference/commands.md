@@ -3,6 +3,12 @@
 Lighthouse provides some convenient artisan commands. All of them
 are namespaced under `lighthouse`.
 
+## cache
+
+Create the cache for the GraphQL AST.
+
+    php artisan lighthouse:cache
+
 ## clear-cache
 
 Clear the cache for the GraphQL AST.
