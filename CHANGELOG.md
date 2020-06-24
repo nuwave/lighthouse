@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.15.0
+
 ### Added
 
 - Add `@withCount` directive to eager load relationship counts on field access https://github.com/nuwave/lighthouse/pull/1390
@@ -24,7 +26,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Restore application of global scopes in nested relation queries when batching pagination https://github.com/nuwave/lighthouse/pull/1447
-- Avoid unnecessarily reloading models and their count in nested relation queries https://github.com/nuwave/lighthouse/pull/1447
+- Avoid unnecessarily reloading models with count in nested relation queries https://github.com/nuwave/lighthouse/pull/1447
 
 ## 4.14.1
 
