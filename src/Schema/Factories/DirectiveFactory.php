@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
+use Nuwave\Lighthouse\Schema\DirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
@@ -39,11 +39,11 @@ class DirectiveFactory
     protected $directiveNamespaces;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveNamespacer
+     * @var \Nuwave\Lighthouse\Schema\DirectiveNamespaces
      */
     protected $directiveNamespacer;
 
-    public function __construct(DirectiveNamespacer $directiveNamespacer)
+    public function __construct(DirectiveNamespaces $directiveNamespacer)
     {
         $this->directiveNamespacer = $directiveNamespacer;
     }

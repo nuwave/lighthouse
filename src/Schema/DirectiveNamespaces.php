@@ -6,7 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
-class DirectiveNamespacer
+class DirectiveNamespaces
 {
     /**
      * @var \Illuminate\Contracts\Events\Dispatcher

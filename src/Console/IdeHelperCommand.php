@@ -8,7 +8,7 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
+use Nuwave\Lighthouse\Schema\DirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -42,7 +42,7 @@ SDL;
     /**
      * Execute the console command.
      */
-    public function handle(DirectiveNamespacer $directiveNamespaces, TypeRegistry $typeRegistry): int
+    public function handle(DirectiveNamespaces $directiveNamespaces, TypeRegistry $typeRegistry): int
     {
         if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
             $this->error(
@@ -64,6 +64,23 @@ SDL;
     }
 
     /**
+     * Create and write schema directive definitions to a file.
+     */
+    protected function schemaDirectiveDefinitions(DirectiveNamespaces $directiveNamespaces): void
+    {
+        $directiveClasses = $this->scanForDirectives(
+            $directiveNamespaces->gather()
+        );
+
+        $schema = $this->buildSchemaString($directiveClasses);
+
+        $filePath = static::schemaDirectivesPath();
+        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+
+        $this->info("Wrote schema directive definitions to $filePath.");
+    }
+
+    /**
      * Scan the given namespaces for directive classes.
      *
      * @param  string[]  $directiveNamespaces
@@ -71,6 +88,9 @@ SDL;
      */
     protected function scanForDirectives(array $directiveNamespaces): array
     {
+        // Optimize performance, PSR-4 finding is really slow https://gitlab.com/hpierce1102/ClassFinder/-/issues/14
+        ClassFinder::disablePSR4Support();
+
         $directives = [];
 
         foreach ($directiveNamespaces as $directiveNamespace) {
@@ -133,23 +153,6 @@ SDL;
 
         return '# Add a proper definition by implementing '.DefinedDirective::class."\n"
             ."directive @{$name}";
-    }
-
-    /**
-     * Create and write schema directive definitions to a file.
-     */
-    protected function schemaDirectiveDefinitions(DirectiveNamespacer $directiveNamespaces): void
-    {
-        $directiveClasses = $this->scanForDirectives(
-            $directiveNamespaces->gather()
-        );
-
-        $schema = $this->buildSchemaString($directiveClasses);
-
-        $filePath = static::schemaDirectivesPath();
-        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
-
-        $this->info("Wrote schema directive definitions to $filePath.");
     }
 
     public static function schemaDirectivesPath(): string
