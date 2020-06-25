@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class WhereConditionsServiceProvider extends ServiceProvider
 {
@@ -48,12 +48,12 @@ class WhereConditionsServiceProvider extends ServiceProvider
                         )
                     )
                     ->setTypeDefinition(
-                        PartialParser::enumTypeDefinition(
+                        Parser::enumTypeDefinition(
                             $operator->enumDefinition()
                         )
                     )
                     ->setTypeDefinition(
-                        PartialParser::scalarTypeDefinition(/** @lang GraphQL */ '
+                        Parser::scalarTypeDefinition(/** @lang GraphQL */ '
                             scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
                         ')
                     );
@@ -66,7 +66,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = PartialParser
+        $operatorName = Parser
             ::enumTypeDefinition(
                 $operator->enumDefinition()
             )
@@ -74,7 +74,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
             ->value;
         $operatorDefault = $operator->default();
 
-        return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
                 "The column that is used for the condition."

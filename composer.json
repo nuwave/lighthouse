@@ -34,7 +34,7 @@
         "illuminate/support": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "illuminate/validation": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "nesbot/carbon": "^1.26.0 || ^2.0",
-        "webonyx/graphql-php": "^0.13.2"
+        "webonyx/graphql-php": "^14.0.0"
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.28.3",
@@ -43,7 +43,7 @@
         "laravel/framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "laravel/scout": "^4.0 || ^5.0 || ^6.0 || ^7.0",
-        "mll-lab/graphql-php-scalars": "^2.1",
+        "mll-lab/graphql-php-scalars": "^3.1.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/larastan": "^0.6.0",
         "orchestra/database": "3.5.* || 3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",

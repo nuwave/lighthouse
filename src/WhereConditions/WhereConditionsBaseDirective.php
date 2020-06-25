@@ -6,9 +6,9 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -80,7 +80,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     ): void {
         if ($this->hasAllowedColumns()) {
             $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
-            $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
+            $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField);
 
             $documentAST
@@ -92,7 +92,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     )
                 );
         } else {
-            $argDefinition->type = PartialParser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
+            $argDefinition->type = Parser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
         }
     }
 

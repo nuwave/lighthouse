@@ -5,10 +5,10 @@ namespace Nuwave\Lighthouse\Support\Traits;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\Parser;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 /**
  * Directives may want to constrain database columns to an enum.
@@ -108,6 +108,6 @@ trait GeneratesColumnsEnum
         }
         $enumDefinition .= '}';
 
-        return PartialParser::enumTypeDefinition($enumDefinition);
+        return Parser::enumTypeDefinition($enumDefinition);
     }
 }

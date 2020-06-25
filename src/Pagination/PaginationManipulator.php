@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class PaginationManipulator
 {
@@ -89,7 +89,7 @@ class PaginationManipulator
 
         $connectionFieldName = addslashes(ConnectionField::class);
 
-        $connectionType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        $connectionType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName edges."
             type $connectionTypeName {
                 "Pagination information about the list of edges."
@@ -104,7 +104,7 @@ GRAPHQL
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
-            ?? PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            ?? Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
                 "An edge that contains a node of type $fieldTypeName and a cursor."
                 type $connectionEdgeName {
                     "The $fieldTypeName node."
@@ -117,15 +117,15 @@ GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
-        $inputValueDefinitions = [
-            self::countArgument('first', $defaultCount, $maxCount),
-            "\"A cursor after which elements are returned.\"\nafter: String",
+        $countArgumentDefinition = self::countArgument('first', $defaultCount, $maxCount);
+        $afterArgumentDefinition = "\"A cursor after which elements are returned.\"\nafter: String";
+        $connectionArguments = [
+            Parser::inputValueDefinition($countArgumentDefinition),
+            Parser::inputValueDefinition($afterArgumentDefinition),
         ];
 
-        $connectionArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
-
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
-        $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
+        $fieldDefinition->type = Parser::namedType($connectionTypeName);
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
     }
@@ -145,7 +145,7 @@ GRAPHQL
         if ($this->modelClass) {
             $objectType->directives = ASTHelper::mergeNodeList(
                 $objectType->directives,
-                [PartialParser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
+                [Parser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
             );
         }
 
@@ -165,7 +165,7 @@ GRAPHQL
         $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
-        $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName items."
             type $paginatorTypeName {
                 "Pagination information about the list of items."
@@ -178,15 +178,15 @@ GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $inputValueDefinitions = [
-            self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
-            "\"The offset from which elements are returned.\"\npage: Int",
+        $countArgumentDefinition = self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount);
+        $pageArgumentDefinition = "\"The offset from which elements are returned.\"\npage: Int";
+        $paginationArguments = [
+            Parser::inputValueDefinition($countArgumentDefinition),
+            Parser::inputValueDefinition($pageArgumentDefinition),
         ];
 
-        $paginationArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
-
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
-        $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
+        $fieldDefinition->type = Parser::namedType($paginatorTypeName);
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
     }

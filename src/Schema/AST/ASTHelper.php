@@ -255,7 +255,7 @@ class ASTHelper
             ]
         );
 
-        $globalIdFieldDefinition = PartialParser::fieldDefinition(
+        $globalIdFieldDefinition = Parser::fieldDefinition(
             config('lighthouse.global_id_field').': ID! @globalId'
         );
 

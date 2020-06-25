@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
@@ -130,7 +130,7 @@ SDL;
             $definition = $directiveClass::definition();
 
             // This operation throws if the schema definition is invalid
-            PartialParser::directiveDefinition($definition);
+            Parser::directiveDefinition($definition);
 
             return trim($definition);
         }

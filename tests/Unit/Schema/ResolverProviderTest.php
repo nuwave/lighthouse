@@ -3,8 +3,8 @@
 namespace Tests\Unit\Schema;
 
 use Closure;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -96,7 +96,7 @@ class ResolverProviderTest extends TestCase
 
     protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
     {
-        $queryType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ "
+        $queryType = Parser::objectTypeDefinition(/** @lang GraphQL */ "
         type {$parentTypeName} {
             {$fieldDefinition}
         }

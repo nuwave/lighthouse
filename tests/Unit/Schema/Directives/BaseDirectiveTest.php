@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Tests\TestCase;
 use Tests\Utils\Models\Category;
@@ -154,7 +154,7 @@ class BaseDirectiveTest extends TestCase
     protected function constructFieldDirective(string $definitionNode): BaseDirective
     {
         return $this->constructTestDirective(
-            PartialParser::fieldDefinition($definitionNode)
+            Parser::fieldDefinition($definitionNode)
         );
     }
 
