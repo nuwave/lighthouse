@@ -19,7 +19,7 @@ class CacheCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Cache the GraphQL AST.';
+    protected $description = 'Compile the GraphQL AST cache.';
 
     /**
      * Execute the console command.
