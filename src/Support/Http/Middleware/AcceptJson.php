@@ -17,8 +17,6 @@ use Illuminate\Http\Request;
 class AcceptJson
 {
     /**
-     * Force the Accept header of the request.
-     *
      * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Http\JsonResponse
      */
     public function handle(Request $request, Closure $next)
