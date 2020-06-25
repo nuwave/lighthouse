@@ -12,7 +12,7 @@ class CacheCommandTest extends TestCase
     public function testCachesAST(): void
     {
         $key = Config::get('lighthouse.cache.key');
-        $this->assertFalse($this->app->cache->has($key));
+        $this->assertFalse(Cache::has($key));
         $this->artisan(CacheCommand::class);
         $this->assertTrue(Cache::has($key));
     }
