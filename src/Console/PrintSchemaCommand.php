@@ -50,11 +50,7 @@ SIGNATURE;
 
     protected function toJson(Schema $schema): string
     {
-        // TODO simplify once https://github.com/webonyx/graphql-php/pull/539 is released
-        $introspectionResult = \GraphQL\GraphQL::executeQuery(
-            $schema,
-            Introspection::getIntrospectionQuery()
-        );
+        $introspectionResult = Introspection::fromSchema($schema);
 
         $json = json_encode($introspectionResult->data);
         // TODO use \Safe\json_encode

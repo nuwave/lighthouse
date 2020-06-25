@@ -39,6 +39,9 @@ class Subscriber implements Serializable
     /**
      * The name of the queried operation.
      *
+     * TODO replace with subscription field name, is guaranteed be be unique because of
+     * @see \GraphQL\Validator\Rules\SingleFieldSubscription
+     *
      * @var string
      */
     public $operationName;

@@ -159,9 +159,7 @@ SDL;
         // Second priority: Look for a Non-Null field with the ID type
         foreach ($fieldDefinitions as $field) {
             if (
-                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 $field->type instanceof NonNullTypeNode
-                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 && $field->type->type instanceof NamedTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {

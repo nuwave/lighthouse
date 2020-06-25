@@ -76,7 +76,7 @@ abstract class WithRelationDirective extends BaseDirective
      */
     protected function loader(ResolveInfo $resolveInfo): BatchLoader
     {
-        return BatchLoader::instance( // @phpstan-ignore-line TODO remove when updating graphql-php
+        return BatchLoader::instance(
             $this->batchLoaderClass(),
             $resolveInfo->path,
             [

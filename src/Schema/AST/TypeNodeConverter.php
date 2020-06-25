@@ -32,7 +32,7 @@ abstract class TypeNodeConverter
             /** @var \GraphQL\Language\AST\NonNullTypeNode|\GraphQL\Language\AST\ListTypeNode $node */
             $wrappers[] = $nodeKind;
 
-            return $this->convertWrappedTypeNode( // @phpstan-ignore-line TODO remove when upgrading graphql-php
+            return $this->convertWrappedTypeNode(
                 $node->type,
                 $wrappers
             );
