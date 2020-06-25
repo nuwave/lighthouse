@@ -12,7 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add middleware `\Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
-  GraphQL query
+  GraphQL query https://github.com/nuwave/lighthouse/pull/1454
 
 ## 4.15.0
 
