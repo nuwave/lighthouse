@@ -10,8 +10,8 @@ class CacheCommandTest extends TestCase
     public function testItCachesGraphQLAST(): void
     {
         $key = config('lighthouse.cache.key');
-        $tester = $this->commandTester(new CacheCommand());
-        $tester->execute([]);
+        config(['lighthouse.cache.ttl' => 60]);
+        $this->commandTester(new CacheCommand)->execute([]);
         $this->assertTrue(cache()->has($key));
     }
 }
