@@ -23,7 +23,7 @@ class AttemptAuthentication
 
     /**
      * @param  string  ...$guards
-     * @return mixed Some response
+     * @return mixed Any kind of response
      */
     public function handle(Request $request, Closure $next, ...$guards)
     {
