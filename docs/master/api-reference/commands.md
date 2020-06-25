@@ -5,19 +5,19 @@ are namespaced under `lighthouse`.
 
 ## cache
 
-Compile the GraphQL AST cache.
+Compile the GraphQL schema and cache it.
 
     php artisan lighthouse:cache
 
 ## clear-cache
 
-Clear the cache for the GraphQL AST.
+Clear the GraphQL schema cache.
 
     php artisan lighthouse:clear-cache
 
 ## directive
 
-Create a class for a GraphQL directive.
+Create a class for a custom schema directive.
 
     php artisan lighthouse:directive
 
@@ -66,7 +66,7 @@ Use the option `--full` to include the seldom needed resolver arguments `$contex
 
 ## print-schema
 
-Compile the final GraphQL schema and print the result.
+Compile the GraphQL schema and print the result.
 
     php artisan lighthouse:print-schema
 
