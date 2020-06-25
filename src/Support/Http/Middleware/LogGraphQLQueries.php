@@ -10,6 +10,8 @@ use Psr\Log\LoggerInterface;
  */
 class LogGraphQLQueries
 {
+    const MESSAGE = 'Received GraphQL query';
+
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -28,7 +30,7 @@ class LogGraphQLQueries
     public function handle($request, Closure $next)
     {
         $this->logger->info(
-            'Received GraphQL query',
+            self::MESSAGE,
             $request->json()->all()
         );
 
