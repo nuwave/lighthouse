@@ -9,11 +9,11 @@ use Tests\TestCase;
 
 class CacheCommandTest extends TestCase
 {
-    public function testCachesAST(): void
+    public function testItCachesGraphQLAST(): void
     {
         $key = Config::get('lighthouse.cache.key');
-        Cache::forget($key);
-        $this->artisan(CacheCommand::class);
+        $tester = $this->commandTester(new CacheCommand());
+        $tester->execute([]);
         $this->assertTrue(Cache::has($key));
     }
 }
