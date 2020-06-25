@@ -5,7 +5,7 @@ are namespaced under `lighthouse`.
 
 ## cache
 
-Complie the GraphQL AST cache.
+Compile the GraphQL AST cache.
 
     php artisan lighthouse:cache
 
