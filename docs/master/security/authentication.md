@@ -62,7 +62,7 @@ to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first
     'guard' => 'sanctum',
 ```
 
-Note that Sanctum requires you to send an CSRF token as [header](https://laravel.com/docs/7.x/csrf#csrf-x-csrf-token)
+Note that Sanctum requires you to send an CSRF token as [header](https://laravel.com/docs/csrf#csrf-x-csrf-token)
 with all GraphQL requests, regardless of whether the user is authenticated or not.
 When using [laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground), follow the [instructions
 to add a CSRF token](https://github.com/mll-lab/laravel-graphql-playground#configure-session-authentication).
