@@ -120,7 +120,7 @@ You can create or destroy a session with mutations instead of separate API endpo
 **Note that this only works when Lighthouse's guard uses a session driver.** Laravel's token based authentication
 does not allow logging in or out on the server side.
 
-This requires the following middlewares to be added to `config/Lighthouse.php`:
+This requires the following middleware to be added to `config/Lighthouse.php`:
 
 ```php
     'route' => [
