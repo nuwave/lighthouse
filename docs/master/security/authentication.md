@@ -45,11 +45,30 @@ This setting is used whenever Lighthouse looks for an authenticated user, for ex
 such as [@guard](../api-reference/directives.md#guard), or when applying the `AttempAuthentication` middleware.
 
 Stateless guards are recommended for most use cases, such as the default `api` guard.
-If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) for your API, set it here:
+
+### Laravel Sanctum
+
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) for your API, set the guard
+to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first middleware for Lighthouse's route.
 
 ```php
+    'route' => [
+        // ...
+        'middleware' => [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            // ... other middlewares
+        ]             
+    ],
     'guard' => 'sanctum',
 ```
+
+Note that Sanctum requires you to send an CSRF token as [header](https://laravel.com/docs/7.x/csrf#csrf-x-csrf-token)
+with all GraphQL requests, regardless of whether the user is authenticated or not.
+When using [laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground), follow the [instructions
+to add a CSRF token](https://github.com/mll-lab/laravel-graphql-playground#configure-session-authentication).
+
+For authenticated queries, the request must contain credentials as well. In GraphQL Playground,
+add this setting to include the session cookie in all requests: `"request.credentials": "same-site"`
 
 ## Guard selected fields
 
@@ -94,3 +113,61 @@ or `null` if the request is not authenticated.
   }
 }
 ```
+
+## Login and Logout Mutations
+
+You can create or destroy a session with mutations instead of separate API endpoints (`/login`, `/logout`).
+**Note that this only works when Lighthouse's guard uses a session driver.** Laravel's token based authentication
+does not allow logging in or out on the server side.
+
+```graphql
+type Mutation {
+    login(email: String!, password: String!): User
+    logout: Boolean @guard
+}
+```
+
+```php
+// Generate skeleton with `php artisan lighthouse:mutation login`
+
+class Login
+{
+    public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        $guard = Auth::guard();
+        // When using Laravel Sanctum, always use Sanctum's guard to create a session:
+        // $guard = Auth::guard(config('sanctum.guard', 'web'));
+        if ($guard->user()) {
+            return $guard->user();
+        }
+
+        $credentials = collect($args)->only('email', 'password')->all();
+        throw_unless(
+            $guard->attempt($credentials),
+            AuthenticationException::class
+        );
+        return $guard->user();
+    }
+}
+```
+
+```php
+// Generate skeleton with `php artisan lighthouse:mutation logout`
+
+class Logout
+{
+    public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        // When using Laravel Sanctum, always use Sanctum's guard to destroy a session:
+        // $guard = Auth::guard(config('sanctum.guard', 'web'));
+        $guard = Auth::guard();
+        $guard->logout();
+        return !$guard->check();
+    }
+}
+
+```
+
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum), you should use Sanctum's guard
+to handle sessions. Sanctum supports both session-based and token-based authentication. The example implementations above
+only make sense when using session-based authentication.
