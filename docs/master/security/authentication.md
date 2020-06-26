@@ -120,6 +120,24 @@ You can create or destroy a session with mutations instead of separate API endpo
 **Note that this only works when Lighthouse's guard uses a session driver.** Laravel's token based authentication
 does not allow logging in or out on the server side.
 
+This requires the following middlewares to be added to `config/Lighthouse.php`:
+
+```php
+    'route' => [
+        // ...
+        'middleware' => [
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            
+            // When using Laravel Sanctum, replace the middleware above with only:
+            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class
+            
+            // ... other middleware
+        ]             
+    ],
+```
+
 ```graphql
 type Mutation {
     login(email: String!, password: String!): User
@@ -128,7 +146,7 @@ type Mutation {
 ```
 
 ```php
-// Generate skeleton with `php artisan lighthouse:mutation login`
+// Example mutation resolver
 
 class Login
 {
@@ -154,7 +172,7 @@ class Login
 ```
 
 ```php
-// Generate skeleton with `php artisan lighthouse:mutation logout`
+// Example mutation resolver
 
 class Logout
 {
@@ -172,6 +190,6 @@ class Logout
 
 ```
 
-If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum), you should use Sanctum's guard
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum), you should use Sanctum's guard in your mutation resolvers
 to handle sessions. Sanctum supports both session-based and token-based authentication. The example implementations above
 only make sense when using session-based authentication.
