@@ -135,8 +135,10 @@ class Login
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         $guard = Auth::guard();
+        
         // When using Laravel Sanctum, always use Sanctum's guard to create a session:
         // $guard = Auth::guard(config('sanctum.guard', 'web'));
+        
         if ($guard->user()) {
             return $guard->user();
         }
@@ -158,9 +160,11 @@ class Logout
 {
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
+        $guard = Auth::guard();
+
         // When using Laravel Sanctum, always use Sanctum's guard to destroy a session:
         // $guard = Auth::guard(config('sanctum.guard', 'web'));
-        $guard = Auth::guard();
+
         $guard->logout();
         return !$guard->check();
     }
