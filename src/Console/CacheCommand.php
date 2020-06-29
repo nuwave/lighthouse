@@ -7,23 +7,10 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 
 class CacheCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'lighthouse:cache';
+    protected $name = 'lighthouse:cache';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Compile the GraphQL AST cache.';
+    protected $description = 'Compile the GraphQL schema and cache it.';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(ASTBuilder $builder): void
     {
         $builder->documentAST();
