@@ -144,8 +144,8 @@ GRAPHQL
 
             if (! $objectType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException(
-                    'Expected object type for pagination wrapper ' . $objectType->name->value
-                    . ', found ' . $objectType->kind . ' instead.'
+                    'Expected object type for pagination wrapper '.$objectType->name->value
+                    .', found '.$objectType->kind.' instead.'
                 );
             }
         }

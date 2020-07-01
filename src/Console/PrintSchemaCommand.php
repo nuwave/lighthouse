@@ -51,7 +51,7 @@ SIGNATURE;
     protected function toJson(Schema $schema): string
     {
         $introspectionResult = Introspection::fromSchema($schema);
-        if($introspectionResult === null) {
+        if ($introspectionResult === null) {
             throw new \Exception(<<<'MESSAGE'
 Did not receive a valid introspection result.
 Check if your schema is correct with:
