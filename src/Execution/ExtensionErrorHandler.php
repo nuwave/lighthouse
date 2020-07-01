@@ -21,7 +21,7 @@ class ExtensionErrorHandler implements ErrorHandler
             // Reconstruct the error, passing in the extensions of the underlying exception
             $error = new Error(
                 $error->getMessage(),
-                $error->nodes,
+                $error->getNodes(),
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),

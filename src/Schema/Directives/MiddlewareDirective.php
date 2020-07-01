@@ -134,7 +134,7 @@ SDL;
             })
             ->implode('", "');
 
-        $middlewareDirective = Parser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
+        $middlewareDirective = Parser::constDirective("@middleware(checks: [\"$middlewareArgValue\"])");
 
         ASTHelper::addDirectiveToFields($middlewareDirective, $objectType);
     }

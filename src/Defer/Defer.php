@@ -73,7 +73,7 @@ class Defer implements CreatesResponse
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            Parser::directive(/** @lang GraphQL */ '@deferrable')
+            Parser::constDirective(/** @lang GraphQL */ '@deferrable')
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(

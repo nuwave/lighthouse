@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
@@ -140,12 +141,19 @@ GRAPHQL
         // If the type already exists, we use that instead
         if (isset($this->documentAST->types[$objectType->name->value])) {
             $objectType = $this->documentAST->types[$objectType->name->value];
+
+            if (! $objectType instanceof ObjectTypeDefinitionNode) {
+                throw new DefinitionException(
+                    'Expected object type for pagination wrapper ' . $objectType->name->value
+                    . ', found ' . $objectType->kind . ' instead.'
+                );
+            }
         }
 
         if ($this->modelClass) {
             $objectType->directives = ASTHelper::mergeNodeList(
                 $objectType->directives,
-                [Parser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
+                [Parser::constDirective('@modelClass(class: "'.addslashes($this->modelClass).'")')]
             );
         }
 

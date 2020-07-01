@@ -209,7 +209,7 @@ Most methods work the same:
 
 ```diff
 -PartialParser::directive(/** @lang GraphQL */ '@deferrable')
--Parser::directive(/** @lang GraphQL */ '@deferrable')
++Parser::constDirective(/** @lang GraphQL */ '@deferrable')
 ```
 
 A few are different:

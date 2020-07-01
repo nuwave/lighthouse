@@ -65,7 +65,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractStringArguments(): void
     {
-        $directive = Parser::directive(/** @lang GraphQL */ '@foo(bar: "baz")');
+        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: "baz")');
         $this->assertSame(
             'baz',
             ASTHelper::directiveArgValue($directive, 'bar')
@@ -74,7 +74,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractBooleanArguments(): void
     {
-        $directive = Parser::directive(/** @lang GraphQL */ '@foo(bar: true)');
+        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: true)');
         $this->assertTrue(
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -82,7 +82,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractArrayArguments(): void
     {
-        $directive = Parser::directive(/** @lang GraphQL */ '@foo(bar: ["one", "two"])');
+        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: ["one", "two"])');
         $this->assertSame(
             ['one', 'two'],
             ASTHelper::directiveArgValue($directive, 'bar')
@@ -91,7 +91,7 @@ class ASTHelperTest extends TestCase
 
     public function testCanExtractObjectArguments(): void
     {
-        $directive = Parser::directive(/** @lang GraphQL */ '@foo(bar: { baz: "foobar" })');
+        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: { baz: "foobar" })');
         $this->assertSame(
             ['baz' => 'foobar'],
             ASTHelper::directiveArgValue($directive, 'bar')
@@ -100,7 +100,7 @@ class ASTHelperTest extends TestCase
 
     public function testReturnsNullForNonExistingArgumentOnDirective(): void
     {
-        $directive = Parser::directive(/** @lang GraphQL */ '@foo');
+        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo');
         $this->assertNull(
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -122,7 +122,7 @@ class ASTHelperTest extends TestCase
         $notAnObject = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
         scalar NotAnObject
         ');
-        $directive = Parser::directive(/** @lang GraphQL */ '@foo');
+        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo');
 
         $this->expectException(DefinitionException::class);
         ASTHelper::addDirectiveToFields($directive, $notAnObject);
@@ -137,7 +137,7 @@ class ASTHelperTest extends TestCase
         ');
 
         ASTHelper::addDirectiveToFields(
-            Parser::directive(/** @lang GraphQL */ '@guard'),
+            Parser::constDirective(/** @lang GraphQL */ '@guard'),
             $object
         );
 
@@ -157,7 +157,7 @@ class ASTHelperTest extends TestCase
         ');
 
         ASTHelper::addDirectiveToFields(
-            Parser::directive(/** @lang GraphQL */ '@guard'),
+            Parser::constDirective(/** @lang GraphQL */ '@guard'),
             $object
         );
 

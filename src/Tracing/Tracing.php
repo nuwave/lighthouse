@@ -46,7 +46,7 @@ class Tracing
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            Parser::directive('@tracing')
+            Parser::constDirective('@tracing')
         );
     }
 
