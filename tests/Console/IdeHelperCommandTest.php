@@ -7,7 +7,6 @@ use GraphQL\Utils\SchemaPrinter;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Tests\Console\UnionDirective;
 use Tests\TestCase;
 
 class IdeHelperCommandTest extends TestCase
