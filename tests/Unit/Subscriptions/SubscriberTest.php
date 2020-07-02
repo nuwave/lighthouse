@@ -15,7 +15,7 @@ class SubscriberTest extends TestCase
 {
     use TestsSerialization;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 

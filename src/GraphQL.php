@@ -126,7 +126,7 @@ class GraphQL
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
      * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  mixed[]  $variables
+     * @param  array<mixed>|null  $variables
      * @param  mixed|null  $rootValue
      */
     public function executeQuery(
@@ -214,7 +214,7 @@ class GraphQL
     /**
      * Construct the validation rules with values given in the config.
      *
-     * @return \GraphQL\Validator\Rules\ValidationRule[]
+     * @return array<class-string<\GraphQL\Validator\Rules\ValidationRule>, \GraphQL\Validator\Rules\ValidationRule>
      */
     protected function getValidationRules(): array
     {

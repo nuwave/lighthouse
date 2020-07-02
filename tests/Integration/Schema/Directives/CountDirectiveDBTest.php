@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -12,13 +13,13 @@ class CountDirectiveDBTest extends DBTestCase
     {
         factory(User::class)->times(3)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             users: Int! @count(model: "User")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users
         }
@@ -31,6 +32,10 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testCanResolveCountByRelation(): void
     {
+        if (AppVersion::below(5.7)) {
+            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        }
+
         /** @var User $user */
         $user = factory(User::class)->create();
 
@@ -40,7 +45,7 @@ class CountDirectiveDBTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             taskCount: Int! @count(relation: "tasks")
         }
@@ -50,7 +55,7 @@ class CountDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 taskCount

@@ -300,8 +300,6 @@ for your GraphQL endpoint in `config/cors.php`:
 return [
 -   'paths' => ['api/*'],
 +   'paths' => ['api/*', 'graphql'],
-    'allowed_methods' => ['*'],
-    'allowed_origins' => explode(',', env('ALLOWED_CORS_ORIGINS', [])),
     ...
 ];
 ```

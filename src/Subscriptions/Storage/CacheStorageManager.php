@@ -86,6 +86,7 @@ class CacheStorageManager implements StoresSubscriptions
             $this->cache->forever($channelKey, $subscriber);
         } else {
             // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
+            // @phpstan-ignore-next-line
             $this->cache->put($channelKey, $subscriber, Carbon::now()->addSeconds($this->ttl));
         }
     }
@@ -112,6 +113,7 @@ class CacheStorageManager implements StoresSubscriptions
             $this->cache->forever($key, $topic);
         } else {
             // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
+            // @phpstan-ignore-next-line
             $this->cache->put($key, $topic, Carbon::now()->addSeconds($this->ttl));
         }
     }

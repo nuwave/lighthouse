@@ -8,7 +8,7 @@ use GraphQL\Deferred;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
@@ -22,13 +22,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
-     * @var \Illuminate\Cache\CacheManager|\Illuminate\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Repository
      */
-    protected $cacheManager;
+    protected $cacheRepository;
 
-    public function __construct(CacheManager $cacheManager)
+    public function __construct(CacheRepository $cacheRepository)
     {
-        $this->cacheManager = $cacheManager;
+        $this->cacheRepository = $cacheRepository;
     }
 
     public static function definition(): string
@@ -72,21 +72,23 @@ SDL;
         $isPrivate = $this->directiveArgValue('private', false);
 
         return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
-            $cacheValue = new CacheValue([
-                'field_value' => $fieldValue,
-                'root' => $root,
-                'args' => $args,
-                'context' => $context,
-                'resolve_info' => $resolveInfo,
-                'is_private' => $isPrivate,
-            ]);
+            $cacheValue = new CacheValue(
+                $root,
+                $args,
+                $context,
+                $resolveInfo,
+                $fieldValue,
+                $isPrivate
+            );
 
             $cacheKey = $cacheValue->getKey();
 
-            /** @var \Illuminate\Cache\Repository|\Illuminate\Cache\TaggedCache $cache */
-            $cache = $this->shouldUseTags()
-                ? $this->cacheManager->tags($cacheValue->getTags())
-                : $this->cacheManager;
+            if ($this->shouldUseTags()) {
+                $cache = $this->cacheRepository->tags($cacheValue->getTags());
+            } else {
+                $cache = $this->cacheRepository;
+            }
+            /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
 
             // We found a matching value in the cache, so we can just return early
             // without actually running the query
@@ -97,10 +99,10 @@ SDL;
             $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
-                ? function ($value) use ($cacheKey, $maxAge, $cache) {
+                ? function ($value) use ($cacheKey, $maxAge, $cache): void {
                     $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
                 }
-            : function ($value) use ($cacheKey, $cache) {
+            : function ($value) use ($cacheKey, $cache): void {
                 $cache->forever($cacheKey, $value);
             };
 
@@ -120,7 +122,7 @@ SDL;
     protected function shouldUseTags(): bool
     {
         return config('lighthouse.cache.tags', false)
-            && method_exists($this->cacheManager->store(), 'tags');
+            && method_exists($this->cacheRepository->getStore(), 'tags');
     }
 
     /**
@@ -142,9 +144,11 @@ SDL;
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $typeDefinition */
         $typeDefinition = $typeValue->getTypeDefinition();
 
+        /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+        $fieldDefinitions = $typeDefinition->fields;
+
         // First priority: Look for a field with the @cacheKey directive
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
-        foreach ($typeDefinition->fields as $field) {
+        foreach ($fieldDefinitions as $field) {
             if (ASTHelper::hasDirective($field, 'cacheKey')) {
                 $typeValue->setCacheKey($field->name->value);
 
@@ -153,8 +157,7 @@ SDL;
         }
 
         // Second priority: Look for a Non-Null field with the ID type
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
-        foreach ($typeDefinition->fields as $field) {
+        foreach ($fieldDefinitions as $field) {
             if (
                 // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 $field->type instanceof NonNullTypeNode

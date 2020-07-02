@@ -41,6 +41,8 @@ class Argument
 
     /**
      * Get the plain PHP value of this argument.
+     *
+     * @return mixed The plain PHP value.
      */
     public function toPlain()
     {
@@ -60,6 +62,7 @@ class Argument
         }
 
         if (is_array($value)) {
+            // @phpstan-ignore-next-line This callable works just fine
             return array_map([static::class, 'toPlainRecursive'], $value);
         }
 

@@ -164,7 +164,7 @@ abstract class BaseDirective implements Directive
      * Find a class name in a set of given namespaces.
      *
      * @param  string[]  $namespacesToTry
-     * @param  callable  $determineMatch
+     * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -234,9 +234,12 @@ abstract class BaseDirective implements Directive
 
     /**
      * Try adding the default model namespace and ensure the given class is a model.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
+        // @phpstan-ignore-next-line The callback ensures we get a Model class
         return $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),

@@ -72,9 +72,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: $column";
     }
 
-    /**
-     * Manipulate the AST.
-     */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
@@ -114,12 +111,13 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     /**
      * Ensure the column name is well formed and prevent SQL injection.
      *
-     *
      * @throws \GraphQL\Error\Error
      */
     protected static function assertValidColumnName(string $column): void
     {
-        if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
+        // TODO use safe
+        $match = preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column);
+        if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
             );

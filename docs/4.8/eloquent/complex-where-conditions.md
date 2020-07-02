@@ -38,7 +38,7 @@ directive @whereConditions(
   This improves introspection capabilities and security.
   """
   columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
 
 You can apply this directive on any field that performs an Eloquent query:
@@ -183,7 +183,7 @@ directive @whereHasConditions(
   This improves introspection capabilities and security.
   """
   columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
 
 This directive works very similar to [`@whereConditions`](#whereconditions), except that

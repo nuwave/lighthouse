@@ -9,3 +9,9 @@ $factory->define(Task::class, function (Faker $faker): array {
         'name' => $faker->unique()->sentence,
     ];
 });
+
+$factory->state(Task::class, 'completed', function (): array {
+    return [
+        'completed_at' => now(),
+    ];
+});

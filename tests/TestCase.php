@@ -52,9 +52,9 @@ GRAPHQL;
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return string[]
+     * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             AuthServiceProvider::class,
@@ -70,9 +70,8 @@ GRAPHQL;
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
@@ -125,6 +124,9 @@ GRAPHQL;
                 'broadcaster' => 'log',
             ]
         );
+
+        // TODO remove when the default changes
+        $config->set('lighthouse.force_fill', true);
 
         $config->set('app.debug', true);
     }
