@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
@@ -125,18 +126,19 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
     {
-        if ($edgeType = $this->directiveArgValue('edgeType')) {
-            if (! isset($documentAST->types[$edgeType])) {
-                throw new DirectiveException(
-                    'The edgeType argument on '.$this->nodeName().' must reference an existing type definition'
+        if ($edgeTypeName = $this->directiveArgValue('edgeType')) {
+            $edgeType = $documentAST->types[$edgeTypeName] ?? null;
+            if (! $edgeType instanceof ObjectTypeDefinitionNode) {
+                throw new DefinitionException(
+                    "The edgeType argument on {$this->nodeName()} must reference an existing object type definition."
                 );
             }
 
-            return $documentAST->types[$edgeType];
+            return $edgeType;
         }
 
         return null;

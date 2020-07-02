@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Str;
@@ -96,8 +97,10 @@ class Subscriber implements Serializable
         $this->context = $context;
 
         $documentNode = new DocumentNode([]);
-        $documentNode->definitions = $resolveInfo->fragments;
-        $documentNode->definitions[] = $operation;
+        $documentNode->definitions = new NodeList([
+            $resolveInfo->fragments,
+            $operation,
+        ]);
         $this->query = $documentNode;
     }
 
