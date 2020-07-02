@@ -19,7 +19,7 @@ class ClientDirectiveTest extends TestCase
 
     public function testCanDefineACustomClientDirective(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         "foo"
         directive @bar(
             "foobar"
@@ -33,9 +33,6 @@ class ClientDirectiveTest extends TestCase
             [
                 'name' => 'bar',
                 'description' => 'foo',
-                'locations' => [
-                    'FIELD',
-                ],
                 'args' => [
                     [
                         'name' => 'baz',
@@ -47,6 +44,9 @@ class ClientDirectiveTest extends TestCase
                         ],
                         'defaultValue' => '"barbaz"',
                     ],
+                ],
+                'locations' => [
+                    'FIELD',
                 ],
             ],
             $bar

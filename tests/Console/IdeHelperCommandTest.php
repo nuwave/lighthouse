@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests\Integration\Console;
+namespace Tests\Console;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Utils\SchemaPrinter;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Tests\Console\UnionDirective;
 use Tests\TestCase;
 
 class IdeHelperCommandTest extends TestCase
@@ -20,7 +21,7 @@ class IdeHelperCommandTest extends TestCase
 
         $config->set('lighthouse.namespaces.directives', [
             // Contains an overwritten UnionDirective
-            'Tests\\Integration\\Console',
+            'Tests\\Console',
             // We need to ensure this does not throw an error
             'Empty\\Because\\The\\User\\Has\\Not\\Created\\Custom\\Directives\\Yet',
         ]);
