@@ -25,7 +25,7 @@ class CountRuns
         return $next($request);
     }
 
-    public function __invoke(): int
+    public function resolve(): int
     {
         return self::$runCounter;
     }
