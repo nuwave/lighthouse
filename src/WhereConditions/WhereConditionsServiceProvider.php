@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class WhereConditionsServiceProvider extends ServiceProvider
 {
-    public const DEFAULT_HAS_OPERATOR = 'GTE';
+    public const DEFAULT_HAS_OPERATOR = SQLOperator::GREATER_THAN_EQUALS;
 
     public const DEFAULT_HAS_AMOUNT = 1;
 
@@ -101,7 +101,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                 "A set of conditions that requires at least one condition to match."
                 OR: [$name!]
 
-                "A condition for chacking relations."
+                "A nested ord direct relation condition that create an amount criteria, and optionaly nested condition criteria."
                 HAS: $hasRelationInputName
             }
 GRAPHQL

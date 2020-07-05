@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
@@ -43,7 +44,7 @@ SDL;
     /**
      * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
      * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Eloquent\Builder | \Illuminate\Database\Query\Builder  The modified builder.
+     * @return \Illuminate\Database\Eloquent\Builder The modified builder.
      */
     public function handleBuilder($builder, $whereConditions)
     {
