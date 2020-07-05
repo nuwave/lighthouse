@@ -45,16 +45,6 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooInvoke: Int');
-
-        $this->assertInstanceOf(
-            Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
-    }
-
     public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
