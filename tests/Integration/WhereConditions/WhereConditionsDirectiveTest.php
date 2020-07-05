@@ -42,7 +42,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     }
     ';
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -464,6 +464,8 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $expectedEnumName = 'WhitelistedColumnsWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
+        $this->assertNotNull($enum);
+        /** @var array<string, mixed> $enum */
         $this->assertArraySubset(
             [
                 'kind' => 'ENUM',

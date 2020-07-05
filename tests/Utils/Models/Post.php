@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 
 /**
@@ -22,6 +23,7 @@ use Laravel\Scout\Searchable;
 class Post extends Model
 {
     use Searchable;
+    use SoftDeletes;
 
     public function user(): BelongsTo
     {

@@ -36,7 +36,7 @@ abstract class DBTestCase extends TestCase
         $this->withFactories(__DIR__.'/database/factories');
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
