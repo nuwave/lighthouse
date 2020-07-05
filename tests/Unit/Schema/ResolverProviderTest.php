@@ -10,7 +10,6 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
-use Tests\Utils\Queries\FooBar;
 
 class ResolverProviderTest extends TestCase
 {
