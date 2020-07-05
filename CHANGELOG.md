@@ -12,7 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Changed
 
 - `__invoke` is now the only supported method name for convention based
-  field resolver classes 
+  field resolver classes  https://github.com/nuwave/lighthouse/pull/1422
 
 ## Unreleased
 

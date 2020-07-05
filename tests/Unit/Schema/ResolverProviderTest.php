@@ -56,25 +56,6 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    /**
-     * @deprecated will be changed in v5
-     */
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooBar: String');
-
-        $resolver = $this->resolverProvider->provideResolver($fieldValue);
-        $this->assertInstanceOf(
-            Closure::class,
-            $resolver
-        );
-
-        $this->assertSame(
-            FooBar::RESOLVE_RESULT,
-            $resolver()
-        );
-    }
-
     public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
