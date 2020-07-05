@@ -15,6 +15,7 @@ class WithEnum extends Model
 {
     use CastsEnums;
 
+    /** @var bool */
     public $timestamps = false;
 
     /**

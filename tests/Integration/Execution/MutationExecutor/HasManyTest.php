@@ -527,7 +527,7 @@ GRAPHQL
         ]);
 
         // The first User has the first Role.
-        $role = Role::first();
+        $role = Role::firstOrFail();
         $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.

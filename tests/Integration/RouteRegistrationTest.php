@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Routing\Route;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase;
 
@@ -20,7 +21,7 @@ class RouteRegistrationTest extends TestCase
         ];
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -39,6 +40,9 @@ class RouteRegistrationTest extends TestCase
         $routes = $router->getRoutes();
 
         $graphqlRoute = $routes->getByName('graphql');
+
+        $this->assertInstanceOf(Route::class, $graphqlRoute);
+        /** @var \Illuminate\Routing\Route $graphqlRoute */
         $this->assertEquals(
             ['GET', 'POST', 'HEAD'],
             $graphqlRoute->methods()

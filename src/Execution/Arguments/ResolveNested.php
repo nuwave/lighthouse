@@ -38,6 +38,7 @@ class ResolveNested implements ArgResolver
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $nested */
         foreach ($nestedArgs->arguments as $nested) {
+            // @phpstan-ignore-next-line we know the resolver is there because we partitioned for it
             ($nested->resolver)($root, $nested->value);
         }
 

@@ -49,7 +49,7 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('bar', Company::first()->name);
+        $this->assertSame('bar', Company::firstOrFail()->name);
     }
 
     public function testCanUpdateFromInputObject(): void
@@ -93,7 +93,7 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('bar', Company::first()->name);
+        $this->assertSame('bar', Company::firstOrFail()->name);
     }
 
     public function testThrowsWhenMissingPrimaryKey(): void
@@ -160,7 +160,7 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('bar', Category::first()->name);
+        $this->assertSame('bar', Category::firstOrFail()->name);
     }
 
     public function testCanUpdateWithCustomPrimaryKeyAsId(): void
@@ -200,7 +200,7 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('bar', Category::first()->name);
+        $this->assertSame('bar', Category::firstOrFail()->name);
     }
 
     public function testDoesNotUpdateWithFailingRelationship(): void
@@ -260,7 +260,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertSame('Original', User::first()->name);
+        $this->assertSame('Original', User::firstOrFail()->name);
     }
 
     public function testNestedArgResolver(): void
