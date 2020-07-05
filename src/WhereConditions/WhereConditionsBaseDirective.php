@@ -64,7 +64,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             );
         }
 
-        if ($hasRelationConditions = $whereConditions['HAS'] ?? null) {
+        if ($hasRelationConditions = $whereConditions['HAS'] ?? null && $model) {
             $builder->whereNested(
                 function ($builder) use ($hasRelationConditions, $model): void {
                     $relation = $hasRelationConditions['relation'];
