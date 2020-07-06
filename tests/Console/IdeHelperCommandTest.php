@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Console;
+namespace Tests\Console;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Utils\SchemaPrinter;
@@ -20,7 +20,7 @@ class IdeHelperCommandTest extends TestCase
 
         $config->set('lighthouse.namespaces.directives', [
             // Contains an overwritten UnionDirective
-            'Tests\\Integration\\Console',
+            'Tests\\Console',
             // We need to ensure this does not throw an error
             'Empty\\Because\\The\\User\\Has\\Not\\Created\\Custom\\Directives\\Yet',
         ]);
