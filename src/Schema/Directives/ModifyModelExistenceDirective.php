@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
@@ -59,12 +58,12 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
                 if ($modelOrModels instanceof Model) {
                     if (! $this->modifyExistence($modelOrModels)) {
-                        $errors []= self::couldNotModify($modelOrModels);
+                        $errors [] = self::couldNotModify($modelOrModels);
                     }
                 } elseif ($modelOrModels instanceof Collection) {
                     foreach ($modelOrModels as $model) {
-                        if(! $this->modifyExistence($model)) {
-                            $errors []= self::couldNotModify($model);
+                        if (! $this->modifyExistence($model)) {
+                            $errors [] = self::couldNotModify($model);
                         }
                     }
                 }
