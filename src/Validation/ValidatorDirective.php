@@ -72,6 +72,7 @@ SDL;
                 // We precomputed and validated the full class name at schema build time
                 $this->directiveArgValue('class')
             );
+            // @phpstan-ignore-next-line Since this directive can only be defined on a field or input, this must be ArgumentSet
             $validator->setArgs($this->argumentValue);
 
             return $this->validator = $validator;
@@ -83,7 +84,9 @@ SDL;
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
         if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
-            throw new DefinitionException();
+            throw new DefinitionException(
+                "Can not use @validator on non input type {$typeDefinition->name->value}."
+            );
         }
 
         if ($this->directiveHasArgument('class')) {
@@ -119,7 +122,7 @@ SDL;
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $definition
      */
-    protected function setFullClassnameOnDirective(Node &$definition, ?string $classCandidate): void
+    protected function setFullClassnameOnDirective(Node &$definition, string $classCandidate): void
     {
         $validatorClass = $this->namespaceValidatorClass($classCandidate);
 

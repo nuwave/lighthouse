@@ -9,12 +9,16 @@ trait HasArgumentValue
      */
     protected $argumentValue;
 
+    /**
+     * @return \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
+     */
     public function argumentValue()
     {
         return $this->argumentValue;
     }
 
     /**
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argument
      * @return $this
      */
     public function setArgumentValue($argument): self

@@ -9,7 +9,7 @@ use Tests\TestCase;
  */
 class ValidationTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 

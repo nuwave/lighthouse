@@ -40,7 +40,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
         );
     }
 
-    public function transformRecursively(ArgumentSet $argumentSet)
+    public function transformRecursively(ArgumentSet $argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $name => $argument) {
             $directivesForArray = $argument->directives->filter(
@@ -69,6 +69,11 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
         return $argumentSet;
     }
 
+
+    /**
+     * @param  mixed  $value The client given value
+     * @return mixed The transformed value
+     */
     protected function transform($value, Collection $directivesForArgument)
     {
         foreach ($directivesForArgument as $directive) {
@@ -78,5 +83,10 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
         return $value;
     }
 
+
+    /**
+     * @param  mixed  $value The client given value
+     * @return mixed The transformed value
+     */
     abstract protected function applyDirective(Directive $directive, $value);
 }
