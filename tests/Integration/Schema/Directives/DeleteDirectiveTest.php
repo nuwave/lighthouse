@@ -3,7 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Directives\DeleteDirective;
+use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -319,7 +319,7 @@ class DeleteDirectiveTest extends DBTestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => DeleteDirective::couldNotDelete($user),
+                    'message' => ModifyModelExistenceDirective::couldNotModify($user),
                 ],
             ],
         ]);

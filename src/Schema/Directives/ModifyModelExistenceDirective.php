@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
@@ -19,8 +20,6 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
-     * The GlobalId resolver.
-     *
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
     protected $globalId;
@@ -30,9 +29,11 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         $this->globalId = $globalId;
     }
 
-    /**
-     * Resolve the field directive.
-     */
+    public static function couldNotModify(Model $user): string
+    {
+        return 'Could not modify model '.get_class($user).' with ID '.$user->getKey().'.';
+    }
+
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
@@ -54,12 +55,22 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                     return;
                 }
 
+                $errors = [];
+
                 if ($modelOrModels instanceof Model) {
-                    $this->modifyExistence($modelOrModels);
+                    if (! $this->modifyExistence($modelOrModels)) {
+                        $errors []= self::couldNotModify($modelOrModels);
+                    }
                 } elseif ($modelOrModels instanceof Collection) {
                     foreach ($modelOrModels as $model) {
-                        $this->modifyExistence($model);
+                        if(! $this->modifyExistence($model)) {
+                            $errors []= self::couldNotModify($model);
+                        }
                     }
+                }
+
+                foreach ($errors as $error) {
+                    // TODO we need a way to report errors without aborting this function
                 }
 
                 return $modelOrModels;
@@ -137,6 +148,8 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     /**
      * Bring a model in or out of existence.
+     *
+     * The return value indicates if the operation was successful.
      */
-    abstract protected function modifyExistence(Model $model): void;
+    abstract protected function modifyExistence(Model $model): bool;
 }

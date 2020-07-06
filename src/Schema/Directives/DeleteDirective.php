@@ -47,19 +47,14 @@ directive @delete(
 SDL;
     }
 
-    public static function couldNotDelete(Model $user): string
-    {
-        return 'Could not delete model '.get_class($user).' with ID '.$user->getKey().'.';
-    }
-
     protected function find(string $modelClass, $idOrIds)
     {
         return $modelClass::find($idOrIds);
     }
 
-    protected function modifyExistence(Model $model): void
+    protected function modifyExistence(Model $model): bool
     {
-        $model->delete();
+        return (bool) $model->delete();
     }
 
     /**
