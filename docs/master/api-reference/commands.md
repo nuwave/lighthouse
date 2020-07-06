@@ -3,15 +3,21 @@
 Lighthouse provides some convenient artisan commands. All of them
 are namespaced under `lighthouse`.
 
+## cache
+
+Compile the GraphQL schema and cache it.
+
+    php artisan lighthouse:cache
+
 ## clear-cache
 
-Clear the cache for the GraphQL AST.
+Clear the GraphQL schema cache.
 
     php artisan lighthouse:clear-cache
 
 ## directive
 
-Create a class for a GraphQL directive.
+Create a class for a custom schema directive.
 
     php artisan lighthouse:directive
 
@@ -56,9 +62,11 @@ Create a class for a single field on the root Mutation type.
 
     php artisan lighthouse:mutation <name>
 
+Use the option `--full` to include the seldom needed resolver arguments `$context` and `$resolveInfo`.
+
 ## print-schema
 
-Compile the final GraphQL schema and print the result.
+Compile the GraphQL schema and print the result.
 
     php artisan lighthouse:print-schema
 
@@ -76,6 +84,8 @@ You can output your schema in JSON format by using the `--json` flag.
 Create a class for a single field on the root Query type.
 
     php artisan lighthouse:query <name>
+
+Use the option `--full` to include the seldom needed resolver arguments `$context` and `$resolveInfo`.
 
 ## scalar
 

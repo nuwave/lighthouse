@@ -49,7 +49,7 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function () use ($previousResolver, $eventClassName) {
-                    $result = call_user_func_array($previousResolver, func_get_args());
+                    $result = $previousResolver(...func_get_args());
 
                     $this->eventsDispatcher->dispatch(
                         new $eventClassName($result)

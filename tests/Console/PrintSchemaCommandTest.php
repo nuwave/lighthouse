@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Console;
+namespace Tests\Console;
 
 use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;

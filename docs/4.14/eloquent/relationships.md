@@ -117,7 +117,7 @@ When you define a relation, Lighthouse assumes that the field and the relationsh
 method have the same name. If you need to name your field differently, you have to
 specify the name of the method.
 
-```
+```graphql
 type Post {
   author: User! @belongsTo(relation: "user")
 }

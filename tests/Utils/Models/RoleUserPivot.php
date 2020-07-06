@@ -15,6 +15,7 @@ class RoleUserPivot extends Model
 {
     public $table = 'role_user';
 
+    /** @var bool */
     public $timestamps = false;
 
     public function role(): BelongsTo
