@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
@@ -9,6 +10,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -23,9 +25,15 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      */
     protected $globalId;
 
-    public function __construct(GlobalId $globalId)
+    /**
+     * @var \Nuwave\Lighthouse\Execution\ErrorPool
+     */
+    protected $errorPool;
+
+    public function __construct(GlobalId $globalId, ErrorPool $errorPool)
     {
         $this->globalId = $globalId;
+        $this->errorPool = $errorPool;
     }
 
     public static function couldNotModify(Model $user): string
@@ -54,22 +62,22 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                     return;
                 }
 
-                $errors = [];
+                $modifyModelExistence = function (Model $model): void {
+                    if (! $this->modifyExistence($model)) {
+                        $this->errorPool->record(
+                            new Error(
+                                self::couldNotModify($model)
+                            )
+                        );
+                    }
+                };
 
                 if ($modelOrModels instanceof Model) {
-                    if (! $this->modifyExistence($modelOrModels)) {
-                        $errors [] = self::couldNotModify($modelOrModels);
-                    }
+                    $modifyModelExistence($modelOrModels);
                 } elseif ($modelOrModels instanceof Collection) {
                     foreach ($modelOrModels as $model) {
-                        if (! $this->modifyExistence($model)) {
-                            $errors [] = self::couldNotModify($model);
-                        }
+                        $modifyModelExistence($model);
                     }
-                }
-
-                foreach ($errors as $error) {
-                    // TODO we need a way to report errors without aborting this function
                 }
 
                 return $modelOrModels;
