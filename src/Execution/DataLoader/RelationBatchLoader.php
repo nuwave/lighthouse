@@ -24,7 +24,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Optionally, a relation may be paginated.
      *
-     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs
+     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs|null
      */
     protected $paginationArgs;
 

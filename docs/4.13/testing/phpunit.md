@@ -133,6 +133,12 @@ Make sure to publish the latest [IDE-helper file](/_ide_helper.php) to get prope
 php artisan lighthouse:ide-helper
 ```
 
+This command requires `haydenpierce/class-finder`. Install it by running:
+
+```bash
+composer require --dev haydenpierce/class-finder
+```
+
 The provided assertions are prefixed with `assertGraphQL` for easy discovery.
 They offer useful shortcuts to common testing tasks.
 For example, you might want to ensure that validation works properly:

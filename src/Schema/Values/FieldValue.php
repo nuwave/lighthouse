@@ -149,9 +149,9 @@ class FieldValue
     /**
      * Get field resolver.
      */
-    public function getResolver(): ?callable
+    public function getResolver(): callable
     {
-        return $this->resolver;
+        return $this->resolver; // @phpstan-ignore-line This must only be called after setResolver() was called
     }
 
     /**

@@ -186,8 +186,11 @@ class ArgumentSetFactoryTest extends TestCase
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
 
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
+        $fields = $queryType->fields;
+
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fooField */
-        $fooField = ASTHelper::firstByName($queryType->fields, 'foo');
+        $fooField = ASTHelper::firstByName($fields, 'foo');
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
         $factory = $this->app->make(ArgumentSetFactory::class);

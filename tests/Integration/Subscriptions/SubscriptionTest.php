@@ -101,9 +101,13 @@ GRAPHQL;
 
         /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
         $log = app(BroadcastManager::class)->driver();
-        $this->assertCount(1, $log->broadcasts());
+        $broadcasts = $log->broadcasts();
 
-        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertNotNull($broadcasts);
+        /** @var array<mixed> $broadcasts */
+        $this->assertCount(1, $broadcasts);
+
+        $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
         $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostCreated']);
     }

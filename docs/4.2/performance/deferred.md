@@ -9,7 +9,7 @@ Deferring fields allows you to prioritize fetching data needed to render the mos
 as fast as possible, and then loading the rest of the page in the background.
 
 Lighthouse's `DeferExtension` adds support for the experimental `@defer` directive
-provided by Apollo which you can read more about [here](https://www.apollographql.com/docs/react/features/defer-support.html).
+provided by Apollo which you can read more about [here](https://www.apollographql.com/blog/introducing-defer-in-apollo-server-f6797c4e9d6e).
 
 ## Setup
 
