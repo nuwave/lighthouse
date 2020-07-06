@@ -8,7 +8,7 @@ use Tests\Utils\Models\User;
 
 class WhereJsonContainsDirectiveDBTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Query {
         users(foo: String! @whereJsonContains(key: "name->nested")): [User!]! @all
     }
@@ -41,7 +41,7 @@ class WhereJsonContainsDirectiveDBTest extends DBTestCase
             ]),
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(foo: "bar") {
                 name

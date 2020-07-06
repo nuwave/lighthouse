@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Role extends Model
 {
+    /** @var bool */
     public $timestamps = false;
 
     public function users(): BelongsToMany

@@ -58,10 +58,10 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Specify which guards to use, e.g. ["api"].
+  Specify which guard to use, e.g. "api".
   When not defined, the default from `lighthouse.php` is used.
   """
-  guard: [String!]
+  guard: String
 ) on FIELD_DEFINITION
 ```
 
@@ -445,8 +445,10 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
+
+  You may pass the string in dot notation to use nested inputs.
   """
   find: String
 
@@ -1906,8 +1908,10 @@ directive @orderBy(
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
+
+**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
 
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
@@ -2000,7 +2004,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ field: "postedAt", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
     title
   }
 }
@@ -2748,18 +2752,13 @@ type Mutation {
 }
 ```
 
-Lighthouse uses the argument `id` to fetch the model by its primary key.
-This will work even if your model has a differently named primary key,
-so you can keep your schema simple and independent of your database structure.
-
-If you want your schema to directly reflect your database schema,
-you can also use the name of the underlying primary key.
-This is not recommended as it makes client-side caching more difficult
-and couples your schema to the underlying implementation.
+If the primary key of your model is not called `id`, it is recommended to rename it.
+Client libraries such as Apollo base their caching mechanism on that assumption.
 
 ```graphql
 type Mutation {
-  updatePost(post_id: ID!, content: String): Post @update
+  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post
+    @update
 }
 ```
 
@@ -3024,3 +3023,36 @@ but rather used for resolving other fields.
 
 If you just want to return the relation itself as-is,
 look into [handling Eloquent relationships](../eloquent/relationships.md).
+
+## @withCount
+
+```graphql
+"""
+Eager-load the count of an Eloquent relation if the field is queried.
+
+Not that this does not return a value for the field, the count is simply
+prefetched, assuming it is used to compute the field value. Use `@count`
+if the field should simply return the relation count.
+"""
+directive @withCount(
+  """
+  Specify the relationship method name in the model class.
+  """
+  relation: String!
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+This can be a useful optimization for fields that use the count to compute a result.
+
+```graphql
+type User {
+  activityStatistics: ActivityStatistics! @withCount(relation: "posts")
+}
+```
+
+If you just want to return the count itself as-is, use [`@count`](#count).

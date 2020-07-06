@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
@@ -24,9 +25,8 @@ class SaveModel implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function __invoke($model, $args)
+    public function __invoke($model, $args): Model
     {
         // Extract $morphTo first, as MorphTo extends BelongsTo
         [$morphTo, $remaining] = ArgPartitioner::relationMethods(
@@ -41,8 +41,14 @@ class SaveModel implements ArgResolver
             BelongsTo::class
         );
 
+        $argsToFill = $remaining->toArray();
+
         // Use all the remaining attributes and fill the model
-        $model->forceFill($remaining->toArray());
+        if (config('lighthouse.force_fill')) {
+            $model->forceFill($argsToFill);
+        } else {
+            $model->fill($argsToFill);
+        }
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */

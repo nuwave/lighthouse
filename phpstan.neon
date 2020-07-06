@@ -3,7 +3,7 @@ includes:
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-  level: 5
+  level: 8
   paths:
   - benchmarks
   - src
@@ -26,14 +26,14 @@ parameters:
   - src/Schema/Factories/FieldFactory.php
   - src/Schema/AST/PartialParser.php
   - src/Schema/Directives/MiddlewareDirective.php
+
+  # As long as we support multiple Laravel versions at once, there will be some dead spots
+  reportUnmatchedIgnoredErrors: false
   ignoreErrors:
   # Some parts of Laravel are just really magical
-  - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched\(\)\.#'
-  - '#Call to protected static method get\(\) of class Illuminate\\Filesystem\\FilesystemManager\.#'
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - path: tests/database/factories/*
-    message: '#Undefined variable: \$factory#'
-  - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::find\(\)\.#'
+    message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
 
@@ -50,8 +50,6 @@ parameters:
   - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$name\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$directives\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$kind\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$name\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeSystemDefinitionNode::\$directives\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeDefinitionNode::\$name\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeExtensionNode::\$name\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
@@ -62,13 +60,10 @@ parameters:
   # Should work once we update to a version of graphql-php that has more accurate types
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\FieldDefinitionNode>\.#'
-  - '#Property GraphQL\\Language\\AST\\InputObjectTypeDefinitionNode::\$fields \(array<GraphQL\\Language\\AST\\InputValueDefinitionNode>\|null\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
-  - '#Property GraphQL\\Language\\AST\\ObjectTypeDefinitionNode::\$fields \(array<GraphQL\\Language\\AST\\FieldDefinitionNode>\|null\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
-  - '#Property GraphQL\\Language\\AST\\ObjectTypeDefinitionNode::\$interfaces \(array<GraphQL\\Language\\AST\\NamedTypeNode>\) does not accept GraphQL\\Language\\AST\\NodeList\.#'
+  - '#.* does not accept GraphQL\\Language\\AST\\NodeList.*#'
+  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList.*#'
   - '#Property GraphQL\\Language\\AST\\DocumentNode::\$definitions \(GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\DefinitionNode>\) does not accept array<GraphQL\\Language\\AST\\FragmentDefinitionNode>\.#'
   - '#Instanceof between GraphQL\\Language\\AST\\ListTypeNode\|GraphQL\\Language\\AST\\NameNode and GraphQL\\Language\\AST\\NamedTypeNode will always evaluate to false\.#'
-  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\Node>, GraphQL\\Language\\AST\\NodeList\|iterable<GraphQL\\Language\\AST\\Node> given\.#'
-  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\Node>, array<int, GraphQL\\Language\\AST\\DirectiveNode> given\.#'
 
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'
@@ -78,16 +73,13 @@ parameters:
 
   # Compatibility fix because Laravel moved the TestResponse class
   - '#.*TestResponse.*#'
+  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
 
   # We are monkeypatching ResolveInfo to pass information through resolver middleware
-  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$builder\.#'
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
   # This just has no type in root resolvers
   - '#Method .* has parameter \$root with no typehint specified\.#'
 
-  # TODO remove once we no longer need PartialParser
-  - '#Method Nuwave\\Lighthouse\\Schema\\AST\\PartialParser::.*\(\) should return GraphQL\\Language\\AST\\.* but returns GraphQL\\Language\\AST\\Node\.#'
-
-  # TODO remove once we no longer support PHPUnit 7
-  - '#Parameter \$invocationOrder of method Tests\\TestCase::mockResolverExpects\(\) has invalid typehint type PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder\.#'
+  # The typehint is defined in the trait UsesTestSchema
+  - '#Property .*::\$schema has no typehint specified\.#'

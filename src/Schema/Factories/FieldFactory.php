@@ -52,7 +52,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @return array Configuration array for a FieldDefinition
+     * @return array Configuration array for a \GraphQL\Type\Definition\FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {

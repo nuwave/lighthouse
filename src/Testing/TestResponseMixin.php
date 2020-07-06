@@ -6,10 +6,12 @@ use Closure;
 use PHPUnit\Framework\Assert;
 
 /**
- * @mixin \Illuminate\Foundation\Testing\TestResponse
+ * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
 {
+    const EXPECTED_VALIDATION_KEYS = 'Expected the query to return validation errors for specific fields.';
+
     public function assertGraphQLValidationError(): Closure
     {
         return function (string $key, ?string $message) {
@@ -36,10 +38,17 @@ class TestResponseMixin
         return function (array $keys) {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
+            Assert::assertNotNull($validation, self::EXPECTED_VALIDATION_KEYS);
+            /** @var array<string, mixed> $validation */
+            Assert::assertArrayHasKey('extensions', $validation);
+            $extensions = $validation['extensions'];
+
+            Assert::assertNotNull($extensions, self::EXPECTED_VALIDATION_KEYS);
+            /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
-                array_keys($validation['extensions']['validation']),
-                'Expected the query to return validation errors for specific fields.'
+                array_keys($extensions['validation']),
+                self::EXPECTED_VALIDATION_KEYS
             );
 
             return $this;
@@ -51,10 +60,7 @@ class TestResponseMixin
         return function () {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
-            Assert::assertNull(
-                $validation,
-                'Expected the query to have no validation errors.'
-            );
+            Assert::assertNull($validation, 'Expected the query to have no validation errors.');
 
             return $this;
         };
@@ -80,7 +86,13 @@ class TestResponseMixin
     public function jsonGet(): Closure
     {
         return function (string $key = null) {
-            return data_get($this->decodeResponseJson(), $key);
+            $json = $this->decodeResponseJson();
+
+            if ($key === null) {
+                return $json;
+            }
+
+            return data_get($json, $key);
         };
     }
 }

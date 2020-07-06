@@ -12,7 +12,7 @@ interface GraphQLRequest
     /**
      * Get the given variables for the query.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function variables(): array;
 

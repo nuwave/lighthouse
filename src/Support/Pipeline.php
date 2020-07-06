@@ -19,7 +19,7 @@ class Pipeline extends BasePipeline
      * @param  \Illuminate\Support\Collection<mixed>|array<mixed>  $pipes
      * @return $this
      */
-    public function through($pipes)
+    public function through($pipes): self
     {
         if ($pipes instanceof Collection) {
             $pipes = $pipes->all();

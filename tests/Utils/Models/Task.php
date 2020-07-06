@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $user_id
  * @property string $name
  * @property string|null $guard
+ * @property \Carbon\Carbon $completed_at
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  *
@@ -26,7 +27,7 @@ class Task extends Model
 {
     use SoftDeletes;
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
@@ -51,6 +52,11 @@ class Task extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->whereNotNull('completed_at');
+    }
+
     /**
      * @param  array<string, int>  $args
      */
@@ -70,9 +76,9 @@ class Task extends Model
     }
 
     /**
-     * @param  array<string>  $tags
+     * @param  iterable<string>  $tags
      */
-    public function scopeWhereTags(Builder $query, array $tags): Builder
+    public function scopeWhereTags(Builder $query, iterable $tags): Builder
     {
         return $query->whereHas('tags', function (Builder $query) use ($tags) {
             $query->whereIn('name', $tags);

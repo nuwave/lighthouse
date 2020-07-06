@@ -25,6 +25,7 @@ class ASTHelperTest extends TestCase
 
         $this->expectException(DefinitionException::class);
 
+        // @phpstan-ignore-next-line
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
             $objectType2->fields
@@ -47,6 +48,7 @@ class ASTHelperTest extends TestCase
         }
         ');
 
+        // @phpstan-ignore-next-line
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
             $objectType2->fields,

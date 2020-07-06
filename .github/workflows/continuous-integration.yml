@@ -45,6 +45,9 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: "composer remove --dev phpbench/phpbench --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
@@ -96,8 +99,8 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Remove PHPStan, it conflicts with old Laravel versions and is not needed here anyways"
-        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery --no-update"
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
@@ -139,6 +142,9 @@ jobs:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: "composer remove --dev phpbench/phpbench --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
