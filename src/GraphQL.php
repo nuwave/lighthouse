@@ -164,7 +164,7 @@ class GraphQL
         }
 
         foreach ($this->errorPool->errors() as $error) {
-            $result->errors []= $error;
+            $result->errors [] = $error;
         }
 
         $result->setErrorsHandler(
