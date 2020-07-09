@@ -3,6 +3,7 @@
 namespace Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -14,6 +15,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class Activity extends Model
 {
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
     protected $guarded = [];
 
     public function content(): MorphTo
@@ -21,7 +27,7 @@ class Activity extends Model
         return $this->morphTo();
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

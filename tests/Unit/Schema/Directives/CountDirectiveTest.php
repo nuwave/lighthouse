@@ -195,7 +195,7 @@ class CountDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testItCanCountPolyMorphicRelations()
+    public function testItCanCountPolyMorphicRelations(): void
     {
         if (AppVersion::below(5.7)) {
             $this->markTestSkipped('Version less than 5.7 do not support loadCount().');

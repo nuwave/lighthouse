@@ -91,10 +91,10 @@ abstract class BatchLoader
     /**
      * Schedule a result to be loaded.
      *
-     * @param  array<string>|string  $key
+     * @param  string  $key
      * @param  array<mixed>  $metaInfo
      */
-    public function load($key, array $metaInfo = []): Deferred
+    public function load(string $key, array $metaInfo = []): Deferred
     {
         $this->keys[$key] = $metaInfo;
 
