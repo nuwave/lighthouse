@@ -28,7 +28,7 @@ interface Operator
     public function defaultHasOperator(): string;
 
     /**
-     * The value of the default has operator
+     * The value of the default has operator.
      *
      * TODO: Find or create an easy way to get the real enum value from the enum options
      *

@@ -87,13 +87,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
     /**
      * @param QueryBuilder|EloquentBuilder $builder
-     * @param Model $model
-     * @param string $relation
      * @param array<string, mixed>|null $condition
-     * @param int|null $amount
-     * @param string|null $operator
      */
-    public function handleHasCondition( $builder, Model $model, string $relation, ?array $condition = null, ?int $amount = null, ?string $operator = null): void
+    public function handleHasCondition($builder, Model $model, string $relation, ?array $condition = null, ?int $amount = null, ?string $operator = null): void
     {
         /** @var int $amount */
         $amount = $amount ?? WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT;
