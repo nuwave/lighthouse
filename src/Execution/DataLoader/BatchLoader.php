@@ -91,7 +91,6 @@ abstract class BatchLoader
     /**
      * Schedule a result to be loaded.
      *
-     * @param  string  $key
      * @param  array<mixed>  $metaInfo
      */
     public function load(string $key, array $metaInfo = []): Deferred
