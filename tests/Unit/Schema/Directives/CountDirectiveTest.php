@@ -254,7 +254,7 @@ class CountDirectiveTest extends DBTestCase
                     ],
                     [
                         'id' => '3',
-                         'content' => [
+                        'content' => [
                             'id' => "{$task->id}",
                             'images_count' => $task->images->count(),
                         ],

@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
  *
  * For example: App\Model\Post:1
  */
-
 class ModelKey
 {
     public static function build(Model $model): string
