@@ -7,6 +7,7 @@ use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -63,7 +64,7 @@ abstract class WithRelationDirective extends BaseDirective
                 }
 
                 return $this->loader($resolveInfo)
-                    ->load("{$parent->getTable()}:{$parent->getKey()}", ['parent' => $parent])
+                    ->load(ModelKey::build($parent), ['parent' => $parent])
                     ->then(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
                         return $resolver($parent, $args, $context, $resolveInfo);
                     });

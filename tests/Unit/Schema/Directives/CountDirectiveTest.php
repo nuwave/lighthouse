@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -236,7 +235,7 @@ class CountDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->dump()->assertExactJson([
+        ')->assertExactJson([
             'data' => [
                 'activity' => [
                     [
