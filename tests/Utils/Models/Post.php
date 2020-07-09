@@ -30,6 +30,11 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function activity(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'content');
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);

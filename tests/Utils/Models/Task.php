@@ -37,6 +37,11 @@ class Task extends Model
         });
     }
 
+    public function activity(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'content');
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
