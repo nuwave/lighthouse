@@ -6,8 +6,6 @@ use GraphQL\Error\Error;
 
 class SQLOperator implements Operator
 {
-    public const GREATER_THAN_EQUALS = 'GTE';
-
     public static function missingValueForColumn(string $column): string
     {
         return "Did not receive a value to match the WhereConditions for column {$column}.";
@@ -66,6 +64,16 @@ GRAPHQL;
     public function default(): string
     {
         return 'EQ';
+    }
+
+    public function defaultHasOperator(): string
+    {
+        return 'GTE';
+    }
+
+    public function defaultHasOperatorValue(): string
+    {
+        return '>=';
     }
 
     public function applyConditions($builder, array $whereConditions, string $boolean)

@@ -43,7 +43,7 @@ SDL;
     /**
      * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
      * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder The modified builder.
+     * @return \Illuminate\Database\Eloquent\Builder The modified builder.
      */
     public function handleBuilder($builder, $whereConditions)
     {
@@ -52,15 +52,14 @@ SDL;
             return $builder;
         }
 
-        return $this->handleWhereConditions($builder, [
-            'HAS' => [
-                'relation'  => $this->getRelationName(),
-                // TODO: There should be a way to convert operator to its value from the code; WhereConditionsServiceProvider::DEFAULT_HAS_OPERATOR
-                'operator'  => '>=',
-                'amount'    => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
-                'condition' => $whereConditions,
-            ],
-        ]);
+        $this->handleHasCondition(
+            $builder,
+            $builder->getModel(),
+            $this->getRelationName(),
+            $whereConditions
+        );
+
+        return $builder;
     }
 
     /**

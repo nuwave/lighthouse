@@ -8,6 +8,7 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -65,27 +66,13 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         }
 
         if (($hasRelationConditions = $whereConditions['HAS'] ?? null) && $model) {
-            $builder->whereNested(
-                function ($builder) use ($hasRelationConditions, $model): void {
-                    $relation = $hasRelationConditions['relation'];
-                    $whereHasQuery = $model->whereHas(
-                        $relation,
-                        function ($builder) use ($relation, $hasRelationConditions, $model): void {
-                            if (array_key_exists('condition', $hasRelationConditions)) {
-                                $this->handleWhereConditions(
-                                    $builder,
-                                    $hasRelationConditions['condition'],
-                                    $this->nestedRelatedModel($model, $relation)
-                                );
-                            }
-                        },
-                        $hasRelationConditions['operator'],
-                        $hasRelationConditions['amount']
-                    );
-
-                    $builder->mergeWheres($whereHasQuery->getQuery()->wheres, $whereHasQuery->getBindings());
-                },
-                $boolean
+            $this->handleHasCondition(
+                $builder,
+                $model,
+                $hasRelationConditions['relation'],
+                $hasRelationConditions['condition'] ?? null,
+                $hasRelationConditions['amount'] ?? null,
+                $hasRelationConditions['operator'] ?? null
             );
         }
 
@@ -96,6 +83,44 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         }
 
         return $builder;
+    }
+
+    /**
+     * @param QueryBuilder|EloquentBuilder $builder
+     * @param Model $model
+     * @param string $relation
+     * @param array<string, mixed>|null $condition
+     * @param int|null $amount
+     * @param string|null $operator
+     */
+    public function handleHasCondition( $builder, Model $model, string $relation, ?array $condition = null, ?int $amount = null, ?string $operator = null): void
+    {
+        /** @var int $amount */
+        $amount = $amount ?? WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT;
+
+        /** @var string $operator */
+        $operator = $operator ?? app(Operator::class)->defaultHasOperatorValue();
+
+        $builder->whereNested(
+            function ($builder) use ($model, $relation, $condition, $amount, $operator): void {
+                $whereHasQuery = $model->whereHas(
+                    $relation,
+                    function ($builder) use ($relation, $model, $condition): void {
+                        if ($condition) {
+                            $this->handleWhereConditions(
+                                $builder,
+                                $condition,
+                                $this->nestedRelatedModel($model, $relation)
+                            );
+                        }
+                    },
+                    $operator,
+                    $amount
+                );
+
+                $builder->mergeWheres($whereHasQuery->getQuery()->wheres, $whereHasQuery->getBindings());
+            }
+        );
     }
 
     public static function invalidColumnName(string $column): string

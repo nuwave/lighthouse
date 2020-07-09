@@ -11,8 +11,6 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class WhereConditionsServiceProvider extends ServiceProvider
 {
-    public const DEFAULT_HAS_OPERATOR = SQLOperator::GREATER_THAN_EQUALS;
-
     public const DEFAULT_HAS_AMOUNT = 1;
 
     public const DEFAULT_WHERE_CONDITIONS = 'WhereConditions';
@@ -101,7 +99,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                 "A set of conditions that requires at least one condition to match."
                 OR: [$name!]
 
-                "A nested ord direct relation condition that create an amount criteria, and optionaly nested condition criteria."
+                "Check whether a relation exists, or if it matches a count criteria. And with option for a where clause."
                 HAS: $hasRelationInputName
             }
 GRAPHQL
@@ -111,12 +109,12 @@ GRAPHQL
     public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
     {
         $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
-        $defaultHasOperator = self::DEFAULT_HAS_OPERATOR;
-        $defaultHasAount = self::DEFAULT_HAS_AMOUNT;
+        $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
         $operatorName = self::operatorName($operator);
+        $operatorDefault = $operator->defaultHasOperator();
 
         return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
@@ -125,10 +123,10 @@ GRAPHQL
                 relation: String!
 
                 "The comparision operator to test against the amount."
-                operator: $operatorName = $defaultHasOperator
+                operator: $operatorName = $operatorDefault
 
                 "The amount to test."
-                amount: Int = $defaultHasAount
+                amount: Int = $defaultHasAmount
 
                 "Additional condition logic."
                 condition: $name
