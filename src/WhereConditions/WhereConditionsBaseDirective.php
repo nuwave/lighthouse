@@ -91,14 +91,18 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     public function handleHasCondition($builder, Model $model, string $relation, ?array $condition = null, ?int $amount = null, ?string $operator = null): void
     {
-        /** @var int $amount */
-        $amount = $amount ?? WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT;
+        $additionalArguments = [];
 
-        /** @var string $operator */
-        $operator = $operator ?? app(Operator::class)->defaultHasOperatorValue();
+        if ($operator) {
+            $additionalArguments[] = $operator;
+        }
+
+        if ($amount) {
+            $additionalArguments[] = $amount;
+        }
 
         $builder->whereNested(
-            function ($builder) use ($model, $relation, $condition, $amount, $operator): void {
+            function ($builder) use ($model, $relation, $condition, $additionalArguments): void {
                 $whereHasQuery = $model->whereHas(
                     $relation,
                     function ($builder) use ($relation, $model, $condition): void {
@@ -110,8 +114,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                             );
                         }
                     },
-                    $operator,
-                    $amount
+                    ...$additionalArguments
                 );
 
                 $builder->mergeWheres($whereHasQuery->getQuery()->wheres, $whereHasQuery->getBindings());
