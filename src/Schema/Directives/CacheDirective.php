@@ -9,7 +9,7 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
@@ -128,7 +128,7 @@ SDL;
     /**
      * Set node's cache key.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function setCacheKeyOnParent(TypeValue $typeValue): void
     {
@@ -169,7 +169,7 @@ SDL;
             }
         }
 
-        throw new DirectiveException(
+        throw new DefinitionException(
             "No @cacheKey or ID field defined on {$typeValue->getTypeDefinitionName()}"
         );
     }

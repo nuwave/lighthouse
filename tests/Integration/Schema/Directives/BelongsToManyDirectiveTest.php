@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -263,7 +263,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

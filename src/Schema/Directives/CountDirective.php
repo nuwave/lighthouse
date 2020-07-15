@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -57,7 +57,7 @@ SDL;
                         return $this->countModel($modelArg);
                     }
 
-                    throw new DirectiveException(
+                    throw new DefinitionException(
                         "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}"
                     );
                 }

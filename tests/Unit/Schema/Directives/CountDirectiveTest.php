@@ -3,7 +3,7 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Illuminate\Support\Facades\DB;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -35,7 +35,7 @@ class CountDirectiveTest extends DBTestCase
 
     public function testItRequiresARelationOrModelArgument(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
             tasks

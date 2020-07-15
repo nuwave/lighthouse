@@ -122,8 +122,6 @@ SDL;
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function addMiddlewareDirectiveToFields(&$objectType): void
     {
