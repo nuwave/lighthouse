@@ -44,7 +44,9 @@ class RelationCountBatchLoader extends BatchLoader
     }
 
     /**
-     * Get the parents from the keys that are present on the BatchLoader.
+     * Get the parent models from the keys that are present on the BatchLoader.
+     * Models are grouped by their fully qualified class name to prevent key
+     * collisions between different types of models.
      */
     protected function getParentModels(): Collection
     {
@@ -53,13 +55,12 @@ class RelationCountBatchLoader extends BatchLoader
                 return get_class($key['parent']);
             }, true)
             ->mapWithKeys(function ($keys) {
-                return (new EloquentCollection(
-                    $keys->map(function (array $meta) {
-                        return $meta['parent'];
-                    })
-                ))->loadCount([
-                    $this->relationName => $this->decorateBuilder,
-                ]);
+                $parentKeys = $keys->map(function (array $meta) {
+                    return $meta['parent'];
+                });
+
+                return (new EloquentCollection($parentKeys))
+                    ->loadCount([$this->relationName => $this->decorateBuilder]);
             });
     }
 }
