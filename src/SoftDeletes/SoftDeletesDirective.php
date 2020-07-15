@@ -34,6 +34,7 @@ Allows to filter if trashed elements should be fetched.
 trashed: Trashed @trashed
 SDL
         );
+        // @phpstan-ignore-next-line NodeList contravariance issue
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, [$softDeletesArgument]);
     }
 }

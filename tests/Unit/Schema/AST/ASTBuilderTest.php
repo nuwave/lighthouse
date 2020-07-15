@@ -43,10 +43,11 @@ class ASTBuilderTest extends TestCase
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
 
-        $this->assertCount(
-            3,
-            $queryType->fields
-        );
+        $fields = $queryType->fields;
+        $this->assertNotNull($fields);
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
+
+        $this->assertCount(3, $fields);
     }
 
     public function testAllowsExtendingUndefinedRootTypes(): void
@@ -68,24 +69,31 @@ class ASTBuilderTest extends TestCase
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
-        $this->assertCount(
-            1,
-            $queryType->fields
-        );
+
+        $queryFields = $queryType->fields;
+        $this->assertNotNull($queryFields);
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $queryFields */
+
+        $this->assertCount(1, $queryFields);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $mutationType */
         $mutationType = $documentAST->types[RootType::MUTATION];
-        $this->assertCount(
-            1,
-            $mutationType->fields
-        );
+
+
+        $mutationFields = $mutationType->fields;
+        $this->assertNotNull($mutationFields);
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $mutationFields */
+
+        $this->assertCount(1, $mutationFields);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $subscriptionType */
         $subscriptionType = $documentAST->types[RootType::SUBSCRIPTION];
-        $this->assertCount(
-            1,
-            $subscriptionType->fields
-        );
+
+        $subscriptionFields = $subscriptionType->fields;
+        $this->assertNotNull($subscriptionFields);
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $subscriptionFields */
+
+        $this->assertCount(1, $subscriptionFields);
     }
 
     public function testCanMergeInputExtensionFields(): void
@@ -107,10 +115,12 @@ class ASTBuilderTest extends TestCase
 
         /** @var \GraphQL\Language\AST\InputObjectTypeDefinitionNode $inputs */
         $inputs = $documentAST->types['Inputs'];
-        $this->assertCount(
-            3,
-            $inputs->fields
-        );
+
+        $fields = $inputs->fields;
+        $this->assertNotNull($fields);
+        /** @var array<\GraphQL\Language\AST\InputValueDefinitionNode> $fields */
+
+        $this->assertCount(3, $fields);
     }
 
     public function testCanMergeInterfaceExtensionFields(): void
@@ -132,7 +142,12 @@ class ASTBuilderTest extends TestCase
 
         /** @var \GraphQL\Language\AST\InterfaceTypeDefinitionNode $named */
         $named = $documentAST->types['Named'];
-        $this->assertCount(3, $named->fields);
+
+        $fields = $named->fields;
+        $this->assertNotNull($fields);
+        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
+
+        $this->assertCount(3, $fields);
     }
 
     public function testCanMergeEnumExtensionFields(): void
@@ -155,7 +170,12 @@ class ASTBuilderTest extends TestCase
 
         /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode $myEnum */
         $myEnum = $documentAST->types['MyEnum'];
-        $this->assertCount(4, $myEnum->values);
+
+        $values = $myEnum->values;
+        $this->assertNotNull($values);
+        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\EnumValueDefinitionNode> $values */
+
+        $this->assertCount(4, $values);
     }
 
     public function testDoesNotAllowExtendingUndefinedTypes(): void

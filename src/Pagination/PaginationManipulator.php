@@ -125,6 +125,7 @@ GRAPHQL
             Parser::inputValueDefinition($afterArgumentDefinition),
         ];
 
+        // @phpstan-ignore-next-line NodeList contravariance issue
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = Parser::namedType($connectionTypeName);
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
@@ -151,6 +152,7 @@ GRAPHQL
         }
 
         if ($this->modelClass) {
+            // @phpstan-ignore-next-line NodeList contravariance issue
             $objectType->directives = ASTHelper::mergeNodeList(
                 $objectType->directives,
                 [Parser::constDirective('@modelClass(class: "'.addslashes($this->modelClass).'")')]
@@ -193,6 +195,7 @@ GRAPHQL
             Parser::inputValueDefinition($pageArgumentDefinition),
         ];
 
+        // @phpstan-ignore-next-line NodeList contravariance issue
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
         $fieldDefinition->type = Parser::namedType($paginatorTypeName);
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable

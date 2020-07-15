@@ -150,16 +150,12 @@ class ASTHelper
     /**
      * Return the PHP internal value of an arguments default value.
      *
-     * @param  \GraphQL\Language\AST\VariableNode|\GraphQL\Language\AST\NullValueNode|\GraphQL\Language\AST\IntValueNode|\GraphQL\Language\AST\FloatValueNode|\GraphQL\Language\AST\StringValueNode|\GraphQL\Language\AST\BooleanValueNode|\GraphQL\Language\AST\EnumValueNode|\GraphQL\Language\AST\ListValueNode|\GraphQL\Language\AST\ObjectValueNode|null  $defaultValue
+     * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
      * @return mixed The plain PHP value.
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
-        if ($defaultValue instanceof NullValueNode) {
-            return;
-        }
-
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
@@ -171,7 +167,7 @@ class ASTHelper
             return $internalValue->value;
         }
 
-        return AST::valueFromAST($defaultValue, $argumentType);
+        return AST::valueFromAST($defaultValue, $argumentType); // @phpstan-ignore-line Inaccurate type in graphql-php
     }
 
     /**

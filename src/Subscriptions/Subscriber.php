@@ -96,12 +96,12 @@ class Subscriber implements Serializable
         $this->args = $args;
         $this->context = $context;
 
-        $documentNode = new DocumentNode([]);
-        $documentNode->definitions = new NodeList([
-            $resolveInfo->fragments,
-            $operation,
+        $this->query = new DocumentNode([
+            'definitions' => new NodeList(array_merge(
+                $resolveInfo->fragments,
+                [$operation]
+            ))
         ]);
-        $this->query = $documentNode;
     }
 
     /**
