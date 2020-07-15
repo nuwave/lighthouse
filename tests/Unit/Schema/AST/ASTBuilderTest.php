@@ -46,7 +46,6 @@ class ASTBuilderTest extends TestCase
         $fields = $queryType->fields;
         $this->assertNotNull($fields);
         /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-
         $this->assertCount(3, $fields);
     }
 
@@ -73,17 +72,14 @@ class ASTBuilderTest extends TestCase
         $queryFields = $queryType->fields;
         $this->assertNotNull($queryFields);
         /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $queryFields */
-
         $this->assertCount(1, $queryFields);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $mutationType */
         $mutationType = $documentAST->types[RootType::MUTATION];
 
-
         $mutationFields = $mutationType->fields;
         $this->assertNotNull($mutationFields);
         /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $mutationFields */
-
         $this->assertCount(1, $mutationFields);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $subscriptionType */
@@ -92,7 +88,6 @@ class ASTBuilderTest extends TestCase
         $subscriptionFields = $subscriptionType->fields;
         $this->assertNotNull($subscriptionFields);
         /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $subscriptionFields */
-
         $this->assertCount(1, $subscriptionFields);
     }
 
@@ -119,7 +114,6 @@ class ASTBuilderTest extends TestCase
         $fields = $inputs->fields;
         $this->assertNotNull($fields);
         /** @var array<\GraphQL\Language\AST\InputValueDefinitionNode> $fields */
-
         $this->assertCount(3, $fields);
     }
 
@@ -146,7 +140,6 @@ class ASTBuilderTest extends TestCase
         $fields = $named->fields;
         $this->assertNotNull($fields);
         /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-
         $this->assertCount(3, $fields);
     }
 
@@ -174,7 +167,6 @@ class ASTBuilderTest extends TestCase
         $values = $myEnum->values;
         $this->assertNotNull($values);
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\EnumValueDefinitionNode> $values */
-
         $this->assertCount(4, $values);
     }
 

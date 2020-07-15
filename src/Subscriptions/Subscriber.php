@@ -100,7 +100,7 @@ class Subscriber implements Serializable
             'definitions' => new NodeList(array_merge(
                 $resolveInfo->fragments,
                 [$operation]
-            ))
+            )),
         ]);
     }
 
