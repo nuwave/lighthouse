@@ -110,6 +110,9 @@ class RelationBatchLoaderTest extends DBTestCase
         $this->assertSame($expectedQueryCount, $queryCount);
     }
 
+    /**
+     * @return array<array<bool|int>>
+     */
     public function batchloadRelationsSetting(): array
     {
         return [

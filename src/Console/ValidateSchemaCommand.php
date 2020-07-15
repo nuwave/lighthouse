@@ -3,33 +3,25 @@
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\GraphQL;
 
 class ValidateSchemaCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'lighthouse:validate-schema';
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    protected $name = 'lighthouse:validate-schema';
+
     protected $description = 'Validate the GraphQL schema definition.';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(Repository $cache, GraphQL $graphQL): void
+    public function handle(CacheRepository $cache, ConfigRepository $config, GraphQL $graphQL): void
     {
         // Clear the cache so this always validates the current schema
-        $cache->forget(config('lighthouse.cache.key'));
+        $cache->forget(
+            $config->get('lighthouse.cache.key')
+        );
 
-        $graphQL->prepSchema()->assertValid();
+        $schema = $graphQL->prepSchema();
+        $schema->assertValid();
 
         $this->info('The defined schema is valid.');
     }

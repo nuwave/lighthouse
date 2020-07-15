@@ -14,7 +14,7 @@ class EventDirectiveTest extends DBTestCase
             CompanyWasCreatedEvent::class,
         ]);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Company {
             id: ID!
             name: String!
@@ -26,7 +26,7 @@ class EventDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createCompany(name: "foo") {
                 id

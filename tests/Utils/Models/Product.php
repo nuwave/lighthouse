@@ -35,6 +35,9 @@ class Product extends Model
     // Usually this is placed on traits
     // This is not related to Lighthouse
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getKey(): array
     {
         $attributes = [];

@@ -16,6 +16,7 @@ For convenience, common tasks are wrapped up in the [Makefile](Makefile) for usa
 
 Just clone the project and run the following in the project root:
 
+    make setup
     make
 
 To see the available commands, run:

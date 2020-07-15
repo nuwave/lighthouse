@@ -17,15 +17,21 @@ class MemoryStream extends Stream implements CanStreamResponse
     {
         if (! empty($paths)) {
             $data = (new Collection($paths))
-                ->mapWithKeys(function (string $path) use ($data): array {
-                    $response['data'] = Arr::get($data, "data.{$path}", []);
-                    $errors = $this->chunkError($path, $data);
-                    if (! empty($errors)) {
-                        $response['errors'] = $errors;
-                    }
+                ->mapWithKeys(
+                    /**
+                     * @return array<string, array<string, mixed>>
+                     */
+                    function (string $path) use ($data): array {
+                        $response = ['data' => Arr::get($data, "data.{$path}", [])];
 
-                    return [$path => $response];
-                })
+                        $errors = $this->chunkError($path, $data);
+                        if (! empty($errors)) {
+                            $response['errors'] = $errors;
+                        }
+
+                        return [$path => $response];
+                    }
+                )
                 ->all();
         }
 

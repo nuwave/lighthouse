@@ -48,10 +48,10 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
 
-  You may pass the string as a dot notation to search in a array.
+  You may pass the string in dot notation to use nested inputs.
   """
   find: String
 
@@ -102,7 +102,8 @@ SDL;
     }
 
     /**
-     * @return iterable<Model|string>
+     * @param  array<string, mixed>  $args
+     * @return iterable<\Illuminate\Database\Eloquent\Model|string>
      *
      * @throws \GraphQL\Error\Error
      */
@@ -114,7 +115,6 @@ SDL;
                 throw new Error(self::missingKeyToFindModel($find));
             }
 
-            /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
@@ -134,13 +134,17 @@ SDL;
             }
 
             try {
-                $modelOrModels = $argumentSet
-                    ->enhanceBuilder(
-                        $queryBuilder,
-                        [],
-                        Utils::instanceofMatcher(TrashedDirective::class)
-                    )
-                    ->findOrFail($findValue);
+                /**
+                 * TODO use generics.
+                 * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
+                 */
+                $enhancedBuilder = $argumentSet->enhanceBuilder(
+                    $queryBuilder,
+                    [],
+                    Utils::instanceofMatcher(TrashedDirective::class)
+                );
+
+                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {
                 throw new Error($exception->getMessage());
             }
@@ -163,6 +167,7 @@ SDL;
     /**
      * @param  string|string[]  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
+     * @param  array<mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -182,7 +187,8 @@ SDL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @return mixed[]
+     * @param  array<mixed>  $args
+     * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
     {

@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\Validator;
 use Laravel\Lumen\Application as LumenApplication;
+use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\DirectiveCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
@@ -61,7 +62,7 @@ class LighthouseServiceProvider extends ServiceProvider
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__.'/lighthouse.php' => $this->app->make('path.config').'/lighthouse.php',
+            __DIR__.'/lighthouse.php' => $this->app->configPath().'/lighthouse.php',
         ], 'config');
 
         $this->publishes([
@@ -118,10 +119,9 @@ class LighthouseServiceProvider extends ServiceProvider
             /** @var \Illuminate\Http\Request $request */
             $request = $app->make('request');
 
-            $isMultipartFormRequest = Str::startsWith(
-                $request->header('Content-Type'),
-                'multipart/form-data'
-            );
+            /** @var string $contentType */
+            $contentType = $request->header('Content-Type') ?? '';
+            $isMultipartFormRequest = Str::startsWith($contentType, 'multipart/form-data');
 
             return $isMultipartFormRequest
                 ? new MultipartFormRequest($request)
@@ -165,6 +165,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                CacheCommand::class,
                 ClearCacheCommand::class,
                 DirectiveCommand::class,
                 IdeHelperCommand::class,

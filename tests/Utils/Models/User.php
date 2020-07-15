@@ -22,14 +22,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property \Carbon\Carbon $updated_at
  *
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
  */
 class User extends Authenticatable
 {
-    /**
-     * @var mixed[]
-     */
-    protected $guarded = [];
-
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -74,7 +70,7 @@ class User extends Authenticatable
         });
     }
 
-    public function getCompanyNameAttribute()
+    public function getCompanyNameAttribute(): string
     {
         return $this->company->name;
     }
@@ -87,6 +83,11 @@ class User extends Authenticatable
     public function tasksLoaded(): bool
     {
         return $this->relationLoaded('tasks');
+    }
+
+    public function tasksCountLoaded(): bool
+    {
+        return isset($this->attributes['tasks_count']);
     }
 
     public function postsCommentsLoaded(): bool

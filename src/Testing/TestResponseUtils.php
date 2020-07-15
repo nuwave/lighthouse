@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Exceptions\ValidationException;
 class TestResponseUtils
 {
     /**
-     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $response
+     * @param  \Illuminate\Testing\TestResponse  $response
      */
     public static function extractValidationErrors($response): ?array
     {

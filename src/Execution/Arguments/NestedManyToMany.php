@@ -20,9 +20,8 @@ class NestedManyToMany implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
         $relation = $parent->{$this->relationName}();

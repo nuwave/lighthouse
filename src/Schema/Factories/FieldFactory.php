@@ -101,7 +101,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @return array Configuration array for a FieldDefinition
+     * @return array Configuration array for a \GraphQL\Type\Definition\FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
@@ -332,16 +332,26 @@ class FieldFactory
         return $validators;
     }
 
+    /**
+     * @param  string[]  $argumentPath
+     */
     protected function argValueExists(array $argumentPath): bool
     {
         return Arr::has($this->args, implode('.', $argumentPath));
     }
 
+    /**
+     * @param  string[]  $argumentPath
+     * @return mixed[]
+     */
     protected function setArgValue(array $argumentPath, $value): array
     {
         return Arr::set($this->args, implode('.', $argumentPath), $value);
     }
 
+    /**
+     * @param  string[]  $argumentPath
+     */
     protected function argValue(array $argumentPath)
     {
         return Arr::get($this->args, implode('.', $argumentPath));

@@ -18,9 +18,6 @@ class BroadcastManagerTest extends SubscriptionTestCase
      */
     protected $broadcastManager;
 
-    /**
-     * Set up test environment.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -59,7 +56,6 @@ class BroadcastManagerTest extends SubscriptionTestCase
 
             public function broadcast(Subscriber $subscriber, array $data)
             {
-                //
             }
         };
 

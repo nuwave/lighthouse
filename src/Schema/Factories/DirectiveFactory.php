@@ -154,7 +154,7 @@ class DirectiveFactory
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
-     * @return \Illuminate\Support\Collection of type <$directiveClass>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> of type <$directiveClass>
      */
     public function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
@@ -188,6 +188,7 @@ class DirectiveFactory
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
+     * TODO rename to exclusiveDirective
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
@@ -196,10 +197,14 @@ class DirectiveFactory
         $directives = $this->createAssociatedDirectivesOfType($node, $directiveClass);
 
         if ($directives->count() > 1) {
-            $directiveNames = $directives->implode(', ');
+            $directiveNames = $directives
+                ->map(function (Directive $directive): string {
+                    return '@'.$directive->name();
+                })
+                ->implode(', ');
 
             throw new DirectiveException(
-                "Node [{$node->name->value}] can only have one directive of type [{$directiveClass}] but found [{$directiveNames}]"
+                "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."
             );
         }
 

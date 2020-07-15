@@ -20,6 +20,7 @@ class CreateTestbenchTasksTable extends Migration
 
             $table->unsignedInteger('user_id')->nullable();
 
+            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

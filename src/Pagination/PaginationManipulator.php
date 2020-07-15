@@ -126,6 +126,7 @@ GRAPHQL
 
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
     }
 
@@ -186,6 +187,7 @@ GRAPHQL
 
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
     }
 

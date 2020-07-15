@@ -27,7 +27,7 @@ class TestSchemaProvider implements SchemaSourceProvider
     /**
      * Set schema root path.
      *
-     * @return \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
+     * @return $this
      */
     public function setRootPath(string $path)
     {

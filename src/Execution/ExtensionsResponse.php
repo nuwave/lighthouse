@@ -16,10 +16,13 @@ class ExtensionsResponse
     protected $key;
 
     /**
-     * JSON-encodable content of the extension.
+     * @var mixed JSON-encodable content of the extension.
      */
     protected $content;
 
+    /**
+     * @param  mixed  $content JSON-encodable content
+     */
     public function __construct(string $key, $content)
     {
         $this->key = $key;
@@ -35,7 +38,7 @@ class ExtensionsResponse
     }
 
     /**
-     * Return the JSON-encodable content of the extension.
+     * @return mixed JSON-encodable content of the extension.
      */
     public function content()
     {

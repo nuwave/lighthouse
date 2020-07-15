@@ -18,29 +18,16 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
  */
 class GlobalId implements GlobalIdContract
 {
-    /**
-     * Glue together a type and an id to create a global id.
-     *
-     * @param  string|int  $id
-     */
     public function encode(string $type, $id): string
     {
         return base64_encode($type.':'.$id);
     }
 
-    /**
-     * Split a global id into the type and the id it contains.
-     *
-     * @return array Contains [$type, $id], e.g. ['User', '123']
-     */
     public function decode(string $globalID): array
     {
         return explode(':', base64_decode($globalID));
     }
 
-    /**
-     * Decode the Global ID and get just the ID.
-     */
     public function decodeID(string $globalID): string
     {
         [$type, $id] = self::decode($globalID);
@@ -48,9 +35,6 @@ class GlobalId implements GlobalIdContract
         return trim($id);
     }
 
-    /**
-     * Decode the Global ID and get just the type.
-     */
     public function decodeType(string $globalID): string
     {
         [$type, $id] = self::decode($globalID);

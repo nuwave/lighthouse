@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\QueryException;
+use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
 use Tests\Utils\Models\Company;
@@ -48,7 +49,7 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('bar', Company::first()->name);
+        $this->assertSame('bar', Company::firstOrFail()->name);
     }
 
     public function testCanUpdateFromInputObject(): void
@@ -73,7 +74,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateCompany(input: {
                 id: 1
@@ -92,7 +93,34 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('bar', Company::first()->name);
+        $this->assertSame('bar', Company::firstOrFail()->name);
+    }
+
+    public function testThrowsWhenMissingPrimaryKey(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+        }
+
+        type Mutation {
+            updateCompany: Company @update
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateCompany {
+                id
+            }
+        }
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE,
+                ],
+            ],
+        ]);
     }
 
     public function testCanUpdateWithCustomPrimaryKey(): void
@@ -113,7 +141,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateCategory(
                 category_id: 1
@@ -132,7 +160,47 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('bar', Category::first()->name);
+        $this->assertSame('bar', Category::firstOrFail()->name);
+    }
+
+    public function testCanUpdateWithCustomPrimaryKeyAsId(): void
+    {
+        factory(Category::class)->create(['name' => 'foo']);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Category {
+            id: ID! @rename(attribute: "category_id")
+            name: String!
+        }
+
+        type Mutation {
+            updateCategory(
+                id: ID!
+                name: String
+            ): Category @update
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateCategory(
+                id: 1
+                name: "bar"
+            ) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateCategory' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('bar', Category::firstOrFail()->name);
     }
 
     public function testDoesNotUpdateWithFailingRelationship(): void
@@ -192,7 +260,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertSame('Original', User::first()->name);
+        $this->assertSame('Original', User::firstOrFail()->name);
     }
 
     public function testNestedArgResolver(): void

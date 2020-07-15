@@ -326,8 +326,8 @@ type Query {
 The way that Lighthouse knows how to resolve the queries is a combination of convention-based
 naming - the type name `Post` is also the name of our Model - and the use of server-side directives.
 
-- [`@all`](../master/api-reference/directives.md#all) returns a list of all `Post` models
-- [`@find`](../master/api-reference/directives.md#find) and [`@eq`](../master/api-reference/directives.md#eq)
+- [@all](../master/api-reference/directives.md#all) returns a list of all `Post` models
+- [@find](../master/api-reference/directives.md#find) and [@eq](../master/api-reference/directives.md#eq)
   are combined to retrieve a single `Post` by its ID
 
 We add additional type definitions that clearly define the shape of our data:
@@ -358,7 +358,7 @@ type Comment {
 ```
 
 Just like in Eloquent, we express the relationship between our types using the
-[`@belongsTo`](../master/api-reference/directives.md#belongsto) and [`@hasMany`](../master/api-reference/directives.md#hasmany) directives.
+[@belongsTo](../master/api-reference/directives.md#belongsto) and [@hasMany](../master/api-reference/directives.md#hasmany) directives.
 
 ## The Result
 

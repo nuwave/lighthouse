@@ -58,7 +58,7 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Use a particular guard to retreive the user.
+  Use a particular guard to retrieve the user.
   """
   guard: String
 ) on FIELD_DEFINITION
@@ -450,10 +450,8 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
-
-  You may pass the string as a dot notation to search in a array.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
   """
   find: String
 
@@ -1855,8 +1853,10 @@ directive @orderBy(
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
+
+**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
 
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
@@ -1948,7 +1948,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ field: "postedAt", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
     title
   }
 }
