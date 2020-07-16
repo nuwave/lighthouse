@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $activity_type
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Tests\Utils\Models\User $user
  */
 class Activity extends Model
 {
