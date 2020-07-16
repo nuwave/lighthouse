@@ -47,14 +47,16 @@ class RelationCountBatchLoader extends BatchLoader
      * Get the parent models from the keys that are present on the BatchLoader.
      * Models are grouped by their fully qualified class name to prevent key
      * collisions between different types of models.
+     *
+     * @return Collection<Model>
      */
     protected function getParentModels(): Collection
     {
         return Collection::make($this->keys)
-            ->groupBy(function ($key) {
+            ->groupBy(function (array $key) {
                 return get_class($key['parent']);
             }, true)
-            ->mapWithKeys(function ($keys) {
+            ->mapWithKeys(function (Collection $keys) {
                 $parentKeys = $keys->map(function (array $meta) {
                     return $meta['parent'];
                 });
