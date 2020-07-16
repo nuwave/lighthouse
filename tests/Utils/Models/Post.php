@@ -19,6 +19,8 @@ use Laravel\Scout\Searchable;
  * @property int|null $parent_id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Tests\Utils\Models\Activity $activity
  */
 class Post extends Model
 {

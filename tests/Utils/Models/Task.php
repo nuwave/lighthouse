@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ * @property-read \Tests\Utils\Models\Activity $activity
  */
 class Task extends Model
 {

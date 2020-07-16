@@ -23,7 +23,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  *
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
- * @property-read \Tests\Utils\Models\Activity $activity
  */
 class User extends Authenticatable
 {
