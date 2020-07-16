@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -205,17 +206,23 @@ class CountDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         /** @var \Tests\Utils\Models\Post $post1 */
         $post1 = factory(Post::class)->create(['user_id' => $user->getKey()]);
-        $post1->activity()->create(['user_id' => $user->getKey()]);
+        $post1->activity()->save(
+            factory(Activity::class)->make(['user_id' => $user->getKey()])
+        );
         $post1->images()->saveMany(factory(Image::class, 3)->make());
 
         /** @var \Tests\Utils\Models\Post $post2 */
         $post2 = factory(Post::class)->create(['user_id' => $user->getKey()]);
-        $post2->activity()->create(['user_id' => $user->getKey()]);
+        $post2->activity()->save(
+            factory(Activity::class)->make(['user_id' => $user->getKey()])
+        );
         $post2->images()->saveMany(factory(Image::class, 2)->make());
 
         /** @var \Tests\Utils\Models\Task $task */
         $task = $post1->task;
-        $task->activity()->create(['user_id' => $user->getKey()]);
+        $task->activity()->save(
+            factory(Activity::class)->make(['user_id' => $user->getKey()])
+        );
         $task->images()->saveMany(factory(Image::class, 4)->make());
 
         $this->graphQL(/** @lang GraphQL */ '
