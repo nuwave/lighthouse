@@ -23,6 +23,6 @@ class ModelKeyTest extends TestCase
         $product->barcode = '123';
         $product->uuid = 'abc';
 
-        $this->assertSame('Tests\Utils\Models\User:123:abc', ModelKey::build($product));
+        $this->assertSame('Tests\Utils\Models\Product:123:abc', ModelKey::build($product));
     }
 }
