@@ -13,17 +13,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  *
+ * Relations
+ * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content
  * @property-read \Tests\Utils\Models\User $user
  */
 class Activity extends Model
 {
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array<string>
-     */
-    protected $guarded = [];
-
     public function content(): MorphTo
     {
         return $this->morphTo();
