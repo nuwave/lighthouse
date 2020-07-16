@@ -10,15 +10,14 @@ class CreateTestbenchActivitiesTable extends Migration
     {
         Schema::create('activities', function (Blueprint $table): void {
             $table->increments('id');
-            $table->bigInteger('user_id');
+
+            $table->unsignedInteger('user_id');
             $table->morphs('content');
+
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('activities');

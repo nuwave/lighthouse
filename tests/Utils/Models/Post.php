@@ -20,7 +20,14 @@ use Laravel\Scout\Searchable;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  *
- * @property-read \Tests\Utils\Models\Activity $activity
+ * @property-read \Tests\Utils\Models\User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Activity> $activity
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Comment> $comments
+ * @property-read \Tests\Utils\Models\Task $task
+ * @property-read \Tests\Utils\Models\Post $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $children
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
  */
 class Post extends Model
 {

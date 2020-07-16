@@ -7,20 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Create a model key that concatenates the models fully-qualified class
  * name and key or composite key.
- *
- * For example: App\Model\Post:1
  */
 class ModelKey
 {
     public static function build(Model $model): string
     {
-        $key = $model->getKey();
-
-        $modelKey = array_merge(
-            [get_class($model)],
-            is_array($key) ? $key : [$key]
+        return implode(
+            ':',
+            array_merge(
+                [get_class($model)],
+                // Might be one or more keys
+                (array) ($model->getKey())
+            )
         );
-
-        return implode(':', $modelKey);
     }
 }
