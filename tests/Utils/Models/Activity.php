@@ -19,13 +19,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class Activity extends Model
 {
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array<string>
-     */
-    protected $guarded = [];
-
     public function content(): MorphTo
     {
         return $this->morphTo();
