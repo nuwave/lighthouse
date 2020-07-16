@@ -51,9 +51,12 @@ class RelationCountBatchLoader extends BatchLoader
     protected function getParentModels(): Collection
     {
         return (new Collection($this->keys))
-            ->groupBy(function ($key) {
-                return get_class($key['parent']);
-            }, true)
+            ->groupBy(
+                static function (array $key): string {
+                    return get_class($key['parent']);
+                },
+                true
+            )
             ->mapWithKeys(function ($keys) {
                 $parentKeys = $keys->map(function (array $meta) {
                     return $meta['parent'];
