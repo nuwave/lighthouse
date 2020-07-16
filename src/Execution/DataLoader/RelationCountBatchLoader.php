@@ -48,7 +48,7 @@ class RelationCountBatchLoader extends BatchLoader
      * Models are grouped by their fully qualified class name to prevent key
      * collisions between different types of models.
      *
-     * @return Collection<\Illuminate\Database\Eloquent\Model>
+     * @return Collection<mixed>
      */
     protected function getParentModels(): Collection
     {
