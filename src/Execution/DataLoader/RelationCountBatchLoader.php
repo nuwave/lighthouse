@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 
 class RelationCountBatchLoader extends BatchLoader
 {
@@ -39,23 +40,32 @@ class RelationCountBatchLoader extends BatchLoader
      */
     public function resolve(): array
     {
-        return $this->getParentModels()
-            ->loadCount([$this->relationName => $this->decorateBuilder])
-            ->all();
+        return $this->getParentModels()->all();
     }
 
     /**
-     * Get the parents from the keys that are present on the BatchLoader.
+     * Get the parent models from the keys that are present on the BatchLoader.
+     * Models are grouped by their fully qualified class name to prevent key
+     * collisions between different types of models.
+     *
+     * @return Collection<mixed>
      */
-    protected function getParentModels(): EloquentCollection
+    protected function getParentModels(): Collection
     {
-        return new EloquentCollection(
-            array_map(
-                function (array $meta) {
-                    return $meta['parent'];
+        return (new Collection($this->keys))
+            ->groupBy(
+                static function (array $key): string {
+                    return get_class($key['parent']);
                 },
-                $this->keys
+                true
             )
-        );
+            ->mapWithKeys(function (Collection $keys) {
+                $parentKeys = $keys->map(function (array $meta) {
+                    return $meta['parent'];
+                });
+
+                return (new EloquentCollection($parentKeys))
+                    ->loadCount([$this->relationName => $this->decorateBuilder]);
+            });
     }
 }

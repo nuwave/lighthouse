@@ -19,6 +19,8 @@ use Laravel\Scout\Searchable;
  * @property int|null $parent_id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Tests\Utils\Models\Activity $activity
  */
 class Post extends Model
 {
@@ -28,6 +30,11 @@ class Post extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function activity(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'content');
     }
 
     public function comments(): HasMany
