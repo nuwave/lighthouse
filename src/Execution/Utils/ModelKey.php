@@ -3,8 +3,6 @@
 namespace Nuwave\Lighthouse\Execution\Utils;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 /**
  * Create a model key that concatenates the models fully-qualified class
