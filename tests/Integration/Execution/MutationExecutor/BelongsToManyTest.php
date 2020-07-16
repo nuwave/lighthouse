@@ -21,6 +21,30 @@ class BelongsToManyTest extends DBTestCase
         id: ID!
         name: String
         roles: [Role!] @belongsToMany
+        lead: CreateLeadHasOne!
+        
+    }
+    input CreateLeadInput {
+        abid: String
+        relation: LeadRelation
+        referral_name: String
+        first_touch_type: LeadFirstTouchType
+        tasks: CreateTaskBelongsToMany @belongsToMany
+    }
+    
+    input CreateLeadHasOne {
+    create: CreateLeadInput
+    }
+
+    input CreateTaskBelongsToMany {
+        connect: [CreateTaskInput]
+    }
+
+    input CreateTaskInput {
+        agent_id: Int!
+        task_id: Int!
+        started_at: DateTime
+        notes: String
     }
 
     type UserRolePivot {
@@ -1095,5 +1119,37 @@ GRAPHQL
                 ],
             ],
         ]);
+    }
+    
+    public function testCanCreateAndConnectWithHasToManyNestedMutation(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '
+       mutation
+        {
+          createUser(input: {
+          parent_id: 1
+            firstname: "last"
+            email: "abc@gmaiol.com"
+            source: ADMIN
+            lead:
+            {
+              create: { 
+                 relation: FAMILY_FRIEND
+               tasks:
+                {
+                  connect:
+                  {
+                    agent_id: 1
+                    task_id: 1
+                  }
+                } 
+              }
+            }
+          })
+          {
+            id
+          }
+        }
+        ');
     }
 }
