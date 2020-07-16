@@ -98,4 +98,11 @@ class User extends Authenticatable
                 ->first()
                 ->relationLoaded('comments');
     }
+     /**
+     * Get the 'lead' record associated with the user.
+     */
+    public function lead() : HasOne
+    {
+        return $this->hasOne(Lead::class);
+    }
 }
