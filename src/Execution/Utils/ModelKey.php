@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Utils;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -15,8 +16,13 @@ class ModelKey
 {
     public static function build(Model $model): string
     {
-        return Collection::make([get_class($model)])
-            ->concat(Collection::wrap($model->getKey()))
-            ->implode(':');
+        $key = $model->getKey();
+
+        $modelKey = array_merge(
+            [get_class($model)],
+            is_array($key) ? $key : [$key]
+        );
+
+        return implode(':', $modelKey);
     }
 }
