@@ -15,7 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add middleware `\Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
   GraphQL query https://github.com/nuwave/lighthouse/pull/1454
 - Allow custom query validation rules selection by rebinding the interface
-  `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules`
+  `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` https://github.com/nuwave/lighthouse/pull/1487
 
 ### Fixed
 
