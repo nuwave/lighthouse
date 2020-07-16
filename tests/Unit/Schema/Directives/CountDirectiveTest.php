@@ -196,7 +196,7 @@ class CountDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testItCanCountPolyMorphicRelations(): void
+    public function testItCanCountPolymorphicRelations(): void
     {
         if (AppVersion::below(5.7)) {
             $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
@@ -204,32 +204,54 @@ class CountDirectiveTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+
         /** @var \Tests\Utils\Models\Post $post1 */
-        $post1 = factory(Post::class)->create(['user_id' => $user->getKey()]);
-        $post1->activity()->save(
-            factory(Activity::class)->make(['user_id' => $user->getKey()])
-        );
-        $post1->images()->saveMany(factory(Image::class, 3)->make());
+        $post1 = factory(Post::class)->make();
+        $user->posts()->save($post1);
+
+        /** @var \Tests\Utils\Models\Activity $activity1 */
+        $activity1 = factory(Activity::class)->make();
+        $activity1->user()->associate($user);
+        $post1->activity()->save($activity1);
+
+        $post1->images()
+            ->saveMany(
+                factory(Image::class, 3)->make()
+            );
 
         /** @var \Tests\Utils\Models\Post $post2 */
-        $post2 = factory(Post::class)->create(['user_id' => $user->getKey()]);
-        $post2->activity()->save(
-            factory(Activity::class)->make(['user_id' => $user->getKey()])
-        );
-        $post2->images()->saveMany(factory(Image::class, 2)->make());
+        $post2 = factory(Post::class)->make();
+        $user->posts()->save($post2);
 
-        /** @var \Tests\Utils\Models\Task $task */
+        /** @var \Tests\Utils\Models\Activity $activity2 */
+        $activity2 = factory(Activity::class)->make();
+        $activity2->user()->associate($user);
+        $post2->activity()->save($activity2);
+
+        $post2->images()
+            ->saveMany(
+                factory(Image::class, 2)->make()
+            );
+
         $task = $post1->task;
-        $task->activity()->save(
-            factory(Activity::class)->make(['user_id' => $user->getKey()])
-        );
-        $task->images()->saveMany(factory(Image::class, 4)->make());
+
+        /** @var \Tests\Utils\Models\Activity $activity3 */
+        $activity3 = factory(Activity::class)->make();
+        $activity3->user()->associate($user);
+        $task->activity()->save($activity3);
+
+        $task->images()
+            ->saveMany(
+                factory(Image::class, 4)->make()
+            );
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             activity {
                 id
                 content {
+                    __typename
+
                     ... on Post {
                         id
                         images_count
@@ -248,6 +270,7 @@ class CountDirectiveTest extends DBTestCase
                     [
                         'id' => '1',
                         'content' => [
+                            '__typename' => 'Post',
                             'id' => "{$post1->id}",
                             'images_count' => $post1->images()->count(),
                         ],
@@ -255,15 +278,17 @@ class CountDirectiveTest extends DBTestCase
                     [
                         'id' => '2',
                         'content' => [
+                            '__typename' => 'Post',
                             'id' => "{$post2->id}",
-                            'images_count' => $post2->images->count(),
+                            'images_count' => $post2->images()->count(),
                         ],
                     ],
                     [
                         'id' => '3',
                         'content' => [
+                            '__typename' => 'Task',
                             'id' => "{$task->id}",
-                            'images_count' => $task->images->count(),
+                            'images_count' => $task->images()->count(),
                         ],
                     ],
                 ],

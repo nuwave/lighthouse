@@ -9,16 +9,15 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Ensure the `@count` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1466
-
 ### Added
 
 - Add artisan command `lighthouse:cache` to compile GraphQL AST https://github.com/nuwave/lighthouse/pull/1451
-
-### Added
-
 - Add middleware `\Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
   GraphQL query https://github.com/nuwave/lighthouse/pull/1454
+
+### Fixed
+
+- Ensure the `@count` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1466
 
 ## 4.15.0
 
