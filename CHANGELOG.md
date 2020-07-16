@@ -14,6 +14,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add artisan command `lighthouse:cache` to compile GraphQL AST https://github.com/nuwave/lighthouse/pull/1451
 - Add middleware `\Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
   GraphQL query https://github.com/nuwave/lighthouse/pull/1454
+- Allow custom query validation rules selection by rebinding the interface
+  `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules`
 
 ### Fixed
 
