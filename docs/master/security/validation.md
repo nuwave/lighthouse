@@ -165,3 +165,19 @@ You can customize the messages for the given rules by implementing the `messages
         ];
     }
 ```
+
+## Customize Query Validation Rules
+
+By default, Lighthouse enables all default query validation rules from `webonyx/graphql-php`.
+This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type. 
+
+If you want to add custom rules or change which ones are used, you can bind a custom implementation
+of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` through a service provider.
+
+```php
+use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
+
+class MyCustomRulesProvider implements ProvidesValidationRules {}
+
+$this->app->bind(ProvidesValidationRules::class, MyCustomRulesProvider::class);
+```

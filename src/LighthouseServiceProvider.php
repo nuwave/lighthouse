@@ -34,6 +34,7 @@ use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
+use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
@@ -52,6 +53,7 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
@@ -147,6 +149,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 }
             };
         });
+
+        $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
 
         $this->app->singleton(MiddlewareAdapter::class, function (Container $app): MiddlewareAdapter {
             // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
