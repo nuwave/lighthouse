@@ -113,7 +113,7 @@ trait HasResolverArguments
     /**
      * Get all the resolver arguments.
      *
-     * @return mixed[]
+     * @return array<mixed>
      */
     public function getResolverArguments(): array
     {

@@ -89,7 +89,7 @@ input CreateUserInput {
 ## Validating Arrays
 
 When you are passing in an array as an argument to a field, you might
-want to apply some validation on the array itself, using [`@rulesForArray`](../api-reference/directives.md#rulesforarray)
+want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rulesforarray)
 
 ```graphql
 type Mutation {
@@ -164,4 +164,20 @@ You can customize the messages for the given rules by implementing the `messages
             'name.unique' => 'The chosen username is not available',
         ];
     }
+```
+
+## Customize Query Validation Rules
+
+By default, Lighthouse enables all default query validation rules from `webonyx/graphql-php`.
+This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type. 
+
+If you want to add custom rules or change which ones are used, you can bind a custom implementation
+of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` through a service provider.
+
+```php
+use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
+
+class MyCustomRulesProvider implements ProvidesValidationRules {}
+
+$this->app->bind(ProvidesValidationRules::class, MyCustomRulesProvider::class);
 ```

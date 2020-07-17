@@ -8,6 +8,8 @@ This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
 with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
 
+The source code of the finished project is available at [nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial).
+
 ## What is GraphQL?
 
 GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data.
@@ -57,8 +59,8 @@ your own GraphQL server.
 The process of building a GraphQL server with Lighthouse can be described in 3 steps:
 
 1. Define the shape of your data using the GraphQL Schema Definition Language
-1. Use Lighthouses pre-built directives to bring your schema to life
-1. Extend Lighthouse with custom functionality where you need it
+1. Use directives to bring your schema to life
+1. Add custom functionality where you need it
 
 <div align="center">
   <img src="./flow.png">  
@@ -155,6 +157,8 @@ Begin by defining models and migrations for your posts and comments
 
     php artisan make:model -m Post
 
+Replace the newly generated `app/Posts.php` and the `create_posts_table.php` with this:
+
 ```php
 <?php
 
@@ -190,8 +194,8 @@ class CreatePostsTable extends Migration
     public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('author_id');
+            $table->id('id');
+            $table->unsignedBigInteger('author_id');
             $table->string('title');
             $table->string('content');
             $table->timestamps();
@@ -204,6 +208,8 @@ class CreatePostsTable extends Migration
     }
 }
 ```
+
+Let's do the same for the Comment model:
 
     php artisan make:model -m Comment
 
@@ -236,8 +242,8 @@ class CreateCommentsTable extends Migration
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('post_id');
+            $table->id('id');
+            $table->unsignedBigInteger('post_id');
             $table->string('reply');
             $table->timestamps();
         });
@@ -261,20 +267,39 @@ Finally, add the `posts` relation to `app/User.php`
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     use Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'name', 'email', 'password',
     ];
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
     protected $hidden = [
         'password', 'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
     ];
 
     public function posts(): HasMany
@@ -284,35 +309,30 @@ class User extends Authenticatable
 }
 ```
 
-## The Magic
+## The Schema
 
 Let's edit `graphql/schema.graphql` and define our blog schema,
 based on the Eloquent models we created.
 
-We add two queries for retrieving posts to the root Query type:
+We add two queries for retrieving posts to the root `Query` type:
 
-```graphql
+```diff
 type Query {
-  posts: [Post!]! @all
-  post(id: Int! @eq): Post @find
++  posts: [Post!]! @all
++  post(id: Int! @eq): Post @find
 }
 ```
 
 The way that Lighthouse knows how to resolve the queries is a combination of convention-based
 naming - the type name `Post` is also the name of our Model - and the use of server-side directives.
 
-- [`@all`](../master/api-reference/directives.md#all) returns a list of all `Post` models
-- [`@find`](../master/api-reference/directives.md#find) and [`@eq`](../master/api-reference/directives.md#eq)
+- [@all](../master/api-reference/directives.md#all) returns a list of all `Post` models
+- [@find](../master/api-reference/directives.md#find) and [@eq](../master/api-reference/directives.md#eq)
   are combined to retrieve a single `Post` by its ID
 
 We add additional type definitions that clearly define the shape of our data:
 
 ```graphql
-type Query {
-  posts: [Post!]! @all
-  post(id: Int! @eq): Post @find
-}
-
 type User {
   id: ID!
   name: String!
@@ -338,9 +358,9 @@ type Comment {
 ```
 
 Just like in Eloquent, we express the relationship between our types using the
-[`@belongsTo`](../master/api-reference/directives.md#belongsto) and [`@hasMany`](../master/api-reference/directives.md#hasmany) directives.
+[@belongsTo](../master/api-reference/directives.md#belongsto) and [@hasMany](../master/api-reference/directives.md#hasmany) directives.
 
-## The Final Test
+## The Result
 
 Insert some fake data into your database,
 you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.

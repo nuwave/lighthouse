@@ -19,7 +19,7 @@ class ExtensionErrorHandler implements ErrorHandler
 
         if ($underlyingException instanceof RendersErrorsExtensions) {
             // Reconstruct the error, passing in the extensions of the underlying exception
-            $error = new Error(
+            $error = new Error( // @phpstan-ignore-line TODO remove after graphql-php upgrade
                 $error->message,
                 $error->nodes,
                 $error->getSource(),

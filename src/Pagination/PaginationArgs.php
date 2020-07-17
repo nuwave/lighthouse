@@ -23,12 +23,12 @@ class PaginationArgs
      * Create a new instance from user given args.
      *
      * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationType|null  $paginationType
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      * @return static
      *
      * @throws \GraphQL\Error\Error
      */
-    public static function extractArgs(array $args, ?PaginationType $paginationType, ?int $paginateMaxCount): self
+    public static function extractArgs(array $args, PaginationType $paginationType, ?int $paginateMaxCount): self
     {
         $instance = new static();
 
@@ -85,7 +85,7 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @param \Illuminate\Database\Query\Builder $builder
+     * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder
      */
     public function applyToBuilder($builder): LengthAwarePaginator
     {

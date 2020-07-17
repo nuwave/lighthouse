@@ -9,9 +9,6 @@ class ComplexValidationDirective extends ValidationDirective
 {
     public const UNIQUE_VALIDATION_MESSAGE = 'Used to test this exact validation is triggered';
 
-    /**
-     * @return mixed[]
-     */
     public function rules(): array
     {
         return [
@@ -24,9 +21,6 @@ class ComplexValidationDirective extends ValidationDirective
         ];
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
         return [

@@ -49,7 +49,7 @@ abstract class DateScalar extends ScalarType
         if (! $valueNode instanceof StringValueNode) {
             throw new Error(
                 "Query error: Can only parse strings, got {$valueNode->kind}",
-                [$valueNode]
+                $valueNode
             );
         }
 
@@ -60,7 +60,7 @@ abstract class DateScalar extends ScalarType
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
      * @param  string  $value
-     * @param  string|\Exception  $exceptionClass
+     * @param  class-string<\Exception>  $exceptionClass
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */
@@ -75,7 +75,15 @@ abstract class DateScalar extends ScalarType
         }
     }
 
+    /**
+     * Serialize the Carbon instance.
+     */
     abstract protected function format(Carbon $carbon): string;
 
+    /**
+     * Try turning a client value into a Carbon instance.
+     *
+     * @param  mixed  $value A possibly faulty client value.
+     */
     abstract protected function parse($value): Carbon;
 }

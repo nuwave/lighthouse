@@ -19,14 +19,12 @@ class NestedOneToOne implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
         $relation = $parent->{$this->relationName}();
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $create */
         if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 

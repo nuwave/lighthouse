@@ -19,6 +19,7 @@ use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -65,7 +66,9 @@ class ASTBuilder
     /**
      * The document AST.
      *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST|null
+     * Initialized lazily, is only set after documentAST() is called.
+     *
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
@@ -95,7 +98,7 @@ class ASTBuilder
         $cacheConfig = $this->configRepository->get('lighthouse.cache');
         if ($cacheConfig['enable']) {
             /** @var \Illuminate\Contracts\Cache\Repository $cache */
-            $cache = app('cache');
+            $cache = app('cache')->store($cacheConfig['store'] ?? null);
             $this->documentAST = $cache->remember(
                 $cacheConfig['key'],
                 // TODO remove this fallback in v5
@@ -135,7 +138,7 @@ class ASTBuilder
         $this->applyFieldManipulators();
         $this->applyArgManipulators();
 
-        // TODO seperate out into modules
+        // TODO separate out into modules
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
 
@@ -171,7 +174,6 @@ class ASTBuilder
     protected function applyTypeExtensionManipulators(): void
     {
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
-            /** @var \GraphQL\Language\AST\TypeExtensionNode $typeExtension */
             foreach ($typeExtensionsList as $typeExtension) {
                 // Before we actually extend the types, we apply the manipulator directives
                 // that are defined on type extensions themselves
@@ -200,30 +202,44 @@ class ASTBuilder
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
     {
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode $extendedObjectLikeType */
-        $extendedObjectLikeType = $this->documentAST->types[$typeName];
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|null $extendedObjectLikeType */
+        $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
+        if ($extendedObjectLikeType === null) {
+            if (RootType::isRootType($typeName)) {
+                $extendedObjectLikeType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
+                $this->documentAST->setTypeDefinition($extendedObjectLikeType);
+            } else {
+                throw new DefinitionException(
+                    $this->missingBaseDefinition($typeName, $typeExtension)
+                );
+            }
+        }
+
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);
 
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $extendedObjectLikeType->fields = ASTHelper::mergeUniqueNodeList(
             $extendedObjectLikeType->fields,
             $typeExtension->fields
         );
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
-    protected function extendEnumType(string $typeName, TypeExtensionNode $typeExtension): void
+    protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
     {
-        /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode $extendedEnum */
-        $extendedEnum = $this->documentAST->types[$typeName];
+        /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
+        $extendedEnum = $this->documentAST->types[$typeName] ?? null;
+        if ($extendedEnum === null) {
+            throw new DefinitionException(
+                $this->missingBaseDefinition($typeName, $typeExtension)
+            );
+        }
+
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
 
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
             $extendedEnum->values,
             $typeExtension->values
@@ -231,7 +247,16 @@ class ASTBuilder
     }
 
     /**
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $typeExtension
+     */
+    protected function missingBaseDefinition(string $typeName, TypeExtensionNode $typeExtension): string
+    {
+        return "Could not find a base definition $typeName of kind {$typeExtension->kind} to extend.";
+    }
+
+    /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode  $definition
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -239,17 +264,9 @@ class ASTBuilder
     {
         if (static::EXTENSION_TO_DEFINITION_CLASS[get_class($extension)] !== get_class($definition)) {
             throw new DefinitionException(
-                static::extensionDoesNotMatchDefinition($extension, $definition)
+                "The type extension {$extension->name->value} of kind {$extension->kind} can not extend a definition of kind {$definition->kind}."
             );
         }
-    }
-
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
-     */
-    public static function extensionDoesNotMatchDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): string
-    {
-        return 'The type extension '.$extension->name->value.' of kind '.$extension->kind.' can not extend a definition of kind '.$definition->kind.'.';
     }
 
     /**
@@ -259,6 +276,7 @@ class ASTBuilder
     {
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
@@ -279,6 +297,7 @@ class ASTBuilder
     {
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
@@ -397,7 +416,7 @@ class ASTBuilder
         $globalId = config('lighthouse.global_id_field');
         // Double slashes to escape the slashes in the namespace.
         $this->documentAST->setTypeDefinition(
-            PartialParser::interfaceTypeDefinition(<<<GRAPHQL
+            PartialParser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 "Node global interface"
 interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {
 "Global identifier that can be used to resolve any Node implementation."
@@ -407,12 +426,13 @@ GRAPHQL
             )
         );
 
-        /** @var ObjectTypeDefinitionNode $queryType */
-        $queryType = $this->documentAST->types['Query'];
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
+        $queryType = $this->documentAST->types[RootType::QUERY];
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $queryType->fields = ASTHelper::mergeNodeList(
             $queryType->fields,
             [
-                PartialParser::fieldDefinition('
+                PartialParser::fieldDefinition(/** @lang GraphQL */ '
                     node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
                 '),
             ]

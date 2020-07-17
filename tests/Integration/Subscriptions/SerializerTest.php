@@ -11,7 +11,7 @@ use Tests\Utils\Models\User;
 
 class SerializerTest extends DBTestCase
 {
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -47,8 +47,11 @@ class SerializerTest extends DBTestCase
         );
 
         $this->assertTrue($retrievedFromDatabase);
-        $this->assertInstanceOf(User::class, $unserialized->user());
-        $this->assertSame($user->getKey(), $unserialized->user()->getKey());
+
+        $unserializedUser = $unserialized->user();
+        $this->assertInstanceOf(User::class, $unserializedUser);
+        /** @var \Tests\Utils\Models\User $unserializedUser */
+        $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }
 
     /**
@@ -93,7 +96,10 @@ class SerializerTest extends DBTestCase
         $unserialized = $serializer->unserialize($serialized);
 
         $this->assertFalse($retrievedFromDatabase);
-        $this->assertInstanceOf(User::class, $unserialized->user());
-        $this->assertSame($user->getKey(), $unserialized->user()->getKey());
+
+        $unserializedUser = $unserialized->user();
+        $this->assertInstanceOf(User::class, $unserializedUser);
+        /** @var \Tests\Utils\Models\User $unserializedUser */
+        $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }
 }

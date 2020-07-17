@@ -20,7 +20,7 @@ class DocumentAST implements Serializable
      *
      * ['foo' => FooType].
      *
-     * @var NodeList<TypeDefinitionNode>
+     * @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node>|array<string, \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node>
      */
     public $types = [];
 
@@ -30,7 +30,7 @@ class DocumentAST implements Serializable
      * Will NOT be kept after unserialization, as the type
      * extensions are merged with the types before.
      *
-     * ['foo' => [0 => FooExtension, 1 => FooExtension]].
+     * @var array<string, array<int, \GraphQL\Language\AST\TypeExtensionNode&\GraphQL\Language\AST\Node>>
      */
     public $typeExtensions = [];
 
@@ -39,7 +39,7 @@ class DocumentAST implements Serializable
      *
      * ['foo' => FooDirective].
      *
-     * @var NodeList<DirectiveDefinitionNode>
+     * @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveDefinitionNode>|array<string, \GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public $directives = [];
 
@@ -66,7 +66,7 @@ class DocumentAST implements Serializable
             );
         }
 
-        $instance = new self;
+        $instance = new static;
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
@@ -100,7 +100,9 @@ class DocumentAST implements Serializable
         };
 
         return serialize([
+            // @phpstan-ignore-next-line Before serialization, those are arrays
             'types' => array_map($nodeToArray, $this->types),
+            // @phpstan-ignore-next-line Before serialization, those are arrays
             'directives' => array_map($nodeToArray, $this->directives),
         ]);
     }

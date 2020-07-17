@@ -8,16 +8,11 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class MorphManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
-    /**
-     * SDL definition of the directive.
-     *
-     * @return string
-     */
-    public static function definition()
+    public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
 """
 directive @morphMany(
   """
@@ -38,14 +33,14 @@ directive @morphMany(
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
 
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
 

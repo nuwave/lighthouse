@@ -13,7 +13,7 @@ interface StoresSubscriptions
      *
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
-    public function subscriberByRequest(array $input, array $headers);
+    public function subscriberByRequest(array $input, array $headers); // @phpstan-ignore-line
 
     /**
      * Find a subscriber by its channel key.

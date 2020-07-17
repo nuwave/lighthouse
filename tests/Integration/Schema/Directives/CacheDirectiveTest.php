@@ -13,11 +13,11 @@ use Tests\Utils\Models\User;
 class CacheDirectiveTest extends DBTestCase
 {
     /**
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var \Illuminate\Cache\TaggedCache
      */
     protected $cache;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -353,7 +353,9 @@ class CacheDirectiveTest extends DBTestCase
 
         $firstResponse = $this->graphQL($query);
 
-        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:first:3");
+        $posts = $this->cache
+            ->tags($tags)
+            ->get("user:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 

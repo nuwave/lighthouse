@@ -7,7 +7,7 @@ class ListType
     /**
      * The type contained within the list.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\NamedType
+     * @var \Nuwave\Lighthouse\Execution\Arguments\NamedType|\Nuwave\Lighthouse\Execution\Arguments\ListType
      */
     public $type;
 
@@ -18,7 +18,10 @@ class ListType
      */
     public $nonNull = false;
 
-    public function __construct(NamedType $type)
+    /**
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType|\Nuwave\Lighthouse\Execution\Arguments\ListType  $type
+     */
+    public function __construct($type)
     {
         $this->type = $type;
     }

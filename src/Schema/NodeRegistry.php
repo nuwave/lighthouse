@@ -82,12 +82,12 @@ class NodeRegistry
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param  mixed|null  $rootValue
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
+     * @return mixed The result of calling the resolver.
      *
      * @throws \GraphQL\Error\Error
      */
-    public function resolve($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         [$decodedType, $decodedId] = $args['id'];
 

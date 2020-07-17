@@ -10,6 +10,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MethodDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
+    /** @var \GraphQL\Language\AST\FieldDefinitionNode */
+    protected $definitionNode;
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
@@ -57,10 +60,10 @@ SDL;
                         $orderedArgs [] = $args[$argDefinition->name->value] ?? null;
                     }
 
-                    return call_user_func_array([$root, $method], $orderedArgs);
+                    return $root->{$method}(...$orderedArgs);
                 }
 
-                return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
+                return $root->{$method}($root, $args, $context, $resolveInfo);
             }
         );
     }

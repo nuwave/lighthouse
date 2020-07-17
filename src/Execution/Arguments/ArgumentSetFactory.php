@@ -42,6 +42,7 @@ class ArgumentSetFactory
     /**
      * Wrap client-given args with type information.
      *
+     * @param  array<mixed>  $args
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
@@ -51,7 +52,9 @@ class ArgumentSetFactory
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentDefinition */
         $parentDefinition = $this->documentAST->types[$parentName];
+
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $fieldDefinition = ASTHelper::firstByName($parentDefinition->fields, $fieldName);
 
         return $this->wrapArgs($fieldDefinition, $args);
@@ -76,9 +79,10 @@ class ArgumentSetFactory
         } else {
             throw new InvalidArgumentException('Got unexpected node of type '.get_class($definition));
         }
+
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
 
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
         foreach ($argumentDefinitionMap as $name => $definition) {
             if (array_key_exists($name, $args)) {
                 $argumentSet->arguments[$name] = $this->wrapInArgument($args[$name], $definition);
@@ -93,12 +97,11 @@ class ArgumentSetFactory
     /**
      * Make a map with the name as keys.
      *
-     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]  $argumentDefinitions
-     * @return \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]
+     * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $argumentDefinitions
+     * @return array<string, \GraphQL\Language\AST\InputValueDefinitionNode>
      */
     protected function makeDefinitionMap($argumentDefinitions): array
     {
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode[] $argumentDefinitionMap */
         $argumentDefinitionMap = [];
 
         foreach ($argumentDefinitions as $definition) {
@@ -111,6 +114,7 @@ class ArgumentSetFactory
     /**
      * Wrap a single client-given argument with type information.
      *
+     * @param  mixed  $value The client given value.
      * @return \Nuwave\Lighthouse\Execution\Arguments\Argument
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
@@ -134,22 +138,22 @@ class ArgumentSetFactory
      */
     protected function wrapWithType($valueOrValues, $type)
     {
+        // No need to recurse down further if the value is null
+        if ($valueOrValues === null) {
+            return;
+        }
+
         // We have to do this conversion as we are resolving a client query
         // because the incoming arguments put a bound on recursion depth
         if ($type instanceof ListType) {
             $typeInList = $type->type;
 
-            if (is_array($valueOrValues)) {
-                $values = [];
-                foreach ($valueOrValues as $singleValue) {
-                    $values [] = $this->wrapWithNamedType($singleValue, $typeInList);
-                }
-
-                return $values;
+            $values = [];
+            foreach ($valueOrValues as $singleValue) {
+                $values [] = $this->wrapWithType($singleValue, $typeInList);
             }
 
-            // This case happens if `null` is passed
-            return $this->wrapWithNamedType($valueOrValues, $typeInList);
+            return $values;
         }
 
         return $this->wrapWithNamedType($valueOrValues, $type);
@@ -158,16 +162,12 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
+     * @param  mixed  $value The client given value.
      * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $namedType
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */
     protected function wrapWithNamedType($value, NamedType $namedType)
     {
-        // As GraphQL does not allow empty input objects, we return null as is
-        if ($value === null) {
-            return;
-        }
-
         // This might be null if the type is
         // - created outside of the schema string
         // - one of the built in types

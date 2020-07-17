@@ -36,19 +36,18 @@ directive @whereHasConditions(
     Mutually exclusive with the `columns` argument.
     """
     columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 SDL;
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed[]  $whereConditions
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
+     * @param  mixed  $whereConditions The client given conditions
+     * @return \Illuminate\Database\Eloquent\Builder  The modified builder.
      */
     public function handleBuilder($builder, $whereConditions)
     {
         // The value `null` should be allowed but have no effect on the query.
-        // Just return the unmodified Builder instance.
         if (is_null($whereConditions)) {
             return $builder;
         }

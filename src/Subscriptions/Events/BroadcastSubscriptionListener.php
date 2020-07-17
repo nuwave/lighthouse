@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob;
 class BroadcastSubscriptionListener
 {
     /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Bus\Dispatcher
      */
     protected $busDispatcher;
 

@@ -11,7 +11,7 @@ class SchemaCachingTest extends TestCase
 {
     use TestsSerialization;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -32,7 +32,7 @@ class SchemaCachingTest extends TestCase
         union Foo = Comment | Color
 
         type Comment {
-            bar: ID
+            comment: ID
         }
 
         type Color {
@@ -41,22 +41,22 @@ class SchemaCachingTest extends TestCase
         ';
         $this->cacheSchema();
 
-        $this->mockResolver(new Comment([
-            'bar' => 'bar',
-        ]));
+        $comment = new Comment();
+        $comment->comment = 'foo';
+        $this->mockResolver($comment);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo {
                 ... on Comment {
-                    bar
+                    comment
                 }
             }
         }
         ')->assertExactJson([
             'data' => [
                 'foo' => [
-                    'bar' => 'bar',
+                    'comment' => $comment->comment,
                 ],
             ],
         ]);

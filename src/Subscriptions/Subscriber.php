@@ -45,6 +45,8 @@ class Subscriber implements Serializable
 
     /**
      * The root element of the query.
+     *
+     * @var mixed Can be anything.
      */
     public $root;
 
@@ -72,10 +74,16 @@ class Subscriber implements Serializable
         GraphQLContext $context,
         ResolveInfo $resolveInfo
     ) {
-        $operationName = $resolveInfo->operation->name;
+        $operation = $resolveInfo->operation;
+        // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
+        if ($operation === null) {
+            throw new SubscriptionException(self::MISSING_OPERATION_NAME);
+        }
+
+        $operationName = $operation->name;
 
         // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
-        if (! $operationName) {
+        if (! $operationName) { // @phpstan-ignore-line TODO remove when upgrading graphql-php
             throw new SubscriptionException(self::MISSING_OPERATION_NAME);
         }
         $this->operationName = $operationName->value;
@@ -86,7 +94,7 @@ class Subscriber implements Serializable
 
         $documentNode = new DocumentNode([]);
         $documentNode->definitions = $resolveInfo->fragments;
-        $documentNode->definitions[] = $resolveInfo->operation;
+        $documentNode->definitions[] = $operation;
         $this->query = $documentNode;
     }
 
@@ -94,15 +102,14 @@ class Subscriber implements Serializable
      * Unserialize subscription from a JSON string.
      *
      * @param  string  $subscription
-     * @return $this
      */
-    public function unserialize($subscription): self
+    public function unserialize($subscription): void
     {
         $data = json_decode($subscription, true);
 
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
-        $this->query = AST::fromArray(
+        $this->query = AST::fromArray( // @phpstan-ignore-line We know this will be exactly a DocumentNode and nothing else
             unserialize($data['query'])
         );
         $this->operationName = $data['operation_name'];
@@ -110,8 +117,6 @@ class Subscriber implements Serializable
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
-
-        return $this;
     }
 
     /**
@@ -119,7 +124,7 @@ class Subscriber implements Serializable
      */
     public function serialize(): string
     {
-        return json_encode([
+        $serialized = json_encode([
             'channel' => $this->channel,
             'topic' => $this->topic,
             'query' => serialize(
@@ -129,6 +134,14 @@ class Subscriber implements Serializable
             'args' => $this->args,
             'context' => $this->contextSerializer()->serialize($this->context),
         ]);
+
+        // TODO use \Safe\json_encode
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('Tried to encode invalid JSON while serializing subscriber data: '.json_last_error_msg());
+        }
+        /** @var string $serialized */
+
+        return $serialized;
     }
 
     /**

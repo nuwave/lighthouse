@@ -28,7 +28,9 @@ class AuthenticatingSyncIteratorTest extends IteratorTest
         $subscribers = $this
             ->subscribers($subscriberCount)
             ->map(static function (Subscriber $subscriber, int $index): Subscriber {
-                $subscriber->context->user = new AuthenticatingSyncIteratorAuthenticatableStub($index + 1);
+                /** @var \Nuwave\Lighthouse\Schema\Context $context */
+                $context = $subscriber->context;
+                $context->user = new AuthenticatingSyncIteratorAuthenticatableStub($index + 1);
 
                 return $subscriber;
             });
@@ -53,6 +55,7 @@ class AuthenticatingSyncIteratorTest extends IteratorTest
             });
         });
 
+        /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $this->app->make(AuthManager::class);
 
         $authManager->extend(SubscriptionGuard::GUARD_NAME, static function () use ($guard) {
@@ -92,6 +95,7 @@ class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 
     public function getAuthIdentifierName()
     {
+        return '';
     }
 
     public function getAuthIdentifier()
@@ -101,10 +105,12 @@ class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 
     public function getAuthPassword()
     {
+        return '';
     }
 
     public function getRememberToken()
     {
+        return '';
     }
 
     public function setRememberToken($value)
@@ -113,5 +119,6 @@ class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 
     public function getRememberTokenName()
     {
+        return '';
     }
 }

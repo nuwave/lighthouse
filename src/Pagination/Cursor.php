@@ -21,6 +21,8 @@ class Cursor
      * If no 'after' argument is provided or the contents are not a valid base64 string,
      * this will return 0. That will effectively reset pagination, so the user gets the
      * first slice.
+     *
+     * @param  array<string, mixed>  $args
      */
     public static function decode(array $args): int
     {
@@ -36,6 +38,6 @@ class Cursor
      */
     public static function encode(int $offset): string
     {
-        return base64_encode($offset);
+        return base64_encode((string) $offset);
     }
 }

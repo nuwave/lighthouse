@@ -80,7 +80,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testCanQueryMorphManyRelationship(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
@@ -95,8 +95,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -110,15 +108,13 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             post(id: {$this->post->id}) {
                 id
                 title
                 images {
                     id
-                    from
-                    to
                 }
             }
 
@@ -127,8 +123,6 @@ class MorphManyDirectiveTest extends DBTestCase
                 name
                 images {
                     id
-                    from
-                    to
                 }
             }
         }
@@ -141,8 +135,6 @@ class MorphManyDirectiveTest extends DBTestCase
                         ->map(function (Image $image) {
                             return [
                                 'id' => $image->id,
-                                'from' => $image->from,
-                                'to' => $image->to,
                             ];
                         })
                         ->toArray(),
@@ -154,8 +146,6 @@ class MorphManyDirectiveTest extends DBTestCase
                         ->map(function (Image $image) {
                             return [
                                 'id' => $image->id,
-                                'from' => $image->from,
-                                'to' => $image->to,
                             ];
                         })
                         ->toArray(),
@@ -167,7 +157,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testCanQueryMorphManyPaginator(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
@@ -176,8 +166,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -187,7 +175,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             post(id: {$this->post->id}) {
                 id
@@ -195,8 +183,6 @@ class MorphManyDirectiveTest extends DBTestCase
                 images(first: 10) {
                     data {
                         id
-                        from
-                        to
                     }
                 }
             }
@@ -211,8 +197,6 @@ class MorphManyDirectiveTest extends DBTestCase
                             ->map(function (Image $image) {
                                 return [
                                     'id' => $image->id,
-                                    'from' => $image->from,
-                                    'to' => $image->to,
                                 ];
                             })
                             ->toArray(),
@@ -224,9 +208,9 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 1]);
+        config(['lighthouse.pagination.max_count' => 1]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
@@ -235,8 +219,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -246,7 +228,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL("
+        $result = $this->graphQL(/** @lang GraphQL */ "
         {
             post(id: {$this->post->id}) {
                 id
@@ -268,9 +250,9 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testPaginatorTypeIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 2]);
+        config(['lighthouse.pagination.max_count' => 2]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
@@ -279,8 +261,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -290,7 +270,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL("
+        $result = $this->graphQL(/** @lang GraphQL */ "
         {
             post(id: {$this->post->id}) {
                 id
@@ -312,7 +292,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testHandlesPaginationWithCountZero(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
@@ -321,8 +301,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -332,7 +310,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             post(id: {$this->post->id}) {
                 id
@@ -340,8 +318,6 @@ class MorphManyDirectiveTest extends DBTestCase
                 images(first: 0) {
                     data {
                         id
-                        from
-                        to
                     }
                 }
             }
@@ -359,7 +335,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testCanQueryMorphManyPaginatorWithADefaultCount(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -368,8 +344,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -379,7 +353,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             task(id: {$this->task->id}) {
                 id
@@ -415,7 +389,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testCanQueryMorphManyRelayConnection(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -424,8 +398,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -435,7 +407,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             task(id: {$this->task->id}) {
                 id
@@ -469,9 +441,9 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 1]);
+        config(['lighthouse.pagination.max_count' => 1]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -480,8 +452,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -491,7 +461,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL("
+        $result = $this->graphQL(/** @lang GraphQL */ "
         {
             task(id: {$this->task->id}) {
                 id
@@ -515,9 +485,9 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testRelayTypeIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 2]);
+        config(['lighthouse.pagination.max_count' => 2]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -526,8 +496,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -537,7 +505,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL("
+        $result = $this->graphQL(/** @lang GraphQL */ "
         {
             task(id: {$this->task->id}) {
                 id
@@ -561,7 +529,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
     public function testCanQueryMorphManyRelayConnectionWithADefaultCount(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -570,8 +538,6 @@ class MorphManyDirectiveTest extends DBTestCase
 
         type Image {
             id: ID!
-            from: String
-            to: String
         }
 
         type Query {
@@ -581,7 +547,7 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             task(id: {$this->task->id}) {
                 id

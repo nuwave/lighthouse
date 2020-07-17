@@ -215,6 +215,9 @@ GRAPHQL
         ]);
     }
 
+    /**
+     * @return array<array<string, string>>
+     */
     public function existingModelMutations(): array
     {
         return [

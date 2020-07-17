@@ -43,7 +43,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => 1,
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -72,7 +72,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => 1,
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -103,7 +103,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => 1,
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -124,7 +124,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => 1,
             ])
             ->assertJsonCount(4, 'data.users');
     }
@@ -146,8 +146,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
             }
             ', [
                 'ids' => [
-                    $this->users->first()->getKey(),
-                    $this->users->last()->getKey(),
+                    1,
+                    5,
                 ],
             ])
             ->assertJsonCount(2, 'data.users');
@@ -161,12 +161,9 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
-
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users(exclude: ['.$user1.', '.$user2.']) {
+            users(exclude: [1, 5]) {
                 id
             }
         }
@@ -181,9 +178,6 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user1 */
-        $user1 = $this->users->first();
-
         $this
             ->graphQL(/** @lang GraphQL */ '
             query ($userId: Int) {
@@ -192,7 +186,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'userId' => $user1->id,
+                'userId' => 1,
             ])
             ->assertJsonCount(4, 'data.users');
     }
@@ -208,14 +202,11 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
-
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(
-                start: '.$user1.'
-                end: '.$user2.'
+                start: 1
+                end: 5
             ) {
                 id
             }
@@ -233,10 +224,12 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[0];
         $user->created_at = now()->subDay();
         $user->save();
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[1];
         $user->created_at = now()->subDay();
         $user->save();
@@ -270,10 +263,12 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[0];
         $user->created_at = now()->subDay();
         $user->save();
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[1];
         $user->created_at = now()->subDay();
         $user->save();
@@ -305,10 +300,12 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[0];
         $user->created_at = now()->subDay();
         $user->save();
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[1];
         $user->created_at = now()->subDay();
         $user->save();
@@ -337,10 +334,12 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[0];
         $user->created_at = now()->subYear();
         $user->save();
 
+        /** @var \Tests\Utils\Models\User $user */
         $user = $this->users[1];
         $user->created_at = now()->subYear();
         $user->save();
@@ -367,9 +366,12 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
+        /** @var \Tests\Utils\Models\User $user */
+        $user = $this->users[0];
+
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users(name: "'.$this->users->first()->name.'") {
+            users(name: "'.$user->name.'") {
                 id
             }
         }

@@ -25,6 +25,7 @@ class ASTHelperTest extends TestCase
 
         $this->expectException(DefinitionException::class);
 
+        // @phpstan-ignore-next-line
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
             $objectType2->fields
@@ -47,6 +48,7 @@ class ASTHelperTest extends TestCase
         }
         ');
 
+        // @phpstan-ignore-next-line
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
             $objectType2->fields,
@@ -55,6 +57,7 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(3, $objectType1->fields);
 
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $firstNameField */
         $firstNameField = ASTHelper::firstByName($objectType1->fields, 'first_name');
 
         $this->assertCount(1, $firstNameField->directives);

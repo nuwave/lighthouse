@@ -13,13 +13,16 @@ class CreateTestbenchUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table): void {
             $table->increments('id');
-            $table->unsignedInteger('company_id')->nullable();
-            $table->unsignedInteger('team_id')->nullable();
-            $table->unsignedInteger('person_id')->nullable();
-            $table->string('person_type')->nullable();
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
+
+            $table->unsignedInteger('company_id')->nullable();
+            $table->unsignedInteger('team_id')->nullable();
+
+            $table->unsignedInteger('person_id')->nullable();
+            $table->string('person_type')->nullable();
+
             $table->timestamps();
         });
     }

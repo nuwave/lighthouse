@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -48,21 +47,11 @@ directive @delete(
 SDL;
     }
 
-    /**
-     * Find one or more models by id.
-     *
-     * @param string|\Illuminate\Database\Eloquent\Model $modelClass
-     * @param string|int|string[]|int[] $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
-     */
     protected function find(string $modelClass, $idOrIds)
     {
         return $modelClass::find($idOrIds);
     }
 
-    /**
-     * Bring a model in or out of existence.
-     */
     protected function modifyExistence(Model $model): void
     {
         $model->delete();
@@ -85,14 +74,17 @@ SDL;
         // Those types of relations may only have one related model attached to
         // it, so we don't need to use an ID to know which model to delete.
         $relationIsHasOneLike = $relation instanceof HasOne || $relation instanceof MorphOne;
-        $relationIsBelongsToLike = $relation instanceof BelongsTo || $relation instanceof MorphTo;
+        // This includes MorphTo, which is a subclass of BelongsTo
+        $relationIsBelongsToLike = $relation instanceof BelongsTo;
 
         if ($relationIsHasOneLike || $relationIsBelongsToLike) {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne|\Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             // Only delete if the given value is truthy, since
             // the client might use a variable and always pass the argument.
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
@@ -100,6 +92,7 @@ SDL;
                 $relation->delete();
             }
         } else {
+            /** @var \Illuminate\Database\Eloquent\Model $related */
             $related = $relation->make();
             $related::destroy($idOrIds);
         }

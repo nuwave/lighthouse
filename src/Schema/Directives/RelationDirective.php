@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -50,7 +51,7 @@ abstract class RelationDirective extends BaseDirective
                             $constructorArgs
                         )
                         ->load(
-                            $parent->getKey(),
+                            ModelKey::build($parent),
                             ['parent' => $parent]
                         );
                 }
@@ -61,10 +62,10 @@ abstract class RelationDirective extends BaseDirective
                 $decorateBuilder($relation);
 
                 if ($paginationArgs) {
-                    $relation = $paginationArgs->applyToBuilder($relation);
+                    return $paginationArgs->applyToBuilder($relation);
+                } else {
+                    return $relation->getResults();
                 }
-
-                return $relation->getResults();
             }
         );
 
@@ -83,17 +84,15 @@ abstract class RelationDirective extends BaseDirective
         };
     }
 
-    protected function paginationArgs(array $args): ?PaginationArgs
-    {
-        if ($paginationType = $this->paginationType()) {
-            return PaginationArgs::extractArgs($args, $paginationType, $this->paginateMaxCount());
-        }
-
-        return null;
-    }
-
+    /**
+     * @return array<string|class-string<\Illuminate\Database\Eloquent\Model>>
+     */
     protected function buildPath(ResolveInfo $resolveInfo, Model $parent): array
     {
+        /**
+         * TODO remove when fixed in graphql-php.
+         * @var array<string> $path
+         */
         $path = $resolveInfo->path;
 
         // When dealing with polymorphic relations, we might have a case where
@@ -123,19 +122,11 @@ abstract class RelationDirective extends BaseDirective
             $paginationType,
             $fieldDefinition,
             $parentType,
-            $this->directiveArgValue('defaultCount'),
+            $this->directiveArgValue('defaultCount')
+                ?? config('lighthouse.pagination.default_count'),
             $this->paginateMaxCount(),
             $this->edgeType($documentAST)
         );
-    }
-
-    protected function paginationType(): ?PaginationType
-    {
-        if ($paginationType = $this->directiveArgValue('type')) {
-            return new PaginationType($paginationType);
-        }
-
-        return null;
     }
 
     /**
@@ -157,11 +148,33 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
+     * @param  array<string, mixed>  $args
+     */
+    protected function paginationArgs(array $args): ?PaginationArgs
+    {
+        if ($paginationType = $this->paginationType()) {
+            return PaginationArgs::extractArgs($args, $paginationType, $this->paginateMaxCount());
+        }
+
+        return null;
+    }
+
+    protected function paginationType(): ?PaginationType
+    {
+        if ($paginationType = $this->directiveArgValue('type')) {
+            return new PaginationType($paginationType);
+        }
+
+        return null;
+    }
+
+    /**
      * Get either the specific max or the global setting.
      */
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')
+            ?? config('lighthouse.pagination.max_count')
             ?? config('lighthouse.paginate_max_count');
     }
 }

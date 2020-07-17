@@ -465,6 +465,9 @@ GRAPHQL
         ]);
     }
 
+    /**
+     * @return array<array<string, string>>
+     */
     public function existingModelMutations(): array
     {
         return [
@@ -510,12 +513,12 @@ GRAPHQL
         ]);
 
         $this->assertTrue(
-            User::find(1)->exists,
+            User::findOrFail(1)->exists,
             'Must not delete the second model.'
         );
 
         $this->assertNull(
-            Task::find(1)->user,
+            Task::findOrFail(1)->user,
             'Must disconnect the parent relationship.'
         );
     }
@@ -524,6 +527,7 @@ GRAPHQL
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\Task $task */
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
@@ -555,12 +559,13 @@ GRAPHQL
         ]);
 
         $this->assertTrue(
-            User::find($user->id)->exists,
+            User::findOrFail($user->id)->exists,
             'Must not delete the second model.'
         );
 
+        $task->refresh();
         $this->assertNull(
-            $task->refresh()->user_id,
+            $task->user_id,
             'Must disconnect the parent relationship.'
         );
     }
@@ -572,6 +577,7 @@ GRAPHQL
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\Task $task */
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
@@ -608,8 +614,9 @@ GRAPHQL
             'This model should be deleted.'
         );
 
+        $task->refresh();
         $this->assertNull(
-            $task->refresh()->user_id,
+            $task->user_id,
             'Must disconnect the parent relationship.'
         );
     }
@@ -650,7 +657,7 @@ GRAPHQL
         );
 
         $this->assertNull(
-            Task::find(1)->user,
+            Task::findOrFail(1)->user,
             'Must disconnect the parent relationship.'
         );
     }
@@ -662,6 +669,7 @@ GRAPHQL
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\Task $task */
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
@@ -696,9 +704,10 @@ GRAPHQL
             ],
         ]);
 
+        $task->refresh();
         $this->assertSame(
             $user->id,
-            $task->refresh()->user->id,
+            $task->user->id,
             'The parent relationship remains untouched.'
         );
     }
@@ -804,6 +813,7 @@ GRAPHQL
         }
 
         input UpsertRoleUserPivotInput {
+            id: ID
             role: UpsertRoleBelongsTo
         }
 
@@ -861,7 +871,7 @@ GRAPHQL
         ]);
 
         // The first User has the first Role.
-        $role = Role::first();
+        $role = Role::firstOrFail();
         $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.
@@ -874,6 +884,7 @@ GRAPHQL
                 name: "fooz"
                 rolesPivot: {
                     upsert: [{
+                        id: "1"
                         role: {
                             upsert: {
                                 id: "1"
@@ -996,6 +1007,123 @@ GRAPHQL
                     'role' => [
                         'id' => '3',
                         'name' => 'role 1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCreateMultipleBelongsToThatDontExistYetWithExistingRecords(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type RoleUserPivot {
+            id: ID!
+            meta: String
+            user: User!
+            role: Role!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Role {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createRoleUser(
+                input: RoleUserInput! @spread
+            ): RoleUserPivot @create
+        }
+
+        input RoleUserInput {
+            id: ID
+            meta: String
+            user: UserInput!
+            role: RoleInput!
+        }
+
+        input UserInput {
+            create: CreateUserInput
+        }
+
+        input CreateUserInput {
+            id: ID
+            name: String!
+        }
+
+        input RoleInput {
+            create: CreateRoleInput
+        }
+
+        input CreateRoleInput {
+            id: ID
+            name: String!
+        }
+        '.self::PLACEHOLDER_QUERY;
+
+        $query = /** @lang GraphQL */ '
+        mutation {
+            createRoleUser(input: {
+                meta: "asdf"
+                user: {
+                    create: {
+                        name: "some username"
+                    }
+                }
+                role: {
+                    create: {
+                        name: "some rolename"
+                    }
+                }
+            }) {
+                id
+                meta
+                user {
+                    id
+                    name
+                }
+                role {
+                    id
+                    name
+                }
+            }
+        }';
+
+        // This must first create a user, then a role, then attach them to the pivot
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'createRoleUser' => [
+                    'id' => '1',
+                    'meta' => 'asdf',
+                    'user' => [
+                        'id' => '1',
+                        'name' => 'some username',
+                    ],
+                    'role' => [
+                        'id' => '1',
+                        'name' => 'some rolename',
+                    ],
+                ],
+            ],
+        ]);
+
+        // We should be able to repeat this query and create new entries the same way
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'createRoleUser' => [
+                    'id' => '2',
+                    'meta' => 'asdf',
+                    'user' => [
+                        'id' => '2',
+                        'name' => 'some username',
+                    ],
+                    'role' => [
+                        'id' => '2',
+                        'name' => 'some rolename',
                     ],
                 ],
             ],

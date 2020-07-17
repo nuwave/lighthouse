@@ -2,45 +2,72 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CacheValue
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
+     * @var mixed|null The root that was passed to the query.
      */
-    protected $fieldValue;
-
-    protected $rootValue;
+    protected $root;
 
     /**
-     * @var array
+     * The args that were passed to the query.
+     *
+     * @var array<string, mixed>
      */
     protected $args;
 
+    /**
+     * The context that was passed to the query.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
+     */
     protected $context;
 
     /**
+     * The ResolveInfo that was passed to the query.
+     *
      * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
-    protected $fieldKey;
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
+     */
+    protected $fieldValue;
 
     /**
      * @var bool
      */
     protected $isPrivate;
 
-    public function __construct(array $arguments = [])
-    {
-        $this->fieldValue = Arr::get($arguments, 'field_value');
-        $this->rootValue = Arr::get($arguments, 'root');
-        $this->args = Arr::get($arguments, 'args');
-        $this->context = Arr::get($arguments, 'context');
-        $this->resolveInfo = Arr::get($arguments, 'resolve_info');
-        $this->isPrivate = Arr::get($arguments, 'is_private');
+    /**
+     * @var mixed The key to use for caching this field.
+     */
+    protected $fieldKey;
+
+    /**
+     * @param  mixed|null  $root The root that was passed to the query.
+     * @param  array<string, mixed>  $args
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     */
+    public function __construct(
+        $root,
+        array $args,
+        GraphQLContext $context,
+        ResolveInfo $resolveInfo,
+        FieldValue $fieldValue,
+        bool $isPrivate
+    ) {
+        $this->root = $root;
+        $this->args = $args;
+        $this->context = $context;
+        $this->resolveInfo = $resolveInfo;
+        $this->fieldValue = $fieldValue;
+        $this->isPrivate = $isPrivate;
 
         $this->fieldKey = $this->fieldKey();
     }
@@ -71,6 +98,8 @@ class CacheValue
 
     /**
      * Get cache tags.
+     *
+     * @return array<string>
      */
     public function getTags(): array
     {
@@ -92,6 +121,8 @@ class CacheValue
 
     /**
      * Convert input arguments to keys.
+     *
+     * @return \Illuminate\Support\Collection<string>
      */
     protected function argKeys(): Collection
     {
@@ -102,7 +133,7 @@ class CacheValue
         return (new Collection($args))
             ->map(function ($value, $key): string {
                 $keyValue = is_array($value)
-                    ? json_encode($value, true)
+                    ? json_encode($value)
                     : $value;
 
                 return "{$key}:{$keyValue}";
@@ -116,7 +147,7 @@ class CacheValue
      */
     protected function fieldKey()
     {
-        if (! $this->fieldValue || ! $this->rootValue) {
+        if ($this->root === null) {
             return;
         }
 
@@ -125,12 +156,12 @@ class CacheValue
             ->getCacheKey();
 
         if ($cacheFieldKey) {
-            return data_get($this->rootValue, $cacheFieldKey);
+            return data_get($this->root, $cacheFieldKey);
         }
     }
 
     /**
-     * Implode value to create string.
+     * @param  array<mixed|null> $items
      */
     protected function implode(array $items): string
     {

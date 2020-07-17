@@ -42,7 +42,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     }
     ';
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -286,19 +286,32 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testAddsNot(): void
+    public function testAddsNestedAndOr(): void
     {
-        $this->markTestSkipped('Kind of works, but breaks down when more nested conditions are added, see https://github.com/nuwave/lighthouse/issues/1124');
-        factory(User::class, 2)->create();
+        factory(User::class, 5)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
-                    NOT: [
+                    AND: [
                         {
                             column: "id"
+                            operator: GT
                             value: 1
+                        }
+                        {
+                            OR: [
+                                {
+                                    column: "id"
+                                    value: 2
+                                }
+                                {
+                                    column: "id"
+                                    value: 3
+                                }
+                            ]
+
                         }
                     ]
                 }
@@ -312,40 +325,6 @@ class WhereConditionsDirectiveTest extends DBTestCase
                     [
                         'id' => '2',
                     ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testAddsNestedNot(): void
-    {
-        $this->markTestSkipped('Not working because of limitations in Eloquent, see https://github.com/nuwave/lighthouse/issues/1124');
-        factory(User::class, 3)->create();
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                where: {
-                    NOT: {
-                        OR: [
-                            {
-                                column: "id"
-                                value: 1
-                            }
-                            {
-                                column: "id"
-                                value: 2
-                            }
-                        ]
-                    }
-                }
-            ) {
-                id
-            }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
                     [
                         'id' => '3',
                     ],
@@ -485,6 +464,8 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $expectedEnumName = 'WhitelistedColumnsWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
+        $this->assertNotNull($enum);
+        /** @var array<string, mixed> $enum */
         $this->assertArraySubset(
             [
                 'kind' => 'ENUM',

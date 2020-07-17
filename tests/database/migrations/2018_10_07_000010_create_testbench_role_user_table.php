@@ -13,9 +13,10 @@ class CreateTestbenchRoleUserTable extends Migration
     {
         Schema::create('role_user', function (Blueprint $table): void {
             $table->increments('id');
+            $table->string('meta')->nullable();
+
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('role_id');
-            $table->string('meta')->nullable();
         });
     }
 
