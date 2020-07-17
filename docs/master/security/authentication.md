@@ -134,6 +134,7 @@ Add the following middleware to `config/lighthouse.php`:
 
             // Or this one when using Laravel Sanctum:
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+
             // ... other middleware
         ],
     ],
