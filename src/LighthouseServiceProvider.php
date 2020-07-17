@@ -27,6 +27,7 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
+use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Execution\LighthouseRequest;
@@ -111,6 +112,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(DirectiveFactory::class);
         $this->app->singleton(NodeRegistry::class);
         $this->app->singleton(TypeRegistry::class);
+        $this->app->singleton(ErrorPool::class);
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 

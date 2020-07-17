@@ -58,7 +58,7 @@ to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first
             // ... other middleware
 
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        ]
+        ],
     ],
     'guard' => 'sanctum',
 ```
@@ -133,10 +133,9 @@ Add the following middleware to `config/lighthouse.php`:
             \Illuminate\Session\Middleware\StartSession::class,
 
             // Or this one when using Laravel Sanctum:
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class
-
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             // ... other middleware
-        ]
+        ],
     ],
 ```
 
