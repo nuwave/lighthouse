@@ -16,6 +16,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   GraphQL query https://github.com/nuwave/lighthouse/pull/1454
 - Allow custom query validation rules selection by rebinding the interface
   `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` https://github.com/nuwave/lighthouse/pull/1487
+- Add `DateTimeUtc` scalar https://github.com/nuwave/lighthouse/pull/1320
 
 ### Changed
 
