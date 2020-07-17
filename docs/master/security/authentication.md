@@ -58,7 +58,7 @@ to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first
             // ... other middleware
 
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        ]             
+        ],
     ],
     'guard' => 'sanctum',
 ```
@@ -131,12 +131,12 @@ Add the following middleware to `config/lighthouse.php`:
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            
+
             // Or this one when using Laravel Sanctum:
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class
-            
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+
             // ... other middleware
-        ]             
+        ],
     ],
 ```
 
@@ -144,11 +144,11 @@ The `login` and `logout` might be defined and implement like this:
 
 ```graphql
 type Mutation {
-    "Log in to a new session and get the user."
-    login(email: String!, password: String!): User!
+  "Log in to a new session and get the user."
+  login(email: String!, password: String!): User!
 
-    "Log out from the current session, showing the user one last time."
-    logout: User @guard
+  "Log out from the current session, showing the user one last time."
+  logout: User @guard
 }
 ```
 
@@ -161,8 +161,8 @@ class Login
      */
     public function __invoke($_, array $args): User
     {
-        // Plain Laravel: Auth::guard() 
-        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web')) 
+        // Plain Laravel: Auth::guard()
+        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web'))
         $guard = ?;
 
         if( ! $guard->attempt($args)) {
@@ -190,8 +190,8 @@ class Logout
      */
     public function __invoke($_, array $args): ?User
     {
-        // Plain Laravel: Auth::guard() 
-        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web')) 
+        // Plain Laravel: Auth::guard()
+        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web'))
         $guard = ?;
 
         /** @var \App\Models\User|null $user */

@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -53,7 +54,12 @@ class GraphQL
     protected $createsContext;
 
     /**
-     * @var ProvidesValidationRules
+     * @var \Nuwave\Lighthouse\Execution\ErrorPool
+     */
+    protected $errorPool;
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules
      */
     protected $providesValidationRules;
 
@@ -63,6 +69,7 @@ class GraphQL
         EventDispatcher $eventDispatcher,
         ASTBuilder $astBuilder,
         CreatesContext $createsContext,
+        ErrorPool $errorPool,
         ProvidesValidationRules $providesValidationRules
     ) {
         $this->schemaBuilder = $schemaBuilder;
@@ -70,6 +77,7 @@ class GraphQL
         $this->eventDispatcher = $eventDispatcher;
         $this->astBuilder = $astBuilder;
         $this->createsContext = $createsContext;
+        $this->errorPool = $errorPool;
         $this->providesValidationRules = $providesValidationRules;
     }
 
@@ -159,6 +167,10 @@ class GraphQL
             }
         }
 
+        foreach ($this->errorPool->errors() as $error) {
+            $result->errors [] = $error;
+        }
+
         $result->setErrorsHandler(
             function (array $errors, callable $formatter): array {
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
@@ -209,6 +221,7 @@ class GraphQL
     protected function cleanUp(): void
     {
         BatchLoader::forgetInstances();
+        $this->errorPool->clear();
     }
 
     /**
