@@ -3,6 +3,9 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
@@ -136,15 +139,29 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      * @param  string[]  $scopes
      * @param  \Closure  $directiveFilter
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation
      */
     public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
     {
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
+
+        $baseBuilder = null;
+        if ($builder instanceof Builder) {
+            $baseBuilder = $builder;
+        } elseif ($builder instanceof EloquentBuilder) {
+            $baseBuilder = $builder->getQuery();
+        } elseif ($builder instanceof Relation) {
+            $baseBuilder = $builder->getBaseQuery();
+        }
+
+        if ($baseBuilder && is_null($baseBuilder->columns)) {
+            // Fix a long standing issue within Eloquent https://github.com/laravel/framework/issues/4962
+            $builder->select($baseBuilder->from.'.*');
+        }
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($this->toArray());

@@ -80,6 +80,13 @@ class User extends Authenticatable
         return $query->whereNotNull('name');
     }
 
+    public function scopeWithTeam(Builder $builder, $teamId): Builder
+    {
+        return $builder
+            ->join('teams', 'teams.id', '=', 'users.team_id')
+            ->where('teams.id', '=', $teamId);
+    }
+
     public function tasksLoaded(): bool
     {
         return $this->relationLoaded('tasks');
