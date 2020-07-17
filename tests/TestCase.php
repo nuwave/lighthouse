@@ -76,6 +76,8 @@ GRAPHQL;
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
 
+        $config->set('lighthouse.route.prefix', 'test-api');
+
         $config->set('lighthouse.namespaces', [
             'models' => [
                 'Tests\\Utils\\Models',
