@@ -19,6 +19,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Publish config file with tag `lighthouse-config` and default schema with tag `lighthouse-schema`
   instead of the previously used tags `config` and `schema` https://github.com/nuwave/lighthouse/issues/1489
+- Throw partial errors when failing to delete, forceDelete or restore a model https://github.com/nuwave/lighthouse/pull/1420
+- Add `\Nuwave\Lighthouse\Execution\ErrorPool` to allow collection of partial errors https://github.com/nuwave/lighthouse/pull/1420
 
 ### Fixed
 
