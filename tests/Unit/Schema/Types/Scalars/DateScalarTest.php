@@ -117,7 +117,7 @@ abstract class DateScalarTest extends TestCase
     /**
      * Data provider with pairs of dates:
      * 1. A valid representation of the date
-     * 1. The canonical representation of the date
+     * 1. The canonical representation of the date.
      *
      * @return array<array<string>>
      */
