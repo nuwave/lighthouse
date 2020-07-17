@@ -26,6 +26,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Ensure the `@count` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1466
 
+### Deprecated
+
+- Deprecate `\Nuwave\Lighthouse\Execution\ErrorBuffer` in favor of `\Nuwave\Lighthouse\Execution\ErrorPool` https://github.com/nuwave/lighthouse/pull/1420
+
 ## 4.15.0
 
 ### Added
