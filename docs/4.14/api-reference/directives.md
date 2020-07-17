@@ -1637,7 +1637,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1669,7 +1669,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1697,7 +1697,7 @@ directive @morphTo(
 
 ```graphql
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1911,6 +1911,8 @@ directive @orderBy(
 ) on ARGUMENT_DEFINITION
 ```
 
+**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
+
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
 
@@ -2002,7 +2004,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ field: "postedAt", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
     title
   }
 }

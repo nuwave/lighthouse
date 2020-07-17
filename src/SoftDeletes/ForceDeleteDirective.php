@@ -41,10 +41,10 @@ SDL;
         return $modelClass::withTrashed()->find($idOrIds);
     }
 
-    protected function modifyExistence(Model $model): void
+    protected function modifyExistence(Model $model): bool
     {
         /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $model */
-        $model->forceDelete();
+        return (bool) $model->forceDelete();
     }
 
     /**

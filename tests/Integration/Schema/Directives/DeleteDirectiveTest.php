@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -14,7 +15,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -24,7 +25,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             deleteUser(id: 1) {
                 id
@@ -45,7 +46,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String
@@ -56,7 +57,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             deleteUsers(id: [1, 2]) {
                 name
@@ -289,5 +290,38 @@ class DeleteDirectiveTest extends DBTestCase
         $this->assertNull(
             $task->refresh()->user_id
         );
+    }
+
+    public function testNotDeleting(): void
+    {
+        User::deleting(function (): bool {
+            return false;
+        });
+
+        $user = factory(User::class)->create();
+
+        $this->schema .= /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID!): User @delete
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            deleteUser(id: 1) {
+                id
+            }
+        }
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => ModifyModelExistenceDirective::couldNotModify($user),
+                ],
+            ],
+        ]);
     }
 }

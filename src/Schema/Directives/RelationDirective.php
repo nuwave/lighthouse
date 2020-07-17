@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -50,7 +51,7 @@ abstract class RelationDirective extends BaseDirective
                             $constructorArgs
                         )
                         ->load(
-                            $parent->getKey(),
+                            ModelKey::build($parent),
                             ['parent' => $parent]
                         );
                 }

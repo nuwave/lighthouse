@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Console;
+namespace Tests\Console;
 
 use Nuwave\Lighthouse\Console\LighthouseGeneratorCommand;
 use Tests\TestCase;
