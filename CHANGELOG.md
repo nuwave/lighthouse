@@ -17,6 +17,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow custom query validation rules selection by rebinding the interface
   `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` https://github.com/nuwave/lighthouse/pull/1487
 
+### Changed
+
+- Publish config file with tag `lighthouse-config` and default schema with tag `lighthouse-schema`
+  instead of the previously used tags `config` and `schema` https://github.com/nuwave/lighthouse/issues/1489
+
 ### Fixed
 
 - Ensure the `@count` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1466
