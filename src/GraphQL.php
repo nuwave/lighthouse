@@ -6,10 +6,6 @@ use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
-use GraphQL\Validator\DocumentValidator;
-use GraphQL\Validator\Rules\DisableIntrospection;
-use GraphQL\Validator\Rules\QueryComplexity;
-use GraphQL\Validator\Rules\QueryDepth;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
@@ -21,64 +17,60 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Pipeline;
 
 class GraphQL
 {
     /**
-     * The executable schema.
-     *
      * @var \GraphQL\Type\Schema
      */
     protected $executableSchema;
 
     /**
-     * The schema builder.
-     *
      * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     protected $schemaBuilder;
 
     /**
-     * The pipeline.
-     *
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
 
     /**
-     * The event dispatcher.
-     *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventDispatcher;
 
     /**
-     * The AST builder.
-     *
      * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
      */
     protected $astBuilder;
 
     /**
-     * The context factory.
-     *
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
     protected $createsContext;
+
+    /**
+     * @var ProvidesValidationRules
+     */
+    protected $providesValidationRules;
 
     public function __construct(
         SchemaBuilder $schemaBuilder,
         Pipeline $pipeline,
         EventDispatcher $eventDispatcher,
         ASTBuilder $astBuilder,
-        CreatesContext $createsContext
+        CreatesContext $createsContext,
+        ProvidesValidationRules $providesValidationRules
     ) {
         $this->schemaBuilder = $schemaBuilder;
         $this->pipeline = $pipeline;
         $this->eventDispatcher = $eventDispatcher;
         $this->astBuilder = $astBuilder;
         $this->createsContext = $createsContext;
+        $this->providesValidationRules = $providesValidationRules;
     }
 
     /**
@@ -153,7 +145,7 @@ class GraphQL
             $variables,
             $operationName,
             null,
-            $this->getValidationRules() + DocumentValidator::defaultRules()
+            $this->providesValidationRules->validationRules()
         );
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
@@ -209,20 +201,6 @@ class GraphQL
         }
 
         return $this->executableSchema;
-    }
-
-    /**
-     * Construct the validation rules with values given in the config.
-     *
-     * @return array<class-string<\GraphQL\Validator\Rules\ValidationRule>, \GraphQL\Validator\Rules\ValidationRule>
-     */
-    protected function getValidationRules(): array
-    {
-        return [
-            QueryComplexity::class => new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
-            QueryDepth::class => new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
-            DisableIntrospection::class => new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
-        ];
     }
 
     /**

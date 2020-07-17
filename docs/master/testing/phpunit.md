@@ -127,7 +127,7 @@ public function testOrdersUsersByName(): void
 ### TestResponse Assertion Mixins
 
 Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
-Make sure to publish the latest [IDE-helper file](/_ide_helper.php) to get proper autocompletion:
+Make sure to generate the latest [IDE-helper file](/_ide_helper.php) to get proper autocompletion:
 
 ```bash
 php artisan lighthouse:ide-helper

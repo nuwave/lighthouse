@@ -12,11 +12,19 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add artisan command `lighthouse:cache` to compile GraphQL AST https://github.com/nuwave/lighthouse/pull/1451
-
-### Added
-
 - Add middleware `\Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
   GraphQL query https://github.com/nuwave/lighthouse/pull/1454
+- Allow custom query validation rules selection by rebinding the interface
+  `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` https://github.com/nuwave/lighthouse/pull/1487
+
+### Changed
+
+- Publish config file with tag `lighthouse-config` and default schema with tag `lighthouse-schema`
+  instead of the previously used tags `config` and `schema` https://github.com/nuwave/lighthouse/issues/1489
+
+### Fixed
+
+- Ensure the `@count` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1466
 
 ## 4.15.0
 
