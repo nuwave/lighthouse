@@ -1529,7 +1529,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1590,7 +1590,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1622,7 +1622,7 @@ Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/el
 
 ```graphql
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
