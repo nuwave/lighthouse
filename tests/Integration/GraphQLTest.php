@@ -35,7 +35,7 @@ class GraphQLTest extends TestCase
     {
         $this
             ->getJson(
-                'graphql?'
+                'test-api/graphql?'
                 .http_build_query(
                     [
                         'query' => /** @lang GraphQL */ '
