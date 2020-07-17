@@ -4,6 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
 use Carbon\Carbon;
 
+/**
+ * Only works with Carbon 2.
+ */
 class DateTimeUtc extends DateScalar
 {
     protected function format(Carbon $carbon): string

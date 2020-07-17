@@ -53,6 +53,8 @@ scalar DateTimeUtc
 
 Internally represented as an instance of `Carbon\Carbon`.
 
+> Only works with Carbon 2.
+
 ## Upload
 
 ```graphql
