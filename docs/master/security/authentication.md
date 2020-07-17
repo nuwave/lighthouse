@@ -45,11 +45,29 @@ This setting is used whenever Lighthouse looks for an authenticated user, for ex
 such as [@guard](../api-reference/directives.md#guard), or when applying the `AttempAuthentication` middleware.
 
 Stateless guards are recommended for most use cases, such as the default `api` guard.
-If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) for your API, set it here:
+
+### Laravel Sanctum
+
+If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) for your API, set the guard
+to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first middleware for Lighthouse's route.
 
 ```php
+    'route' => [
+        // ...
+        'middleware' => [
+            // ... other middleware
+
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]             
+    ],
     'guard' => 'sanctum',
 ```
+
+Note that Sanctum requires you to send an CSRF token as [header](https://laravel.com/docs/csrf#csrf-x-csrf-token)
+with all GraphQL requests, regardless of whether the user is authenticated or not.
+
+When using [laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground), follow the [instructions
+to add a CSRF token](https://github.com/mll-lab/laravel-graphql-playground#configure-session-authentication).
 
 ## Guard selected fields
 
@@ -92,5 +110,95 @@ or `null` if the request is not authenticated.
     name
     email
   }
+}
+```
+
+## Stateful Authentication Example
+
+You can create or destroy a session with mutations instead of separate API endpoints (`/login`, `/logout`).
+**This only works when Lighthouse's guard uses a session driver.**
+Laravel's token based authentication does not allow logging in or out on the server side.
+
+The implementation in the docs is only an example and may have to be adapted to your specific use case.
+
+Add the following middleware to `config/lighthouse.php`:
+
+```php
+    'route' => [
+        // ...
+        'middleware' => [
+            // Either those for plain Laravel:
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            
+            // Or this one when using Laravel Sanctum:
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class
+            
+            // ... other middleware
+        ]             
+    ],
+```
+
+The `login` and `logout` might be defined and implement like this:
+
+```graphql
+type Mutation {
+    "Log in to a new session and get the user."
+    login(email: String!, password: String!): User!
+
+    "Log out from the current session, showing the user one last time."
+    logout: User @guard
+}
+```
+
+```php
+class Login
+{
+    /**
+     * @param  null  $_
+     * @param  array<string, mixed>  $args
+     */
+    public function __invoke($_, array $args): User
+    {
+        // Plain Laravel: Auth::guard() 
+        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web')) 
+        $guard = ?;
+
+        if( ! $guard->attempt($args)) {
+            throw new Error('Invalid credentials.');
+        }
+
+        /**
+         * Since we successfully logged in, this can no longer be `null`.
+         *
+         * @var \App\Models\User $user
+         */
+        $user = $guard->user();
+
+        return $user;
+    }
+}
+```
+
+```php
+class Logout
+{
+    /**
+     * @param  null  $_
+     * @param  array<string, mixed>  $args
+     */
+    public function __invoke($_, array $args): ?User
+    {
+        // Plain Laravel: Auth::guard() 
+        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web')) 
+        $guard = ?;
+
+        /** @var \App\Models\User|null $user */
+        $user = $guard->user();
+        $guard->logout();
+
+        return $user;
+    }
 }
 ```
