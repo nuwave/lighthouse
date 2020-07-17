@@ -28,6 +28,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Ensure the `@count` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1466
+- Take route prefix into account in `graphQLEnpointUrl()` test helper https://github.com/nuwave/lighthouse/pull/1439
 
 ### Deprecated
 

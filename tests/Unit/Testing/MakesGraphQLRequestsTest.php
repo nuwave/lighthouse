@@ -6,8 +6,20 @@ use Tests\TestCase;
 
 class MakesGraphQLRequestsTest extends TestCase
 {
-    public function testGraphQLEndpointUrl(): void
+    protected function getEnvironmentSetUp($app): void
     {
-        $this->assertEquals($this->graphQLEndpointUrl(), 'http://localhost/test-api/graphql');
+        parent::getEnvironmentSetUp($app);
+
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app['config'];
+        $config->set('lighthouse.route.prefix', 'prefix');
+    }
+
+    public function testGraphQLEndpointUrlWithPrefix(): void
+    {
+        $this->assertSame(
+            'http://localhost/prefix/graphql',
+            $this->graphQLEndpointUrl()
+        );
     }
 }
