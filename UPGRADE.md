@@ -9,6 +9,14 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ## v4 to v5
 
+### Update PHP, Laravel and PHPUnit
+
+The following versions are now the minimal required versions:
+
+- PHP 7.2
+- Laravel 5.6
+- PHPUnit 7
+
 ### Replace @middleware with @guard and specialized FieldMiddleware
 
 The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL
@@ -285,4 +293,15 @@ try {
 }
 
 return $result;
+```
+
+### Use native `TestResponse::json()`
+
+The `TestResponse::jsonGet()` mixin was removed in favor of the `->json()` method,
+natively supported by Laravel starting from version 5.6.
+
+```diff
+$response = $this->graphQL(...);
+-$response->jsonGet(...);
++$response->json(...);
 ```

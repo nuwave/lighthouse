@@ -238,7 +238,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 5),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -314,7 +314,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 5),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -350,7 +350,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -388,7 +388,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 

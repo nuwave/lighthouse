@@ -23,6 +23,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Removed
 
+- Remove support for PHP 7.1, Laravel 5.5 and PHPUnit 6 https://github.com/nuwave/lighthouse/pull/1192
+- Remove `TestResponse::jsonGet()` helper, use `->json()` instead https://github.com/nuwave/lighthouse/pull/1192/files
 - Remove `\Nuwave\Lighthouse\Execution\GraphQLValidator` as validation now uses Laravel's native validator https://github.com/nuwave/lighthouse/pull/1185
 - Remove interfaces `HasArgumentPath` and `HasErrorBuffer` and the parts of `FieldFactory` that calls them https://github.com/nuwave/lighthouse/pull/1185
 - Remove the `ValidationDirective` abstract class in favour of validator classes https://github.com/nuwave/lighthouse/pull/1185
