@@ -7,11 +7,11 @@ use Tests\Utils\Models\User;
 
 class ArgBuilderDirectiveTest extends DBTestCase
 {
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String
@@ -83,6 +83,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             id: ID @eq
         }
         ';
+        $users = factory(User::class, 2)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -98,7 +99,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => 1,
+                'id' => $users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -188,6 +189,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             users(id: Int @where(operator: ">")): [User!]! @all
         }
         ';
+        $users = factory(User::class, 3)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -199,7 +201,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ', [
                 'userId' => $users->first()->getKey(),
             ])
-            ->assertJsonCount(4, 'data.users');
+            ->assertJsonCount(2, 'data.users');
     }
 
     public function testCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
@@ -371,7 +373,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testAttachMultipleWhereFiltersToQuery(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             users(
                 name: String
@@ -393,12 +395,16 @@ class ArgBuilderDirectiveTest extends DBTestCase
             'email' => $username,
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(name: "'.$username.'") {
-                id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($name: String) {
+                users(name: $name) {
+                    id
+                }
             }
-        }
-        ')->assertJsonCount(1, 'data.users');
+            ', [
+                'name' => $username
+            ])
+            ->assertJsonCount(1, 'data.users');
     }
 }
