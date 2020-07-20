@@ -71,11 +71,6 @@ GRAPHQL;
         return 'GTE';
     }
 
-    public function defaultHasOperatorValue(): string
-    {
-        return '>=';
-    }
-
     public function applyConditions($builder, array $whereConditions, string $boolean)
     {
         $column = $whereConditions['column'];
