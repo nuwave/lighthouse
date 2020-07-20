@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
@@ -237,7 +238,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 5),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -313,7 +314,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 5),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -349,7 +350,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -387,7 +388,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -423,10 +424,13 @@ class HasManyDirectiveTest extends DBTestCase
         );
 
         $user = $this->introspectType('User');
+
+        $this->assertNotNull($user);
+        /** @var array<string, mixed> $user */
         $tasks = Arr::first(
-            $user['fields'],
-            function (array $user): bool {
-                return $user['name'] === 'tasks';
+            $user['fields'], // @phpstan-ignore-line
+            function (array $field): bool {
+                return $field['name'] === 'tasks';
             }
         );
         $this->assertSame(
@@ -706,6 +710,9 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $type = $schema->getType('User');
+
+        $this->assertInstanceOf(Type::class, $type);
+        /** @var \GraphQL\Type\Definition\Type $type */
         $type->config['fields']();
     }
 

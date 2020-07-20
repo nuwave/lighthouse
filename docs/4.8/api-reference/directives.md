@@ -470,8 +470,8 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
   """
   find: String
 
@@ -1593,7 +1593,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1654,7 +1654,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1686,7 +1686,7 @@ Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/el
 
 ```graphql
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1909,8 +1909,10 @@ directive @orderBy(
   If not given, the column names can be passed as a String by clients.
   """
   columns: [String!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
+
+**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
 
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
@@ -1980,7 +1982,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ field: "postedAt", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
     title
   }
 }

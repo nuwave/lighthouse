@@ -74,7 +74,7 @@ GRAPHQL;
         $method = 'where';
 
         // The first argument to conditions methods is always the column name
-        $args[] = $column;
+        $args = [$column];
 
         // Some operators require calling Laravel's conditions in different ways
         $operator = $whereConditions['operator'];

@@ -2,17 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class WithDirective extends RelationDirective implements FieldMiddleware
+class WithDirective extends WithRelationDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -35,46 +28,13 @@ directive @with(
 SDL;
     }
 
-    /**
-     * Eager load a relation on the parent instance.
-     */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function batchLoaderClass(): string
     {
-        $resolver = $fieldValue->getResolver();
+        return RelationBatchLoader::class;
+    }
 
-        return $next(
-            $fieldValue->setResolver(
-                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
-                    $loader = BatchLoader::instance( // @phpstan-ignore-line TODO remove when updating graphql-php
-                        RelationBatchLoader::class,
-                        $resolveInfo->path,
-                        [
-                            'relationName' => $this->directiveArgValue('relation', $this->nodeName()),
-                            'decorateBuilder' => function ($query) use ($resolveInfo) {
-                                $resolveInfo
-                                    ->argumentSet
-                                    ->enhanceBuilder(
-                                        $query,
-                                        $this->directiveArgValue('scopes', [])
-                                    );
-                            },
-                        ]
-                    );
-
-                    return new Deferred(function () use ($loader, $resolver, $parent, $args, $context, $resolveInfo) {
-                        return $loader
-                            ->load(
-                                $parent->getKey(),
-                                ['parent' => $parent]
-                            )
-                            ->then(
-                                function () use ($resolver, $parent, $args, $context, $resolveInfo) {
-                                    return $resolver($parent, $args, $context, $resolveInfo);
-                                }
-                            );
-                    });
-                }
-            )
-        );
+    public function relationName(): string
+    {
+        return $this->directiveArgValue('relation', $this->nodeName());
     }
 }

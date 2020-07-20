@@ -71,19 +71,18 @@ SDL;
         $isPrivate = $this->directiveArgValue('private', false);
 
         return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
-            $cacheValue = new CacheValue([
-                'field_value' => $fieldValue,
-                'root' => $root,
-                'args' => $args,
-                'context' => $context,
-                'resolve_info' => $resolveInfo,
-                'is_private' => $isPrivate,
-            ]);
+            $cacheValue = new CacheValue(
+                $root,
+                $args,
+                $context,
+                $resolveInfo,
+                $fieldValue,
+                $isPrivate
+            );
 
             $cacheKey = $cacheValue->getKey();
 
             if ($this->shouldUseTags()) {
-                // @phpstan-ignore-next-line We know this method exists because we checked for it
                 $cache = $this->cacheRepository->tags($cacheValue->getTags());
             } else {
                 $cache = $this->cacheRepository;
@@ -99,10 +98,10 @@ SDL;
             $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
-                ? function ($value) use ($cacheKey, $maxAge, $cache) {
+                ? function ($value) use ($cacheKey, $maxAge, $cache): void {
                     $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
                 }
-            : function ($value) use ($cacheKey, $cache) {
+            : function ($value) use ($cacheKey, $cache): void {
                 $cache->forever($cacheKey, $value);
             };
 
@@ -144,9 +143,11 @@ SDL;
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $typeDefinition */
         $typeDefinition = $typeValue->getTypeDefinition();
 
+        /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+        $fieldDefinitions = $typeDefinition->fields;
+
         // First priority: Look for a field with the @cacheKey directive
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
-        foreach ($typeDefinition->fields as $field) {
+        foreach ($fieldDefinitions as $field) {
             if (ASTHelper::hasDirective($field, 'cacheKey')) {
                 $typeValue->setCacheKey($field->name->value);
 
@@ -155,8 +156,7 @@ SDL;
         }
 
         // Second priority: Look for a Non-Null field with the ID type
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $field */
-        foreach ($typeDefinition->fields as $field) {
+        foreach ($fieldDefinitions as $field) {
             if (
                 // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 $field->type instanceof NonNullTypeNode

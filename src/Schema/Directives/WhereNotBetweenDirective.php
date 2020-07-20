@@ -30,7 +30,7 @@ SDL;
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $values)
+    public function handleBuilder($builder, $values): object
     {
         return $builder->whereNotBetween(
             $this->directiveArgValue('key', $this->nodeName()),

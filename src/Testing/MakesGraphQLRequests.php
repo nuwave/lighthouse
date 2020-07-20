@@ -37,11 +37,11 @@ trait MakesGraphQLRequests
      * Execute a query as if it was sent as a request to the server.
      *
      * @param  string  $query  The GraphQL query to send
-     * @param  array<string, mixed>|null  $variables  The variables to include in the query
-     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the JSON payload
+     * @param  array<string, mixed>  $variables  The variables to include in the query
+     * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function graphQL(string $query, array $variables = null, array $extraParams = [])
+    protected function graphQL(string $query, array $variables = [], array $extraParams = [])
     {
         $params = ['query' => $query];
 
@@ -146,11 +146,7 @@ trait MakesGraphQLRequests
             $this->introspect();
         }
 
-        // TODO Replace with ->json() once we remove support for Laravel 5.5
-        $results = data_get(
-            $this->introspectionResult->decodeResponseJson(),
-            $path
-        );
+        $results = $this->introspectionResult->json($path);
 
         return Arr::first(
             $results,
@@ -165,18 +161,18 @@ trait MakesGraphQLRequests
      */
     protected function graphQLEndpointUrl(): string
     {
-        return config('lighthouse.route.uri');
+        return route(config('lighthouse.route.name'));
     }
 
     /**
      * Send the query and capture all chunks of the streamed response.
      *
      * @param  string  $query  The GraphQL query to send
-     * @param  array<string, mixed>|null  $variables  The variables to include in the query
-     * @param  array<string, mixed>|null  $extraParams  Extra parameters to add to the HTTP payload
+     * @param  array<string, mixed>  $variables  The variables to include in the query
+     * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
      * @return array<int, mixed>  The chunked results
      */
-    protected function streamGraphQL(string $query, array $variables = null, array $extraParams = []): array
+    protected function streamGraphQL(string $query, array $variables = [], array $extraParams = []): array
     {
         if ($this->deferStream === null) {
             $this->setUpDeferStream();

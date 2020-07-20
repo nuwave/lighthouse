@@ -17,6 +17,9 @@
         <testsuite name="Integration">
             <directory>./tests/Integration/</directory>
         </testsuite>
+        <testsuite name="Console">
+            <directory>./tests/Console/</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>

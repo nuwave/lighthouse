@@ -42,7 +42,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     }
     ';
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -461,14 +461,18 @@ class WhereConditionsDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $expectedEnumName = 'WhitelistedColumnsWhereColumn';
+        $expectedEnumName = 'QueryWhitelistedColumnsWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
+        $this->assertNotNull($enum);
+        /** @var array<string, mixed> $enum */
+
+        // TODO: Replace with dms/phpunit-arraysubset-asserts when we require PHPUnit 9 + PHP 7.3
         $this->assertArraySubset(
             [
                 'kind' => 'ENUM',
                 'name' => $expectedEnumName,
-                'description' => 'Allowed column names for the `where` argument on the query `whitelistedColumns`.',
+                'description' => 'Allowed column names for the `where` argument on field `whitelistedColumns` on type `Query`.',
                 'enumValues' => [
                     [
                         'name' => 'ID',

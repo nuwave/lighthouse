@@ -55,14 +55,11 @@ class OrderByServiceProvider extends ServiceProvider
 
     public static function createOrderByClauseInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
-        // TODO deprecated remove in v5
-        $columnName = config('lighthouse.orderBy');
-
         return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
                 "The column that is used for ordering."
-                $columnName: $columnType!
+                column: $columnType!
 
                 "The direction that is used for ordering."
                 order: SortOrder!

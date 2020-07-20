@@ -16,6 +16,7 @@ For convenience, common tasks are wrapped up in the [Makefile](Makefile) for usa
 
 Just clone the project and run the following in the project root:
 
+    make setup
     make
 
 To see the available commands, run:
@@ -186,13 +187,29 @@ function bar(){
 We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
 at the Laravel coding style.
 
-Look through some code to get a feel for the naming conventions.
-
 Prefer explicit naming and short, focused functions over excessive comments.
 
-### Ternarys
+### Alignment
 
-Ternary's should be spread out across multiple lines.
+Do not align stuff horizontally, it leads to ugly diffs.
+
+```php
+// Right
+[
+    'foo' => 1,
+    'barbaz' => 2,
+]
+
+// Wrong
+[
+    'foo'    => 1,
+    'barbaz' => 2,
+]
+```
+
+### Multiline Ternary Expressions
+
+Ternary expressions must be spread across multiple lines.
 
 ```php
 $foo = $cond
@@ -229,6 +246,37 @@ You can use the following two case-sensitive regexes to search for violations:
 ```regexp
 @(var|param|return|throws).*\|[A-Z]
 @(var|param|return|throws)\s*[A-Z]
+```
+
+### Test Data Setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$user->post()->save();
+
+// Wrong
+$user = factory(Post::class)->create([
+    'user_id' => $post->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
 ```
 
 ## Benchmarks

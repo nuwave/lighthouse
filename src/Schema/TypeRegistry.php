@@ -256,7 +256,10 @@ EOL
 
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
     {
+        /** @var array<string, array<string, mixed>> $values */
         $values = [];
+
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($enumDefinition->values as $enumValue) {
             /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
             $enumDirective = $this->directiveFactory->createSingleDirectiveOfType($enumValue, EnumDirective::class);
@@ -316,16 +319,20 @@ EOL
             'name' => $objectDefinition->name->value,
             'description' => data_get($objectDefinition->description, 'value'),
             'fields' => $this->makeFieldsLoader($objectDefinition),
-            'interfaces' => function () use ($objectDefinition): array {
-                $interfaces = [];
+            'interfaces' =>
+                /**
+                 * @return array<\GraphQL\Type\Definition\Type>
+                 */
+                function () use ($objectDefinition): array {
+                    $interfaces = [];
 
-                // Might be a NodeList, so we can not use array_map()
-                foreach ($objectDefinition->interfaces as $interface) {
-                    $interfaces [] = $this->get($interface->name->value);
-                }
+                    // Might be a NodeList, so we can not use array_map()
+                    foreach ($objectDefinition->interfaces as $interface) {
+                        $interfaces [] = $this->get($interface->name->value);
+                    }
 
-                return $interfaces;
-            },
+                    return $interfaces;
+                },
         ]);
     }
 
@@ -336,21 +343,26 @@ EOL
      */
     protected function makeFieldsLoader($typeDefinition): Closure
     {
-        return function () use ($typeDefinition): array {
-            $typeValue = new TypeValue($typeDefinition);
-            $fields = [];
+        return
+            /**
+             * @return array<string, array>
+             */
+            function () use ($typeDefinition): array {
+                $typeValue = new TypeValue($typeDefinition);
+                $fields = [];
 
-            // Might be a NodeList, so we can not use array_map()
-            foreach ($typeDefinition->fields as $fieldDefinition) {
-                /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
-                $fieldFactory = app(FieldFactory::class);
-                $fieldValue = new FieldValue($typeValue, $fieldDefinition);
+                // Might be a NodeList, so we can not use array_map()
+                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
+                    $fieldFactory = app(FieldFactory::class);
+                    $fieldValue = new FieldValue($typeValue, $fieldDefinition);
 
-                $fields[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
-            }
+                    $fields[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
+                }
 
-            return $fields;
-        };
+                return $fields;
+            };
     }
 
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
@@ -359,9 +371,14 @@ EOL
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
             'astNode' => $inputDefinition,
-            'fields' => function () use ($inputDefinition): array {
-                return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-            },
+            'fields' =>
+                /**
+                 * @return array<string, array<string, mixed>>
+                 */
+                function () use ($inputDefinition): array {
+                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+                    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+                },
         ]);
     }
 
@@ -459,16 +476,21 @@ EOL
         return new UnionType([
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
-            'types' => function () use ($unionDefinition): array {
-                $types = [];
+            'types' =>
+                /**
+                 * @return array<\GraphQL\Type\Definition\Type>
+                 */
+                function () use ($unionDefinition): array {
+                    $types = [];
 
-                // Might be a NodeList, so we can not use array_map()
-                foreach ($unionDefinition->types as $type) {
-                    $types[] = $this->get($type->name->value);
-                }
+                    // Might be a NodeList, so we can not use array_map()
+                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+                    foreach ($unionDefinition->types as $type) {
+                        $types[] = $this->get($type->name->value);
+                    }
 
-                return $types;
-            },
+                    return $types;
+                },
             'resolveType' => $typeResolver,
         ]);
     }

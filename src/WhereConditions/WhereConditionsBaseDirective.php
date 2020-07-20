@@ -6,7 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -33,7 +33,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * @param  array<string, mixed>  $whereConditions
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleWhereConditions($builder, array $whereConditions, string $boolean = 'and')
+    public function handleWhereConditions(object $builder, array $whereConditions, string $boolean = 'and'): object
     {
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
             $builder->whereNested(
@@ -71,9 +71,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: $column";
     }
 
-    /**
-     * Manipulate the AST.
-     */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
@@ -81,9 +78,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).$this->generatedInputSuffix();
             $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
-            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField);
+            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
             $documentAST
                 ->setTypeDefinition(
@@ -99,19 +96,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * Create the name for the restricted WhereConditions input.
+     * Ensure the column name is well formed.
      *
-     * @example FieldNameArgNameWhereHasConditions
-     */
-    protected function restrictedWhereConditionsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
-    {
-        return Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value)
-            .'WhereConditions';
-    }
-
-    /**
-     * Ensure the column name is well formed and prevent SQL injection.
+     * This prevents SQL injection.
      *
      * @throws \GraphQL\Error\Error
      */
@@ -125,4 +112,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             );
         }
     }
+
+    /**
+     * Get the suffix that will be added to generated input types.
+     */
+    abstract protected function generatedInputSuffix(): string;
 }

@@ -6,7 +6,7 @@ use Closure;
 use PHPUnit\Framework\Assert;
 
 /**
- * @mixin \Illuminate\Foundation\Testing\TestResponse
+ * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
 {
@@ -36,9 +36,16 @@ class TestResponseMixin
         return function (array $keys) {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
+            Assert::assertNotNull($validation, 'Expected the query to return validation errors for specific fields.');
+            /** @var array<string, mixed> $validation */
+            Assert::assertArrayHasKey('extensions', $validation);
+            $extensions = $validation['extensions'];
+
+            Assert::assertNotNull($extensions, 'Expected the query to return validation errors for specific fields.');
+            /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
-                array_keys($validation['extensions']['validation']),
+                array_keys($extensions['validation']),
                 'Expected the query to return validation errors for specific fields.'
             );
 
@@ -51,10 +58,7 @@ class TestResponseMixin
         return function () {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
-            Assert::assertNull(
-                $validation,
-                'Expected the query to have no validation errors.'
-            );
+            Assert::assertNull($validation, 'Expected the query to have no validation errors.');
 
             return $this;
         };
@@ -74,13 +78,6 @@ class TestResponseMixin
             ]);
 
             return $this;
-        };
-    }
-
-    public function jsonGet(): Closure
-    {
-        return function (string $key = null) {
-            return data_get($this->decodeResponseJson(), $key);
         };
     }
 }

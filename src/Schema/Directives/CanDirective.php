@@ -47,10 +47,10 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
 
-  You may pass the string as a dot notation to search in a array.
+  You may pass the string in dot notation to use nested inputs.
   """
   find: String
 
@@ -102,7 +102,7 @@ SDL;
 
     /**
      * @param  array<string, mixed>  $args
-     * @return iterable<Model|string>
+     * @return iterable<\Illuminate\Database\Eloquent\Model|string>
      *
      * @throws \GraphQL\Error\Error
      */
@@ -114,7 +114,6 @@ SDL;
                 throw new Error(self::missingKeyToFindModel($find));
             }
 
-            /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
             $queryBuilder = $this->getModelClass()::query();
 
             $directivesContainsForceDelete = $argumentSet->directives->contains(
@@ -188,7 +187,7 @@ SDL;
      * Additional arguments that are passed to `Gate::check`.
      *
      * @param  array<mixed>  $args
-     * @return mixed[]
+     * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
     {

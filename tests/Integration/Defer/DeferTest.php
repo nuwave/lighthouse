@@ -18,7 +18,7 @@ class DeferTest extends TestCase
         $this->setUpDeferStream();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -38,9 +38,11 @@ class DeferTest extends TestCase
         }
         ');
 
-        $this->assertContains(
-            'defer',
-            $introspection->jsonGet('data.__schema.directives.*.name')
+        $this->assertTrue(
+            in_array(
+                'defer',
+                $introspection->json('data.__schema.directives.*.name')
+            )
         );
     }
 

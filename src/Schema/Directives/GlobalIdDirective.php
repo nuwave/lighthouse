@@ -5,11 +5,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
-class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, ArgDirective
 {
     /**
      * The GlobalId resolver.
@@ -53,7 +54,7 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function () use ($type, $resolver): string {
-                    $resolvedValue = call_user_func_array($resolver, func_get_args());
+                    $resolvedValue = $resolver(...func_get_args());
 
                     return $this->globalId->encode(
                         $type,

@@ -24,23 +24,10 @@ class IdeHelperCommand extends Command
 
 SDL;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'lighthouse:ide-helper';
+    protected $name = 'lighthouse:ide-helper';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(DirectiveNamespacer $directiveNamespaces, TypeRegistry $typeRegistry): int
     {
         if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
@@ -60,6 +47,23 @@ SDL;
         $this->info("\nIt is recommended to add them to your .gitignore file.");
 
         return 0;
+    }
+
+    /**
+     * Create and write schema directive definitions to a file.
+     */
+    protected function schemaDirectiveDefinitions(DirectiveNamespacer $directiveNamespaces): void
+    {
+        $directiveClasses = $this->scanForDirectives(
+            $directiveNamespaces->gather()
+        );
+
+        $schema = $this->buildSchemaString($directiveClasses);
+
+        $filePath = static::schemaDirectivesPath();
+        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+
+        $this->info("Wrote schema directive definitions to $filePath.");
     }
 
     /**
@@ -129,23 +133,6 @@ SDL;
         return trim($definition);
     }
 
-    /**
-     * Create and write schema directive definitions to a file.
-     */
-    protected function schemaDirectiveDefinitions(DirectiveNamespacer $directiveNamespaces): void
-    {
-        $directiveClasses = $this->scanForDirectives(
-            $directiveNamespaces->gather()
-        );
-
-        $schema = $this->buildSchemaString($directiveClasses);
-
-        $filePath = static::schemaDirectivesPath();
-        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
-
-        $this->info("Wrote schema directive definitions to $filePath.");
-    }
-
     public static function schemaDirectivesPath(): string
     {
         return base_path().'/schema-directives.graphql';
@@ -160,7 +147,7 @@ SDL;
 
         $filePath = static::programmaticTypesPath();
 
-        if ($types->isEmpty()) {
+        if ($types->isEmpty() && file_exists($filePath)) {
             unlink($filePath);
 
             return;

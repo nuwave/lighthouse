@@ -30,6 +30,7 @@ class WithDirectiveTest extends DBTestCase
             'user_id' => $user->getKey(),
         ]);
 
+        // Sanity check
         $this->assertFalse(
             $user->tasksLoaded()
         );
@@ -75,19 +76,18 @@ class WithDirectiveTest extends DBTestCase
             ]);
         }
 
+        // Sanity check
         $this->assertFalse(
             $user->postsCommentsLoaded()
         );
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users {
                 postsCommentsLoaded
             }
         }
-        ');
-
-        $response->assertJson([
+        ')->assertJson([
             'data' => [
                 'users' => [
                     'postsCommentsLoaded' => true,

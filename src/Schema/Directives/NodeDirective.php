@@ -59,7 +59,10 @@ SDL;
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
             $resolver = function ($id): ?Model {
-                return $this->getModelClass()::find($id);
+                /** @var \Illuminate\Database\Eloquent\Model|null $model */
+                $model = $this->getModelClass()::find($id);
+
+                return $model;
             };
         }
 

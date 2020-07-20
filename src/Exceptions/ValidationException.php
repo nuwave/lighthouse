@@ -2,22 +2,39 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-class ValidationException extends \Illuminate\Validation\ValidationException implements RendersErrorsExtensions
+use Exception;
+use Illuminate\Contracts\Validation\Validator;
+
+class ValidationException extends Exception implements RendersErrorsExtensions
 {
     const CATEGORY = 'validation';
 
-    public function isClientSafe()
+    /**
+     * @var \Illuminate\Contracts\Validation\Validator
+     */
+    protected $validator;
+
+    public function __construct(string $message, Validator $validator)
+    {
+        parent::__construct($message);
+
+        $this->validator = $validator;
+    }
+
+    public function isClientSafe(): bool
     {
         return true;
     }
 
-    public function getCategory()
+    public function getCategory(): string
     {
         return self::CATEGORY;
     }
 
     public function extensionsContent(): array
     {
-        return [self::CATEGORY => $this->errors()];
+        return [
+            'validation' => $this->validator->errors()->messages(),
+        ];
     }
 }

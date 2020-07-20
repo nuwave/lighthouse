@@ -36,7 +36,7 @@ directive @whereHasConditions(
     Mutually exclusive with the `columns` argument.
     """
     columnsEnum: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 SDL;
     }
 
@@ -45,7 +45,7 @@ SDL;
      * @param  mixed  $whereConditions The client given conditions
      * @return \Illuminate\Database\Eloquent\Builder  The modified builder.
      */
-    public function handleBuilder($builder, $whereConditions)
+    public function handleBuilder($builder, $whereConditions): object
     {
         // The value `null` should be allowed but have no effect on the query.
         if (is_null($whereConditions)) {
@@ -81,5 +81,10 @@ SDL;
         }
 
         return $relationName;
+    }
+
+    protected function generatedInputSuffix(): string
+    {
+        return 'WhereHasConditions';
     }
 }

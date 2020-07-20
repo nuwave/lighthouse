@@ -52,7 +52,9 @@ class ArgumentSetFactory
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentDefinition */
         $parentDefinition = $this->documentAST->types[$parentName];
+
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $fieldDefinition = ASTHelper::firstByName($parentDefinition->fields, $fieldName);
 
         return $this->wrapArgs($fieldDefinition, $args);
@@ -77,9 +79,10 @@ class ArgumentSetFactory
         } else {
             throw new InvalidArgumentException('Got unexpected node of type '.get_class($definition));
         }
+
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
 
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
         foreach ($argumentDefinitionMap as $name => $definition) {
             if (array_key_exists($name, $args)) {
                 $argumentSet->arguments[$name] = $this->wrapInArgument($args[$name], $definition);

@@ -14,7 +14,7 @@ class AttemptAuthenticationTest extends TestCase
     /** @var \Tests\Utils\Models\User|null */
     public $user;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 

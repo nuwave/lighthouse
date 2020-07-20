@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
+use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -52,9 +53,9 @@ GRAPHQL;
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return string[]
+     * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             AuthServiceProvider::class,
@@ -63,6 +64,7 @@ GRAPHQL;
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
             OrderByServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
@@ -70,9 +72,8 @@ GRAPHQL;
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
@@ -108,6 +109,9 @@ GRAPHQL;
             'directives' => [
                 'Tests\\Utils\\Directives',
             ],
+            'validators' => [
+                'Tests\\Utils\\Validators',
+            ],
         ]);
 
         $config->set(
@@ -125,6 +129,9 @@ GRAPHQL;
                 'broadcaster' => 'log',
             ]
         );
+
+        // TODO remove when the default changes
+        $config->set('lighthouse.force_fill', true);
 
         $config->set('app.debug', true);
     }

@@ -34,6 +34,9 @@ return [
             // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
             // middleware, this delegates auth and permission checks to the field level.
             \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
+
+            // Logs every incoming GraphQL query.
+            // \Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries::class,
         ],
 
         /*
@@ -50,7 +53,7 @@ return [
     |
     | The guard to use for authenticating GraphQL requests, if needed.
     | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
-    | such as `@guard` and when applying the `AttempAuthentication` middleware.
+    | such as `@guard` and when applying the `AttemptAuthentication` middleware.
     | TODO this setting will default to 'api' in v5
     |
     */
@@ -83,8 +86,24 @@ return [
     */
 
     'cache' => [
+        /*
+         * Setting to true enables schema caching.
+         */
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
+
+        /*
+         * The name of the cache item for the schema cache.
+         */
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_CACHE_STORE', null),
+
+        /**
+         * Duration in seconds the schema should remain cached, null means forever.
+         */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
     ],
 
@@ -108,6 +127,7 @@ return [
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
         'directives' => ['App\\GraphQL\\Directives'],
+        'validators' => ['App\\GraphQL\\Validators'],
     ],
 
     /*
@@ -163,20 +183,6 @@ return [
     */
 
     'pagination_amount_argument' => 'first',
-
-    /*
-    |--------------------------------------------------------------------------
-    | @orderBy input name
-    |--------------------------------------------------------------------------
-    |
-    | Set the name to use for the generated argument on the
-    | OrderByClause used for the @orderBy directive.
-    |
-    | DEPRECATED This setting will be removed in v5.
-    |
-    */
-
-    'orderBy' => 'field',
 
     /*
     |--------------------------------------------------------------------------
@@ -241,6 +247,21 @@ return [
     */
 
     'transactional_mutations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mass Assignment Protection
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, mutations will use forceFill() over fill() when populating
+    | a model with arguments in mutation directives. Since GraphQL constrains
+    | allowed inputs by design, mass assignment protection is not needed.
+    |
+    | Will default to true in v5.
+    |
+    */
+
+    'force_fill' => false,
 
     /*
     |--------------------------------------------------------------------------

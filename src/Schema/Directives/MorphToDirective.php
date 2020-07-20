@@ -6,9 +6,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class MorphToDirective extends RelationDirective implements FieldResolver
 {
-    /**
-     * SDL definition of the directive.
-     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'

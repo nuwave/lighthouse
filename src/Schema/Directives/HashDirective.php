@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Contracts\Hashing\Hasher;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
-class HashDirective extends BaseDirective implements ArgTransformerDirective
+class HashDirective extends BaseDirective implements ArgTransformerDirective, ArgDirective
 {
     /**
      * @var \Illuminate\Contracts\Hashing\Hasher

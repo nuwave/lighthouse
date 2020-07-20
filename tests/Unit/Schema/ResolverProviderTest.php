@@ -10,7 +10,6 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
-use Tests\Utils\Queries\FooBar;
 
 class ResolverProviderTest extends TestCase
 {
@@ -46,35 +45,6 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooInvoke: Int');
-
-        $this->assertInstanceOf(
-            Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
-    }
-
-    /**
-     * @deprecated will be changed in v5
-     */
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooBar: String');
-
-        $resolver = $this->resolverProvider->provideResolver($fieldValue);
-        $this->assertInstanceOf(
-            Closure::class,
-            $resolver
-        );
-
-        $this->assertSame(
-            FooBar::RESOLVE_RESULT,
-            $resolver()
-        );
-    }
-
     public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
@@ -104,6 +74,10 @@ class ResolverProviderTest extends TestCase
 
         $typeValue = new TypeValue($queryType);
 
-        return new FieldValue($typeValue, $queryType->fields[0]);
+        return new FieldValue(
+            $typeValue,
+            // @phpstan-ignore-next-line can not be null
+            $queryType->fields[0]
+        );
     }
 }
