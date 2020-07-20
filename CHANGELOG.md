@@ -7,12 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
-## 5.0.0
-
-### Removed
-
-- Remove `Nuwave\Lighthouse\Schema\AST\PartialParser` in favor of `GraphQL\Language\Parser` https://github.com/nuwave/lighthouse/pull/1457
-
 ## Unreleased
 
 ### Added
@@ -46,6 +40,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `\Nuwave\Lighthouse\Support\Contracts\DefinedDirective` interface, moving its
   functionality to `\Nuwave\Lighthouse\Support\Contracts\Directive` https://github.com/nuwave/lighthouse/pull/1386
 - Remove fallback for `lighthouse.cache.ttl` setting https://github.com/nuwave/lighthouse/pull/1423
+- Remove `Nuwave\Lighthouse\Schema\AST\PartialParser` in favor of `GraphQL\Language\Parser` https://github.com/nuwave/lighthouse/pull/1457
 
 ## 4.16.0
 
