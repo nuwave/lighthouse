@@ -168,6 +168,7 @@ class BaseDirectiveTest extends TestCase
         $directive = new class extends BaseDirective {
             public static function definition(): string
             {
+                return /** @lang GraphQL */ 'directive @baseTest on FIELD_DEFINITION';
             }
 
             /**

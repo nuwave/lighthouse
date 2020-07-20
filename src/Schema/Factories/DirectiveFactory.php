@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -199,7 +200,10 @@ class DirectiveFactory
         if ($directives->count() > 1) {
             $directiveNames = $directives
                 ->map(function (Directive $directive): string {
-                    return '@'.$directive->name();
+                    $definition = PartialParser::directiveDefinition(
+                        $directive::definition()
+                    );
+                    return '@'.$definition->name->value;
                 })
                 ->implode(', ');
 
