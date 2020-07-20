@@ -8,7 +8,6 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -86,7 +85,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param QueryBuilder|EloquentBuilder $builder
+     * @param Illuminate\Database\Query\Builder|Illuminate\Database\Eloquent\Builder $builder
      * @param array<string, mixed>|null $condition
      */
     public function handleHasCondition($builder, Model $model, string $relation, ?array $condition = null, ?int $amount = null, ?string $operator = null): void
