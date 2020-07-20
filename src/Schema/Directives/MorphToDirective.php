@@ -2,10 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-
-class MorphToDirective extends RelationDirective implements FieldResolver, DefinedDirective
+class MorphToDirective extends RelationDirective
 {
     public static function definition(): string
     {

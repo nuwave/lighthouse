@@ -6,11 +6,10 @@ use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class SpreadDirective extends BaseDirective implements ArgDirective, FieldMiddleware, DefinedDirective
+class SpreadDirective extends BaseDirective implements ArgDirective, FieldMiddleware
 {
     public static function definition(): string
     {

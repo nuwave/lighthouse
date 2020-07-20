@@ -5,10 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\Directive;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class DeprecatedDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class DeprecatedDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -27,9 +26,6 @@ directive @deprecated(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $reason = $this->directiveArgValue('reason', Directive::DEFAULT_DEPRECATION_REASON);

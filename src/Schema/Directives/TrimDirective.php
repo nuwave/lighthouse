@@ -4,9 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective, DefinedDirective
+class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
 {
     public static function definition(): string
     {

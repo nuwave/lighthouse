@@ -26,6 +26,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
   This affects `@orderBy`, `@whereConditions` and `@whereHasConditions` https://github.com/nuwave/lighthouse/pull/1337
 - `__invoke` is now the only supported method name for convention based
   field resolver classes  https://github.com/nuwave/lighthouse/pull/1422
+- Change `\Nuwave\Lighthouse\Support\Contracts\Directive` to require all directives to have an SDL
+  definition by implementing `public static definition(): string` https://github.com/nuwave/lighthouse/pull/1386
 
 ### Removed
 
@@ -35,6 +37,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove interfaces `HasArgumentPath` and `HasErrorBuffer` and the parts of `FieldFactory` that calls them https://github.com/nuwave/lighthouse/pull/1185
 - Remove the `ValidationDirective` abstract class in favour of validator classes https://github.com/nuwave/lighthouse/pull/1185
 - Remove configuration option `lighthouse.orderBy`, always uses `column` now https://github.com/nuwave/lighthouse/pull/1337
+- Remove `\Nuwave\Lighthouse\Support\Contracts\DefinedDirective` interface, moving its
+  functionality to `\Nuwave\Lighthouse\Support\Contracts\Directive` https://github.com/nuwave/lighthouse/pull/1386
 
 ## 4.16.0
 

@@ -8,11 +8,10 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class ValidateDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class ValidateDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Illuminate\Contracts\Validation\Factory
@@ -24,7 +23,7 @@ class ValidateDirective extends BaseDirective implements FieldMiddleware, Define
         $this->validationFactory = $validationFactory;
     }
 
-    public static function definition()
+    public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
@@ -34,9 +33,6 @@ directive @validate on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();

@@ -15,12 +15,11 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class CanDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Illuminate\Contracts\Auth\Access\Gate

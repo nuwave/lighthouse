@@ -7,11 +7,10 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
-class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, ArgDirective, DefinedDirective
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, ArgDirective
 {
     /**
      * The GlobalId resolver.
@@ -44,9 +43,6 @@ directive @globalId(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();

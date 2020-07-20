@@ -51,9 +51,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective, DefinedDirective
+class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
 {
     public static function definition(): string
     {
@@ -157,7 +156,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective, DefinedDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective
 {
     public static function definition(): string
     {
@@ -241,9 +240,8 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class ModelArgsDirective extends BaseDirective implements ArgManipulator, DefinedDirective
+class ModelArgsDirective extends BaseDirective implements ArgManipulator
 {
     /**
      * SDL definition of the directive.
