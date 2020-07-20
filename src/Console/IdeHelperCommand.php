@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class IdeHelperCommand extends Command
@@ -125,18 +124,13 @@ SDL;
 
     protected function define(string $name, string $directiveClass): string
     {
-        if (is_a($directiveClass, DefinedDirective::class, true)) {
-            /** @var DefinedDirective $directiveClass */
-            $definition = $directiveClass::definition();
+        /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
+        $definition = $directiveClass::definition();
 
-            // This operation throws if the schema definition is invalid
-            Parser::directiveDefinition($definition);
+        // This operation throws if the schema definition is invalid
+        Parser::directiveDefinition($definition);
 
-            return trim($definition);
-        }
-
-        return '# Add a proper definition by implementing '.DefinedDirective::class."\n"
-            ."directive @{$name}";
+        return trim($definition);
     }
 
     public static function schemaDirectivesPath(): string

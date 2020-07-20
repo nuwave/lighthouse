@@ -13,7 +13,7 @@ class PrintSchemaCommandTest extends TestCase
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute([]);
 
-        $this->assertContains($this->schema, $tester->getDisplay());
+        $this->assertStringContainsString($this->schema, $tester->getDisplay());
     }
 
     public function testPrintsSchemaAsJSON(): void
@@ -24,7 +24,7 @@ class PrintSchemaCommandTest extends TestCase
         $json = $tester->getDisplay();
 
         $this->assertJson($json);
-        $this->assertContains('"name":"foo"', $json, 'Should contain the introspection result for the schema.');
+        $this->assertStringContainsString('"name":"foo"', $json, 'Should contain the introspection result for the schema.');
     }
 
     public function testWritesSchema(): void
@@ -33,7 +33,7 @@ class PrintSchemaCommandTest extends TestCase
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--write' => true]);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             $this->schema,
             Storage::get(PrintSchemaCommand::GRAPHQL_FILENAME)
         );

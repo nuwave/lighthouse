@@ -30,7 +30,7 @@ class HashDirectiveTest extends TestCase
                 }
             }
             ')
-            ->jsonGet('data.foo.bar');
+            ->json('data.foo.bar');
 
         $this->assertNotSame('password', $password);
         $this->assertTrue(password_verify('password', $password));
@@ -88,33 +88,33 @@ class HashDirectiveTest extends TestCase
         }
         ');
 
-        $password = $result->jsonGet('data.user.password');
+        $password = $result->json('data.user.password');
         $this->assertNotSame('password', $password);
         $this->assertTrue(password_verify('password', $password));
 
         // apply to array
-        $altPasswordOne = $result->jsonGet('data.user.alt_passwords.0');
+        $altPasswordOne = $result->json('data.user.alt_passwords.0');
         $this->assertNotSame('alt_password_1', $altPasswordOne);
         $this->assertTrue(password_verify('alt_password_1', $altPasswordOne));
 
-        $altPasswordTwo = $result->jsonGet('data.user.alt_passwords.1');
+        $altPasswordTwo = $result->json('data.user.alt_passwords.1');
         $this->assertNotSame('alt_password_2', $altPasswordTwo);
         $this->assertTrue(password_verify('alt_password_2', $altPasswordTwo));
 
         // apply to (nested) input
-        $friendPasswordOne = $result->jsonGet('data.user.friends.0.password');
+        $friendPasswordOne = $result->json('data.user.friends.0.password');
         $this->assertNotSame('friend_password_1', $friendPasswordOne);
         $this->assertTrue(password_verify('friend_password_1', $friendPasswordOne));
 
-        $friendPasswordTwo = $result->jsonGet('data.user.friends.1.password');
+        $friendPasswordTwo = $result->json('data.user.friends.1.password');
         $this->assertNotSame('friend_password_2', $friendPasswordTwo);
         $this->assertTrue(password_verify('friend_password_2', $friendPasswordTwo));
 
-        $friendPasswordThree = $result->jsonGet('data.user.friends.2.password');
+        $friendPasswordThree = $result->json('data.user.friends.2.password');
         $this->assertNotSame('friend_password_3', $friendPasswordThree);
         $this->assertTrue(password_verify('friend_password_3', $friendPasswordThree));
 
-        $friendPasswordFour = $result->jsonGet('data.user.friends.2.friends.0.password');
+        $friendPasswordFour = $result->json('data.user.friends.2.friends.0.password');
         $this->assertNotSame('friend_password_4', $friendPasswordFour);
         $this->assertTrue(password_verify('friend_password_4', $friendPasswordFour));
     }

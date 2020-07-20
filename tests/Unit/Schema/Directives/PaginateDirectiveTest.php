@@ -209,7 +209,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(6, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -242,7 +242,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
-            $resultFromDefaultPagination->jsonGet('errors.0.message')
+            $resultFromDefaultPagination->json('errors.0.message')
         );
 
         $resultFromRelayPagination = $this->graphQL(/** @lang GraphQL */ '
@@ -260,7 +260,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
-            $resultFromRelayPagination->jsonGet('errors.0.message')
+            $resultFromRelayPagination->json('errors.0.message')
         );
     }
 
@@ -294,7 +294,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedZeroOrLessItems(0),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 

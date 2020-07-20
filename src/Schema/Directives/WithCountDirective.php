@@ -4,10 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithCountDirective extends WithRelationDirective implements FieldMiddleware, DefinedDirective
+class WithCountDirective extends WithRelationDirective implements FieldMiddleware
 {
     public static function definition(): string
     {

@@ -8,11 +8,8 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Factory as ValidationFactory;
-use Illuminate\Validation\Validator;
 use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
@@ -26,10 +23,10 @@ use Nuwave\Lighthouse\Console\ScalarCommand;
 use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
+use Nuwave\Lighthouse\Console\ValidatorCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Nuwave\Lighthouse\Execution\SingleResponse;
@@ -62,7 +59,7 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
+    public function boot(ConfigRepository $configRepository): void
     {
         $this->publishes([
             __DIR__.'/lighthouse.php' => $this->app->configPath().'/lighthouse.php',
@@ -73,15 +70,6 @@ class LighthouseServiceProvider extends ServiceProvider
         ], 'lighthouse-schema');
 
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
-
-        $validationFactory->resolver(
-            function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {
-                // This determines whether we are resolving a GraphQL field
-                return Arr::has($customAttributes, ['root', 'context', 'resolveInfo'])
-                    ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
-                    : new Validator($translator, $data, $rules, $messages, $customAttributes);
-            }
-        );
     }
 
     /**
@@ -144,8 +132,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
                 {
                     throw new Exception(
-                       'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
-                   );
+                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
+                    );
                 }
             };
         });
@@ -183,6 +171,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 SubscriptionCommand::class,
                 UnionCommand::class,
                 ValidateSchemaCommand::class,
+                ValidatorCommand::class,
             ]);
         }
 

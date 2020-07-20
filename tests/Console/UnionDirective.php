@@ -3,10 +3,9 @@
 namespace Tests\Console;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
-class UnionDirective extends BaseDirective implements Directive, DefinedDirective
+class UnionDirective extends BaseDirective implements Directive
 {
     public static function definition(): string
     {

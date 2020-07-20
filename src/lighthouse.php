@@ -127,6 +127,7 @@ return [
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
         'directives' => ['App\\GraphQL\\Directives'],
+        'validators' => ['App\\GraphQL\\Validators'],
     ],
 
     /*
@@ -182,21 +183,6 @@ return [
     */
 
     'pagination_amount_argument' => 'first',
-
-    /*
-    |--------------------------------------------------------------------------
-    | @orderBy input name
-    |--------------------------------------------------------------------------
-    |
-    | Set the name to use for the generated argument on the
-    | OrderByClause used for the @orderBy directive.
-    |
-    | DEPRECATED This setting will be removed in v5, Lighthouse will assume
-    | the value 'column'. Change it soon, as you prepare for the upgrade.
-    |
-    */
-
-    'orderBy' => 'field',
 
     /*
     |--------------------------------------------------------------------------

@@ -10,7 +10,6 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
-use Tests\Utils\Queries\FooBar;
 
 class ResolverProviderTest extends TestCase
 {
@@ -43,35 +42,6 @@ class ResolverProviderTest extends TestCase
         $this->assertInstanceOf(
             Closure::class,
             $this->resolverProvider->provideResolver($fieldValue)
-        );
-    }
-
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooInvoke: Int');
-
-        $this->assertInstanceOf(
-            Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
-    }
-
-    /**
-     * @deprecated will be changed in v5
-     */
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooBar: String');
-
-        $resolver = $this->resolverProvider->provideResolver($fieldValue);
-        $this->assertInstanceOf(
-            Closure::class,
-            $resolver
-        );
-
-        $this->assertSame(
-            FooBar::RESOLVE_RESULT,
-            $resolver()
         );
     }
 
