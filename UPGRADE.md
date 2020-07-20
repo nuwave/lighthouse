@@ -196,6 +196,22 @@ If you need to revert to the old behavior of using `fill()`, you can change your
 +   'force_fill' => false,
 ```
 
+### Replace `ErrorBuffer` with `ErrorPool`
+
+Collecting partial errors is now done through the singleton `\Nuwave\Lighthouse\Execution\ErrorPool`
+instead of `\Nuwave\Lighthouse\Execution\ErrorBuffer`:
+
+```php
+try {
+    // Something that might fail but still allows for a partial result
+} catch (\Throwable $error) {
+    $errorPool = app(\Nuwave\Lighthouse\Execution\ErrorPool::class);
+    $errorPool->record($error);
+}
+
+return $result;
+```
+
 ### Use `GraphQL\Language\Parser` instead of `Nuwave\Lighthouse\Schema\AST\PartialParser`
 
 The native parser from [webonyx/graphql-php](https://github.com/webonyx/graphql-php) now supports partial parsing.
