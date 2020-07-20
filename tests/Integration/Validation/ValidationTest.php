@@ -227,7 +227,7 @@ class ValidationTest extends TestCase
             password(password: " 1234567 ")
         }
         ');
-        $password = $validPasswordResult->jsonGet('data.password');
+        $password = $validPasswordResult->json('data.password');
 
         $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
