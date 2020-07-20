@@ -29,14 +29,32 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.16.0
+
 ### Added
 
 - Add artisan command `lighthouse:cache` to compile GraphQL AST https://github.com/nuwave/lighthouse/pull/1451
-
-### Added
-
 - Add middleware `\Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
   GraphQL query https://github.com/nuwave/lighthouse/pull/1454
+- Allow custom query validation rules selection by rebinding the interface
+  `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` https://github.com/nuwave/lighthouse/pull/1487
+- Add `DateTimeUtc` scalar https://github.com/nuwave/lighthouse/pull/1320
+
+### Changed
+
+- Publish config file with tag `lighthouse-config` and default schema with tag `lighthouse-schema`
+  instead of the previously used tags `config` and `schema` https://github.com/nuwave/lighthouse/issues/1489
+- Throw partial errors when failing to delete, forceDelete or restore a model https://github.com/nuwave/lighthouse/pull/1420
+- Add `\Nuwave\Lighthouse\Execution\ErrorPool` to allow collection of partial errors https://github.com/nuwave/lighthouse/pull/1420
+
+### Fixed
+
+- Ensure the `@count` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1466
+- Take route prefix into account in `graphQLEnpointUrl()` test helper https://github.com/nuwave/lighthouse/pull/1439
+
+### Deprecated
+
+- Deprecate `\Nuwave\Lighthouse\Execution\ErrorBuffer` in favor of `\Nuwave\Lighthouse\Execution\ErrorPool` https://github.com/nuwave/lighthouse/pull/1420
 
 ## 4.15.0
 

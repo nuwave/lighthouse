@@ -52,9 +52,9 @@ SDL;
         return $modelClass::find($idOrIds);
     }
 
-    protected function modifyExistence(Model $model): void
+    protected function modifyExistence(Model $model): bool
     {
-        $model->delete();
+        return (bool) $model->delete();
     }
 
     /**
