@@ -69,7 +69,6 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
         return $argumentSet;
     }
 
-
     /**
      * @param  mixed  $value The client given value
      * @return mixed The transformed value
@@ -82,7 +81,6 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
         return $value;
     }
-
 
     /**
      * @param  mixed  $value The client given value

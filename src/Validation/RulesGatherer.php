@@ -85,7 +85,6 @@ class RulesGatherer
         }
     }
 
-
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $value
      * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
@@ -99,7 +98,6 @@ class RulesGatherer
             $this->gatherRulesRecursively($value, $path);
         }
     }
-
 
     /**
      * @param  array<int|string>  $argumentPath
@@ -120,7 +118,6 @@ class RulesGatherer
         $messages = $providesRules->messages();
         $this->messages += $this->wrap($messages, $argumentPath);
     }
-
 
     /**
      * @param  array<string, mixed>  $rulesOrMessages
