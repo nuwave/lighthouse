@@ -1911,8 +1911,6 @@ directive @orderBy(
 ) on ARGUMENT_DEFINITION
 ```
 
-**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
-
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
 
@@ -1927,16 +1925,16 @@ together with the `SortOrder` enum, and add that to your schema. Here is how it 
 
 ```graphql
 "Allows ordering a list of records."
-input PostsOrderByOrderByClause {
+input QueryPostsOrderByOrderByClause {
   "The column that is used for ordering."
-  column: PostsOrderByColumn!
+  column: QueryPostsOrderByColumn!
 
   "The direction that is used for ordering."
   order: SortOrder!
 }
 
 "Order by clause for the `orderBy` argument on the query `posts`."
-enum PostsOrderByColumn {
+enum QueryPostsOrderByColumn {
   POSTED_AT @enum(value: "posted_at")
   TITLE @enum(value: "title")
 }
@@ -2004,7 +2002,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "posted_at", order: ASC }] }) {
     title
   }
 }

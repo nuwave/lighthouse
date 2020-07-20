@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
@@ -16,6 +17,7 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
@@ -303,5 +305,24 @@ class ASTHelper
 
             $fieldDefinition->directives = $fieldDefinition->directives->merge([$directiveNode]);
         }
+    }
+
+    /**
+     * Create a fully qualified base for a generated name that belongs to an argument.
+     *
+     * We have to make sure it is unique in the schema. Even though
+     * this name becomes a bit verbose, it is also very unlikely to collide
+     * with a random user defined type.
+     *
+     * @example ParentNameFieldNameArgName
+     */
+    public static function qualifiedArgType(
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): string {
+        return Str::studly($parentType->name->value)
+            .Str::studly($parentField->name->value)
+            .Str::studly($argDefinition->name->value);
     }
 }

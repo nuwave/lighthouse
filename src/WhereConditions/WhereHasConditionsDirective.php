@@ -82,4 +82,9 @@ SDL;
 
         return $relationName;
     }
+
+    protected function generatedInputSuffix(): string
+    {
+        return 'WhereHasConditions';
+    }
 }
