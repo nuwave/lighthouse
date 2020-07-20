@@ -38,11 +38,13 @@ class TestResponseMixin
         return function (array $keys) {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
-            Assert::assertIsArray($validation, self::EXPECTED_VALIDATION_KEYS);
-
+            Assert::assertNotNull($validation, self::EXPECTED_VALIDATION_KEYS);
+            /** @var array<string, mixed> $validation */
+            Assert::assertArrayHasKey('extensions', $validation);
             $extensions = $validation['extensions'];
-            Assert::assertIsArray($extensions, self::EXPECTED_VALIDATION_KEYS);
 
+            Assert::assertNotNull($extensions, self::EXPECTED_VALIDATION_KEYS);
+            /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
                 array_keys($extensions['validation']),

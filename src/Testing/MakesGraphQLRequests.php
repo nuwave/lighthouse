@@ -161,7 +161,7 @@ trait MakesGraphQLRequests
      */
     protected function graphQLEndpointUrl(): string
     {
-        return config('lighthouse.route.uri');
+        return route(config('lighthouse.route.name'));
     }
 
     /**

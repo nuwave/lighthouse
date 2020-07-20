@@ -204,6 +204,22 @@ If you need to revert to the old behavior of using `fill()`, you can change your
 +   'force_fill' => false,
 ```
 
+### Replace `ErrorBuffer` with `ErrorPool`
+
+Collecting partial errors is now done through the singleton `\Nuwave\Lighthouse\Execution\ErrorPool`
+instead of `\Nuwave\Lighthouse\Execution\ErrorBuffer`:
+
+```php
+try {
+    // Something that might fail but still allows for a partial result
+} catch (\Throwable $error) {
+    $errorPool = app(\Nuwave\Lighthouse\Execution\ErrorPool::class);
+    $errorPool->record($error);
+}
+
+return $result;
+```
+
 ### Use native `TestResponse::json()`
 
 The `TestResponse::jsonGet()` mixin was removed in favor of the `->json()` method,

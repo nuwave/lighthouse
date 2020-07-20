@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema;
 
 use Closure;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\EnumValueDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
@@ -42,7 +43,11 @@ class TypeRegistryTest extends TestCase
 
         $this->assertInstanceOf(EnumType::class, $enumType);
         $this->assertSame('Role', $enumType->name);
-        $this->assertSame(123, $enumType->getValue('ADMIN')->value);
+
+        $enumValueDefinition = $enumType->getValue('ADMIN');
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
+        /** @var \GraphQL\Type\Definition\EnumValueDefinition $enumValueDefinition */
+        $this->assertSame(123, $enumValueDefinition->value);
     }
 
     public function testDefaultsEnumValueToItsName(): void
@@ -57,7 +62,11 @@ class TypeRegistryTest extends TestCase
 
         $this->assertInstanceOf(EnumType::class, $enumType);
         $this->assertSame('Role', $enumType->name);
-        $this->assertSame('EMPLOYEE', $enumType->getValue('EMPLOYEE')->value);
+
+        $enumValueDefinition = $enumType->getValue('EMPLOYEE');
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
+        /** @var \GraphQL\Type\Definition\EnumValueDefinition $enumValueDefinition */
+        $this->assertSame('EMPLOYEE', $enumValueDefinition->value);
     }
 
     public function testCanTransformScalars(): void
