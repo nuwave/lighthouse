@@ -28,9 +28,6 @@ directive @lazyLoad(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations', []);

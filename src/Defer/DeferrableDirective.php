@@ -42,9 +42,6 @@ SDL;
         $this->defer = $defer;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();

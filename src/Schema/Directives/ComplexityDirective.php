@@ -27,9 +27,6 @@ directive @complexity(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldFieldValue, Closure $next): FieldValue
     {
         if ($this->directiveHasArgument('resolver')) {

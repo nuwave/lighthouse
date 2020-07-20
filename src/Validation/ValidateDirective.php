@@ -33,9 +33,6 @@ directive @validate on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();

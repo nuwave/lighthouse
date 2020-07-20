@@ -43,9 +43,6 @@ directive @globalId(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();

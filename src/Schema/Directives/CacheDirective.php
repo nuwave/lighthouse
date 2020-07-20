@@ -53,9 +53,6 @@ directive @cache(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $this->setCacheKeyOnParent(

@@ -34,9 +34,6 @@ SDL;
     }
 
     /**
-     * Resolve the field directive.
-     *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

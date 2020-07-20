@@ -26,9 +26,6 @@ directive @deprecated(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $reason = $this->directiveArgValue('reason', Directive::DEFAULT_DEPRECATION_REASON);

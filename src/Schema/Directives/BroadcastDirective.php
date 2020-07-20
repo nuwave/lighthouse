@@ -28,9 +28,6 @@ directive @broadcast(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         // Ensure this is run after the other field middleware directives

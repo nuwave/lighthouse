@@ -33,9 +33,6 @@ directive @tracing on FIELD_DEFINITION
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $fieldValue = $next($fieldValue);
