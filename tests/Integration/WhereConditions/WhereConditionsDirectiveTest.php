@@ -385,14 +385,14 @@ class WhereConditionsDirectiveTest extends DBTestCase
                         operator: GT
                         value: 2
                         HAS: {
-                            relation  : "posts.comments"
-                            operator  : GT
-                            amount    : 4
-                            condition : {
-                               column : "comment",
-                               value  : "test"
-                               HAS    : {
-                                    relation  : "user.posts.comments"
+                            relation: "posts.comments"
+                            operator: GT
+                            amount: 4
+                            condition: {
+                               column: "comment",
+                               value: "test"
+                               HAS: {
+                                    relation: "user.posts.comments"
                                }
                             }
                         }
@@ -472,8 +472,8 @@ class WhereConditionsDirectiveTest extends DBTestCase
             users(
                 where: {
                     HAS: {
-                        relation : "posts.comments"
-                        amount   : 3
+                        relation: "posts.comments"
+                        amount: 3
                     }
                 }
             ) {
@@ -510,9 +510,9 @@ class WhereConditionsDirectiveTest extends DBTestCase
             users(
                 where: {
                     HAS: {
-                        relation : "posts.comments"
-                        amount   : 5
-                        operator : EQ
+                        relation: "posts.comments"
+                        amount: 5
+                        operator: EQ
                     }
                 }
             ) {
@@ -550,10 +550,10 @@ class WhereConditionsDirectiveTest extends DBTestCase
             users(
                 where: {
                     HAS: {
-                        relation  : "posts.comments"
-                        condition : {
-                           column : "comment",
-                           value  : "test"
+                        relation: "posts.comments"
+                        condition: {
+                           column: "comment",
+                           value: "test"
                         }
                     }
                 }
@@ -595,7 +595,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                     value: 6
                     AND: [{
                         HAS: {
-                            relation  : "posts.comments"
+                            relation: "posts.comments"
                         }
                     }]
                 }
@@ -639,13 +639,13 @@ class WhereConditionsDirectiveTest extends DBTestCase
             users(
                 where: {
                     HAS: {
-                        relation  : "posts.comments"
-                        condition : {
+                        relation: "posts.comments"
+                        condition: {
                            HAS: {
-                               relation  : "user.posts.comments"
-                               condition : {
+                               relation: "user.posts.comments"
+                               condition: {
                                    HAS: {
-                                       relation  : "post.user.tasks"
+                                       relation: "post.user.tasks"
                                    }
                                }
                            }
