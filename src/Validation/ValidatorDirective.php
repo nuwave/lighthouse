@@ -7,10 +7,10 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -129,7 +129,7 @@ SDL;
             if ($directive->name->value === $this->name()) {
                 $directive->arguments = ASTHelper::mergeUniqueNodeList(
                     $directive->arguments,
-                    [PartialParser::argument('class: "'.addslashes($validatorClass).'"')],
+                    [Parser::argument('class: "'.addslashes($validatorClass).'"')],
                     true
                 );
             }
