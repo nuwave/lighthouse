@@ -203,6 +203,7 @@ class DirectiveFactory
                     $definition = PartialParser::directiveDefinition(
                         $directive::definition()
                     );
+
                     return '@'.$definition->name->value;
                 })
                 ->implode(', ');
