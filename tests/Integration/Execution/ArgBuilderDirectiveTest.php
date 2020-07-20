@@ -7,18 +7,13 @@ use Tests\Utils\Models\User;
 
 class ArgBuilderDirectiveTest extends DBTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema = /** @lang GraphQL */ '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        ';
+    protected $schema = /** @lang GraphQL */ '
+    type User {
+        id: ID!
+        name: String
+        email: String
     }
+    ';
 
     public function testCanAttachEqFilterToQuery(): void
     {
