@@ -177,16 +177,16 @@ class ArgumentSet
                 ->directives
                 ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
-            if (! empty($directiveFilter)) {
+            if (null !== $directiveFilter) {
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }
 
-            $filteredDirectives->each(function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value) {
+            $filteredDirectives->each(static function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value): void {
                 $builder = $argBuilderDirective->handleBuilder($builder, $value);
             });
 
             Utils::applyEach(
-                function ($value) use (&$builder, $directiveFilter) {
+                static function ($value) use (&$builder, $directiveFilter) {
                     if ($value instanceof self) {
                         self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
                     }
