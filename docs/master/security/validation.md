@@ -112,56 +112,90 @@ type Mutation {
 }
 ```
 
-## Validate Fields
+## Validator Classes
 
-In some cases, validation rules are more complex and need to use entirely custom logic
-or take multiple arguments into account.
+In cases where your validation becomes too complex and demanding, you want to have the power of PHP to perform
+complex validation. For example, accessing existing data in the database or validating the combination of input
+values cannot be achieved with the examples above. This is where validator classes come into play.
 
-To create a reusable validator that can be applied to fields, extend the base validation
-directive `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective`. Your custom directive
-class should be located in one of the configured default directive namespaces, e.g. `App\GraphQL\Directives`.
+Validator classes can be reused on field definitions or input types within your schema.
+Use the [`@validator`](../api-reference/directives.md#validator) directive:
+
+```graphql
+input UpdateUserInput @validator {
+  id: ID
+  name: String
+}
+```
+
+We need to back that with a validator class. Lighthouse uses a simple naming convention for validator classes,
+just use the name of the input type and append `Validator`:
+
+    php artisan lighthouse:validator UpdateUserInputValidator
+
+The resulting class will be placed in your configured validator namespace. Let's go ahead
+and define the validation rules for the input:
 
 ```php
-<?php
-
-namespace App\GraphQL\Directives;
+namespace App\GraphQL\Validators;
 
 use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
+use Nuwave\Lighthouse\Validation\Validator;
 
-class UpdateUserValidationDirective extends ValidationDirective
+class UpdateUserInputValidator extends Validator
 {
-    /**
-     * @return mixed[]
-     */
     public function rules(): array
     {
         return [
-            'id' => ['required'],
-            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
+            'id' => [
+                'required'
+            ],
+            'name' => [
+                'sometimes',
+                Rule::unique('users', 'name')->ignore($this->arg('id'), 'id'),
+            ],
         ];
     }
 }
 ```
 
-Use it in your schema upon the field you want to validate.
+Note that this gives you access to all kinds of programmatic validation rules that Laravel
+provides. This can give you additional flexibility when you need it.
+
+You can customize the messages for the given rules by implementing the `messages` function:
+
+```php
+public function messages(): array
+{
+    return [
+        'name.unique' => 'The chosen username is not available',
+    ];
+}
+```
+
+The `@validator` directive can also be used upon fields:
 
 ```graphql
 type Mutation {
-  updateUser(id: ID, name: String): User @update @updateUserValidation
+  updateUser(id: ID!, name: String): User @validator
 }
 ```
 
-You can customize the messages for the given rules by implementing the `messages` function.
+In that case, Lighthouse will look for a validator class in a sub-namespace matching the parent type, in this case
+that would be `Mutation`, so the default FQCN would be `App\GraphQL\Validators\Mutation\UpdateUserValidator`.
+
+## Customize Query Validation Rules
+
+By default, Lighthouse enables all default query validation rules from `webonyx/graphql-php`.
+This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type.
+
+If you want to add custom rules or change which ones are used, you can bind a custom implementation
+of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` through a service provider.
 
 ```php
-    /**
-     * @return string[]
-     */
-    public function messages(): array
-    {
-        return [
-            'name.unique' => 'The chosen username is not available',
-        ];
-    }
+use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
+
+class MyCustomRulesProvider implements ProvidesValidationRules {}
+
+$this->app->bind(ProvidesValidationRules::class, MyCustomRulesProvider::class);
 ```

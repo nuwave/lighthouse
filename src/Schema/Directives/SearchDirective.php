@@ -28,7 +28,7 @@ SDL;
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return \Laravel\Scout\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         /**
          * TODO make class-string once PHPStan can handle it.

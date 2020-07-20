@@ -14,29 +14,29 @@ trait TestsSerialization
 {
     protected function fakeContextSerializer(Container $app): void
     {
-        $app->bind(ContextSerializer::class, function (): ContextSerializer {
-            return new class implements ContextSerializer {
-                public function serialize(GraphQLContext $context)
-                {
-                    return 'foo';
-                }
+        $contextSerializer = new class implements ContextSerializer {
+            public function serialize(GraphQLContext $context)
+            {
+                return 'foo';
+            }
 
-                public function unserialize(string $context)
-                {
-                    return new class implements GraphQLContext {
-                        public function user()
-                        {
-                            return new User();
-                        }
+            public function unserialize(string $context)
+            {
+                return new class implements GraphQLContext {
+                    public function user()
+                    {
+                        return new User();
+                    }
 
-                        public function request()
-                        {
-                            return new Request();
-                        }
-                    };
-                }
-            };
-        });
+                    public function request()
+                    {
+                        return new Request();
+                    }
+                };
+            }
+        };
+
+        $app->instance(ContextSerializer::class, $contextSerializer);
     }
 
     protected function useSerializingArrayStore(Container $app): void

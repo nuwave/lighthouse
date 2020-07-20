@@ -98,7 +98,7 @@ class ASTBuilder
         $cacheConfig = $this->configRepository->get('lighthouse.cache');
         if ($cacheConfig['enable']) {
             /** @var \Illuminate\Contracts\Cache\Repository $cache */
-            $cache = app('cache');
+            $cache = app('cache')->store($cacheConfig['store'] ?? null);
             $this->documentAST = $cache->remember(
                 $cacheConfig['key'],
                 // TODO remove this fallback in v5

@@ -466,6 +466,8 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
         $this->assertNotNull($enum);
         /** @var array<string, mixed> $enum */
+
+        // TODO: Replace with dms/phpunit-arraysubset-asserts when we require PHPUnit 9 + PHP 7.3
         $this->assertArraySubset(
             [
                 'kind' => 'ENUM',

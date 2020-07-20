@@ -34,6 +34,9 @@ return [
             // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
             // middleware, this delegates auth and permission checks to the field level.
             \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
+
+            // Logs every incoming GraphQL query.
+            // \Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries::class,
         ],
 
         /*
@@ -83,8 +86,24 @@ return [
     */
 
     'cache' => [
+        /*
+         * Setting to true enables schema caching.
+         */
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
+
+        /*
+         * The name of the cache item for the schema cache.
+         */
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_CACHE_STORE', null),
+
+        /**
+         * Duration in seconds the schema should remain cached, null means forever.
+         */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
     ],
 
@@ -108,6 +127,7 @@ return [
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
         'directives' => ['App\\GraphQL\\Directives'],
+        'validators' => ['App\\GraphQL\\Validators'],
     ],
 
     /*

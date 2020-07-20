@@ -6,6 +6,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -77,24 +78,66 @@ class ModelRelationFetcherTest extends DBTestCase
         $this->assertSame($secondTasksCount, $secondUser->tasks->count());
     }
 
-    public function testCanHandleSoftDeletes(): void
+    public function testLoadsMultipleRelations(): void
     {
-        $initialCount = 4;
-
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+
         $user->tasks()->saveMany(
-            factory(Task::class, $initialCount)->make()
+            factory(Task::class, 2)->make()
+        );
+        $user->posts()->saveMany(
+            factory(Post::class, 3)->make()
         );
 
-        Task::firstOrFail()->delete();
+        $users = (new ModelRelationFetcher(User::all(), ['tasks', 'posts']))
+            ->loadRelationsForPage($this->makePaginationArgs(4));
+
+        /** @var \Tests\Utils\Models\User $firstUser */
+        $firstUser = $users[0];
+
+        $this->assertTrue($firstUser->relationLoaded('tasks'));
+        $this->assertTrue($firstUser->relationLoaded('posts'));
+    }
+
+    public function testCanHandleSoftDeletes(): void
+    {
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = factory(User::class)->create();
+
+        $tasksUser1 = 3;
+        $user1->tasks()->saveMany(
+            factory(Task::class, $tasksUser1)->make()
+        );
+
+        $softDeletedTaskUser1 = factory(Task::class)->make();
+        $user1->tasks()->save($softDeletedTaskUser1);
+        $softDeletedTaskUser1->delete();
+
+        /** @var \Tests\Utils\Models\User $user2 */
+        $user2 = factory(User::class)->create();
+
+        $tasksUser2 = 4;
+        $user2->tasks()->saveMany(
+            factory(Task::class, $tasksUser2)->make()
+        );
+
+        $softDeletedTaskUser2 = factory(Task::class)->make();
+        $user2->tasks()->save($softDeletedTaskUser2);
+        $softDeletedTaskUser2->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage($this->makePaginationArgs(4));
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
-        $this->assertCount($initialCount - 1, $firstUser->tasks);
+        $this->assertTrue($firstUser->relationLoaded('tasks'));
+        $this->assertCount($tasksUser1, $firstUser->tasks);
+
+        /** @var \Tests\Utils\Models\User $secondUser */
+        $secondUser = $users[1];
+        $this->assertTrue($secondUser->relationLoaded('tasks'));
+        $this->assertCount($tasksUser2, $secondUser->tasks);
     }
 
     public function testGetsPolymorphicRelationship(): void

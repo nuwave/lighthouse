@@ -25,8 +25,6 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     }
 
     /**
-     * Get the default namespace for the class.
-     *
      * @param  string  $rootNamespace
      */
     protected function getDefaultNamespace($rootNamespace): string
