@@ -8,8 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class Nested extends BaseDirective implements ArgResolver, Directive
 {
-    public function __invoke($root, $args)
+    public function __invoke($root, $args): void
     {
-        //
     }
 }

@@ -1,7 +1,7 @@
 # Custom Directives
 
 Lighthouse provides various convenient server side directives that can be applied to a lots of generic use cases.
-However you are free to create your own directives depending upon your needs. 
+However you are free to create your own directives depending upon your needs.
 
 ## Directive Types
 
@@ -21,7 +21,7 @@ The class name of directive must follow the following pattern:
 <Study case of directive name> + "Directive"
 ```
 
-For example the class name of directive `@fooBar` must be `FooBarDirective`. 
+For example the class name of directive `@fooBar` must be `FooBarDirective`.
 
 ## Node Directives
 
@@ -42,7 +42,7 @@ There are 2 types of argument directives in Lighthouse.
 
 ### ArgTransformerDirective
 
-The `ArgTransformerDirective` takes an incoming value an returns a new value. 
+The `ArgTransformerDirective` takes an incoming value an returns a new value.
 
 Let's take a look at the built-in `@trim` directive.
 
@@ -113,7 +113,7 @@ class CreateUser
 
 ### ArgFilterDirective
 
-The `ArgFilterDirective` applies additional queries to those directives that are using the `Nuwave\Lighthouse\Execution\QueryFilter`. 
+The `ArgFilterDirective` applies additional queries to those directives that are using the `Nuwave\Lighthouse\Execution\QueryFilter`.
 
 Currently, the following directives use the defined filters for resolving the query:
 
@@ -125,7 +125,7 @@ For example, if we have the following schema:
 
 ```graphql
 type User {
- posts(category: String @eq(key: "cat")): [Post!]! @hasMany
+  posts(category: String @eq(key: "cat")): [Post!]! @hasMany
 }
 ```
 
@@ -182,13 +182,13 @@ class EqDirective implements ArgFilterDirective
 The `applyFilter` method takes three arguments
 
 - `$builder`  
-The query builder for applying the additional query on to.
+  The query builder for applying the additional query on to.
 - `$columnName`  
-The argument name by default, in our example the default value will be `'category'`.  
-However you can specify a value explicitly by using the `key` argument of `@eq`.
-As you can see, in our example we set the `key` to a string value 'cat', so the value of `$columnName` here is `'cat'`.
+  The argument name by default, in our example the default value will be `'category'`.  
+  However you can specify a value explicitly by using the `key` argument of `@eq`.
+  As you can see, in our example we set the `key` to a string value 'cat', so the value of `$columnName` here is `'cat'`.
 - `$value`  
-The value of the argument value that the `@eq` was applied on to.
+  The value of the argument value that the `@eq` was applied on to.
 
 The `combinesMultipleArguments` method determine whether or not to combines multiple arguments.
 
@@ -222,7 +222,7 @@ type Mutation {
 Notice the order how the argument directives were written.
 
 The evaluation process of the above example written in pseudo code can be:
- 
+
 ```php
 $trimedValue = trim($password);
 // validate with the rules ["min:10,max:20"] ...

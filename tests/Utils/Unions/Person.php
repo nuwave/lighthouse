@@ -17,11 +17,11 @@ class Person
         $this->typeRegistry = $typeRegistry;
     }
 
-    public function resolveType($value): Type
+    /**
+     * @param  array<string, mixed>  $value
+     */
+    public function resolveType(array $value): Type
     {
-        // The return type can be a string either,
-        // because the upstream lib `webonyx/graphql-php` allows us to give a string
-        // which in this case you can just return the `$type` it self.
         $type = isset($value['id'])
             ? 'User'
             : 'Employee';

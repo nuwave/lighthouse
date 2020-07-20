@@ -7,7 +7,7 @@ These directives can generally be applied to [type definitions](../the-basics/ty
 ## TypeManipulator
 
 The [`\Nuwave\Lighthouse\Support\Contracts\TypeManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeManipulator.php)
-interface can be used to manipulate the AST from a type definition node. 
+interface can be used to manipulate the AST from a type definition node.
 
 ## TypeMiddleware
 

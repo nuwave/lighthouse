@@ -14,6 +14,7 @@ class CreateTestbenchTeamsTable extends Migration
         Schema::create('teams', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('name');
+
             $table->timestamps();
         });
     }

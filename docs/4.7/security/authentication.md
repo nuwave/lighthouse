@@ -44,7 +44,7 @@ If you need to apply middleware to multiple fields, just use [@middleware](../ap
 on a `type` or an `extend type` definition.
 
 ```graphql
-extend type Query @middleware(checks: ["auth:admin"]){
+extend type Query @middleware(checks: ["auth:admin"]) {
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
 }

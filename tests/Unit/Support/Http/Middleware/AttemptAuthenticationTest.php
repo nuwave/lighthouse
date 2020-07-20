@@ -14,7 +14,7 @@ class AttemptAuthenticationTest extends TestCase
     /** @var \Tests\Utils\Models\User|null */
     public $user;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -28,8 +28,9 @@ class AttemptAuthenticationTest extends TestCase
         $config = $app->make('config');
 
         $config->set('lighthouse.route.middleware', [
-            AttemptAuthentication::class.':foo',
+            AttemptAuthentication::class,
         ]);
+        $config->set('lighthouse.guard', 'foo');
         $config->set('auth.guards.foo', [
             'driver' => 'foo',
             'provider' => 'users',

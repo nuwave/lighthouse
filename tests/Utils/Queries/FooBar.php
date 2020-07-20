@@ -10,10 +10,8 @@ class FooBar
 
     /**
      * Return a value for the field.
-     *
-     * @return string
      */
-    public function __invoke()
+    public function __invoke(): string
     {
         return self::INVOKE_RESULT;
     }

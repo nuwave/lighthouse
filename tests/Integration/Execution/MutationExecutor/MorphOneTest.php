@@ -209,7 +209,10 @@ GRAPHQL
         ]);
     }
 
-    public function existingModelMutations()
+    /**
+     * @return array<array<string, string>>
+     */
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],

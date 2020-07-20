@@ -52,9 +52,9 @@ GRAPHQL;
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return string[]
+     * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             AuthServiceProvider::class,
@@ -70,9 +70,8 @@ GRAPHQL;
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
@@ -126,13 +125,10 @@ GRAPHQL;
             ]
         );
 
-        $config->set('app.debug', true);
+        // TODO remove when the default changes
+        $config->set('lighthouse.force_fill', true);
 
-        if (class_exists('Illuminate\Testing\TestResponse')) {
-            \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());
-        } elseif (class_exists('Illuminate\Foundation\Testing\TestResponse')) {
-            \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
-        }
+        $config->set('app.debug', true);
     }
 
     /**
@@ -142,9 +138,8 @@ GRAPHQL;
      * are fully dumped to the console when making requests.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function resolveApplicationExceptionHandler($app)
+    protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
             if (AppVersion::atLeast(7.0)) {

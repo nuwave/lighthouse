@@ -25,14 +25,14 @@ abstract class DriverManager
     /**
      * The array of resolved drivers.
      *
-     * @var array
+     * @var array<string, object>
      */
     protected $drivers = [];
 
     /**
      * The registered custom driver creators.
      *
-     * @var array
+     * @var array<string, \Closure>
      */
     protected $customCreators = [];
 
@@ -43,6 +43,8 @@ abstract class DriverManager
 
     /**
      * Get a driver instance by name.
+     *
+     * @return object The driver instance.
      */
     public function driver(?string $name = null)
     {
@@ -53,6 +55,8 @@ abstract class DriverManager
 
     /**
      * Attempt to get the driver from the local cache.
+     *
+     * @return object The resolved driver.
      */
     protected function get(string $name)
     {
@@ -77,11 +81,13 @@ abstract class DriverManager
 
     /**
      * Get the driver configuration.
+     *
+     * @return array<string, mixed>
      */
     protected function getConfig(string $name): array
     {
         return $this->app['config']->get(
-            $this->configKey().".{$name}",
+            "{$this->configKey()}.{$name}",
             ['driver' => $name]
         );
     }
@@ -101,16 +107,13 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
+     * @return object The resolved driver.
      *
      * @throws \InvalidArgumentException
      */
     protected function resolve(string $name)
     {
         $config = $this->getConfig($name);
-
-        if ($config === null) {
-            throw new InvalidArgumentException("Driver [{$name}] is not defined.");
-        }
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->validateDriver($this->callCustomCreator($config));
@@ -127,6 +130,9 @@ abstract class DriverManager
 
     /**
      * Call a custom driver creator.
+     *
+     * @param  array<string, mixed>  $config
+     * @return object The created driver.
      */
     protected function callCustomCreator(array $config)
     {
@@ -136,6 +142,8 @@ abstract class DriverManager
     /**
      * Validate driver implements the proper interface.
      *
+     * @param  object  $driver
+     * @return object
      *
      * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
      */
@@ -152,6 +160,9 @@ abstract class DriverManager
 
     /**
      * Dynamically call the default driver instance.
+     *
+     * @param  array<mixed>  $parameters
+     * @return mixed Whatever the driver returned.
      */
     public function __call(string $method, array $parameters)
     {

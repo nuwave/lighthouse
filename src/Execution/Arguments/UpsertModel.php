@@ -22,7 +22,6 @@ class UpsertModel implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
     public function __invoke($model, $args)
     {

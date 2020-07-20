@@ -16,7 +16,7 @@ class DeprecatedDirectiveTest extends TestCase
         $this->schema = "
         type Query {
             foo: String @field(resolver: \"{$resolver}\")
-                @deprecated(reason: \"{$reason}\") 
+                @deprecated(reason: \"{$reason}\")
             withDefaultReason: String @field(resolver: \"{$resolver}\")
                 @deprecated
             bar: String @field(resolver: \"{$resolver}\")
@@ -53,7 +53,7 @@ class DeprecatedDirectiveTest extends TestCase
         $result = $this->graphQL($includeDeprecatedIntrospectionQuery);
 
         $deprecatedFields = Arr::where(
-            $result->jsonGet('data.__schema.queryType.fields'),
+            $result->json('data.__schema.queryType.fields'),
             function (array $field): bool {
                 return $field['isDeprecated'];
             }

@@ -93,9 +93,8 @@ abstract class BatchLoader
      *
      * @param  array<mixed>  $metaInfo
      */
-    public function load($key, array $metaInfo = []): Deferred
+    public function load(string $key, array $metaInfo = []): Deferred
     {
-        $key = $this->buildKey($key);
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
@@ -133,16 +132,4 @@ abstract class BatchLoader
      * @return array<mixed, mixed>
      */
     abstract public function resolve(): array;
-
-    /**
-     * Build a key out of one or more given keys, supporting composite keys.
-     *
-     * E.g.: $primaryKey = ['key1', 'key2'];.
-     */
-    protected function buildKey($key): string
-    {
-        return is_array($key)
-            ? implode('___', $key)
-            : $key;
-    }
 }

@@ -5,12 +5,16 @@ namespace Nuwave\Lighthouse\Execution;
 use Closure;
 use Nuwave\Lighthouse\Exceptions\GenericException;
 
+/**
+ * @deprecated in favor of
+ * @see \Nuwave\Lighthouse\Execution\ErrorPool
+ */
 class ErrorBuffer
 {
     /**
      * The gathered error messages.
      *
-     * @var string[]|string[][]
+     * @var array<string>|array<string, array<string>>
      */
     protected $errors = [];
 
@@ -58,6 +62,7 @@ class ErrorBuffer
      * Resolve the exception by calling the exception handler with the given args.
      *
      * @param  mixed  ...$args
+     * @return \Throwable
      */
     protected function resolveException(...$args)
     {
@@ -74,6 +79,7 @@ class ErrorBuffer
         if ($key === null) {
             $this->errors[] = $errorMessage;
         } else {
+            // @phpstan-ignore-next-line sigh...
             $this->errors[$key][] = $errorMessage;
         }
 
@@ -83,8 +89,7 @@ class ErrorBuffer
     /**
      * Flush the errors.
      *
-     *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function flush(string $errorMessage): void
     {

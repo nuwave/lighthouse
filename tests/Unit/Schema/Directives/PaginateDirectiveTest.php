@@ -91,7 +91,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testHasMaxCountInGeneratedCountDescription(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $queryType = $this
             ->buildSchema(/** @lang GraphQL */ '
@@ -108,24 +108,48 @@ class PaginateDirectiveTest extends TestCase
             ')
             ->getQueryType();
 
+        $defaultPaginatedAmountArg = $queryType
+            ->getField('defaultPaginated')
+            ->getArg(config('lighthouse.pagination_amount_argument'));
+
+        $this->assertInstanceOf(FieldArgument::class, $defaultPaginatedAmountArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $defaultPaginatedAmountArg */
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 5.',
-            $queryType->getField('defaultPaginated')->getArg(config('lighthouse.pagination_amount_argument'))->description
+            $defaultPaginatedAmountArg->description
         );
 
+        $defaultRelayFirstArg = $queryType
+            ->getField('defaultRelay')
+            ->getArg('first');
+
+        $this->assertInstanceOf(FieldArgument::class, $defaultRelayFirstArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $defaultRelayFirstArg */
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 5.',
-            $queryType->getField('defaultRelay')->getArg('first')->description
+            $defaultRelayFirstArg->description
         );
 
+        $customPaginatedAmountArg = $queryType
+            ->getField('customPaginated')
+            ->getArg(config('lighthouse.pagination_amount_argument'));
+
+        $this->assertInstanceOf(FieldArgument::class, $customPaginatedAmountArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $customPaginatedAmountArg */
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
-            $queryType->getField('customPaginated')->getArg(config('lighthouse.pagination_amount_argument'))->description
+            $customPaginatedAmountArg->description
         );
 
+        $customRelayFirstArg = $queryType
+            ->getField('customRelay')
+            ->getArg('first');
+
+        $this->assertInstanceOf(FieldArgument::class, $customRelayFirstArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $customRelayFirstArg */
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
-            $queryType->getField('customRelay')->getArg('first')->description
+            $customRelayFirstArg->description
         );
     }
 
@@ -153,7 +177,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testIsLimitedByMaxCountFromDirective(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $this->schema = /** @lang GraphQL */
             '
@@ -181,13 +205,13 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(6, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
     public function testIsLimitedToMaxCountFromConfig(): void
     {
-        config(['lighthouse.paginate_max_count' => 5]);
+        config(['lighthouse.pagination.max_count' => 5]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -214,7 +238,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
-            $resultFromDefaultPagination->jsonGet('errors.0.message')
+            $resultFromDefaultPagination->json('errors.0.message')
         );
 
         $resultFromRelayPagination = $this->graphQL(/** @lang GraphQL */ '
@@ -232,7 +256,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
-            $resultFromRelayPagination->jsonGet('errors.0.message')
+            $resultFromRelayPagination->json('errors.0.message')
         );
     }
 
@@ -266,7 +290,7 @@ class PaginateDirectiveTest extends TestCase
 
         $this->assertSame(
             PaginationArgs::requestedZeroOrLessItems(0),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 

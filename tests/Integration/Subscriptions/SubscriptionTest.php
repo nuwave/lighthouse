@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -23,7 +23,7 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             body: String
         }
@@ -34,14 +34,14 @@ class SubscriptionTest extends TestCase
 
         type Mutation {
             createPost(post: String!): Post
-                @field(resolver: \"{$this->qualifyTestResolver()}\")
-                @broadcast(subscription: \"onPostCreated\")
+                @field(resolver: "{$this->qualifyTestResolver()}")
+                @broadcast(subscription: "onPostCreated")
         }
 
         type Query {
             foo: String
         }
-        ";
+GRAPHQL;
     }
 
     public function testSendsSubscriptionChannelInResponse(): void
@@ -52,7 +52,7 @@ class SubscriptionTest extends TestCase
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
-            $response->jsonGet()
+            $response->json()
         );
     }
 
@@ -60,7 +60,7 @@ class SubscriptionTest extends TestCase
     {
         $response = $this->postGraphQL([
             [
-                'query' => '
+                'query' => /** @lang GraphQL */ '
                     subscription OnPostCreatedV1 {
                         onPostCreated {
                             body
@@ -69,7 +69,7 @@ class SubscriptionTest extends TestCase
                     ',
             ],
             [
-                'query' => '
+                'query' => /** @lang GraphQL */ '
                     subscription OnPostCreatedV2 {
                         onPostCreated {
                             body
@@ -91,7 +91,7 @@ class SubscriptionTest extends TestCase
     public function testCanBroadcastSubscriptions(): void
     {
         $this->subscribe();
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createPost(post: "Foobar") {
                 body
@@ -101,22 +101,28 @@ class SubscriptionTest extends TestCase
 
         /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
         $log = app(BroadcastManager::class)->driver();
-        $this->assertCount(1, $log->broadcasts());
+        $broadcasts = $log->broadcasts();
 
-        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertNotNull($broadcasts);
+        /** @var array<mixed> $broadcasts */
+        $this->assertCount(1, $broadcasts);
+
+        $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
         $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostCreated']);
     }
 
     public function testThrowsWithMissingOperationName(): void
     {
-        $this->graphQL('
-        subscription {
-            onPostCreated {
-                body
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            subscription {
+                onPostCreated {
+                    body
+                }
             }
-        }
-        ')->assertErrorCategory('subscription')
+            ')
+            ->assertGraphQLErrorCategory('subscription')
             ->assertJson([
                 'data' => [
                     'onPostCreated' => null,
@@ -139,12 +145,12 @@ class SubscriptionTest extends TestCase
     }
 
     /**
-     * @return \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse
+     * @return \Illuminate\Testing\TestResponse
      */
     protected function subscribe()
     {
         return $this->postGraphQL([
-            'query' => '
+            'query' => /** @lang GraphQL */ '
                 subscription OnPostCreated {
                     onPostCreated {
                         body

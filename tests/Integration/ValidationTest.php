@@ -59,7 +59,7 @@ class ValidationTest extends DBTestCase
     ';
 
     /**
-     * @param  mixed[]  $args
+     * @param  array<string, string>  $args
      */
     public function resolvePassword($root, array $args): string
     {
@@ -179,14 +179,14 @@ class ValidationTest extends DBTestCase
 
         $this->assertTrue(
             Str::endsWith(
-                $result->jsonGet('errors.0.extensions.validation.stringList.0'),
+                $result->json('errors.0.extensions.validation.stringList.0'),
                 'may not have more than 1 items.'
             )
         );
 
         $this->assertTrue(
             Str::endsWith(
-                $result->jsonGet('errors.0.extensions.validation.input.0'),
+                $result->json('errors.0.extensions.validation.input.0'),
                 'must have at least 3 items.'
             ),
             'Validate size as an array by prepending the rules with the "array" validation'
@@ -213,7 +213,7 @@ class ValidationTest extends DBTestCase
             password(password: " 1234567 ")
         }
         ');
-        $password = $validPasswordResult->jsonGet('data.password');
+        $password = $validPasswordResult->json('data.password');
 
         $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
@@ -239,7 +239,7 @@ class ValidationTest extends DBTestCase
         }
         ');
 
-        $this->assertSame('no-password', $validPasswordResult->jsonGet('data.password'));
+        $this->assertSame('no-password', $validPasswordResult->json('data.password'));
 
         $invalidPasswordResult = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -373,7 +373,7 @@ class ValidationTest extends DBTestCase
                     ComplexValidationDirective::UNIQUE_VALIDATION_MESSAGE,
                 ],
             ],
-            $duplicateName->jsonGet('errors.0.extensions.validation')
+            $duplicateName->json('errors.0.extensions.validation')
         );
     }
 
@@ -455,7 +455,7 @@ class ValidationTest extends DBTestCase
 
         $this->assertCount(
             2,
-            $result->jsonGet('errors.0.extensions.validation.foo')
+            $result->json('errors.0.extensions.validation.foo')
         );
     }
 
@@ -493,7 +493,7 @@ class ValidationTest extends DBTestCase
 
         $this->assertCount(
             2,
-            $result->jsonGet('errors.0.extensions.validation.foo')
+            $result->json('errors.0.extensions.validation.foo')
         );
     }
 
@@ -524,11 +524,12 @@ class ValidationTest extends DBTestCase
     /**
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
-     * @param  \Illuminate\Foundation\Testing\TestResponse|\Illuminate\Testing\TestResponse  $result
+     * @param  array<string>  $keys
+     * @param  \Illuminate\Testing\TestResponse  $result
      */
     protected function assertValidationKeysSame(array $keys, $result): void
     {
-        $validation = $result->jsonGet('errors.0.extensions.validation');
+        $validation = $result->json('errors.0.extensions.validation');
 
         $this->assertSame($keys, array_keys($validation));
     }

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
@@ -9,6 +10,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -19,39 +21,36 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
-     * The GlobalId resolver.
-     *
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
     protected $globalId;
 
-    public function __construct(GlobalId $globalId)
+    /**
+     * @var \Nuwave\Lighthouse\Execution\ErrorPool
+     */
+    protected $errorPool;
+
+    public function __construct(GlobalId $globalId, ErrorPool $errorPool)
     {
         $this->globalId = $globalId;
+        $this->errorPool = $errorPool;
     }
 
-    /**
-     * Resolve the field directive.
-     */
+    public static function couldNotModify(Model $user): string
+    {
+        return 'Could not modify model '.get_class($user).' with ID '.$user->getKey().'.';
+    }
+
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
             function ($root, array $args) {
-                /** @var string|int|string[]|int[] $idOrIds */
+                /** @var string|int|array<string>|array<int> $idOrIds */
                 $idOrIds = reset($args);
 
                 if ($this->directiveArgValue('globalId', false)) {
-                    // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-                    if ($this->idArgument()->type instanceof ListTypeNode) {
-                        $idOrIds = array_map(
-                            function (string $id): string {
-                                return $this->globalId->decodeID($id);
-                            },
-                            $idOrIds
-                        );
-                    } else {
-                        $idOrIds = $this->globalId->decodeID($idOrIds);
-                    }
+                    // @phpstan-ignore-next-line We know that global ids must be strings
+                    $idOrIds = $this->decodeIdOrIds($idOrIds);
                 }
 
                 $modelOrModels = $this->find(
@@ -59,17 +58,25 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                     $idOrIds
                 );
 
-                if (! $modelOrModels) {
+                if ($modelOrModels === null) {
                     return;
                 }
 
-                if ($modelOrModels instanceof Model) {
-                    $this->modifyExistence($modelOrModels);
-                }
+                $modifyModelExistence = function (Model $model): void {
+                    if (! $this->modifyExistence($model)) {
+                        $this->errorPool->record(
+                            new Error(
+                                self::couldNotModify($model)
+                            )
+                        );
+                    }
+                };
 
-                if ($modelOrModels instanceof Collection) {
+                if ($modelOrModels instanceof Model) {
+                    $modifyModelExistence($modelOrModels);
+                } elseif ($modelOrModels instanceof Collection) {
                     foreach ($modelOrModels as $model) {
-                        $this->modifyExistence($model);
+                        $modifyModelExistence($model);
                     }
                 }
 
@@ -84,7 +91,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * Not using an actual type hint, as the manipulateFieldDefinition function
      * validates the type during schema build time.
      *
-     * @return \GraphQL\Language\AST\NonNullTypeNode
+     * @return mixed but should be a \GraphQL\Language\AST\NonNullTypeNode
      */
     protected function idArgument()
     {
@@ -103,7 +110,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         ObjectTypeDefinitionNode &$parentType
     ): void {
         // Ensure there is only a single argument defined on the field.
-        if (count($this->definitionNode->arguments) !== 1) {
+        if (count($fieldDefinition->arguments) !== 1) {
             throw new DefinitionException(
                 'The @'.static::name()." directive requires the field {$this->nodeName()} to only contain a single argument."
             );
@@ -117,16 +124,39 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     }
 
     /**
+     * @param  string|array<string>  $idOrIds
+     * @return string|array<string>
+     */
+    protected function decodeIdOrIds($idOrIds)
+    {
+        // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
+        if ($this->idArgument()->type instanceof ListTypeNode) {
+            /** @var array<string> $idOrIds */
+            return array_map(
+                function (string $id): string {
+                    return $this->globalId->decodeID($id);
+                },
+                $idOrIds
+            );
+        } else {
+            /** @var string $idOrIds */
+            return $this->globalId->decodeID($idOrIds);
+        }
+    }
+
+    /**
      * Find one or more models by id.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model  $modelClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @param  string|int|string[]|int[]  $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
      */
     abstract protected function find(string $modelClass, $idOrIds);
 
     /**
      * Bring a model in or out of existence.
+     *
+     * The return value indicates if the operation was successful.
      */
-    abstract protected function modifyExistence(Model $model): void;
+    abstract protected function modifyExistence(Model $model): bool;
 }

@@ -3,8 +3,11 @@
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
 use Illuminate\Queue\SerializesModels;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription as Subscription;
+use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 
+/**
+ * @deprecated will be removed in v5 and replaced with a Job
+ */
 class BroadcastSubscriptionEvent
 {
     use SerializesModels;
@@ -19,9 +22,9 @@ class BroadcastSubscriptionEvent
      */
     public $fieldName;
 
-    public $root;
+    public $root; // @phpstan-ignore-line
 
-    public function __construct(Subscription $subscription, string $fieldName, $root)
+    public function __construct(GraphQLSubscription $subscription, string $fieldName, $root)
     {
         $this->subscription = $subscription;
         $this->fieldName = $fieldName;

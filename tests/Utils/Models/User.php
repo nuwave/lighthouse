@@ -9,13 +9,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * @property int $id
+ * @property int|null $company_id
+ * @property int|null $team_id
+ * @property int|null $person_id
+ * @property string|null $person_type
+ * @property string|null $name
+ * @property string|null $email
+ * @property string|null $password
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
+ */
 class User extends Authenticatable
 {
-    /**
-     * @var mixed[]
-     */
-    protected $guarded = [];
-
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -60,7 +70,7 @@ class User extends Authenticatable
         });
     }
 
-    public function getCompanyNameAttribute()
+    public function getCompanyNameAttribute(): string
     {
         return $this->company->name;
     }
@@ -73,6 +83,11 @@ class User extends Authenticatable
     public function tasksLoaded(): bool
     {
         return $this->relationLoaded('tasks');
+    }
+
+    public function tasksCountLoaded(): bool
+    {
+        return isset($this->attributes['tasks_count']);
     }
 
     public function postsCommentsLoaded(): bool

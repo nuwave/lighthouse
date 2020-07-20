@@ -61,9 +61,6 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
         );
     }
 
-    /**
-     * Return custom messages for the rules.
-     */
     public function messages(): array
     {
         return [];

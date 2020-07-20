@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    /**
+     * Indicates if migrations ran.
+     *
+     * @var bool
+     */
     protected static $migrated = false;
 
     protected function setUp(): void
@@ -13,10 +18,9 @@ abstract class DBTestCase extends TestCase
         parent::setUp();
 
         if (! static::$migrated) {
-            // We have to use this instead of --realpath as long as Laravel 5.5 is supported
-            $this->app->setBasePath(__DIR__);
             $this->artisan('migrate:fresh', [
-                '--path' => 'database/migrations',
+                '--path' => __DIR__.'/database/migrations',
+                '--realpath' => true,
             ]);
 
             static::$migrated = true;
@@ -31,7 +35,7 @@ abstract class DBTestCase extends TestCase
         $this->withFactories(__DIR__.'/database/factories');
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 

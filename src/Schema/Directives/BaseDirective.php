@@ -45,7 +45,6 @@ abstract class BaseDirective implements Directive
      * Returns the name of the used directive.
      *
      * TODO: Change to a strongly typed hint in v5
-     *
      * @return string
      */
     public function name()
@@ -61,7 +60,7 @@ abstract class BaseDirective implements Directive
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
-        $this->definitionNode = $definitionNode;
+        $this->definitionNode = $definitionNode; // @phpstan-ignore-line Dealing with union types properly is hard in PHP
 
         return $this;
     }
@@ -97,7 +96,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the AST definition node associated with the current directive.
      *
-     * @deprecated in favour of the plain property
+     * @deprecated in favor of the plain property
      */
     protected function directiveDefinition(): DirectiveNode
     {
@@ -119,7 +118,7 @@ abstract class BaseDirective implements Directive
      * Get the model class from the `model` argument of the field.
      *
      * @param  string  $argumentName The default argument name "model" may be overwritten
-     * @return string|\Illuminate\Database\Eloquent\Model
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -165,7 +164,7 @@ abstract class BaseDirective implements Directive
      * Find a class name in a set of given namespaces.
      *
      * @param  string[]  $namespacesToTry
-     * @param  callable  $determineMatch
+     * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -235,9 +234,12 @@ abstract class BaseDirective implements Directive
 
     /**
      * Try adding the default model namespace and ensure the given class is a model.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
+        // @phpstan-ignore-next-line The callback ensures we get a Model class
         return $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),

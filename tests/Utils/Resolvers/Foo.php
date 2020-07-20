@@ -18,8 +18,9 @@ class Foo
 
     /**
      * @param  mixed[]  $args
+     * @see \Tests\Unit\Schema\Directives\FieldDirectiveTest
      */
-    public function baz($root, array $args)
+    public function baz($root, array $args): string
     {
         return Arr::get($args, 'directive.0');
     }

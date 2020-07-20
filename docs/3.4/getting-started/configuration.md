@@ -273,10 +273,8 @@ for your GraphQL endpoint in `config/cors.php`:
 return [
 -   'paths' => ['api/*'],
 +   'paths' => ['api/*', 'graphql'],
-    'allowed_methods' => ['*'],
-    'allowed_origins' => explode(',', env('ALLOWED_CORS_ORIGINS', [])),
     ...
 ];
-``` 
+```
 
 > CORS is built into Laravel starting from version 7, for previous versions use https://github.com/fruitcake/laravel-cors

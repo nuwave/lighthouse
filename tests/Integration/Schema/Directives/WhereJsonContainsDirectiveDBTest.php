@@ -2,13 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
 class WhereJsonContainsDirectiveDBTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Query {
         users(foo: String! @whereJsonContains(key: "name->nested")): [User!]! @all
     }
@@ -17,15 +16,6 @@ class WhereJsonContainsDirectiveDBTest extends DBTestCase
         name: String
     }
     ';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(5.6)) {
-            $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
-        }
-    }
 
     public function testCanApplyWhereJsonContainsFilter(): void
     {
@@ -41,7 +31,7 @@ class WhereJsonContainsDirectiveDBTest extends DBTestCase
             ]),
         ]);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(foo: "bar") {
                 name

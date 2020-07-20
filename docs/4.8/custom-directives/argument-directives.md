@@ -15,7 +15,7 @@ You must implement exactly one of those two interfaces in order for an argument 
 ## ArgTransformerDirective
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
-takes an incoming value an returns a new value. 
+takes an incoming value an returns a new value.
 
 Let's take a look at the built-in `@trim` directive.
 
@@ -97,6 +97,7 @@ type Mutation {
 ```
 
 In the given example, Lighthouse will take the value of the `password` argument and:
+
 1. Trim any whitespace
 1. Run validation on it
 1. Encrypt the password via `bcrypt`
@@ -119,7 +120,7 @@ Take the following schema as an example:
 
 ```graphql
 type User {
-    posts(category: String @eq): [Post!]! @hasMany
+  posts(category: String @eq): [Post!]! @hasMany
 }
 ```
 
@@ -141,9 +142,9 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedD
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
-directive @eq(  
+directive @eq(
   """
-  Specify the database column to compare. 
+  Specify the database column to compare.
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
@@ -171,9 +172,9 @@ SDL;
 The `handleBuilder` method takes two arguments:
 
 - `$builder`
-The query builder for applying the additional query on to.
+  The query builder for applying the additional query on to.
 - `$value`
-The value of the argument value that the `@eq` was applied on to.
+  The value of the argument value that the `@eq` was applied on to.
 
 If you want to use a more complex value for manipulating a query,
 you can build a `ArgBuilderDirective` to work with lists or nested input objects.
@@ -181,14 +182,13 @@ Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is o
 
 ```graphql
 type Query {
-    users(
-        createdBetween: DateRange @whereBetween(key: "created_at")
-    ): [User!]! @paginate
+  users(createdBetween: DateRange @whereBetween(key: "created_at")): [User!]!
+    @paginate
 }
 
 input DateRange {
-    from: Date!
-    to: Date!
+  from: Date!
+  to: Date!
 }
 ```
 
@@ -203,8 +203,8 @@ read the [explanation of arg resolvers](../concepts/arg-resolvers.md).
 
 ## ArgManipulator
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)	
-directive can be used to manipulate the schema AST. 
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)
+directive can be used to manipulate the schema AST.
 
 For example, you might want to add a directive that automagically derives the arguments
 for a field based on an object type. A skeleton for this directive might look something like this:

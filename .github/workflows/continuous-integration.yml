@@ -1,5 +1,3 @@
-# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
-
 name: "Continuous Integration"
 
 on:
@@ -14,42 +12,6 @@ env:
   LIGHTHOUSE_TEST_DB_PASSWORD: "root"
 
 jobs:
-  coding-standards:
-    name: "Coding Standards"
-
-    runs-on: "ubuntu-latest"
-
-    strategy:
-      matrix:
-        php-version:
-          - "7.4"
-        laravel-version:
-          - "^7.0"
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
-
-      - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
-        with:
-          coverage: "none"
-          extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
-          php-version: "${{ matrix.php-version }}"
-
-      - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
-        with:
-          path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
-
-      - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Run ergebnis/composer-normalize"
-        run: "composer normalize --dry-run"
-
   static-code-analysis:
     name: "Static Code Analysis"
 
@@ -58,21 +20,12 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - "7.1"
           - "7.2"
           - "7.3"
           - "7.4"
         laravel-version:
-          - "5.6.*"
-          - "5.7.*"
-          - "5.8.*"
           - "^6.0"
           - "^7.0"
-        exclude:
-          - php-version: "7.1"
-            laravel-version: "^6.0"
-          - php-version: "7.1"
-            laravel-version: "^7.0"
 
     steps:
       - name: "Checkout"
@@ -91,6 +44,9 @@ jobs:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: "composer remove --dev phpbench/phpbench --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
@@ -106,24 +62,15 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - "7.1"
           - "7.2"
           - "7.3"
           - "7.4"
         laravel-version:
-          - "5.5.*"
           - "5.6.*"
           - "5.7.*"
           - "5.8.*"
           - "^6.0"
           - "^7.0"
-        exclude:
-          - php-version: "7.1"
-            laravel-version: "^6.0"
-          - php-version: "7.1"
-            laravel-version: "^7.0"
-          - php-version: "7.4"
-            laravel-version: "5.5.*"
 
     steps:
       - name: "Checkout"
@@ -143,9 +90,8 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
-      - name: "Remove larastan for old Laravel versions"
-        if: "matrix.laravel-version != '^7.0'"
-        run: "composer remove --dev nunomaduro/larastan --no-update"
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
@@ -187,6 +133,9 @@ jobs:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: "composer remove --dev phpbench/phpbench --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"

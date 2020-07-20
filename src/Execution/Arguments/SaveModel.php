@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
@@ -24,9 +25,8 @@ class SaveModel implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function __invoke($model, $args)
+    public function __invoke($model, $args): Model
     {
         // Extract $morphTo first, as MorphTo extends BelongsTo
         [$morphTo, $remaining] = ArgPartitioner::relationMethods(
@@ -41,16 +41,26 @@ class SaveModel implements ArgResolver
             BelongsTo::class
         );
 
+        $argsToFill = $remaining->toArray();
+
         // Use all the remaining attributes and fill the model
-        $model->fill($remaining->toArray());
+        if (config('lighthouse.force_fill')) {
+            $model->forceFill($argsToFill);
+        } else {
+            $model->fill($argsToFill);
+        }
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
-            $belongsToResolver = new ResolveNested(new NestedBelongsTo($relationName));
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
+            $belongsTo = $model->{$relationName}();
+            $belongsToResolver = new ResolveNested(new NestedBelongsTo($belongsTo));
             $belongsToResolver($model, $nestedOperations->value);
         }
 
         foreach ($morphTo->arguments as $relationName => $nestedOperations) {
-            $morphToResolver = new ResolveNested(new NestedMorphTo($relationName));
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $morphTo */
+            $morphTo = $model->{$relationName}();
+            $morphToResolver = new ResolveNested(new NestedMorphTo($morphTo));
             $morphToResolver($model, $nestedOperations->value);
         }
 
@@ -66,9 +76,14 @@ class SaveModel implements ArgResolver
         $model->save();
 
         if ($this->parentRelation instanceof BelongsTo) {
-            $this->parentRelation
-                ->associate($model)
-                ->save();
+            $parentModel = $this->parentRelation->associate($model);
+
+            // If the parent Model does not exist (still to be saved),
+            // a save could break any pending belongsTo relations that still
+            // needs to be created and associated with the parent model
+            if ($parentModel->exists) {
+                $parentModel->save();
+            }
         }
 
         if ($this->parentRelation instanceof BelongsToMany) {

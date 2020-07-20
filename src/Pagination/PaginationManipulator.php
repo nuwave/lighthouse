@@ -22,7 +22,7 @@ class PaginationManipulator
      * for a relation, as the model is not required for resolving
      * that directive and the user may choose a different type.
      *
-     * @var string|null
+     * @var class-string<\Illuminate\Database\Eloquent\Model>|null
      */
     protected $modelClass;
 
@@ -34,6 +34,7 @@ class PaginationManipulator
     /**
      * Set the model class to use for code generation.
      *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @return $this
      */
     public function setModelClass(string $modelClass): self
@@ -125,6 +126,7 @@ GRAPHQL
 
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
     }
 
@@ -185,6 +187,7 @@ GRAPHQL
 
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
+        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
     }
 

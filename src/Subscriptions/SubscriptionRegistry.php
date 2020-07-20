@@ -76,7 +76,7 @@ class SubscriptionRegistry
     /**
      * Get subscription keys.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function keys(): array
     {
@@ -97,12 +97,9 @@ class SubscriptionRegistry
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return $this
      */
-    public function subscriber(Subscriber $subscriber, string $channel): self
+    public function subscriber(Subscriber $subscriber, string $topic): self
     {
-        if ($subscriber->channel) {
-            $this->storage->storeSubscriber($subscriber, $channel);
-        }
-
+        $this->storage->storeSubscriber($subscriber, $topic);
         $this->subscribers[$subscriber->operationName] = $subscriber->channel;
 
         return $this;
@@ -112,6 +109,7 @@ class SubscriptionRegistry
      * Get registered subscriptions.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {

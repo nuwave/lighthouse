@@ -37,7 +37,7 @@ The following query:
     id
     name
   }
-}  
+}
 ```
 
 Will return the following result:
@@ -46,8 +46,8 @@ Will return the following result:
 {
   "data": {
     "users": [
-      {"id": 1, "name": "James Bond"},
-      {"id": 2, "name": "Madonna"}
+      { "id": 1, "name": "James Bond" },
+      { "id": 2, "name": "Madonna" }
     ]
   }
 }
@@ -60,7 +60,7 @@ query a large list of models in chunks.
 
 ```graphql
 type Query {
-    posts: [Post!]! @paginate
+  posts: [Post!]! @paginate
 }
 ```
 
@@ -68,12 +68,12 @@ The schema definition is automatically transformed to this:
 
 ```graphql
 type Query {
-    posts(first: Int!, page: Int): PostPaginator
+  posts(first: Int!, page: Int): PostPaginator
 }
 
 type PostPaginator {
-    data: [Post!]!
-    paginatorInfo: PaginatorInfo!
+  data: [Post!]!
+  paginatorInfo: PaginatorInfo!
 }
 ```
 
@@ -81,16 +81,16 @@ And can be queried like this:
 
 ```graphql
 {
-    posts(first: 10) {
-        data {
-            id
-            title
-        }
-        paginatorInfo {
-            currentPage
-            lastPage
-        }
+  posts(first: 10) {
+    data {
+      id
+      title
     }
+    paginatorInfo {
+      currentPage
+      lastPage
+    }
+  }
 }
 ```
 
@@ -111,7 +111,7 @@ You can query this field like this:
 
 ```graphql
 {
-  user(id: 69){
+  user(id: 69) {
     name
   }
 }
@@ -143,7 +143,7 @@ This will take the arguments that the `createUser` field receives and use them t
 
 ```graphql
 mutation {
-  createUser(name: "Donald"){
+  createUser(name: "Donald") {
     id
     name
   }
@@ -163,7 +163,7 @@ The newly created user is returned as a result:
 }
 ```
 
-__Note__: Due to Laravel's protections against mass assignment, any arguments used in `@create` or `@update` must be added to the `$fillable` property in your Model. For the above example, we would need the following in `\App\Models\User`:
+**Note**: Due to Laravel's protections against mass assignment, any arguments used in `@create` or `@update` must be added to the `$fillable` property in your Model. For the above example, we would need the following in `\App\Models\User`:
 
 ```php
 class User extends Model
@@ -189,7 +189,7 @@ Since GraphQL allows you to update just parts of your data, it is best to have a
 
 ```graphql
 mutation {
-  updateUser(id: "123" name: "Hillary"){
+  updateUser(id: "123", name: "Hillary") {
     id
     name
   }
@@ -220,8 +220,8 @@ may fail to find the model you provided and return `null`:
 
 ## Upsert
 
-Use the [@upsert](../api-reference/directives.md#upsert) directive to update a model with 
-a given `id` or create it if it does not exist. 
+Use the [@upsert](../api-reference/directives.md#upsert) directive to update a model with
+a given `id` or create it if it does not exist.
 
 ```graphql
 type Mutation {
@@ -234,7 +234,7 @@ The `id` is always required and must be marked as fillable in the model.
 
 ```graphql
 mutation {
-  upsertUser(id: "123" name: "Hillary"){
+  upsertUser(id: "123", name: "Hillary") {
     id
     name
     email
@@ -268,7 +268,7 @@ Simply call it with the ID of the user you want to delete.
 
 ```graphql
 mutation {
-  deleteUser(id: "123"){
+  deleteUser(id: "123") {
     secret
   }
 }

@@ -11,6 +11,8 @@ class GraphQLValidator extends Validator
 {
     /**
      * Get the root object that was passed to the field that is being validated.
+     *
+     * @return mixed The root object.
      */
     public function getRoot()
     {

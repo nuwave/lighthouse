@@ -4,11 +4,11 @@ There are times when you'll need to filter out specific events based on the argu
 
 ```graphql
 subscription onPostUpdated($post_id: ID!) {
-    postUpdated(post_id: $post_id) {
-        id
-        title
-        content
-    }
+  postUpdated(post_id: $post_id) {
+    id
+    title
+    content
+  }
 }
 ```
 

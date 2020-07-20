@@ -16,14 +16,15 @@ use Illuminate\Http\Request;
  */
 class AcceptJson
 {
+    const ACCEPT = 'Accept';
+    const APPLICATION_JSON = 'application/json';
+
     /**
-     * Force the Accept header of the request.
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Http\JsonResponse
      */
     public function handle(Request $request, Closure $next)
     {
-        $request->headers->set('Accept', 'application/json');
+        $request->headers->set(self::ACCEPT, self::APPLICATION_JSON);
 
         return $next($request);
     }

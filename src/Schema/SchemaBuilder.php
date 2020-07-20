@@ -38,25 +38,25 @@ class SchemaBuilder
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Always set Query since it is required
-        $config->setQuery(
-            $this->typeRegistry->get('Query')
-        );
+        /** @var \GraphQL\Type\Definition\ObjectType $query */
+        $query = $this->typeRegistry->get(RootType::QUERY);
+        $config->setQuery($query);
 
-        // Those are optional so only add them if they are present in the schema
-        if (isset($documentAST->types['Mutation'])) {
-            $config->setMutation(
-                $this->typeRegistry->get('Mutation')
-            );
+        // Mutation and Subscription are optional, so only add them
+        // if they are present in the schema
+        if (isset($documentAST->types[RootType::MUTATION])) {
+            /** @var \GraphQL\Type\Definition\ObjectType $mutation */
+            $mutation = $this->typeRegistry->get(RootType::MUTATION);
+            $config->setMutation($mutation);
         }
-        if (isset($documentAST->types['Subscription'])) {
+
+        if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
             /** @var \GraphQL\Type\Definition\ObjectType $subscription */
-            $subscription = $this->typeRegistry->get('Subscription');
+            $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
             // Eager-load the subscription fields to ensure they are registered
             $subscription->getFields();
 
-            $config->setSubscription(
-                $subscription
-            );
+            $config->setSubscription($subscription);
         }
 
         // Use lazy type loading to prevent unnecessary work

@@ -11,8 +11,8 @@ class ArgumentFactory
     /**
      * Convert input value definitions to a executable types.
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitionNodes
-     * @return mixed[]
+     * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $definitionNodes
+     * @return array<string, array<string, mixed>>
      */
     public function toTypeMap($definitionNodes): array
     {
@@ -32,12 +32,13 @@ class ArgumentFactory
      * @see \GraphQL\Type\Definition\FieldArgument
      * @see \GraphQL\Type\Definition\InputObjectField
      *
-     * @return mixed[]
+     * @return array<string, mixed> The configuration to construct an \GraphQL\Type\Definition\InputObjectField|\GraphQL\Type\Definition\FieldArgument
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
         /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $definitionNodeConverter */
         $definitionNodeConverter = app(ExecutableTypeNodeConverter::class);
+        /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $type */
         $type = $definitionNodeConverter->convert($definitionNode->type);
 
         $config = [
@@ -47,7 +48,7 @@ class ArgumentFactory
             'astNode' => $definitionNode,
         ];
 
-        if ($defaultValue = $definitionNode->defaultValue) {
+        if ($defaultValue = $definitionNode->defaultValue) { // @phpstan-ignore-line TODO remove when fixed https://github.com/webonyx/graphql-php/pull/654
             $config += [
                 'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $type),
             ];

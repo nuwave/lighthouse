@@ -16,7 +16,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
     /**
      * Ensure a model uses the SoftDeletes trait.
      *
-     *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      * @see \Illuminate\Database\Eloquent\SoftDeletes
      */

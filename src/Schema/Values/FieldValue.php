@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -50,7 +51,7 @@ class FieldValue
     /**
      * A closure that determines the complexity of executing the field.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected $complexity;
 
@@ -79,7 +80,7 @@ class FieldValue
      */
     public function useDefaultResolver(): self
     {
-        $this->resolver = $this->getParentName() === 'Subscription'
+        $this->resolver = $this->getParentName() === RootType::SUBSCRIPTION
             ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
             : app(ProvidesResolver::class)->provideResolver($this);
 
@@ -148,9 +149,9 @@ class FieldValue
     /**
      * Get field resolver.
      */
-    public function getResolver(): ?callable
+    public function getResolver(): callable
     {
-        return $this->resolver;
+        return $this->resolver; // @phpstan-ignore-line This must only be called after setResolver() was called
     }
 
     /**
@@ -161,11 +162,11 @@ class FieldValue
     public function defaultNamespacesForParent(): array
     {
         switch ($this->getParentName()) {
-            case 'Query':
+            case RootType::QUERY:
                 return (array) config('lighthouse.namespaces.queries');
-            case 'Mutation':
+            case RootType::MUTATION:
                 return (array) config('lighthouse.namespaces.mutations');
-            case 'Subscription':
+            case RootType::SUBSCRIPTION:
                 return (array) config('lighthouse.namespaces.subscriptions');
             default:
                return [];
@@ -200,9 +201,6 @@ class FieldValue
      */
     public function parentIsRootType(): bool
     {
-        return in_array(
-            $this->getParentName(),
-            ['Query', 'Mutation', 'Subscription']
-        );
+        return RootType::isRootType($this->getParentName());
     }
 }

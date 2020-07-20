@@ -3,6 +3,7 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -223,7 +224,7 @@ GRAPHQL
 
     public function testCanCreateUsingUpsertWithNewHasMany(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertUser(input: {
                 id: 1
@@ -259,7 +260,10 @@ GRAPHQL
         ]);
     }
 
-    public function existingModelMutations()
+    /**
+     * @return array<array<string, string>>
+     */
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -274,14 +278,14 @@ GRAPHQL
     {
         factory(User::class)->create();
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}User(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 tasks: {
                     create: [{
-                        name: \"bar\"
+                        name: "bar"
                     }]
                 }
             }) {
@@ -293,7 +297,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -321,15 +326,15 @@ GRAPHQL
                 factory(Task::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}User(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 tasks: {
                     update: [{
                         id: 1
-                        name: \"bar\"
+                        name: "bar"
                     }]
                 }
             }) {
@@ -341,7 +346,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -369,15 +375,15 @@ GRAPHQL
                 factory(Task::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}User(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 tasks: {
                     upsert: [{
                         id: 1
-                        name: \"bar\"
+                        name: "bar"
                     }]
                 }
             }) {
@@ -389,7 +395,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -417,11 +424,11 @@ GRAPHQL
                 factory(Task::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             ${action}User(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 tasks: {
                     delete: [1]
                 }
@@ -434,7 +441,8 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -443,5 +451,121 @@ GRAPHQL
                 ],
             ],
         ]);
+    }
+
+    public function testUpsertAcrossPivotTableOverrideExistingModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+            roles: [Role!] @belongsToMany
+        }
+
+        type Role {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            upsertUser(input: UpsertUserInput! @spread): User @upsert
+        }
+
+        input UpsertUserInput {
+            id: ID
+            name: String!
+            roles: UpsertRolesHasMany
+        }
+
+        input UpsertRolesHasMany {
+            upsert: [UpsertRoleInput!]
+        }
+
+        input UpsertRoleInput {
+            id: ID
+            name: String!
+            users: UpsertRoleUsersRelation
+        }
+
+        input UpsertRoleUsersRelation {
+            sync: [ID!]
+        }
+        '.self::PLACEHOLDER_QUERY;
+
+        // Create the first User with a Role.
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertUser(input: {
+                name: "foo"
+                roles: {
+                    upsert: [{
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                roles {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'roles' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        // The first User has the first Role.
+        $role = Role::firstOrFail();
+        $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
+
+        // Create another User.
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertUser(input: {
+                id: "1"
+                name: "fooz"
+                roles: {
+                    upsert: [{
+                        id: "1"
+                        name: "baz"
+                        users: {
+                            sync: ["2"] # Here the first User is switching the relationship of the first Role to another User.
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                roles {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'id' => '1',
+                    'name' => 'fooz',
+                    'roles' => [],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
     }
 }

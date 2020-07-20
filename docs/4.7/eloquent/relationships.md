@@ -19,7 +19,7 @@ class Post extends Model
     {
         return $this->hasMany(Comment::class);
     }
-    
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -42,13 +42,13 @@ the default field resolver will work just fine.
 ## Avoiding the N+1 performance problem
 
 When accessing Eloquent relationships as properties, the relationship data is "lazy loaded".
-This means the relationship data is not actually loaded until you first access the property. 
+This means the relationship data is not actually loaded until you first access the property.
 
 This leads to a common performance pitfall that comes with the nested nature of GraphQL queries:
 the so-called N+1 query problem. [Learn more](../performance/n-plus-one.md).
 
 When you decorate your relationship fields with Lighthouse's built-in relationship
-directives, queries are automatically combined through a technique called *batch loading*.
+directives, queries are automatically combined through a technique called _batch loading_.
 That means you get fewer database requests and better performance without doing much work.
 
 > Batch loading might not provide ideal performance for all use cases. You can turn
@@ -117,7 +117,7 @@ When you define a relation, Lighthouse assumes that the field and the relationsh
 method have the same name. If you need to name your field differently, you have to
 specify the name of the method.
 
-```
+```graphql
 type Post {
   author: User! @belongsTo(relation: "user")
 }
@@ -133,7 +133,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model 
+class Post extends Model
 {
     public function user(): BelongsTo
     {
