@@ -99,7 +99,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                 "A set of conditions that requires at least one condition to match."
                 OR: [$name!]
 
-                "Check whether a relation exists, or if it matches a count criteria. And with option for a where clause."
+                "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
                 HAS: $hasRelationInputName
             }
 GRAPHQL
