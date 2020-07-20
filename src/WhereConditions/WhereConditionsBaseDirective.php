@@ -97,7 +97,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $additionalArguments[] = $operator;
         }
 
-        if ($amount) {
+        if ($amount !== null) {
             $additionalArguments[] = $amount;
         }
 
