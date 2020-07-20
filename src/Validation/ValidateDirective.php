@@ -23,7 +23,7 @@ class ValidateDirective extends BaseDirective implements FieldMiddleware
         $this->validationFactory = $validationFactory;
     }
 
-    public static function definition()
+    public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
