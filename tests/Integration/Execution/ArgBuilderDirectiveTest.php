@@ -398,7 +398,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'name' => $username
+                'name' => $username,
             ])
             ->assertJsonCount(1, 'data.users');
     }
