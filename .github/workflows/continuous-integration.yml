@@ -62,24 +62,15 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - "7.1"
           - "7.2"
           - "7.3"
           - "7.4"
         laravel-version:
-          - "5.5.*"
           - "5.6.*"
           - "5.7.*"
           - "5.8.*"
           - "^6.0"
           - "^7.0"
-        exclude:
-          - php-version: "7.1"
-            laravel-version: "^6.0"
-          - php-version: "7.1"
-            laravel-version: "^7.0"
-          - php-version: "7.4"
-            laravel-version: "5.5.*"
 
     steps:
       - name: "Checkout"

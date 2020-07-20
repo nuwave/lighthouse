@@ -244,7 +244,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -286,7 +286,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -479,7 +479,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -523,7 +523,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 

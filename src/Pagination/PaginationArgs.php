@@ -87,7 +87,7 @@ class PaginationArgs
      *
      * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder
      */
-    public function applyToBuilder($builder): LengthAwarePaginator
+    public function applyToBuilder(object $builder): LengthAwarePaginator
     {
         if ($builder instanceof ScoutBuilder) {
             return $builder->paginate($this->first, 'page', $this->page);
