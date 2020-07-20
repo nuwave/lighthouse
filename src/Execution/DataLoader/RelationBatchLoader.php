@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -68,7 +69,7 @@ class RelationBatchLoader extends BatchLoader
                  * @return array<string, mixed>
                  */
                 function (Model $model): array {
-                    return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
+                    return [ModelKey::build($model) => $this->extractRelation($model)];
                 }
             )
             ->all();
