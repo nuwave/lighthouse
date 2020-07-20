@@ -120,7 +120,7 @@ mutation {
 }
 GRAPHQL
                     )
-                    ->jsonGet()
+                    ->json()
             );
     }
 
@@ -173,7 +173,7 @@ GRAPHQL
 }
 GRAPHQL
                     )
-                    ->jsonGet()
+                    ->json()
             );
     }
 
@@ -208,7 +208,7 @@ GRAPHQL
 }
 GRAPHQL
                     )
-                    ->jsonGet()
+                    ->json()
             );
     }
 

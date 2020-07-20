@@ -33,7 +33,7 @@ SDL;
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         $scope = $this->directiveArgValue('name');
         try {
