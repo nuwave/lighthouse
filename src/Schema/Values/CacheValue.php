@@ -2,40 +2,42 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CacheValue
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
+     * @var mixed|null The root that was passed to the query.
      */
-    protected $fieldValue;
+    protected $root;
 
     /**
-     * @var mixed
-     */
-    protected $rootValue;
-
-    /**
-     * @var array
+     * The args that were passed to the query.
+     *
+     * @var array<string, mixed>
      */
     protected $args;
 
     /**
-     * @var mixed
+     * The context that was passed to the query.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     protected $context;
 
     /**
+     * The ResolveInfo that was passed to the query.
+     *
      * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
     /**
-     * @var mixed
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    protected $fieldKey;
+    protected $fieldValue;
 
     /**
      * @var bool
@@ -43,27 +45,35 @@ class CacheValue
     protected $isPrivate;
 
     /**
-     * Create instance of cache value.
-     *
-     * @param  array  $arguments
-     * @return void
+     * @var mixed The key to use for caching this field.
      */
-    public function __construct(array $arguments = [])
-    {
-        $this->fieldValue = Arr::get($arguments, 'field_value');
-        $this->rootValue = Arr::get($arguments, 'root');
-        $this->args = Arr::get($arguments, 'args');
-        $this->context = Arr::get($arguments, 'context');
-        $this->resolveInfo = Arr::get($arguments, 'resolve_info');
-        $this->isPrivate = Arr::get($arguments, 'is_private');
+    protected $fieldKey;
+
+    /**
+     * @param  mixed|null  $root The root that was passed to the query.
+     * @param  array<string, mixed>  $args
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     */
+    public function __construct(
+        $root,
+        array $args,
+        GraphQLContext $context,
+        ResolveInfo $resolveInfo,
+        FieldValue $fieldValue,
+        bool $isPrivate
+    ) {
+        $this->root = $root;
+        $this->args = $args;
+        $this->context = $context;
+        $this->resolveInfo = $resolveInfo;
+        $this->fieldValue = $fieldValue;
+        $this->isPrivate = $isPrivate;
 
         $this->fieldKey = $this->fieldKey();
     }
 
     /**
      * Resolve key from root value.
-     *
-     * @return string
      */
     public function getKey(): string
     {
@@ -89,7 +99,7 @@ class CacheValue
     /**
      * Get cache tags.
      *
-     * @return array
+     * @return array<string>
      */
     public function getTags(): array
     {
@@ -112,18 +122,15 @@ class CacheValue
     /**
      * Convert input arguments to keys.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<string>
      */
     protected function argKeys(): Collection
     {
-        // TODO use ->sortKeys() once we drop support for Laravel 5.5
-        $args = $this->args;
-        ksort($args);
-
-        return (new Collection($args))
+        return (new Collection($this->args))
+            ->sortKeys()
             ->map(function ($value, $key): string {
                 $keyValue = is_array($value)
-                    ? json_encode($value, true)
+                    ? json_encode($value)
                     : $value;
 
                 return "{$key}:{$keyValue}";
@@ -137,7 +144,7 @@ class CacheValue
      */
     protected function fieldKey()
     {
-        if (! $this->fieldValue || ! $this->rootValue) {
+        if ($this->root === null) {
             return;
         }
 
@@ -146,15 +153,12 @@ class CacheValue
             ->getCacheKey();
 
         if ($cacheFieldKey) {
-            return data_get($this->rootValue, $cacheFieldKey);
+            return data_get($this->root, $cacheFieldKey);
         }
     }
 
     /**
-     * Implode value to create string.
-     *
-     * @param  array  $items
-     * @return string
+     * @param  array<mixed|null> $items
      */
     protected function implode(array $items): string
     {

@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -14,28 +14,28 @@ class CanDirectiveDBTest extends DBTestCase
 {
     public function testQueriesForSpecificModel(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
-        $user = factory(User::class)->create(['name' => 'foo']);
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", find: "id")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @first
         }
-        
+
         type User {
             id: ID!
             name: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             user(id: {$user->getKey()}) {
                 name
@@ -52,79 +52,167 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testFailsToFindSpecificModel(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolverExpects(
+            $this->never()
         );
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", find: "id")
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+                @mock
         }
-        
+
         type User {
             id: ID!
             name: String!
         }
         ';
 
-        $this->expectException(ModelNotFoundException::class);
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user(id: "not-present") {
                 name
             }
         }
-        ');
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => 'No query results for model [Tests\Utils\Models\User] not-present',
+                ],
+            ],
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+    }
+
+    public function testThrowsIfFindValueIsNotGiven(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID): User
+                @can(ability: "view", find: "some.path")
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => CanDirective::missingKeyToFindModel('some.path'),
+                ],
+            ],
+        ]);
+    }
+
+    public function testFindUsingNestedInputWithDotNotation(): void
+    {
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(input: FindUserInput): User
+                @can(ability: "view", find: "input.id")
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        input FindUserInput {
+          id: ID
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID){
+            user(input: {
+              id: $id
+            }) {
+                name
+            }
+        }
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
     }
 
     public function testThrowsIfNotAuthorized(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
-        $userB = User::create([
-            'name' => 'foo',
-        ]);
+        $userB = new User();
+        $userB->name = 'foo';
+        $userB->save();
 
         $postB = factory(Post::class)->create([
             'user_id' => $userB->getKey(),
             'title' => 'Harry Potter and the Half-Blood Prince',
         ]);
 
-        $this->schema = '
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             post(foo: ID @eq): Post
                 @can(ability: "view", find: "foo")
-                @field(resolver: "'.$this->qualifyTestResolver('resolvePost').'")
+                @mock
         }
-        
+
         type Post {
             id: ID!
             title: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             post(foo: {$postB->getKey()}) {
                 title
             }
         }
-        ")->assertErrorCategory(AuthorizationException::CATEGORY);
+        ")->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testCanHandleMultipleModels(): void
     {
-        $user = User::create([
-            'name' => UserPolicy::ADMIN,
-        ]);
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
         $postA = factory(Post::class)->create([
@@ -136,20 +224,20 @@ class CanDirectiveDBTest extends DBTestCase
             'title' => 'Harry Potter and the Chamber of Secrets',
         ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             deletePosts(ids: [ID!]!): [Post!]!
-                @delete
                 @can(ability: "delete", find: "ids")
+                @delete
         }
-        
+
         type Post {
             id: ID!
             title: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             deletePosts(ids: [{$postA->getKey()}, {$postB->getKey()}]) {
                 title
@@ -171,29 +259,27 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testWorksWithSoftDeletes(): void
     {
-        $this->be(
-            new User([
-                'name' => UserPolicy::ADMIN,
-            ])
-        );
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
 
         $task = factory(Task::class)->create();
         $task->delete();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             task(id: ID @eq): Task
                 @can(ability: "adminOnly", find: "id")
                 @softDeletes
                 @find
         }
-        
+
         type Task {
             name: String!
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             task(id: {$task->getKey()}, trashed: WITH) {
                 name
@@ -206,15 +292,5 @@ class CanDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
-    }
-
-    public function resolveUser($root, array $args): ?User
-    {
-        return User::where('id', $args['id'])->first();
-    }
-
-    public function resolvePost($root, array $args): ?User
-    {
-        return Post::where('id', $args['id'])->first();
     }
 }

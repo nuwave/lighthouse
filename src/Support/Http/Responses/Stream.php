@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 abstract class Stream
@@ -10,21 +9,23 @@ abstract class Stream
     /**
      * Get error from chunk if it exists.
      *
-     * @param  string  $path
-     * @param  array  $data
-     * @return array|null
+     * @param  array<string, mixed>  $data
+     * @return array<array<string, mixed>>|null
      */
     protected function chunkError(string $path, array $data): ?array
     {
-        if (! isset($data['errors'])) {
+        $errors = $data['errors'] ?? null;
+        if (! is_array($errors)) {
             return null;
         }
 
-        return (new Collection($data['errors']))
-            ->filter(function (array $error) use ($path): bool {
+        $errorsMatchingPath = array_filter(
+            $errors,
+            function (array $error) use ($path): bool {
                 return Str::startsWith(implode('.', $error['path']), $path);
-            })
-            ->values()
-            ->all();
+            }
+        );
+
+        return array_values($errorsMatchingPath);
     }
 }

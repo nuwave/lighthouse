@@ -12,37 +12,44 @@ trait MocksResolvers
     /**
      * Create and register a PHPUnit mock to be called through the @mock directive.
      *
-     * @param  callable|null  $resolver
-     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
+     * @param  callable|mixed|null  $resolverOrValue
      */
-    protected function mockResolver(callable $resolver = null): InvocationMocker
+    protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
     {
-        $mock = $this->getMockBuilder(MockResolver::class)
-            ->getMock();
+        $method = $this->mockResolverExpects($this->atLeastOnce(), $key);
 
-        $this->registerMockResolver($mock);
-
-        $method = $mock
-            ->expects($this->once())
-            ->method('__invoke');
-
-        if ($resolver) {
-            $method->willReturnCallback($resolver);
+        if (is_callable($resolverOrValue)) {
+            $method->willReturnCallback($resolverOrValue);
+        } else {
+            $method->willReturn($resolverOrValue);
         }
 
         return $method;
     }
 
     /**
-     * Register a mock resolver that will be called through the @mock directive.
+     * Register a resolver for @mock.
      *
-     * @param  callable  $mock
-     * @return void
+     * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
      */
-    protected function registerMockResolver(callable $mock): void
+    protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
+    {
+        $mock = $this->createMock(MockResolver::class);
+
+        $this->registerMockResolver($mock, $key);
+
+        return $mock
+            ->expects($invocationOrder)
+            ->method('__invoke');
+    }
+
+    /**
+     * Register a mock resolver that will be called through the @mock directive.
+     */
+    protected function registerMockResolver(callable $mock, string $key): void
     {
         /** @var \Nuwave\Lighthouse\Testing\MockDirective $mockDirective */
         $mockDirective = app(MockDirective::class);
-        $mockDirective->register($mock);
+        $mockDirective->register($mock, $key);
     }
 }

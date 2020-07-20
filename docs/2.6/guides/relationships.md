@@ -20,7 +20,7 @@ class Post extends Model
     {
         return $this->hasMany(Comment::class);
     }
-    
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -111,7 +111,7 @@ When you define a relation, Lighthouse assumes that the field and the relationsh
 method have the same name. If you need to name your field differently, you have to
 specify the name of the method.
 
-```
+```graphql
 type Post {
   author: User! @belongsTo(relation: "user")
 }
@@ -127,7 +127,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model 
+class Post extends Model
 {
     public function user(): BelongsTo
     {

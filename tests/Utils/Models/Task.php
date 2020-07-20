@@ -11,13 +11,25 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $name
+ * @property string|null $guard
+ * @property \Carbon\Carbon $completed_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ *
+ * @property-read \Tests\Utils\Models\User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * @property-read \Tests\Utils\Models\Activity $activity
+ */
 class Task extends Model
 {
     use SoftDeletes;
 
-    protected $guarded = [];
-
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
@@ -25,6 +37,11 @@ class Task extends Model
         static::addGlobalScope('no_cleaning', function (Builder $builder): void {
             $builder->where('name', '!=', 'cleaning');
         });
+    }
+
+    public function activity(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'content');
     }
 
     public function user(): BelongsTo
@@ -42,22 +59,33 @@ class Task extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    public function scopeFoo(Builder $query, $args): Builder
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->whereNotNull('completed_at');
+    }
+
+    /**
+     * @param  array<string, int>  $args
+     */
+    public function scopeFoo(Builder $query, array $args): Builder
     {
         return $query->limit($args['foo']);
     }
 
-    public function hours(): MorphMany
+    public function images(): MorphMany
     {
-        return $this->morphMany(Hour::class, 'hourable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function hour(): MorphOne
+    public function image(): MorphOne
     {
-        return $this->morphOne(Hour::class, 'hourable');
+        return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function scopeWhereTags(Builder $query, $tags)
+    /**
+     * @param  iterable<string>  $tags
+     */
+    public function scopeWhereTags(Builder $query, iterable $tags): Builder
     {
         return $query->whereHas('tags', function (Builder $query) use ($tags) {
             $query->whereIn('name', $tags);

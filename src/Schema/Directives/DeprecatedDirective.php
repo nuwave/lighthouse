@@ -5,28 +5,17 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\Directive;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class DeprecatedDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class DeprecatedDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'deprecated';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Marks an element of a GraphQL schema as no longer supported.
 """
-directive @deprecated(  
+directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
   suggestion for how to access supported similar data. Formatted
@@ -37,13 +26,6 @@ directive @deprecated(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $reason = $this->directiveArgValue('reason', Directive::DEFAULT_DEPRECATION_REASON);

@@ -11,7 +11,7 @@ The following schema defines a simple field called `hello` that returns a `Strin
 
 ```graphql
 type Query {
-  hello: String! 
+  hello: String!
 }
 ```
 
@@ -86,7 +86,7 @@ The following query:
     id
     name
   }
-}  
+}
 ```
 
 Will return the following result:
@@ -95,8 +95,8 @@ Will return the following result:
 {
   "data": {
     "users": [
-      {"id": 1, "name": "James Bond"},
-      {"id": 2, "name": "Madonna"}
+      { "id": 1, "name": "James Bond" },
+      { "id": 2, "name": "Madonna" }
     ]
   }
 }
@@ -119,7 +119,7 @@ You can query this field like this:
 
 ```graphql
 {
-  user(id: 69){
+  user(id: 69) {
     name
   }
 }
@@ -140,7 +140,7 @@ And, if found, receive a result like this:
 ## Mutate data
 
 Reading data is all fine and dandy through Queries, but you might want to offer a way to change data, too.
-Per convention, a GraphQL *Query* is not allowed to change data, so you will need to define a *Mutation* for that.
+Per convention, a GraphQL _Query_ is not allowed to change data, so you will need to define a _Mutation_ for that.
 The only difference between them is their ability to change data, apart from that, they are the same.
 
 ### Create
@@ -158,7 +158,7 @@ This will take the arguments that the `createUser` field receives and use them t
 
 ```graphql
 mutation {
-  createUser(name: "Donald"){
+  createUser(name: "Donald") {
     id
     name
   }
@@ -190,10 +190,9 @@ type Mutation {
 
 Since GraphQL allows you to update just parts of your data, it is best to have all arguments except `id` as optional.
 
-
 ```graphql
 mutation {
-  updateUser(id: "123" name: "Hillary"){
+  updateUser(id: "123", name: "Hillary") {
     id
     name
   }
@@ -236,7 +235,7 @@ Simply call it with the ID if the user you want gone:
 
 ```graphql
 mutation {
-  deleteUser(id: "123"){
+  deleteUser(id: "123") {
     secret
   }
 }
@@ -252,7 +251,7 @@ This mutation will return the deleted object, so you will have a last chance to 
     }
   }
 }
-``` 
+```
 
 ## Custom resolvers
 
@@ -299,4 +298,4 @@ For example, this is how you generate a class for the field `latestPost`:
     php artisan lighthouse:query LatestPost
 
 If you need to implement custom resolvers for fields that are not on one of the
-root types `Query` or `Mutation`, you can use the [@field](../api-reference/directives.md#field) directive. 
+root types `Query` or `Mutation`, you can use the [@field](../api-reference/directives.md#field) directive.

@@ -2,24 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 
-class TrimDirective implements ArgTransformerDirective, DefinedDirective
+class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
 {
-    /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'trim';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run the `trim` function on an input value.
 """
@@ -31,9 +21,8 @@ SDL;
      * Remove whitespace from the beginning and end of a given input.
      *
      * @param  string  $argumentValue
-     * @return string
      */
-    public function transform($argumentValue): string
+    public function sanitize($argumentValue): string
     {
         return trim($argumentValue);
     }

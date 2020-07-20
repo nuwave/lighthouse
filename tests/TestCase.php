@@ -2,21 +2,23 @@
 
 namespace Tests;
 
-use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Illuminate\Console\Command;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
-use Nuwave\Lighthouse\Testing\TestingServiceProvider;
+use Nuwave\Lighthouse\Testing\UsesTestSchema;
+use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Policies\AuthServiceProvider;
 
@@ -24,37 +26,45 @@ abstract class TestCase extends BaseTestCase
 {
     use MakesGraphQLRequests;
     use MocksResolvers;
-
-    const PLACEHOLDER_QUERY = '
-    type Query {
-        foo: Int
-    }
-    ';
+    use UsesTestSchema;
 
     /**
-     * This variable is injected the main GraphQL class
-     * during execution of each test. It may be set either
-     * for an entire test class or for a single test.
-     *
-     * @var string
+     * A dummy query type definition that is added to tests by default.
      */
-    protected $schema = self::PLACEHOLDER_QUERY;
+    public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
+type Query {
+  foo: Int
+}
+
+GRAPHQL;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (! $this->schema) {
+            $this->schema = self::PLACEHOLDER_QUERY;
+        }
+
+        $this->setUpTestSchema();
+    }
 
     /**
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return string[]
+     * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
-            ScoutServiceProvider::class,
             AuthServiceProvider::class,
+            ConsoleServiceProvider::class,
+            ScoutServiceProvider::class,
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
-            TestingServiceProvider::class,
-            ConsoleServiceProvider::class,
+            OrderByServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
@@ -62,17 +72,9 @@ abstract class TestCase extends BaseTestCase
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
-        $app->bind(
-            SchemaSourceProvider::class,
-            function (): TestSchemaProvider {
-                return new TestSchemaProvider($this->schema);
-            }
-        );
-
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
 
@@ -89,7 +91,9 @@ abstract class TestCase extends BaseTestCase
                 'Tests\\Utils\\Mutations',
                 'Tests\\Utils\\MutationsSecondary',
             ],
-            'subscriptions' => 'Tests\\Utils\\Subscriptions',
+            'subscriptions' => [
+                'Tests\\Utils\\Subscriptions',
+            ],
             'interfaces' => [
                 'Tests\\Utils\\Interfaces',
                 'Tests\\Utils\\InterfacesSecondary',
@@ -104,6 +108,9 @@ abstract class TestCase extends BaseTestCase
             ],
             'directives' => [
                 'Tests\\Utils\\Directives',
+            ],
+            'validators' => [
+                'Tests\\Utils\\Validators',
             ],
         ]);
 
@@ -123,9 +130,10 @@ abstract class TestCase extends BaseTestCase
             ]
         );
 
-        $config->set('app.debug', true);
+        // TODO remove when the default changes
+        $config->set('lighthouse.force_fill', true);
 
-        TestResponse::mixin(new TestResponseMixin());
+        $config->set('app.debug', true);
     }
 
     /**
@@ -135,32 +143,15 @@ abstract class TestCase extends BaseTestCase
      * are fully dumped to the console when making requests.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function resolveApplicationExceptionHandler($app)
+    protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
-            return new class implements ExceptionHandler {
-                public function report(Exception $e)
-                {
-                    //
-                }
+            if (AppVersion::atLeast(7.0)) {
+                return new Laravel7ExceptionHandler();
+            }
 
-                public function render($request, Exception $e)
-                {
-                    throw $e;
-                }
-
-                public function renderForConsole($output, Exception $e)
-                {
-                    //
-                }
-
-                public function shouldReport(Exception $e)
-                {
-                    return false;
-                }
-            };
+            return new PreLaravel7ExceptionHandler();
         });
     }
 
@@ -173,9 +164,6 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
-     *
-     * @param  string  $schema
-     * @return \GraphQL\Type\Schema
      */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
@@ -186,9 +174,6 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Build an executable schema from an SDL string.
-     *
-     * @param  string  $schema
-     * @return \GraphQL\Type\Schema
      */
     protected function buildSchema(string $schema): Schema
     {
@@ -201,12 +186,19 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Get a fully qualified reference to a method that is defined on the test class.
-     *
-     * @param  string  $method
-     * @return string
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
         return addslashes(static::class).'@'.$method;
+    }
+
+    /**
+     * Construct a command tester.
+     */
+    protected function commandTester(Command $command): CommandTester
+    {
+        $command->setLaravel($this->app);
+
+        return new CommandTester($command);
     }
 }

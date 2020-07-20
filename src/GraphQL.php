@@ -6,95 +6,85 @@ use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
-use GraphQL\Validator\DocumentValidator;
-use GraphQL\Validator\Rules\DisableIntrospection;
-use GraphQL\Validator\Rules\QueryComplexity;
-use GraphQL\Validator\Rules\QueryDepth;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Pipeline;
 
 class GraphQL
 {
     /**
-     * The executable schema.
-     *
      * @var \GraphQL\Type\Schema
      */
     protected $executableSchema;
 
     /**
-     * The schema builder.
-     *
      * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     protected $schemaBuilder;
 
     /**
-     * The pipeline.
-     *
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
 
     /**
-     * The event dispatcher.
-     *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventDispatcher;
 
     /**
-     * The AST builder.
-     *
      * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
      */
     protected $astBuilder;
 
     /**
-     * The context factory.
-     *
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
     protected $createsContext;
 
     /**
-     * GraphQL constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
-     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
-     * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
-     * @return void
+     * @var \Nuwave\Lighthouse\Execution\ErrorPool
      */
+    protected $errorPool;
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules
+     */
+    protected $providesValidationRules;
+
     public function __construct(
         SchemaBuilder $schemaBuilder,
         Pipeline $pipeline,
         EventDispatcher $eventDispatcher,
         ASTBuilder $astBuilder,
-        CreatesContext $createsContext
+        CreatesContext $createsContext,
+        ErrorPool $errorPool,
+        ProvidesValidationRules $providesValidationRules
     ) {
         $this->schemaBuilder = $schemaBuilder;
         $this->pipeline = $pipeline;
         $this->eventDispatcher = $eventDispatcher;
         $this->astBuilder = $astBuilder;
         $this->createsContext = $createsContext;
+        $this->errorPool = $errorPool;
+        $this->providesValidationRules = $providesValidationRules;
     }
 
     /**
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
-     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return mixed[]
      */
     public function executeRequest(GraphQLRequest $request): array
@@ -115,7 +105,6 @@ class GraphQL
     /**
      * Apply the debug settings from the config and get the result as an array.
      *
-     * @param  \GraphQL\Executor\ExecutionResult  $result
      * @return mixed[]
      */
     public function applyDebugSettings(ExecutionResult $result): array
@@ -137,11 +126,8 @@ class GraphQL
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
      * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  mixed[]  $variables
+     * @param  array<mixed>|null  $variables
      * @param  mixed|null  $rootValue
-     * @param  string|null  $operationName
-     * @return \GraphQL\Executor\ExecutionResult
      */
     public function executeQuery(
         $query,
@@ -167,10 +153,10 @@ class GraphQL
             $variables,
             $operationName,
             null,
-            $this->getValidationRules() + DocumentValidator::defaultRules()
+            $this->providesValidationRules->validationRules()
         );
 
-        /** @var \Nuwave\Lighthouse\Execution\ExtensionsResponse[] $extensionsResponses */
+        /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
             new BuildExtensionsResponse
         );
@@ -179,6 +165,10 @@ class GraphQL
             if ($extensionsResponse) {
                 $result->extensions[$extensionsResponse->key()] = $extensionsResponse->content();
             }
+        }
+
+        foreach ($this->errorPool->errors() as $error) {
+            $result->errors [] = $error;
         }
 
         $result->setErrorsHandler(
@@ -206,13 +196,13 @@ class GraphQL
             new ManipulateResult($result)
         );
 
+        $this->cleanUp();
+
         return $result;
     }
 
     /**
      * Ensure an executable GraphQL schema is present.
-     *
-     * @return \GraphQL\Type\Schema
      */
     public function prepSchema(): Schema
     {
@@ -226,24 +216,18 @@ class GraphQL
     }
 
     /**
-     * Construct the validation rules with values given in the config.
-     *
-     * @return \GraphQL\Validator\Rules\ValidationRule[]
+     * Clean up after executing a query.
      */
-    protected function getValidationRules(): array
+    protected function cleanUp(): void
     {
-        return [
-            QueryComplexity::class => new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
-            QueryDepth::class => new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
-            DisableIntrospection::class => new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
-        ];
+        BatchLoader::forgetInstances();
+        $this->errorPool->clear();
     }
 
     /**
      * Get instance of DocumentAST.
      *
      * @deprecated use ASTBuilder instead
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function documentAST(): DocumentAST
     {

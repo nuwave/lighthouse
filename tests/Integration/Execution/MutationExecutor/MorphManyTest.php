@@ -3,95 +3,96 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Hour;
+use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
 class MorphManyTest extends DBTestCase
 {
-    protected $schema = '
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
-        hours: [Hour!]!
+        images: [Image!]!
     }
-    
-    type Hour {
-        weekday: Int
+
+    type Image {
+        id: ID!
+        url: String
     }
-    
+
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
         upsertTask(input: UpdateTaskInput! @spread): Task @upsert
     }
-    
+
     input CreateTaskInput {
         name: String!
-        hours: CreateHourRelation
+        images: CreateImageRelation
     }
-    
-    input CreateHourRelation {
-        create: [CreateHourInput!]
-        upsert: [UpsertHourInput!]
+
+    input CreateImageRelation {
+        create: [CreateImageInput!]
+        upsert: [UpsertImageInput!]
     }
-    
-    input CreateHourInput {
-        weekday: Int
+
+    input CreateImageInput {
+        url: String
     }
-    
+
     input UpdateTaskInput {
-        id: ID!
+        id: ID
         name: String
-        hours: UpdateHourRelation
+        images: UpdateImageRelation
     }
-    
-    input UpdateHourRelation {
-        create: [CreateHourInput!]
-        update: [UpdateHourInput!]
-        upsert: [UpsertHourInput!]
+
+    input UpdateImageRelation {
+        create: [CreateImageInput!]
+        update: [UpdateImageInput!]
+        upsert: [UpsertImageInput!]
         delete: [ID!]
     }
-    
-    input UpdateHourInput {
+
+    input UpdateImageInput {
         id: ID!
-        weekday: Int
+        url: String
     }
 
     input UpsertTaskInput {
         id: ID!
         name: String
-        hours: UpsertHourRelation
+        images: UpsertImageRelation
     }
 
-    input UpsertHourRelation {
-        create: [CreateHourInput!]
-        update: [UpdateHourInput!]
-        upsert: [UpsertHourInput!]
+    input UpsertImageRelation {
+        create: [CreateImageInput!]
+        update: [UpdateImageInput!]
+        upsert: [UpsertImageInput!]
         delete: [ID!]
     }
 
-    input UpsertHourInput {
-        id: ID!
-        weekday: Int
+    input UpsertImageInput {
+        id: ID
+        url: String
     }
     '.self::PLACEHOLDER_QUERY;
 
     public function testCanCreateWithNewMorphMany(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
-                hours: {
+                images: {
                     create: [{
-                        weekday: 3
+                        url: "foo"
                     }]
                 }
             }) {
                 id
                 name
-                hours {
-                    weekday
+                images {
+                    url
                 }
             }
         }
@@ -100,9 +101,9 @@ class MorphManyTest extends DBTestCase
                 'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hours' => [
+                    'images' => [
                         [
-                            'weekday' => 3,
+                            'url' => 'foo',
                         ],
                     ],
                 ],
@@ -112,21 +113,21 @@ class MorphManyTest extends DBTestCase
 
     public function testCanCreateWithUpsertMorphMany(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "foo"
-                hours: {
+                images: {
                     upsert: [{
                         id: 1
-                        weekday: 3
+                        url: "foo"
                     }]
                 }
             }) {
                 id
                 name
-                hours {
-                    weekday
+                images {
+                    url
                 }
             }
         }
@@ -135,9 +136,9 @@ class MorphManyTest extends DBTestCase
                 'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hours' => [
+                    'images' => [
                         [
-                            'weekday' => 3,
+                            'url' => 'foo',
                         ],
                     ],
                 ],
@@ -145,7 +146,79 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    public function existingModelMutations()
+    public function testUpsertMorphManyWithoutId(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                images: {
+                    upsert: [{
+                        url: "foo"
+                    }]
+                }
+            }) {
+                id
+                name
+                images {
+                    id
+                    url
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'images' => [
+                        [
+                            'id' => 1,
+                            'url' => 'foo',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testAllowsNullOperations(): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "foo"
+                images: {
+                    create: null
+                    update: null
+                    upsert: null
+                    delete: null
+                }
+            }) {
+                name
+                images {
+                    url
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'name' => 'foo',
+                    'images' => [],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @return array<array<string, string>>
+     */
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -160,21 +233,21 @@ class MorphManyTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hours: {
+                images: {
                     create: [{
-                        weekday: 3
+                        url: \"foo\"
                     }]
                 }
             }) {
                 id
                 name
-                hours {
-                    weekday
+                images {
+                    url
                 }
             }
         }
@@ -183,9 +256,9 @@ class MorphManyTest extends DBTestCase
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hours' => [
+                    'images' => [
                         [
-                            'weekday' => 3,
+                            'url' => 'foo',
                         ],
                     ],
                 ],
@@ -200,27 +273,27 @@ class MorphManyTest extends DBTestCase
     {
         factory(Task::class)
             ->create()
-            ->hours()
+            ->images()
             ->save(
-                factory(Hour::class)->create()
+                factory(Image::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hours: {
+                images: {
                     update: [{
                         id: 1
-                        weekday: 3
+                        url: \"foo\"
                     }]
                 }
             }) {
                 id
                 name
-                hours {
-                    weekday
+                images {
+                    url
                 }
             }
         }
@@ -229,9 +302,9 @@ class MorphManyTest extends DBTestCase
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hours' => [
+                    'images' => [
                         [
-                            'weekday' => 3,
+                            'url' => 'foo',
                         ],
                     ],
                 ],
@@ -246,27 +319,27 @@ class MorphManyTest extends DBTestCase
     {
         factory(Task::class)
             ->create()
-            ->hours()
+            ->images()
             ->save(
-                factory(Hour::class)->create()
+                factory(Image::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hours: {
+                images: {
                     upsert: [{
                         id: 1
-                        weekday: 3
+                        url: \"foo\"
                     }]
                 }
             }) {
                 id
                 name
-                hours {
-                    weekday
+                images {
+                    url
                 }
             }
         }
@@ -275,9 +348,9 @@ class MorphManyTest extends DBTestCase
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hours' => [
+                    'images' => [
                         [
-                            'weekday' => 3,
+                            'url' => 'foo',
                         ],
                     ],
                 ],
@@ -292,24 +365,24 @@ class MorphManyTest extends DBTestCase
     {
         factory(Task::class)
             ->create()
-            ->hours()
+            ->images()
             ->save(
-                factory(Hour::class)->create()
+                factory(Image::class)->create()
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             ${action}Task(input: {
                 id: 1
                 name: \"foo\"
-                hours: {
+                images: {
                     delete: [1]
                 }
             }) {
                 id
                 name
-                hours {
-                    weekday
+                images {
+                    url
                 }
             }
         }
@@ -318,7 +391,7 @@ class MorphManyTest extends DBTestCase
                 "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'hours' => [],
+                    'images' => [],
                 ],
             ],
         ]);

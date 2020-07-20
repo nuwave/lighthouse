@@ -2,29 +2,28 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Exception;
 use GraphQL\Deferred;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
 {
-    use HandlesCompositeKey;
+    /**
+     * Active BatchLoader instances.
+     *
+     * @var array<string, static>
+     */
+    protected static $instances = [];
 
     /**
-     * Keys to resolve.
+     * Map from keys to metainfo for resolving.
      *
-     * @var array
+     * @var array<mixed, array<mixed>>
      */
     protected $keys = [];
 
     /**
-     * Map of loaded results.
+     * Map from keys to resolved values.
      *
-     * [key => resolvedValue]
-     *
-     * @var mixed[]
+     * @var array<mixed, mixed>
      */
     protected $results = [];
 
@@ -39,8 +38,8 @@ abstract class BatchLoader
      * Return an instance of a BatchLoader for a specific field.
      *
      * @param  string  $loaderClass  The class name of the concrete BatchLoader to instantiate
-     * @param  mixed[]  $pathToField  Path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param  mixed[]  $constructorArgs  Those arguments are passed to the constructor of the new BatchLoader instance
+     * @param  array<int|string>  $pathToField  Path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param  array<mixed>  $constructorArgs  Those arguments are passed to the constructor of the new BatchLoader instance
      * @return static
      *
      * @throws \Exception
@@ -50,60 +49,52 @@ abstract class BatchLoader
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
 
-        // If we are resolving a batched query, we need to assign each
-        // query a uniquely indexed instance
-        /** @var \Nuwave\Lighthouse\Execution\GraphQLRequest $graphQLRequest */
-        $graphQLRequest = app(GraphQLRequest::class);
-        if ($graphQLRequest->isBatched()) {
-            $currentBatchIndex = $graphQLRequest->batchIndex();
-            $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
+        if (isset(self::$instances[$instanceName])) {
+            return self::$instances[$instanceName];
         }
 
-        // Only register a new instance if it is not already bound
-        $instance = app()->bound($instanceName)
-            ? app($instanceName)
-            : app()->instance(
-                $instanceName,
-                app()->makeWith($loaderClass, $constructorArgs)
-            );
-
-        if (! $instance instanceof self) {
-            throw new Exception(
-                "The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader"
-            );
-        }
-
-        return $instance;
+        return self::$instances[$instanceName] = app()->makeWith($loaderClass, $constructorArgs);
     }
 
     /**
      * Generate a unique key for the instance, using the path in the query.
      *
-     * @param  mixed[]  $path
-     * @return string
+     * @param  array<int|string>  $path
      */
     public static function instanceKey(array $path): string
     {
-        return (new Collection($path))
-            ->filter(function ($path): bool {
-                // Ignore numeric path entries, as those signify an array of fields.
+        $significantPathSegments = array_filter(
+            $path,
+            function ($path): bool {
+                // Ignore numeric path entries, as those signify a list of fields.
                 // Combining the queries for those is the very purpose of the
                 // batch loader, so they must not be included.
                 return ! is_numeric($path);
-            })
-            ->implode('_');
+            }
+        );
+        $pathIgnoringLists = implode('.', $significantPathSegments);
+
+        return 'nuwave/lighthouse/batchloader/'.$pathIgnoringLists;
     }
 
     /**
-     * Load object by key.
+     * Remove all stored BatchLoaders.
      *
-     * @param  mixed  $key
-     * @param  mixed[]  $metaInfo
-     * @return \GraphQL\Deferred
+     * This is called after Lighthouse has resolved a query, so multiple
+     * queries can be handled in a single request/session.
      */
-    public function load($key, array $metaInfo = []): Deferred
+    public static function forgetInstances(): void
     {
-        $key = $this->buildKey($key);
+        self::$instances = [];
+    }
+
+    /**
+     * Schedule a result to be loaded.
+     *
+     * @param  array<mixed>  $metaInfo
+     */
+    public function load(string $key, array $metaInfo = []): Deferred
+    {
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
@@ -117,11 +108,28 @@ abstract class BatchLoader
     }
 
     /**
+     * Schedule multiple results to be loaded.
+     *
+     * @param  array<mixed>  $keys
+     * @param  array<mixed>  $metaInfo
+     * @return \GraphQL\Deferred[]
+     */
+    public function loadMany(array $keys, array $metaInfo = []): array
+    {
+        return array_map(
+            function ($key) use ($metaInfo): Deferred {
+                return $this->load($key, $metaInfo);
+            },
+            $keys
+        );
+    }
+
+    /**
      * Resolve the keys.
      *
-     * The result has to be an associative array: [key => result]
+     * The result has to be a map from keys to resolved values.
      *
-     * @return mixed[]
+     * @return array<mixed, mixed>
      */
     abstract public function resolve(): array;
 }

@@ -8,9 +8,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Utils;
 
 class DirectiveFactory
 {
@@ -38,16 +40,10 @@ class DirectiveFactory
     protected $directiveNamespaces;
 
     /**
-     * @var DirectiveNamespacer
+     * @var \Nuwave\Lighthouse\Schema\DirectiveNamespacer
      */
     protected $directiveNamespacer;
 
-    /**
-     * DirectiveFactory constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespacer  $directiveNamespacer
-     * @return void
-     */
     public function __construct(DirectiveNamespacer $directiveNamespacer)
     {
         $this->directiveNamespacer = $directiveNamespacer;
@@ -55,60 +51,41 @@ class DirectiveFactory
 
     /**
      * Create a directive by the given directive name.
-     *
-     * @param  string  $directiveName
-     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode|null  $definitionNode
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive
      */
-    public function create(string $directiveName, $definitionNode = null): Directive
+    public function create(string $directiveName): Directive
     {
-        $directive = $this->resolve($directiveName)
-            ?? $this->createOrFail($directiveName);
+        $directiveClass = $this->resolve($directiveName);
 
-        return $definitionNode
-            ? $this->hydrate($directive, $definitionNode)
-            : $directive;
+        return app($directiveClass);
     }
 
     /**
-     * Create a directive from resolved directive classes.
+     * Resolve the class for a given directive name.
      *
-     * @param  string  $directiveName
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive|null
-     */
-    protected function resolve(string $directiveName): ?Directive
-    {
-        if ($className = Arr::get($this->resolvedClassnames, $directiveName)) {
-            return app($className);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param  string  $directiveName
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    protected function createOrFail(string $directiveName): Directive
+    protected function resolve(string $directiveName): string
     {
+        if ($directiveClass = Arr::get($this->resolvedClassnames, $directiveName)) {
+            return $directiveClass;
+        }
+
         if (! $this->directiveNamespaces) {
             $this->directiveNamespaces = $this->directiveNamespacer->gather();
         }
 
         foreach ($this->directiveNamespaces as $baseNamespace) {
-            $className = $baseNamespace.'\\'.Str::studly($directiveName).'Directive';
-            if (class_exists($className)) {
-                $directive = app($className);
+            $directiveClass = $baseNamespace.'\\'.static::className($directiveName);
 
-                if (! $directive instanceof Directive) {
-                    throw new DirectiveException("Class $className is not a directive.");
+            if (class_exists($directiveClass)) {
+                if (! is_a($directiveClass, Directive::class, true)) {
+                    throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
 
-                $this->addResolved($directiveName, $className);
+                $this->addResolved($directiveName, $directiveClass);
 
-                return $directive;
+                return $directiveClass;
             }
         }
 
@@ -116,11 +93,29 @@ class DirectiveFactory
     }
 
     /**
-     * @deprecated use the RegisterDirectiveNamespaces instead, will be removed as of v5
+     * Returns the expected class name for a directive name.
+     */
+    protected static function className(string $directiveName): string
+    {
+        return Str::studly($directiveName).'Directive';
+    }
+
+    /**
+     * Returns the expected directive name for a class name.
+     */
+    public static function directiveName(string $className): string
+    {
+        $baseName = basename(str_replace('\\', '/', $className));
+
+        return lcfirst(
+            Str::before($baseName, 'Directive')
+        );
+    }
+
+    /**
+     * @deprecated use the RegisterDirectiveNamespaces event instead, this method will be removed as of v5
      * @see \Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces
      *
-     * @param  string  $directiveName
-     * @param  string  $className
      * @return $this
      */
     public function addResolved(string $directiveName, string $className): self
@@ -137,8 +132,6 @@ class DirectiveFactory
     }
 
     /**
-     * @param  string  $directiveName
-     * @param  string  $className
      * @return $this
      */
     public function setResolved(string $directiveName, string $className): self
@@ -149,7 +142,7 @@ class DirectiveFactory
     }
 
     /**
-     * @deprecated
+     * @deprecated will be removed as of v5
      * @return $this
      */
     public function clearResolved(): self
@@ -160,46 +153,33 @@ class DirectiveFactory
     }
 
     /**
-     * Set the given definition on the directive.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\Directive  $directive
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive
-     */
-    protected function hydrate(Directive $directive, Node $node): Directive
-    {
-        return $directive instanceof BaseDirective
-            ? $directive->hydrate($node)
-            : $directive;
-    }
-
-    /**
      * Get all directives of a certain type that are associated with an AST node.
      *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @param  string  $directiveClass
-     * @return \Illuminate\Support\Collection of type <$directiveClass>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> of type <$directiveClass>
      */
     public function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
         return $this
             ->createAssociatedDirectives($node)
-            ->filter(function (Directive $directive) use ($directiveClass): bool {
-                return $directive instanceof $directiveClass;
-            });
+            ->filter(Utils::instanceofMatcher($directiveClass));
     }
 
     /**
      * Get all directives that are associated with an AST node.
      *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @return \Illuminate\Support\Collection of type <$directiveClass>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function createAssociatedDirectives(Node $node): Collection
     {
         return (new Collection($node->directives))
-            ->map(function (DirectiveNode $directive) use ($node): Directive {
-                return $this->create($directive->name->value, $node);
+            ->map(function (DirectiveNode $directiveNode) use ($node): Directive {
+                $directive = $this->create($directiveNode->name->value);
+
+                if ($directive instanceof BaseDirective) {
+                    $directive->hydrate($directiveNode, $node);
+                }
+
+                return $directive;
             });
     }
 
@@ -209,9 +189,7 @@ class DirectiveFactory
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @param  string  $directiveClass
-     * @return \Nuwave\Lighthouse\Support\Contracts\Directive|null
+     * TODO rename to exclusiveDirective
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
@@ -220,10 +198,18 @@ class DirectiveFactory
         $directives = $this->createAssociatedDirectivesOfType($node, $directiveClass);
 
         if ($directives->count() > 1) {
-            $directiveNames = $directives->implode(', ');
+            $directiveNames = $directives
+                ->map(function (Directive $directive): string {
+                    $definition = PartialParser::directiveDefinition(
+                        $directive::definition()
+                    );
+
+                    return '@'.$definition->name->value;
+                })
+                ->implode(', ');
 
             throw new DirectiveException(
-                "Node [{$node->name->value}] can only have one directive of type [{$directiveClass}] but found [{$directiveNames}]"
+                "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."
             );
         }
 

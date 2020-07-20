@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Tests\Constants;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -11,18 +12,18 @@ class CreateDirectiveTest extends DBTestCase
 {
     public function testCanCreateFromFieldArguments(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Company {
             id: ID!
             name: String!
         }
-        
+
         type Mutation {
             createCompany(name: String): Company @create
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createCompany(name: "foo") {
                 id
@@ -41,22 +42,22 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCanCreateFromInputObject(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Company {
             id: ID!
             name: String!
         }
-        
+
         type Mutation {
             createCompany(input: CreateCompanyInput! @spread): Company @create
         }
-        
+
         input CreateCompanyInput {
             name: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createCompany(input: {
                 name: "foo"
@@ -77,18 +78,18 @@ class CreateDirectiveTest extends DBTestCase
 
     public function testCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             createTag(name: String): Tag @create
         }
-        
+
         type Tag {
             name: String!
             default_string: String!
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTag(name: "foobar"){
                 name
@@ -111,38 +112,38 @@ class CreateDirectiveTest extends DBTestCase
 
         $this->app['config']->set('app.debug', false);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type User {
             id: ID!
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
-        
+
         input CreateUserInput {
             name: String
             tasks: CreateTaskRelation
         }
-        
+
         input CreateTaskRelation {
             create: [CreateTaskInput!]
         }
-        
+
         input CreateTaskInput {
             name: String
             user: ID
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -168,48 +169,48 @@ class CreateDirectiveTest extends DBTestCase
             ])
             ->assertJsonCount(1, 'errors');
 
-        $this->assertCount(1, User::all());
+        $this->assertCount(0, User::all());
     }
 
-    public function testDoesCreateWithFailingRelationshipAndTransactionParam(): void
+    public function testCreatesOnPartialFailureWithTransactionsDisabled(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
         $this->app['config']->set('app.debug', false);
         config(['lighthouse.transactional_mutations' => false]);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
         }
-        
+
         type User {
             id: ID!
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
-        
+
         input CreateUserInput {
             name: String
             tasks: CreateTaskRelation
         }
-        
+
         input CreateTaskRelation {
             create: [CreateTaskInput!]
         }
-        
+
         input CreateTaskInput {
             name: String
             user: ID
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -239,44 +240,44 @@ class CreateDirectiveTest extends DBTestCase
 //            ])
             ->assertJsonCount(1, 'errors');
 
-        $this->assertCount(2, User::all());
+        $this->assertCount(1, User::all());
     }
 
     public function testDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
             guard: String
         }
-        
+
         type User {
             id: ID!
             name: String
             tasks: [Task!]! @hasMany
         }
-        
+
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
-        
+
         input CreateUserInput {
             name: String
             tasks: CreateTaskRelation
         }
-        
+
         input CreateTaskRelation {
             create: [CreateTaskInput!]
         }
-        
+
         input CreateTaskInput {
             name: String
             guard: String
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -303,5 +304,275 @@ class CreateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testNestedArgResolverHasMany(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        type Task {
+            name: String!
+        }
+
+        type User {
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        input CreateUserInput {
+            name: String
+            newTask: CreateTaskInput @create(relation: "tasks")
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                newTask: {
+                    name: "Uniq"
+                }
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'name' => 'Uniq',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testNestedArgResolverForOptionalBelongsTo(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        type Task {
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            name: String
+        }
+
+        input CreateTaskInput {
+            name: String
+            user: CreateUserInput @create
+        }
+
+        input CreateUserInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createTask(input: {
+                name: "task"
+                user: {
+                    name: "user"
+                }
+            }) {
+                name
+                user {
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'createTask' => [
+                    'name' => 'task',
+                    'user' => [
+                        'name' => 'user',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateTwice(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "fooTask"
+                    }]
+                }
+            }) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createUser(input: {
+                name: "bar"
+                tasks: {
+                    create: [{
+                        name: "barTask"
+                    }]
+                }
+            }) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateTwiceWithCreateDirective(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String
+            tasks: [CreateTaskInput!] @create
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: [
+                    {
+                        name: "fooTask"
+                    },
+                    {
+                        name: "barTask"
+                    }
+                ]
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'name' => 'fooTask',
+                        ],
+                        [
+                            'name' => 'barTask',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testTurnOnMassAssignment(): void
+    {
+        config(['lighthouse.force_fill' => false]);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Company {
+            name: String!
+        }
+
+        type Mutation {
+            createCompany(name: String): Company @create
+        }
+        ';
+
+        $this->expectException(MassAssignmentException::class);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createCompany(name: "foo") {
+                name
+            }
+        }
+        ');
     }
 }

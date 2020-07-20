@@ -5,12 +5,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
-class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, DefinedDirective
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, ArgDirective
 {
     /**
      * The GlobalId resolver.
@@ -19,30 +19,14 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      */
     protected $globalId;
 
-    /**
-     * GlobalIdDirective constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
-     * @return void
-     */
     public function __construct(GlobalId $globalId)
     {
         $this->globalId = $globalId;
     }
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'globalId';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Converts between IDs/types and global IDs.
 When used upon a field, it encodes,
@@ -59,13 +43,6 @@ directive @globalId(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();
@@ -74,7 +51,7 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function () use ($type, $resolver): string {
-                    $resolvedValue = call_user_func_array($resolver, func_get_args());
+                    $resolvedValue = $resolver(...func_get_args());
 
                     return $this->globalId->encode(
                         $type,

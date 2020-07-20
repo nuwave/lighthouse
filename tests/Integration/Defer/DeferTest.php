@@ -11,21 +11,14 @@ use Tests\TestCase;
 
 class DeferTest extends TestCase
 {
-    use SetUpDefer;
-
-    /**
-     * @var mixed[]
-     */
-    public static $data = [];
-
-    protected function getEnvironmentSetUp($app)
+    protected function setUp(): void
     {
-        parent::getEnvironmentSetUp($app);
+        parent::setUp();
 
-        $this->setUpDefer($app);
+        $this->setUpDeferStream();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -35,46 +28,46 @@ class DeferTest extends TestCase
 
     public function testAddsTheDeferClientDirective(): void
     {
-        $introspection = $this->graphQL('
-          query IntrospectionQuery {
-            __schema {
-              directives {
-                name
-              }
+        $introspection = $this->graphQL(/** @lang GraphQL */ '
+        query IntrospectionQuery {
+          __schema {
+            directives {
+              name
             }
           }
+        }
         ');
 
         $this->assertTrue(
             in_array(
                 'defer',
-                $introspection->jsonGet('data.__schema.directives.*.name')
+                $introspection->json('data.__schema.directives.*.name')
             )
         );
     }
 
     public function testCanDeferFields(): void
     {
-        self::$data = [
+        $this->mockResolver([
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
-        ];
+        ]);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
             parent: User
         }
 
         type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+            user: User @mock
         }
-        ";
+        ';
 
-        $chunks = $this->getStreamedChunks('
-        { 
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        {
             user {
                 name
                 parent @defer {
@@ -108,7 +101,7 @@ class DeferTest extends TestCase
 
     public function testCanDeferNestedFields(): void
     {
-        self::$data = [
+        $data = [
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
@@ -117,20 +110,21 @@ class DeferTest extends TestCase
                 ],
             ],
         ];
+        $this->mockResolver($data);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
             parent: User
         }
 
         type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+            user: User @mock
         }
-        ";
+        ';
 
-        $chunks = $this->getStreamedChunks('
-        { 
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        {
             user {
                 name
                 parent @defer {
@@ -145,47 +139,46 @@ class DeferTest extends TestCase
 
         $this->assertCount(3, $chunks);
 
-        $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
+        $this->assertSame($data['name'], Arr::get($chunks[0], 'data.user.name'));
         $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
 
         $deferred = Arr::get($chunks[1], 'user.parent');
         $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertSame(self::$data['parent']['name'], $deferred['data']['name']);
+        $this->assertSame($data['parent']['name'], $deferred['data']['name']);
         $this->assertArrayHasKey('parent', $deferred['data']);
         $this->assertNull($deferred['data']['parent']);
 
         $nestedDeferred = Arr::get($chunks[2], 'user.parent.parent');
         $this->assertArrayHasKey('name', $nestedDeferred['data']);
-        $this->assertSame(self::$data['parent']['parent']['name'], $nestedDeferred['data']['name']);
+        $this->assertSame($data['parent']['parent']['name'], $nestedDeferred['data']['name']);
     }
 
     public function testCanDeferNestedFieldsOnMutations(): void
     {
-        self::$data = [
+        $this->mockResolver([
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
-        ];
+        ]);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
             parent: User
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        
-        type Mutation {
-            updateUser(name: String!): User
-                @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $chunks = $this->getStreamedChunks('
-        mutation { 
+        type Query {
+            user: User @mock
+        }
+
+        type Mutation {
+            updateUser(name: String!): User @mock
+        }
+        ';
+
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        mutation {
             updateUser(
                 name: "Foo"
             ) {
@@ -221,7 +214,7 @@ class DeferTest extends TestCase
 
     public function testCanDeferListFields(): void
     {
-        self::$data = [
+        $data = [
             [
                 'title' => 'Foo',
                 'author' => [
@@ -235,24 +228,25 @@ class DeferTest extends TestCase
                 ],
             ],
         ];
+        $this->mockResolver($data);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             title: String
             author: User
         }
-        
+
         type User {
             name: String!
         }
-        
-        type Query {
-            posts: [Post] @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $chunks = $this->getStreamedChunks('
-        { 
+        type Query {
+            posts: [Post] @mock
+        }
+        ';
+
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        {
             posts {
                 title
                 author @defer {
@@ -268,15 +262,15 @@ class DeferTest extends TestCase
         $this->assertNull(Arr::get($chunks[0], 'data.posts.1.author'));
 
         $deferredPost1 = $chunks[1]['posts.0.author']['data'];
-        $this->assertSame(self::$data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
+        $this->assertSame($data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
 
         $deferredPost2 = $chunks[1]['posts.1.author']['data'];
-        $this->assertSame(self::$data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
+        $this->assertSame($data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
     }
 
     public function testCanDeferGroupedListFields(): void
     {
-        self::$data = [
+        $data = [
             [
                 'title' => 'Foo',
                 'author' => [
@@ -296,29 +290,30 @@ class DeferTest extends TestCase
                 ],
             ],
         ];
+        $this->mockResolver($data);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type Comment {
             message: String
         }
-        
+
         type Post {
             title: String
             author: User
             comments: [Comment]
         }
-        
+
         type User {
             name: String!
         }
-        
-        type Query {
-            posts: [Post] @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $chunks = $this->getStreamedChunks('
-        { 
+        type Query {
+            posts: [Post] @mock
+        }
+        ';
+
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        {
             posts {
                 title
                 author @defer {
@@ -337,39 +332,23 @@ class DeferTest extends TestCase
         $this->assertNull(Arr::get($chunks[0], 'data.posts.1.author'));
 
         $deferredPost1 = $chunks[1]['posts.0.author']['data'];
-        $this->assertSame(self::$data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
+        $this->assertSame($data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
 
         $deferredComment1 = $chunks[1]['posts.0.comments']['data'];
         $this->assertCount(1, $deferredComment1);
-        $this->assertSame(self::$data[0]['comments'][0]['message'], Arr::get($deferredComment1[0], 'message'));
+        $this->assertSame($data[0]['comments'][0]['message'], Arr::get($deferredComment1[0], 'message'));
 
         $deferredPost2 = $chunks[1]['posts.1.author']['data'];
-        $this->assertSame(self::$data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
+        $this->assertSame($data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
 
         $deferredComment2 = $chunks[1]['posts.1.comments']['data'];
         $this->assertCount(1, $deferredComment2);
-        $this->assertSame(self::$data[1]['comments'][0]['message'], Arr::get($deferredComment2[0], 'message'));
+        $this->assertSame($data[1]['comments'][0]['message'], Arr::get($deferredComment2[0], 'message'));
     }
 
     public function testCancelsDefermentAfterMaxExecutionTime(): void
     {
-        $this->schema = "
-        type User {
-            name: String!
-            parent: User
-        }
-
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
-
-        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
-        $defer = app(Defer::class);
-        // Set max execution time to now so we immediately resolve deferred fields
-        $defer->setMaxExecutionTime(microtime(true));
-
-        self::$data = [
+        $data = [
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
@@ -378,9 +357,26 @@ class DeferTest extends TestCase
                 ],
             ],
         ];
+        $this->mockResolver($data);
 
-        $chunks = $this->getStreamedChunks('
-        { 
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            name: String!
+            parent: User
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
+        $defer = app(Defer::class);
+        // Set max execution time to now so we immediately resolve deferred fields
+        $defer->setMaxExecutionTime(microtime(true));
+
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        {
             user {
                 name
                 parent @defer {
@@ -396,34 +392,19 @@ class DeferTest extends TestCase
         // If we didn't hit the max execution time we would have 3 items in the array
         $this->assertCount(2, $chunks);
 
-        $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
+        $this->assertSame($data['name'], Arr::get($chunks[0], 'data.user.name'));
         $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
 
         $deferred = Arr::get($chunks[1], 'user.parent');
         $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertSame(self::$data['parent']['name'], $deferred['data']['name']);
+        $this->assertSame($data['parent']['name'], $deferred['data']['name']);
         $this->assertArrayHasKey('parent', $deferred['data']);
-        $this->assertSame(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
+        $this->assertSame($data['parent']['parent']['name'], $deferred['data']['parent']['name']);
     }
 
     public function testCancelsDefermentAfterMaxNestedFields(): void
     {
-        $this->schema = "
-        type User {
-            name: String!
-            parent: User
-        }
-
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
-
-        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
-        $defer = app(Defer::class);
-        $defer->setMaxNestedFields(1);
-
-        self::$data = [
+        $data = [
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
@@ -432,9 +413,25 @@ class DeferTest extends TestCase
                 ],
             ],
         ];
+        $this->mockResolver($data);
 
-        $chunks = $this->getStreamedChunks('
-        { 
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            name: String!
+            parent: User
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
+        $defer = app(Defer::class);
+        $defer->setMaxNestedFields(1);
+
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        {
             user {
                 name
                 parent @defer {
@@ -449,38 +446,38 @@ class DeferTest extends TestCase
 
         $this->assertCount(2, $chunks);
 
-        $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
+        $this->assertSame($data['name'], Arr::get($chunks[0], 'data.user.name'));
         $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
 
         $deferred = Arr::get($chunks[1], 'user.parent');
         $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertSame(self::$data['parent']['name'], $deferred['data']['name']);
+        $this->assertSame($data['parent']['name'], $deferred['data']['name']);
         $this->assertArrayHasKey('parent', $deferred['data']);
-        $this->assertSame(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
+        $this->assertSame($data['parent']['parent']['name'], $deferred['data']['parent']['name']);
     }
 
     public function testThrowsExceptionOnNunNullableFields(): void
     {
-        self::$data = [
+        $this->mockResolver([
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
-        ];
+        ]);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
             parent: User!
         }
 
         type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+            user: User @mock
         }
-        ";
+        ';
 
-        $this->graphQL('
-        { 
+        $this->graphQL(/** @lang GraphQL */ '
+        {
             user {
                 name
                 parent @defer {
@@ -499,35 +496,56 @@ class DeferTest extends TestCase
 
     public function testDoesNotDeferWithIncludeAndSkipDirectives(): void
     {
-        self::$data = [
+        $this->mockResolver([
             'name' => 'John Doe',
-            'parent' => [
-                'name' => 'Jane Doe',
-                'parent' => [
-                    'name' => 'Mr. Smith',
-                ],
-            ],
-        ];
+        ]);
+        $this->mockResolverExpects(
+            $this->never(),
+            'skipped'
+        );
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         directive @include(if: Boolean!) on FIELD
         directive @skip(if: Boolean!) on FIELD
 
         type User {
             name: String!
-            parent: User
+            parent: User @mock(key: "skipped")
         }
 
         type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+            user: User @mock
         }
-        ";
+        ';
 
-        $this->graphQL('
-        { 
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+                parent @defer @include(if: false) {
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'user' => [
+                    'name' => 'John Doe',
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($include: Boolean!, $skip: Boolean!){
             userInclude: user {
                 name
                 parent @defer @include(if: false) {
+                    name
+                }
+            }
+            userIncludeVariable: user {
+                name
+                parent @defer @include(if: $include) {
                     name
                 }
             }
@@ -537,13 +555,28 @@ class DeferTest extends TestCase
                     name
                 }
             }
+            userSkipVariable: user {
+                name
+                parent @defer @skip(if: $skip) {
+                    name
+                }
+            }
         }
-        ')->assertExactJson([
+        ', [
+            'include' => false,
+            'skip' => true,
+        ])->assertExactJson([
             'data' => [
                 'userInclude' => [
                     'name' => 'John Doe',
                 ],
+                'userIncludeVariable' => [
+                    'name' => 'John Doe',
+                ],
                 'userSkip' => [
+                    'name' => 'John Doe',
+                ],
+                'userSkipVariable' => [
                     'name' => 'John Doe',
                 ],
             ],
@@ -552,32 +585,33 @@ class DeferTest extends TestCase
 
     public function testRequiresDeferDirectiveOnAllFieldDeclarations(): void
     {
-        self::$data = [
+        $data = [
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
         ];
+        $this->mockResolver($data);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
             parent: User
         }
 
         type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+            user: User @mock
         }
-        ";
+        ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         fragment UserWithParent on User {
             name
             parent {
                 name
             }
         }
-        { 
+        query {
             user {
                 ...UserWithParent
                 parent @defer {
@@ -587,37 +621,32 @@ class DeferTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'user' => self::$data,
+                'user' => $data,
             ],
         ]);
     }
 
     public function testThrowsIfTryingToDeferRootMutationFields(): void
     {
-        self::$data = [
-            'name' => 'John Doe',
-        ];
+        $this->mockResolverExpects(
+            $this->never()
+        );
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
             parent: User
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        
-        type Mutation {
-            updateUser(name: String!): User
-                @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $this->graphQL('
+        type Mutation {
+            updateUser(name: String!): User @mock
+        }
+        '.self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ '
         mutation UpdateUser {
             updateUser(name: "John Doe") @defer {
-                name 
+                name
             }
         }
         ')->assertJson([
@@ -631,25 +660,26 @@ class DeferTest extends TestCase
 
     public function testDoesNotDeferFieldsIfFalse(): void
     {
-        self::$data = [
+        $data = [
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
         ];
+        $this->mockResolver($data);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
             parent: User
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $this->graphQL('
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -660,32 +690,39 @@ class DeferTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'user' => self::$data,
+                'user' => $data,
             ],
         ]);
     }
 
     public function testIncludesErrorsForDeferredFields(): void
     {
-        self::$data = [
+        $this->mockResolver([
             'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
-        ];
+        ]);
 
-        $this->schema = "
+        $this->mockResolver(
+            function () {
+                throw new Error('deferred_exception');
+            },
+            'throw'
+        );
+
+        $this->schema = /** @lang GraphQL */ '
         type User {
             name: String!
-            parent: User @field(resolver: \"{$this->qualifyTestResolver('throw')}\")
+            parent: User @mock(key: "throw")
         }
-        
-        type Query {
-            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
-        }
-        ";
 
-        $chunks = $this->getStreamedChunks('
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 name
@@ -703,18 +740,5 @@ class DeferTest extends TestCase
         $this->assertNull($parent['user.parent']['data']);
         $this->assertArrayHasKey('errors', $parent['user.parent']);
         $this->assertCount(1, $parent['user.parent']['errors']);
-    }
-
-    public function resolve(): array
-    {
-        return self::$data;
-    }
-
-    /**
-     * @throws \GraphQL\Error\Error
-     */
-    public function throw(): void
-    {
-        throw new Error('deferred_exception');
     }
 }

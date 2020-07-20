@@ -7,19 +7,19 @@ a minimalistic [Vue](https://vuejs.org/) powered static site generator.
 
 ```
 docs/
-├── .vuepress/            
+├── .vuepress/
 │   ├── config.js         # global site config
 │   └── versions.json     # auto-generated versions file
 │
-├── master/               
-│   ├── guides/         
+├── master/
+│   ├── guides/
 │   │   └── auth.md       # http://mysite.com/master/guides/auth.html
-│   ├── the-basics/         
+│   ├── the-basics/
 │   │   └── fields.md     # http://mysite.com/master/the-basics/fields.html
-│   │ 
-│   └── sidebar.js        # versioned sidebar for this version   
+│   │
+│   └── sidebar.js        # versioned sidebar for this version
 │
-├── 2.6/               
+├── 2.6/
 │   └── ...               # same structure as "docs/master/"
 │
 ├── pages/
@@ -34,7 +34,7 @@ docs/
 Make sure you have:
 
 - Node 8+
-- Yarn 
+- Yarn
 
 Then, start Vue Press in development mode (with hot reloading).
 
@@ -43,11 +43,12 @@ Then, start Vue Press in development mode (with hot reloading).
     yarn start
 
 > Keep a eye on the console when editing pages.
-If an error occurs, it might be necessary to restart the compilation process.
+> If an error occurs, it might be necessary to restart the compilation process.
 
 If you use Docker you can start up the environment (including docs) by running:
 
-    docker-compose up --build --detach
+    make setup
+    make node
 
 Finally, navigate to http://localhost:8080
 
@@ -57,13 +58,13 @@ Finally, navigate to http://localhost:8080
 
 Place the new file into the corresponding version folder,
 e.g. `docs/3.1/guides/cruds.md`
-    
+
 Include the reference for the new file into the corresponding `sidebar.js`,
 according to its version number, e.g. `docs/3.1/sidebar.js`
 
 ### Linking files
 
-Remember to include the `.md` extension. 
+Remember to include the `.md` extension.
 
 ```md
 The [@paginate](directives.md#paginate) directive is great!
@@ -78,16 +79,16 @@ See [configuration](../getting-started/configuration.md) for more info.
 ## Versioning
 
 Each subfolder in `docs/` will represent a documentation version,
-except `docs/pages/` that will remain the same for all docs versions. 
+except `docs/pages/` that will remain the same for all docs versions.
 
 This ensures that the docs are always in sync with the released version of Lighthouse.
 Version specific changes are handled by keeping the docs for each version separate.
 
-| Path                                    | Web route                                           |
-|-----------------------------------------|-----------------------------------------------------|
-| `docs/master/guides/installation.md`    | `http://mysite.com/master/guides/installation.html` |
-| `docs/2.6/guides/installation.md`       | `http://mysite.com/2.6/guides/installation.html`    |
-| `docs/pages/users.md`                   | `http://mysite.com/pages/users.html`    |
+| Path                                 | Web route                                           |
+| ------------------------------------ | --------------------------------------------------- |
+| `docs/master/guides/installation.md` | `http://mysite.com/master/guides/installation.html` |
+| `docs/2.6/guides/installation.md`    | `http://mysite.com/2.6/guides/installation.html`    |
+| `docs/pages/users.md`                | `http://mysite.com/pages/users.html`                |
 
 ### Updating existing versions
 
@@ -99,10 +100,10 @@ in a single PR.
 
 ### Tagging a new version
 
-1. First, finish your work on `docs/master`.
+1.  First, finish your work on `docs/master`.
 
-1. Enter a new version number. We only tag minor releases, so `3.1` will get separate
-docs, but `3.1.4` will not.
+1.  Enter a new version number. We only tag minor releases, so `3.1` will get separate
+    docs, but `3.1.4` will not.
 
         yarn bump-version 3.1
 

@@ -9,14 +9,12 @@ class Baz
      *
      * @var int
      */
-    const THE_ANSWER = 42;
+    public const THE_ANSWER = 42;
 
     /**
      * Return a value for the field.
-     *
-     * @return int
      */
-    public function resolve(): int
+    public function __invoke(): int
     {
         return self::THE_ANSWER;
     }

@@ -2,7 +2,7 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Foundation\Testing\TestResponse;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 use Tests\Utils\Scalars\Email;
@@ -15,7 +15,7 @@ class IntrospectionTest extends TestCase
     protected $typeRegistry;
 
     /**
-     * @var TestResponse|null
+     * @var \Illuminate\Testing\TestResponse|null
      */
     protected $introspectionResult;
 
@@ -28,17 +28,17 @@ class IntrospectionTest extends TestCase
 
     public function testFindsTypesFromSchema(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type Foo {
             bar: Int
-        }        
+        }
         ';
 
         $this->assertNotNull(
             $this->introspectType('Foo')
         );
         $this->assertNotNull(
-            $this->introspectType('Query')
+            $this->introspectType(RootType::QUERY)
         );
 
         $this->assertNull(

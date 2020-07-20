@@ -13,8 +13,10 @@ class CreateTestbenchTaggablesTable extends Migration
     {
         Schema::create('taggables', function (Blueprint $table): void {
             $table->unsignedInteger('tag_id');
+
             $table->unsignedInteger('taggable_id');
             $table->string('taggable_type');
+
             $table->timestamps();
         });
     }

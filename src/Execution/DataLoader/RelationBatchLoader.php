@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -15,107 +16,94 @@ class RelationBatchLoader extends BatchLoader
     protected $relationName;
 
     /**
-     * The arguments that were passed to the field.
+     * This function is called with the relation query builder and may modify it.
      *
-     * @var mixed[]
+     * @var \Closure
      */
-    protected $args;
+    protected $decorateBuilder;
 
     /**
-     * Names of the scopes that have to be called for the query.
+     * Optionally, a relation may be paginated.
      *
-     * @var string[]
+     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs|null
      */
-    protected $scopes;
+    protected $paginationArgs;
 
     /**
-     * The ResolveInfo of the currently executing field.
-     *
-     * @var \GraphQL\Type\Definition\ResolveInfo
-     */
-    protected $resolveInfo;
-
-    /**
-     * Present when using pagination, the amount of rows to be fetched.
-     *
-     * @var int|null
-     */
-    protected $first;
-
-    /**
-     * Present when using pagination, the page to be fetched.
-     *
-     * @var int|null
-     */
-    protected $page;
-
-    /**
-     * @param  string  $relationName
-     * @param  mixed[]  $args
-     * @param  string[]  $scopes
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @param  int|null  $first
-     * @param  int|null  $page
-     * @return void
+     * @param  \Closure  $decorateBuilder
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
      */
     public function __construct(
         string $relationName,
-        array $args,
-        array $scopes,
-        ResolveInfo $resolveInfo,
-        ?int $first = null,
-        ?int $page = null
+        // Not using a type-hint to avoid resolving those params through the container
+        $decorateBuilder,
+        $paginationArgs = null
     ) {
         $this->relationName = $relationName;
-        $this->args = $args;
-        $this->scopes = $scopes;
-        $this->resolveInfo = $resolveInfo;
-        $this->first = $first;
-        $this->page = $page;
+        $this->decorateBuilder = $decorateBuilder;
+        $this->paginationArgs = $paginationArgs;
     }
 
     /**
-     * Resolve the keys.
+     * Eager-load the relation.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function resolve(): array
     {
-        $modelRelationFetcher = $this->getRelationFetcher();
+        $relation = [$this->relationName => $this->decorateBuilder];
 
-        if ($this->first !== null) {
-            $modelRelationFetcher->loadRelationsForPage($this->first, $this->page);
+        if ($this->paginationArgs !== null) {
+            $modelRelationFetcher = new ModelRelationFetcher(
+                $this->getParentModels(),
+                $relation
+            );
+            $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
-            $modelRelationFetcher->loadRelations();
+            $models = $this->getParentModels()->load($relation);
         }
 
-        return $modelRelationFetcher->getRelationDictionary($this->relationName);
-    }
-
-    /**
-     * Construct a new instance of a relation fetcher.
-     *
-     * @return \Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher
-     */
-    protected function getRelationFetcher(): ModelRelationFetcher
-    {
-        return new ModelRelationFetcher(
-            $this->getParentModels(),
-            [$this->relationName => function ($query) {
-                return $this->resolveInfo
-                    ->argumentSet
-                    ->enhanceBuilder($query, $this->scopes);
-            }]
-        );
+        return $models
+            ->mapWithKeys(
+                /**
+                 * @return array<string, mixed>
+                 */
+                function (Model $model): array {
+                    return [ModelKey::build($model) => $this->extractRelation($model)];
+                }
+            )
+            ->all();
     }
 
     /**
      * Get the parents from the keys that are present on the BatchLoader.
-     *
-     * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Model>
      */
-    protected function getParentModels(): Collection
+    protected function getParentModels(): EloquentCollection
     {
-        return (new Collection($this->keys))->pluck('parent');
+        return new EloquentCollection(
+            array_map(
+                function (array $meta) {
+                    return $meta['parent'];
+                },
+                $this->keys
+            )
+        );
+    }
+
+    /**
+     * Extract the relation that was loaded.
+     *
+     * @return mixed The model's relation.
+     */
+    protected function extractRelation(Model $model)
+    {
+        // Dot notation may be used to eager load nested relations
+        $parts = explode('.', $this->relationName);
+
+        // We just return the first level of relations for now. They
+        // hold the nested relations in case they are needed.
+        $firstRelation = $parts[0];
+
+        return $model->getRelation($firstRelation);
     }
 }

@@ -5,9 +5,7 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 interface Directive
 {
     /**
-     * Name of the directive as used in the schema.
-     *
-     * @return string
+     * Formal directive specification in schema definition language (SDL).
      */
-    public function name();
+    public static function definition(): string;
 }

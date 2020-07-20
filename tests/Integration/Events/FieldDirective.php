@@ -2,17 +2,17 @@
 
 namespace Tests\Integration\Events;
 
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class FieldDirective implements Directive
+class FieldDirective extends BaseDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
+    public static function definition(): string
     {
-        return 'field';
+        return /** @lang GraphQL */ <<<'SDL'
+    """
+    An alternate @field.
+    """
+    directive @field on FIELD_DEFINITION
+SDL;
     }
 }

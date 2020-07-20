@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Defer;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
@@ -13,21 +12,7 @@ use Tests\Utils\Models\User;
 
 class DeferDBTest extends DBTestCase
 {
-    use SetUpDefer;
-
-    /**
-     * @var \Closure
-     */
-    protected static $resolver;
-
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $this->setUpDefer($app);
-    }
-
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -42,12 +27,9 @@ class DeferDBTest extends DBTestCase
             'company_id' => $company->getKey(),
         ]);
 
-        $resolver = $this->qualifyTestResolver();
-        self::$resolver = function () use ($user): User {
-            return $user;
-        };
+        $this->mockResolver($user);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
         }
@@ -58,16 +40,16 @@ class DeferDBTest extends DBTestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @mock
         }
-        ";
+        ';
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks('
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -98,12 +80,9 @@ class DeferDBTest extends DBTestCase
         ]);
         $user = $users[0];
 
-        $resolver = $this->qualifyTestResolver();
-        self::$resolver = function () use ($user): User {
-            return $user;
-        };
+        $this->mockResolver($user);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
             users: [User] @hasMany
@@ -115,16 +94,16 @@ class DeferDBTest extends DBTestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @mock
         }
-        ";
+        ';
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks('
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             user {
                 email
@@ -175,12 +154,9 @@ class DeferDBTest extends DBTestCase
                 ]);
             });
 
-        $resolver = $this->qualifyTestResolver();
-        self::$resolver = function () use ($companies): Collection {
-            return $companies;
-        };
+        $this->mockResolver($companies);
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ '
         type Company {
             name: String!
             users: [User] @hasMany
@@ -192,16 +168,16 @@ class DeferDBTest extends DBTestCase
         }
 
         type Query {
-            companies: [Company] @field(resolver: \"{$resolver}\")
+            companies: [Company] @mock
         }
-        ";
+        ';
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $chunks = $this->getStreamedChunks('
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
             companies {
                 name
@@ -219,8 +195,15 @@ class DeferDBTest extends DBTestCase
         $this->assertCount(3, $chunks);
 
         $deferredCompanies = $chunks[0];
-        $this->assertSame($companies[0]->name, Arr::get($deferredCompanies, 'data.companies.0.name'));
-        $this->assertSame($companies[1]->name, Arr::get($deferredCompanies, 'data.companies.1.name'));
+
+        /** @var \Tests\Utils\Models\Company $company0 */
+        $company0 = $companies[0];
+        $this->assertSame($company0->name, Arr::get($deferredCompanies, 'data.companies.0.name'));
+
+        /** @var \Tests\Utils\Models\Company $company1 */
+        $company1 = $companies[1];
+        $this->assertSame($company1->name, Arr::get($deferredCompanies, 'data.companies.1.name'));
+
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.0.users'));
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.1.users'));
 
@@ -250,19 +233,10 @@ class DeferDBTest extends DBTestCase
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
 
-            $this->assertTrue(
-                in_array(
-                    $item['name'],
-                    $companies->pluck('name')->all()
-                )
+            $this->assertContains(
+                $item['name'],
+                $companies->pluck('name')->all()
             );
         });
-    }
-
-    public function resolve()
-    {
-        $resolver = self::$resolver;
-
-        return $resolver();
     }
 }

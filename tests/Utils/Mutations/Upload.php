@@ -10,13 +10,11 @@ class Upload
     /**
      * Return a value for the field.
      *
-     * @param  mixed  $root
      * @param  mixed[]  $args
-     * @return bool
      *
      * @throws Exception
      */
-    public function resolve($root, array $args): bool
+    public function __invoke($root, array $args): bool
     {
         return $args['file'] instanceof UploadedFile;
     }

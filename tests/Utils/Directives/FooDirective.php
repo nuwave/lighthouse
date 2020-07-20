@@ -2,17 +2,17 @@
 
 namespace Tests\Utils\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class FooDirective implements Directive
+class FooDirective extends BaseDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
+    public static function definition(): string
     {
-        return 'foo';
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Maximum bar.
+"""
+directive @foo on FIELD_DEFINITION
+SDL;
     }
 }

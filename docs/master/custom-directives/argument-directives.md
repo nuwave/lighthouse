@@ -12,47 +12,72 @@ what your argument should apply to in addition to its function.
 
 You must implement exactly one of those two interfaces in order for an argument directive to work.
 
-## ArgTransformerDirective
+## Evaluation Order
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
-takes an incoming value an returns a new value. 
+The application of directives that implement the `ArgDirective` interface is
+split into three distinct phases:
 
-Let's take a look at the built-in `@trim` directive.
+- Sanitize: Clean the input, e.g. trim whitespace.
+  Directives can hook into this phase by implementing `ArgSanitizerDirective`.
+- Validate: Ensure the input conforms to the expectations, e.g. check a valid email is given
+- Transform: Change the input before processing it further, e.g. hashing passwords.
+  Directives can hook into this phase by implementing `ArgTransformerDirective`
+
+```graphql
+type Mutation {
+  createUser(
+    password: String @trim @rules(apply: ["min:10,max:20"]) @hash
+  ): User
+}
+```
+
+In the given example, Lighthouse will take the value of the `password` argument and:
+
+1. Trim any whitespace
+1. Run validation on it
+1. Hash it
+
+## ArgSanitizerDirective
+
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgSanitizerDirective.php)
+takes an incoming value and returns a new value.
+
+Let's take a look at the built-in [@trim](../api-reference/directives.md#trim) directive.
 
 ```php
 <?php
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 
-class TrimDirective implements ArgTransformerDirective
+class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
 {
-    /**
-     * Directive name.
-     *
-     * @return string
-     */
-    public function name(): string
+    public static function definition(): string
     {
-        return 'trim';
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Run the `trim` function on an input value.
+"""
+directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**
      * Remove whitespace from the beginning and end of a given input.
      *
      * @param  string  $argumentValue
-     * @return mixed
      */
-    public function transform($argumentValue): string
+    public function sanitize($argumentValue): string
     {
         return trim($argumentValue);
     }
 }
 ```
 
-The `transform` method takes an argument which represents the actual incoming value that is given
-to an argument in a query and is expected to transform the value and return it.
+The `sanitize` method takes an argument which represents the actual incoming value that is given
+to an argument in a query and is expected to modify the value, if needed, and return it.
 
 For example, if we have the following schema.
 
@@ -62,7 +87,7 @@ type Mutation {
 }
 ```
 
-When you resolve the field, the argument will hold the "transformed" value.
+When you resolve the field, the argument will hold the sanitized value.
 
 ```php
 <?php
@@ -83,22 +108,14 @@ class CreateUser
 }
 ```
 
-### Evaluation Order
+## ArgTransformerDirective
 
-Argument directives are evaluated in the order that they are defined in the schema.
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
+works essentially the same as an [`ArgSanitizerDirective`](#argsanitizerdirective).
+Notable differences are:
 
-```graphql
-type Mutation {
-  createUser(
-    password: String @trim @rules(apply: ["min:10,max:20"]) @bcrypt
-  ): User
-}
-```
-
-In the given example, Lighthouse will take the value of the `password` argument and:
-1. Trim any whitespace
-1. Run validation on it
-1. Encrypt the password via `bcrypt`
+- The method to implement is called `transform`
+- Transformations are applied after validation, whereas sanitization is applied before
 
 ## ArgBuilderDirective
 
@@ -108,24 +125,27 @@ modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use the defined filters for resolving the query:
 
-- `@all`
-- `@paginate`
-- `@find`
-- `@first`
-- `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
+- [@all](../api-reference/directives.md#all)
+- [@paginate](../api-reference/directives.md#paginate)
+- [@find](../api-reference/directives.md#find)
+- [@first](../api-reference/directives.md#first)
+- [@hasMany](../api-reference/directives.md#hasmany)
+- [@hasOne](../api-reference/directives.md#hasone)
+- [@belongsTo](../api-reference/directives.md#belongsto)
+- [@belongsToMany](../api-reference/directives.md#belongstomany)
 
 Take the following schema as an example:
 
 ```graphql
 type User {
-    posts(category: String @eq): [Post!]! @hasMany
+  posts(category: String @eq): [Post!]! @hasMany
 }
 ```
 
 Passing the `category` argument will select only the user's posts
 where the `category` column is equal to the value of the `category` argument.
 
-So let's take a look at the built-in `@eq` directive.
+So let's take a look at the built-in [@eq](../api-reference/directives.md#eq) directive.
 
 ```php
 <?php
@@ -133,30 +153,35 @@ So let's take a look at the built-in `@eq` directive.
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
+    public static function definition(): string
     {
-        return 'eq';
+        return /** @lang GraphQL */ <<<'SDL'
+directive @eq(
+  """
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**
-     * Apply a simple "WHERE = $value" clause.
+     * Apply a "WHERE = $value" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param  mixed $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder(object $builder, $value): object
     {
         return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }
@@ -166,28 +191,105 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
 The `handleBuilder` method takes two arguments:
 
 - `$builder`
-The query builder for applying the additional query on to.
+  The query builder for applying the additional query on to.
 - `$value`
-The value of the argument value that the `@eq` was applied on to.
+  The value of the argument value that [@eq](../api-reference/directives.md#eq) was applied on to.
 
 If you want to use a more complex value for manipulating a query,
 you can build a `ArgBuilderDirective` to work with lists or nested input objects.
-Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is one example of this.
+Lighthouse's [@whereBetween](../api-reference/directives.md#wherebetween) is one example of this.
 
 ```graphql
 type Query {
-    users(
-        createdBetween: DateRange @whereBetween(key: "created_at")
-    ): [User!]! @paginate
+  users(createdBetween: DateRange @whereBetween(key: "created_at")): [User!]!
+    @paginate
 }
 
 input DateRange {
-    from: Date!
-    to: Date!
+  from: Date!
+  to: Date!
 }
 ```
 
+## ArgResolver
+
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php)
+directive allows you to compose resolvers for complex nested inputs, similar to the way
+that field resolvers are composed together.
+
+For an in-depth explanation of the concept of composing arg resolvers,
+read the [explanation of arg resolvers](../concepts/arg-resolvers.md).
+
 ## ArgManipulator
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)	
-directive can be used to manipulate the schema AST. 
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)
+directive can be used to manipulate the schema AST.
+
+For example, you might want to add a directive that automagically derives the arguments
+for a field based on an object type. A skeleton for this directive might look something like this:
+
+```php
+<?php
+
+namespace App\GraphQL\Directives;
+
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+
+class ModelArgsDirective extends BaseDirective implements ArgManipulator
+{
+    /**
+     * SDL definition of the directive.
+     *
+     * @return string
+     */
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Automatically generates an input argument based on a type.
+"""
+directive @typeToInput(
+    """
+    The name of the type to use as the basis for the input type.
+    """
+    name: String!
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
+    /**
+     * Manipulate the AST.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @return void
+     */
+    public function manipulateArgDefinition(
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): void {
+        $typeName = $this->directiveArgValue('name');
+        $type = $documentAST->types[$typeName];
+
+        $input = $this->generateInputFromType($type);
+        $argDefinition->name->value = $input->value->name;
+
+        $documentAST->setTypeDefinition($input);
+    }
+
+    protected function generateInputFromType(ObjectTypeDefinitionNode $type): InputObjectTypeDefinitionNode
+    {
+        // TODO generate this type based on rules and conventions that work for you
+    }
+}
+```

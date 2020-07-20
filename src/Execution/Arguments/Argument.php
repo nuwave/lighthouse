@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Collection;
+
 class Argument
 {
     /**
@@ -14,7 +16,7 @@ class Argument
     /**
      * The type of the argument.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null
      */
     public $type;
 
@@ -26,9 +28,21 @@ class Argument
     public $directives;
 
     /**
+     * An argument may have a resolver that handles it's given value.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\ArgResolver|null
+     */
+    public $resolver;
+
+    public function __construct()
+    {
+        $this->directives = new Collection();
+    }
+
+    /**
      * Get the plain PHP value of this argument.
      *
-     * @return mixed
+     * @return mixed The plain PHP value.
      */
     public function toPlain()
     {
@@ -48,6 +62,7 @@ class Argument
         }
 
         if (is_array($value)) {
+            // @phpstan-ignore-next-line This callable works just fine
             return array_map([static::class, 'toPlainRecursive'], $value);
         }
 

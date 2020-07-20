@@ -4,7 +4,7 @@ namespace Tests\Utils\InterfacesSecondary;
 
 class Bar
 {
-    public function resolve()
+    public function __invoke(): void
     {
         //
     }

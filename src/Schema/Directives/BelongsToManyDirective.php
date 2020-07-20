@@ -2,25 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
+class BelongsToManyDirective extends RelationDirective implements FieldManipulator
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'belongsToMany';
-    }
-
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
@@ -30,7 +18,7 @@ directive @belongsToMany(
   if it is named different from the field in the schema.
   """
   relation: String
-  
+
   """
   Apply scopes to the underlying query.
   """
@@ -38,22 +26,22 @@ directive @belongsToMany(
 
   """
   ALlows to resolve the relation as a paginated list.
-  Allowed values: paginator, connection.
+  Allowed values: `paginator`, `connection`.
   """
   type: String
 
   """
-  Specify the default quantity of elements to be returned.
-  Only applies when using pagination.
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
   """
   defaultCount: Int
-  
+
   """
-  Specify the maximum quantity of elements to be returned.
-  Only applies when using pagination.
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
-  
+
   """
   Specify a custom type that implements the Edge interface
   to extend edge object.

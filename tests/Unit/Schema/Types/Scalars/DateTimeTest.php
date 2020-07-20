@@ -2,109 +2,27 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Carbon\Carbon;
-use GraphQL\Error\Error;
-use GraphQL\Error\InvariantViolation;
-use GraphQL\Language\AST\IntValueNode;
-use GraphQL\Language\AST\StringValueNode;
+use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateTime;
-use Tests\TestCase;
 
-class DateTimeTest extends TestCase
+class DateTimeTest extends DateScalarTest
 {
-    /**
-     * @dataProvider invalidDateTimeValues
-     *
-     * @param  mixed  $value
-     * @return void
-     */
-    public function testThrowsIfSerializingNonString($value): void
+    protected function scalarInstance(): DateScalar
     {
-        $this->expectException(InvariantViolation::class);
-
-        (new DateTime)->serialize($value);
+        return new DateTime();
     }
 
-    /**
-     * @dataProvider invalidDateTimeValues
-     *
-     * @param  mixed  $value
-     * @return void
-     */
-    public function testThrowsIfParseValueNonString($value): void
-    {
-        $this->expectException(Error::class);
-
-        (new DateTime)->parseValue($value);
-    }
-
-    /**
-     * Those values should fail passing as a date.
-     *
-     * @return mixed[]
-     */
-    public function invalidDateTimeValues(): array
+    public function validDates(): array
     {
         return [
-            [1],
-            ['rolf'],
-            [new class {
-            }],
-            [null],
-            [''],
+            ['2020-04-20 23:51:15'],
         ];
     }
 
-    public function testParsesValueString(): void
+    public function canonicalizeDates(): array
     {
-        $date = '2018-10-01 12:45:01';
-        $this->assertEquals(
-            (new Carbon($date))->toDateTimeString(),
-            (new DateTime)->parseValue($date)
-        );
-    }
-
-    public function testParsesLiteral(): void
-    {
-        $dateLiteral = new StringValueNode(
-            ['value' => '2018-10-01 12:45:01']
-        );
-        $result = (new DateTime)->parseLiteral($dateLiteral);
-
-        $this->assertSame(
-            $dateLiteral->value,
-            $result->toDateTimeString()
-        );
-    }
-
-    public function testThrowsIfParseLiteralNonString(): void
-    {
-        $this->expectException(Error::class);
-
-        (new DateTime)->parseLiteral(
-            new IntValueNode([])
-        );
-    }
-
-    public function testSerializesCarbonInstance(): void
-    {
-        $now = now();
-        $result = (new DateTime)->serialize($now);
-
-        $this->assertSame(
-            $now->toDateTimeString(),
-            $result
-        );
-    }
-
-    public function testSerializesValidDateTimeString(): void
-    {
-        $date = '2018-10-01 12:45:01';
-        $result = (new DateTime)->serialize($date);
-
-        $this->assertSame(
-            $date,
-            $result
-        );
+        return [
+            ['2020-4-20 23:51:15', '2020-04-20 23:51:15'],
+        ];
     }
 }
