@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 /**
- * @deprecated
+ * @deprecated in favor of @hash
+ * @see \Nuwave\Lighthouse\Schema\Directives\HashDirective
  */
-class BcryptDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
+class BcryptDirective extends BaseDirective implements ArgTransformerDirective, ArgDirective
 {
     public static function definition(): string
     {

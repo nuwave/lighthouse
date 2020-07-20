@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
-class ModelClassDirective extends BaseDirective implements DefinedDirective, Directive
+class ModelClassDirective extends BaseDirective implements Directive
 {
     public static function definition(): string
     {

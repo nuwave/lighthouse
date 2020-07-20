@@ -10,18 +10,17 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-abstract class RelationDirective extends BaseDirective
+abstract class RelationDirective extends BaseDirective implements FieldResolver
 {
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $value): FieldValue
     {
         $value->setResolver(
@@ -50,7 +49,7 @@ abstract class RelationDirective extends BaseDirective
                             $constructorArgs
                         )
                         ->load(
-                            $parent->getKey(),
+                            ModelKey::build($parent),
                             ['parent' => $parent]
                         );
                 }

@@ -14,7 +14,7 @@ class Baz
     /**
      * Return a value for the field.
      */
-    public function resolve(): int
+    public function __invoke(): int
     {
         return self::THE_ANSWER;
     }

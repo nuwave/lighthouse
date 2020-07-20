@@ -5,10 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class EventDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Illuminate\Contracts\Events\Dispatcher
@@ -37,9 +36,6 @@ directive @event(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $eventBaseName = $this->directiveArgValue('dispatch');

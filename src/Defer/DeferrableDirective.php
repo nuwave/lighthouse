@@ -12,11 +12,10 @@ use Nuwave\Lighthouse\ClientDirectives\ClientDirective;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class DeferrableDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
+class DeferrableDirective extends BaseDirective implements FieldMiddleware
 {
     public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
     public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
@@ -43,9 +42,6 @@ SDL;
         $this->defer = $defer;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();

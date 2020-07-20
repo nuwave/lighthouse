@@ -52,7 +52,7 @@ GRAPHQL;
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
-            $response->jsonGet()
+            $response->json()
         );
     }
 

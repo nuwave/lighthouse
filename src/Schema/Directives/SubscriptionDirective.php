@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 /**
@@ -11,7 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
  *
  * @see \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
  */
-class SubscriptionDirective extends BaseDirective implements Directive, DefinedDirective
+class SubscriptionDirective extends BaseDirective implements Directive
 {
     public const NAME = 'subscription';
 

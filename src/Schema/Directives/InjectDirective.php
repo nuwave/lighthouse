@@ -7,11 +7,10 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class InjectDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class InjectDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -35,9 +34,6 @@ SDL;
     }
 
     /**
-     * Resolve the field directive.
-     *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

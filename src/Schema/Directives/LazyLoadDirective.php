@@ -7,11 +7,10 @@ use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class LazyLoadDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
+class LazyLoadDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -29,9 +28,6 @@ directive @lazyLoad(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations', []);

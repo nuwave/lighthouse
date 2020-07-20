@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
+use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -63,6 +64,7 @@ GRAPHQL;
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
             OrderByServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
@@ -106,6 +108,9 @@ GRAPHQL;
             ],
             'directives' => [
                 'Tests\\Utils\\Directives',
+            ],
+            'validators' => [
+                'Tests\\Utils\\Validators',
             ],
         ]);
 

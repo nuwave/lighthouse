@@ -45,9 +45,8 @@ abstract class BaseDirective implements Directive
      * Returns the name of the used directive.
      *
      * TODO: Change to a strongly typed hint in v5
-     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->directiveNode->name->value;
     }

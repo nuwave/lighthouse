@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-
-class InterfaceDirective extends BaseDirective implements DefinedDirective
+class InterfaceDirective extends BaseDirective
 {
     public static function definition(): string
     {

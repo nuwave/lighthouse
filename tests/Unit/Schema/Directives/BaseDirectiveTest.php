@@ -166,6 +166,11 @@ class BaseDirectiveTest extends TestCase
     protected function constructTestDirective($definitionNode): BaseDirective
     {
         $directive = new class extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @baseTest on FIELD_DEFINITION';
+            }
+
             /**
              * Allow to call protected methods from the test.
              *

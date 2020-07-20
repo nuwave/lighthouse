@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-
-class ScalarDirective extends BaseDirective implements DefinedDirective
+class ScalarDirective extends BaseDirective
 {
     public static function definition(): string
     {

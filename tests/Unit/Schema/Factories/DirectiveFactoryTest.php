@@ -63,7 +63,7 @@ class DirectiveFactoryTest extends TestCase
         ');
 
         $directive = new class implements FieldMiddleware {
-            public function name(): string
+            public static function definition(): string
             {
                 return 'foo';
             }
