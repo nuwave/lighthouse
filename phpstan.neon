@@ -55,6 +55,8 @@ parameters:
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeExtensionNode::\$name\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\ValueNode given\.#'
+  - '#.* expects GraphQL\\Type\\Definition\\Type, GraphQL\\Type\\Definition\\InputType given\.#'
+  - '#PHPDoc tag @param for parameter \$definition with type GraphQL\\Language\\AST\\FieldDefinitionNode\|GraphQL\\Language\\AST\\TypeDefinitionNode is not subtype of native type GraphQL\\Language\\AST\\Node\.#'
 
   # Should work once we update to a version of graphql-php that has more accurate types
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'

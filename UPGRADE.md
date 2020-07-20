@@ -168,6 +168,81 @@ The method will have to change like this:
 +public function purchasedItemsCount(int $year, ?bool $includeReturns)
 ```
 
+### Implement `ArgDirective` or `ArgDirectiveForArray` explicitly
+
+This affects custom directives that implemented one of the following interfaces:
+
+- `\Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`
+- `\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`
+- `\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`
+
+Whereas those interfaces previously extended `\Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now
+have to choose if you want them to apply to entire lists of arguments, elements within that list, or both.
+Change them as follows to make them behave like in v4:
+
+```diff
++use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+
+-class MyCustomArgDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
++class MyCustomArgDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective, ArgDirective
+```
+
+### `ArgDirective` run in distinct phases
+
+The application of directives that implement the `ArgDirective` interface is
+split into three distinct phases:
+
+- Sanitize: Clean the input, e.g. trim whitespace.
+  Directives can hook into this phase by implementing `ArgSanitizerDirective`.
+- Validate: Ensure the input conforms to the expectations, e.g. check a valid email is given
+- Transform: Change the input before processing it further, e.g. hashing passwords.
+  Directives can hook into this phase by implementing `ArgTransformerDirective`
+
+### Replace custom validation directives with validator classes
+
+The `ValidationDirective` abstract class was removed in favour of validator classes.
+They represent a more lightweight way and flexible way to reuse complex validation rules,
+not only on fields but also on input objects.
+
+To convert an existing custom validation directive to a validator class, change it as follows:
+
+```diff
+<?php
+
+-namespace App\GraphQL\Directives;
++namespace App\GraphQL\Validators;
+
+use Illuminate\Validation\Rule;
+-use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
++use Nuwave\Lighthouse\Validation\Validator;
+
+-class UpdateUserValidationDirective extends ValidationDirective
++class UpdateUserValidator extends Validator
+{
+    /**
+     * @return mixed[]
+     */
+    public function rules(): array
+    {
+        return [
+            'id' => ['required'],
+            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
+        ];
+    }
+}
+```
+
+Instead of directly using this class as a directive, place the `@validator` directive on your field.
+
+```graphql
+type Mutation {
+- updateUser(id: ID, name: String): User @update @updateUserValidation
++ updateUser(id: ID, name: String): User @update @validator
+}
+```
+
 ### `Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent` is no longer fired
 
 The event is no longer fired, and the event class was removed. Lighthouse now uses a queued job instead.
