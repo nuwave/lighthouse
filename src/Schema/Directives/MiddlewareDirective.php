@@ -5,13 +5,13 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -118,8 +118,6 @@ SDL;
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function addMiddlewareDirectiveToFields(&$objectType): void
     {
@@ -130,7 +128,7 @@ SDL;
             })
             ->implode('", "');
 
-        $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
+        $middlewareDirective = Parser::constDirective("@middleware(checks: [\"$middlewareArgValue\"])");
 
         ASTHelper::addDirectiveToFields($middlewareDirective, $objectType);
     }

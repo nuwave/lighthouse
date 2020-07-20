@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\OrderBy;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
@@ -69,7 +69,7 @@ SDL;
     ): void {
         if ($this->hasAllowedColumns()) {
             $restrictedOrderByName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).'OrderByClause';
-            $argDefinition->type = PartialParser::listType("[$restrictedOrderByName!]");
+            $argDefinition->type = Parser::typeReference("[$restrictedOrderByName!]");
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
             $documentAST
@@ -81,7 +81,7 @@ SDL;
                     )
                 );
         } else {
-            $argDefinition->type = PartialParser::listType('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
+            $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
         }
     }
 }

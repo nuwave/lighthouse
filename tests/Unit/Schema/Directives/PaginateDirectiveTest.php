@@ -20,18 +20,20 @@ class PaginateDirectiveTest extends TestCase
 
     protected function getConnectionQueryField(string $type): FieldDefinition
     {
-        return $this
-            ->buildSchema(/** @lang GraphQL */ "
-            type User {
-                name: String
-            }
+        $schema = $this->buildSchema(/** @lang GraphQL */ "
+        type User {
+            name: String
+        }
 
-            type Query {
-                users: [User!]! @paginate(type: \"$type\")
-            }
-            ")
-            ->getQueryType()
-            ->getField('users');
+        type Query {
+            users: [User!]! @paginate(type: \"$type\")
+        }
+        ");
+
+        /** @var \GraphQL\Type\Definition\ObjectType $queryType */
+        $queryType = $schema->getQueryType();
+
+        return $queryType->getField('users');
     }
 
     public function testOnlyRegistersOneTypeForMultiplePaginators(): void
@@ -93,6 +95,7 @@ class PaginateDirectiveTest extends TestCase
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
+        /** @var \GraphQL\Type\Definition\ObjectType $queryType */
         $queryType = $this
             ->buildSchema(/** @lang GraphQL */ '
             type Query {
@@ -157,6 +160,7 @@ class PaginateDirectiveTest extends TestCase
     {
         config(['lighthouse.pagination_amount_argument' => 'first']);
 
+        /** @var \GraphQL\Type\Definition\ObjectType $queryType */
         $queryType = $this
             ->buildSchema(/** @lang GraphQL */ '
             type Query {

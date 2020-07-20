@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Str;
@@ -38,6 +39,9 @@ class Subscriber implements Serializable
 
     /**
      * The name of the queried operation.
+     *
+     * TODO replace with subscription field name, is guaranteed be be unique because of
+     * @see \GraphQL\Validator\Rules\SingleFieldSubscription
      *
      * @var string
      */
@@ -92,10 +96,12 @@ class Subscriber implements Serializable
         $this->args = $args;
         $this->context = $context;
 
-        $documentNode = new DocumentNode([]);
-        $documentNode->definitions = $resolveInfo->fragments;
-        $documentNode->definitions[] = $operation;
-        $this->query = $documentNode;
+        $this->query = new DocumentNode([
+            'definitions' => new NodeList(array_merge(
+                $resolveInfo->fragments,
+                [$operation]
+            )),
+        ]);
     }
 
     /**

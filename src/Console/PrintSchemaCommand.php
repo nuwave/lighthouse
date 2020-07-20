@@ -50,13 +50,19 @@ SIGNATURE;
 
     protected function toJson(Schema $schema): string
     {
-        // TODO simplify once https://github.com/webonyx/graphql-php/pull/539 is released
-        $introspectionResult = \GraphQL\GraphQL::executeQuery(
-            $schema,
-            Introspection::getIntrospectionQuery()
-        );
+        $introspectionResult = Introspection::fromSchema($schema);
+        if ($introspectionResult === null) {
+            throw new \Exception(<<<'MESSAGE'
+Did not receive a valid introspection result.
+Check if your schema is correct with:
 
-        $json = json_encode($introspectionResult->data);
+    php artisan lighthouse:validate-schema
+
+MESSAGE
+);
+        }
+
+        $json = json_encode($introspectionResult);
         // TODO use \Safe\json_encode
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('Tried to encode invalid JSON while converting schema: '.json_last_error_msg());

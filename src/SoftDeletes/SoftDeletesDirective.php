@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\SoftDeletes;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
@@ -26,13 +26,14 @@ SDL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $softDeletesArgument = PartialParser::inputValueDefinition(/** @lang GraphQL */ <<<'SDL'
+        $softDeletesArgument = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'SDL'
 """
 Allows to filter if trashed elements should be fetched.
 """
 trashed: Trashed @trashed
 SDL
         );
+        // @phpstan-ignore-next-line NodeList contravariance issue
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, [$softDeletesArgument]);
     }
 }

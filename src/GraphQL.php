@@ -120,10 +120,10 @@ class GraphQL
     }
 
     /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw ExecutionResult.
+     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
      *
-     * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in \GraphQL\Error\Debug
+     * To render the @see ExecutionResult, you will probably want to call `->toArray($debug)` on it,
+     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
      *
      * @param  string|\GraphQL\Language\AST\DocumentNode  $query
      * @param  array<mixed>|null  $variables

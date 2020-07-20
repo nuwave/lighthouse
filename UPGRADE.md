@@ -330,3 +330,30 @@ $response = $this->graphQL(...);
 -$response->jsonGet(...);
 +$response->json(...);
 ```
+
+### Use `GraphQL\Language\Parser` instead of `Nuwave\Lighthouse\Schema\AST\PartialParser`
+
+The native parser from [webonyx/graphql-php](https://github.com/webonyx/graphql-php) now supports partial parsing.
+
+```diff
+-use Nuwave\Lighthouse\Schema\AST\PartialParser;
++use GraphQL\Language\Parser;
+```
+
+Most methods work the same:
+
+```diff
+-PartialParser::directive(/** @lang GraphQL */ '@deferrable')
++Parser::constDirective(/** @lang GraphQL */ '@deferrable')
+```
+
+A few are different:
+
+```diff
+-PartialParser::listType("[$restrictedOrderByName!]");
++Parser::typeReference("[$restrictedOrderByName!]");
+
+-PartialParser::inputValueDefinitions([$foo, $bar]);
++Parser::inputValueDefinition($foo);
++Parser::inputValueDefinition($bar);
+```

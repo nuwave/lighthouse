@@ -37,7 +37,7 @@ class ErrorPool
                     $throwable->getMessage(),
                     null,
                     null,
-                    null,
+                    [],
                     null,
                     $throwable
                 );

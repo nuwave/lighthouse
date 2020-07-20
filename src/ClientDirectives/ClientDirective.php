@@ -68,10 +68,6 @@ class ClientDirective
         $graphQL = app(GraphQL::class);
         $schema = $graphQL->prepSchema();
 
-        /**
-         * TODO remove once graphql-php is accurate.
-         * @var \GraphQL\Type\Definition\Directive|null $definition
-         */
         $definition = $schema->getDirective($this->name);
         if ($definition === null) {
             throw new DefinitionException("Missing a schema definition for the client directive $this->name");

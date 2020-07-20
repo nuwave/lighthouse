@@ -24,8 +24,8 @@ parameters:
 
   # Will be obsolote in v5
   - src/Schema/Factories/FieldFactory.php
-  - src/Schema/AST/PartialParser.php
   - src/Schema/Directives/MiddlewareDirective.php
+  - tests/Unit/Schema/Directives/MiddlewareDirectiveTest.php
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false

@@ -235,8 +235,10 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        $barArg = $schema
-            ->getQueryType()
+        /** @var ObjectType $queryType */
+        $queryType = $schema->getQueryType();
+
+        $barArg = $queryType
             ->getField('foo')
             ->getArg('bar');
 

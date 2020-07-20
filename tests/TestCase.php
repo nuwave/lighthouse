@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -116,10 +116,10 @@ GRAPHQL;
 
         $config->set(
             'lighthouse.debug',
-            Debug::INCLUDE_DEBUG_MESSAGE
-            | Debug::INCLUDE_TRACE
-            /*| Debug::RETHROW_INTERNAL_EXCEPTIONS*/
-            | Debug::RETHROW_UNSAFE_EXCEPTIONS
+            DebugFlag::INCLUDE_DEBUG_MESSAGE
+            | DebugFlag::INCLUDE_TRACE
+            // | Debug::RETHROW_INTERNAL_EXCEPTIONS
+            | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
         );
 
         $config->set(
