@@ -9,10 +9,9 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 
-abstract class BaseRulesDirective extends BaseDirective implements ProvidesRules, DefinedDirective, ArgManipulator
+abstract class BaseRulesDirective extends BaseDirective implements ProvidesRules, ArgManipulator
 {
     /**
      * @return mixed[]

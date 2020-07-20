@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-
-class BelongsToDirective extends RelationDirective implements FieldResolver
+class BelongsToDirective extends RelationDirective
 {
     public static function definition(): string
     {

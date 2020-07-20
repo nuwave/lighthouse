@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class MorphManyDirective extends RelationDirective implements FieldResolver, FieldManipulator
+class MorphManyDirective extends RelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
