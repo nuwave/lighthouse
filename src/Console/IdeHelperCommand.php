@@ -8,8 +8,8 @@ use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\SchemaDirectives;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\SchemaDirectives;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 

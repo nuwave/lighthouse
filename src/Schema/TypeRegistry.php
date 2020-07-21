@@ -25,7 +25,6 @@ use Nuwave\Lighthouse\Schema\Directives\EnumDirective;
 use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
 use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
-use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;

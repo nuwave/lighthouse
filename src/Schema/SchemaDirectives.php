@@ -7,7 +7,6 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class SchemaDirectives
@@ -93,8 +92,8 @@ class SchemaDirectives
         $definitions = [];
 
         /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
-        foreach($this->classes() as $directiveClass) {
-            $definitions []= Parser::directiveDefinition($directiveClass::definition());
+        foreach ($this->classes() as $directiveClass) {
+            $definitions [] = Parser::directiveDefinition($directiveClass::definition());
         }
 
         return $definitions;

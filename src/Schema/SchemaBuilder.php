@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class SchemaBuilder
 {
@@ -82,7 +82,7 @@ class SchemaBuilder
         foreach ($documentAST->directives as $directiveDefinition) {
             $directives [] = $this->directiveFactory->handle($directiveDefinition);
         }
-        foreach($this->schemaDirectives->definitions() as $directiveDefinition) {
+        foreach ($this->schemaDirectives->definitions() as $directiveDefinition) {
             $directives [] = $this->directiveFactory->handle($directiveDefinition);
         }
 
