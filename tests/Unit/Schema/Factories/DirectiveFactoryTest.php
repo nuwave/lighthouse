@@ -6,7 +6,7 @@ use Closure;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -16,13 +16,13 @@ use Tests\TestCase;
 class DirectiveFactoryTest extends TestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
     public function getEnvironmentSetUp($app): void
     {
-        $this->directiveFactory = $app->make(DirectiveFactory::class);
+        $this->directiveFactory = $app->make(DirectiveLocator::class);
 
         parent::getEnvironmentSetUp($app);
     }

@@ -18,7 +18,7 @@ use Nuwave\Lighthouse\Validation\ValidateDirective;
 class FieldFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
@@ -38,7 +38,7 @@ class FieldFactory
     protected $argumentSetFactory;
 
     public function __construct(
-        DirectiveFactory $directiveFactory,
+        DirectiveLocator $directiveFactory,
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
         ArgumentSetFactory $argumentSetFactory

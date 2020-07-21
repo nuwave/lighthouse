@@ -124,7 +124,7 @@ namespace Nuwave\Lighthouse\Events;
  * Listeners may return one or more strings that are used as the base
  * namespace for locating directives.
  *
- * @see \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+ * @see \Nuwave\Lighthouse\Schema\DirectiveLocator
  */
 class RegisterDirectiveNamespaces
 {

@@ -25,7 +25,7 @@ use Nuwave\Lighthouse\Schema\Directives\EnumDirective;
 use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
 use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
@@ -49,7 +49,7 @@ class TypeRegistry
     protected $pipeline;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
@@ -65,7 +65,7 @@ class TypeRegistry
 
     public function __construct(
         Pipeline $pipeline,
-        DirectiveFactory $directiveFactory,
+        DirectiveLocator $directiveFactory,
         ArgumentFactory $argumentFactory
     ) {
         $this->pipeline = $pipeline;

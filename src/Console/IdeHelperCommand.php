@@ -8,8 +8,8 @@ use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\SchemaDirectives;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
@@ -28,7 +28,7 @@ SDL;
 
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    public function handle(DirectiveNamespacer $directiveNamespaces, TypeRegistry $typeRegistry): int
+    public function handle(SchemaDirectives $directiveNamespaces, TypeRegistry $typeRegistry): int
     {
         if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
             $this->error(
@@ -52,10 +52,10 @@ SDL;
     /**
      * Create and write schema directive definitions to a file.
      */
-    protected function schemaDirectiveDefinitions(DirectiveNamespacer $directiveNamespaces): void
+    protected function schemaDirectiveDefinitions(SchemaDirectives $directiveNamespaces): void
     {
         $directiveClasses = $this->scanForDirectives(
-            $directiveNamespaces->gather()
+            $directiveNamespaces->namespaces()
         );
 
         $schema = $this->buildSchemaString($directiveClasses);
@@ -90,7 +90,7 @@ SDL;
                     continue;
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
-                $name = DirectiveFactory::directiveName($class);
+                $name = DirectiveLocator::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
                 if (isset($directives[$name])) {
@@ -112,7 +112,7 @@ SDL;
         $schema = '';
 
         foreach ($directiveClasses as $name => $directiveClass) {
-            $definition = $this->define($name, $directiveClass);
+            $definition = $this->define($directiveClass);
 
             $schema .= "\n"
                 ."# Directive class: $directiveClass\n"
@@ -122,7 +122,7 @@ SDL;
         return $schema;
     }
 
-    protected function define(string $name, string $directiveClass): string
+    protected function define(string $directiveClass): string
     {
         /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
         $definition = $directiveClass::definition();

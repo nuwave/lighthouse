@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class SchemaBuilder
@@ -16,16 +16,23 @@ class SchemaBuilder
     protected $typeRegistry;
 
     /**
-     * @var \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
-    protected $clientDirectiveFactory;
+    protected $directiveFactory;
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\SchemaDirectives
+     */
+    protected $schemaDirectives;
 
     public function __construct(
         TypeRegistry $typeRegistry,
-        ClientDirectiveFactory $clientDirectiveFactory
+        SchemaDirectives $schemaDirectives,
+        DirectiveFactory $directiveFactory
     ) {
         $this->typeRegistry = $typeRegistry;
-        $this->clientDirectiveFactory = $clientDirectiveFactory;
+        $this->directiveFactory = $directiveFactory;
+        $this->schemaDirectives = $schemaDirectives;
     }
 
     /**
@@ -70,14 +77,17 @@ class SchemaBuilder
             [$this->typeRegistry, 'possibleTypes']
         );
 
-        // There is no way to resolve client directives lazily,
-        // so we convert them eagerly
-        $clientDirectives = [];
+        // There is no way to resolve directives lazily, so we convert them eagerly
+        $directives = [];
         foreach ($documentAST->directives as $directiveDefinition) {
-            $clientDirectives [] = $this->clientDirectiveFactory->handle($directiveDefinition);
+            $directives [] = $this->directiveFactory->handle($directiveDefinition);
         }
+        foreach($this->schemaDirectives->definitions() as $directiveDefinition) {
+            $directives [] = $this->directiveFactory->handle($directiveDefinition);
+        }
+
         $config->setDirectives(
-            array_merge(GraphQL::getStandardDirectives(), $clientDirectives)
+            array_merge(GraphQL::getStandardDirectives(), $directives)
         );
 
         return new Schema($config);

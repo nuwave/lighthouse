@@ -19,7 +19,7 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -39,7 +39,7 @@ class ASTBuilder
     /**
      * The directive factory.
      *
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
@@ -74,7 +74,7 @@ class ASTBuilder
     protected $documentAST;
 
     public function __construct(
-        DirectiveFactory $directiveFactory,
+        DirectiveLocator $directiveFactory,
         SchemaSourceProvider $schemaSourceProvider,
         EventDispatcher $eventDispatcher,
         ConfigRepository $configRepository
