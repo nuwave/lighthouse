@@ -199,7 +199,7 @@ If you need to revert to the old behavior of using `fill()`, you can change your
 ### There must be a `defaultHasOperator` in implementations of Operator
 
 Since the addition of the `HAS` input in `whereCondition` mechanics, there has to be a default operator for the `HAS` 
-input
+input.
 
 ```php
 public function defaultHasOperator(): string
