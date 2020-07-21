@@ -341,37 +341,43 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 3,
-        ]);
+        $commentOne = new Comment();
+        $commentOne->post_id = 3;
+        $commentOne->user_id = 1;
+        $commentOne->comment = 'none';
+        $commentOne->save();
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 7,
-            'user_id' => 2,
-            'comment' => 'test',
-        ]);
+        $commentTwo = new Comment();
+        $commentTwo->post_id = 7;
+        $commentTwo->user_id = 2;
+        $commentTwo->comment = 'test';
+        $commentTwo->save();
 
-        factory(Comment::class, 5)->create([
-            'post_id' => 9,
-            'user_id' => 2,
-            'comment' => 'test',
-        ]);
+        for($i = 0; $i < 5; $i++) {
+            $commentBatch = new Comment();
+            $commentBatch->post_id = 9;
+            $commentBatch->user_id = 2;
+            $commentBatch->comment = 'test';
+            $commentBatch->save();
+        }
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 11,
-            'user_id' => 1,
-            'comment' => 'test',
-        ]);
+        $commentThree = new Comment();
+        $commentThree->post_id = 11;
+        $commentThree->user_id = 1;
+        $commentThree->comment = 'test';
+        $commentThree->save();
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 14,
-            'user_id' => 2,
-        ]);
+        $commentFour = new Comment();
+        $commentFour->post_id = 14;
+        $commentFour->user_id = 2;
+        $commentFour->comment = 'none';
+        $commentFour->save();
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 15,
-            'user_id' => 2,
-        ]);
+        $commentFive = new Comment();
+        $commentFive->post_id = 15;
+        $commentFive->user_id = 2;
+        $commentFive->comment = 'none';
+        $commentFive->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -419,13 +425,17 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 3,
-        ]);
+        $commentOne = new Comment();
+        $commentOne->user_id = 1;
+        $commentOne->post_id = 3;
+        $commentOne->comment = 'none';
+        $commentOne->save();
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 7,
-        ]);
+        $commentTwo = new Comment();
+        $commentTwo->user_id = 1;
+        $commentTwo->post_id = 7;
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -459,13 +469,21 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        factory(Comment::class, 5)->create([
-            'post_id' => 3,
-        ]);
+        for($i = 0; $i < 5; $i++) {
+            $commentBatchOne = new Comment();
+            $commentBatchOne->user_id = 1;
+            $commentBatchOne->post_id = 3;
+            $commentBatchOne->comment = 'none';
+            $commentBatchOne->save();
+        }
 
-        factory(Comment::class, 2)->create([
-            'post_id' => 7,
-        ]);
+        for($i = 0; $i < 2; $i++) {
+            $commentBatchTwo = new Comment();
+            $commentBatchTwo->user_id = 1;
+            $commentBatchTwo->post_id = 7;
+            $commentBatchTwo->comment = 'none';
+            $commentBatchTwo->save();
+        }
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -497,13 +515,21 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        factory(Comment::class, 5)->create([
-            'post_id' => 3,
-        ]);
+        for($i = 0; $i < 5; $i++) {
+            $commentBatchOne = new Comment();
+            $commentBatchOne->user_id = 1;
+            $commentBatchOne->post_id = 3;
+            $commentBatchOne->comment = 'none';
+            $commentBatchOne->save();
+        }
 
-        factory(Comment::class, 6)->create([
-            'post_id' => 7,
-        ]);
+        for($i = 0; $i < 6; $i++) {
+            $commentBatchTwo = new Comment();
+            $commentBatchTwo->user_id = 1;
+            $commentBatchTwo->post_id = 7;
+            $commentBatchTwo->comment = 'none';
+            $commentBatchTwo->save();
+        }
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -536,14 +562,17 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 3,
-            'comment' => 'test',
-        ]);
+        $commentOne = new Comment();
+        $commentOne->user_id = 1;
+        $commentOne->post_id = 3;
+        $commentOne->comment = 'test';
+        $commentOne->save();
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 7,
-        ]);
+        $commentTwo = new Comment();
+        $commentTwo->user_id = 1;
+        $commentTwo->post_id = 7;
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -578,13 +607,17 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 7,
-        ]);
+        $commentOne = new Comment();
+        $commentOne->user_id = 1;
+        $commentOne->post_id = 7;
+        $commentOne->comment = 'none';
+        $commentOne->save();
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 11,
-        ]);
+        $commentTwo = new Comment();
+        $commentTwo->user_id = 1;
+        $commentTwo->post_id = 11;
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -620,19 +653,22 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 3,
-            'user_id' => 3,
-        ]);
+        $commentOne = new Comment();
+        $commentOne->user_id = 3;
+        $commentOne->post_id = 3;
+        $commentOne->comment = 'none';
+        $commentOne->save();
 
-        factory(Comment::class, 1)->create([
-            'post_id' => 7,
-            'user_id' => 2,
-        ]);
+        $commentTwo = new Comment();
+        $commentTwo->user_id = 2;
+        $commentTwo->post_id = 7;
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
 
-        factory(Task::class, 1)->create([
-            'user_id' => 2,
-        ]);
+        $task = new Task();
+        $task->name = 'test';
+        $task->user_id = 2;
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
