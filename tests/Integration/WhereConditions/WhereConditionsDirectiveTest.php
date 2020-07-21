@@ -353,7 +353,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $commentTwo->comment = 'test';
         $commentTwo->save();
 
-        for($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $commentBatch = new Comment();
             $commentBatch->post_id = 9;
             $commentBatch->user_id = 2;
@@ -469,7 +469,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        for($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $commentBatchOne = new Comment();
             $commentBatchOne->user_id = 1;
             $commentBatchOne->post_id = 3;
@@ -477,7 +477,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchOne->save();
         }
 
-        for($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $commentBatchTwo = new Comment();
             $commentBatchTwo->user_id = 1;
             $commentBatchTwo->post_id = 7;
@@ -515,7 +515,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        for($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $commentBatchOne = new Comment();
             $commentBatchOne->user_id = 1;
             $commentBatchOne->post_id = 3;
@@ -523,7 +523,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchOne->save();
         }
 
-        for($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 6; $i++) {
             $commentBatchTwo = new Comment();
             $commentBatchTwo->user_id = 1;
             $commentBatchTwo->post_id = 7;
