@@ -9,14 +9,14 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class TracingServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
      */
-    public function boot(DirectiveFactory $directiveFactory, EventsDispatcher $eventsDispatcher): void
+    public function boot(DirectiveLocator $directiveFactory, EventsDispatcher $eventsDispatcher): void
     {
         $eventsDispatcher->listen(
             RegisterDirectiveNamespaces::class,

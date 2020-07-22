@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -12,6 +13,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\AST;
@@ -320,5 +322,21 @@ class ASTHelper
         return Str::studly($parentType->name->value)
             .Str::studly($parentField->name->value)
             .Str::studly($argDefinition->name->value);
+    }
+
+    /**
+     * Given a collection of directives, returns the string value for the deprecation reason.
+     *
+     * @param  \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $node
+     * @return string
+     */
+    public static function deprecationReason(Node $node): ?string
+    {
+        $deprecated = Values::getDirectiveValues(
+            Directive::deprecatedDirective(),
+            $node
+        );
+
+        return $deprecated['reason'] ?? null;
     }
 }

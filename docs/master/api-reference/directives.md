@@ -2301,7 +2301,7 @@ directive @rules(
   Specified as an input object that maps rules to messages,
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: [RulesMessageMap!]
+  messages: RulesMessageMap
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -2334,7 +2334,7 @@ directive @rulesForArray(
   Specified as an input object that maps rules to messages,
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: [RulesMessageMap!]
+  messages: RulesMessageMap
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
