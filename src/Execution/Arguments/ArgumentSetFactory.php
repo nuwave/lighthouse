@@ -70,7 +70,7 @@ class ArgumentSetFactory
     public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $this->directiveFactory->createAssociatedDirectives($definition);
+        $argumentSet->directives = $this->directiveFactory->associated($definition);
 
         if ($definition instanceof FieldDefinitionNode) {
             $argDefinitions = $definition->arguments;
@@ -122,7 +122,7 @@ class ArgumentSetFactory
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $this->directiveFactory->createAssociatedDirectives($definition);
+        $argument->directives = $this->directiveFactory->associated($definition);
         $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
 

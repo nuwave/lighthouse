@@ -44,7 +44,7 @@ class DirectiveFactoryTest extends TestCase
         /** @var \Nuwave\Lighthouse\Schema\Directives\FieldDirective $fieldDirective */
         $fieldDirective = $this
             ->directiveFactory
-            ->createAssociatedDirectives($fieldDefinition)
+            ->associated($fieldDefinition)
             ->first();
 
         $definitionNode = new ReflectionProperty($fieldDirective, 'definitionNode');
@@ -78,7 +78,7 @@ class DirectiveFactoryTest extends TestCase
 
         $directive = $this
             ->directiveFactory
-            ->createAssociatedDirectives($fieldDefinition)
+            ->associated($fieldDefinition)
             ->first();
 
         $this->assertObjectNotHasAttribute('definitionNode', $directive);
@@ -97,7 +97,7 @@ class DirectiveFactoryTest extends TestCase
             foo: [Foo!]! @hasMany
         ');
 
-        $resolver = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
+        $resolver = $this->directiveFactory->exclusiveOfType($fieldDefinition, FieldResolver::class);
         $this->assertInstanceOf(FieldResolver::class, $resolver);
     }
 
@@ -110,7 +110,7 @@ class DirectiveFactoryTest extends TestCase
             bar: [Bar!]! @hasMany @belongsTo
         ');
 
-        $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
+        $this->directiveFactory->exclusiveOfType($fieldDefinition, FieldResolver::class);
     }
 
     public function testCanCreateMultipleDirectives(): void
@@ -119,7 +119,7 @@ class DirectiveFactoryTest extends TestCase
             bar: String @can(if: ["viewBar"]) @event
         ');
 
-        $middleware = $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinition, FieldMiddleware::class);
+        $middleware = $this->directiveFactory->associatedOfType($fieldDefinition, FieldMiddleware::class);
         $this->assertCount(2, $middleware);
     }
 }

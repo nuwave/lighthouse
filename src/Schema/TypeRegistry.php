@@ -212,11 +212,11 @@ EOL
         return $this->pipeline
             ->send($typeValue)
             ->through(
-                $this->directiveFactory->createAssociatedDirectivesOfType($definition, TypeMiddleware::class)
+                $this->directiveFactory->associatedOfType($definition, TypeMiddleware::class)
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                if ($typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class)) {
+                if ($typeResolver = $this->directiveFactory->exclusiveOfType($definition, TypeResolver::class)) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                     return $typeResolver->resolveNode($value);
                 }
@@ -261,7 +261,7 @@ EOL
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($enumDefinition->values as $enumValue) {
             /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
-            $enumDirective = $this->directiveFactory->createSingleDirectiveOfType($enumValue, EnumDirective::class);
+            $enumDirective = $this->directiveFactory->exclusiveOfType($enumValue, EnumDirective::class);
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value

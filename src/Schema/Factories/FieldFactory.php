@@ -62,13 +62,13 @@ class FieldFactory
 
         // Directives have the first priority for defining a resolver for a field
         /** @var \Nuwave\Lighthouse\Support\Contracts\FieldResolver $resolverDirective */
-        if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
+        if ($resolverDirective = $this->directiveFactory->exclusiveOfType($fieldDefinitionNode, FieldResolver::class)) {
             $fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
             $fieldValue = $fieldValue->useDefaultResolver();
         }
 
-        $fieldMiddleware = $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
+        $fieldMiddleware = $this->directiveFactory->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
             // Middleware resolve in reversed order
             ->push(app(RenameArgsDirective::class))
             ->push(app(SpreadDirective::class))

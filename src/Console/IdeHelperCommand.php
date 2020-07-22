@@ -30,16 +30,6 @@ SDL;
 
     public function handle(SchemaDirectives $directiveNamespaces, TypeRegistry $typeRegistry): int
     {
-        if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
-            $this->error(
-                "This command requires haydenpierce/class-finder. Install it by running:\n"
-                ."\n"
-                ."    composer require --dev haydenpierce/class-finder\n"
-            );
-
-            return 1;
-        }
-
         $this->schemaDirectiveDefinitions($directiveNamespaces);
         $this->programmaticTypes($typeRegistry);
         $this->phpIdeHelper();

@@ -5,9 +5,11 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\Parser;
-use Illuminate\Support\Arr;
+use HaydenPierce\ClassFinder\ClassFinder;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -15,6 +17,18 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class DirectiveLocator
 {
+    /**
+     * The paths used for locating directive classes.
+     *
+     * Should be tried in the order they are contained in this array,
+     * going from the most significant to least significant.
+     *
+     * Lazily initialized.
+     *
+     * @var string[]
+     */
+    protected $directiveNamespaces;
+
     /**
      * A map from short directive names to full class names.
      *
@@ -29,23 +43,95 @@ class DirectiveLocator
     protected $resolvedClassnames = [];
 
     /**
-     * The paths used for locating directive classes.
-     *
-     * Should be tried in the order they are contained in this array,
-     * going from the most significant to least significant.
-     *
-     * @var string[]
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $directiveNamespaces;
+    protected $eventsDispatcher;
+
+    public function __construct(EventsDispatcher $eventsDispatcher)
+    {
+        $this->eventsDispatcher = $eventsDispatcher;
+    }
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\SchemaDirectives
+     * A list of namespaces with directives in descending priority.
+     *
+     * @return array<string>
      */
-    protected $schemaDirectives;
-
-    public function __construct(SchemaDirectives $schemaDirectives)
+    public function namespaces(): array
     {
-        $this->schemaDirectives = $schemaDirectives;
+        if(! isset($this->directiveNamespaces)) {
+            $this->directiveNamespaces =
+                // When looking for a directive by name, the namespaces are tried in order
+                (new Collection([
+                    // User defined directives (top priority)
+                    config('lighthouse.namespaces.directives'),
+
+                    // Plugin developers defined directives
+                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces),
+
+                    // Lighthouse defined directives
+                    'Nuwave\\Lighthouse\\Schema\\Directives',
+                ]))
+                ->flatten()
+                ->filter()
+                ->all();
+        }
+
+        return $this->directiveNamespaces;
+    }
+
+    /**
+     * Scan the namespaces for directive classes.
+     *
+     * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
+     */
+    public function classes(): array
+    {
+        $directives = [];
+
+        foreach ($this->namespaces() as $directiveNamespace) {
+            /** @var array<class-string> $classesInNamespace */
+            $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
+
+            foreach ($classesInNamespace as $class) {
+                $reflection = new \ReflectionClass($class);
+                if (! $reflection->isInstantiable()) {
+                    continue;
+                }
+
+                if (! is_a($class, Directive::class, true)) {
+                    continue;
+                }
+                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
+                $name = DirectiveLocator::directiveName($class);
+
+                // The directive was already found, so we do not add it twice
+                if (isset($directives[$name])) {
+                    continue;
+                }
+
+                $directives[$name] = $class;
+            }
+        }
+
+        return $directives;
+    }
+
+    /**
+     * Return the parsed definitions for all directive classes.
+     *
+     * @return array<\GraphQL\Language\AST\DirectiveDefinitionNode>
+     */
+    public function definitions(): array
+    {
+        $definitions = [];
+
+        /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
+        foreach ($this->classes() as $directiveClass) {
+            $definitions [] = Parser::directiveDefinition($directiveClass::definition());
+        }
+
+        return $definitions;
     }
 
     /**
@@ -61,19 +147,18 @@ class DirectiveLocator
     /**
      * Resolve the class for a given directive name.
      *
+     * @return class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function resolve(string $directiveName): string
     {
-        if ($directiveClass = Arr::get($this->resolvedClassnames, $directiveName)) {
-            return $directiveClass;
+        // Bail to respect the priority of namespaces, the first resolved directive is kept
+        if (array_key_exists($directiveName, $this->directiveNamespaces)) {
+            return $this->directiveNamespaces[$directiveName];
         }
 
-        if (! $this->directiveNamespaces) {
-            $this->directiveNamespaces = $this->schemaDirectives->namespaces();
-        }
-
-        foreach ($this->directiveNamespaces as $baseNamespace) {
+        foreach ($this->namespaces() as $baseNamespace) {
             $directiveClass = $baseNamespace.'\\'.static::className($directiveName);
 
             if (class_exists($directiveClass)) {
@@ -81,7 +166,7 @@ class DirectiveLocator
                     throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
 
-                $this->addResolved($directiveName, $directiveClass);
+                $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;
             }
@@ -111,25 +196,6 @@ class DirectiveLocator
     }
 
     /**
-     * @deprecated use the RegisterDirectiveNamespaces event instead, this method will be removed as of v5
-     * @see \Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces
-     *
-     * @return $this
-     */
-    public function addResolved(string $directiveName, string $className): self
-    {
-        // Bail to respect the priority of namespaces, the first
-        // resolved directive is kept
-        if (in_array($directiveName, $this->resolvedClassnames, true)) {
-            return $this;
-        }
-
-        $this->resolvedClassnames[$directiveName] = $className;
-
-        return $this;
-    }
-
-    /**
      * @return $this
      */
     public function setResolved(string $directiveName, string $className): self
@@ -140,34 +206,11 @@ class DirectiveLocator
     }
 
     /**
-     * @deprecated will be removed as of v5
-     * @return $this
-     */
-    public function clearResolved(): self
-    {
-        $this->resolvedClassnames = [];
-
-        return $this;
-    }
-
-    /**
-     * Get all directives of a certain type that are associated with an AST node.
-     *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> of type <$directiveClass>
-     */
-    public function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
-    {
-        return $this
-            ->createAssociatedDirectives($node)
-            ->filter(Utils::instanceofMatcher($directiveClass));
-    }
-
-    /**
      * Get all directives that are associated with an AST node.
      *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
-    public function createAssociatedDirectives(Node $node): Collection
+    public function associated(Node $node): Collection
     {
         return (new Collection($node->directives))
             ->map(function (DirectiveNode $directiveNode) use ($node): Directive {
@@ -182,18 +225,28 @@ class DirectiveLocator
     }
 
     /**
+     * Get all directives of a certain type that are associated with an AST node.
+     *
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> of type <$directiveClass>
+     */
+    public function associatedOfType(Node $node, string $directiveClass): Collection
+    {
+        return $this
+            ->associated($node)
+            ->filter(Utils::instanceofMatcher($directiveClass));
+    }
+
+    /**
      * Get a single directive of a type that belongs to an AST node.
      *
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
-     * TODO rename to exclusiveDirective
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    public function createSingleDirectiveOfType(Node $node, string $directiveClass): ?Directive
+    public function exclusiveOfType(Node $node, string $directiveClass): ?Directive
     {
-        $directives = $this->createAssociatedDirectivesOfType($node, $directiveClass);
+        $directives = $this->associatedOfType($node, $directiveClass);
 
         if ($directives->count() > 1) {
             $directiveNames = $directives

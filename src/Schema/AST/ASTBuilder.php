@@ -160,7 +160,7 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
-                $this->directiveFactory->createAssociatedDirectivesOfType($typeDefinition, TypeManipulator::class)
+                $this->directiveFactory->associatedOfType($typeDefinition, TypeManipulator::class)
                 as $typeDefinitionManipulator
             ) {
                 $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -179,7 +179,7 @@ class ASTBuilder
                 // that are defined on type extensions themselves
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
-                    $this->directiveFactory->createAssociatedDirectivesOfType($typeExtension, TypeExtensionManipulator::class)
+                    $this->directiveFactory->associatedOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
@@ -280,7 +280,7 @@ class ASTBuilder
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
-                        $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinition, FieldManipulator::class)
+                        $this->directiveFactory->associatedOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -302,7 +302,7 @@ class ASTBuilder
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
-                            $this->directiveFactory->createAssociatedDirectivesOfType($argumentDefinition, ArgManipulator::class)
+                            $this->directiveFactory->associatedOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
                             $argManipulator->manipulateArgDefinition(
