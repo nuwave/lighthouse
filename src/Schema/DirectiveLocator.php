@@ -59,7 +59,7 @@ class DirectiveLocator
      */
     public function namespaces(): array
     {
-        if(! isset($this->directiveNamespaces)) {
+        if (! isset($this->directiveNamespaces)) {
             $this->directiveNamespaces =
                 // When looking for a directive by name, the namespaces are tried in order
                 (new Collection([
@@ -103,7 +103,7 @@ class DirectiveLocator
                     continue;
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
-                $name = DirectiveLocator::directiveName($class);
+                $name = self::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
                 if (isset($directives[$name])) {
