@@ -165,7 +165,9 @@ class DirectiveLocator
                 if (! is_a($directiveClass, Directive::class, true)) {
                     throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
+                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass */
 
+                // @phpstan-ignore-next-line We validated that $directiveClass has the correct type
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;
@@ -196,11 +198,12 @@ class DirectiveLocator
     }
 
     /**
+     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
      * @return $this
      */
-    public function setResolved(string $directiveName, string $className): self
+    public function setResolved(string $directiveName, string $directiveClass): self
     {
-        $this->resolvedClassnames[$directiveName] = $className;
+        $this->resolvedClassnames[$directiveName] = $directiveClass;
 
         return $this;
     }
