@@ -9,7 +9,6 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -173,7 +172,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             );
         }
     }
-  
+
     protected function nestedRelatedModel(Model $model, string $nestedRelationPath): Model
     {
         $relations = explode('.', $nestedRelationPath);
@@ -185,7 +184,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
         return $relatedModel;
     }
-  
+
     /**
      * Get the suffix that will be added to generated input types.
      */
