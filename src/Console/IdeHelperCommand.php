@@ -9,7 +9,6 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Schema\SchemaDirectives;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
@@ -28,9 +27,9 @@ SDL;
 
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    public function handle(SchemaDirectives $directiveNamespaces, TypeRegistry $typeRegistry): int
+    public function handle(DirectiveLocator $directiveLocator, TypeRegistry $typeRegistry): int
     {
-        $this->schemaDirectiveDefinitions($directiveNamespaces);
+        $this->schemaDirectiveDefinitions($directiveLocator);
         $this->programmaticTypes($typeRegistry);
         $this->phpIdeHelper();
 
@@ -42,10 +41,10 @@ SDL;
     /**
      * Create and write schema directive definitions to a file.
      */
-    protected function schemaDirectiveDefinitions(SchemaDirectives $directiveNamespaces): void
+    protected function schemaDirectiveDefinitions(DirectiveLocator $directiveLocator): void
     {
         $directiveClasses = $this->scanForDirectives(
-            $directiveNamespaces->namespaces()
+            $directiveLocator->namespaces()
         );
 
         $schema = $this->buildSchemaString($directiveClasses);

@@ -7,9 +7,9 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
-use Nuwave\Lighthouse\Schema\SchemaDirectives;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class ValidateSchemaCommand extends Command
@@ -22,7 +22,7 @@ class ValidateSchemaCommand extends Command
         CacheRepository $cache,
         ConfigRepository $config,
         GraphQL $graphQL,
-        SchemaDirectives $schemaDirectives,
+        DirectiveLocator $directiveLocator,
         TypeRegistry $typeRegistry
     ): void {
         // Clear the cache so this always validates the current schema
@@ -37,7 +37,7 @@ class ValidateSchemaCommand extends Command
         $directiveFactory = new DirectiveFactory(
             new FallbackTypeNodeConverter($typeRegistry)
         );
-        foreach ($schemaDirectives->definitions() as $directiveDefinition) {
+        foreach ($directiveLocator->definitions() as $directiveDefinition) {
             // TODO solve cleanly
             if ($directiveDefinition->name->value !== 'deprecated') {
                 $schemaConfig->directives [] = $directiveFactory->handle($directiveDefinition);
