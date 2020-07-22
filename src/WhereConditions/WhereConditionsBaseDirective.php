@@ -31,9 +31,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param  Illuminate\Database\Query\Builder|Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string, mixed>  $whereConditions
-     * @return Illuminate\Database\Query\Builder|Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleWhereConditions($builder, array $whereConditions, Model $model = null, string $boolean = 'and')
     {
@@ -84,7 +84,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param Illuminate\Database\Query\Builder|Illuminate\Database\Eloquent\Builder $builder
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
      * @param array<string, mixed>|null $condition
      */
     public function handleHasCondition($builder, Model $model, string $relation, ?array $condition = null, ?int $amount = null, ?string $operator = null): void
