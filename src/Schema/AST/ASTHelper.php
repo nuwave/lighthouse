@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;

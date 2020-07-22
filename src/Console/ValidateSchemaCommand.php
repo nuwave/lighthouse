@@ -37,9 +37,9 @@ class ValidateSchemaCommand extends Command
         $directiveFactory = new DirectiveFactory(
             new FallbackTypeNodeConverter($typeRegistry)
         );
-        foreach($schemaDirectives->definitions() as $directiveDefinition) {
+        foreach ($schemaDirectives->definitions() as $directiveDefinition) {
             // TODO solve cleanly
-            if($directiveDefinition->name->value !== 'deprecated') {
+            if ($directiveDefinition->name->value !== 'deprecated') {
                 $schemaConfig->directives [] = $directiveFactory->handle($directiveDefinition);
             }
         }

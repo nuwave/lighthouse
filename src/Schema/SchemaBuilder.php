@@ -15,7 +15,8 @@ class SchemaBuilder
      */
     protected $typeRegistry;
 
-    public function __construct(TypeRegistry $typeRegistry) {
+    public function __construct(TypeRegistry $typeRegistry)
+    {
         $this->typeRegistry = $typeRegistry;
     }
 
