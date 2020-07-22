@@ -118,10 +118,16 @@ GRAPHQL
 
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
-        $operatorName = self::operatorName($operator);
+
+        $operatorName = Parser
+            ::enumTypeDefinition(
+                $operator->enumDefinition()
+            )
+            ->name
+            ->value;
         $operatorDefault = $operator->defaultHasOperator();
 
-        return PartialParser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $hasRelationInputName {
                 "The relation that is checked."
@@ -138,15 +144,5 @@ GRAPHQL
             }
 GRAPHQL
         );
-    }
-
-    protected static function operatorName(Operator $operator): string
-    {
-        return PartialParser
-            ::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
-            ->name
-            ->value;
     }
 }
