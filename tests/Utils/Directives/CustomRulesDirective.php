@@ -2,12 +2,13 @@
 
 namespace Tests\Utils\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Validation\BaseRulesDirective;
 
 /**
  * TODO remove once we can use @rules repeatedly.
  */
-class CustomRulesDirective extends BaseRulesDirective
+class CustomRulesDirective extends BaseRulesDirective implements ArgDirective
 {
     public static function definition(): string
     {
