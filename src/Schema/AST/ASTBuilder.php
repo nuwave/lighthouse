@@ -12,6 +12,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
+use GraphQL\Language\Parser;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
@@ -101,8 +102,7 @@ class ASTBuilder
             $cache = app('cache')->store($cacheConfig['store'] ?? null);
             $this->documentAST = $cache->remember(
                 $cacheConfig['key'],
-                // TODO remove this fallback in v5
-                $cacheConfig['ttl'] ?? null,
+                $cacheConfig['ttl'],
                 function (): DocumentAST {
                     return $this->build();
                 }
@@ -209,7 +209,7 @@ class ASTBuilder
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
         if ($extendedObjectLikeType === null) {
             if (RootType::isRootType($typeName)) {
-                $extendedObjectLikeType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
+                $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
             } else {
                 throw new DefinitionException(
@@ -324,7 +324,7 @@ class ASTBuilder
     protected function addPaginationInfoTypes(): void
     {
         $this->documentAST->setTypeDefinition(
-            PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+            Parser::objectTypeDefinition(/** @lang GraphQL */ '
                 "Pagination information about the corresponding list of items."
                 type PaginatorInfo {
                   "Total count of available items in the page."
@@ -355,7 +355,7 @@ class ASTBuilder
         );
 
         $this->documentAST->setTypeDefinition(
-            PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+            Parser::objectTypeDefinition(/** @lang GraphQL */ '
                 "Pagination information about the corresponding list of items."
                 type PageInfo {
                   "When paginating forwards, are there more items?"
@@ -416,7 +416,7 @@ class ASTBuilder
         $globalId = config('lighthouse.global_id_field');
         // Double slashes to escape the slashes in the namespace.
         $this->documentAST->setTypeDefinition(
-            PartialParser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 "Node global interface"
 interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {
 "Global identifier that can be used to resolve any Node implementation."
@@ -432,7 +432,7 @@ GRAPHQL
         $queryType->fields = ASTHelper::mergeNodeList(
             $queryType->fields,
             [
-                PartialParser::fieldDefinition(/** @lang GraphQL */ '
+                Parser::fieldDefinition(/** @lang GraphQL */ '
                     node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
                 '),
             ]

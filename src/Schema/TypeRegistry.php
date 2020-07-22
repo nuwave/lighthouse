@@ -328,6 +328,7 @@ EOL
 
                     // Might be a NodeList, so we can not use array_map()
                     foreach ($objectDefinition->interfaces as $interface) {
+                        // @phpstan-ignore-next-line remove once https://github.com/webonyx/graphql-php/pull/695 is releases
                         $interfaces [] = $this->get($interface->name->value);
                     }
 

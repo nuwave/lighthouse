@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\Parser;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -199,7 +200,11 @@ class DirectiveFactory
         if ($directives->count() > 1) {
             $directiveNames = $directives
                 ->map(function (Directive $directive): string {
-                    return '@'.$directive->name();
+                    $definition = Parser::directiveDefinition(
+                        $directive::definition()
+                    );
+
+                    return '@'.$definition->name->value;
                 })
                 ->implode(', ');
 

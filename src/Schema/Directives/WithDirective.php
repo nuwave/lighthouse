@@ -3,10 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithDirective extends WithRelationDirective implements FieldMiddleware, DefinedDirective
+class WithDirective extends WithRelationDirective implements FieldMiddleware
 {
     public static function definition(): string
     {

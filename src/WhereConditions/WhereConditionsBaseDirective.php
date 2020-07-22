@@ -6,18 +6,18 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
 
-abstract class WhereConditionsBaseDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
+abstract class WhereConditionsBaseDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator
 {
     use GeneratesColumnsEnum;
 
@@ -36,7 +36,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * @param  array<string, mixed>  $whereConditions
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleWhereConditions($builder, array $whereConditions, Model $model = null, string $boolean = 'and')
+    public function handleWhereConditions(object $builder, array $whereConditions, Model $model = null, string $boolean = 'and'): object
     {
         if ($builder instanceof EloquentBuilder) {
             $model = $builder->getModel();
@@ -133,9 +133,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = $this->restrictedWhereConditionsName($argDefinition, $parentField);
-            $argDefinition->type = PartialParser::namedType($restrictedWhereConditionsName);
-            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField);
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).$this->generatedInputSuffix();
+            $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
+            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
             $documentAST
                 ->setTypeDefinition(
@@ -152,24 +152,14 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     )
                 );
         } else {
-            $argDefinition->type = PartialParser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
+            $argDefinition->type = Parser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
         }
     }
 
     /**
-     * Create the name for the restricted WhereConditions input.
+     * Ensure the column name is well formed.
      *
-     * @example FieldNameArgNameWhereHasConditions
-     */
-    protected function restrictedWhereConditionsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
-    {
-        return Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value)
-            .'WhereConditions';
-    }
-
-    /**
-     * Ensure the column name is well formed and prevent SQL injection.
+     * This prevents SQL injection.
      *
      * @throws \GraphQL\Error\Error
      */
@@ -183,7 +173,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             );
         }
     }
-
+  
     protected function nestedRelatedModel(Model $model, string $nestedRelationPath): Model
     {
         $relations = explode('.', $nestedRelationPath);
@@ -195,4 +185,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
         return $relatedModel;
     }
+  
+    /**
+     * Get the suffix that will be added to generated input types.
+     */
+    abstract protected function generatedInputSuffix(): string;
 }

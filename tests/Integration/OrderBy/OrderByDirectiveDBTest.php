@@ -37,7 +37,7 @@ class OrderByDirectiveDBTest extends DBTestCase
             users(
                 orderBy: [
                     {
-                        field: "name"
+                        column: "name"
                         order: ASC
                     }
                 ]
@@ -69,7 +69,7 @@ class OrderByDirectiveDBTest extends DBTestCase
             users(
                 orderBy: [
                     {
-                        field: "name"
+                        column: "name"
                         order: ASC
                     }
                 ]
@@ -102,11 +102,11 @@ class OrderByDirectiveDBTest extends DBTestCase
             users(
                 orderBy: [
                     {
-                        field: "team_id"
+                        column: "team_id"
                         order: ASC
                     }
                     {
-                        field: "name"
+                        column: "name"
                         order: ASC
                     }
                 ]
@@ -145,44 +145,7 @@ class OrderByDirectiveDBTest extends DBTestCase
             users(
                 orderByRestricted: [
                     {
-                        field: NAME
-                        order: ASC
-                    }
-                ]
-            ) {
-                name
-            }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'name' => 'A',
-                    ],
-                    [
-                        'name' => 'B',
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @deprecated will be removed in v5 when column is the new default
-     */
-    public function testConfigureColumnArg(): void
-    {
-        config(['lighthouse.orderBy' => 'column']);
-
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                orderBy: [
-                    {
-                        column: "name"
+                        column: NAME
                         order: ASC
                     }
                 ]
@@ -214,7 +177,7 @@ class OrderByDirectiveDBTest extends DBTestCase
             users(
                 orderByRestrictedEnum: [
                     {
-                        field: NAME
+                        column: NAME
                         order: ASC
                     }
                 ]

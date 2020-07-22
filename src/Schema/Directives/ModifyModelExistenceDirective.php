@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
@@ -9,30 +10,36 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
-abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
+abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
     /**
-     * The GlobalId resolver.
-     *
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
     protected $globalId;
 
-    public function __construct(GlobalId $globalId)
+    /**
+     * @var \Nuwave\Lighthouse\Execution\ErrorPool
+     */
+    protected $errorPool;
+
+    public function __construct(GlobalId $globalId, ErrorPool $errorPool)
     {
         $this->globalId = $globalId;
+        $this->errorPool = $errorPool;
     }
 
-    /**
-     * Resolve the field directive.
-     */
+    public static function couldNotModify(Model $user): string
+    {
+        return 'Could not modify model '.get_class($user).' with ID '.$user->getKey().'.';
+    }
+
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
@@ -54,11 +61,21 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                     return;
                 }
 
+                $modifyModelExistence = function (Model $model): void {
+                    if (! $this->modifyExistence($model)) {
+                        $this->errorPool->record(
+                            new Error(
+                                self::couldNotModify($model)
+                            )
+                        );
+                    }
+                };
+
                 if ($modelOrModels instanceof Model) {
-                    $this->modifyExistence($modelOrModels);
+                    $modifyModelExistence($modelOrModels);
                 } elseif ($modelOrModels instanceof Collection) {
                     foreach ($modelOrModels as $model) {
-                        $this->modifyExistence($model);
+                        $modifyModelExistence($model);
                     }
                 }
 
@@ -94,13 +111,13 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         // Ensure there is only a single argument defined on the field.
         if (count($fieldDefinition->arguments) !== 1) {
             throw new DefinitionException(
-                'The @'.static::name()." directive requires the field {$this->nodeName()} to only contain a single argument."
+                'The @'.$this->name()." directive requires the field {$this->nodeName()} to only contain a single argument."
             );
         }
 
         if (! $this->idArgument() instanceof NonNullTypeNode) {
             throw new DefinitionException(
-                'The @'.static::name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
+                'The @'.$this->name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
             );
         }
     }
@@ -137,6 +154,8 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     /**
      * Bring a model in or out of existence.
+     *
+     * The return value indicates if the operation was successful.
      */
-    abstract protected function modifyExistence(Model $model): void;
+    abstract protected function modifyExistence(Model $model): bool;
 }

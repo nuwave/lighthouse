@@ -48,7 +48,7 @@ class ArgumentFactory
             'astNode' => $definitionNode,
         ];
 
-        if ($defaultValue = $definitionNode->defaultValue) { // @phpstan-ignore-line TODO remove when fixed https://github.com/webonyx/graphql-php/pull/654
+        if ($defaultValue = $definitionNode->defaultValue) {
             $config += [
                 'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $type),
             ];

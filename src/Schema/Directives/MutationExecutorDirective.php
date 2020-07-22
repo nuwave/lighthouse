@@ -10,13 +10,12 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective, ArgResolver
+abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
     /**
      * The database manager.

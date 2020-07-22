@@ -13,9 +13,8 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective, ArgResolver, ArgManipulator
+class DeleteDirective extends ModifyModelExistenceDirective implements ArgResolver, ArgManipulator
 {
     public static function definition(): string
     {
@@ -52,9 +51,9 @@ SDL;
         return $modelClass::find($idOrIds);
     }
 
-    protected function modifyExistence(Model $model): void
+    protected function modifyExistence(Model $model): bool
     {
-        $model->delete();
+        return (bool) $model->delete();
     }
 
     /**

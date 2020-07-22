@@ -142,7 +142,7 @@ class ArgumentSet
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function enhanceBuilder($builder, array $scopes, Closure $directiveFilter = null)
+    public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
 
@@ -162,7 +162,7 @@ class ArgumentSet
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      */
-    protected static function applyArgBuilderDirectives(self $argumentSet, &$builder, Closure $directiveFilter = null): void
+    protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
     {
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
@@ -177,16 +177,16 @@ class ArgumentSet
                 ->directives
                 ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
-            if (! empty($directiveFilter)) {
+            if (null !== $directiveFilter) {
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }
 
-            $filteredDirectives->each(function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value) {
+            $filteredDirectives->each(static function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value): void {
                 $builder = $argBuilderDirective->handleBuilder($builder, $value);
             });
 
             Utils::applyEach(
-                function ($value) use (&$builder, $directiveFilter) {
+                static function ($value) use (&$builder, $directiveFilter) {
                     if ($value instanceof self) {
                         self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
                     }

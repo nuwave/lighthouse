@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
+use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -63,6 +64,7 @@ GRAPHQL;
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
             OrderByServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
@@ -107,14 +109,17 @@ GRAPHQL;
             'directives' => [
                 'Tests\\Utils\\Directives',
             ],
+            'validators' => [
+                'Tests\\Utils\\Validators',
+            ],
         ]);
 
         $config->set(
             'lighthouse.debug',
-            Debug::INCLUDE_DEBUG_MESSAGE
-            | Debug::INCLUDE_TRACE
-            /*| Debug::RETHROW_INTERNAL_EXCEPTIONS*/
-            | Debug::RETHROW_UNSAFE_EXCEPTIONS
+            DebugFlag::INCLUDE_DEBUG_MESSAGE
+            | DebugFlag::INCLUDE_TRACE
+            // | Debug::RETHROW_INTERNAL_EXCEPTIONS
+            | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
         );
 
         $config->set(

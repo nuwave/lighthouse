@@ -127,6 +127,7 @@ return [
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
         'directives' => ['App\\GraphQL\\Directives'],
+        'validators' => ['App\\GraphQL\\Validators'],
     ],
 
     /*
@@ -185,21 +186,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | @orderBy input name
-    |--------------------------------------------------------------------------
-    |
-    | Set the name to use for the generated argument on the
-    | OrderByClause used for the @orderBy directive.
-    |
-    | DEPRECATED This setting will be removed in v5, Lighthouse will assume
-    | the value 'column'. Change it soon, as you prepare for the upgrade.
-    |
-    */
-
-    'orderBy' => 'field',
-
-    /*
-    |--------------------------------------------------------------------------
     | Debug
     |--------------------------------------------------------------------------
     |
@@ -208,7 +194,7 @@ return [
     |
     */
 
-    'debug' => \GraphQL\Error\Debug::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\Debug::INCLUDE_TRACE,
+    'debug' => \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\DebugFlag::INCLUDE_TRACE,
 
     /*
     |--------------------------------------------------------------------------

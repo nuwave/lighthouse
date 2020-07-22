@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
+use GraphQL\Language\Parser;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,11 +73,11 @@ class Defer implements CreatesResponse
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            PartialParser::directive(/** @lang GraphQL */ '@deferrable')
+            Parser::constDirective(/** @lang GraphQL */ '@deferrable')
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
-            PartialParser::directiveDefinition(/** @lang GraphQL */ '
+            Parser::directiveDefinition(/** @lang GraphQL */ '
 """
 Use this directive on expensive or slow fields to resolve them asynchronously.
 Must not be placed upon:

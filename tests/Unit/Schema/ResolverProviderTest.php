@@ -3,14 +3,13 @@
 namespace Tests\Unit\Schema;
 
 use Closure;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
-use Tests\Utils\Queries\FooBar;
 
 class ResolverProviderTest extends TestCase
 {
@@ -46,35 +45,6 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooInvoke: Int');
-
-        $this->assertInstanceOf(
-            Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
-    }
-
-    /**
-     * @deprecated will be changed in v5
-     */
-    public function testGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
-    {
-        $fieldValue = $this->constructFieldValue('fooBar: String');
-
-        $resolver = $this->resolverProvider->provideResolver($fieldValue);
-        $this->assertInstanceOf(
-            Closure::class,
-            $resolver
-        );
-
-        $this->assertSame(
-            FooBar::RESOLVE_RESULT,
-            $resolver()
-        );
-    }
-
     public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
@@ -96,7 +66,7 @@ class ResolverProviderTest extends TestCase
 
     protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
     {
-        $queryType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ "
+        $queryType = Parser::objectTypeDefinition(/** @lang GraphQL */ "
         type {$parentTypeName} {
             {$fieldDefinition}
         }

@@ -52,19 +52,19 @@ class IdeHelperCommandTest extends TestCase
 
         $this->assertStringEndsWith("\n", $schemaDirectives);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             FieldDirective::definition(),
             $schemaDirectives,
             'Generates definition for built-in directives'
         );
-        $this->assertContains(FieldDirective::class, $schemaDirectives);
+        $this->assertStringContainsString(FieldDirective::class, $schemaDirectives);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             UnionDirective::definition(),
             $schemaDirectives,
             'Overwrites definitions through custom namespaces'
         );
-        $this->assertContains(UnionDirective::class, $schemaDirectives);
+        $this->assertStringContainsString(UnionDirective::class, $schemaDirectives);
 
         /*
          * Programmatic types
@@ -72,7 +72,7 @@ class IdeHelperCommandTest extends TestCase
 
         $programmaticTypes = \Safe\file_get_contents(IdeHelperCommand::programmaticTypesPath());
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             SchemaPrinter::printType($programmaticType),
             $programmaticTypes,
             'Generates definitions for programmatically registered types'
@@ -84,7 +84,7 @@ class IdeHelperCommandTest extends TestCase
 
         $ideHelper = \Safe\file_get_contents(IdeHelperCommand::phpIdeHelperPath());
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             IdeHelperCommand::OPENING_PHP_TAG.IdeHelperCommand::GENERATED_NOTICE,
             $ideHelper
         );
