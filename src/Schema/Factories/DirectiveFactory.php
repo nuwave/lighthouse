@@ -6,18 +6,18 @@ use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\FieldArgument;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class DirectiveFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter
+     * @var \Nuwave\Lighthouse\Schema\AST\TypeNodeConverter
      */
-    protected $definitionNodeConverter;
+    protected $typeNodeConverter;
 
-    public function __construct(ExecutableTypeNodeConverter $definitionNodeConverter)
+    public function __construct(TypeNodeConverter $typeNodeConverter)
     {
-        $this->definitionNodeConverter = $definitionNodeConverter;
+        $this->typeNodeConverter = $typeNodeConverter;
     }
 
     /**
@@ -29,7 +29,7 @@ class DirectiveFactory
         /** @var \GraphQL\Language\AST\InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
             /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
-            $argumentType = $this->definitionNodeConverter->convert($argument->type);
+            $argumentType = $this->typeNodeConverter->convert($argument->type);
 
             $fieldArgumentConfig = [
                 'name' => $argument->name->value,

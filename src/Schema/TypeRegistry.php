@@ -269,6 +269,7 @@ EOL
                     ? $enumDirective->value()
                     : $enumValue->name->value,
                 'description' => data_get($enumValue->description, 'value'),
+                'deprecationReason' => ASTHelper::deprecationReason($enumValue),
             ];
         }
 

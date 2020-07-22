@@ -2,8 +2,8 @@
 
 namespace Tests\Console;
 
-use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\TestCase;
 
 class ValidateSchemaCommandTest extends TestCase
@@ -23,14 +23,27 @@ class ValidateSchemaCommandTest extends TestCase
         $this->assertSame(0, $tester->getStatusCode());
     }
 
-    public function testFailsValidationForIncorrectSchema(): void
+    public function testFailsValidationUnknownDirective(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: ID @unknown
         }
         ';
-        $tester = $this->commandTester(new PrintSchemaCommand());
+        $tester = $this->commandTester(new ValidateSchemaCommand());
+
+        $this->expectException(DirectiveException::class);
+        $tester->execute([]);
+    }
+
+    public function testFailsValidationDirectiveInWrongLocation(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query @field {
+            foo: ID @eq
+        }
+        ';
+        $tester = $this->commandTester(new ValidateSchemaCommand());
         $tester->execute([]);
 
         $this->assertSame(1, $tester->getStatusCode());

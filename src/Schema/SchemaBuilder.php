@@ -15,24 +15,8 @@ class SchemaBuilder
      */
     protected $typeRegistry;
 
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
-     */
-    protected $directiveFactory;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\SchemaDirectives
-     */
-    protected $schemaDirectives;
-
-    public function __construct(
-        TypeRegistry $typeRegistry,
-        SchemaDirectives $schemaDirectives,
-        DirectiveFactory $directiveFactory
-    ) {
+    public function __construct(TypeRegistry $typeRegistry) {
         $this->typeRegistry = $typeRegistry;
-        $this->directiveFactory = $directiveFactory;
-        $this->schemaDirectives = $schemaDirectives;
     }
 
     /**
@@ -78,12 +62,13 @@ class SchemaBuilder
         );
 
         // There is no way to resolve directives lazily, so we convert them eagerly
+        $directiveFactory = new DirectiveFactory(
+            new ExecutableTypeNodeConverter($this->typeRegistry)
+        );
+
         $directives = [];
         foreach ($documentAST->directives as $directiveDefinition) {
-            $directives [] = $this->directiveFactory->handle($directiveDefinition);
-        }
-        foreach ($this->schemaDirectives->definitions() as $directiveDefinition) {
-            $directives [] = $this->directiveFactory->handle($directiveDefinition);
+            $directives [] = $directiveFactory->handle($directiveDefinition);
         }
 
         $config->setDirectives(

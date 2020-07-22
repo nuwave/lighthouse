@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective;
 use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
@@ -38,12 +40,12 @@ class FieldFactory
     protected $argumentSetFactory;
 
     public function __construct(
-        DirectiveLocator $directiveFactory,
+        DirectiveLocator $directiveLocator,
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
         ArgumentSetFactory $argumentSetFactory
     ) {
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveFactory = $directiveLocator;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
         $this->argumentSetFactory = $argumentSetFactory;
@@ -52,7 +54,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @return array Configuration array for a \GraphQL\Type\Definition\FieldDefinition
+     * @return array<string, mixed> Configuration array for a \GraphQL\Type\Definition\FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
@@ -102,7 +104,7 @@ class FieldFactory
             'resolve' => $fieldValue->getResolver(),
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
-            'deprecationReason' => $fieldValue->getDeprecationReason(),
+            'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
         ];
     }
 }

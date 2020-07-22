@@ -61,7 +61,6 @@ class DirectiveLocator
     /**
      * Resolve the class for a given directive name.
      *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function resolve(string $directiveName): string
