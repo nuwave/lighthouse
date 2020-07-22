@@ -33,7 +33,7 @@ use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
@@ -97,7 +97,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->singleton(GraphQL::class);
         $this->app->singleton(ASTBuilder::class);
-        $this->app->singleton(DirectiveFactory::class);
+        $this->app->singleton(DirectiveLocator::class);
         $this->app->singleton(NodeRegistry::class);
         $this->app->singleton(TypeRegistry::class);
         $this->app->singleton(ErrorPool::class);

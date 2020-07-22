@@ -27,12 +27,6 @@ To improve your editing experience, you can generate a definition file
 php artisan lighthouse:ide-helper
 ```
 
-This command requires `haydenpierce/class-finder`. Install it by running:
-
-```bash
-composer require --dev haydenpierce/class-finder
-```
-
 We recommend the following plugins:
 
 | IDE      | Plugin                                               |

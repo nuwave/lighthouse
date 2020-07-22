@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective;
 use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
@@ -18,7 +20,7 @@ use Nuwave\Lighthouse\Validation\ValidateDirective;
 class FieldFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
@@ -38,12 +40,12 @@ class FieldFactory
     protected $argumentSetFactory;
 
     public function __construct(
-        DirectiveFactory $directiveFactory,
+        DirectiveLocator $directiveLocator,
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
         ArgumentSetFactory $argumentSetFactory
     ) {
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveFactory = $directiveLocator;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
         $this->argumentSetFactory = $argumentSetFactory;
@@ -52,7 +54,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @return array Configuration array for a \GraphQL\Type\Definition\FieldDefinition
+     * @return array<string, mixed> Configuration array for a \GraphQL\Type\Definition\FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
@@ -60,13 +62,13 @@ class FieldFactory
 
         // Directives have the first priority for defining a resolver for a field
         /** @var \Nuwave\Lighthouse\Support\Contracts\FieldResolver $resolverDirective */
-        if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
+        if ($resolverDirective = $this->directiveFactory->exclusiveOfType($fieldDefinitionNode, FieldResolver::class)) {
             $fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
             $fieldValue = $fieldValue->useDefaultResolver();
         }
 
-        $fieldMiddleware = $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
+        $fieldMiddleware = $this->directiveFactory->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
             // Middleware resolve in reversed order
             ->push(app(RenameArgsDirective::class))
             ->push(app(SpreadDirective::class))
@@ -102,7 +104,7 @@ class FieldFactory
             'resolve' => $fieldValue->getResolver(),
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
-            'deprecationReason' => $fieldValue->getDeprecationReason(),
+            'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
         ];
     }
 }

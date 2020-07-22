@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class SchemaBuilder
 {
@@ -15,17 +15,9 @@ class SchemaBuilder
      */
     protected $typeRegistry;
 
-    /**
-     * @var \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory
-     */
-    protected $clientDirectiveFactory;
-
-    public function __construct(
-        TypeRegistry $typeRegistry,
-        ClientDirectiveFactory $clientDirectiveFactory
-    ) {
+    public function __construct(TypeRegistry $typeRegistry)
+    {
         $this->typeRegistry = $typeRegistry;
-        $this->clientDirectiveFactory = $clientDirectiveFactory;
     }
 
     /**
@@ -70,14 +62,18 @@ class SchemaBuilder
             [$this->typeRegistry, 'possibleTypes']
         );
 
-        // There is no way to resolve client directives lazily,
-        // so we convert them eagerly
-        $clientDirectives = [];
+        // There is no way to resolve directives lazily, so we convert them eagerly
+        $directiveFactory = new DirectiveFactory(
+            new ExecutableTypeNodeConverter($this->typeRegistry)
+        );
+
+        $directives = [];
         foreach ($documentAST->directives as $directiveDefinition) {
-            $clientDirectives [] = $this->clientDirectiveFactory->handle($directiveDefinition);
+            $directives [] = $directiveFactory->handle($directiveDefinition);
         }
+
         $config->setDirectives(
-            array_merge(GraphQL::getStandardDirectives(), $clientDirectives)
+            array_merge(GraphQL::getStandardDirectives(), $directives)
         );
 
         return new Schema($config);
