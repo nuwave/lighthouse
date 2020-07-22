@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
+- Include schema directives when running `php artisan lighthouse:validate-schema` https://github.com/nuwave/lighthouse/pull/1494
 
 ### Changed
 
@@ -28,6 +29,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
   field resolver classes  https://github.com/nuwave/lighthouse/pull/1422
 - Change `\Nuwave\Lighthouse\Support\Contracts\Directive` to require all directives to have an SDL
   definition by implementing `public static definition(): string` https://github.com/nuwave/lighthouse/pull/1386
+- Combine `Nuwave\Lighthouse\Schema\Factories\DirectiveNamespacer` and `Nuwave\Lighthouse\Schema\Factories\DirectiveFactory` into
+  `\Lighthouse\Schema\DirectiveLocator` https://github.com/nuwave/lighthouse/pull/1494
+- Require `haydenpierce/class-finder` as a built-in dependency https://github.com/nuwave/lighthouse/pull/1494
 
 ### Removed
 
