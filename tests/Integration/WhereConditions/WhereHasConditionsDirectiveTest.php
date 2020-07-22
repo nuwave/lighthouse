@@ -4,6 +4,7 @@ namespace Tests\Integration\WhereConditions;
 
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 class WhereHasConditionsDirectiveTest extends DBTestCase
@@ -168,6 +169,31 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                     ],
                 ],
             ],
+        ]);
+    }
+
+    public function testConditionOnQueriedField() : void {
+        factory(Post::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */'
+        {
+            posts(
+                hasUser: {
+                    column: "id"
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => '1'
+                    ]
+                ]
+            ]
         ]);
     }
 }
