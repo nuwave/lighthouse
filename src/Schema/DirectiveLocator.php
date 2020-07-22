@@ -25,7 +25,7 @@ class DirectiveLocator
      *
      * Lazily initialized.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $directiveNamespaces;
 
@@ -38,7 +38,7 @@ class DirectiveLocator
      *   'custom' => 'App\GraphQL\Directives\CustomDirective',
      * ]
      *
-     * @var string[]
+     * @var array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected $resolvedClassnames = [];
 
@@ -55,7 +55,7 @@ class DirectiveLocator
     /**
      * A list of namespaces with directives in descending priority.
      *
-     * @return array<string>
+     * @return array<int, string>
      */
     public function namespaces(): array
     {
@@ -120,7 +120,7 @@ class DirectiveLocator
     /**
      * Return the parsed definitions for all directive classes.
      *
-     * @return array<\GraphQL\Language\AST\DirectiveDefinitionNode>
+     * @return array<int, \GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public function definitions(): array
     {
@@ -154,8 +154,8 @@ class DirectiveLocator
     protected function resolve(string $directiveName): string
     {
         // Bail to respect the priority of namespaces, the first resolved directive is kept
-        if (array_key_exists($directiveName, $this->directiveNamespaces)) {
-            return $this->directiveNamespaces[$directiveName];
+        if (array_key_exists($directiveName, $this->resolvedClassnames)) {
+            return $this->resolvedClassnames[$directiveName];
         }
 
         foreach ($this->namespaces() as $baseNamespace) {
