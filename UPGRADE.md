@@ -304,18 +304,6 @@ If you need to revert to the old behavior of using `fill()`, you can change your
 +   'force_fill' => false,
 ```
 
-### There must be a `defaultHasOperator` in implementations of Operator
-
-Since the addition of the `HAS` input in `whereCondition` mechanics, there has to be a default operator for the `HAS` 
-input.
-
-```php
-public function defaultHasOperator(): string
-{
-    return 'GTE';
-}
-```
-
 ### Replace `ErrorBuffer` with `ErrorPool`
 
 Collecting partial errors is now done through the singleton `\Nuwave\Lighthouse\Execution\ErrorPool`
@@ -368,4 +356,19 @@ A few are different:
 -PartialParser::inputValueDefinitions([$foo, $bar]);
 +Parser::inputValueDefinition($foo);
 +Parser::inputValueDefinition($bar);
+```
+
+### Add method `defaultHasOperator` to `\Nuwave\Lighthouse\WhereConditions\Operator`
+
+Since the addition of the `HAS` input in `whereCondition` mechanics,
+there has to be a default operator for the `HAS` input.
+
+If you implement your own custom operator, implement `defaultHasOperator`.
+For example, this is the implementation of the default `\Nuwave\Lighthouse\WhereConditions\SQLOperator`:
+
+```php
+public function defaultHasOperator(): string
+{
+    return 'GTE';
+}
 ```

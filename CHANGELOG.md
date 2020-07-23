@@ -13,6 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
 - Include schema directives when running `php artisan lighthouse:validate-schema` https://github.com/nuwave/lighthouse/pull/1494
+- Add ability to query for the existence of relations in where conditions https://github.com/nuwave/lighthouse/pull/1412
 
 ### Changed
 
@@ -32,6 +33,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Combine `Nuwave\Lighthouse\Schema\Factories\DirectiveNamespacer` and `Nuwave\Lighthouse\Schema\Factories\DirectiveFactory` into
   `\Lighthouse\Schema\DirectiveLocator` https://github.com/nuwave/lighthouse/pull/1494
 - Require `haydenpierce/class-finder` as a built-in dependency https://github.com/nuwave/lighthouse/pull/1494
+- Add method `defaultHasOperator` to `\Nuwave\Lighthouse\WhereConditions\Operator` https://github.com/nuwave/lighthouse/pull/1412
 
 ### Removed
 

@@ -35,8 +35,12 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * @param  array<string, mixed>  $whereConditions
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleWhereConditions($builder, array $whereConditions, Model $model = null, string $boolean = 'and')
-    {
+    public function handleWhereConditions(
+        object $builder,
+        array $whereConditions,
+        Model $model = null,
+        string $boolean = 'and'
+    ) {
         if ($builder instanceof EloquentBuilder) {
             $model = $builder->getModel();
         }
@@ -87,8 +91,14 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
      * @param array<string, mixed>|null $condition
      */
-    public function handleHasCondition($builder, Model $model, string $relation, ?array $condition = null, ?int $amount = null, ?string $operator = null): void
-    {
+    public function handleHasCondition(
+        object $builder,
+        Model $model,
+        string $relation,
+        ?array $condition = null,
+        ?int $amount = null,
+        ?string $operator = null
+    ): void {
         $additionalArguments = [];
 
         if ($operator !== null) {
