@@ -1014,20 +1014,6 @@ directive @event(
 
 ## @globalId
 
-Converts between IDs/types and global IDs.
-
-```graphql
-type User {
-  id: ID! @globalId
-  name: String
-}
-```
-
-Instead of the original ID, the `id` field will now return a base64-encoded String
-that globally identifies the User and can be used for querying the `node` endpoint.
-
-### Definition
-
 ```graphql
 """
 Converts between IDs/types and global IDs.
@@ -1038,22 +1024,30 @@ directive @globalId(
   """
   By default, an array of `[$type, $id]` is returned when decoding.
   You may limit this to returning just one of both.
-  Allowed values: "ARRAY", "TYPE", "ID"
+  Allowed values: ARRAY, TYPE, ID
   """
-  decode: String = "ARRAY"
+  decode: String = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 ```
 
-### Examples
+Instead of the original ID, the `id` field will now return a base64-encoded String
+that globally identifies the User and can be used for querying the `node` endpoint.
+
+```graphql
+type User {
+  id: ID! @globalId
+  name: String
+}
+```
+
+The field resolver will receive the decoded version of the passed `id`,
+split into type and ID.
 
 ```graphql
 type Mutation {
   deleteNode(id: ID @globalId): Node
 }
 ```
-
-The field resolver will receive the decoded version of the passed `id`,
-split into type and ID.
 
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.

@@ -13,8 +13,6 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, ArgDirective
 {
     /**
-     * The GlobalId resolver.
-     *
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
     protected $globalId;
@@ -36,9 +34,9 @@ directive @globalId(
   """
   By default, an array of `[$type, $id]` is returned when decoding.
   You may limit this to returning just one of both.
-  Allowed values: "ARRAY", "TYPE", "ID"
+  Allowed values: ARRAY, TYPE, ID
   """
-  decode: String = "ARRAY"
+  decode: String = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 SDL;
     }
@@ -80,7 +78,7 @@ SDL;
                     return $this->globalId->decode($argumentValue);
                 default:
                     throw new DefinitionException(
-                        "The only argument of the @globalId directive can only be ID or TYPE, got {$decode}"
+                        "The decode argument of the @globalId directive can only be TYPE, ARRAY or ID, got {$decode}"
                     );
             }
         }
