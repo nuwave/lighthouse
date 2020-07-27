@@ -130,8 +130,7 @@ GRAPHQL;
             ]
         );
 
-        // TODO remove when the default changes
-        $config->set('lighthouse.force_fill', true);
+        $config->set('lighthouse.guard', null);
 
         $config->set('app.debug', true);
     }
