@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-
 interface ArgResolver
 {
     /**
