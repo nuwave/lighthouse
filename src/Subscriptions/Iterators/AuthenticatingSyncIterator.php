@@ -19,12 +19,12 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
     /**
      * @var \Illuminate\Contracts\Config\Repository
      */
-    private $configRepository;
+    protected $configRepository;
 
     /**
      * @var \Illuminate\Contracts\Auth\Factory
      */
-    private $authFactory;
+    protected $authFactory;
 
     public function __construct(Repository $configRepository, Factory $authFactory)
     {

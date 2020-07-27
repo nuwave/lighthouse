@@ -39,7 +39,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
     /**
      * @var \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter
      */
-    private $middlewareAdapter;
+    protected $middlewareAdapter;
 
     public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareAdapter $middlewareAdapter)
     {

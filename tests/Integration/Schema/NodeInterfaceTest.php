@@ -11,7 +11,7 @@ class NodeInterfaceTest extends DBTestCase
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
-    private $globalIdResolver;
+    protected $globalIdResolver;
 
     protected function setUp(): void
     {

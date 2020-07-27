@@ -16,7 +16,7 @@ class ResolverProviderTest extends TestCase
     /**
      * @var \Nuwave\Lighthouse\Schema\ResolverProvider
      */
-    private $resolverProvider;
+    protected $resolverProvider;
 
     protected function setUp(): void
     {

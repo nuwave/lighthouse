@@ -24,7 +24,7 @@ class ClientDirective
     /**
      * @var \GraphQL\Type\Definition\Directive|null
      */
-    private $definition;
+    protected $definition;
 
     public function __construct(string $name)
     {

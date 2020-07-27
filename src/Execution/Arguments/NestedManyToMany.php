@@ -10,7 +10,7 @@ class NestedManyToMany implements ArgResolver
     /**
      * @var string
      */
-    private $relationName;
+    protected $relationName;
 
     public function __construct(string $relationName)
     {
@@ -70,7 +70,7 @@ class NestedManyToMany implements ArgResolver
      * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
      * @return mixed[]
      */
-    private function generateRelationArray(Argument $args): array
+    protected function generateRelationArray(Argument $args): array
     {
         $values = $args->toPlain();
 
