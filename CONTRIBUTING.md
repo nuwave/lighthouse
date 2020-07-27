@@ -67,6 +67,11 @@ Then, add a short description of your change and close it off with a link to you
 
 ## Code guidelines
 
+### `protected` over `private`
+
+Always use class member visibility `protected` over `private`. We cannot foresee every
+possible use case in advance, extending the code should remain possible. 
+
 ### Laravel feature usage
 
 We strive to be compatible with both Lumen and Laravel.
