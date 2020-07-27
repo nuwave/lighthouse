@@ -66,7 +66,7 @@ class LighthouseServiceProvider extends ServiceProvider
         ], 'lighthouse-config');
 
         $this->publishes([
-            __DIR__ . '/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
+            __DIR__.'/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'lighthouse-schema');
 
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
