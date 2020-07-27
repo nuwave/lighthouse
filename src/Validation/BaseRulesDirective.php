@@ -13,10 +13,6 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 
 abstract class BaseRulesDirective extends BaseDirective implements ProvidesRules, ArgManipulator
 {
-    /**
-     * @return mixed[]
-     * @throws DefinitionException
-     */
     public function rules(): array
     {
         $rules = $this->directiveArgValue('apply');
@@ -33,9 +29,6 @@ abstract class BaseRulesDirective extends BaseDirective implements ProvidesRules
         return $rules;
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
         return (array) $this->directiveArgValue('messages');

@@ -10,7 +10,7 @@ class Upload
     /**
      * Return a value for the field.
      *
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
      *
      * @throws Exception
      */

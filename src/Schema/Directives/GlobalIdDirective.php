@@ -64,7 +64,7 @@ SDL;
      * Decodes a global id given as an argument.
      *
      * @param  string  $argumentValue
-     * @return string|string[]
+     * @return string|array<string>
      */
     public function sanitize($argumentValue)
     {

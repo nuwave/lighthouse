@@ -57,7 +57,7 @@ class Subscriber implements Serializable
     /**
      * The args passed to the subscription query.
      *
-     * @var mixed[]
+     * @var array<string, mixed>
      */
     public $args;
 
@@ -69,7 +69,7 @@ class Subscriber implements Serializable
     public $context;
 
     /**
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
      *
      * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
      */

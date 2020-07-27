@@ -164,7 +164,7 @@ SDL;
     }
 
     /**
-     * @param  string|string[]  $ability
+     * @param  string|array<string>  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
      * @param  array<mixed>  $arguments
      *

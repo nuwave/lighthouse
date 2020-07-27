@@ -93,7 +93,7 @@ SDL;
     }
 
     /**
-     * @param  string|string[]  $middlewareArgValue
+     * @param  string|array<string>  $middlewareArgValue
      * @return \Illuminate\Support\Collection<string>
      */
     protected function getQualifiedMiddlewareNames($middlewareArgValue): Collection

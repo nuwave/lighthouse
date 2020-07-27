@@ -22,7 +22,7 @@ class PaginationArgs
     /**
      * Create a new instance from user given args.
      *
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      * @return static
      *

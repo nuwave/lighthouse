@@ -136,8 +136,8 @@ GRAPHQL;
     }
 
     /**
-     * @param  mixed[]  $args
-     * @return mixed[]
+     * @param  array<string, mixed>  $args
+     * @return array<string, string>
      */
     public function resolve($root, array $args): array
     {
@@ -164,7 +164,7 @@ GRAPHQL;
     /**
      * Build the expectation for the first subscription reponse.
      *
-     * @return mixed[]
+     * @return array<string, array<string, mixed>>
      */
     protected function buildResponse(string $channelName, string $channel): array
     {

@@ -58,7 +58,7 @@ SDL;
     /**
      * Scan the given namespaces for directive classes.
      *
-     * @param  string[]  $directiveNamespaces
+     * @param  array<string>  $directiveNamespaces
      * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected function scanForDirectives(array $directiveNamespaces): array

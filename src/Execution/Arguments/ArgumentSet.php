@@ -137,7 +137,7 @@ class ArgumentSet
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
-     * @param  string[]  $scopes
+     * @param  array<string>  $scopes
      * @param  \Closure  $directiveFilter
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation

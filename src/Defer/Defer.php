@@ -25,17 +25,17 @@ class Defer implements CreatesResponse
     protected $graphQL;
 
     /**
-     * @var mixed[]
+     * @var array<mixed>
      */
     protected $result = [];
 
     /**
-     * @var mixed[]
+     * @var array<mixed>
      */
     protected $deferred = [];
 
     /**
-     * @var mixed[]
+     * @var array<int, mixed>
      */
     protected $resolved = [];
 
@@ -162,7 +162,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Return either a final response or a stream of responses.
      *
-     * @param  mixed[]  $result
+     * @param  array<mixed>  $result
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function createResponse(array $result): Response

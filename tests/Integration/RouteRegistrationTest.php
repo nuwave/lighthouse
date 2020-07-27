@@ -12,7 +12,7 @@ class RouteRegistrationTest extends TestCase
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return string[]
+     * @return array<class-string>
      */
     protected function getPackageProviders($app): array
     {

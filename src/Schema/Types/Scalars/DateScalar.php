@@ -40,7 +40,7 @@ abstract class DateScalar extends ScalarType
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
      * @param  \GraphQL\Language\AST\Node  $valueNode
-     * @param  mixed[]|null  $variables
+     * @param  array<string, mixed>|null  $variables
      *
      * @throws \GraphQL\Error\Error
      */

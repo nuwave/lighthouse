@@ -35,7 +35,7 @@ class Tracing
      *
      * Is reset between batches.
      *
-     * @var array[]
+     * @var array<int, array<string, mixed>>
      */
     protected $resolverTraces = [];
 

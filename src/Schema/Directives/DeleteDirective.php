@@ -60,7 +60,7 @@ SDL;
      * Delete on ore more related models.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  mixed|mixed[]  $idOrIds
+     * @param  mixed|array<mixed>  $idOrIds
      */
     public function __invoke($parent, $idOrIds): void
     {

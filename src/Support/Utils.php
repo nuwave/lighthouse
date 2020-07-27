@@ -82,8 +82,8 @@ class Utils
     /**
      * Apply a callback to a value or each value in an array.
      *
-     * @param  mixed|mixed[]  $valueOrValues
-     * @return mixed|mixed[]
+     * @param  mixed|array<mixed>  $valueOrValues
+     * @return mixed|array<mixed>
      */
     public static function applyEach(\Closure $callback, $valueOrValues)
     {

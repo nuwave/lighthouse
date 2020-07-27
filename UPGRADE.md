@@ -247,7 +247,7 @@ use Illuminate\Validation\Rule;
 +class UpdateUserValidator extends Validator
 {
     /**
-     * @return mixed[]
+     * @return array<string, array<mixed>>
      */
     public function rules(): array
     {

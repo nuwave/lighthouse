@@ -46,18 +46,11 @@ directive @validator(
 SDL;
     }
 
-    /**
-     * @return mixed[]
-     * @throws DefinitionException
-     */
     public function rules(): array
     {
         return $this->validator()->rules();
     }
 
-    /**
-     * @return string[]
-     */
     public function messages(): array
     {
         return $this->validator()->messages();

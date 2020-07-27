@@ -69,7 +69,7 @@ SDL;
     /**
      * Determine if the user is logged in to any of the given guards.
      *
-     * @param  string[]  $guards
+     * @param  array<string>  $guards
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */

@@ -68,7 +68,7 @@ class NestedManyToMany implements ArgResolver
      * as keys, so we transform the passed arguments to match that.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
-     * @return mixed[]
+     * @return array<mixed>
      */
     protected function generateRelationArray(Argument $args): array
     {

@@ -21,7 +21,7 @@ abstract class TypeNodeConverter
     /**
      * Convert an AST type and apply wrapping types.
      *
-     * @param  string[]  $wrappers
+     * @param  array<string>  $wrappers
      * @return mixed The wrapped type.
      */
     protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])

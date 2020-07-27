@@ -112,7 +112,7 @@ abstract class BatchLoader
      *
      * @param  array<mixed>  $keys
      * @param  array<mixed>  $metaInfo
-     * @return \GraphQL\Deferred[]
+     * @return array<\GraphQL\Deferred>
      */
     public function loadMany(array $keys, array $metaInfo = []): array
     {

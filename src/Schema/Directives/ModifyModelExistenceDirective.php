@@ -147,7 +147,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * Find one or more models by id.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @param  string|int|string[]|int[]  $idOrIds
+     * @param  string|int|array<string>|array<int>  $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
      */
     abstract protected function find(string $modelClass, $idOrIds);

@@ -44,7 +44,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      *
      * For example, ['App\\Foo\\A', 'App\\Foo\\B'] would return 'App\\Foo'.
      *
-     * @param  string[]  $namespaces
+     * @param  array<string>  $namespaces
      */
     public static function commonNamespace(array $namespaces): string
     {

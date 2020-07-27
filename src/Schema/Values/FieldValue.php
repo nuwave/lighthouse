@@ -138,7 +138,7 @@ class FieldValue
     /**
      * Return the namespaces configured for the parent type.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function defaultNamespacesForParent(): array
     {

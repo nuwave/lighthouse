@@ -82,10 +82,9 @@ class GraphQL
     }
 
     /**
-     * Execute a set of batched queries on the lighthouse schema and return a
-     * collection of ExecutionResults.
+     * Run a single GraphQL request against the schema and get a result.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function executeRequest(GraphQLRequest $request): array
     {
@@ -105,7 +104,7 @@ class GraphQL
     /**
      * Apply the debug settings from the config and get the result as an array.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function applyDebugSettings(ExecutionResult $result): array
     {

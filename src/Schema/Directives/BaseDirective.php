@@ -162,7 +162,7 @@ abstract class BaseDirective implements Directive
     /**
      * Find a class name in a set of given namespaces.
      *
-     * @param  string[]  $namespacesToTry
+     * @param  array<string>  $namespacesToTry
      * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -204,7 +204,7 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @return string[] Contains two entries: [string $className, string $methodName]
+     * @return array<string> Contains two entries: [string $className, string $methodName]
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
