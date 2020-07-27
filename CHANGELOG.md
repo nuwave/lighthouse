@@ -34,6 +34,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
   `\Lighthouse\Schema\DirectiveLocator` https://github.com/nuwave/lighthouse/pull/1494
 - Require `haydenpierce/class-finder` as a built-in dependency https://github.com/nuwave/lighthouse/pull/1494
 - Add method `defaultHasOperator` to `\Nuwave\Lighthouse\WhereConditions\Operator` https://github.com/nuwave/lighthouse/pull/1412
+- Change default configuration options in `lighthouse.php`:
+  - `'guard' => 'api'`
+  - `'forceFill' => true`
 
 ### Removed
 

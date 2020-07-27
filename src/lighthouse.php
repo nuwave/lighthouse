@@ -54,11 +54,10 @@ return [
     | The guard to use for authenticating GraphQL requests, if needed.
     | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
     | such as `@guard` and when applying the `AttemptAuthentication` middleware.
-    | TODO this setting will default to 'api' in v5
     |
     */
 
-    'guard' => null,
+    'guard' => 'api',
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +100,7 @@ return [
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
 
-        /**
+        /*
          * Duration in seconds the schema should remain cached, null means forever.
          */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
@@ -257,11 +256,9 @@ return [
     | a model with arguments in mutation directives. Since GraphQL constrains
     | allowed inputs by design, mass assignment protection is not needed.
     |
-    | Will default to true in v5.
-    |
     */
 
-    'force_fill' => false,
+    'force_fill' => true,
 
     /*
     |--------------------------------------------------------------------------
