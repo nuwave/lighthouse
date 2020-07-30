@@ -1014,20 +1014,6 @@ directive @event(
 
 ## @globalId
 
-Converts between IDs/types and global IDs.
-
-```graphql
-type User {
-  id: ID! @globalId
-  name: String
-}
-```
-
-Instead of the original ID, the `id` field will now return a base64-encoded String
-that globally identifies the User and can be used for querying the `node` endpoint.
-
-### Definition
-
 ```graphql
 """
 Converts between IDs/types and global IDs.
@@ -1038,22 +1024,30 @@ directive @globalId(
   """
   By default, an array of `[$type, $id]` is returned when decoding.
   You may limit this to returning just one of both.
-  Allowed values: "ARRAY", "TYPE", "ID"
+  Allowed values: ARRAY, TYPE, ID
   """
-  decode: String = "ARRAY"
+  decode: String = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 ```
 
-### Examples
+Instead of the original ID, the `id` field will now return a base64-encoded String
+that globally identifies the User and can be used for querying the `node` endpoint.
+
+```graphql
+type User {
+  id: ID! @globalId
+  name: String
+}
+```
+
+The field resolver will receive the decoded version of the passed `id`,
+split into type and ID.
 
 ```graphql
 type Mutation {
   deleteNode(id: ID @globalId): Node
 }
 ```
-
-The field resolver will receive the decoded version of the passed `id`,
-split into type and ID.
 
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
@@ -1637,7 +1631,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1669,7 +1663,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1697,7 +1691,7 @@ directive @morphTo(
 
 ```graphql
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1911,8 +1905,6 @@ directive @orderBy(
 ) on ARGUMENT_DEFINITION
 ```
 
-**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
-
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
 
@@ -1927,16 +1919,16 @@ together with the `SortOrder` enum, and add that to your schema. Here is how it 
 
 ```graphql
 "Allows ordering a list of records."
-input PostsOrderByOrderByClause {
+input QueryPostsOrderByOrderByClause {
   "The column that is used for ordering."
-  column: PostsOrderByColumn!
+  column: QueryPostsOrderByColumn!
 
   "The direction that is used for ordering."
   order: SortOrder!
 }
 
 "Order by clause for the `orderBy` argument on the query `posts`."
-enum PostsOrderByColumn {
+enum QueryPostsOrderByColumn {
   POSTED_AT @enum(value: "posted_at")
   TITLE @enum(value: "title")
 }
@@ -2004,7 +1996,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "posted_at", order: ASC }] }) {
     title
   }
 }
@@ -2303,7 +2295,7 @@ directive @rules(
   Specified as an input object that maps rules to messages,
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: [RulesMessageMap!]
+  messages: RulesMessageMap
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -2336,7 +2328,7 @@ directive @rulesForArray(
   Specified as an input object that maps rules to messages,
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: [RulesMessageMap!]
+  messages: RulesMessageMap
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -2812,6 +2804,26 @@ type Mutation {
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @validator
+
+```graphql
+"""
+Provide validation rules through a PHP class.
+"""
+directive @validator(
+  """
+  The name of the class to use.
+
+  If defined on an input, this defaults to a class called `{$inputName}Validator` in the
+  default validator namespace. For fields, it uses the name of the parent type
+  and the field name: `{$parent}{$field}Validator`.
+  """
+  class: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
+```
+
+Read more in the [validation docs](../security/validation.md#validator-classes).
 
 ## @where
 

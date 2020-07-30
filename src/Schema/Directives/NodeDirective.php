@@ -10,11 +10,10 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 
-class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator, DefinedDirective
+class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\NodeRegistry

@@ -25,7 +25,6 @@ use Nuwave\Lighthouse\Schema\Directives\EnumDirective;
 use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
 use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
@@ -49,7 +48,7 @@ class TypeRegistry
     protected $pipeline;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
@@ -65,7 +64,7 @@ class TypeRegistry
 
     public function __construct(
         Pipeline $pipeline,
-        DirectiveFactory $directiveFactory,
+        DirectiveLocator $directiveFactory,
         ArgumentFactory $argumentFactory
     ) {
         $this->pipeline = $pipeline;
@@ -213,11 +212,11 @@ EOL
         return $this->pipeline
             ->send($typeValue)
             ->through(
-                $this->directiveFactory->createAssociatedDirectivesOfType($definition, TypeMiddleware::class)
+                $this->directiveFactory->associatedOfType($definition, TypeMiddleware::class)
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                if ($typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class)) {
+                if ($typeResolver = $this->directiveFactory->exclusiveOfType($definition, TypeResolver::class)) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                     return $typeResolver->resolveNode($value);
                 }
@@ -262,7 +261,7 @@ EOL
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($enumDefinition->values as $enumValue) {
             /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
-            $enumDirective = $this->directiveFactory->createSingleDirectiveOfType($enumValue, EnumDirective::class);
+            $enumDirective = $this->directiveFactory->exclusiveOfType($enumValue, EnumDirective::class);
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value
@@ -270,6 +269,7 @@ EOL
                     ? $enumDirective->value()
                     : $enumValue->name->value,
                 'description' => data_get($enumValue->description, 'value'),
+                'deprecationReason' => ASTHelper::deprecationReason($enumValue),
             ];
         }
 
@@ -328,6 +328,7 @@ EOL
 
                     // Might be a NodeList, so we can not use array_map()
                     foreach ($objectDefinition->interfaces as $interface) {
+                        // @phpstan-ignore-next-line remove once https://github.com/webonyx/graphql-php/pull/695 is releases
                         $interfaces [] = $this->get($interface->name->value);
                     }
 

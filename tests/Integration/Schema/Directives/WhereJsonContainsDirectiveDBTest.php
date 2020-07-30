@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -17,15 +16,6 @@ class WhereJsonContainsDirectiveDBTest extends DBTestCase
         name: String
     }
     ';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(5.6)) {
-            $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
-        }
-    }
 
     public function testCanApplyWhereJsonContainsFilter(): void
     {

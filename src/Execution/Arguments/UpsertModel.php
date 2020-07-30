@@ -9,7 +9,7 @@ class UpsertModel implements ArgResolver
     /**
      * @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
      */
-    private $previous;
+    protected $previous;
 
     /**
      * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous

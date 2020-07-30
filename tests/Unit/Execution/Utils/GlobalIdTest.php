@@ -10,7 +10,7 @@ class GlobalIdTest extends TestCase
     /**
      * @var \Nuwave\Lighthouse\Execution\Utils\GlobalId
      */
-    private $globalIdResolver;
+    protected $globalIdResolver;
 
     protected function setUp(): void
     {

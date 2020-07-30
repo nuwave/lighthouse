@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-
-class UnionDirective extends BaseDirective implements DefinedDirective
+class UnionDirective extends BaseDirective
 {
     public static function definition(): string
     {

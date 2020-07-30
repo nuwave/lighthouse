@@ -62,7 +62,10 @@ GRAPHQL
         }
         ');
 
-        $complexityFn = $schema->getQueryType()
+        /** @var \GraphQL\Type\Definition\ObjectType $queryType */
+        $queryType = $schema->getQueryType();
+
+        $complexityFn = $queryType
             ->getField('foo')
             ->getComplexityFn();
 

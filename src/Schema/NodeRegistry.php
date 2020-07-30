@@ -20,7 +20,7 @@ class NodeRegistry
     /**
      * A map from type names to resolver functions.
      *
-     * @var \Closure[]
+     * @var array<string, \Closure>
      */
     protected $nodeResolver = [];
 

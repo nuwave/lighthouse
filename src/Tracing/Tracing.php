@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
+use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -10,7 +11,6 @@ use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class Tracing
 {
@@ -35,7 +35,7 @@ class Tracing
      *
      * Is reset between batches.
      *
-     * @var array[]
+     * @var array<int, array<string, mixed>>
      */
     protected $resolverTraces = [];
 
@@ -46,7 +46,7 @@ class Tracing
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            PartialParser::directive('@tracing')
+            Parser::constDirective('@tracing')
         );
     }
 

@@ -36,7 +36,7 @@ class MiddlewareDirectiveTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<array<string>>
      */
     public function fooMiddlewareQueries(): array
     {

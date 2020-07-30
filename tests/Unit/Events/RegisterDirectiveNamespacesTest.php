@@ -3,7 +3,7 @@
 namespace Tests\Unit\Events;
 
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Tests\Integration\Events\FieldDirective as TestFieldDirective;
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
@@ -11,9 +11,9 @@ use Tests\Utils\Directives\FooDirective;
 class RegisterDirectiveNamespacesTest extends TestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     protected function getEnvironmentSetUp($app): void
     {
@@ -27,21 +27,21 @@ class RegisterDirectiveNamespacesTest extends TestCase
             }
         );
 
-        $this->directiveFactory = $app->make(DirectiveFactory::class);
+        $this->directiveLocator = $app->make(DirectiveLocator::class);
 
         parent::getEnvironmentSetUp($app);
     }
 
     public function testCanAddAdditionalDirectiveBaseNamespacesThroughEvent(): void
     {
-        $directive = $this->directiveFactory->create('foo');
+        $directive = $this->directiveLocator->create('foo');
 
         $this->assertInstanceOf(FooDirective::class, $directive);
     }
 
     public function testCanOverwriteDefaultDirectiveThroughEvent(): void
     {
-        $directive = $this->directiveFactory->create('field');
+        $directive = $this->directiveLocator->create('field');
 
         $this->assertInstanceOf(TestFieldDirective::class, $directive);
     }

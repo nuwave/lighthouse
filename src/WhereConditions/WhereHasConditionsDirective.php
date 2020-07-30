@@ -43,26 +43,23 @@ SDL;
     /**
      * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
      * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Eloquent\Builder  The modified builder.
+     * @return \Illuminate\Database\Eloquent\Builder The modified builder.
      */
-    public function handleBuilder($builder, $whereConditions)
+    public function handleBuilder($builder, $whereConditions): object
     {
         // The value `null` should be allowed but have no effect on the query.
         if (is_null($whereConditions)) {
             return $builder;
         }
 
-        return $builder->whereHas(
+        $this->handleHasCondition(
+            $builder,
+            $builder->getModel(),
             $this->getRelationName(),
-            function ($builder) use ($whereConditions): void {
-                // This extra nesting is required for the `OR` condition to work correctly.
-                $builder->whereNested(
-                    function ($builder) use ($whereConditions): void {
-                        $this->handleWhereConditions($builder, $whereConditions);
-                    }
-                );
-            }
+            $whereConditions
         );
+
+        return $builder;
     }
 
     /**
@@ -81,5 +78,10 @@ SDL;
         }
 
         return $relationName;
+    }
+
+    protected function generatedInputSuffix(): string
+    {
+        return 'WhereHasConditions';
     }
 }

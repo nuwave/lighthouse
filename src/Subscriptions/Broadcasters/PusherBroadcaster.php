@@ -74,7 +74,7 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  mixed[]  $data
+     * @param  array<mixed>  $data
      */
     public function broadcast(Subscriber $subscriber, array $data): void
     {

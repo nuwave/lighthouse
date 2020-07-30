@@ -44,7 +44,7 @@ class Upload extends ScalarType
      * This always throws, as the Upload scalar must be used with a multipart form request.
      *
      * @param  \GraphQL\Language\AST\Node  $valueNode
-     * @param  mixed[]|null  $variables
+     * @param  array<string, mixed>|null  $variables
      *
      * @throws \GraphQL\Error\Error
      */

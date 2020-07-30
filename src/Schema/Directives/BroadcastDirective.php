@@ -6,10 +6,9 @@ use Closure;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class BroadcastDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class BroadcastDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -29,9 +28,6 @@ directive @broadcast(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         // Ensure this is run after the other field middleware directives

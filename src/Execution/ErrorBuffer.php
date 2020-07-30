@@ -5,6 +5,10 @@ namespace Nuwave\Lighthouse\Execution;
 use Closure;
 use Nuwave\Lighthouse\Exceptions\GenericException;
 
+/**
+ * @deprecated in favor of
+ * @see \Nuwave\Lighthouse\Execution\ErrorPool
+ */
 class ErrorBuffer
 {
     /**

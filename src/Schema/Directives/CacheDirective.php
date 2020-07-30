@@ -9,17 +9,16 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class CacheDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Illuminate\Contracts\Cache\Repository
@@ -54,9 +53,6 @@ directive @cache(
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $this->setCacheKeyOnParent(
@@ -128,7 +124,7 @@ SDL;
     /**
      * Set node's cache key.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function setCacheKeyOnParent(TypeValue $typeValue): void
     {
@@ -159,9 +155,7 @@ SDL;
         // Second priority: Look for a Non-Null field with the ID type
         foreach ($fieldDefinitions as $field) {
             if (
-                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 $field->type instanceof NonNullTypeNode
-                // @phpstan-ignore-next-line TODO remove once graphql-php is accurate
                 && $field->type->type instanceof NamedTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {
@@ -171,7 +165,7 @@ SDL;
             }
         }
 
-        throw new DirectiveException(
+        throw new DefinitionException(
             "No @cacheKey or ID field defined on {$typeValue->getTypeDefinitionName()}"
         );
     }

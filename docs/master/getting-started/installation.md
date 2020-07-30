@@ -14,7 +14,7 @@ Lighthouse includes a default schema to get you going right away. Publish
 it using the following `artisan` command:
 
 ```bash
-php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
+php artisan vendor:publish lighthouse-schema
 ```
 
 ## IDE Support
@@ -25,12 +25,6 @@ To improve your editing experience, you can generate a definition file
 
 ```bash
 php artisan lighthouse:ide-helper
-```
-
-This command requires `haydenpierce/class-finder`. Install it by running:
-
-```bash
-composer require --dev haydenpierce/class-finder
 ```
 
 We recommend the following plugins:

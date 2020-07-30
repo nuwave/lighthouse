@@ -22,7 +22,7 @@ class PaginationArgs
     /**
      * Create a new instance from user given args.
      *
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      * @return static
      *
@@ -87,7 +87,7 @@ class PaginationArgs
      *
      * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder
      */
-    public function applyToBuilder($builder): LengthAwarePaginator
+    public function applyToBuilder(object $builder): LengthAwarePaginator
     {
         if ($builder instanceof ScoutBuilder) {
             return $builder->paginate($this->first, 'page', $this->page);

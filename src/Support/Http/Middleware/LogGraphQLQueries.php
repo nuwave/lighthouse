@@ -16,7 +16,7 @@ class LogGraphQLQueries
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     public function __construct(LoggerInterface $logger)
     {

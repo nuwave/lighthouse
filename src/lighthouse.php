@@ -56,11 +56,10 @@ return [
     | The guard to use for authenticating GraphQL requests, if needed.
     | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
     | such as `@guard` and when applying the `AttemptAuthentication` middleware.
-    | TODO this setting will default to 'api' in v5
     |
     */
 
-    'guard' => null,
+    'guard' => 'api',
 
     /*
     |--------------------------------------------------------------------------
@@ -103,7 +102,7 @@ return [
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
 
-        /**
+        /*
          * Duration in seconds the schema should remain cached, null means forever.
          */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
@@ -129,6 +128,7 @@ return [
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
         'directives' => ['App\\GraphQL\\Directives'],
+        'validators' => ['App\\GraphQL\\Validators'],
     ],
 
     /*
@@ -187,21 +187,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | @orderBy input name
-    |--------------------------------------------------------------------------
-    |
-    | Set the name to use for the generated argument on the
-    | OrderByClause used for the @orderBy directive.
-    |
-    | DEPRECATED This setting will be removed in v5, Lighthouse will assume
-    | the value 'column'. Change it soon, as you prepare for the upgrade.
-    |
-    */
-
-    'orderBy' => 'field',
-
-    /*
-    |--------------------------------------------------------------------------
     | Debug
     |--------------------------------------------------------------------------
     |
@@ -210,7 +195,7 @@ return [
     |
     */
 
-    'debug' => \GraphQL\Error\Debug::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\Debug::INCLUDE_TRACE,
+    'debug' => \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\DebugFlag::INCLUDE_TRACE,
 
     /*
     |--------------------------------------------------------------------------
@@ -273,11 +258,9 @@ return [
     | a model with arguments in mutation directives. Since GraphQL constrains
     | allowed inputs by design, mass assignment protection is not needed.
     |
-    | Will default to true in v5.
-    |
     */
 
-    'force_fill' => false,
+    'force_fill' => true,
 
     /*
     |--------------------------------------------------------------------------

@@ -3,7 +3,7 @@ includes:
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 parameters:
-  level: 8
+  level: max
   paths:
   - benchmarks
   - src
@@ -24,8 +24,8 @@ parameters:
 
   # Will be obsolote in v5
   - src/Schema/Factories/FieldFactory.php
-  - src/Schema/AST/PartialParser.php
   - src/Schema/Directives/MiddlewareDirective.php
+  - tests/Unit/Schema/Directives/MiddlewareDirectiveTest.php
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false
@@ -36,6 +36,7 @@ parameters:
     message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
+  - '#Parameter \#1 \$callback of method Illuminate\\Support\\Collection<mixed,mixed>::mapWithKeys\(\) expects callable\(mixed, mixed\): array, Closure\(Illuminate\\Support\\Collection\): Illuminate\\Database\\Eloquent\\Collection given\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -54,6 +55,8 @@ parameters:
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeExtensionNode::\$name\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\ValueNode given\.#'
+  - '#.* expects GraphQL\\Type\\Definition\\Type, GraphQL\\Type\\Definition\\InputType given\.#'
+  - '#PHPDoc tag @param for parameter \$definition with type GraphQL\\Language\\AST\\FieldDefinitionNode\|GraphQL\\Language\\AST\\TypeDefinitionNode is not subtype of native type GraphQL\\Language\\AST\\Node\.#'
 
   # Should work once we update to a version of graphql-php that has more accurate types
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
@@ -76,7 +79,7 @@ parameters:
   # We are monkeypatching ResolveInfo to pass information through resolver middleware
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
-  # This just has no type in root resolvers
+  # This really has no type in root resolvers
   - '#Method .* has parameter \$root with no typehint specified\.#'
 
   # The typehint is defined in the trait UsesTestSchema

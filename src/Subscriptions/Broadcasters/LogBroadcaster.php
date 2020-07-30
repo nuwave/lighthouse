@@ -77,7 +77,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * Get configuration options.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function config(): array
     {

@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
@@ -31,7 +30,7 @@ SDL;
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $values)
+    public function handleBuilder($builder, $values): object
     {
         return $builder->whereNotBetween(
             $this->directiveArgValue('key', $this->nodeName()),

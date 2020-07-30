@@ -119,7 +119,7 @@ as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super pow
 
 Then publish default schema to `graphql/schema.graphql`.
 
-    php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
+    php artisan vendor:publish --tag=lighthouse-schema
 
 To make sure everything is working, access Laravel GraphQL Playground on `/graphql-playground`
 and try the following query:
