@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Symfony\Component\HttpFoundation\Response;
 
-class RedisBroadcaster implements Broadcaster
+class EchoBroadcaster implements Broadcaster
 {
     /**
      * @var BroadcastManager
@@ -25,7 +25,7 @@ class RedisBroadcaster implements Broadcaster
 
     /**
      * @param Subscriber $subscriber
-     * @param array $data
+     * @param array<string, mixed> $data
      */
     public function broadcast(Subscriber $subscriber, array $data)
     {

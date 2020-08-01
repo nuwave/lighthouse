@@ -85,7 +85,7 @@ class Authorizer implements AuthorizesSubscriptions
      * Removes unwanted data from the given request.
      * @param Request $request
      */
-    private function sanitizeInput(Request $request)
+    private function sanitizeInput(Request $request): void
     {
         // Laravel echo presence channels will prefix the subscriber with "presence-",
         // so we need to get rid of that prefix to be able to identify the subscriber.

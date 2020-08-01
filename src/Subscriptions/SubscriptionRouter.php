@@ -27,7 +27,7 @@ class SubscriptionRouter
     /**
      * @param   \Illuminate\Routing\Router  $router
      */
-    public function echoRoutes($router)
+    public function echoRoutes($router): void
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',

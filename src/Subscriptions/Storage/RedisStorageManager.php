@@ -58,8 +58,8 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param array $input
-     * @param array $headers
+     * @param  array<string, mixed>  $input
+     * @param  array<mixed>  $headers
      * @return Subscriber|null
      * @deprecated will be removed in favor of subscriberByChannel
      */
