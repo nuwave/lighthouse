@@ -52,7 +52,7 @@ class RedisStorageManager implements StoresSubscriptions
     public function __construct(Repository $config, Factory $redis)
     {
         $this->connection = $redis->connection(
-            $config->get('lighthouse.broadcasters.redis.connection', 'default')
+            $config->get('lighthouse.broadcasters.echo.connection', 'default')
         );
         $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
     }
@@ -91,6 +91,7 @@ class RedisStorageManager implements StoresSubscriptions
     {
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
         $subscriberIds = array_map([$this, 'channelKey'], $subscriberIds);
+        $subscriberIds = array_map([$this, 'prefix'], $subscriberIds);
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
         return collect(
@@ -107,7 +108,9 @@ class RedisStorageManager implements StoresSubscriptions
     {
         $subscriber->topic = $topic;
 
-        $topicKey = $this->topicKey($topic);
+        $topicKey = $this->prefix(
+            $this->topicKey($topic)
+        );
         $this->connection->command('sadd', [
             $topicKey,
             $subscriber->channel
@@ -134,7 +137,9 @@ class RedisStorageManager implements StoresSubscriptions
         if ($subscriber) {
             $this->connection->command('del', [$key]);
             $this->connection->command('srem', [
-                $this->topicKey($subscriber->topic),
+                $this->prefix(
+                    $this->topicKey($subscriber->topic)
+                ),
                 $channel
             ]);
         }
@@ -172,8 +177,18 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
+     * @param string $key
+     * @return string
+     */
+    protected function prefix(string $key): string
+    {
+        return $this->connection->client()->_prefix($key);
+    }
+
+    /**
      * @param mixed $value
      * @return mixed
+     * @see \Illuminate\Cache\RedisStore::serialize
      */
     protected function serialize($value)
     {
