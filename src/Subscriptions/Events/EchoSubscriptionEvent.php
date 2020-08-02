@@ -12,8 +12,14 @@ class EchoSubscriptionEvent implements ShouldBroadcast
      */
     public $channel;
 
+    /**
+     * @var mixed
+     */
     public $data;
 
+    /**
+     * @param mixed $data
+     */
     public function __construct(string $channel, $data)
     {
         $this->channel = $channel;
