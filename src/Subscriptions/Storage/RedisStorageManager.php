@@ -192,7 +192,7 @@ class RedisStorageManager implements StoresSubscriptions
      */
     protected function serialize($value)
     {
-        return is_numeric($value) && !in_array($value, [INF, -INF]) && !is_nan($value) ? $value : serialize($value);
+        return is_numeric($value) && !in_array($value, [INF, -INF]) && !is_nan(floatval($value)) ? $value : serialize($value);
     }
 
     /**

@@ -45,6 +45,7 @@ SDL;
 
         return $fieldValue->setResolver(
             function () use ($guard): ?Authenticatable {
+                // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
                 return $this
                     ->authFactory
                     ->guard($guard)
