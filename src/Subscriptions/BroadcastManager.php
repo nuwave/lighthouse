@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\DriverManager;
 use Pusher\Pusher;
@@ -80,7 +80,6 @@ class BroadcastManager extends DriverManager
 
     /**
      * @param array<string, mixed> $config
-     * @return EchoBroadcaster
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function createEchoDriver(array $config): EchoBroadcaster

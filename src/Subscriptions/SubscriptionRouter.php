@@ -31,7 +31,7 @@ class SubscriptionRouter
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
-            'uses' => SubscriptionController::class . '@authorize',
+            'uses' => SubscriptionController::class.'@authorize',
         ]);
     }
 }

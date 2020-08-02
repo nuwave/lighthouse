@@ -38,8 +38,6 @@ class Authorizer implements AuthorizesSubscriptions
 
     /**
      * Authorize subscription request.
-     * @param Request $request
-     * @return bool
      */
     public function authorize(Request $request): bool
     {
@@ -83,7 +81,6 @@ class Authorizer implements AuthorizesSubscriptions
 
     /**
      * Removes unwanted data from the given request.
-     * @param Request $request
      */
     private function sanitizeInput(Request $request): void
     {

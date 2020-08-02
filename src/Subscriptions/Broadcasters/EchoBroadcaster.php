@@ -24,7 +24,6 @@ class EchoBroadcaster implements Broadcaster
     }
 
     /**
-     * @param Subscriber $subscriber
      * @param array<string, mixed> $data
      */
     public function broadcast(Subscriber $subscriber, array $data)
@@ -35,23 +34,21 @@ class EchoBroadcaster implements Broadcaster
     }
 
     /**
-     * @param Request $request
      * @return Response
      */
     public function authorized(Request $request)
     {
-        $userId = md5($request->input('channel_name') . $request->input('socket_id'));
+        $userId = md5($request->input('channel_name').$request->input('socket_id'));
 
         return new JsonResponse([
             'channel_data' => [
                 'user_id' => $userId,
                 'user_info' => [],
-            ]
+            ],
         ]);
     }
 
     /**
-     * @param Request $request
      * @return Response
      */
     public function unauthorized(Request $request)
@@ -60,7 +57,6 @@ class EchoBroadcaster implements Broadcaster
     }
 
     /**
-     * @param Request $request
      * @return Response
      */
     public function hook(Request $request)

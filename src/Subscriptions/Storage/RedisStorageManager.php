@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Illuminate\Contracts\Config\Repository;
@@ -45,10 +44,6 @@ class RedisStorageManager implements StoresSubscriptions
      */
     protected $ttl;
 
-    /**
-     * @param Repository $config
-     * @param Factory $redis
-     */
     public function __construct(Repository $config, Factory $redis)
     {
         $this->connection = $redis->connection(
@@ -60,7 +55,6 @@ class RedisStorageManager implements StoresSubscriptions
     /**
      * @param  array<string, mixed>  $input
      * @param  array<mixed>  $headers
-     * @return Subscriber|null
      * @deprecated will be removed in favor of subscriberByChannel
      */
     public function subscriberByRequest(array $input, array $headers): ?Subscriber
@@ -72,10 +66,6 @@ class RedisStorageManager implements StoresSubscriptions
             : null;
     }
 
-    /**
-     * @param string $channel
-     * @return Subscriber|null
-     */
     public function subscriberByChannel(string $channel): ?Subscriber
     {
         return $this->getSubscriber(
@@ -84,7 +74,6 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param string $topic
      * @return Collection<Subscriber>
      */
     public function subscribersByTopic(string $topic): Collection
@@ -100,8 +89,6 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param Subscriber $subscriber
-     * @param string $topic
      * @return void
      */
     public function storeSubscriber(Subscriber $subscriber, string $topic)
@@ -113,7 +100,7 @@ class RedisStorageManager implements StoresSubscriptions
         );
         $this->connection->command('sadd', [
             $topicKey,
-            $subscriber->channel
+            $subscriber->channel,
         ]);
         if (isset($this->ttl)) {
             $this->connection->command('expire', [$topicKey, $this->ttl]);
@@ -126,7 +113,6 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param string $channel
      * @return Subscriber|null
      */
     public function deleteSubscriber(string $channel)
@@ -140,7 +126,7 @@ class RedisStorageManager implements StoresSubscriptions
                 $this->prefix(
                     $this->topicKey($subscriber->topic)
                 ),
-                $channel
+                $channel,
             ]);
         }
 
@@ -149,7 +135,6 @@ class RedisStorageManager implements StoresSubscriptions
 
     /**
      * @param string $channelKey
-     * @return Subscriber|null
      */
     protected function getSubscriber($channelKey): ?Subscriber
     {
@@ -158,47 +143,29 @@ class RedisStorageManager implements StoresSubscriptions
         );
     }
 
-    /**
-     * @param string $channel
-     * @return string
-     */
     protected function channelKey(string $channel): string
     {
-        return self::SUBSCRIBER_KEY . '.' . $channel;
+        return self::SUBSCRIBER_KEY.'.'.$channel;
     }
 
-    /**
-     * @param string $topic
-     * @return string
-     */
     protected function topicKey(string $topic): string
     {
-        return self::TOPIC_KEY . '.' . $topic;
+        return self::TOPIC_KEY.'.'.$topic;
     }
 
-    /**
-     * @param string $key
-     * @return string
-     */
     protected function prefix(string $key): string
     {
         return $this->connection->client()->_prefix($key);
     }
 
     /**
-     * @param mixed $value
-     * @return mixed
      * @see \Illuminate\Cache\RedisStore::serialize
      */
     protected function serialize($value)
     {
-        return is_numeric($value) && !in_array($value, [INF, -INF]) && !is_nan(floatval($value)) ? $value : serialize($value);
+        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan(floatval($value)) ? $value : serialize($value);
     }
 
-    /**
-     * @param mixed $value
-     * @return mixed
-     */
     protected function unserialize($value)
     {
         if (false === $value) {

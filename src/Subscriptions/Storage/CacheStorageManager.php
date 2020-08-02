@@ -130,8 +130,6 @@ class CacheStorageManager implements StoresSubscriptions
 
     /**
      * Add the subscriber to the topic they subscribe to.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      */
     protected function addSubscriberToTopic(Subscriber $subscriber): void
     {
