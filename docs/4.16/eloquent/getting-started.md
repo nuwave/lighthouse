@@ -131,7 +131,7 @@ And, if a result is found, receive a result like this:
 
 ## Local Scopes
 
-[Local scopes](https://laravel.com/docs/eloquent#local-scopes) are commonly used in Eloquent ,odels
+[Local scopes](https://laravel.com/docs/eloquent#local-scopes) are commonly used in Eloquent models
 to specify reusable query constraints.
 
 ```php
