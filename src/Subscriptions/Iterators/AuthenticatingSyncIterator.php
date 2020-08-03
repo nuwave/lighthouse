@@ -19,12 +19,12 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
     /**
      * @var \Illuminate\Contracts\Config\Repository
      */
-    private $configRepository;
+    protected $configRepository;
 
     /**
      * @var \Illuminate\Contracts\Auth\Factory
      */
-    private $authFactory;
+    protected $authFactory;
 
     public function __construct(Repository $configRepository, Factory $authFactory)
     {
@@ -45,8 +45,8 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
 
         $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {
             // If there is an authenticated user set in the context, set that user as the authenticated user
-            if ($item->context->user()) {
-                $guard->setUser($item->context->user());
+            if ($user = $item->context->user()) {
+                $guard->setUser($user);
             }
 
             try {

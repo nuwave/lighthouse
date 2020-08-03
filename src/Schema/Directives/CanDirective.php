@@ -15,12 +15,11 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class CanDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Illuminate\Contracts\Auth\Access\Gate
@@ -48,10 +47,10 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
 
-  You may pass the string as a dot notation to search in a array.
+  You may pass the string in dot notation to use nested inputs.
   """
   find: String
 
@@ -165,7 +164,7 @@ SDL;
     }
 
     /**
-     * @param  string|string[]  $ability
+     * @param  string|array<string>  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
      * @param  array<mixed>  $arguments
      *

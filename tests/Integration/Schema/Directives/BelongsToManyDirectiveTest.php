@@ -2,8 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -262,7 +263,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -395,10 +396,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue($result->jsonGet('data.user.roles.pageInfo.hasNextPage'));
+        $this->assertTrue($result->json('data.user.roles.pageInfo.hasNextPage'));
 
-        $userRolesEdges = $result->jsonGet('data.user.roles.edges');
-        $nestedUserRolesEdges = $result->jsonGet('data.user.roles.edges.0.node.users.0.roles.edges');
+        $userRolesEdges = $result->json('data.user.roles.edges');
+        $nestedUserRolesEdges = $result->json('data.user.roles.edges.0.node.users.0.roles.edges');
         $this->assertCount(2, $userRolesEdges);
         $this->assertCount(2, $nestedUserRolesEdges);
         $this->assertSame(Arr::get($userRolesEdges, 'node.0.acl.id'), Arr::get($nestedUserRolesEdges, 'node.0.acl.id'));
@@ -420,6 +421,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ');
 
         $type = $schema->getType('User');
+
+        $this->assertInstanceOf(Type::class, $type);
+        /** @var \GraphQL\Type\Definition\Type $type */
         $type->config['fields']();
     }
 }

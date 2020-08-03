@@ -45,7 +45,7 @@ class BroadcastManager extends DriverManager
     /**
      * Create instance of pusher driver.
      *
-     * @param  mixed[]  $config
+     * @param  array<string, mixed>  $config
      * @throws \Pusher\PusherException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
@@ -70,7 +70,7 @@ class BroadcastManager extends DriverManager
     /**
      * Create instance of log driver.
      *
-     * @param  mixed[]  $config
+     * @param  array<string, mixed>  $config
      */
     protected function createLogDriver(array $config): LogBroadcaster
     {

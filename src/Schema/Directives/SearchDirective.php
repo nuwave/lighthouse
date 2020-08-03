@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class SearchDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class SearchDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
@@ -28,7 +27,7 @@ SDL;
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return \Laravel\Scout\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         /**
          * TODO make class-string once PHPStan can handle it.

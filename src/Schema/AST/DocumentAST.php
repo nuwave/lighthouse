@@ -130,6 +130,8 @@ class DocumentAST implements Serializable
      *
      * This operation will overwrite existing definitions with the same name.
      *
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $type
+     *
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
@@ -143,6 +145,8 @@ class DocumentAST implements Serializable
      * Set a directive definition in the AST.
      *
      * This operation will overwrite existing definitions with the same name.
+     *
+     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node  $directive
      *
      * @return $this
      */

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 
 class DeferServiceProvider extends ServiceProvider
@@ -14,7 +14,7 @@ class DeferServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(DirectiveFactory $directiveFactory, Dispatcher $dispatcher): void
+    public function boot(DirectiveLocator $directiveFactory, Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,

@@ -5,16 +5,14 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
-class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, DefinedDirective
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSanitizerDirective, ArgDirective
 {
     /**
-     * The GlobalId resolver.
-     *
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
     protected $globalId;
@@ -36,16 +34,13 @@ directive @globalId(
   """
   By default, an array of `[$type, $id]` is returned when decoding.
   You may limit this to returning just one of both.
-  Allowed values: "ARRAY", "TYPE", "ID"
+  Allowed values: ARRAY, TYPE, ID
   """
-  decode: String = "ARRAY"
+  decode: String = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();
@@ -54,7 +49,7 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function () use ($type, $resolver): string {
-                    $resolvedValue = call_user_func_array($resolver, func_get_args());
+                    $resolvedValue = $resolver(...func_get_args());
 
                     return $this->globalId->encode(
                         $type,
@@ -69,9 +64,9 @@ SDL;
      * Decodes a global id given as an argument.
      *
      * @param  string  $argumentValue
-     * @return string|string[]
+     * @return string|array<string>
      */
-    public function transform($argumentValue)
+    public function sanitize($argumentValue)
     {
         if ($decode = $this->directiveArgValue('decode')) {
             switch ($decode) {
@@ -83,7 +78,7 @@ SDL;
                     return $this->globalId->decode($argumentValue);
                 default:
                     throw new DefinitionException(
-                        "The only argument of the @globalId directive can only be ID or TYPE, got {$decode}"
+                        "The decode argument of the @globalId directive can only be TYPE, ARRAY or ID, got {$decode}"
                     );
             }
         }

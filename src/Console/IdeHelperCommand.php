@@ -2,16 +2,14 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class IdeHelperCommand extends Command
@@ -25,36 +23,13 @@ class IdeHelperCommand extends Command
 
 SDL;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'lighthouse:ide-helper';
+    protected $name = 'lighthouse:ide-helper';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(DirectiveNamespacer $directiveNamespaces, TypeRegistry $typeRegistry): int
+    public function handle(DirectiveLocator $directiveLocator, TypeRegistry $typeRegistry): int
     {
-        if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
-            $this->error(
-                "This command requires haydenpierce/class-finder. Install it by running:\n"
-                ."\n"
-                ."    composer require --dev haydenpierce/class-finder\n"
-            );
-
-            return 1;
-        }
-
-        $this->schemaDirectiveDefinitions($directiveNamespaces);
+        $this->schemaDirectiveDefinitions($directiveLocator);
         $this->programmaticTypes($typeRegistry);
         $this->phpIdeHelper();
 
@@ -64,9 +39,26 @@ SDL;
     }
 
     /**
+     * Create and write schema directive definitions to a file.
+     */
+    protected function schemaDirectiveDefinitions(DirectiveLocator $directiveLocator): void
+    {
+        $directiveClasses = $this->scanForDirectives(
+            $directiveLocator->namespaces()
+        );
+
+        $schema = $this->buildSchemaString($directiveClasses);
+
+        $filePath = static::schemaDirectivesPath();
+        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+
+        $this->info("Wrote schema directive definitions to $filePath.");
+    }
+
+    /**
      * Scan the given namespaces for directive classes.
      *
-     * @param  string[]  $directiveNamespaces
+     * @param  array<string>  $directiveNamespaces
      * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected function scanForDirectives(array $directiveNamespaces): array
@@ -87,7 +79,7 @@ SDL;
                     continue;
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
-                $name = DirectiveFactory::directiveName($class);
+                $name = DirectiveLocator::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
                 if (isset($directives[$name])) {
@@ -109,7 +101,7 @@ SDL;
         $schema = '';
 
         foreach ($directiveClasses as $name => $directiveClass) {
-            $definition = $this->define($name, $directiveClass);
+            $definition = $this->define($directiveClass);
 
             $schema .= "\n"
                 ."# Directive class: $directiveClass\n"
@@ -119,37 +111,15 @@ SDL;
         return $schema;
     }
 
-    protected function define(string $name, string $directiveClass): string
+    protected function define(string $directiveClass): string
     {
-        if (is_a($directiveClass, DefinedDirective::class, true)) {
-            /** @var DefinedDirective $directiveClass */
-            $definition = $directiveClass::definition();
+        /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
+        $definition = $directiveClass::definition();
 
-            // This operation throws if the schema definition is invalid
-            PartialParser::directiveDefinition($definition);
+        // This operation throws if the schema definition is invalid
+        Parser::directiveDefinition($definition);
 
-            return trim($definition);
-        }
-
-        return '# Add a proper definition by implementing '.DefinedDirective::class."\n"
-            ."directive @{$name}";
-    }
-
-    /**
-     * Create and write schema directive definitions to a file.
-     */
-    protected function schemaDirectiveDefinitions(DirectiveNamespacer $directiveNamespaces): void
-    {
-        $directiveClasses = $this->scanForDirectives(
-            $directiveNamespaces->gather()
-        );
-
-        $schema = $this->buildSchemaString($directiveClasses);
-
-        $filePath = static::schemaDirectivesPath();
-        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
-
-        $this->info("Wrote schema directive definitions to $filePath.");
+        return trim($definition);
     }
 
     public static function schemaDirectivesPath(): string

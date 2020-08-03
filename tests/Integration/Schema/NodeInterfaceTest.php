@@ -11,7 +11,7 @@ class NodeInterfaceTest extends DBTestCase
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
-    private $globalIdResolver;
+    protected $globalIdResolver;
 
     protected function setUp(): void
     {
@@ -21,7 +21,7 @@ class NodeInterfaceTest extends DBTestCase
     }
 
     /**
-     * @var mixed[]
+     * @var array<int, array<string, mixed>>
      */
     protected $testTuples = [
         1 => [
@@ -75,7 +75,7 @@ class NodeInterfaceTest extends DBTestCase
     }
 
     /**
-     * @return mixed[]
+     * @return array<mixed>
      */
     public function resolveNode(int $id): array
     {
@@ -118,7 +118,7 @@ class NodeInterfaceTest extends DBTestCase
     }
 
     /**
-     * @return string[][]
+     * @return array<array<string>>
      */
     public function modelNodeDirectiveStyles(): array
     {

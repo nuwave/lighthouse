@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
-class CacheKeyDirective extends BaseDirective implements Directive, DefinedDirective
+class CacheKeyDirective extends BaseDirective implements Directive
 {
     public static function definition(): string
     {

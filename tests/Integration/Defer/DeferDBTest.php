@@ -12,7 +12,7 @@ use Tests\Utils\Models\User;
 
 class DeferDBTest extends DBTestCase
 {
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -195,8 +195,15 @@ class DeferDBTest extends DBTestCase
         $this->assertCount(3, $chunks);
 
         $deferredCompanies = $chunks[0];
-        $this->assertSame($companies[0]->name, Arr::get($deferredCompanies, 'data.companies.0.name'));
-        $this->assertSame($companies[1]->name, Arr::get($deferredCompanies, 'data.companies.1.name'));
+
+        /** @var \Tests\Utils\Models\Company $company0 */
+        $company0 = $companies[0];
+        $this->assertSame($company0->name, Arr::get($deferredCompanies, 'data.companies.0.name'));
+
+        /** @var \Tests\Utils\Models\Company $company1 */
+        $company1 = $companies[1];
+        $this->assertSame($company1->name, Arr::get($deferredCompanies, 'data.companies.1.name'));
+
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.0.users'));
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.1.users'));
 

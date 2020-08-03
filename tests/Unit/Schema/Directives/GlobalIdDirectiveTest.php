@@ -40,15 +40,64 @@ class GlobalIdDirectiveTest extends TestCase
         ]);
     }
 
-    public function testDecodesGlobalIds(): void
+    public function testDecodesGlobalIdOnInput(): void
     {
-        $this->schema = "
+        $this->mockResolver(
+            /**
+             * @param  array<string, mixed>  $args
+             */
+            static function ($root, array $args): array {
+                return $args['input']['bar'];
+            }
+        );
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: FooInput!): [String!]! @mock
+        }
+
+        input FooInput {
+            bar: String! @globalId
+        }
+        ';
+
+        $globalId = $this->globalId->encode('foo', 'bar');
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($bar: String!) {
+                foo(input: {
+                    bar: $bar
+                })
+            }
+            ', [
+                'bar' => $globalId,
+            ])
+            ->assertJson([
+                'data' => [
+                    'foo' => $this->globalId->decode($globalId),
+                ],
+            ]);
+    }
+
+    public function testDecodesGlobalIdInDifferentWays(): void
+    {
+        $this->mockResolver(
+            /**
+             * @param  array<string, mixed>  $args
+             */
+            static function ($root, array $args): array {
+                return $args;
+            }
+        );
+
+        $this->schema = /** @lang GraphQL */'
         type Query {
             foo(
                 type: ID! @globalId(decode: TYPE)
                 id: ID! @globalId(decode: ID)
                 array: ID! @globalId
-            ): Foo @field(resolver: \"{$this->qualifyTestResolver()}\")
+            ): Foo @mock
         }
 
         type Foo {
@@ -56,11 +105,11 @@ class GlobalIdDirectiveTest extends TestCase
             id: ID!
             array: [String!]!
         }
-        ";
+        ';
 
         $globalId = $this->globalId->encode('Foo', 'bar');
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ "
         {
             foo(
                 type: \"{$globalId}\"
@@ -84,14 +133,5 @@ class GlobalIdDirectiveTest extends TestCase
                 ],
             ],
         ]);
-    }
-
-    /**
-     * @param  array<string, mixed>  $args
-     * @return array<string, mixed>
-     */
-    public function resolve($root, array $args): array
-    {
-        return $args;
     }
 }

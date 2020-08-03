@@ -13,7 +13,7 @@ class MultipartFormRequest extends BaseRequest
      *
      * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file
      *
-     * @var mixed[]|mixed[][]
+     * @var array<string, mixed>|array<int, array<string, mixed>>
      */
     protected $operations;
 
@@ -54,9 +54,11 @@ class MultipartFormRequest extends BaseRequest
 
     protected function fieldValue(string $key)
     {
-        return $this->isBatched()
-            ? Arr::get($this->operations, $this->batchIndex.'.'.$key)
-            : $this->operations[$key] ?? null;
+        $operation = $this->isBatched()
+            ? $this->operations[$this->batchIndex]
+            : $this->operations;
+
+        return $operation[$key] ?? null;
     }
 
     /**

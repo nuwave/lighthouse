@@ -5,9 +5,9 @@ namespace Tests\Unit\Schema\AST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
@@ -43,7 +43,7 @@ class DocumentASTTest extends TestCase
         }
         ');
 
-        $overwrite = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+        $overwrite = Parser::objectTypeDefinition(/** @lang GraphQL */ '
         type Query {
             bar: Int
         }
@@ -81,6 +81,7 @@ class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(
             FieldDefinitionNode::class,
+            // @phpstan-ignore-next-line can not be null
             $queryType->fields[0]
         );
 

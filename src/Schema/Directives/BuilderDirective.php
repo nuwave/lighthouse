@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class BuilderDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class BuilderDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
@@ -30,7 +29,7 @@ SDL;
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         return call_user_func(
             $this->getResolverFromArgument('method'),

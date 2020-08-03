@@ -7,14 +7,14 @@ interface MiddlewareAdapter
     /**
      * Get all of the defined middleware short-hand names.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getMiddleware(): array;
 
     /**
      * Get all of the defined middleware groups.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getMiddlewareGroups(): array;
 }

@@ -3,6 +3,9 @@
 namespace Tests\Unit\Schema;
 
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\EnumValueDefinition;
+use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
@@ -75,7 +78,11 @@ class SchemaBuilderTest extends TestCase
 
         $enumValues = $enumType->getValues();
         $this->assertCount(2, $enumValues);
-        $this->assertSame('Company administrator.', $enumType->getValue('ADMIN')->description);
+
+        $enumValueDefinition = $enumType->getValue('ADMIN');
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
+        /** @var \GraphQL\Type\Definition\EnumValueDefinition $enumValueDefinition */
+        $this->assertSame('Company administrator.', $enumValueDefinition->description);
     }
 
     public function testCanResolveInterfaceTypes(): void
@@ -111,16 +118,19 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\ObjectType $foo */
         $foo = $schema->getType('Foo');
         $this->assertInstanceOf(ObjectType::class, $foo);
-
+        /** @var \GraphQL\Type\Definition\ObjectType $foo */
         $this->assertSame('Foo', $foo->name);
 
         $bar = $foo->getField('bar');
+        $this->assertInstanceOf(FieldDefinition::class, $bar);
+        /** @var \GraphQL\Type\Definition\FieldDefinition $bar */
         $this->assertSame('bar attribute of Foo', $bar->description);
 
         $baz = $bar->getArg('baz');
+        $this->assertInstanceOf(FieldArgument::class, $baz);
+        /** @var \GraphQL\Type\Definition\FieldArgument $baz */
         $this->assertSame('arg', $baz->description);
         $this->assertTrue($baz->defaultValueExists());
         $this->assertFalse($baz->defaultValue);
@@ -225,13 +235,15 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        $this->assertSame(
-            'internal',
-            $schema
-                ->getQueryType()
-                ->getField('foo')
-                ->getArg('bar')
-                ->defaultValue
-        );
+        /** @var ObjectType $queryType */
+        $queryType = $schema->getQueryType();
+
+        $barArg = $queryType
+            ->getField('foo')
+            ->getArg('bar');
+
+        $this->assertInstanceOf(FieldArgument::class, $barArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $barArg */
+        $this->assertSame('internal', $barArg->defaultValue);
     }
 }

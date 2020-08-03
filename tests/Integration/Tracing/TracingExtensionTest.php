@@ -13,7 +13,7 @@ type Query {
 }
 SCHEMA;
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -66,17 +66,17 @@ SCHEMA;
             ]);
 
         $this->assertSame(
-            $result->jsonGet('0.extensions.tracing.startTime'),
-            $result->jsonGet('1.extensions.tracing.startTime')
+            $result->json('0.extensions.tracing.startTime'),
+            $result->json('1.extensions.tracing.startTime')
         );
 
         $this->assertNotSame(
-            $result->jsonGet('0.extensions.tracing.endTime'),
-            $result->jsonGet('1.extensions.tracing.endTime')
+            $result->json('0.extensions.tracing.endTime'),
+            $result->json('1.extensions.tracing.endTime')
         );
 
-        $this->assertCount(1, $result->jsonGet('0.extensions.tracing.execution.resolvers'));
-        $this->assertCount(1, $result->jsonGet('1.extensions.tracing.execution.resolvers'));
+        $this->assertCount(1, $result->json('0.extensions.tracing.execution.resolvers'));
+        $this->assertCount(1, $result->json('1.extensions.tracing.execution.resolvers'));
     }
 
     public function resolve(): string

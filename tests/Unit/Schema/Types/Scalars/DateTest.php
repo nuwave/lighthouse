@@ -12,8 +12,17 @@ class DateTest extends DateScalarTest
         return new Date();
     }
 
-    protected function validDate(): string
+    public function validDates(): array
     {
-        return '2020-04-20';
+        return [
+            ['2020-04-20'],
+        ];
+    }
+
+    public function canonicalizeDates(): array
+    {
+        return [
+            ['2020-4-20', '2020-04-20'],
+        ];
     }
 }

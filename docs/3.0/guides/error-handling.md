@@ -33,7 +33,7 @@ class CustomException extends Exception implements RendersErrorsExtensions
     /**
     * @var @string
     */
-    private $reason;
+    protected $reason;
 
     public function __construct(string $message, string $reason)
     {

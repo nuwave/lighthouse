@@ -5,13 +5,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class InjectDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class InjectDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -35,23 +34,20 @@ SDL;
     }
 
     /**
-     * Resolve the field directive.
-     *
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $contextAttributeName = $this->directiveArgValue('context');
         if (! $contextAttributeName) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 "The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `context` argument"
             );
         }
 
         $argumentName = $this->directiveArgValue('name');
         if (! $argumentName) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 "The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `name` argument"
             );
         }

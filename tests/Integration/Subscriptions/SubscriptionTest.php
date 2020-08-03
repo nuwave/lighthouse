@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -52,7 +52,7 @@ GRAPHQL;
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
-            $response->jsonGet()
+            $response->json()
         );
     }
 
@@ -101,9 +101,13 @@ GRAPHQL;
 
         /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
         $log = app(BroadcastManager::class)->driver();
-        $this->assertCount(1, $log->broadcasts());
+        $broadcasts = $log->broadcasts();
 
-        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertNotNull($broadcasts);
+        /** @var array<mixed> $broadcasts */
+        $this->assertCount(1, $broadcasts);
+
+        $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
         $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostCreated']);
     }
@@ -132,8 +136,8 @@ GRAPHQL;
     }
 
     /**
-     * @param  mixed[]  $args
-     * @return mixed[]
+     * @param  array<string, mixed>  $args
+     * @return array<string, string>
      */
     public function resolve($root, array $args): array
     {
@@ -160,7 +164,7 @@ GRAPHQL;
     /**
      * Build the expectation for the first subscription reponse.
      *
-     * @return mixed[]
+     * @return array<string, array<string, mixed>>
      */
     protected function buildResponse(string $channelName, string $channel): array
     {

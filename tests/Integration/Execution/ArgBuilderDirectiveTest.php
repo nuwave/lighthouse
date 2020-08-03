@@ -7,11 +7,6 @@ use Tests\Utils\Models\User;
 
 class ArgBuilderDirectiveTest extends DBTestCase
 {
-    /**
-     * @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User>
-     */
-    protected $users;
-
     protected $schema = /** @lang GraphQL */ '
     type User {
         id: ID!
@@ -20,13 +15,6 @@ class ArgBuilderDirectiveTest extends DBTestCase
     }
     ';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->users = factory(User::class, 5)->create();
-    }
-
     public function testCanAttachEqFilterToQuery(): void
     {
         $this->schema .= /** @lang GraphQL */ '
@@ -34,6 +22,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             users(id: ID @eq): [User!]! @all
         }
         ';
+        $users = factory(User::class, 2)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -43,7 +32,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => $users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -59,6 +48,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             id: ID @eq
         }
         ';
+        $users = factory(User::class, 2)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -72,7 +62,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => $users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -88,6 +78,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             id: ID @eq
         }
         ';
+        $users = factory(User::class, 2)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -103,7 +94,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => $users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
     }
@@ -115,6 +106,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             users(id: ID @neq): [User!]! @all
         }
         ';
+        $users = factory(User::class, 3)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -124,9 +116,9 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'id' => $this->users->first()->getKey(),
+                'id' => $users->first()->getKey(),
             ])
-            ->assertJsonCount(4, 'data.users');
+            ->assertJsonCount(2, 'data.users');
     }
 
     public function testCanAttachInFilterToQuery(): void
@@ -137,6 +129,10 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
+        $user1 = factory(User::class)->create();
+        factory(User::class, 3)->create();
+        $user2 = factory(User::class)->create();
+
         $this
             ->graphQL(/** @lang GraphQL */ '
             query ($ids: [Int]) {
@@ -146,8 +142,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
             }
             ', [
                 'ids' => [
-                    $this->users->first()->getKey(),
-                    $this->users->last()->getKey(),
+                    $user1->id,
+                    $user2->id,
                 ],
             ])
             ->assertJsonCount(2, 'data.users');
@@ -161,16 +157,24 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
+        $user1 = factory(User::class)->create();
+        factory(User::class, 3)->create();
+        $user2 = factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(exclude: ['.$user1.', '.$user2.']) {
-                id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($ids: [Int]) {
+                users(exclude: $ids) {
+                    id
+                }
             }
-        }
-        ')->assertJsonCount(3, 'data.users');
+            ', [
+                'ids' => [
+                    $user1->id,
+                    $user2->id,
+                ],
+            ])
+            ->assertJsonCount(3, 'data.users');
     }
 
     public function testCanAttachWhereFilterToQuery(): void
@@ -180,9 +184,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             users(id: Int @where(operator: ">")): [User!]! @all
         }
         ';
-
-        /** @var \Tests\Utils\Models\User $user1 */
-        $user1 = $this->users->first();
+        $users = factory(User::class, 3)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -192,9 +194,9 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 }
             }
             ', [
-                'userId' => $user1->id,
+                'userId' => $users->first()->getKey(),
             ])
-            ->assertJsonCount(4, 'data.users');
+            ->assertJsonCount(2, 'data.users');
     }
 
     public function testCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
@@ -207,15 +209,13 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ): [User!]! @all
         }
         ';
-
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
+        factory(User::class, 5)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(
-                start: '.$user1.'
-                end: '.$user2.'
+                start: 1
+                end: 5
             ) {
                 id
             }
@@ -233,11 +233,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subDay();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -252,7 +249,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertJsonCount(1, 'data.users');
     }
 
     public function testCanUseInputObjectsForWhereBetweenFilter(): void
@@ -270,11 +267,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subDay();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -292,7 +286,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertJsonCount(1, 'data.users');
     }
 
     public function testCanAttachWhereNotBetweenFilterToQuery(): void
@@ -305,11 +299,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subDay();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -324,7 +315,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(3, 'data.users');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     public function testCanAttachWhereClauseFilterToQuery(): void
@@ -337,11 +328,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subYear();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subYear();
         $user->save();
 
@@ -353,7 +341,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertJsonCount(1, 'data.users');
     }
 
     public function testOnlyProcessesFilledArguments(): void
@@ -367,12 +355,51 @@ class ArgBuilderDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $users = factory(User::class, 3)->create();
+
+        $this->graphQL('
         {
-            users(name: "'.$this->users->first()->name.'") {
+            users(name: "'.$users->first()->name.'") {
                 id
             }
         }
         ')->assertJsonCount(1, 'data.users');
+    }
+
+    public function testAttachMultipleWhereFiltersToQuery(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Query {
+            users(
+                name: String
+                    @where(operator: "=")
+                    @where(operator: "=", key: "email")
+            ): [User!]! @all
+        }
+        ';
+
+        $username = 'foo@bar.baz';
+        factory(User::class)->create([
+            'name' => $username,
+        ]);
+        factory(User::class)->create([
+            'email' => $username,
+        ]);
+        factory(User::class)->create([
+            'name' => $username,
+            'email' => $username,
+        ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($name: String) {
+                users(name: $name) {
+                    id
+                }
+            }
+            ', [
+                'name' => $username,
+            ])
+            ->assertJsonCount(1, 'data.users');
     }
 }

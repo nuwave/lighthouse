@@ -30,12 +30,12 @@ SCHEMA;
     /**
      * @var string
      */
-    private $documentNode;
+    protected $documentNode;
 
     /**
      * @var string
      */
-    private $documentAST;
+    protected $documentAST;
 
     public function prepareSchema(): void
     {

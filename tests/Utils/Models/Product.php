@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Product extends Model
 {
     /**
-     * @var string[]
+     * @var array<string>
      */
     protected $primaryKey = ['barcode', 'uuid'];
 

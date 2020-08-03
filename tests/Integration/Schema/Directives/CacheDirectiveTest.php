@@ -17,7 +17,7 @@ class CacheDirectiveTest extends DBTestCase
      */
     protected $cache;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -297,8 +297,8 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
-            $firstResponse->jsonGet(),
-            $cachedResponse->jsonGet()
+            $firstResponse->json(),
+            $cachedResponse->json()
         );
     }
 
@@ -363,8 +363,8 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
-            $firstResponse->jsonGet(),
-            $cachedResponse->jsonGet()
+            $firstResponse->json(),
+            $cachedResponse->json()
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Str;
@@ -39,6 +40,9 @@ class Subscriber implements Serializable
     /**
      * The name of the queried operation.
      *
+     * TODO replace with subscription field name, is guaranteed be be unique because of
+     * @see \GraphQL\Validator\Rules\SingleFieldSubscription
+     *
      * @var string
      */
     public $operationName;
@@ -53,7 +57,7 @@ class Subscriber implements Serializable
     /**
      * The args passed to the subscription query.
      *
-     * @var mixed[]
+     * @var array<string, mixed>
      */
     public $args;
 
@@ -65,7 +69,7 @@ class Subscriber implements Serializable
     public $context;
 
     /**
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
      *
      * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
      */
@@ -74,7 +78,13 @@ class Subscriber implements Serializable
         GraphQLContext $context,
         ResolveInfo $resolveInfo
     ) {
-        $operationName = $resolveInfo->operation->name;
+        $operation = $resolveInfo->operation;
+        // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
+        if ($operation === null) {
+            throw new SubscriptionException(self::MISSING_OPERATION_NAME);
+        }
+
+        $operationName = $operation->name;
 
         // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
         if (! $operationName) { // @phpstan-ignore-line TODO remove when upgrading graphql-php
@@ -86,10 +96,12 @@ class Subscriber implements Serializable
         $this->args = $args;
         $this->context = $context;
 
-        $documentNode = new DocumentNode([]);
-        $documentNode->definitions = $resolveInfo->fragments;
-        $documentNode->definitions[] = $resolveInfo->operation;
-        $this->query = $documentNode;
+        $this->query = new DocumentNode([
+            'definitions' => new NodeList(array_merge(
+                $resolveInfo->fragments,
+                [$operation]
+            )),
+        ]);
     }
 
     /**
