@@ -26,7 +26,7 @@ class EchoBroadcaster implements Broadcaster
     /**
      * @param array<string, mixed> $data
      */
-    public function broadcast(Subscriber $subscriber, array $data)
+    public function broadcast(Subscriber $subscriber, array $data): void
     {
         $this->broadcaster->event(
             new EchoSubscriptionEvent($subscriber->channel, Arr::get($data, 'data', $data))
