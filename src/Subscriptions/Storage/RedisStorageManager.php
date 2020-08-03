@@ -88,10 +88,7 @@ class RedisStorageManager implements StoresSubscriptions
         )->filter();
     }
 
-    /**
-     * @return void
-     */
-    public function storeSubscriber(Subscriber $subscriber, string $topic)
+    public function storeSubscriber(Subscriber $subscriber, string $topic): void
     {
         $subscriber->topic = $topic;
 
