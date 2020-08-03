@@ -16,7 +16,7 @@ class EchoBroadcaster implements Broadcaster
     /**
      * @var BroadcastManager
      */
-    private $broadcaster;
+    protected $broadcaster;
 
     public function __construct(BroadcastManager $broadcaster)
     {
