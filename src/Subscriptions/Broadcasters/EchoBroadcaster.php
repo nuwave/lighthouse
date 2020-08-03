@@ -33,10 +33,7 @@ class EchoBroadcaster implements Broadcaster
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function authorized(Request $request)
+    public function authorized(Request $request): JsonResponse
     {
         $userId = md5($request->input('channel_name').$request->input('socket_id'));
 
