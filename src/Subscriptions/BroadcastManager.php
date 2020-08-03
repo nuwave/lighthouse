@@ -80,7 +80,6 @@ class BroadcastManager extends DriverManager
 
     /**
      * @param array<string, mixed> $config
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function createEchoDriver(array $config): EchoBroadcaster
     {
