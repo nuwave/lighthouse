@@ -44,6 +44,7 @@ SDL;
         $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
 
         return $fieldValue->setResolver(
+            // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
             function () use ($guard): ?Authenticatable {
                 return $this
                     ->authFactory
