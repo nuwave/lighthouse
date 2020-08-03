@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Redis\Factory;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -52,20 +51,6 @@ class RedisStorageManager implements StoresSubscriptions
         $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
     }
 
-    /**
-     * @param  array<string, mixed>  $input
-     * @param  array<mixed>  $headers
-     * @deprecated will be removed in favor of subscriberByChannel
-     */
-    public function subscriberByRequest(array $input, array $headers): ?Subscriber
-    {
-        $channel = Arr::get($input, 'channel_name');
-
-        return $channel
-            ? $this->subscriberByChannel($channel)
-            : null;
-    }
-
     public function subscriberByChannel(string $channel): ?Subscriber
     {
         return $this->getSubscriber(
@@ -83,9 +68,11 @@ class RedisStorageManager implements StoresSubscriptions
         $subscriberIds = array_map([$this, 'prefix'], $subscriberIds);
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
-        return collect(
-            array_map([$this, 'unserialize'], $subscribers)
-        )->filter();
+        return (new Collection($subscribers))
+            ->map(function ($subscriber) {
+                return $this->unserialize($subscriber);
+            })
+            ->filter();
     }
 
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
