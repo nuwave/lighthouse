@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -87,8 +88,8 @@ class Authorizer implements AuthorizesSubscriptions
         // Laravel echo presence channels will prefix the subscriber with "presence-",
         // so we need to get rid of that prefix to be able to identify the subscriber.
         if (
-            isset($request['channel_name']) &&
-            strpos($request['channel_name'], 'presence-') === 0
+            isset($request['channel_name'])
+            && Str::startsWith($request['channel_name'], 'presence-')
         ) {
             $request['channel_name'] = substr($request['channel_name'], 9);
         }
