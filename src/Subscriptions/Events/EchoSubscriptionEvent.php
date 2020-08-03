@@ -13,12 +13,12 @@ class EchoSubscriptionEvent implements ShouldBroadcast
     public $channel;
 
     /**
-     * @var mixed
+     * @var mixed The data to broadcast.
      */
     public $data;
 
     /**
-     * @param mixed $data
+     * @param mixed $data The data to broadcast.
      */
     public function __construct(string $channel, $data)
     {
