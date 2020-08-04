@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use GraphQL\Error\Error;
 use Tests\TestCase;
 
 class ErrorTest extends TestCase
@@ -9,16 +10,21 @@ class ErrorTest extends TestCase
     public function testMissingQuery(): void
     {
         $this->postGraphQL([])
-            ->assertExactJson([
+            ->assertJson([
                 'errors' => [
-                    'foo',
+                    [
+                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
+                        'extensions' => [
+                            'category' => 'request',
+                        ],
+                    ],
                 ],
             ]);
     }
 
     public function testRejectsInvalidQuery(): void
     {
-        $result = $this->graphQL('
+        $result = $this->graphQL(/** @lang GraphQL */ '
         {
             nonExistingField
         }
@@ -33,7 +39,7 @@ class ErrorTest extends TestCase
     public function testIgnoresInvalidJSONVariables(): void
     {
         $result = $this->postGraphQL([
-            'query' => '{}',
+            'query' => /** @lang GraphQL */ '{}',
             'variables' => '{}',
         ]);
 
@@ -47,9 +53,9 @@ class ErrorTest extends TestCase
             ->assertJson([
                 'errors' => [
                     [
-                        'message' => 'Syntax Error: Unexpected <EOF>',
+                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
                         'extensions' => [
-                            'category' => 'graphql',
+                            'category' => 'request',
                         ],
                     ],
                 ],
@@ -63,12 +69,43 @@ class ErrorTest extends TestCase
             ->assertJson([
                 'errors' => [
                     [
-                        'message' => 'Syntax Error: Unexpected <EOF>',
+                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
                         'extensions' => [
-                            'category' => 'graphql',
+                            'category' => 'request',
                         ],
                     ],
                 ],
             ]);
+    }
+
+    public function testHandlesErrorInResolver(): void
+    {
+        $message = 'foo';
+        $this->mockResolver()
+            ->willThrowException(new Error($message));
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => null,
+                ],
+                'errors' => [
+                    [
+                        'message' => $message,
+                    ],
+                ],
+            ])
+            ->assertStatus(200);
     }
 }

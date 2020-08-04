@@ -70,7 +70,7 @@ class ValidationTest extends TestCase
                         ],
                         'locations' => [
                             [
-                                'line' => 2,
+                                'line' => 3,
                                 'column' => 17,
                             ],
                         ],
