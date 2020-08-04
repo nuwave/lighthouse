@@ -104,7 +104,7 @@ class GraphQL
                 if (count($errors) > 0) {
                     $errors = GraphQLUtils::map(
                         $errors,
-                        static function (RequestError $err) : Error {
+                        static function (RequestError $err): Error {
                             return Error::createLocatedError($err, null, null);
                         }
                     );
