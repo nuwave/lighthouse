@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
 use GraphQL\Language\Parser;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\GraphQL;
@@ -23,6 +24,11 @@ class Defer implements CreatesResponse
      * @var \Nuwave\Lighthouse\GraphQL
      */
     protected $graphQL;
+
+    /**
+     * @var Container
+     */
+    protected $container;
 
     /**
      * @var array<mixed>
@@ -59,10 +65,11 @@ class Defer implements CreatesResponse
      */
     protected $maxNestedFields = 0;
 
-    public function __construct(CanStreamResponse $stream, GraphQL $graphQL)
+    public function __construct(CanStreamResponse $stream, GraphQL $graphQL, Container $container)
     {
         $this->stream = $stream;
         $this->graphQL = $graphQL;
+        $this->container = $container;
         $this->maxNestedFields = config('lighthouse.defer.max_nested_fields', 0);
     }
 
@@ -110,6 +117,7 @@ directive @defer(if: Boolean = true) on FIELD
         }
 
         $this->deferred[$path] = $resolver;
+        return null;
     }
 
     /**
@@ -249,7 +257,7 @@ directive @defer(if: Boolean = true) on FIELD
      */
     protected function executeDeferred(): void
     {
-        $this->result = app()->call(
+        $this->result = $this->container->call(
             [$this->graphQL, 'executeRequest']
         );
 

@@ -24,14 +24,9 @@ class ErrorTest extends TestCase
         }
         ');
 
-        // TODO remove as we stop supporting Laravel 5.5/PHPUnit 6
-        $assertContains = method_exists($this, 'assertStringContainsString')
-            ? 'assertStringContainsString'
-            : 'assertContains';
-
-        $this->{$assertContains}(
+        $this->assertStringContainsString(
             'nonExistingField',
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -50,13 +45,11 @@ class ErrorTest extends TestCase
         $this->postGraphQL([])
             ->assertStatus(200)
             ->assertJson([
-                [
-                    'errors' => [
-                        [
-                            'message' => 'Syntax Error: Unexpected <EOF>',
-                            'extensions' => [
-                                'category' => 'graphql',
-                            ],
+                'errors' => [
+                    [
+                        'message' => 'Syntax Error: Unexpected <EOF>',
+                        'extensions' => [
+                            'category' => 'graphql',
                         ],
                     ],
                 ],

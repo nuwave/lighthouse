@@ -5,9 +5,12 @@ namespace Nuwave\Lighthouse;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Http\Request;
+use Laragraph\LaravelGraphQLUtils\RequestParser;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -19,6 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Pipeline;
+use Nuwave\Lighthouse\Support\Utils;
 
 class GraphQL
 {
@@ -78,6 +82,24 @@ class GraphQL
         $this->createsContext = $createsContext;
         $this->errorPool = $errorPool;
         $this->providesValidationRules = $providesValidationRules;
+    }
+
+    /**
+     * @return array<string, mixed>|array<int, array<string, mixed>>
+     */
+    public function executeRequest(Request $request, RequestParser $requestParser, Helper $graphQLHelper)
+    {
+        $operationParams = $requestParser->parseRequest($request);
+
+        return Utils::applyEach(
+            function (OperationParams $operationParams) use ($graphQLHelper) {
+                // TODO handle those validation errors
+                $errors = $graphQLHelper->validateOperationParams($operationParams);
+
+                return $this->executeOperation($operationParams);
+            },
+            $operationParams
+        );
     }
 
     /**
