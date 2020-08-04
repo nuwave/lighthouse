@@ -2,13 +2,16 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use Illuminate\Container\Container;
+use GraphQL\Server\Helper;
+use GraphQL\Server\OperationParams;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Laragraph\LaravelGraphQLUtils\RequestParser;
 use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Nuwave\Lighthouse\Support\Utils;
 use Symfony\Component\HttpFoundation\Response;
 
 class GraphQLController extends Controller
@@ -24,62 +27,55 @@ class GraphQLController extends Controller
     protected $eventsDispatcher;
 
     /**
+     * @var \Laragraph\LaravelGraphQLUtils\RequestParser
+     */
+    protected $requestParser;
+
+    /**
+     * @var \GraphQL\Server\Helper
+     */
+    protected $graphQLHelper;
+
+    /**
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesResponse
      */
     protected $createsResponse;
 
-    /**
-     * @var \Illuminate\Container\Container
-     */
-    protected $container;
-
     public function __construct(
         GraphQL $graphQL,
         EventsDispatcher $eventsDispatcher,
-        CreatesResponse $createsResponse,
-        Container $container
+        RequestParser $requestParser,
+        Helper $graphQLHelper,
+        CreatesResponse $createsResponse
     ) {
         $this->graphQL = $graphQL;
         $this->eventsDispatcher = $eventsDispatcher;
+        $this->requestParser = $requestParser;
+        $this->graphQLHelper = $graphQLHelper;
         $this->createsResponse = $createsResponse;
-        $this->container = $container;
     }
 
     /**
      * Execute GraphQL query.
      */
-    public function query(GraphQLRequest $request): Response
+    public function __invoke(Request $request): Response
     {
         $this->eventsDispatcher->dispatch(
             new StartRequest($request)
         );
 
-        $result = $request->isBatched()
-            ? $this->executeBatched($request)
-            : $this->graphQL->executeRequest($request);
+        $operationParams = $this->requestParser->parseRequest($request);
 
-        $response = $this->createsResponse->createResponse($result);
+        $result = Utils::applyEach(
+            function (OperationParams $operationParams) {
+                // TODO handle those validation errors
+                $errors = $this->graphQLHelper->validateOperationParams($operationParams);
 
-        // When handling multiple requests during the application lifetime,
-        // for example in tests, we need a new GraphQLRequest instance
-        // for each HTTP request, so we forget the singleton here.
-        $this->container->forgetInstance(GraphQLRequest::class);
+                return $this->graphQL->executeOperation($operationParams);
+            },
+            $operationParams
+        );
 
-        return $response;
-    }
-
-    /**
-     * Loop through the individual batched queries and collect the results.
-     *
-     * @return array<int, mixed>
-     */
-    protected function executeBatched(GraphQLRequest $request): array
-    {
-        $results = [];
-        do {
-            $results[] = $this->graphQL->executeRequest($request);
-        } while ($request->advanceBatchIndex());
-
-        return $results;
+        return $this->createsResponse->createResponse($result);
     }
 }

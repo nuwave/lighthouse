@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
@@ -14,7 +15,6 @@ use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -96,6 +96,26 @@ class GraphQL
             $request->variables(),
             null,
             $request->operationName()
+        );
+
+        return $this->applyDebugSettings($result);
+    }
+
+    /**
+     * Run a single GraphQL operation against the schema and get a result.
+     *
+     * @return array<string, mixed>
+     */
+    public function executeOperation(OperationParams $params): array
+    {
+        $result = $this->executeQuery(
+            $params->query,
+            $this->createsContext->generate(
+                app('request')
+            ),
+            $params->variables,
+            null,
+            $params->operation
         );
 
         return $this->applyDebugSettings($result);
@@ -205,7 +225,7 @@ class GraphQL
      */
     public function prepSchema(): Schema
     {
-        if (empty($this->executableSchema)) {
+        if (! isset($this->executableSchema)) {
             $this->executableSchema = $this->schemaBuilder->build(
                 $this->astBuilder->documentAST()
             );
@@ -221,15 +241,5 @@ class GraphQL
     {
         BatchLoader::forgetInstances();
         $this->errorPool->clear();
-    }
-
-    /**
-     * Get instance of DocumentAST.
-     *
-     * @deprecated use ASTBuilder instead
-     */
-    public function documentAST(): DocumentAST
-    {
-        return $this->astBuilder->documentAST();
     }
 }
