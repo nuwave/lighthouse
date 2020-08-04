@@ -9,7 +9,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
