@@ -13,7 +13,6 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\ErrorPool;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -79,26 +78,6 @@ class GraphQL
         $this->createsContext = $createsContext;
         $this->errorPool = $errorPool;
         $this->providesValidationRules = $providesValidationRules;
-    }
-
-    /**
-     * Run a single GraphQL request against the schema and get a result.
-     *
-     * @return array<string, mixed>
-     */
-    public function executeRequest(GraphQLRequest $request): array
-    {
-        $result = $this->executeQuery(
-            $request->query(),
-            $this->createsContext->generate(
-                app('request')
-            ),
-            $request->variables(),
-            null,
-            $request->operationName()
-        );
-
-        return $this->applyDebugSettings($result);
     }
 
     /**

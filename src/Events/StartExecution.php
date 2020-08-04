@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Events;
 
 use Carbon\Carbon;
-use GraphQL\Server\OperationParams;
 
 /**
  * Fires right before resolving an individual query.
@@ -14,20 +13,14 @@ use GraphQL\Server\OperationParams;
 class StartExecution
 {
     /**
-     * @var \GraphQL\Server\OperationParams
-     */
-    public $operationParams;
-
-    /**
      * The point in time when the query execution started.
      *
      * @var \Carbon\Carbon
      */
     public $moment;
 
-    public function __construct(OperationParams $operationParams)
+    public function __construct()
     {
-        $this->operationParams = $operationParams;
         $this->moment = Carbon::now();
     }
 }
