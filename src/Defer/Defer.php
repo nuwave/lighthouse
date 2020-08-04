@@ -117,6 +117,7 @@ directive @defer(if: Boolean = true) on FIELD
         }
 
         $this->deferred[$path] = $resolver;
+
         return null;
     }
 
