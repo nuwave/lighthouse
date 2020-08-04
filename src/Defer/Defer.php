@@ -26,7 +26,7 @@ class Defer implements CreatesResponse
     protected $graphQL;
 
     /**
-     * @var Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 

@@ -9,7 +9,6 @@ use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
-use GraphQL\Utils\Utils as GraphQLUtils;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Http\Request;
 use Laragraph\LaravelGraphQLUtils\RequestParser;
@@ -98,15 +97,14 @@ class GraphQL
              * @return array<string, mixed>
              */
             function (OperationParams $operationParams) use ($graphQLHelper): array {
-                // TODO handle those validation errors
                 $errors = $graphQLHelper->validateOperationParams($operationParams);
 
                 if (count($errors) > 0) {
-                    $errors = GraphQLUtils::map(
-                        $errors,
-                        static function (RequestError $err): Error {
+                    $errors = array_map(
+                        static function (RequestError $err) : Error {
                             return Error::createLocatedError($err, null, null);
-                        }
+                        },
+                        $errors
                     );
 
                     return $this->applyDebugSettings(
