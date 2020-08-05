@@ -11,6 +11,7 @@ use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Laragraph\LaravelGraphQLUtils\RequestParser;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
@@ -23,7 +24,6 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
-use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
 class GraphQL

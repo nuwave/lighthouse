@@ -8,6 +8,7 @@ use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -19,7 +20,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
-use Illuminate\Pipeline\Pipeline;
 
 /**
  * @deprecated Will be removed in v5
