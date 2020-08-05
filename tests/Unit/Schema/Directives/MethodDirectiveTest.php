@@ -25,8 +25,7 @@ class MethodDirectiveTest extends TestCase
         $foo = $this->mockFoo();
         $foo->expects($this->once())
             ->method('bar')
-            // TODO remove in v5
-            ->with($foo, []);
+            ->with();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -65,7 +64,7 @@ class MethodDirectiveTest extends TestCase
             bar(
                 first: ID
                 second: ID
-            ): ID @method(passOrdered: true)
+            ): ID @method
         }
         ';
 
@@ -92,7 +91,7 @@ class MethodDirectiveTest extends TestCase
         type Foo {
             bar(
                 baz: ID
-            ): ID @method(passOrdered: true)
+            ): ID @method
         }
         ';
 
@@ -100,28 +99,6 @@ class MethodDirectiveTest extends TestCase
         $foo->expects($this->once())
             ->method('bar')
             ->with(null);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo {
-                bar
-            }
-        }
-        ');
-    }
-
-    public function testPassOrderedWithNoArgs(): void
-    {
-        $this->schema .= /** @lang GraphQL */ '
-        type Foo {
-            bar: ID @method(passOrdered: true)
-        }
-        ';
-
-        $foo = $this->mockFoo();
-        $foo->expects($this->once())
-            ->method('bar')
-            ->with();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
