@@ -40,9 +40,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
   - `'forceFill' => true`
 - Use `laragraph/laravel-graphql-utils` for parsing HTTP requests https://github.com/nuwave/lighthouse/pull/1424
 - Replace the subscription broadcast queued event handler with a queued job to allow the queue name to be specified https://github.com/nuwave/lighthouse/pull/1507
-- Make `ErrorHandler` method `handle()` non-static https://github.com/nuwave/lighthouse/pull/1508
 - Make `@method` call the underlying method with the arguments as ordered parameters instead
   of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1509
+- Change `ErrorHandler` method `handle()` to non-static `__invoke()` and allow discarding
+  errors by returning `null`
 
 ### Removed
 

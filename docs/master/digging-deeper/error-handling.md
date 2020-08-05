@@ -157,10 +157,17 @@ use Nuwave\Lighthouse\Execution\ErrorHandler;
 
 class ExtensionErrorHandler implements ErrorHandler
 {
-    public function handle(Error $error, Closure $next): array
+    public function __invoke(?Error $error, Closure $next): ?array
     {
-        // TODO do something with $error
+        // You can discard errors by returning null
+        if ($this->shouldBeDiscarded($error)) {
+            return null;
+        }
 
+        // Error handlers are instantiated once per query
+        $this->errorCount++;
+
+        // Keep the pipeline going, last step formats the error into an array
         return $next($error);
     }
 }

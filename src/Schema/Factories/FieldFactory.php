@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -14,7 +15,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Validation\ValidateDirective;
 
 class FieldFactory
@@ -30,7 +30,7 @@ class FieldFactory
     protected $argumentFactory;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Pipeline
+     * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
 
@@ -78,7 +78,7 @@ class FieldFactory
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through($fieldMiddleware)
+            ->through($fieldMiddleware->all())
             ->via('handleField')
             ->thenReturn()
             ->getResolver();
