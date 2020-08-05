@@ -373,7 +373,7 @@ public function defaultHasOperator(): string
 }
 ```
 
-### Make `ErrorHandler` method `handle()` non-static
+### Change `ErrorHandler` method `handle()`
 
 If you implemented your own error handler, change it like this:
 
@@ -383,9 +383,11 @@ use Nuwave\Lighthouse\Execution\ErrorHandler;
 class ExtensionErrorHandler implements ErrorHandler
 {
 -   public static function handle(Error $error, Closure $next): array
-+   public function handle(Error $error, Closure $next): array
++   public function __invoke(?Error $error, Closure $next): ?array
     {
         ...
     }
 }
 ```
+
+You can now discard errors by returning `null` from the handler.

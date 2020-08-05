@@ -18,6 +18,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
+use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -30,7 +31,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
-use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Utils;
 
 class TypeRegistry
@@ -43,7 +43,7 @@ class TypeRegistry
     protected $types = [];
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Pipeline
+     * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
 
@@ -207,12 +207,14 @@ EOL
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
-        $typeValue = new TypeValue($definition);
-
         return $this->pipeline
-            ->send($typeValue)
+            ->send(
+                new TypeValue($definition)
+            )
             ->through(
-                $this->directiveFactory->associatedOfType($definition, TypeMiddleware::class)
+                $this->directiveFactory
+                    ->associatedOfType($definition, TypeMiddleware::class)
+                    ->all()
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {

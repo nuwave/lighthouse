@@ -8,6 +8,7 @@ use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -19,7 +20,6 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
-use Nuwave\Lighthouse\Support\Pipeline;
 
 /**
  * @deprecated Will be removed in v5
@@ -27,7 +27,7 @@ use Nuwave\Lighthouse\Support\Pipeline;
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     /**
-     * @var \Nuwave\Lighthouse\Support\Pipeline
+     * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
 
@@ -78,7 +78,7 @@ SDL;
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $middleware) {
                     return $this->pipeline
                         ->send($context->request())
-                        ->through($middleware)
+                        ->through($middleware->all())
                         ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo) {
                             return $resolver(
                                 $root,
