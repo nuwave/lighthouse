@@ -14,6 +14,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
 - Include schema directives when running `php artisan lighthouse:validate-schema` https://github.com/nuwave/lighthouse/pull/1494
 - Add ability to query for the existence of relations in where conditions https://github.com/nuwave/lighthouse/pull/1412
+- Handle content types `application/graphql` and `application/x-www-form-urlencoded` properly https://github.com/nuwave/lighthouse/pull/1424
 
 ### Changed
 
@@ -37,6 +38,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change default configuration options in `lighthouse.php`:
   - `'guard' => 'api'`
   - `'forceFill' => true`
+- Use `laragraph/laravel-graphql-utils` for parsing HTTP requests https://github.com/nuwave/lighthouse/pull/1424
+- Replace the subscription broadcast queued event handler with a queued job to allow the queue name to be specified https://github.com/nuwave/lighthouse/pull/1507
+- Make `ErrorHandler` method `handle()` non-static https://github.com/nuwave/lighthouse/pull/1508
+- Make `@method` call the underlying method with the arguments as ordered parameters instead
+  of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1509
 
 ### Removed
 
@@ -50,6 +56,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   functionality to `\Nuwave\Lighthouse\Support\Contracts\Directive` https://github.com/nuwave/lighthouse/pull/1386
 - Remove fallback for `lighthouse.cache.ttl` setting https://github.com/nuwave/lighthouse/pull/1423
 - Remove `Nuwave\Lighthouse\Schema\AST\PartialParser` in favor of `GraphQL\Language\Parser` https://github.com/nuwave/lighthouse/pull/1457
+- Remove `Nuwave\Lighthouse\Execution\GraphQLRequest` singleton https://github.com/nuwave/lighthouse/pull/1424
 
 ## 4.16.0
 
@@ -262,8 +269,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add optional `columnsEnum` argument to the `@whereConditions`, `@whereHasConditions`
   and `@orderBy` directives https://github.com/nuwave/lighthouse/pull/1150
-- Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used
-  so the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
+- Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used,
+  the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
 - Add test trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
 - Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using

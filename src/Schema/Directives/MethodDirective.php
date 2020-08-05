@@ -2,10 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MethodDirective extends BaseDirective implements FieldResolver
 {
@@ -27,42 +25,30 @@ directive @method(
   Defaults to the name of the field if not given.
   """
   name: String
-
-  """
-  Pass the field arguments to the method, using the argument definition
-  order from the schema to sort them before passing them along.
-
-  @deprecated This behaviour will default to true in v5 and this setting will be removed.
-  """
-  passOrdered: Boolean = false
 ) on FIELD_DEFINITION
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            /**
+             * @param  array<string, mixed>  $args
+             * @return mixed Really anything
+             */
+            function ($root, array $args) {
                 /** @var string $method */
                 $method = $this->directiveArgValue(
                     'name',
                     $this->nodeName()
                 );
 
-                // TODO always do this in v5
-                if ($this->directiveArgValue('passOrdered')) {
-                    $orderedArgs = [];
-                    foreach ($this->definitionNode->arguments as $argDefinition) {
-                        $orderedArgs [] = $args[$argDefinition->name->value] ?? null;
-                    }
-
-                    return $root->{$method}(...$orderedArgs);
+                $orderedArgs = [];
+                foreach ($this->definitionNode->arguments as $argDefinition) {
+                    $orderedArgs [] = $args[$argDefinition->name->value] ?? null;
                 }
 
-                return $root->{$method}($root, $args, $context, $resolveInfo);
+                return $root->{$method}(...$orderedArgs);
             }
         );
     }
