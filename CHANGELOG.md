@@ -40,6 +40,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   - `'forceFill' => true`
 - Use `laragraph/laravel-graphql-utils` for parsing HTTP requests https://github.com/nuwave/lighthouse/pull/1424
 - Replace the subscription broadcast queued event handler with a queued job to allow the queue name to be specified https://github.com/nuwave/lighthouse/pull/1507
+- Make `ErrorHandler` method `handle()` non-static https://github.com/nuwave/lighthouse/pull/1508
 
 ### Removed
 
@@ -266,8 +267,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add optional `columnsEnum` argument to the `@whereConditions`, `@whereHasConditions`
   and `@orderBy` directives https://github.com/nuwave/lighthouse/pull/1150
-- Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used
-  so the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
+- Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used,
+  the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
 - Add test trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
 - Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using

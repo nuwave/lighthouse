@@ -292,7 +292,7 @@ class ValidationTest extends TestCase
             foo(
                 bar: String
                     @rules(apply: ["min:2"])
-                    @customRules(apply: ["max:3"])
+                    @rules(apply: ["max:3"])
             ): Int
         }
         ';
