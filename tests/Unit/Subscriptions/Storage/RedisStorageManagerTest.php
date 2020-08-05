@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Tests\Unit\Subscriptions\Storage;
 
 use Illuminate\Contracts\Config\Repository;
@@ -9,8 +8,8 @@ use Illuminate\Redis\Connections\Connection;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Redis;
-use Tests\Utils\Subscriptions\DummySubscriber;
 use Tests\Unit\Subscriptions\SubscriptionTestCase;
+use Tests\Utils\Subscriptions\DummySubscriber;
 
 class RedisStorageManagerTest extends SubscriptionTestCase
 {
@@ -25,7 +24,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->once())
             ->method('command')
-            ->with('get', ['graphql.subscriber.' . $channel])
+            ->with('get', ['graphql.subscriber.'.$channel])
             ->willReturn(serialize($subscriber));
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -44,14 +43,14 @@ class RedisStorageManagerTest extends SubscriptionTestCase
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
-        $prefixedChannel = 'graphql.subscriber.' . $channel;
+        $prefixedChannel = 'graphql.subscriber.'.$channel;
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->exactly(3))
             ->method('command')
             ->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
-                ['srem', ['test-prefix-graphql.topic.' . $subscriber->topic, $channel]]
+                ['srem', ['test-prefix-graphql.topic.'.$subscriber->topic, $channel]]
             )
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber)
@@ -79,10 +78,10 @@ class RedisStorageManagerTest extends SubscriptionTestCase
                 ]],
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
-                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{' . json_encode([
+                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.json_encode([
                         'channel' => 'private-lighthouse-foo',
                         'topic' => 'some-topic',
-                    ]) . '}',
+                    ]).'}',
                 ]]
             );
 
@@ -105,7 +104,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
         $redisConnection->expects($this->exactly(2))
             ->method('command')
             ->withConsecutive(
-                ['smembers', ['graphql.topic.' . $topic]],
+                ['smembers', ['graphql.topic.'.$topic]],
                 ['mget', [[
                     'test-prefix-graphql.subscriber.foo1',
                     'test-prefix-graphql.subscriber.foo2'
@@ -138,7 +137,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
         $redisClient->expects($this->any())
             ->method('_prefix')
             ->willReturnCallback(function (string $input): string {
-                return 'test-prefix-' . $input;
+                return 'test-prefix-'.$input;
             });
 
         return $redisConnection;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Tests\Utils\Subscriptions;
 
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -12,7 +11,6 @@ class DummySubscriber extends Subscriber
         $this->channel = $channel;
         $this->topic = $topic;
     }
-
 
     public function serialize(): string
     {
