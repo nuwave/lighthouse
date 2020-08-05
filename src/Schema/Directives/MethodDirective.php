@@ -2,10 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MethodDirective extends BaseDirective implements FieldResolver
 {
