@@ -1424,14 +1424,6 @@ directive @method(
   Defaults to the name of the field if not given.
   """
   name: String
-
-  """
-  Pass the field arguments to the method, using the argument definition
-  order from the schema to sort them before passing them along.
-
-  @deprecated This behaviour will default to true in v5 and this setting will be removed.
-  """
-  passOrdered: Boolean = false
 ) on FIELD_DEFINITION
 ```
 
@@ -1443,17 +1435,14 @@ type User {
 }
 ```
 
-This calls a method `App\User::getMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
-If you want to pass down only the arguments in sequence, use the `passOrdered` option:
+This will call the method `User::purchasedItemsCount()` with the client given arguments.
 
 ```graphql
 type User {
-  purchasedItemsCount(year: Int!, includeReturns: Boolean): Int
-    @method(passOrdered: true)
+  purchasedItemsCount(year: Int!, includeReturns: Boolean): Int @method
 }
 ```
 
-This will call the method with the arguments a client passes to the field.
 Ensure the order of the argument definition matches the parameters of your method.
 
 ```php
