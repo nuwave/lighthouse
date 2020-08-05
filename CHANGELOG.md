@@ -37,6 +37,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change default configuration options in `lighthouse.php`:
   - `'guard' => 'api'`
   - `'forceFill' => true`
+- Use `laragraph/laravel-graphql-utils` for parsing HTTP requests
 
 ### Removed
 
