@@ -372,3 +372,20 @@ public function defaultHasOperator(): string
     return 'GTE';
 }
 ```
+
+### Make `ErrorHandler` method `handle()` non-static
+
+If you implemented your own error handler, change it like this:
+
+```diff
+use Nuwave\Lighthouse\Execution\ErrorHandler;
+
+class ExtensionErrorHandler implements ErrorHandler
+{
+-   public static function handle(Error $error, Closure $next): array
++   public function handle(Error $error, Closure $next): array
+    {
+        ...
+    }
+}
+```

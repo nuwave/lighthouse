@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
  */
 class ExtensionErrorHandler implements ErrorHandler
 {
-    public static function handle(Error $error, Closure $next): array
+    public function handle(Error $error, Closure $next): array
     {
         $underlyingException = $error->getPrevious();
 
