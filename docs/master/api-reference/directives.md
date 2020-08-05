@@ -503,7 +503,7 @@ directive @count(
 ) on FIELD_DEFINITION
 ```
 
-Specify the name of the model to count when using this directive on a root query. 
+Specify the name of the model to count when using this directive on a root query.
 
 ```graphql
 type Query {
@@ -511,7 +511,7 @@ type Query {
 }
 ```
 
-You can also count relations. 
+You can also count relations.
 
 ```graphql
 type User {
