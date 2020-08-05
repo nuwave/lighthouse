@@ -78,7 +78,7 @@ class FieldFactory
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through($fieldMiddleware)
+            ->through($fieldMiddleware->all())
             ->via('handleField')
             ->thenReturn()
             ->getResolver();

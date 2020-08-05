@@ -78,7 +78,7 @@ SDL;
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $middleware) {
                     return $this->pipeline
                         ->send($context->request())
-                        ->through($middleware)
+                        ->through($middleware->all())
                         ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo) {
                             return $resolver(
                                 $root,

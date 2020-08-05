@@ -207,12 +207,14 @@ EOL
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
-        $typeValue = new TypeValue($definition);
-
         return $this->pipeline
-            ->send($typeValue)
+            ->send(
+                new TypeValue($definition)
+            )
             ->through(
-                $this->directiveFactory->associatedOfType($definition, TypeMiddleware::class)
+                $this->directiveFactory
+                    ->associatedOfType($definition, TypeMiddleware::class)
+                    ->all()
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {

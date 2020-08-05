@@ -11,6 +11,7 @@ use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Laragraph\LaravelGraphQLUtils\RequestParser;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
@@ -213,17 +214,21 @@ class GraphQL
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = config('lighthouse.error_handlers', []);
 
-                return array_map(
-                    function (Error $error) use ($handlers, $formatter) {
+                return (new Collection($errors))
+                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
                         return $this->pipeline
                             ->send($error)
                             ->through($handlers)
-                            ->then(function (Error $error) use ($formatter) {
+                            ->then(function (?Error $error) use ($formatter): ?array {
+                                if ($error === null) {
+                                    return null;
+                                }
+
                                 return $formatter($error);
                             });
-                    },
-                    $errors
-                );
+                    })
+                    ->filter()
+                    ->all();
             }
         );
 
