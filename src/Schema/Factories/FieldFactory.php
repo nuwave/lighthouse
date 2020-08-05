@@ -14,7 +14,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Pipeline;
+use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Validation\ValidateDirective;
 
 class FieldFactory
@@ -30,7 +30,7 @@ class FieldFactory
     protected $argumentFactory;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Pipeline
+     * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
 

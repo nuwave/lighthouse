@@ -23,7 +23,7 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
-use Nuwave\Lighthouse\Support\Pipeline;
+use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
 class GraphQL
@@ -39,7 +39,7 @@ class GraphQL
     protected $schemaBuilder;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Pipeline
+     * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
 

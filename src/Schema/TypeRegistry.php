@@ -30,7 +30,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
-use Nuwave\Lighthouse\Support\Pipeline;
+use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Support\Utils;
 
 class TypeRegistry
@@ -43,7 +43,7 @@ class TypeRegistry
     protected $types = [];
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Pipeline
+     * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
 

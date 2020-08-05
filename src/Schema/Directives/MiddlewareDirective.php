@@ -19,7 +19,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
-use Nuwave\Lighthouse\Support\Pipeline;
+use Illuminate\Pipeline\Pipeline;
 
 /**
  * @deprecated Will be removed in v5
@@ -27,7 +27,7 @@ use Nuwave\Lighthouse\Support\Pipeline;
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     /**
-     * @var \Nuwave\Lighthouse\Support\Pipeline
+     * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
 
