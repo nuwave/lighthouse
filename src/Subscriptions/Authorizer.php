@@ -4,8 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;

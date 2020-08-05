@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Subscriptions;
 
-use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;

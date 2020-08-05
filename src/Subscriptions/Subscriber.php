@@ -4,11 +4,9 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Serializable;
@@ -79,7 +77,6 @@ class Subscriber implements Serializable
         GraphQLContext $context,
         ResolveInfo $resolveInfo
     ) {
-
         $this->fieldName = $resolveInfo->fieldName;
         $this->channel = self::uniqueChannelName();
         $this->args = $args;
