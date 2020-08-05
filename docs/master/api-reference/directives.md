@@ -1451,7 +1451,6 @@ The method will get called like this:
 $user->purchasedItemsCount(2017, null)
 ```
 
-
 ## @model
 
 ```graphql
