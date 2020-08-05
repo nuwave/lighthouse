@@ -80,9 +80,7 @@ class FieldFactory
             ->send($fieldValue)
             ->through($fieldMiddleware)
             ->via('handleField')
-            ->then(function (FieldValue $fieldValue): FieldValue {
-                return $fieldValue;
-            })
+            ->thenReturn()
             ->getResolver();
 
         $fieldValue->setResolver(
