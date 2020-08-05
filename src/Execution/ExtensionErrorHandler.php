@@ -15,6 +15,10 @@ class ExtensionErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {
+        if ($error === null) {
+            return $next(null);
+        }
+
         $underlyingException = $error->getPrevious();
 
         if ($underlyingException instanceof RendersErrorsExtensions) {
