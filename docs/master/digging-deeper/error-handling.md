@@ -157,7 +157,7 @@ use Nuwave\Lighthouse\Execution\ErrorHandler;
 
 class ExtensionErrorHandler implements ErrorHandler
 {
-    public static function handle(Error $error, Closure $next): array
+    public function handle(Error $error, Closure $next): array
     {
         // TODO do something with $error
 

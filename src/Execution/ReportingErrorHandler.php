@@ -11,7 +11,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
  */
 class ReportingErrorHandler implements ErrorHandler
 {
-    public static function handle(Error $error, Closure $next): array
+    public function handle(Error $error, Closure $next): array
     {
         // Client-safe errors are assumed to be something that a client can handle
         // or is expected to happen, e.g. wrong syntax, authentication or validation
