@@ -91,8 +91,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                     $subscriber->query,
                     $subscriber->context,
                     $subscriber->args,
-                    $subscriber->setRoot($root),
-                    $subscriber->operationName
+                    $subscriber->setRoot($root)
                 );
 
                 $this->broadcastManager->broadcast(

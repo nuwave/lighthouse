@@ -26,7 +26,7 @@ class BaseDirectiveTest extends TestCase
     public function testGetsModelClassFromDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @modelClass(class: "Team") {
+        type User @model(class: "Team") {
             id: ID
         }
         ';

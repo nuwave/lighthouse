@@ -2,6 +2,7 @@ includes:
 - vendor/bensampo/laravel-enum/extension.neon
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
+- vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon
 parameters:
   level: max
   paths:
@@ -21,11 +22,6 @@ parameters:
   - tests/TestCase.php
   - tests/Laravel7ExceptionHandler.php
   - tests/PreLaravel7ExceptionHandler.php
-
-  # Will be obsolote in v5
-  - src/Schema/Factories/FieldFactory.php
-  - src/Schema/Directives/MiddlewareDirective.php
-  - tests/Unit/Schema/Directives/MiddlewareDirectiveTest.php
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false

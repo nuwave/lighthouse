@@ -118,7 +118,12 @@ EOL
      */
     public function register(Type $type): self
     {
-        $this->types[$type->name] = $type;
+        $name = $type->name;
+        if ($this->has($name)) {
+            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+        }
+
+        $this->types[$name] = $type;
 
         return $this;
     }
@@ -130,26 +135,7 @@ EOL
      */
     public function overwrite(Type $type): self
     {
-        return $this->register($type);
-    }
-
-    /**
-     * Register a new type, throw if the name is already registered.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
-     * @deprecated just use register() for this behavior
-     * TODO remove in v5
-     * @return $this
-     */
-    public function registerNew(Type $type): self
-    {
-        $name = $type->name;
-        if ($this->has($name)) {
-            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
-        }
-
-        $this->types[$name] = $type;
+        $this->types[$type->name] = $type;
 
         return $this;
     }
@@ -415,20 +401,6 @@ EOL
      */
     protected function findTypeResolverClass(string $nodeName, array $namespaces): ?Closure
     {
-        // TODO use only __invoke in v5
-        $className = Utils::namespaceClassname(
-            $nodeName,
-            $namespaces,
-            function (string $className): bool {
-                return method_exists($className, 'resolveType');
-            }
-        );
-        if ($className) {
-            return Closure::fromCallable(
-                [app($className), 'resolveType']
-            );
-        }
-
         $className = Utils::namespaceClassname(
             $nodeName,
             $namespaces,

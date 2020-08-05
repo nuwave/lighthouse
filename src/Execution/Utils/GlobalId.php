@@ -25,7 +25,7 @@ class GlobalId implements GlobalIdContract
 
     public function decode(string $globalID): array
     {
-        return explode(':', base64_decode($globalID));
+        return explode(':', \Safe\base64_decode($globalID));
     }
 
     public function decodeID(string $globalID): string

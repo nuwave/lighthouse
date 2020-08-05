@@ -91,16 +91,6 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the AST definition node associated with the current directive.
-     *
-     * @deprecated in favor of the plain property
-     */
-    protected function directiveDefinition(): DirectiveNode
-    {
-        return $this->directiveNode;
-    }
-
-    /**
      * Get the value of an argument on the directive.
      *
      * @param  mixed|null  $default

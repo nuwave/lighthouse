@@ -46,19 +46,6 @@ class StorageManager implements StoresSubscriptions
         $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
     }
 
-    /**
-     * @param  array<string, mixed>  $input
-     * @param  array<mixed>  $headers
-     */
-    public function subscriberByRequest(array $input, array $headers): ?Subscriber
-    {
-        $channel = Arr::get($input, 'channel_name');
-
-        return $channel
-            ? $this->subscriberByChannel($channel)
-            : null;
-    }
-
     public function subscriberByChannel(string $channel): ?Subscriber
     {
         return $this->cache->get(self::channelKey($channel));

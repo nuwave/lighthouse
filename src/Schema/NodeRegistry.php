@@ -65,21 +65,6 @@ class NodeRegistry
     }
 
     /**
-     * Register an Eloquent model that can be resolved as a Node.
-     *
-     * @deprecated use registerNode
-     * @return $this
-     */
-    public function registerModel(string $typeName, string $modelName): self
-    {
-        $this->nodeResolver[$typeName] = function ($id) use ($modelName): ?Model {
-            return $modelName::find($id);
-        };
-
-        return $this;
-    }
-
-    /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
      * @param  array<string, mixed>  $args

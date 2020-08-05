@@ -241,19 +241,6 @@ type CustomRoleEdge implements Edge {
 }
 ```
 
-## @bcrypt
-
-```graphql
-"""
-Run the `bcrypt` function on the argument it is defined on.
-
-@deprecated(reason: "Use @hash instead. This directive will be removed in v5.")
-"""
-directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
-Deprecated in favor of [@hash](#hash).
-
 ## @broadcast
 
 Broadcast the results of a mutation to subscribed clients.
@@ -721,19 +708,6 @@ type Mutation {
 
 ## @deprecated
 
-You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive and providing a
-`reason`. Deprecated fields are not included in introspection queries unless
-requested and they can still be queried by clients.
-
-```graphql
-type Query {
-  users: [User] @deprecated(reason: "Use the `allUsers` field")
-  allUsers: [User]
-}
-```
-
-### Definition
-
 ```graphql
 """
 Marks an element of a GraphQL schema as no longer supported.
@@ -746,6 +720,17 @@ directive @deprecated(
   """
   reason: String = "No longer supported"
 ) on FIELD_DEFINITION
+```
+
+You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive and providing a
+`reason`. Deprecated fields are not included in introspection queries unless
+requested and they can still be queried by clients.
+
+```graphql
+type Query {
+  users: [User] @deprecated(reason: "Use the `allUsers` field")
+  allUsers: [User]
+}
 ```
 
 ## @field
@@ -1466,92 +1451,16 @@ The method will get called like this:
 $user->purchasedItemsCount(2017, null)
 ```
 
-## @middleware
-
-**DEPRECATED**
-Use [@guard](#guard) or custom [`FieldMiddleware`](../custom-directives/field-directives.md#fieldmiddleware) instead.
-
-```graphql
-"""
-Run Laravel middleware for a specific field or group of fields.
-This can be handy to reuse existing HTTP middleware.
-"""
-directive @middleware(
-  """
-  Specify which middleware to run.
-  Pass in either a fully qualified class name, an alias or
-  a middleware group - or any combination of them.
-  """
-  checks: [String!]
-) on FIELD_DEFINITION | OBJECT
-```
-
-You can define middleware just like you would in Laravel. Pass in either a fully qualified
-class name, an alias or a middleware group - or any combination of them.
-
-```graphql
-type Query {
-  users: [User!]!
-    @middleware(
-      checks: ["auth:api", "App\\Http\\Middleware\\MyCustomAuth", "api"]
-    )
-    @all
-}
-```
-
-If you need to apply middleware to a group of fields, you can put [@middleware](../api-reference/directives.md#middleware) on an Object type.
-The middleware will apply only to direct child fields of the type definition.
-
-```graphql
-type Query @middleware(checks: ["auth:api"]) {
-  # This field will use the "auth:api" middleware
-  users: [User!]! @all
-}
-
-extend type Query {
-  # This field will not use any middleware
-  posts: [Post!]! @all
-}
-```
-
-Other then global middleware defined in the [configuration](../getting-started/configuration.md), field middleware
-only applies to the specific field it is defined on. This has the benefit of limiting errors
-to particular fields and not failing an entire request if a middleware fails.
-
-There are a few caveats to field middleware though:
-
-- The Request object is shared between fields.
-  If the middleware of one field modifies the Request, this does influence other fields.
-- They not receive the complete Response object when calling `$next($request)`,
-  but rather the slice of data that the particular field returned.
-- The `terminate` method of field middleware is not called.
-
-If the middleware needs to be aware of GraphQL specifics, such as the resolver arguments,
-it is often more suitable to define a custom field directive.
 
 ## @model
 
 ```graphql
 """
-Enable fetching an Eloquent model by its global id through the `node` query.
-
-@deprecated(reason: "Use @node instead. This directive will be repurposed and do what @modelClass does now in v5.")
-"""
-directive @model on OBJECT
-```
-
-**Deprecated** Use [@node](#node) for Relay global object identification.
-
-## @modelClass
-
-```graphql
-"""
 Map a model class to an object type.
-This can be used when the name of the model differs from the name of the type.
 
-**This directive will be renamed to @model in v5.**
+This can be used when the name of the model differs from the name of the type.
 """
-directive @modelClass(
+directive @model(
   """
   The class name of the corresponding model.
   """
@@ -1559,12 +1468,10 @@ directive @modelClass(
 ) on OBJECT
 ```
 
-**Attention** This directive will be renamed to `@model` in v5.
-
-Lighthouse will respect the overwritten model name in it's directives.
+Lighthouse will respect the overwritten model name in its directives.
 
 ```graphql
-type Post @modelClass(class: "\\App\\BlogPost") {
+type Post @model(class: "\\App\\BlogPost") {
   title: String!
 }
 ```

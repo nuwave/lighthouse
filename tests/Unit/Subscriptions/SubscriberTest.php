@@ -28,12 +28,9 @@ class SubscriberTest extends TestCase
         $args = ['foo' => 'bar'];
 
         $resolveInfo = $this->createMock(ResolveInfo::class);
-        $operationName = 'baz';
-        $resolveInfo->operation = new OperationDefinitionNode([
-            'name' => new NameNode([
-                'value' => $operationName,
-            ]),
-        ]);
+        $fieldName = 'baz';
+        $resolveInfo->fieldName = $fieldName;
+        $resolveInfo->operation = new OperationDefinitionNode([]);
         $resolveInfo->fragments = [];
         $context = new Context(new Request());
 
@@ -48,6 +45,6 @@ class SubscriberTest extends TestCase
         $this->assertSame($args, $serialized->args);
         $this->assertNotNull($serialized->channel);
         $this->assertSame($topic, $serialized->topic);
-        $this->assertSame($operationName, $serialized->operationName);
+        $this->assertSame($fieldName, $serialized->fieldName);
     }
 }

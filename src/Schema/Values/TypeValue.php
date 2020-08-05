@@ -49,17 +49,6 @@ class TypeValue
     }
 
     /**
-     * Get the underlying type definition fields.
-     *
-     * @deprecated
-     * @return iterable<\GraphQL\Language\AST\FieldDefinitionNode>
-     */
-    public function getTypeDefinitionFields()
-    {
-        return data_get($this->typeDefinition, 'fields', []);
-    }
-
-    /**
      * Get node's cache key.
      */
     public function getCacheKey(): ?string
