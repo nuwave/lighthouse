@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Subscriptions\Broadcasters;
-
 
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Http\Request;

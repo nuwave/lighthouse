@@ -107,7 +107,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
                 ['smembers', ['graphql.topic.'.$topic]],
                 ['mget', [[
                     'test-prefix-graphql.subscriber.foo1',
-                    'test-prefix-graphql.subscriber.foo2'
+                    'test-prefix-graphql.subscriber.foo2',
                 ]]]
             )
             ->willReturnOnConsecutiveCalls(
