@@ -9,7 +9,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
@@ -26,9 +25,6 @@ use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ErrorPool;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use Nuwave\Lighthouse\Execution\LighthouseRequest;
-use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
@@ -106,19 +102,6 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
         $this->app->bind(GlobalIdContract::class, GlobalId::class);
-
-        $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
-            /** @var \Illuminate\Http\Request $request */
-            $request = $app->make('request');
-
-            /** @var string $contentType */
-            $contentType = $request->header('Content-Type') ?? '';
-            $isMultipartFormRequest = Str::startsWith($contentType, 'multipart/form-data');
-
-            return $isMultipartFormRequest
-                ? new MultipartFormRequest($request)
-                : new LighthouseRequest($request);
-        });
 
         $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
             return new SchemaStitcher(

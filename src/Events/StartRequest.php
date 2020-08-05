@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Events;
 
 use Carbon\Carbon;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
+use Illuminate\Http\Request;
 
 /**
  * Fires right after a request reaches the GraphQLController.
@@ -16,9 +16,9 @@ use Nuwave\Lighthouse\Execution\GraphQLRequest;
 class StartRequest
 {
     /**
-     * GraphQL request instance.
+     * HTTP request instance.
      *
-     * @var \Nuwave\Lighthouse\Execution\GraphQLRequest
+     * @var \Illuminate\Http\Request
      */
     public $request;
 
@@ -29,7 +29,7 @@ class StartRequest
      */
     public $moment;
 
-    public function __construct(GraphQLRequest $request)
+    public function __construct(Request $request)
     {
         $this->request = $request;
         $this->moment = Carbon::now();

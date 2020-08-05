@@ -14,6 +14,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
 - Include schema directives when running `php artisan lighthouse:validate-schema` https://github.com/nuwave/lighthouse/pull/1494
 - Add ability to query for the existence of relations in where conditions https://github.com/nuwave/lighthouse/pull/1412
+- Handle content types `application/graphql` and `application/x-www-form-urlencoded` properly https://github.com/nuwave/lighthouse/pull/1424
 
 ### Changed
 
@@ -37,6 +38,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change default configuration options in `lighthouse.php`:
   - `'guard' => 'api'`
   - `'forceFill' => true`
+- Use `laragraph/laravel-graphql-utils` for parsing HTTP requests https://github.com/nuwave/lighthouse/pull/1424
 
 ### Removed
 
@@ -50,6 +52,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   functionality to `\Nuwave\Lighthouse\Support\Contracts\Directive` https://github.com/nuwave/lighthouse/pull/1386
 - Remove fallback for `lighthouse.cache.ttl` setting https://github.com/nuwave/lighthouse/pull/1423
 - Remove `Nuwave\Lighthouse\Schema\AST\PartialParser` in favor of `GraphQL\Language\Parser` https://github.com/nuwave/lighthouse/pull/1457
+- Remove `Nuwave\Lighthouse\Execution\GraphQLRequest` singleton https://github.com/nuwave/lighthouse/pull/1424
 
 ## 4.16.0
 
