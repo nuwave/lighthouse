@@ -48,7 +48,7 @@ class RedisStorageManager implements StoresSubscriptions
         $this->connection = $redis->connection(
             $config->get('lighthouse.broadcasters.echo.connection', 'default')
         );
-        $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
+        $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl', null);
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber
