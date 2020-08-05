@@ -43,8 +43,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Returns the name of the used directive.
-     *
-     * TODO: Change to a strongly typed hint in v5
      */
     public function name(): string
     {
