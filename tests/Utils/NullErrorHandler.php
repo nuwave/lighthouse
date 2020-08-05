@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Execution\ErrorHandler;
 
 class NullErrorHandler implements ErrorHandler
 {
-    public function handle(Error $error, Closure $next): ?array
+    public function __invoke(?Error $error, Closure $next): ?array
     {
         return null;
     }

@@ -212,7 +212,10 @@ class GraphQL
             function (array $errors, callable $formatter): array {
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
-                $handlers = config('lighthouse.error_handlers', []);
+                $handlers = [];
+                foreach(config('lighthouse.error_handlers', []) as $handlerClass) {
+                    $handlers []= app($handlerClass);
+                }
 
                 return (new Collection($errors))
                     ->map(function (Error $error) use ($handlers, $formatter): ?array {
