@@ -39,7 +39,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   - `'guard' => 'api'`
   - `'forceFill' => true`
 - Use `laragraph/laravel-graphql-utils` for parsing HTTP requests https://github.com/nuwave/lighthouse/pull/1424
-- Make `ErrorHandler` method `handle()` non-static
+- Make `ErrorHandler` method `handle()` non-static https://github.com/nuwave/lighthouse/pull/1508
 
 ### Removed
 
