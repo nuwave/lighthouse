@@ -24,7 +24,7 @@ parameters:
   - tests/PreLaravel7ExceptionHandler.php
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
-  reportUnmatchedIgnoredErrors: false
+#  reportUnmatchedIgnoredErrors: false
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
@@ -43,24 +43,15 @@ parameters:
     message: '#PHPDoc tag @var for variable \$modelClass contains unresolvable type\.#'
 
   # Correctly writing out the union of all the subtypes of AST nodes is too much work
-  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$kind\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$name\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$directives\.#'
   - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$kind\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeDefinitionNode::\$name\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeExtensionNode::\$name\.#'
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
-  - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\ValueNode given\.#'
-  - '#.* expects GraphQL\\Type\\Definition\\Type, GraphQL\\Type\\Definition\\InputType given\.#'
   - '#PHPDoc tag @param for parameter \$definition with type GraphQL\\Language\\AST\\FieldDefinitionNode\|GraphQL\\Language\\AST\\TypeDefinitionNode is not subtype of native type GraphQL\\Language\\AST\\Node\.#'
 
   # Should work once we update to a version of graphql-php that has more accurate types
   - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
-  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\FieldDefinitionNode>\.#'
   - '#.* does not accept GraphQL\\Language\\AST\\NodeList.*#'
-  - '#Parameter \#1 \$list of method GraphQL\\Language\\AST\\NodeList::merge\(\) expects GraphQL\\Language\\AST\\NodeList.*#'
-  - '#Property GraphQL\\Language\\AST\\DocumentNode::\$definitions \(GraphQL\\Language\\AST\\NodeList&iterable<GraphQL\\Language\\AST\\DefinitionNode>\) does not accept array<GraphQL\\Language\\AST\\FragmentDefinitionNode>\.#'
-  - '#Instanceof between GraphQL\\Language\\AST\\ListTypeNode\|GraphQL\\Language\\AST\\NameNode and GraphQL\\Language\\AST\\NamedTypeNode will always evaluate to false\.#'
 
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'
@@ -77,6 +68,3 @@ parameters:
 
   # This really has no type in root resolvers
   - '#Method .* has parameter \$root with no typehint specified\.#'
-
-  # The typehint is defined in the trait UsesTestSchema
-  - '#Property .*::\$schema has no typehint specified\.#'

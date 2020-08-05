@@ -22,7 +22,7 @@ class CustomStuff
      *
      * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
      */
-    public function resolveType($rootValue): Type
+    public function __invoke($rootValue): Type
     {
         return $this->typeRegistry->get(
             // Add prefix

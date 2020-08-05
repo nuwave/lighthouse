@@ -10,7 +10,7 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Perform a full-text by the given input value.
+Perform a full-text search by the given input value.
 """
 directive @search(
   """
