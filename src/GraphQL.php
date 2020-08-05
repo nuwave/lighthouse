@@ -213,8 +213,8 @@ class GraphQL
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
-                foreach(config('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers []= app($handlerClass);
+                foreach (config('lighthouse.error_handlers', []) as $handlerClass) {
+                    $handlers [] = app($handlerClass);
                 }
 
                 return (new Collection($errors))
