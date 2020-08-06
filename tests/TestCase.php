@@ -19,7 +19,6 @@ use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends BaseTestCase
@@ -152,13 +151,6 @@ GRAPHQL;
 
             return new PreLaravel7ExceptionHandler();
         });
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        CountRuns::$runCounter = 0;
     }
 
     /**
