@@ -13,8 +13,6 @@ use Serializable;
 
 class Subscriber implements Serializable
 {
-    public const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
-
     /**
      * A unique key for the subscriber.
      *
@@ -69,8 +67,6 @@ class Subscriber implements Serializable
 
     /**
      * @param  array<string, mixed>  $args
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
      */
     public function __construct(
         array $args,

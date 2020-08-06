@@ -74,7 +74,7 @@ class ArgPartitionerTest extends TestCase
 
         $this->expectException(DefinitionException::class);
 
-        [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
+        ArgPartitioner::relationMethods(
             $argumentSet,
             new WithoutRelationClassImport(),
             HasMany::class
