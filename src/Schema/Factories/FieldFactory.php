@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Pipeline\Pipeline;
+use Laravie\QueryFilter\Value\Field;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -80,7 +81,11 @@ class FieldFactory
             ->send($fieldValue)
             ->through($fieldMiddleware->all())
             ->via('handleField')
-            ->thenReturn()
+            // TODO replace when we cut support for Laravel 5.6
+            #->thenReturn()
+            ->then(static function (FieldValue $fieldValue): FieldValue {
+                return $fieldValue;
+            })
             ->getResolver();
 
         $fieldValue->setResolver(
