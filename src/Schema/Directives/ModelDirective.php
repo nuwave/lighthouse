@@ -8,11 +8,16 @@ class ModelDirective extends NodeDirective
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Enable fetching an Eloquent model by its global id through the `node` query.
+Map a model class to an object type.
 
-@deprecated(reason: "Use @node instead. This directive will be repurposed and do what @modelClass does now in v5.")
+This can be used when the name of the model differs from the name of the type.
 """
-directive @model on OBJECT
+directive @model(
+  """
+  The class name of the corresponding model.
+  """
+  class: String!
+) on OBJECT
 SDL;
     }
 }

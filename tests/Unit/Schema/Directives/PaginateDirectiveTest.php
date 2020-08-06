@@ -113,7 +113,7 @@ class PaginateDirectiveTest extends TestCase
 
         $defaultPaginatedAmountArg = $queryType
             ->getField('defaultPaginated')
-            ->getArg(config('lighthouse.pagination_amount_argument'));
+            ->getArg('first');
 
         $this->assertInstanceOf(FieldArgument::class, $defaultPaginatedAmountArg);
         /** @var \GraphQL\Type\Definition\FieldArgument $defaultPaginatedAmountArg */
@@ -135,7 +135,7 @@ class PaginateDirectiveTest extends TestCase
 
         $customPaginatedAmountArg = $queryType
             ->getField('customPaginated')
-            ->getArg(config('lighthouse.pagination_amount_argument'));
+            ->getArg('first');
 
         $this->assertInstanceOf(FieldArgument::class, $customPaginatedAmountArg);
         /** @var \GraphQL\Type\Definition\FieldArgument $customPaginatedAmountArg */
@@ -153,29 +153,6 @@ class PaginateDirectiveTest extends TestCase
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
             $customRelayFirstArg->description
-        );
-    }
-
-    public function testCanChangePaginationAmountArgument(): void
-    {
-        config(['lighthouse.pagination_amount_argument' => 'first']);
-
-        /** @var \GraphQL\Type\Definition\ObjectType $queryType */
-        $queryType = $this
-            ->buildSchema(/** @lang GraphQL */ '
-            type Query {
-                defaultPaginated: [User!]! @paginate
-            }
-
-            type User {
-                id: ID!
-            }
-            ')
-            ->getQueryType();
-
-        $this->assertInstanceOf(
-            FieldArgument::class,
-            $queryType->getField('defaultPaginated')->getArg('first')
         );
     }
 

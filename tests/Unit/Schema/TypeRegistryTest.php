@@ -210,9 +210,9 @@ class TypeRegistryTest extends TestCase
     public function testThrowsWhenRegisteringExistingType(): void
     {
         $foo = new ObjectType(['name' => 'Foo']);
-        $this->typeRegistry->registerNew($foo);
+        $this->typeRegistry->register($foo);
 
         $this->expectException(DefinitionException::class);
-        $this->typeRegistry->registerNew($foo);
+        $this->typeRegistry->register($foo);
     }
 }

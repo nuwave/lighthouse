@@ -91,16 +91,6 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the AST definition node associated with the current directive.
-     *
-     * @deprecated in favor of the plain property
-     */
-    protected function directiveDefinition(): DirectiveNode
-    {
-        return $this->directiveNode;
-    }
-
-    /**
      * Get the value of an argument on the directive.
      *
      * @param  mixed|null  $default
@@ -138,8 +128,8 @@ abstract class BaseDirective implements Directive
                 }
                 $type = $documentAST->types[$returnTypeName];
 
-                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')) {
-                    $model = ASTHelper::directiveArgValue($modelClass, 'class');
+                if ($modelDirective = ASTHelper::directiveDefinition($type, 'model')) {
+                    $model = ASTHelper::directiveArgValue($modelDirective, 'class');
                 } else {
                     $model = $returnTypeName;
                 }

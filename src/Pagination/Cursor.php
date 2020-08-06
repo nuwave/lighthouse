@@ -27,7 +27,7 @@ class Cursor
     public static function decode(array $args): int
     {
         if ($cursor = Arr::get($args, 'after')) {
-            return (int) base64_decode($cursor);
+            return (int) \Safe\base64_decode($cursor);
         }
 
         return 0;

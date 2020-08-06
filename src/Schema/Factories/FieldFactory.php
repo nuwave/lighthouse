@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Pipeline\Pipeline;
+use Laravie\QueryFilter\Value\Field;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -61,8 +62,8 @@ class FieldFactory
         $fieldDefinitionNode = $fieldValue->getField();
 
         // Directives have the first priority for defining a resolver for a field
-        /** @var \Nuwave\Lighthouse\Support\Contracts\FieldResolver $resolverDirective */
-        if ($resolverDirective = $this->directiveFactory->exclusiveOfType($fieldDefinitionNode, FieldResolver::class)) {
+        $resolverDirective = $this->directiveFactory->exclusiveOfType($fieldDefinitionNode, FieldResolver::class);
+        if ($resolverDirective instanceof FieldResolver) {
             $fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
             $fieldValue = $fieldValue->useDefaultResolver();
@@ -80,7 +81,11 @@ class FieldFactory
             ->send($fieldValue)
             ->through($fieldMiddleware->all())
             ->via('handleField')
-            ->thenReturn()
+            // TODO replace when we cut support for Laravel 5.6
+            //->thenReturn()
+            ->then(static function (FieldValue $fieldValue): FieldValue {
+                return $fieldValue;
+            })
             ->getResolver();
 
         $fieldValue->setResolver(

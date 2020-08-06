@@ -76,7 +76,7 @@ class LighthouseServiceProvider extends ServiceProvider
     protected function loadRoutesFrom($path): void
     {
         if (AppVersion::isLumen()) {
-            require realpath($path);
+            require \Safe\realpath($path);
 
             return;
         }

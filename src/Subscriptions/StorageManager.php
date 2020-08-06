@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Carbon\Carbon;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
@@ -44,19 +43,6 @@ class StorageManager implements StoresSubscriptions
             config('lighthouse.subscriptions.storage', 'redis')
         );
         $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
-    }
-
-    /**
-     * @param  array<string, mixed>  $input
-     * @param  array<mixed>  $headers
-     */
-    public function subscriberByRequest(array $input, array $headers): ?Subscriber
-    {
-        $channel = Arr::get($input, 'channel_name');
-
-        return $channel
-            ? $this->subscriberByChannel($channel)
-            : null;
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber

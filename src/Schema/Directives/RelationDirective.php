@@ -169,7 +169,6 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')
-            ?? config('lighthouse.pagination.max_count')
-            ?? config('lighthouse.paginate_max_count');
+            ?? config('lighthouse.pagination.max_count');
     }
 }

@@ -41,11 +41,7 @@ SDL;
         } else {
             $resolver = function (int $childrenComplexity, array $args): int {
                 /** @var int $complexity */
-                $complexity = Arr::get(
-                    $args,
-                    'first',
-                    Arr::get($args, config('lighthouse.pagination_amount_argument'), 1)
-                );
+                $complexity = Arr::get($args, 'first', 1);
 
                 return $childrenComplexity * $complexity;
             };

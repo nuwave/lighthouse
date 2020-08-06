@@ -13,6 +13,9 @@ class AllDirective extends BaseDirective implements FieldResolver
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
+"""
+Fetch all Eloquent models and return the collection as the result.
+"""
 directive @all(
   """
   Specify the class name of the model to use.

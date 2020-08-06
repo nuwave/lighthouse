@@ -9,6 +9,9 @@ class InDirective extends BaseDirective implements ArgBuilderDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
+"""
+Filter a column by an array using a `whereIn` clause.
+"""
 directive @in(
   """
   Specify the database column to compare.

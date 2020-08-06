@@ -87,6 +87,8 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
                 $subscriber,
                 $subscription->encodeTopic($subscriber, $fieldName)
             );
+
+            return null;
         };
     }
 }

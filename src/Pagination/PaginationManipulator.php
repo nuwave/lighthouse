@@ -118,7 +118,7 @@ GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
-        $countArgumentDefinition = self::countArgument('first', $defaultCount, $maxCount);
+        $countArgumentDefinition = self::countArgument($defaultCount, $maxCount);
         $afterArgumentDefinition = "\"A cursor after which elements are returned.\"\nafter: String";
         $connectionArguments = [
             Parser::inputValueDefinition($countArgumentDefinition),
@@ -155,7 +155,7 @@ GRAPHQL
             // @phpstan-ignore-next-line NodeList contravariance issue
             $objectType->directives = ASTHelper::mergeNodeList(
                 $objectType->directives,
-                [Parser::constDirective('@modelClass(class: "'.addslashes($this->modelClass).'")')]
+                [Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")')]
             );
         }
 
@@ -188,7 +188,7 @@ GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $countArgumentDefinition = self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount);
+        $countArgumentDefinition = self::countArgument($defaultCount, $maxCount);
         $pageArgumentDefinition = "\"The offset from which elements are returned.\"\npage: Int";
         $paginationArguments = [
             Parser::inputValueDefinition($countArgumentDefinition),
@@ -205,7 +205,7 @@ GRAPHQL
     /**
      * Build the count argument definition string, considering default and max values.
      */
-    protected static function countArgument(string $argumentName, ?int $defaultCount = null, ?int $maxCount = null): string
+    protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
     {
         $description = '"Limits number of fetched elements.';
         if ($maxCount) {
@@ -213,7 +213,7 @@ GRAPHQL
         }
         $description .= "\"\n";
 
-        $definition = $argumentName.': Int'
+        $definition = 'first: Int'
             .($defaultCount
                 ? ' = '.$defaultCount
                 : '!'
