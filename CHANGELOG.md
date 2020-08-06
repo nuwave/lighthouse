@@ -804,6 +804,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove the `@security` directive in favor of defining security options through the config https://github.com/nuwave/lighthouse/pull/435
 - Rename the `resolver` argument of `@interface` and `@union` to `resolveType` https://github.com/nuwave/lighthouse/pull/435
 - Remove deprecated Traits https://github.com/nuwave/lighthouse/pull/435
+- Remove `\Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions::subscriberByRequest()`
 
 ## Pre-v3
 
