@@ -35,8 +35,9 @@
         "illuminate/support": "5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "illuminate/validation": "5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "laragraph/laravel-graphql-utils": "dev-master",
-        "nesbot/carbon": "^1.26.0 || ^2.0",
-        "webonyx/graphql-php": "^14.1.0"
+        "nesbot/carbon": "^1.26 || ^2.0",
+        "thecodingmachine/safe": "^1.0",
+        "webonyx/graphql-php": "^14.1"
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.28.3",
@@ -44,15 +45,16 @@
         "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "laravel/lumen-framework": "5.6.* || 5.7.* || 5.8.* || ^6.0 || ^7.0",
         "laravel/scout": "^7.0",
-        "mll-lab/graphql-php-scalars": "^3.1.0",
+        "mll-lab/graphql-php-scalars": "^3.1",
         "mockery/mockery": "^1.0",
-        "nunomaduro/larastan": "^0.6.0",
+        "nunomaduro/larastan": "^0.6",
         "orchestra/database": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
         "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0",
-        "phpbench/phpbench": "^0.17.0",
+        "phpbench/phpbench": "^0.17",
         "phpstan/phpstan-mockery": "^0.12.5",
         "phpunit/phpunit": "^7.5 || ^8.4",
-        "pusher/pusher-php-server": "^3.2"
+        "pusher/pusher-php-server": "^3.2",
+        "thecodingmachine/phpstan-safe-rule": "^1.0"
     },
     "suggest": {
         "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",

@@ -45,11 +45,6 @@ class CacheStorageManagerTest extends SubscriptionTestCase
             $subscriber,
             $this->storage->subscriberByChannel($subscriber->channel)
         );
-
-        $this->assertSubscriberIsSame(
-            $subscriber,
-            $this->storage->subscriberByRequest(['channel_name' => $subscriber->channel], [])
-        );
     }
 
     public function testStoreAndRetrieveByTopics(): void

@@ -132,8 +132,6 @@ SDL;
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')
-            ?? config('lighthouse.pagination.max_count')
-            // TODO remove in v5
-            ?? config('lighthouse.paginate_max_count');
+            ?? config('lighthouse.pagination.max_count');
     }
 }

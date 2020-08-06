@@ -178,7 +178,7 @@ SDL;
      * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder(object $builder, $value): object
+    public function handleBuilder($builder, $value): object
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),

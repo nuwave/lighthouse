@@ -9,6 +9,9 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
+"""
+Place an equal operator on an Eloquent query.
+"""
 directive @eq(
   """
   Specify the database column to compare.

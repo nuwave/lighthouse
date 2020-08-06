@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Source;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Safe\Exceptions\FilesystemException;
 
 class SchemaStitcher implements SchemaSourceProvider
 {
@@ -15,19 +16,13 @@ class SchemaStitcher implements SchemaSourceProvider
 
     public function __construct(string $rootSchemaPath)
     {
+        if (! file_exists($rootSchemaPath)) {
+            throw new FileNotFoundException(
+                "Failed to find a GraphQL schema file at {$rootSchemaPath}. If you just installed Lighthouse, run php artisan vendor:publish --tag=lighthouse-schema"
+            );
+        }
+
         $this->rootSchemaPath = $rootSchemaPath;
-    }
-
-    /**
-     * Set schema root path.
-     *
-     * @return $this
-     */
-    public function setRootPath(string $path): self
-    {
-        $this->rootSchemaPath = $path;
-
-        return $this;
     }
 
     /**
@@ -43,11 +38,7 @@ class SchemaStitcher implements SchemaSourceProvider
      */
     protected static function gatherSchemaImportsRecursively(string $path): string
     {
-        if (! file_exists($path)) {
-            self::throwFileNotFoundException($path);
-        }
-
-        return (new Collection(file($path)))
+        return (new Collection(\Safe\file($path)))
             ->map(function (string $line) use ($path): string {
                 if (! Str::startsWith(trim($line), '#import ')) {
                     return rtrim($line, PHP_EOL).PHP_EOL;
@@ -57,34 +48,23 @@ class SchemaStitcher implements SchemaSourceProvider
                 $importFilePath = dirname($path).'/'.$importFileName;
 
                 if (! Str::contains($importFileName, '*')) {
-                    $realPath = realpath($importFilePath);
-
-                    if ($realPath === false) {
-                        self::throwFileNotFoundException($importFilePath);
+                    try {
+                        $realpath = \Safe\realpath($importFilePath);
+                    } catch (FilesystemException $exception) {
+                        throw new FileNotFoundException(
+                            "Did not find GraphQL schema import at {$importFilePath}."
+                        );
                     }
-                    /** @var string $realPath */
 
-                    return self::gatherSchemaImportsRecursively($realPath);
+                    return self::gatherSchemaImportsRecursively($realpath);
                 }
 
-                $importFilePaths = glob($importFilePath);
-
-                return (new Collection($importFilePaths))
+                return (new Collection(\Safe\glob($importFilePath)))
                     ->map(function ($file): string {
                         return self::gatherSchemaImportsRecursively($file);
                     })
                     ->implode('');
             })
             ->implode('');
-    }
-
-    /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    protected static function throwFileNotFoundException(string $path): void
-    {
-        throw new FileNotFoundException(
-            "Failed to find a GraphQL schema file at {$path}. If you just installed Lighthouse, run php artisan vendor:publish --provider=\"Nuwave\Lighthouse\Providers\LighthouseServiceProvider\" --tag=schema"
-        );
     }
 }

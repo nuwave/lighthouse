@@ -45,33 +45,31 @@ class Authorizer implements AuthorizesSubscriptions
         $this->sanitizeInput($request);
 
         try {
-            $subscriber = $this->storage->subscriberByChannel(
-                $request->input('channel_name')
-            );
+            $channel = $request->input('channel_name');
+            if ($channel === null) {
+                return false;
+            }
 
-            if (! $subscriber) {
+            $subscriber = $this->storage->subscriberByChannel($channel);
+            if ($subscriber === null) {
                 return false;
             }
 
             $subscriptions = $this->registry->subscriptions($subscriber);
-
             if ($subscriptions->isEmpty()) {
                 return false;
             }
 
-            $authorized = $subscriptions->reduce(
-                function ($authorized, GraphQLSubscription $subscription) use ($subscriber, $request): bool {
-                    return $authorized === false
-                        ? false
-                        : $subscription->authorize($subscriber, $request);
-                }
-            );
+            /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
+            foreach ($subscriptions as $subscription) {
+                if (! $subscription->authorize($subscriber, $request)) {
+                    $this->storage->deleteSubscriber($subscriber->channel);
 
-            if (! $authorized) {
-                $this->storage->deleteSubscriber($subscriber->channel);
+                    return false;
+                }
             }
 
-            return $authorized;
+            return true;
         } catch (Exception $e) {
             $this->exceptionHandler->handleAuthError($e);
 

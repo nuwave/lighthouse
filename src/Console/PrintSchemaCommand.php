@@ -62,13 +62,6 @@ MESSAGE
 );
         }
 
-        $json = json_encode($introspectionResult);
-        // TODO use \Safe\json_encode
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('Tried to encode invalid JSON while converting schema: '.json_last_error_msg());
-        }
-        /** @var string $json */
-
-        return $json;
+        return \Safe\json_encode($introspectionResult);
     }
 }

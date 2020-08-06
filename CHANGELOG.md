@@ -44,6 +44,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1509
 - Change `ErrorHandler` method `handle()` to non-static `__invoke()` and allow discarding
   errors by returning `null`
+- Allow subscriptions without named operations, base channels on the field name
 
 ### Removed
 
@@ -58,6 +59,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove fallback for `lighthouse.cache.ttl` setting https://github.com/nuwave/lighthouse/pull/1423
 - Remove `Nuwave\Lighthouse\Schema\AST\PartialParser` in favor of `GraphQL\Language\Parser` https://github.com/nuwave/lighthouse/pull/1457
 - Remove `Nuwave\Lighthouse\Execution\GraphQLRequest` singleton https://github.com/nuwave/lighthouse/pull/1424
+- Remove `@bcrypt` in favor of `@hash` https://github.com/nuwave/lighthouse/pull/1200
+- Remove the `@middleware` directive, as it violates the boundary between HTTP and GraphQL
+  request handling. Use `@guard` or other field middleware directives instead https://github.com/nuwave/lighthouse/pull/1135
+- Remove configuration option `pagination_amount_argument`, it is always `first` now
 
 ## 4.16.0
 
@@ -800,6 +805,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove the `@security` directive in favor of defining security options through the config https://github.com/nuwave/lighthouse/pull/435
 - Rename the `resolver` argument of `@interface` and `@union` to `resolveType` https://github.com/nuwave/lighthouse/pull/435
 - Remove deprecated Traits https://github.com/nuwave/lighthouse/pull/435
+- Remove `\Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions::subscriberByRequest()`
 
 ## Pre-v3
 

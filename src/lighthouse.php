@@ -171,20 +171,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Pagination Amount Argument
-    |--------------------------------------------------------------------------
-    |
-    | Set the name to use for the generated argument on paginated fields
-    | that controls how many results are returned.
-    |
-    | DEPRECATED This setting will be removed in v5.
-    |
-    */
-
-    'pagination_amount_argument' => 'first',
-
-    /*
-    |--------------------------------------------------------------------------
     | Debug
     |--------------------------------------------------------------------------
     |

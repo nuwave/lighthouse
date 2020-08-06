@@ -58,7 +58,7 @@ class LaravelEnumType extends EnumType
     public function serialize($value): string
     {
         if (! $value instanceof Enum) {
-            $value = $this->enumClass::getInstance($value);
+            $value = $this->enumClass::fromValue($value);
         }
 
         return $value->key;

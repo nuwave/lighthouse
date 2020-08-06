@@ -174,8 +174,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     protected static function assertValidColumnName(string $column): void
     {
-        // TODO use safe-php
-        $match = preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column);
+        $match = \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column);
         if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)

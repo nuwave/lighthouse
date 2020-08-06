@@ -6,7 +6,6 @@ use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -60,21 +59,6 @@ class NodeRegistry
     public function registerNode(string $typeName, Closure $resolve): self
     {
         $this->nodeResolver[$typeName] = $resolve;
-
-        return $this;
-    }
-
-    /**
-     * Register an Eloquent model that can be resolved as a Node.
-     *
-     * @deprecated use registerNode
-     * @return $this
-     */
-    public function registerModel(string $typeName, string $modelName): self
-    {
-        $this->nodeResolver[$typeName] = function ($id) use ($modelName): ?Model {
-            return $modelName::find($id);
-        };
 
         return $this;
     }

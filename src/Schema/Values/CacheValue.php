@@ -130,7 +130,7 @@ class CacheValue
             ->sortKeys()
             ->map(function ($value, $key): string {
                 $keyValue = is_array($value)
-                    ? json_encode($value)
+                    ? \Safe\json_encode($value)
                     : $value;
 
                 return "{$key}:{$keyValue}";

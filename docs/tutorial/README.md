@@ -157,7 +157,7 @@ Begin by defining models and migrations for your posts and comments
 
     php artisan make:model -m Post
 
-Replace the newly generated `app/Posts.php` and the `create_posts_table.php` with this:
+Replace the newly generated `app/Post.php` and the `create_posts_table.php` with this:
 
 ```php
 <?php

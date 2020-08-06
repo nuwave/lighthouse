@@ -50,7 +50,7 @@ SDL;
         $schema = $this->buildSchemaString($directiveClasses);
 
         $filePath = static::schemaDirectivesPath();
-        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
 
         $this->info("Wrote schema directive definitions to $filePath.");
     }
@@ -137,7 +137,7 @@ SDL;
         $filePath = static::programmaticTypesPath();
 
         if ($types->isEmpty() && file_exists($filePath)) {
-            unlink($filePath);
+            \Safe\unlink($filePath);
 
             return;
         }
@@ -148,7 +148,7 @@ SDL;
             })
             ->implode("\n");
 
-        file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
 
         $this->info("Wrote definitions for programmatically registered types to $filePath.");
     }
@@ -161,12 +161,9 @@ SDL;
     protected function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
-        $contents = file_get_contents(__DIR__.'/../../_ide_helper.php');
-        if ($contents === false) {
-            throw new \Exception('Could not load the contents of _ide_helper.php. Try deleting /vendor and run composer install again.');
-        }
+        $contents = \Safe\file_get_contents(__DIR__.'/../../_ide_helper.php');
 
-        file_put_contents($filePath, $this->withGeneratedNotice($contents));
+        \Safe\file_put_contents($filePath, $this->withGeneratedNotice($contents));
 
         $this->info("Wrote PHP definitions to $filePath.");
     }
