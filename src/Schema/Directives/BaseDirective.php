@@ -128,8 +128,8 @@ abstract class BaseDirective implements Directive
                 }
                 $type = $documentAST->types[$returnTypeName];
 
-                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')) {
-                    $model = ASTHelper::directiveArgValue($modelClass, 'class');
+                if ($modelDirective = ASTHelper::directiveDefinition($type, 'model')) {
+                    $model = ASTHelper::directiveArgValue($modelDirective, 'class');
                 } else {
                     $model = $returnTypeName;
                 }
