@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Source;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Safe\Exceptions\FilesystemException;
 
 class SchemaStitcher implements SchemaSourceProvider
 {
@@ -47,9 +48,15 @@ class SchemaStitcher implements SchemaSourceProvider
                 $importFilePath = dirname($path).'/'.$importFileName;
 
                 if (! Str::contains($importFileName, '*')) {
-                    return self::gatherSchemaImportsRecursively(
-                        \Safe\realpath($importFilePath)
-                    );
+                    try {
+                        $realpath = \Safe\realpath($importFilePath);
+                    } catch (FilesystemException $exception) {
+                        throw new FileNotFoundException(
+                            "Did not find GraphQL schema import at {$importFilePath}."
+                        );
+                    }
+
+                    return self::gatherSchemaImportsRecursively($realpath);
                 }
 
                 return (new Collection(\Safe\glob($importFilePath)))
