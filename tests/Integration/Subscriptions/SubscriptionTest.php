@@ -145,7 +145,7 @@ GRAPHQL;
     public function resolve($root, array $args): array
     {
         return [
-            'body' => $args['post']
+            'body' => $args['post'],
         ];
     }
 
