@@ -44,6 +44,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1509
 - Change `ErrorHandler` method `handle()` to non-static `__invoke()` and allow discarding
   errors by returning `null`
+- Allow subscriptions without named operations, base channels on the field name
 
 ### Removed
 
