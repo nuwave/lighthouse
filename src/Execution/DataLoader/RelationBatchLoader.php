@@ -56,17 +56,12 @@ class RelationBatchLoader extends BatchLoader
 
         if ($this->paginationArgs !== null) {
             $modelRelationFetcher = new ModelRelationFetcher(
-                $this->getParentModels(),
+                $this->getParentModels(false),
                 $relation
             );
             $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
-            $models = $this->getParentModels()
-                ->map(function (Model $parent) {
-                    return $parent->load([
-                        $this->relationName => $this->decorateBuilder,
-                    ]);
-                });
+            $models = $this->getParentModels();
         }
 
         return $models
@@ -86,7 +81,7 @@ class RelationBatchLoader extends BatchLoader
      *
      * @return EloquentCollection<mixed>
      */
-    protected function getParentModels(): EloquentCollection
+    protected function getParentModels(bool $shouldLoadRelation = true): EloquentCollection
     {
         return (new EloquentCollection($this->keys))
             // Models are grouped by their fully qualified class name to prevent key
@@ -105,7 +100,7 @@ class RelationBatchLoader extends BatchLoader
                 /**
                  * @param  \Illuminate\Support\Collection<array>  $keys
                  */
-                function (Collection $keys) {
+                function (Collection $keys) use ($shouldLoadRelation) {
                     $parents = $keys->map(
                         /**
                          * @param  array<string, mixed>  $meta
@@ -115,7 +110,18 @@ class RelationBatchLoader extends BatchLoader
                         }
                     );
 
-                    return new EloquentCollection($parents);
+                    return (new EloquentCollection($parents))
+                        ->when(
+                            $shouldLoadRelation,
+                            /**
+                             * @param EloquentCollection<mixed> $parents
+                             */
+                            function (EloquentCollection $parents) {
+                                return $parents->load([
+                                    $this->relationName => $this->decorateBuilder,
+                                ]);
+                            }
+                        );
                 }
             );
     }
