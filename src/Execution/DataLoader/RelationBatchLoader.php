@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
 class RelationBatchLoader extends BatchLoader
@@ -60,7 +61,12 @@ class RelationBatchLoader extends BatchLoader
             );
             $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
-            $models = $this->getParentModels()->load($relation);
+            $models = $this->getParentModels()
+                ->map(function (Model $parent) {
+                    return $parent->load([
+                        $this->relationName => $this->decorateBuilder,
+                    ]);
+                });
         }
 
         return $models
@@ -77,17 +83,41 @@ class RelationBatchLoader extends BatchLoader
 
     /**
      * Get the parents from the keys that are present on the BatchLoader.
+     *
+     * @return EloquentCollection<mixed>
      */
     protected function getParentModels(): EloquentCollection
     {
-        return new EloquentCollection(
-            array_map(
-                function (array $meta) {
-                    return $meta['parent'];
+        return (new EloquentCollection($this->keys))
+            // Models are grouped by their fully qualified class name to prevent key
+            // collisions between different types of models.
+            ->groupBy(
+                /**
+                 * @param  array<string, mixed>  $key
+                 * @return class-string<\Illuminate\Database\Eloquent\Model>
+                 */
+                static function (array $key): string {
+                    return get_class($key['parent']);
                 },
-                $this->keys
+                true
             )
-        );
+            ->mapWithKeys(
+                /**
+                 * @param  \Illuminate\Support\Collection<array>  $keys
+                 */
+                function (Collection $keys) {
+                    $parents = $keys->map(
+                        /**
+                         * @param  array<string, mixed>  $meta
+                         */
+                        static function (array $meta): Model {
+                            return $meta['parent'];
+                        }
+                    );
+
+                    return new EloquentCollection($parents);
+                }
+            );
     }
 
     /**
