@@ -139,7 +139,6 @@ class ASTBuilder
         $this->applyArgManipulators();
 
         // TODO separate out into modules
-        $this->addPaginationInfoTypes();
         $this->addNodeSupport();
 
         // Listeners may manipulate the DocumentAST that is passed by reference
@@ -316,74 +315,6 @@ class ASTBuilder
                 }
             }
         }
-    }
-
-    /**
-     * Add the types required for pagination.
-     */
-    protected function addPaginationInfoTypes(): void
-    {
-        $this->documentAST->setTypeDefinition(
-            Parser::objectTypeDefinition(/** @lang GraphQL */ '
-                "Pagination information about the corresponding list of items."
-                type PaginatorInfo {
-                  "Total count of available items in the page."
-                  count: Int!
-
-                  "Current pagination page."
-                  currentPage: Int!
-
-                  "Index of first item in the current page."
-                  firstItem: Int
-
-                  "If collection has more pages."
-                  hasMorePages: Boolean!
-
-                  "Index of last item in the current page."
-                  lastItem: Int
-
-                  "Last page number of the collection."
-                  lastPage: Int!
-
-                  "Number of items per page in the collection."
-                  perPage: Int!
-
-                  "Total items available in the collection."
-                  total: Int!
-                }
-            ')
-        );
-
-        $this->documentAST->setTypeDefinition(
-            Parser::objectTypeDefinition(/** @lang GraphQL */ '
-                "Pagination information about the corresponding list of items."
-                type PageInfo {
-                  "When paginating forwards, are there more items?"
-                  hasNextPage: Boolean!
-
-                  "When paginating backwards, are there more items?"
-                  hasPreviousPage: Boolean!
-
-                  "When paginating backwards, the cursor to continue."
-                  startCursor: String
-
-                  "When paginating forwards, the cursor to continue."
-                  endCursor: String
-
-                  "Total number of node in connection."
-                  total: Int
-
-                  "Count of nodes in current request."
-                  count: Int
-
-                  "Current page of request."
-                  currentPage: Int
-
-                  "Last page in connection."
-                  lastPage: Int
-                }
-            ')
-        );
     }
 
     /**
