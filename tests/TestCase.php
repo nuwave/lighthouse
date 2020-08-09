@@ -10,6 +10,7 @@ use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
+use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
@@ -60,9 +61,12 @@ GRAPHQL;
             AuthServiceProvider::class,
             ConsoleServiceProvider::class,
             ScoutServiceProvider::class,
+
+            // Lighthouse's own
             LighthouseServiceProvider::class,
-            SoftDeletesServiceProvider::class,
             OrderByServiceProvider::class,
+            PaginationServiceProvider::class,
+            SoftDeletesServiceProvider::class,
             ValidationServiceProvider::class,
         ];
     }
