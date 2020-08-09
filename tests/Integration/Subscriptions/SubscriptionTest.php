@@ -122,7 +122,7 @@ GRAPHQL;
         }
         ');
 
-        $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
+        $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $response->assertJson([
             'data' => [
