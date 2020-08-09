@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Unit\Pagination;
 
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
