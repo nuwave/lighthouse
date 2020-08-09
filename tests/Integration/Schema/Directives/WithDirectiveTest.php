@@ -170,9 +170,7 @@ class WithDirectiveTest extends DBTestCase
                 factory(Image::class, 4)->make()
             );
 
-        $this->graphQL(
-        /** @lang GraphQL */
-        '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             activity {
                 id
