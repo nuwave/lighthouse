@@ -7,6 +7,7 @@ use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Laravel\Scout\ScoutServiceProvider;
+use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
@@ -64,6 +65,7 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            GlobalIdServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
             SoftDeletesServiceProvider::class,
