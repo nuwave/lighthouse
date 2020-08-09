@@ -22,7 +22,7 @@ class AuthorizeRequestsTest extends EchoTestCase
 
         $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
         $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-' . $channel,
+            'channel_name' => 'presence-'.$channel,
         ])->assertSuccessful()
             ->assertJsonStructure([
                 'channel_data' => ['user_id', 'user_info'],
@@ -35,7 +35,7 @@ class AuthorizeRequestsTest extends EchoTestCase
 
         $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
         $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-' . $channel . 'plain-wrong',
+            'channel_name' => 'presence-'.$channel.'plain-wrong',
         ])->assertForbidden();
     }
 
@@ -45,7 +45,7 @@ class AuthorizeRequestsTest extends EchoTestCase
 
         $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
         $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-' . $channel,
+            'channel_name' => 'presence-'.$channel,
         ])->assertSuccessful()
             ->assertJsonStructure([
                 'channel_data' => ['user_id', 'user_info'],
@@ -55,13 +55,10 @@ class AuthorizeRequestsTest extends EchoTestCase
             ->deleteSubscriber($channel);
 
         $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-' . $channel,
+            'channel_name' => 'presence-'.$channel,
         ])->assertForbidden();
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
     private function querySubscription(): \Illuminate\Testing\TestResponse
     {
         return $this->graphQL('

@@ -29,7 +29,7 @@ class EchoTestCase extends SubscriptionTestCase
                 'broadcasters' => [
                     'echo' => [
                         'driver' => 'echo',
-                        'routes' => SubscriptionRouter::class . '@echoRoutes',
+                        'routes' => SubscriptionRouter::class.'@echoRoutes',
                     ],
                 ],
             ]

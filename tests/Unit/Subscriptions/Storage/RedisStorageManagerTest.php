@@ -7,7 +7,6 @@ use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use PHPUnit\Framework\MockObject\MockObject;
-use Redis;
 use Tests\Unit\Subscriptions\SubscriptionTestCase;
 use Tests\Utils\Subscriptions\DummySubscriber;
 

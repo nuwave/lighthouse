@@ -15,7 +15,7 @@ class SubscriptionTestCase extends TestCase
             parent::getPackageProviders($app),
             [
                 RedisServiceProvider::class,
-                SubscriptionServiceProvider::class
+                SubscriptionServiceProvider::class,
             ]
         );
     }
