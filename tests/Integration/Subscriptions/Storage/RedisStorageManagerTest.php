@@ -1,6 +1,6 @@
 <?php
 
-namespace Subscriptions\Storage;
+namespace Tests\Integration\Subscriptions\Storage;
 
 use Illuminate\Support\Facades\Redis;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
