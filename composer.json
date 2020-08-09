@@ -70,6 +70,7 @@
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
+                "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
                 "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
             ],
