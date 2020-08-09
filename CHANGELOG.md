@@ -8,8 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
-- Ensure the `@with` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1517
-- 
+
 ### Added
 
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
@@ -64,6 +63,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove the `@middleware` directive, as it violates the boundary between HTTP and GraphQL
   request handling. Use `@guard` or other field middleware directives instead https://github.com/nuwave/lighthouse/pull/1135
 - Remove configuration option `pagination_amount_argument`, it is always `first` now
+
+### Fixed
+
+- Ensure the `@with` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1517
 
 ## 4.16.0
 
