@@ -117,9 +117,15 @@ class RedisStorageManager implements StoresSubscriptions
      */
     protected function getSubscriber($channelKey): ?Subscriber
     {
-        return $this->unserialize(
+        $subscriber = $this->unserialize(
             $this->connection->command('get', [$channelKey])
         );
+
+        if ($subscriber instanceof Subscriber) {
+            return $subscriber;
+        }
+
+        return null;
     }
 
     protected function channelKey(string $channel): string
