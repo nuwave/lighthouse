@@ -69,6 +69,7 @@
         "laravel": {
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
+                "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
                 "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
