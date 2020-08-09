@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Unit\GlobalId;
 
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
@@ -10,7 +10,7 @@ use Tests\Utils\Queries\Foo;
 class GlobalIdDirectiveTest extends TestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\Execution\Utils\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
      */
     protected $globalId;
 

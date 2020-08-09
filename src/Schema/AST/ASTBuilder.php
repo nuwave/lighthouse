@@ -138,9 +138,6 @@ class ASTBuilder
         $this->applyFieldManipulators();
         $this->applyArgManipulators();
 
-        // TODO separate out into modules
-        $this->addNodeSupport();
-
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
         // that want to programmatically change the schema.
@@ -315,58 +312,5 @@ class ASTBuilder
                 }
             }
         }
-    }
-
-    /**
-     * Returns whether or not the given interface is used within the defined types.
-     */
-    protected function hasTypeImplementingInterface(string $interfaceName): bool
-    {
-        foreach ($this->documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                if (ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Inject the Node interface and a node field into the Query type.
-     */
-    protected function addNodeSupport(): void
-    {
-        // Only add the node type and node field if a type actually implements them
-        // Otherwise, a validation error is thrown
-        if (! $this->hasTypeImplementingInterface('Node')) {
-            return;
-        }
-
-        $globalId = config('lighthouse.global_id_field');
-        // Double slashes to escape the slashes in the namespace.
-        $this->documentAST->setTypeDefinition(
-            Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-"Node global interface"
-interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {
-"Global identifier that can be used to resolve any Node implementation."
-$globalId: ID!
-}
-GRAPHQL
-            )
-        );
-
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $this->documentAST->types[RootType::QUERY];
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
-        $queryType->fields = ASTHelper::mergeNodeList(
-            $queryType->fields,
-            [
-                Parser::fieldDefinition(/** @lang GraphQL */ '
-                    node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
-                '),
-            ]
-        );
     }
 }
