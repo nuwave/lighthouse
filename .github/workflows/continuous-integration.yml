@@ -32,11 +32,6 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
-      - name: "Start Redis"
-        uses: "supercharge/redis-github-action@1.1.0"
-        with:
-          redis-version: ${{ matrix.redis-version }}
-
       - name: "Install PHP with extensions"
         uses: "shivammathur/setup-php@2.1.0"
         with:
@@ -89,7 +84,7 @@ jobs:
       - name: "Start Redis"
         uses: "supercharge/redis-github-action@1.1.0"
         with:
-          redis-version: ${{ matrix.redis-version }}
+          redis-version: "${{ matrix.redis-version }}"
 
       - name: "Install PHP with extensions"
         uses: "shivammathur/setup-php@2.1.0"
@@ -139,7 +134,7 @@ jobs:
       - name: "Start Redis"
         uses: "supercharge/redis-github-action@1.1.0"
         with:
-          redis-version: ${{ matrix.redis-version }}
+          redis-version: 6
 
       - name: "Install PHP with extensions"
         uses: "shivammathur/setup-php@2.1.0"
@@ -190,11 +185,6 @@ jobs:
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
-
-      - name: "Start Redis"
-        uses: "supercharge/redis-github-action@1.1.0"
-        with:
-          redis-version: ${{ matrix.redis-version }}
 
       - name: "Install PHP with extensions"
         uses: "shivammathur/setup-php@2.1.0"
