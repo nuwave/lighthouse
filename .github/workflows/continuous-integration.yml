@@ -7,7 +7,7 @@ on:
       - "master"
 
 env:
-  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
+  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql, redis"
   LIGHTHOUSE_TEST_DB_HOST: "127.0.0.1"
   LIGHTHOUSE_TEST_DB_PASSWORD: "root"
   LIGHTHOUSE_TEST_REDIS_HOST: "127.0.0.1"
