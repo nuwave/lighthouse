@@ -47,6 +47,34 @@ class RelationFetcher
 
     /**
      * Get the parents from the keys that are present on the BatchLoader and
+     * and load the count of the given relation.
+     *
+     * @param array<mixed, array<mixed>> $keys
+     * @param array<string, \Closure> $relation
+     */
+    public static function getCountedParentModels(array $keys, array $relation): Collection
+    {
+        return static::groupModelsByClassKey($keys)
+            ->mapWithKeys(
+                /**
+                 * @param  \Illuminate\Database\Eloquent\Collection<array>  $keys
+                 */
+                function (Collection $keys) use ($relation) {
+                    return (new Collection(static::extractParents($keys)))
+                        ->tap(
+                            /**
+                             * @param Illuminate\Database\Eloquent\Collection<mixed> $parents
+                             */
+                            function (Collection $parents) use ($relation): void {
+                                $parents->loadCount($relation);
+                            }
+                        );
+                }
+            );
+    }
+
+    /**
+     * Get the parents from the keys that are present on the BatchLoader and
      * and load the given relation.
      *
      * @param array<mixed, array<mixed>> $keys
