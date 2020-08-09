@@ -36,6 +36,7 @@ jobs:
         uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "none"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
@@ -92,6 +93,7 @@ jobs:
         uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "none"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
@@ -147,6 +149,7 @@ jobs:
         uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "pcov"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
@@ -196,6 +199,7 @@ jobs:
         uses: "shivammathur/setup-php@2.1.0"
         with:
           coverage: "none"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
