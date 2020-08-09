@@ -114,7 +114,7 @@ class RelationBatchLoader extends BatchLoader
                         ->when(
                             $shouldLoadRelation,
                             /**
-                             * @param EloquentCollection<mixed> $parents
+                             * @param Illuminate\Database\Eloquent\Collection<mixed> $parents
                              */
                             function (EloquentCollection $parents) {
                                 return $parents->load([
