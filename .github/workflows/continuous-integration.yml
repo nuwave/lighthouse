@@ -10,6 +10,7 @@ env:
   REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
   LIGHTHOUSE_TEST_DB_HOST: "127.0.0.1"
   LIGHTHOUSE_TEST_DB_PASSWORD: "root"
+  LIGHTHOUSE_TEST_REDIS_HOST: "127.0.0.1"
 
 jobs:
   static-code-analysis:
@@ -74,14 +75,14 @@ jobs:
 
     services:
       redis:
-        # Docker Hub image
         image: redis
-        # Set health checks to wait until redis has started
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 6379:6379
 
     steps:
       - name: "Checkout"
@@ -126,6 +127,17 @@ jobs:
           - "7.4"
         laravel-version:
           - "^7.0"
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
 
     steps:
       - name: "Checkout"
