@@ -39,7 +39,7 @@ class RedisStorageManagerTest extends EchoTestCase
         $this->assertStringStartsWith('lighthouse-test-', $keys[1]);
     }
 
-    public function testDeleteSubscriber()
+    public function testDeleteSubscriber(): void
     {
         /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);

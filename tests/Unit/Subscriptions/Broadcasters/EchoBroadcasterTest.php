@@ -39,7 +39,7 @@ class EchoBroadcasterTest extends SubscriptionTestCase
         $request['socket_id'] = 'def';
 
         $response = $redisBroadcaster->authorized($request);
-        $data = json_decode($response->content());
+        $data = \Safe\json_decode($response->content());
         $this->assertEquals(md5('abcdef'), $data->channel_data->user_id);
         $this->assertEquals(200, $response->status());
     }

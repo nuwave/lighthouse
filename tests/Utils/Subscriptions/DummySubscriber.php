@@ -25,7 +25,7 @@ class DummySubscriber extends Subscriber
      */
     public function unserialize($subscription): void
     {
-        $data = json_decode($subscription);
+        $data = \Safe\json_decode($subscription);
 
         $this->channel = $data->channel;
         $this->topic = $data->topic;

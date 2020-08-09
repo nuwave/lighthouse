@@ -79,10 +79,13 @@ class Authorizer implements AuthorizesSubscriptions
     /**
      * Removes the prefix "presence-" from the channel name.
      */
-    private function sanitizeChannelName(string $channelName): string
+    private function sanitizeChannelName(?string $channelName): ?string
     {
-        if (Str::startsWith($channelName, 'presence-')) {
-            return substr($channelName, 9);
+        if (
+            is_string($channelName)
+            && Str::startsWith($channelName, 'presence-')
+        ) {
+            return Str::substr($channelName, 9);
         }
 
         return $channelName;

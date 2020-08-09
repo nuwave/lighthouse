@@ -77,7 +77,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
                 ]],
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
-                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.json_encode([
+                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
                         'channel' => 'private-lighthouse-foo',
                         'topic' => 'some-topic',
                     ]).'}',
