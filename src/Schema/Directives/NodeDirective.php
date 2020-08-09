@@ -6,9 +6,9 @@ use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\GlobalId\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
@@ -16,7 +16,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\NodeRegistry
+     * @var \Nuwave\Lighthouse\GlobalId\NodeRegistry
      */
     protected $nodeRegistry;
 

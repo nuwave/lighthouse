@@ -91,7 +91,9 @@ class ModelRelationFetcherTest extends DBTestCase
         );
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks', 'posts']))
-            ->loadRelationsForPage($this->makePaginationArgs(4));
+            ->loadRelationsForPage(
+                $this->makePaginationArgs(4)
+            );
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -127,7 +129,9 @@ class ModelRelationFetcherTest extends DBTestCase
         $softDeletedTaskUser2->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage($this->makePaginationArgs(4));
+            ->loadRelationsForPage(
+                $this->makePaginationArgs(4)
+            );
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];

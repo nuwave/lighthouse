@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Pagination;
 
 use Illuminate\Database\Eloquent\Builder;
 use Tests\DBTestCase;

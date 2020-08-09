@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Unit\Execution\Utils;
+namespace Tests\Unit\GlobalId;
 
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Tests\TestCase;
 
 class GlobalIdTest extends TestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\Execution\Utils\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
      */
     protected $globalIdResolver;
 

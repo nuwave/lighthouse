@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution\Utils;
+namespace Nuwave\Lighthouse\GlobalId;
 
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 
