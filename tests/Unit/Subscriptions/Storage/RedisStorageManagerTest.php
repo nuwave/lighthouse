@@ -17,7 +17,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
     {
         /** @var MockObject&Repository $config */
         $config = $this->createMock(Repository::class);
-        $redisConnection = $this->getRedisConnection();
+        $redisConnection = $this->createMock(Connection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
@@ -39,7 +39,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
     public function testDeleteSubscriber(): void
     {
         $config = $this->createMock(Repository::class);
-        $redisConnection = $this->getRedisConnection();
+        $redisConnection = $this->createMock(Connection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
@@ -50,7 +50,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
             ->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
-                ['srem', ['test-prefix-graphql.topic.'.$subscriber->topic, $channel]]
+                ['srem', ['graphql.topic.'.$subscriber->topic, $channel]]
             )
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber)
@@ -64,7 +64,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
     public function testStoreSubscriber(): void
     {
         $config = $this->createMock(Repository::class);
-        $redisConnection = $this->getRedisConnection();
+        $redisConnection = $this->createMock(Connection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $subscriber = new DummySubscriber('private-lighthouse-foo', 'dummy-topic');
@@ -73,7 +73,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
             ->method('command')
             ->withConsecutive(
                 ['sadd', [
-                    'test-prefix-graphql.topic.some-topic',
+                    'graphql.topic.some-topic',
                     'private-lighthouse-foo',
                 ]],
                 ['set', [
@@ -92,7 +92,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
     public function testSubscribersByTopic(): void
     {
         $config = $this->createMock(Repository::class);
-        $redisConnection = $this->getRedisConnection();
+        $redisConnection = $this->createMock(Connection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $topic = 'bar';
@@ -106,8 +106,8 @@ class RedisStorageManagerTest extends SubscriptionTestCase
             ->withConsecutive(
                 ['smembers', ['graphql.topic.'.$topic]],
                 ['mget', [[
-                    'test-prefix-graphql.subscriber.foo1',
-                    'test-prefix-graphql.subscriber.foo2',
+                    'graphql.subscriber.foo1',
+                    'graphql.subscriber.foo2',
                 ]]]
             )
             ->willReturnOnConsecutiveCalls(
@@ -120,27 +120,6 @@ class RedisStorageManagerTest extends SubscriptionTestCase
             $subscribers,
             $manager->subscribersByTopic($topic)->all()
         );
-    }
-
-    /**
-     * @return MockObject&Connection
-     */
-    private function getRedisConnection(): MockObject
-    {
-        $redisConnection = $this->createMock(Connection::class);
-        $redisClient = $this->createMock(Redis::class);
-
-        $redisConnection->expects($this->any())
-            ->method('client')
-            ->willReturn($redisClient);
-
-        $redisClient->expects($this->any())
-            ->method('_prefix')
-            ->willReturnCallback(function (string $input): string {
-                return 'test-prefix-'.$input;
-            });
-
-        return $redisConnection;
     }
 
     /**

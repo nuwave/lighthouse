@@ -65,7 +65,6 @@ class RedisStorageManager implements StoresSubscriptions
     {
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
         $subscriberIds = array_map([$this, 'channelKey'], $subscriberIds);
-        $subscriberIds = array_map([$this, 'prefix'], $subscriberIds);
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
         return (new Collection($subscribers))
@@ -79,9 +78,7 @@ class RedisStorageManager implements StoresSubscriptions
     {
         $subscriber->topic = $topic;
 
-        $topicKey = $this->prefix(
-            $this->topicKey($topic)
-        );
+        $topicKey = $this->topicKey($topic);
         $this->connection->command('sadd', [
             $topicKey,
             $subscriber->channel,
@@ -107,9 +104,7 @@ class RedisStorageManager implements StoresSubscriptions
         if ($subscriber) {
             $this->connection->command('del', [$key]);
             $this->connection->command('srem', [
-                $this->prefix(
-                    $this->topicKey($subscriber->topic)
-                ),
+                $this->topicKey($subscriber->topic),
                 $channel,
             ]);
         }
@@ -135,11 +130,6 @@ class RedisStorageManager implements StoresSubscriptions
     protected function topicKey(string $topic): string
     {
         return self::TOPIC_KEY.'.'.$topic;
-    }
-
-    protected function prefix(string $key): string
-    {
-        return $this->connection->client()->_prefix($key);
     }
 
     /**
