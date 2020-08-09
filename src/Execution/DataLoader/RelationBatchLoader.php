@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
 class RelationBatchLoader extends BatchLoader
@@ -56,12 +54,12 @@ class RelationBatchLoader extends BatchLoader
 
         if ($this->paginationArgs !== null) {
             $modelRelationFetcher = new ModelRelationFetcher(
-                $this->getParentModels(false),
+                RelationFetcher::getParentModels($this->keys),
                 $relation
             );
             $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
-            $models = $this->getParentModels();
+            $models = RelationFetcher::getLoadedParentModels($this->keys, $relation);
         }
 
         return $models
@@ -74,56 +72,6 @@ class RelationBatchLoader extends BatchLoader
                 }
             )
             ->all();
-    }
-
-    /**
-     * Get the parents from the keys that are present on the BatchLoader.
-     *
-     * @return EloquentCollection<mixed>
-     */
-    protected function getParentModels(bool $shouldLoadRelation = true): EloquentCollection
-    {
-        return (new EloquentCollection($this->keys))
-            // Models are grouped by their fully qualified class name to prevent key
-            // collisions between different types of models.
-            ->groupBy(
-                /**
-                 * @param  array<string, mixed>  $key
-                 * @return class-string<\Illuminate\Database\Eloquent\Model>
-                 */
-                static function (array $key): string {
-                    return get_class($key['parent']);
-                },
-                true
-            )
-            ->mapWithKeys(
-                /**
-                 * @param  \Illuminate\Support\Collection<array>  $keys
-                 */
-                function (Collection $keys) use ($shouldLoadRelation) {
-                    $parents = $keys->map(
-                        /**
-                         * @param  array<string, mixed>  $meta
-                         */
-                        static function (array $meta): Model {
-                            return $meta['parent'];
-                        }
-                    );
-
-                    return (new EloquentCollection($parents))
-                        ->when(
-                            $shouldLoadRelation,
-                            /**
-                             * @param Illuminate\Database\Eloquent\Collection<mixed> $parents
-                             */
-                            function (EloquentCollection $parents) {
-                                return $parents->load([
-                                    $this->relationName => $this->decorateBuilder,
-                                ]);
-                            }
-                        );
-                }
-            );
     }
 
     /**
