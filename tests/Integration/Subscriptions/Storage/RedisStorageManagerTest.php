@@ -86,7 +86,10 @@ class RedisStorageManagerTest extends EchoTestCase
         $this->assertContainsOnlyInstancesOf(Subscriber::class, $createdSubscribers);
     }
 
-    private function querySubscription(string $topic = 'taskUpdated(id: 123)'): \Illuminate\Testing\TestResponse
+    /**
+     * @return \Illuminate\Testing\TestResponse
+     */
+    private function querySubscription(string $topic = 'taskUpdated(id: 123)')
     {
         return $this->graphQL('
         subscription {

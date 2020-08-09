@@ -59,7 +59,10 @@ class AuthorizeRequestsTest extends EchoTestCase
         ])->assertForbidden();
     }
 
-    private function querySubscription(): \Illuminate\Testing\TestResponse
+    /**
+     * @return \Illuminate\Testing\TestResponse
+     */
+    private function querySubscription()
     {
         return $this->graphQL('
         subscription {
