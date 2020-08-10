@@ -21,9 +21,6 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
  */
 class RedisStorageManager implements StoresSubscriptions
 {
-    /**
-     * @var string
-     */
     public const TOPIC_KEY = 'graphql.topic';
 
     /**
