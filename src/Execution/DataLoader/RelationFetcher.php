@@ -8,7 +8,6 @@ use Illuminate\Support\Collection as SupportCollection;
 
 class RelationFetcher
 {
-
     /**
      * Extract the parent from the keys of the BatchLoader.
      *
@@ -39,7 +38,7 @@ class RelationFetcher
                 /**
                  * @param  \Illuminate\Database\Eloquent\Collection<Model>  $keys
                  */
-                function (Collection $keys) {;
+                function (Collection $keys) {
                     return new Collection(static::extractParents($keys));
                 }
             );
