@@ -142,7 +142,7 @@ class ModelRelationFetcher
     {
         return $this->models->toBase()->map(
             function (Model $model) use ($relationName, $relationConstraints): Relation {
-                $relation = $this->getRelationInstance($relationName);
+                $relation = $this->relationInstance($relationName);
 
                 $relation->addEagerConstraints([$model]);
 
@@ -203,7 +203,7 @@ class ModelRelationFetcher
      *
      * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
      */
-    protected function getRelationCountName(string $relationName): string
+    protected function relationCountName(string $relationName): string
     {
         return Str::snake("{$relationName}_count");
     }
@@ -237,7 +237,7 @@ class ModelRelationFetcher
     {
         $this->models->each(function (Model $model) use ($paginationArgs, $relationName): void {
             $total = $model->getAttribute(
-                $this->getRelationCountName($relationName)
+                $this->relationCountName($relationName)
             );
 
             $paginator = app()->makeWith(
@@ -264,7 +264,7 @@ class ModelRelationFetcher
      */
     protected function associateRelationModels(string $relationName, EloquentCollection $relationModels): self
     {
-        $relation = $this->getRelationInstance($relationName);
+        $relation = $this->relationInstance($relationName);
 
         $relation->match(
             $this->models->all(),
@@ -283,7 +283,7 @@ class ModelRelationFetcher
      */
     protected function hydratePivotRelation(string $relationName, EloquentCollection $relationModels): self
     {
-        $relation = $this->getRelationInstance($relationName);
+        $relation = $this->relationInstance($relationName);
 
         if ($relationModels->isNotEmpty() && method_exists($relation, 'hydratePivotRelation')) {
             $hydrationMethod = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
@@ -297,7 +297,7 @@ class ModelRelationFetcher
     /**
      * Use the underlying model to instantiate a relation by name.
      */
-    protected function getRelationInstance(string $relationName): Relation
+    protected function relationInstance(string $relationName): Relation
     {
         return $this
             ->newModelQuery()
