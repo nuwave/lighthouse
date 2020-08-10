@@ -53,10 +53,7 @@ class EchoBroadcaster implements Broadcaster
         return new JsonResponse(['message' => 'Unauthorized'], 403);
     }
 
-    /**
-     * @return Response
-     */
-    public function hook(Request $request)
+    public function hook(Request $request): JsonResponse
     {
         // Does nothing.
         // The redis broadcaster has the lighthouse:subscribe command to take care of cleaning vacant channels.
