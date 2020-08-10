@@ -26,10 +26,7 @@ class EchoSubscriptionEvent implements ShouldBroadcast
         $this->data = $data;
     }
 
-    /**
-     * @return PresenceChannel
-     */
-    public function broadcastOn()
+    public function broadcastOn(): PresenceChannel
     {
         return new PresenceChannel($this->channel);
     }
