@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - "master"
+      - "4.x"
 
 env:
   REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
