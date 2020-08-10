@@ -224,7 +224,7 @@ class WithDirectiveTest extends DBTestCase
                             '__typename' => 'Task',
                             'id' => "{$task->id}",
                             'images' => $task->images()->get()
-                                ->map(function (Image $image) {
+                                ->map(static function (Image $image): array {
                                     return  ['id' => "{$image->id}"];
                                 }),
                         ],
