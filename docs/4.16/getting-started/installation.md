@@ -14,7 +14,7 @@ Lighthouse includes a default schema to get you going right away. Publish
 it using the following `artisan` command:
 
 ```bash
-php artisan vendor:publish lighthouse-schema
+php artisan vendor:publish --tag=lighthouse-schema
 ```
 
 ## IDE Support
