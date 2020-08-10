@@ -61,7 +61,9 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->singleton(BroadcastManager::class);
         $this->app->singleton(SubscriptionRegistry::class);
         $this->app->singleton(StoresSubscriptions::class, function () {
-            switch ($this->app['config']->get('lighthouse.subscriptions.storage')) {
+            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
+            $configRepository = $this->app->make(ConfigRepository::class);
+            switch ($configRepository->get('lighthouse.subscriptions.storage')) {
                 case 'redis':
                     return $this->app->make(RedisStorageManager::class);
                 default:
