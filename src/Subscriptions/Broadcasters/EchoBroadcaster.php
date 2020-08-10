@@ -45,10 +45,7 @@ class EchoBroadcaster implements Broadcaster
         ]);
     }
 
-    /**
-     * @return Response
-     */
-    public function unauthorized(Request $request)
+    public function unauthorized(Request $request): JsonResponse
     {
         return new JsonResponse(['message' => 'Unauthorized'], 403);
     }
