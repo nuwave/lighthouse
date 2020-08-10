@@ -10,66 +10,62 @@ class RelationFetcher
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @param array<int, array<string, mixed>> $keys
+     * @param array<string, array<string, mixed>> $keys
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public static function extractParentModels(array $keys): EloquentCollection
     {
-        return (new EloquentCollection($keys))
-            ->map(
-                /**
-                 * @param  array<string, mixed>  $meta
-                 */
-                static function (array $meta): Model {
-                    return $meta['parent'];
-                }
-            );
-    }
+        $models = [];
 
-    /**
-     * Extract the parents from the keys and load the count of the given relation.
-     *
-     * @param  array<int, array<string, mixed>>  $keys
-     * @param  array<string, \Closure>  $relation
-     * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
-     */
-    public static function countedParentModels(array $keys, array $relation): EloquentCollection
-    {
-        return static::groupModelsByClassKey($keys)
-            ->flatMap(
-                /**
-                 * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
-                 * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
-                 */
-                static function (EloquentCollection $models) use ($relation): EloquentCollection {
-                    $models->loadCount($relation);
+        foreach ($keys as $key => $meta) {
+            $models[$key] = $meta['parent'];
+        }
 
-                    return $models;
-                }
-            );
+        return new EloquentCollection($models);
     }
 
     /**
      * Extract the parents from the keys and load the given relation.
      *
-     * @param  array<int, array<string, mixed>>  $keys
-     * @param array<string, \Closure> $relation
+     * @param  array<string, array<string, mixed>>  $keys
+     * @param  array<string, \Closure> $relation
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public static function loadedParentModels(array $keys, array $relation): EloquentCollection
     {
-        return static::groupModelsByClassKey($keys)
-            ->flatMap(
-                /**
-                 * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
-                 * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
-                 */
-                static function (EloquentCollection $models) use ($relation): EloquentCollection {
-                    $models->load($relation);
+        $allModels = [];
 
-                    return $models;
-                }
-            );
+        foreach (static::groupModelsByClassKey($keys) as $modelsOfSameClass) {
+            $modelsOfSameClass->load($relation);
+
+            foreach ($modelsOfSameClass as $key => $model) {
+                $allModels[$key] = $model;
+            }
+        }
+
+        return new EloquentCollection($allModels);
+    }
+
+    /**
+     * Extract the parents from the keys and load the count of the given relation.
+     *
+     * @param  array<string, array<string, mixed>>  $keys
+     * @param  array<string, \Closure>  $relation
+     * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
+     */
+    public static function countedParentModels(array $keys, array $relation): EloquentCollection
+    {
+        $allModels = [];
+
+        foreach (static::groupModelsByClassKey($keys) as $modelsOfSameClass) {
+            $modelsOfSameClass->loadCount($relation);
+
+            foreach ($modelsOfSameClass as $key => $model) {
+                $allModels[$key] = $model;
+            }
+        }
+
+        return new EloquentCollection($allModels);
     }
 
     /**
@@ -77,7 +73,7 @@ class RelationFetcher
      *
      * This prevents key collisions between different types of models.
      *
-     * @param array<int, array<string, mixed>> $keys
+     * @param array<string, array<string, mixed>> $keys
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>
      */
     protected static function groupModelsByClassKey(array $keys): EloquentCollection
