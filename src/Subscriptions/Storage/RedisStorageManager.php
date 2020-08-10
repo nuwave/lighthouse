@@ -23,9 +23,6 @@ class RedisStorageManager implements StoresSubscriptions
 {
     public const TOPIC_KEY = 'graphql.topic';
 
-    /**
-     * @var string
-     */
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
     /**
