@@ -64,7 +64,10 @@ abstract class WithRelationDirective extends BaseDirective
                 }
 
                 return $this->loader($resolveInfo)
-                    ->load(ModelKey::build($parent), ['parent' => $parent])
+                    ->load(
+                        ModelKey::build($parent),
+                        ['parent' => $parent]
+                    )
                     ->then(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
                         return $resolver($parent, $args, $context, $resolveInfo);
                     });
