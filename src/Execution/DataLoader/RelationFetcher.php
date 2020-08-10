@@ -89,9 +89,9 @@ class RelationFetcher
     protected static function extractParents(EloquentCollection $keys): SupportCollection
     {
         return $keys->map(
-        /**
-         * @param  array<string, mixed>  $meta
-         */
+            /**
+             * @param  array<string, mixed>  $meta
+             */
             function (array $meta) {
                 return $meta['parent'];
             }
