@@ -98,7 +98,7 @@ class WithDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testItEagerLoadsPolymorphicRelations(): void
+    public function testEagerLoadsPolymorphicRelations(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
