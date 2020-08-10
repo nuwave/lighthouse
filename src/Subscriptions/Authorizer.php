@@ -78,6 +78,10 @@ class Authorizer implements AuthorizesSubscriptions
 
     /**
      * Removes the prefix "presence-" from the channel name.
+     *
+     * When connecting to a presence channel named "private-lighthouse-subscription-1234"
+     * Laravel Echo prefixes the channel with "presence-", but we store the channel
+     * without the "presence-" prefix, which is what we have to remove here.
      */
     private function sanitizeChannelName(?string $channelName): ?string
     {
