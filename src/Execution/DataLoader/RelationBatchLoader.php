@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
@@ -55,12 +54,12 @@ class RelationBatchLoader extends BatchLoader
 
         if ($this->paginationArgs !== null) {
             $modelRelationFetcher = new ModelRelationFetcher(
-                $this->getParentModels(),
+                RelationFetcher::getParentModels($this->keys),
                 $relation
             );
             $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
-            $models = $this->getParentModels()->load($relation);
+            $models = RelationFetcher::getLoadedParentModels($this->keys, $relation);
         }
 
         return $models
@@ -73,21 +72,6 @@ class RelationBatchLoader extends BatchLoader
                 }
             )
             ->all();
-    }
-
-    /**
-     * Get the parents from the keys that are present on the BatchLoader.
-     */
-    protected function getParentModels(): EloquentCollection
-    {
-        return new EloquentCollection(
-            array_map(
-                function (array $meta) {
-                    return $meta['parent'];
-                },
-                $this->keys
-            )
-        );
     }
 
     /**

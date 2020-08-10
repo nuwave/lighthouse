@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.16.1
+
+### Fixed
+
+- Ensure the `@with` directive works properly with polymorphic relations https://github.com/nuwave/lighthouse/pull/1517
+
 ## 4.16.0
 
 ### Added
@@ -220,8 +226,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add optional `columnsEnum` argument to the `@whereConditions`, `@whereHasConditions`
   and `@orderBy` directives https://github.com/nuwave/lighthouse/pull/1150
-- Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used
-  so the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
+- Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used,
+  the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
 - Add test trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
 - Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
@@ -750,6 +756,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove the `@security` directive in favor of defining security options through the config https://github.com/nuwave/lighthouse/pull/435
 - Rename the `resolver` argument of `@interface` and `@union` to `resolveType` https://github.com/nuwave/lighthouse/pull/435
 - Remove deprecated Traits https://github.com/nuwave/lighthouse/pull/435
+- Remove `\Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions::subscriberByRequest()`
 
 ## Pre-v3
 
