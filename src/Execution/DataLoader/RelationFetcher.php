@@ -36,7 +36,7 @@ class RelationFetcher
     public static function countedParentModels(array $keys, array $relation): EloquentCollection
     {
         return static::groupModelsByClassKey($keys)
-            ->mapWithKeys(
+            ->flatMap(
                 /**
                  * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
                  * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
@@ -59,7 +59,7 @@ class RelationFetcher
     public static function loadedParentModels(array $keys, array $relation): EloquentCollection
     {
         return static::groupModelsByClassKey($keys)
-            ->mapWithKeys(
+            ->flatMap(
                 /**
                  * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
                  * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
