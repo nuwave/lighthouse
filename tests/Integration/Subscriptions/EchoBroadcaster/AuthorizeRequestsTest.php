@@ -21,11 +21,15 @@ class AuthorizeRequestsTest extends EchoTestCase
         $response = $this->querySubscription();
 
         $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
-        $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-'.$channel,
-        ])->assertSuccessful()
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'presence-'.$channel,
+            ])
+            ->assertSuccessful()
             ->assertJsonStructure([
-                'channel_data' => ['user_id', 'user_info'],
+                'channel_data' => [
+                    'user_id', 'user_info',
+                ],
             ]);
     }
 
