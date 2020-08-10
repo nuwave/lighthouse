@@ -52,8 +52,6 @@ You can get an instance of it through the Laravel Container.
 ```php
 <?php
 
-declare(strict_types=1);
-
 namespace App\Providers;
 
 use GraphQL\Type\Definition\Type;
