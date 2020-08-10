@@ -64,7 +64,7 @@ class AuthorizeRequestsTest extends EchoTestCase
      */
     private function querySubscription()
     {
-        return $this->graphQL('
+        return $this->graphQL(/** @lang GraphQL */ '
         subscription {
             taskUpdated(id: 123) {
                 id
