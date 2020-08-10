@@ -4,25 +4,24 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection as SupportCollection;
 
 class RelationFetcher
 {
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @param array<mixed, array<mixed>> $keys
-     * @return \Illuminate\Database\Eloquent\Collection<mixed>
+     * @param array<int, array<string, mixed>> $keys
+     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
-    public static function parentModels(array $keys): EloquentCollection
+    public static function extractParentModels(array $keys): EloquentCollection
     {
-        return static::groupModelsByClassKey($keys)
-            ->mapWithKeys(
+        return (new EloquentCollection($keys))
+            ->map(
                 /**
-                 * @param  \Illuminate\Database\Eloquent\Collection<Model>  $keys
+                 * @param  array<string, mixed>  $meta
                  */
-                function (EloquentCollection $keys) {
-                    return new EloquentCollection(static::extractParents($keys));
+                static function (array $meta): Model {
+                    return $meta['parent'];
                 }
             );
     }
@@ -30,26 +29,22 @@ class RelationFetcher
     /**
      * Extract the parents from the keys and load the count of the given relation.
      *
-     * @param array<mixed, array<mixed>> $keys
-     * @param array<string, \Closure> $relation
+     * @param  array<int, array<string, mixed>>  $keys
+     * @param  array<string, \Closure>  $relation
+     * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public static function countedParentModels(array $keys, array $relation): EloquentCollection
     {
         return static::groupModelsByClassKey($keys)
             ->mapWithKeys(
                 /**
-                 * @param  \Illuminate\Database\Eloquent\Collection<array>  $keys
+                 * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
+                 * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
                  */
-                function (EloquentCollection $keys) use ($relation) {
-                    return (new EloquentCollection(static::extractParents($keys)))
-                        ->tap(
-                            /**
-                             * @param \Illuminate\Database\Eloquent\Collection<mixed> $parents
-                             */
-                            function (EloquentCollection $parents) use ($relation): void {
-                                $parents->loadCount($relation);
-                            }
-                        );
+                static function (EloquentCollection $models) use ($relation): EloquentCollection {
+                    $models->loadCount($relation);
+
+                    return $models;
                 }
             );
     }
@@ -57,62 +52,43 @@ class RelationFetcher
     /**
      * Extract the parents from the keys and load the given relation.
      *
-     * @param array<mixed, array<mixed>> $keys
+     * @param  array<int, array<string, mixed>>  $keys
      * @param array<string, \Closure> $relation
+     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public static function loadedParentModels(array $keys, array $relation): EloquentCollection
     {
         return static::groupModelsByClassKey($keys)
             ->mapWithKeys(
                 /**
-                 * @param  \Illuminate\Database\Eloquent\Collection<array>  $keys
+                 * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
+                 * @return  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
                  */
-                function (EloquentCollection $keys) use ($relation) {
-                    return (new EloquentCollection(static::extractParents($keys)))
-                        ->tap(
-                            /**
-                             * @param \Illuminate\Database\Eloquent\Collection<mixed> $parents
-                             */
-                            function (EloquentCollection $parents) use ($relation): void {
-                                $parents->load($relation);
-                            }
-                        );
+                static function (EloquentCollection $models) use ($relation): EloquentCollection {
+                    $models->load($relation);
+
+                    return $models;
                 }
             );
     }
 
     /**
-     * Extract the parent from the keys of the BatchLoader.
+     * Group the models by their fully qualified class name.
      *
-     * @param  \Illuminate\Support\Collection<mixed> $keys
-     */
-    protected static function extractParents(EloquentCollection $keys): SupportCollection
-    {
-        return $keys->map(
-            /**
-             * @param  array<string, mixed>  $meta
-             */
-            function (array $meta) {
-                return $meta['parent'];
-            }
-        );
-    }
-
-    /**
-     * Group the models by their fully qualified class name to prevent key collisions between different types of models.
+     * This prevents key collisions between different types of models.
      *
-     * @param array<mixed, array<mixed>> $keys
+     * @param array<int, array<string, mixed>> $keys
+     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>
      */
     protected static function groupModelsByClassKey(array $keys): EloquentCollection
     {
-        return (new EloquentCollection($keys))
+        return self::extractParentModels($keys)
             ->groupBy(
                 /**
-                 * @param  array<string, mixed>  $key
                  * @return class-string<\Illuminate\Database\Eloquent\Model>
                  */
-                static function (array $key): string {
-                    return get_class($key['parent']);
+                static function (Model $model): string {
+                    return get_class($model);
                 },
                 true
             );
