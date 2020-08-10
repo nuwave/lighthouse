@@ -31,7 +31,7 @@ class RedisStorageManager implements StoresSubscriptions
     /**
      * @var \Illuminate\Redis\Connections\Connection
      */
-    private $connection;
+    protected $connection;
 
     /**
      * The time to live for items in the cache.
