@@ -33,10 +33,10 @@ class EchoSubscriptionEvent implements ShouldBroadcast
 
     /**
      * Returns an event name.
+     *
      * Allows the echo client to receive this event using .listen('.lighthouse.subscription', () => ...).
-     * @return string
      */
-    public function broadcastAs()
+    public function broadcastAs(): string
     {
         return 'lighthouse.subscription';
     }
