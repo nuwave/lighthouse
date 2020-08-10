@@ -155,6 +155,8 @@ class RedisStorageManager implements StoresSubscriptions
             return null;
         }
 
-        return is_numeric($value) ? $value : unserialize($value);
+        return is_numeric($value)
+            ? $value
+            : unserialize($value);
     }
 }
