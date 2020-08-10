@@ -24,7 +24,7 @@ class EchoBroadcaster implements Broadcaster
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function broadcast(Subscriber $subscriber, array $data): void
     {
