@@ -90,10 +90,7 @@ class RedisStorageManager implements StoresSubscriptions
         ], $this->ttl ? ['EX', $this->ttl] : []));
     }
 
-    /**
-     * @return Subscriber|null
-     */
-    public function deleteSubscriber(string $channel)
+    public function deleteSubscriber(string $channel): ?Subscriber
     {
         $key = $this->channelKey($channel);
         $subscriber = $this->getSubscriber($key);
