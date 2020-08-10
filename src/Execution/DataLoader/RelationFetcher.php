@@ -10,7 +10,7 @@ class RelationFetcher
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @param  array<string, array<string, mixed>> $keys
+     * @param  array<string, array<string, mixed>>  $keys
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public static function extractParentModels(array $keys): EloquentCollection
@@ -27,8 +27,8 @@ class RelationFetcher
     /**
      * Extract the parents from the keys and load the given relation.
      *
-     * @param  array<string, array<string, mixed>> $keys
-     * @param  array<string, \Closure> $relation
+     * @param  array<string, array<string, mixed>>  $keys
+     * @param  array<string, \Closure>  $relation
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public static function loadedParentModels(array $keys, array $relation): EloquentCollection
@@ -49,8 +49,8 @@ class RelationFetcher
     /**
      * Extract the parents from the keys and load the count of the given relation.
      *
-     * @param  array<string, array<string, mixed>> $keys
-     * @param  array<string, \Closure> $relation
+     * @param  array<string, array<string, mixed>>  $keys
+     * @param  array<string, \Closure>  $relation
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
     public static function countedParentModels(array $keys, array $relation): EloquentCollection
@@ -73,7 +73,7 @@ class RelationFetcher
      *
      * This prevents key collisions between different types of models.
      *
-     * @param  array<string, array<string, mixed>> $keys
+     * @param  array<string, array<string, mixed>>  $keys
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>
      */
     protected static function groupModelsByClassKey(array $keys): EloquentCollection
