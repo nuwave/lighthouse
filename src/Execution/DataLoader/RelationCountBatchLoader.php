@@ -39,7 +39,8 @@ class RelationCountBatchLoader extends BatchLoader
     {
         $relation = [$this->relationName => $this->decorateBuilder];
 
-        return RelationFetcher::getCountedParentModels($this->keys, $relation)
+        return RelationFetcher
+            ::countedParentModels($this->keys, $relation)
             ->all();
     }
 }

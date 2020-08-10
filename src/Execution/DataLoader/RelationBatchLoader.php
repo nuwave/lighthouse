@@ -54,12 +54,12 @@ class RelationBatchLoader extends BatchLoader
 
         if ($this->paginationArgs !== null) {
             $modelRelationFetcher = new ModelRelationFetcher(
-                RelationFetcher::getParentModels($this->keys),
+                RelationFetcher::parentModels($this->keys),
                 $relation
             );
             $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
         } else {
-            $models = RelationFetcher::getLoadedParentModels($this->keys, $relation);
+            $models = RelationFetcher::loadedParentModels($this->keys, $relation);
         }
 
         return $models
