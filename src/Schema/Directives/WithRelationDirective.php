@@ -40,19 +40,6 @@ abstract class WithRelationDirective extends BaseDirective
     }
 
     /**
-     * Decorate the builder used to fetch the models.
-     */
-    protected function decorateBuilder(ResolveInfo $resolveInfo): Closure
-    {
-        return function ($query) use ($resolveInfo) {
-            $resolveInfo->argumentSet->enhanceBuilder(
-                $query,
-                $this->directiveArgValue('scopes', [])
-            );
-        };
-    }
-
-    /**
      * Return a new deferred resolver.
      */
     protected function deferredRelationResolver(callable $resolver): Closure
@@ -88,5 +75,18 @@ abstract class WithRelationDirective extends BaseDirective
                 'decorateBuilder' => $this->decorateBuilder($resolveInfo),
             ]
         );
+    }
+
+    /**
+     * Decorate the builder used to fetch the models.
+     */
+    protected function decorateBuilder(ResolveInfo $resolveInfo): Closure
+    {
+        return function ($query) use ($resolveInfo) {
+            $resolveInfo->argumentSet->enhanceBuilder(
+                $query,
+                $this->directiveArgValue('scopes', [])
+            );
+        };
     }
 }

@@ -5,52 +5,31 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
-class RelationBatchLoader extends BatchLoader
+class RelationBatchLoader
 {
     /**
-     * The name of the Eloquent relation to load.
+     * A map from relation names and meta information about them.
      *
-     * @var string
+     * @var array<string, \Nuwave\Lighthouse\Execution\DataLoader\RelationMeta>
      */
-    protected $relationName;
+    protected $relations = [];
 
-    /**
-     * This function is called with the relation query builder and may modify it.
-     *
-     * @var \Closure
-     */
-    protected $decorateBuilder;
+    public function relation(string $relationName, RelationMeta $relationMeta)
+    {
+        // TODO what happens if the name exists? throw, bail, overwrite?
 
-    /**
-     * Optionally, a relation may be paginated.
-     *
-     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs|null
-     */
-    protected $paginationArgs;
-
-    /**
-     * @param  \Closure  $decorateBuilder
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
-     */
-    public function __construct(
-        string $relationName,
-        // Not using a type-hint to avoid resolving those params through the container
-        $decorateBuilder,
-        $paginationArgs = null
-    ) {
-        $this->relationName = $relationName;
-        $this->decorateBuilder = $decorateBuilder;
-        $this->paginationArgs = $paginationArgs;
+        $this->relations[$relationName] = $relationMeta;
     }
 
     /**
-     * Eager-load the relation.
+     * Eager-load the relations.
      *
      * @return array<string, mixed>
      */
     public function resolve(): array
     {
-        $relation = [$this->relationName => $this->decorateBuilder];
+        // TODO split paginated and non-paginated relations
+        $relation = [$this->relations => $this->decorateBuilder];
 
         if ($this->paginationArgs !== null) {
             $modelRelationFetcher = new ModelRelationFetcher(
@@ -82,7 +61,7 @@ class RelationBatchLoader extends BatchLoader
     protected function extractRelation(Model $model)
     {
         // Dot notation may be used to eager load nested relations
-        $parts = explode('.', $this->relationName);
+        $parts = explode('.', $this->relations);
 
         // We just return the first level of relations for now. They
         // hold the nested relations in case they are needed.

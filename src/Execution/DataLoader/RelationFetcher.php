@@ -25,6 +25,23 @@ class RelationFetcher
     }
 
     /**
+     * Get the parents from the keys that are present on the BatchLoader.
+     *
+     * @param  array<string, array<string, mixed>>  $keys
+     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
+     */
+    public static function extractRelations(array $keys): EloquentCollection
+    {
+        $models = [];
+
+        foreach ($keys as $key => $meta) {
+            $models[$key] = $meta['parent'];
+        }
+
+        return new EloquentCollection($models);
+    }
+
+    /**
      * Extract the parents from the keys and load the given relation.
      *
      * @param  array<string, array<string, mixed>>  $keys
@@ -35,6 +52,7 @@ class RelationFetcher
     {
         $allModels = [];
 
+        /** @var \Illuminate\Database\Eloquent\Model $modelsOfSameClass */
         foreach (static::groupModelsByClassKey($keys) as $modelsOfSameClass) {
             $modelsOfSameClass->load($relation);
 

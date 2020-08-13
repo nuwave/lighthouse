@@ -98,4 +98,13 @@ class User extends Authenticatable
                 ->first()
                 ->relationLoaded('comments');
     }
+
+    public function tasksAndPostsCommentsLoaded(): bool
+    {
+        dump($this->tasksLoaded());
+        dump($this->postsCommentsLoaded());
+
+        return $this->tasksLoaded()
+            && $this->postsCommentsLoaded();
+    }
 }
