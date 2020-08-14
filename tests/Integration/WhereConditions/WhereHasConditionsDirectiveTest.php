@@ -181,24 +181,22 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasBelongsToMany(): void
     {
-        factory(Role::class)->create();
         factory(User::class)->create();
+
+        /** @var Role $role */
+        $role = factory(Role::class)->create();
 
         /** @var User $user */
         $user = factory(User::class)->create();
 
-        $user
-            ->roles()
-            ->attach(
-                factory(Role::class, 4)->create()
-            );
+        $user->roles()->attach($role);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 hasRoles: {
                     column: "id",
-                    value: 1
+                    value: ' . $role->getKey() . '
                 }
             ) {
                 id
@@ -208,7 +206,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '2',
+                        'id' => (string) $user->getKey(),
                     ],
                 ],
             ],

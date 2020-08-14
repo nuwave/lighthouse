@@ -115,10 +115,15 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     $relation,
                     function ($builder) use ($relation, $model, $condition): void {
                         if ($condition) {
+                            $relatedModel = $this->nestedRelatedModel($model, $relation);
+
                             $this->handleWhereConditions(
                                 $builder,
-                                $condition,
-                                $this->nestedRelatedModel($model, $relation)
+                                $this->prefixConditionWithTableName(
+                                    $condition,
+                                    $relatedModel
+                                ),
+                                $relatedModel
                             );
                         }
                     },
@@ -174,7 +179,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      */
     protected static function assertValidColumnName(string $column): void
     {
-        $match = \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column);
+        $match = \Safe\preg_match('/^(?![0-9])[.A-Za-z0-9_-]*$/', $column);
         if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
@@ -192,6 +197,15 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         });
 
         return $relatedModel;
+    }
+
+    protected function prefixConditionWithTableName(array $conditions, Model $model): array
+    {
+        if ($conditions['column'] ?? null) {
+            $conditions['column'] = $model->getTable() . '.' .$conditions['column'];
+        }
+
+        return $conditions;
     }
 
     /**
