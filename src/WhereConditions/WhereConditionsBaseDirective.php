@@ -200,9 +200,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param array<string, mixed>|null $condition
+     * @param array<string, mixed> $condition
      * @param Model $model
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>
      */
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
