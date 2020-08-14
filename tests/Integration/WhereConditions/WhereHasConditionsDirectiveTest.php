@@ -196,7 +196,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             users(
                 hasRoles: {
                     column: "id",
-                    value: ' . $role->getKey() . '
+                    value: '.$role->getKey().'
                 }
             ) {
                 id
