@@ -1015,7 +1015,7 @@ on all of them at once.
 
 ```graphql
 extend type Query @guard(with: ["api"]) {
-    
+
 }
 ```
 
