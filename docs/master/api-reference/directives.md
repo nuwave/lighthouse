@@ -237,7 +237,7 @@ directive @broadcast(
   This defaults to the global config option `lighthouse.subscriptions.queue_broadcasts`.
   """
   shouldQueue: Boolean
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 [Read more about subscriptions](../subscriptions/getting-started.md)
@@ -274,7 +274,7 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 You must point to a `method` which will receive the builder instance
@@ -418,7 +418,7 @@ directive @can(
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: Mixed
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
@@ -876,7 +876,7 @@ is an identical string. [Read more about enum types](../the-basics/types.md#enum
 
 ```graphql
 """
-Place an equal operator on an Eloquent query.
+Use the client given value to add an equal conditional to a database query.
 """
 directive @eq(
   """
@@ -884,7 +884,7 @@ directive @eq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ```graphql
@@ -906,22 +906,34 @@ type User {
 
 ```graphql
 """
-Fire an event after a mutation has taken place.
-It requires the `dispatch` argument that should be
-the class name of the event you want to fire.
+Dispatch an event after the resolution of a field.
+
+The event constructor will be called with a single argument:
+the resolved value of the field.
 """
 directive @event(
   """
   Specify the fully qualified class name (FQCN) of the event to dispatch.
   """
   dispatch: String!
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
+
+For example, you might want to have an event when new orders are placed in a shop:
 
 ```graphql
 type Mutation {
-  createPost(title: String!, content: String!): Post
-    @event(dispatch: "App\\Events\\PostCreated")
+  placeOrder(items: [CartItems!]!): Order!
+    @event(dispatch: "App\\Events\\PlacedOrder")
+}
+```
+
+The event class must accept an `Order` in the constructor:
+
+```php
+class PlacedOrder
+{
+    public function __construct(Order $order) { ... }
 }
 ```
 
@@ -970,8 +982,11 @@ own mechanism of encoding/decoding global ids.
 ```graphql
 """
 Run authentication through one or more guards.
+
 This is run per field and may allow unauthenticated
 users to still receive partial results.
+
+Used upon an object, it applies to all fields within.
 """
 directive @guard(
   """
@@ -993,6 +1008,15 @@ To ensure the user is logged in, add the `AttemptAuthenticate` middleware to you
     // middleware, this delegates auth and permission checks to the field level.
     \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
 ],
+```
+
+A useful pattern is to group fields in an `extend type` and apply [@guard](#guard)
+on all of them at once.
+
+```graphql
+extend type Query @guard(with: ["api"]) {
+    
+}
 ```
 
 ## @hash

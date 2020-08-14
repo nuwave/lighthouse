@@ -72,7 +72,7 @@ directive @can(
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: Mixed
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 SDL;
     }
 

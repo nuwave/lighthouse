@@ -293,6 +293,7 @@ class ASTHelper
         /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
         $fieldDefinitions = $objectType->fields;
         foreach ($fieldDefinitions as $fieldDefinition) {
+            // TODO check if directive is repeatable
             // If the field already has the same directive defined, skip over it.
             // Field directives are more specific than those defined on a type.
             if (self::hasDirective($fieldDefinition, $name)) {
