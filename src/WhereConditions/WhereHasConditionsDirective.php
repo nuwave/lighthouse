@@ -63,7 +63,7 @@ SDL;
                     $builder->getModel(),
                     $this->getRelationName()
                 )
-            ),
+            )
         );
 
         return $builder;
