@@ -206,7 +206,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
         if ($condition['column'] ?? null) {
-            $condition['column'] = $model->getTable() .'.'.$condition['column'];
+            $condition['column'] = $model->getTable().'.'.$condition['column'];
         }
 
         return $condition;
