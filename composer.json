@@ -37,7 +37,7 @@
         "laragraph/laravel-graphql-utils": "dev-master",
         "nesbot/carbon": "^1.26 || ^2.0",
         "thecodingmachine/safe": "^1.0",
-        "webonyx/graphql-php": "^14.1"
+        "webonyx/graphql-php": "^14.2"
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.28.3",
