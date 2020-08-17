@@ -130,13 +130,11 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             $stub
         );
 
-        $stub = str_replace(
+        return str_replace(
             '{{ implements }}',
             $this->implements->implode(', '),
             $stub
         );
-
-        return $stub;
     }
 
     /**

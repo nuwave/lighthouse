@@ -54,6 +54,7 @@
         "phpstan/phpstan-mockery": "^0.12.5",
         "phpunit/phpunit": "^7.5 || ^8.4",
         "pusher/pusher-php-server": "^3.2",
+        "rector/rector": "^0.7.64",
         "thecodingmachine/phpstan-safe-rule": "^1.0"
     },
     "suggest": {

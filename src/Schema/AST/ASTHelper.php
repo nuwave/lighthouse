@@ -143,7 +143,7 @@ class ASTHelper
         /** @var \GraphQL\Language\AST\ArgumentNode|null $arg */
         $arg = self::firstByName($directive->arguments, $name);
 
-        return $arg
+        return $arg !== null
             ? AST::valueFromASTUntyped($arg->value)
             : $default;
     }
@@ -212,7 +212,7 @@ class ASTHelper
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
-        return $namespaceDirective
+        return $namespaceDirective !== null
             // The namespace directive can contain an argument with the name of the
             // current directive, in which case it applies here
             ? static::directiveArgValue($namespaceDirective, $directiveName, '')

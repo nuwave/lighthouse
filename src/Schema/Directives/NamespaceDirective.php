@@ -43,7 +43,8 @@ SDL;
 
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($objectType->fields as $fieldDefinition) {
-            if ($existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
+            $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);
+            if ($existingNamespaces !== null) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
