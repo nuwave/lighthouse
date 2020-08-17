@@ -64,6 +64,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
   request handling. Use `@guard` or other field middleware directives instead https://github.com/nuwave/lighthouse/pull/1135
 - Remove configuration option `pagination_amount_argument`, it is always `first` now
 
+## 4.16.2
+
+### Fixed
+
+- Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
+
 ## 4.16.1
 
 ### Fixed

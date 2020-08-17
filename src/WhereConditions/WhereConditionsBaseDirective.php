@@ -79,7 +79,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         }
 
         if ($column = $whereConditions['column'] ?? null) {
-            static::assertValidColumnName($column);
+            static::assertValidColumnReference($column);
 
             return $this->operator->applyConditions($builder, $whereConditions, $boolean);
         }
@@ -171,15 +171,17 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * Ensure the column name is well formed.
-     *
-     * This prevents SQL injection.
+     * Ensure the column name is well formed to prevent SQL injection.
      *
      * @throws \GraphQL\Error\Error
      */
-    protected static function assertValidColumnName(string $column): void
+    protected static function assertValidColumnReference(string $column): void
     {
-        $match = \Safe\preg_match('/^(?![0-9])[.A-Za-z0-9_-]*$/', $column);
+        // A valid column reference:
+        // - must not start with a digit, dot or hyphen
+        // - must contain only alphanumerics, digits, underscores, dots or hyphens
+        // Dots are allowed to reference a column in a table: my_table.my_column.
+        $match = \Safe\preg_match('/^(?![0-9.-])[A-Za-z0-9_.-]*$/', $column);
         if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
@@ -200,13 +202,18 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param array<string, mixed> $condition
+     * If the condition references a column, prefix it with the table name.
+     *
+     * This is important for queries which can otherwise be ambiguous, for
+     * example when multiple tables with a column "id" are involved.
+     *
+     * @param  array<string, mixed>  $condition
      * @return array<string, mixed>
      */
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
-        if ($condition['column'] ?? null) {
-            $condition['column'] = $model->getTable().'.'.$condition['column'];
+        if ($column = $condition['column'] ?? null) {
+            $condition['column'] = $model->getTable().'.'.$column;
         }
 
         return $condition;
