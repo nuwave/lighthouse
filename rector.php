@@ -8,11 +8,13 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
-    $services = $containerConfigurator->services();
 
     $parameters->set(Option::SETS, [
         SetList::CODE_QUALITY,
         SetList::DEAD_CODE,
+        SetList::PHPUNIT_EXCEPTION,
+        SetList::PHPUNIT_SPECIFIC_METHOD,
+        SetList::PHPUNIT_YIELD_DATA_PROVIDER,
     ]);
 
     $parameters->set(Option::EXCLUDE_RECTORS, [
