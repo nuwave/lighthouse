@@ -66,6 +66,8 @@ class ArgumentSet
 
     /**
      * Apply the @spread directive and return a new, modified instance.
+     *
+     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
      */
     public function spread(): self
     {
@@ -97,6 +99,8 @@ class ArgumentSet
 
     /**
      * Apply the @rename directive and return a new, modified instance.
+     *
+     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
      */
     public function rename(): self
     {
