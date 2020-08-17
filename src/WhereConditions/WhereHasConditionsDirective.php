@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
@@ -57,13 +56,7 @@ SDL;
             $builder,
             $builder->getModel(),
             $this->getRelationName(),
-            $this->prefixConditionWithTableName(
-                $whereConditions,
-                $this->nestedRelatedModel(
-                    $builder->getModel(),
-                    $this->getRelationName()
-                )
-            )
+            $whereConditions
         );
 
         return $builder;
@@ -90,18 +83,5 @@ SDL;
     protected function generatedInputSuffix(): string
     {
         return 'WhereHasConditions';
-    }
-
-    /**
-     * @param array<string, mixed> $condition
-     * @return array<string, mixed>
-     */
-    protected function prefixConditionWithTableName(array $condition, Model $model): array
-    {
-        if ($condition['column'] ?? null) {
-            $condition['column'] = $model->getTable().'.'.$condition['column'];
-        }
-
-        return $condition;
     }
 }

@@ -115,10 +115,15 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     $relation,
                     function ($builder) use ($relation, $model, $condition): void {
                         if ($condition) {
+                            $relatedModel = $this->nestedRelatedModel($model, $relation);
+
                             $this->handleWhereConditions(
                                 $builder,
-                                $condition,
-                                $this->nestedRelatedModel($model, $relation)
+                                $this->prefixConditionWithTableName(
+                                    $condition,
+                                    $relatedModel
+                                ),
+                                $relatedModel
                             );
                         }
                     },
@@ -192,6 +197,19 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         });
 
         return $relatedModel;
+    }
+
+    /**
+     * @param array<string, mixed> $condition
+     * @return array<string, mixed>
+     */
+    protected function prefixConditionWithTableName(array $condition, Model $model): array
+    {
+        if ($condition['column'] ?? null) {
+            $condition['column'] = $model->getTable().'.'.$condition['column'];
+        }
+
+        return $condition;
     }
 
     /**
