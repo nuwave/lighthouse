@@ -4,8 +4,11 @@ namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
 use GraphQL\Language\Parser;
+use GraphQL\Server\Helper;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Laragraph\LaravelGraphQLUtils\RequestParser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -259,8 +262,7 @@ directive @defer(if: Boolean = true) on FIELD
     protected function executeDeferred(): void
     {
         $this->result = $this->container->call(
-            function (; $request, 
-             $requestParser, defer $graphQLHelper) {
+            function (Request $request, RequestParser $requestParser, Helper $graphQLHelper) {
                 return $this->graphQL->executeRequest($request, $requestParser, $graphQLHelper);
             }
         );

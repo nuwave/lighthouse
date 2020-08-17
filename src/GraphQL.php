@@ -89,7 +89,7 @@ class GraphQL
     /**
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
-    public function executeRequest(Request $request, RequestParser $requestParser, Helper $graphQLHelper)
+    public function executeRequest(Request $request, RequestParser $requestParser, Helper $graphQLHelper): array
     {
         $operationParams = $requestParser->parseRequest($request);
 

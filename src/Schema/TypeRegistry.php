@@ -204,7 +204,7 @@ EOL
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                $typeResolver = $this->directiveFactory->exclusiveOfType($definition, TypeResolver::class)
+                $typeResolver = $this->directiveFactory->exclusiveOfType($definition, TypeResolver::class);
                 if ($typeResolver !== null) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                     return $typeResolver->resolveNode($value);
