@@ -123,7 +123,7 @@ class ArgumentSet
                 return $directive instanceof RenameDirective;
             });
 
-            if ($renameDirective) {
+            if ($renameDirective !== null) {
                 $argumentSet->arguments[$renameDirective->attributeArgValue()] = $argument;
             } else {
                 $argumentSet->arguments[$name] = $argument;

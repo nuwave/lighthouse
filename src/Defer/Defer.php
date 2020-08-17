@@ -203,7 +203,7 @@ directive @defer(if: Boolean = true) on FIELD
                 // We've hit the max execution time or max nested levels of deferred fields.
                 // We process remaining deferred fields, but are no longer allowing additional
                 // fields to be deferred.
-                if (count($this->deferred)) {
+                if (count($this->deferred) > 0) {
                     $this->acceptFurtherDeferring = false;
                     $this->executeDeferred();
                 }
@@ -259,7 +259,10 @@ directive @defer(if: Boolean = true) on FIELD
     protected function executeDeferred(): void
     {
         $this->result = $this->container->call(
-            [$this->graphQL, 'executeRequest']
+            function (; $request, 
+             $requestParser, defer $graphQLHelper) {
+                return $this->graphQL->executeRequest($request, $requestParser, $graphQLHelper);
+            }
         );
 
         $this->stream->stream(

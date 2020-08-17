@@ -204,7 +204,8 @@ EOL
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                if ($typeResolver = $this->directiveFactory->exclusiveOfType($definition, TypeResolver::class)) {
+                $typeResolver = $this->directiveFactory->exclusiveOfType($definition, TypeResolver::class)
+                if ($typeResolver !== null) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                     return $typeResolver->resolveNode($value);
                 }
@@ -253,7 +254,7 @@ EOL
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value
-                'value' => $enumDirective
+                'value' => $enumDirective !== null
                     ? $enumDirective->value()
                     : $enumValue->name->value,
                 'description' => data_get($enumValue->description, 'value'),
@@ -275,7 +276,7 @@ EOL
     {
         $scalarName = $scalarDefinition->name->value;
 
-        if ($directive = ASTHelper::directiveDefinition($scalarDefinition, 'scalar')) {
+        if (($directive = ASTHelper::directiveDefinition($scalarDefinition, 'scalar')) !== null) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
             $className = $scalarName;
@@ -374,7 +375,7 @@ EOL
     {
         $nodeName = $interfaceDefinition->name->value;
 
-        if ($directiveNode = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
+        if (($directiveNode = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) !== null) {
             $interfaceDirective = (new InterfaceDirective)->hydrate($directiveNode, $interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
@@ -434,7 +435,7 @@ EOL
     {
         $nodeName = $unionDefinition->name->value;
 
-        if ($directiveNode = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
+        if (($directiveNode = ASTHelper::directiveDefinition($unionDefinition, 'union')) !== null) {
             $unionDirective = (new UnionDirective)->hydrate($directiveNode, $unionDefinition);
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');

@@ -53,13 +53,17 @@ class SchemaBuilder
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            [$this->typeRegistry, 'get']
+            function (string $name): Type {
+                return $this->typeRegistry->get($name);
+            }
         );
 
         // This is just used for introspection, it is required
         // to be able to retrieve all the types in the schema
         $config->setTypes(
-            [$this->typeRegistry, 'possibleTypes']
+            function (): array {
+                return $this->typeRegistry->possibleTypes();
+            }
         );
 
         // There is no way to resolve directives lazily, so we convert them eagerly
