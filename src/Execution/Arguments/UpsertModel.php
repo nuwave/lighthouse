@@ -34,7 +34,7 @@ class UpsertModel implements ArgResolver
                 ->newQuery()
                 ->find($id->value);
 
-            if ($existingModel !== null ) {
+            if ($existingModel !== null) {
                 $model = $existingModel;
             }
         }
