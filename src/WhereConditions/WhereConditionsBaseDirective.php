@@ -192,9 +192,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         $relations = explode('.', $nestedRelationPath);
         $relatedModel = $model->newInstance();
 
-        array_walk($relations, static function (string $relation) use (&$relatedModel): void {
+        foreach ($relations as $relation) {
             $relatedModel = $relatedModel->{$relation}()->getRelated();
-        });
+        }
 
         return $relatedModel;
     }
