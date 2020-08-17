@@ -16,10 +16,9 @@ class ConnectionField
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {
-        // Laravel type-hints are inaccurate here
-        /** @var int|null $firstItem */
+        /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
-        /** @var int|null $lastItem */
+        /** @var int|null $lastItem Laravel type-hints are inaccurate here */
         $lastItem = $paginator->lastItem();
 
         return [
@@ -55,6 +54,7 @@ class ConnectionField
         $objectLikeType = $listOfType->ofType;
         $returnTypeFields = $objectLikeType->getFields();
 
+        /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
 
         return $paginator
