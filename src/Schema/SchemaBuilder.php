@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\GraphQL;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
