@@ -22,7 +22,6 @@ use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class ASTHelper
 {
