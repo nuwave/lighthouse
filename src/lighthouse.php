@@ -1,5 +1,11 @@
 <?php
 
+use Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective;
+use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
+use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective;
+use Nuwave\Lighthouse\Validation\ValidateDirective;
+
 return [
 
     /*
@@ -195,6 +201,25 @@ return [
     'error_handlers' => [
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Field Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Register global field middleware directives that wrap around every field.
+    | Execution happens in the defined order, before other field middleware.
+    | The classes must implement \Nuwave\Lighthouse\Support\Contracts\FieldMiddleware
+    |
+    */
+
+    'field_middleware' => [
+        SanitizeDirective::class,
+        ValidateDirective::class,
+        TransformArgsDirective::class,
+        SpreadDirective::class,
+        RenameArgsDirective::class,
     ],
 
     /*
