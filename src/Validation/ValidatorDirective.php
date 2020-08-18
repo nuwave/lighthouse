@@ -58,7 +58,7 @@ SDL;
 
     protected function validator(): Validator
     {
-        if (! $this->validator) {
+        if ($this->validator === null) {
             /** @var \Nuwave\Lighthouse\Validation\Validator $validator */
             $validator = app(
                 // We precomputed and validated the full class name at schema build time

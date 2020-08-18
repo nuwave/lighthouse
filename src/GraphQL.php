@@ -89,7 +89,7 @@ class GraphQL
     /**
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
-    public function executeRequest(Request $request, RequestParser $requestParser, Helper $graphQLHelper)
+    public function executeRequest(Request $request, RequestParser $requestParser, Helper $graphQLHelper): array
     {
         $operationParams = $requestParser->parseRequest($request);
 
@@ -199,7 +199,7 @@ class GraphQL
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {
-            if ($extensionsResponse) {
+            if ($extensionsResponse !== null) {
                 $result->extensions[$extensionsResponse->key()] = $extensionsResponse->content();
             }
         }

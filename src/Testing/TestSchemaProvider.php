@@ -23,14 +23,4 @@ class TestSchemaProvider implements SchemaSourceProvider
     {
         return $this->schema;
     }
-
-    /**
-     * Set schema root path.
-     *
-     * @return $this
-     */
-    public function setRootPath(string $path)
-    {
-        return $this;
-    }
 }

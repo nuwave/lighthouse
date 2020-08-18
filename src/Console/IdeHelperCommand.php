@@ -100,7 +100,7 @@ SDL;
     {
         $schema = '';
 
-        foreach ($directiveClasses as $name => $directiveClass) {
+        foreach ($directiveClasses as $directiveClass) {
             $definition = $this->define($directiveClass);
 
             $schema .= "\n"

@@ -101,13 +101,12 @@ SDL;
         }
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
-        foreach ($includes as $include) {
-            if ($include === [Directive::IF_ARGUMENT_NAME => false]) {
-                return false;
-            }
-        }
 
-        return true;
+        return ! in_array(
+            [Directive::IF_ARGUMENT_NAME => false],
+            $includes,
+            true
+        );
     }
 
     /**
