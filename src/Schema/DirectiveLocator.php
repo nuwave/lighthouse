@@ -151,7 +151,7 @@ class DirectiveLocator
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    protected function resolve(string $directiveName): string
+    public function resolve(string $directiveName): string
     {
         // Bail to respect the priority of namespaces, the first resolved directive is kept
         if (array_key_exists($directiveName, $this->resolvedClassnames)) {

@@ -25,10 +25,10 @@ directive @where(
   key: String
 
   """
-  Use Laravel\'s where clauses upon the query builder.
+  Use Laravel's where clauses upon the query builder.
   """
   clause: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 

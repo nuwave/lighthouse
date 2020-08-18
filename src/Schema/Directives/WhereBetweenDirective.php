@@ -11,6 +11,7 @@ class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
         return /** @lang GraphQL */ <<<'SDL'
 """
 Verify that a column's value is between two values.
+
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
@@ -20,7 +21,7 @@ directive @whereBetween(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 

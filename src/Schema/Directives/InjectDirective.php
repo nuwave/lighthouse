@@ -32,7 +32,7 @@ directive @inject(
   within the incoming argument.
   """
   name: String!
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 SDL;
     }
 

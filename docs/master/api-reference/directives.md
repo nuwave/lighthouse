@@ -237,7 +237,7 @@ directive @broadcast(
   This defaults to the global config option `lighthouse.subscriptions.queue_broadcasts`.
   """
   shouldQueue: Boolean
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 [Read more about subscriptions](../subscriptions/getting-started.md)
@@ -274,7 +274,7 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 You must point to a `method` which will receive the builder instance
@@ -418,7 +418,7 @@ directive @can(
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: Mixed
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
@@ -876,7 +876,7 @@ is an identical string. [Read more about enum types](../the-basics/types.md#enum
 
 ```graphql
 """
-Place an equal operator on an Eloquent query.
+Use the client given value to add an equal conditional to a database query.
 """
 directive @eq(
   """
@@ -884,7 +884,7 @@ directive @eq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ```graphql
@@ -906,22 +906,34 @@ type User {
 
 ```graphql
 """
-Fire an event after a mutation has taken place.
-It requires the `dispatch` argument that should be
-the class name of the event you want to fire.
+Dispatch an event after the resolution of a field.
+
+The event constructor will be called with a single argument:
+the resolved value of the field.
 """
 directive @event(
   """
   Specify the fully qualified class name (FQCN) of the event to dispatch.
   """
   dispatch: String!
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
+
+For example, you might want to have an event when new orders are placed in a shop:
 
 ```graphql
 type Mutation {
-  createPost(title: String!, content: String!): Post
-    @event(dispatch: "App\\Events\\PostCreated")
+  placeOrder(items: [CartItems!]!): Order!
+    @event(dispatch: "App\\Events\\PlacedOrder")
+}
+```
+
+The event class must accept an `Order` in the constructor:
+
+```php
+class PlacedOrder
+{
+    public function __construct(Order $order) { ... }
 }
 ```
 
@@ -970,8 +982,11 @@ own mechanism of encoding/decoding global ids.
 ```graphql
 """
 Run authentication through one or more guards.
+
 This is run per field and may allow unauthenticated
 users to still receive partial results.
+
+Used upon an object, it applies to all fields within.
 """
 directive @guard(
   """
@@ -993,6 +1008,13 @@ To ensure the user is logged in, add the `AttemptAuthenticate` middleware to you
     // middleware, this delegates auth and permission checks to the field level.
     \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
 ],
+```
+
+A useful pattern is to group fields in an `extend type` to apply [@guard](#guard)
+on all of them at once.
+
+```graphql
+extend type Query @guard { ... }
 ```
 
 ## @hash
@@ -1116,7 +1138,7 @@ type User {
 
 ```graphql
 """
-Filter a column by an array using a `whereIn` clause.
+Use the client given list value to add an IN conditional to a database query.
 """
 directive @in(
   """
@@ -1124,7 +1146,7 @@ directive @in(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ```graphql
@@ -1182,7 +1204,7 @@ directive @inject(
   within the incoming argument.
   """
   name: String!
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 This is useful to ensure that the authenticated user's `id` is
@@ -1289,7 +1311,7 @@ directive @lazyLoad(
   The names of the relationship methods to load.
   """
   relations: [String!]!
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 This is often useful when loading relationships with the [@hasMany](#hasmany) directive.
@@ -1535,7 +1557,7 @@ A [@namespace](#namespace) directive defined on a field directive wins in case o
 
 ```graphql
 """
-Place a not equals operator `!=` on an Eloquent query.
+Use the client given value to add an not-equal conditional to a database query.
 """
 directive @neq(
   """
@@ -1543,7 +1565,7 @@ directive @neq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ```graphql
@@ -1592,6 +1614,7 @@ type User {
 ```graphql
 """
 Register a type for Relay's global object identification.
+
 When used without any arguments, Lighthouse will attempt
 to resolve the type through a model with the same name.
 """
@@ -1649,15 +1672,15 @@ to find the model by it's primary id in the database.
 
 ```graphql
 """
-Filter a column by an array using a `whereNotIn` clause.
+Use the client given value to add a NOT IN conditional to a database query.
 """
 directive @notIn(
   """
-  Specify the name of the column.
-  Only required if it differs from the name of the argument.
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ```graphql
@@ -1748,7 +1771,7 @@ enum PostColumn {
 ```
 
 Lighthouse will still automatically generate the necessary input types and the `SortOrder` enum.
-But instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
+Instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
 
 Querying a field that has an `orderBy` argument looks like this:
 
@@ -1762,10 +1785,8 @@ Querying a field that has an `orderBy` argument looks like this:
 
 You may pass more than one sorting option to add a secondary ordering.
 
-### Input Definition Example
-
 The [@orderBy](#orderby) directive can also be applied inside an input field definition
-when used in conjunction with the [@spread](#spread) directive. See below for example:
+when used in conjunction with the [@spread](#spread) directive.
 
 ```graphql
 type Query {
@@ -1777,7 +1798,7 @@ input PostFilterInput {
 }
 ```
 
-And usage example:
+This can be queried like this:
 
 ```graphql
 {
@@ -2003,6 +2024,7 @@ class Blog
 ```graphql
 """
 Change the internally used name of a field or argument.
+
 This does not change the schema from a client perspective.
 """
 directive @rename(
@@ -2081,7 +2103,7 @@ directive @rules(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: RulesMessageMap
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 For example, this rule ensures that users pass a valid 2 character country code:
@@ -2114,7 +2136,7 @@ directive @rulesForArray(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: RulesMessageMap
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 This is typically used to assert a certain number of elements is given in a list.
@@ -2164,6 +2186,7 @@ scalar DateTime
 ```graphql
 """
 Adds a scope to the query builder.
+
 The scope method will receive the client-given value of the argument as the second parameter.
 """
 directive @scope(
@@ -2171,7 +2194,7 @@ directive @scope(
   The name of the scope.
   """
   name: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 You may use this in combination with field directives such as [@all](#all).
@@ -2579,7 +2602,7 @@ directive @validator(
   and the field name: `{$parent}{$field}Validator`.
   """
   class: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
 ```
 
 Read more in the [validation docs](../security/validation.md#validator-classes).
@@ -2606,7 +2629,7 @@ directive @where(
   Use Laravel's where clauses upon the query builder.
   """
   clause: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 You can specify simple operators:
@@ -2630,6 +2653,7 @@ type Query {
 ```graphql
 """
 Verify that a column's value is between two values.
+
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
@@ -2639,7 +2663,7 @@ directive @whereBetween(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 This example defines an `input` to filter that a value is between two dates.
@@ -2678,7 +2702,7 @@ directive @whereJsonContains(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 Use in combination with other Eloquent directives such as [@all](#all)
@@ -2702,6 +2726,7 @@ type Query {
 ```graphql
 """
 Verify that a column's value lies outside of two values.
+
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
@@ -2711,7 +2736,7 @@ directive @whereNotBetween(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ```graphql
@@ -2744,7 +2769,7 @@ directive @with(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 This can be a useful optimization for fields that are not returned directly
@@ -2765,7 +2790,7 @@ look into [handling Eloquent relationships](../eloquent/relationships.md).
 """
 Eager-load the count of an Eloquent relation if the field is queried.
 
-Not that this does not return a value for the field, the count is simply
+Note that this does not return a value for the field, the count is simply
 prefetched, assuming it is used to compute the field value. Use `@count`
 if the field should simply return the relation count.
 """
@@ -2779,7 +2804,7 @@ directive @withCount(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 ```
 
 This can be a useful optimization for fields that use the count to compute a result.

@@ -20,6 +20,7 @@ use GraphQL\Utils\AST;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
 class ASTHelper
@@ -290,12 +291,21 @@ class ASTHelper
             );
         }
 
+        /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator $directiveLocator */
+        $directiveLocator = app(DirectiveLocator::class);
+        $directive = $directiveLocator->resolve($name);
+        $directiveDefinition = Parser::directiveDefinition($directive::definition());
+
         /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
         $fieldDefinitions = $objectType->fields;
         foreach ($fieldDefinitions as $fieldDefinition) {
-            // If the field already has the same directive defined, skip over it.
+            // If the field already has the same directive defined, and it is not
+            // a repeatable directive, skip over it.
             // Field directives are more specific than those defined on a type.
-            if (self::hasDirective($fieldDefinition, $name)) {
+            if (
+                self::hasDirective($fieldDefinition, $name)
+                && ! $directiveDefinition->repeatable
+            ) {
                 continue;
             }
 
