@@ -10,7 +10,7 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Place a not equals operator `!=` on an Eloquent query.
+Use the client given value to add an not-equal conditional to a database query.
 """
 directive @neq(
   """
@@ -18,7 +18,7 @@ directive @neq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 

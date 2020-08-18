@@ -15,6 +15,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Include schema directives when running `php artisan lighthouse:validate-schema` https://github.com/nuwave/lighthouse/pull/1494
 - Add ability to query for the existence of relations in where conditions https://github.com/nuwave/lighthouse/pull/1412
 - Handle content types `application/graphql` and `application/x-www-form-urlencoded` properly https://github.com/nuwave/lighthouse/pull/1424
+- Mark directives that can be used more than once per location as `repeatable` https://github.com/nuwave/lighthouse/pull/1529
+- Allow configuring global field middleware directives in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1533
 
 ### Changed
 

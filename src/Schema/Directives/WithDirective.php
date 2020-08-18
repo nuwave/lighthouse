@@ -24,7 +24,7 @@ directive @with(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 SDL;
     }
 

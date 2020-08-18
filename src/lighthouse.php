@@ -199,6 +199,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Field Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Register global field middleware directives that wrap around every field.
+    | Execution happens in the defined order, before other field middleware.
+    | The classes must implement \Nuwave\Lighthouse\Support\Contracts\FieldMiddleware
+    |
+    */
+
+    'field_middleware' => [
+        \Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
+        \Nuwave\Lighthouse\Validation\ValidateDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Global ID
     |--------------------------------------------------------------------------
     |

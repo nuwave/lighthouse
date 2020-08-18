@@ -19,7 +19,7 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
