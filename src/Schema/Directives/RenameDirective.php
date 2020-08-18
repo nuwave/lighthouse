@@ -13,6 +13,7 @@ class RenameDirective extends BaseDirective implements FieldResolver
         return /** @lang GraphQL */ <<<'SDL'
 """
 Change the internally used name of a field or argument.
+
 This does not change the schema from a client perspective.
 """
 directive @rename(

@@ -10,7 +10,7 @@ class InDirective extends BaseDirective implements ArgBuilderDirective
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Filter a column by an array using a `whereIn` clause.
+Use the client given list value to add an IN conditional to a database query.
 """
 directive @in(
   """
@@ -18,7 +18,7 @@ directive @in(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
