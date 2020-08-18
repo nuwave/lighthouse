@@ -31,11 +31,8 @@ SDL;
      */
     public function handleBuilder($builder, $value): object
     {
-        return call_user_func(
-            $this->getResolverFromArgument('method'),
-            $builder,
-            $value,
-            $this->definitionNode
-        );
+        $resolver = $this->getResolverFromArgument('method');
+
+        return $resolver($builder, $value, $this->definitionNode);
     }
 }

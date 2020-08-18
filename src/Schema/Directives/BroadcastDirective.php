@@ -35,7 +35,7 @@ SDL;
         $resolver = $fieldValue->getResolver();
 
         return $fieldValue->setResolver(function () use ($resolver) {
-            $resolved = call_user_func_array($resolver, func_get_args());
+            $resolved = $resolver(...func_get_args());
 
             $subscriptionField = $this->directiveArgValue('subscription');
             $shouldQueue = $this->directiveArgValue('shouldQueue');
