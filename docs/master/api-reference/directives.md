@@ -1674,7 +1674,7 @@ to find the model by it's primary id in the database.
 """
 Use the client given value to add a NOT IN conditional to a database query.
 """
-directive @eq(
+directive @notIn(
   """
   Specify the database column to compare.
   Only required if database column has a different name than the attribute in your schema.
