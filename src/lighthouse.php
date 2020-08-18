@@ -1,11 +1,5 @@
 <?php
 
-use Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective;
-use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
-use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
-use Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective;
-use Nuwave\Lighthouse\Validation\ValidateDirective;
-
 return [
 
     /*
@@ -215,11 +209,11 @@ return [
     */
 
     'field_middleware' => [
-        SanitizeDirective::class,
-        ValidateDirective::class,
-        TransformArgsDirective::class,
-        SpreadDirective::class,
-        RenameArgsDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
+        \Nuwave\Lighthouse\Validation\ValidateDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
     ],
 
     /*
