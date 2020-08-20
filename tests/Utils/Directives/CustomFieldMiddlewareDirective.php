@@ -11,7 +11,7 @@ class CustomFieldMiddlewareDirective extends BaseDirective implements FieldMiddl
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<SDL
+        return /** @lang GraphQL */ <<<'SDL'
 directive @customFieldMiddleware on FIELD_DEFINITION
 SDL;
     }

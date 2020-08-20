@@ -29,7 +29,7 @@ class FieldMiddlewareTest extends TestCase
                 'foo' => [
                     'id' => 'foo',
                 ],
-            ]
+            ],
         ]);
     }
 }
