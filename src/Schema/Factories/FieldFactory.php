@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -65,9 +66,10 @@ class FieldFactory
 
         $fieldMiddleware = $this->directiveFactory->associatedOfType($fieldDefinitionNode, FieldMiddleware::class);
 
-        foreach (config('lighthouse.field_middleware') as $globalFieldMiddlewareClass) {
-            // Middleware resolve in reversed order, so we add them to the beginning of the chain
-            $fieldMiddleware->prepend(
+        $globalFieldMiddleware = config('lighthouse.field_middleware');
+        // Middleware resolve in reversed order, so we reverse them
+        foreach (array_reverse($globalFieldMiddleware) as $globalFieldMiddlewareClass) {
+            $fieldMiddleware->push(
                 app($globalFieldMiddlewareClass)
             );
         }
