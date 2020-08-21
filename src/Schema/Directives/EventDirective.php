@@ -23,29 +23,32 @@ class EventDirective extends BaseDirective implements FieldMiddleware
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Fire an event after a mutation has taken place.
-It requires the `dispatch` argument that should be
-the class name of the event you want to fire.
+Dispatch an event after the resolution of a field.
+
+The event constructor will be called with a single argument:
+the resolved value of the field.
 """
 directive @event(
   """
   Specify the fully qualified class name (FQCN) of the event to dispatch.
   """
   dispatch: String!
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 SDL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $eventBaseName = $this->directiveArgValue('dispatch');
-        $eventClassName = $this->namespaceClassName($eventBaseName);
         $previousResolver = $fieldValue->getResolver();
 
         return $next(
             $fieldValue->setResolver(
-                function () use ($previousResolver, $eventClassName) {
+                function () use ($previousResolver) {
                     $result = $previousResolver(...func_get_args());
+
+                    $eventClassName = $this->namespaceClassName(
+                        $this->directiveArgValue('dispatch')
+                    );
 
                     $this->eventsDispatcher->dispatch(
                         new $eventClassName($result)

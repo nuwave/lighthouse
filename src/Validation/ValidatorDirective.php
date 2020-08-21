@@ -42,7 +42,7 @@ directive @validator(
   and the field name: `{$parent}{$field}Validator`.
   """
   class: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
 SDL;
     }
 
@@ -58,7 +58,7 @@ SDL;
 
     protected function validator(): Validator
     {
-        if (! $this->validator) {
+        if ($this->validator === null) {
             /** @var \Nuwave\Lighthouse\Validation\Validator $validator */
             $validator = app(
                 // We precomputed and validated the full class name at schema build time

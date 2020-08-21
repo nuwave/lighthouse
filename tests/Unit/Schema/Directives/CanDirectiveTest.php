@@ -41,7 +41,10 @@ class CanDirectiveTest extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
@@ -75,7 +78,10 @@ class CanDirectiveTest extends TestCase
             $this->markTestSkipped('Version less than 5.7 do not support guest user.');
         }
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
@@ -109,7 +115,10 @@ class CanDirectiveTest extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
@@ -164,7 +173,10 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!
@@ -196,7 +208,10 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!

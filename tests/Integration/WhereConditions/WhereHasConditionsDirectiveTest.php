@@ -4,6 +4,7 @@ namespace Tests\Integration\WhereConditions;
 
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
 class WhereHasConditionsDirectiveTest extends DBTestCase
@@ -13,6 +14,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         id: ID!
         name: String
         email: String
+        roles: [Role!]! @belongsToMany
     }
 
     type Post {
@@ -26,6 +28,11 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         name: String
     }
 
+    type Role {
+        id: Int!
+        name: String!
+    }
+
     type Query {
         posts(
             hasUser: _ @whereHasConditions(relation: "user")
@@ -34,6 +41,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         users(
             hasCompany: _ @whereHasConditions(relation: "company")
             hasPost: _ @whereHasConditions(relation: "posts")
+            hasRoles: _ @whereHasConditions(relation: "roles")
         ): [User!]! @all
 
         companies(
@@ -165,6 +173,40 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                     ],
                     [
                         'id' => '3',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasBelongsToMany(): void
+    {
+        factory(User::class)->create();
+
+        /** @var Role $role */
+        $role = factory(Role::class)->create();
+
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $user->roles()->attach($role);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                hasRoles: {
+                    column: "id",
+                    value: '.$role->getKey().'
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $user->getKey(),
                     ],
                 ],
             ],

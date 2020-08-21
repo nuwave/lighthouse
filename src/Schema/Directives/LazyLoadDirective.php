@@ -20,11 +20,11 @@ Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy
 on the relations of a list of models.
 """
 directive @lazyLoad(
-    """
-    The names of the relationship methods to load.
-    """
-    relations: [String!]!
-) on FIELD_DEFINITION
+  """
+  The names of the relationship methods to load.
+  """
+  relations: [String!]!
+) repeatable on FIELD_DEFINITION
 SDL;
     }
 

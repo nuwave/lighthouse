@@ -82,10 +82,11 @@ GRAPHQL
     protected function hasTypeImplementingInterface(DocumentAST $documentAST, string $interfaceName): bool
     {
         foreach ($documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                if (ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName)) {
-                    return true;
-                }
+            if (
+                $typeDefinition instanceof ObjectTypeDefinitionNode
+                && ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName)
+            ) {
+                return true;
             }
         }
 
