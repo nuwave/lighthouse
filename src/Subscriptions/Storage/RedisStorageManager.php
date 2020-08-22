@@ -109,6 +109,7 @@ class RedisStorageManager implements StoresSubscriptions
             $this->connection->command('get', [$channelKey])
         );
 
+        // unserialize could return false, so we make sure to only return a Subscriber or null
         if ($subscriber instanceof Subscriber) {
             return $subscriber;
         }
