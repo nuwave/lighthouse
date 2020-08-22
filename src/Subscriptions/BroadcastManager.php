@@ -78,10 +78,7 @@ class BroadcastManager extends DriverManager
         return new LogBroadcaster($config);
     }
 
-    /**
-     * @param array<string, mixed> $config
-     */
-    protected function createEchoDriver(array $config): EchoBroadcaster
+    protected function createEchoDriver(): EchoBroadcaster
     {
         return $this->app->make(EchoBroadcaster::class);
     }
