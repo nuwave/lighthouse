@@ -62,7 +62,7 @@ class RedisStorageManager implements StoresSubscriptions
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
         return (new Collection($subscribers))
-            ->map(function ($subscriber) {
+            ->map(function (string $subscriber) {
                 return $this->unserialize($subscriber);
             })
             ->filter();
