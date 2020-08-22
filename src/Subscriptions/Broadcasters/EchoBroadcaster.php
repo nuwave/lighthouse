@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Symfony\Component\HttpFoundation\Response;
 
 class EchoBroadcaster implements Broadcaster
 {
