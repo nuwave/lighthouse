@@ -92,13 +92,9 @@ SDL;
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
                 if ($this->directiveHasArgument('builder')) {
-                    $query = call_user_func(
-                        $this->getResolverFromArgument('builder'),
-                        $root,
-                        $args,
-                        $context,
-                        $resolveInfo
-                    );
+                    $builderResolver = $this->getResolverFromArgument('builder');
+
+                    $query = $builderResolver($root, $args, $context, $resolveInfo);
                 } else {
                     $query = $this->getModelClass()::query();
                 }

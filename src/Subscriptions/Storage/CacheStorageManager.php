@@ -43,7 +43,7 @@ class CacheStorageManager implements StoresSubscriptions
         $this->cache = $cacheManager->store(
             config('lighthouse.subscriptions.storage', 'file')
         );
-        $this->ttl = config('lighthouse.subscriptions.storage_ttl', null);
+        $this->ttl = config('lighthouse.subscriptions.storage_ttl');
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber

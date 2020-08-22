@@ -193,8 +193,6 @@ in a `LaravelEnumType`.
 ```php
 <?php
 
-declare(strict_types=1);
-
 namespace App\GraphQL;
 
 use App\Enums\UserType;

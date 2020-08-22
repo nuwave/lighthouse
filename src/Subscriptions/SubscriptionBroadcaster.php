@@ -66,7 +66,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
         $broadcastSubscriptionJob = new BroadcastSubscriptionJob($subscription, $fieldName, $root);
-        $broadcastSubscriptionJob->onQueue(config('lighthouse.subscriptions.broadcasts_queue_name', null));
+        $broadcastSubscriptionJob->onQueue(config('lighthouse.subscriptions.broadcasts_queue_name'));
 
         $this->busDispatcher->dispatch($broadcastSubscriptionJob);
     }

@@ -36,7 +36,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                         'decorateBuilder' => $decorateBuilder,
                     ];
 
-                    if ($paginationArgs) {
+                    if ($paginationArgs !== null) {
                         $constructorArgs += [
                             'paginationArgs' => $paginationArgs,
                         ];
@@ -59,7 +59,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
                 $decorateBuilder($relation);
 
-                if ($paginationArgs) {
+                if ($paginationArgs !== null) {
                     return $paginationArgs->applyToBuilder($relation);
                 } else {
                     return $relation->getResults();
@@ -107,7 +107,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
-        if (! $paginationType) {
+        if ($paginationType === null) {
             return;
         }
 
@@ -147,7 +147,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
      */
     protected function paginationArgs(array $args): ?PaginationArgs
     {
-        if ($paginationType = $this->paginationType()) {
+        if (($paginationType = $this->paginationType()) !== null) {
             return PaginationArgs::extractArgs($args, $paginationType, $this->paginateMaxCount());
         }
 

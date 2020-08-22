@@ -19,7 +19,7 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -31,11 +31,8 @@ SDL;
      */
     public function handleBuilder($builder, $value): object
     {
-        return call_user_func(
-            $this->getResolverFromArgument('method'),
-            $builder,
-            $value,
-            $this->definitionNode
-        );
+        $resolver = $this->getResolverFromArgument('method');
+
+        return $resolver($builder, $value, $this->definitionNode);
     }
 }

@@ -79,12 +79,10 @@ SDL;
 
             $cacheKey = $cacheValue->getKey();
 
-            if ($this->shouldUseTags()) {
-                $cache = $this->cacheRepository->tags($cacheValue->getTags());
-            } else {
-                $cache = $this->cacheRepository;
-            }
             /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
+            $cache = $this->shouldUseTags()
+                ? $this->cacheRepository->tags($cacheValue->getTags())
+                : $this->cacheRepository;
 
             // We found a matching value in the cache, so we can just return early
             // without actually running the query

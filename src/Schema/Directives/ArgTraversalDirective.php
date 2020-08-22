@@ -38,7 +38,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     public function transformRecursively(ArgumentSet $argumentSet): ArgumentSet
     {
-        foreach ($argumentSet->arguments as $name => $argument) {
+        foreach ($argumentSet->arguments as $argument) {
             $directivesForArray = $argument->directives->filter(
                 Utils::instanceofMatcher(ArgDirectiveForArray::class)
             );

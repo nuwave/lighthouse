@@ -25,16 +25,16 @@ class UpsertModel implements ArgResolver
      */
     public function __invoke($model, $args)
     {
-        if (
-            $id = $args->arguments['id']
-                ?? $args->arguments[$model->getKeyName()]
-                ?? null
-        ) {
-            if (
-                $existingModel = $model
-                    ->newQuery()
-                    ->find($id->value)
-            ) {
+        $id = $args->arguments['id']
+            ?? $args->arguments[$model->getKeyName()]
+            ?? null;
+
+        if ($id !== null) {
+            $existingModel = $model
+                ->newQuery()
+                ->find($id->value);
+
+            if ($existingModel !== null) {
                 $model = $existingModel;
             }
         }

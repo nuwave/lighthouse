@@ -180,7 +180,9 @@ class ArgPartitioner
         }
 
         $relationMethodCandidate = $modelReflection->getMethod($name);
-        if (! $returnType = $relationMethodCandidate->getReturnType()) {
+
+        $returnType = $relationMethodCandidate->getReturnType();
+        if ($returnType === null) {
             return false;
         }
 
