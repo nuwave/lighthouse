@@ -42,6 +42,9 @@ class Authorizer implements AuthorizesSubscriptions
     public function authorize(Request $request): bool
     {
         try {
+            if ($request->missing('channel_name')) {
+                return false;
+            }
             $channel = $this->sanitizeChannelName(
                 $request->input('channel_name')
             );
@@ -83,12 +86,9 @@ class Authorizer implements AuthorizesSubscriptions
      * Laravel Echo prefixes the channel with "presence-", but we store the channel
      * without the "presence-" prefix, which is what we have to remove here.
      */
-    private function sanitizeChannelName(?string $channelName): ?string
+    private function sanitizeChannelName(string $channelName): string
     {
-        if (
-            is_string($channelName)
-            && Str::startsWith($channelName, 'presence-')
-        ) {
+        if (Str::startsWith($channelName, 'presence-')) {
             return Str::substr($channelName, 9);
         }
 
