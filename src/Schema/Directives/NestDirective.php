@@ -5,9 +5,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
-class NestDirective extends BaseDirective implements ArgResolver
+class NestDirective extends BaseDirective implements ArgResolver, DefinedDirective
 {
     public static function definition(): string
     {
