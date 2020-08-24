@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.16.2
+
+### Fixed
+
+- Provide the definition for `@nest`
+
 ## 4.16.1
 
 ### Fixed
