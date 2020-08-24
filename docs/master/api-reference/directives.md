@@ -247,7 +247,7 @@ The `subscription` argument must reference the name of a subscription field.
 ```graphql
 type Mutation {
   createPost(input: CreatePostInput!): Post
-    @broadcast(subscription: "postCreated")
+  @broadcast(subscription: "postCreated")
 }
 ```
 
@@ -257,7 +257,7 @@ passing the `shouldQueue` argument.
 ```graphql
 type Mutation {
   updatePost(input: UpdatePostInput!): Post
-    @broadcast(subscription: "postUpdated", shouldQueue: false)
+  @broadcast(subscription: "postUpdated", shouldQueue: false)
 }
 ```
 
@@ -427,7 +427,7 @@ passing the `model` argument.
 ```graphql
 type Mutation {
   createBlogPost(input: PostInput): BlogPost
-    @can(ability: "create", model: "App\\Post")
+  @can(ability: "create", model: "App\\Post")
 }
 ```
 
@@ -462,7 +462,7 @@ You can provide your own function to calculate complexity.
 ```graphql
 type Query {
   posts: [Post!]!
-    @complexity(resolver: "App\\Security\\ComplexityAnalyzer@userPosts")
+  @complexity(resolver: "App\\Security\\ComplexityAnalyzer@userPosts")
 }
 ```
 
@@ -646,7 +646,7 @@ This directive can also be used as a [nested arg resolver](../concepts/arg-resol
 ```graphql
 type Mutation {
   updateUser(id: Int, deleteTasks: [Int!]! @delete(relation: "tasks")): User
-    @update
+  @update
 }
 ```
 
@@ -657,7 +657,7 @@ possible model that can be deleted.
 ```graphql
 type Mutation {
   updateTask(id: Int, deleteUser: Boolean @delete(relation: "user")): Task
-    @update
+  @update
 }
 ```
 
@@ -715,7 +715,7 @@ If you pass only a class name, the method name defaults to `__invoke`.
 ```graphql
 type Mutation {
   createPost(title: String!): Post
-    @field(resolver: "App\\GraphQL\\Mutations\\PostMutator@create")
+  @field(resolver: "App\\GraphQL\\Mutations\\PostMutator@create")
 }
 ```
 
@@ -735,7 +735,7 @@ such as transforming the value of scalar fields, e.g. reformat a date.
 ```graphql
 type User {
   created_at: String!
-    @field(resolver: "App\\GraphQL\\Types\\UserType@created_at")
+  @field(resolver: "App\\GraphQL\\Types\\UserType@created_at")
 }
 ```
 
@@ -809,7 +809,7 @@ If your model does not sit in the default namespace, you can overwrite it.
 ```graphql
 type Query {
   userByFirstName(first_name: String! @eq): User
-    @first(model: "App\\Authentication\\User")
+  @first(model: "App\\Authentication\\User")
 }
 ```
 
@@ -924,7 +924,7 @@ For example, you might want to have an event when new orders are placed in a sho
 ```graphql
 type Mutation {
   placeOrder(items: [CartItems!]!): Order!
-    @event(dispatch: "App\\Events\\PlacedOrder")
+  @event(dispatch: "App\\Events\\PlacedOrder")
 }
 ```
 
@@ -1213,8 +1213,8 @@ automatically used for creating new models and cannot be manipulated.
 ```graphql
 type Mutation {
   createPost(title: String!, content: String!): Post
-    @create
-    @inject(context: "user.id", name: "user_id")
+  @create
+  @inject(context: "user.id", name: "user_id")
 }
 ```
 
@@ -1224,8 +1224,8 @@ set a nested argument.
 ```graphql
 type Mutation {
   createTask(input: CreateTaskInput!): Task
-    @create
-    @inject(context: "user.id", name: "input.user_id")
+  @create
+  @inject(context: "user.id", name: "input.user_id")
 }
 ```
 
@@ -1252,7 +1252,7 @@ Set the `resolveType` argument to a function that returns the implementing Objec
 
 ```graphql
 interface Commentable
-  @interface(resolveType: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
+@interface(resolveType: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
   id: ID!
 }
 ```
@@ -1536,8 +1536,8 @@ to the [@field](#field) directive used on the `posts` field.
 ```graphql
 type Query {
   posts: [Post!]!
-    @field(resolver: "Post@resolveAll")
-    @namespace(field: "App\\Blog")
+  @field(resolver: "Post@resolveAll")
+  @namespace(field: "App\\Blog")
 }
 ```
 
@@ -1758,7 +1758,7 @@ Here's an example of how you could define it in your schema:
 type Query {
   allPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]! @all
   paginatedPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]!
-    @paginate
+  @paginate
 }
 
 "A custom description for this custom enum."
@@ -2178,7 +2178,7 @@ If your class is not in the default namespace, pass a fully qualified class name
 
 ```graphql
 scalar DateTime
-  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+@scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
 ## @scope
@@ -2374,7 +2374,7 @@ you do not need this directive. It is only useful if you need to override the de
 ```graphql
 type Subscription {
   postUpdated(author: ID!): Post
-    @subscription(class: "App\\GraphQL\\Blog\\PostUpdatedSubscription")
+  @subscription(class: "App\\GraphQL\\Blog\\PostUpdatedSubscription")
 }
 ```
 
@@ -2532,7 +2532,7 @@ Client libraries such as Apollo base their caching mechanism on that assumption.
 ```graphql
 type Mutation {
   updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post
-    @update
+  @update
 }
 ```
 

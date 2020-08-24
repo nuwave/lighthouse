@@ -53,10 +53,10 @@ type Query {
     "Search by title"
     title: String @where(operator: "%LIKE%")
   ): [Post!]!
-    # Resolve as a paginated list
-    @paginate
-    # Require authentication
-    @guard(with: "api")
+  # Resolve as a paginated list
+  @paginate
+  # Require authentication
+  @guard(with: "api")
 }
 ```
 
