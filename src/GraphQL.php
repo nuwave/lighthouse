@@ -18,6 +18,7 @@ use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\LoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -264,7 +265,7 @@ class GraphQL
      */
     protected function cleanUp(): void
     {
-        BatchLoader::forgetInstances();
+        LoaderRegistry::forgetInstances();
         $this->errorPool->clear();
     }
 }

@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\LoaderRegistry;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -42,7 +43,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                         ];
                     }
 
-                    return BatchLoader
+                    return LoaderRegistry
                         ::instance(
                             RelationBatchLoader::class,
                             $this->buildPath($resolveInfo, $parent),

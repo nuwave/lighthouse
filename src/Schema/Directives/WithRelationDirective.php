@@ -7,6 +7,7 @@ use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\LoaderRegistry;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -67,7 +68,7 @@ abstract class WithRelationDirective extends BaseDirective
      */
     protected function loader(ResolveInfo $resolveInfo): BatchLoader
     {
-        return BatchLoader::instance(
+        return LoaderRegistry::instance(
             $this->batchLoaderClass(),
             $resolveInfo->path,
             [
