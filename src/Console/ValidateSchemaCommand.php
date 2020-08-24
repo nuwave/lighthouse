@@ -38,10 +38,7 @@ class ValidateSchemaCommand extends Command
             new FallbackTypeNodeConverter($typeRegistry)
         );
         foreach ($directiveLocator->definitions() as $directiveDefinition) {
-            // TODO solve cleanly
-            if ($directiveDefinition->name->value !== 'deprecated') {
-                $schemaConfig->directives [] = $directiveFactory->handle($directiveDefinition);
-            }
+            $schemaConfig->directives [] = $directiveFactory->handle($directiveDefinition);
         }
 
         $schema = new Schema($schemaConfig);
