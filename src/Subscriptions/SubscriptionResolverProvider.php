@@ -73,7 +73,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             }
 
             $subscriber = new Subscriber(
-                $args,
+                $context->request()->get('variables'), // @TODO: This must be changed to correctly consider batched requests
                 $context,
                 $resolveInfo
             );
