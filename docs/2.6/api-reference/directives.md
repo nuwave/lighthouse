@@ -218,7 +218,7 @@ You can provide your own function to calculate complexity.
 ```graphql
 type Query {
   posts: [Post!]!
-    @complexity(resolver: "App\\Security\\ComplexityAnalyzer@userPosts")
+  @complexity(resolver: "App\\Security\\ComplexityAnalyzer@userPosts")
 }
 ```
 
@@ -292,7 +292,7 @@ Pass a class and a method to the `resolver` argument and separate them with an `
 ```graphql
 type Mutation {
   createPost(title: String!): Post
-    @field(resolver: "App\\Http\\GraphQL\\Mutations\\PostMutator@create")
+  @field(resolver: "App\\Http\\GraphQL\\Mutations\\PostMutator@create")
 }
 ```
 
@@ -312,7 +312,7 @@ such as transforming the value of scalar fields, e.g. reformat a date.
 ```graphql
 type User {
   created_at: String!
-    @field(resolver: "App\\Http\\GraphQL\\Types\\UserType@created_at")
+  @field(resolver: "App\\Http\\GraphQL\\Types\\UserType@created_at")
 }
 ```
 
@@ -380,7 +380,7 @@ Fire an event after a mutation has taken place. It requires the `fire` argument 
 ```graphql
 type Mutation {
   createPost(title: String!, content: String!): Post
-    @event(fire: "App\\Events\\PostCreated")
+  @event(fire: "App\\Events\\PostCreated")
 }
 ```
 
@@ -484,8 +484,8 @@ Inject a value from the context object into the arguments. This is really useful
 ```graphql
 type Mutation {
   createPost(title: String!, content: String!): Post
-    @create(model: "App\\Post")
-    @inject(context: "user.id", name: "user_id")
+  @create(model: "App\\Post")
+  @inject(context: "user.id", name: "user_id")
 }
 ```
 
@@ -499,7 +499,7 @@ Set the `resolver` argument to a function that returns the implementing Object T
 
 ```graphql
 interface Commentable
-  @interface(resolver: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
+@interface(resolver: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
   id: ID!
 }
 ```
@@ -575,9 +575,9 @@ class name, an alias or a middleware group - or any combination of them.
 ```graphql
 type Query {
   users: [User!]!
-    @middleware(
-      checks: ["auth:api", "App\\Http\\Middleware\\MyCustomAuth", "api"]
-    )
+  @middleware(
+    checks: ["auth:api", "App\\Http\\Middleware\\MyCustomAuth", "api"]
+  )
 }
 ```
 
@@ -655,10 +655,10 @@ it if the need arises.
 
 ```graphql
 type User
-  @node(
-    resolver: "App\\GraphQL\\NodeResolver@resolveUser"
-    typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
-  ) {
+@node(
+  resolver: "App\\GraphQL\\NodeResolver@resolveUser"
+  typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
+) {
   name: String!
 }
 ```
@@ -791,7 +791,7 @@ If your class is not in the default namespace, pass a fully qualified class name
 
 ```graphql
 scalar DateTime
-  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+@scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
 ## @search
