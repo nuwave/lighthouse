@@ -165,11 +165,54 @@ GRAPHQL;
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            updatePost(post: "Foobar") {
-                body
+            mutation {
+                updatePost(post: "Foobar") {
+                    body
+                }
             }
-        }
+        ');
+
+        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
+        $log = app(BroadcastManager::class)->driver();
+        $this->assertCount(1, $log->broadcasts());
+
+        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertArrayHasKey('onPostUpdated', $broadcasted);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostUpdated']);
+    }
+
+    public function testSubscriptionWithEnumInputCorrectlyResolvesUsingBatchedQuery(): void
+    {
+        $this
+            ->postGraphQL([
+                [
+                    'query' => /** @lang GraphQL */ '
+                        {
+                            bar
+                        }
+                    ',
+                ],
+                [
+                    'query' => /** @lang GraphQL */ '
+                        subscription OnPostUpdated($status: PostStatus!) {
+                            onPostUpdated(status: $status) {
+                                body
+                            }
+                        }
+                    ',
+                    'variables' => [
+                        'status' => 'DELETED',
+                    ],
+                    'operationName' => 'OnPostUpdated',
+                ],
+            ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation {
+                updatePost(post: "Foobar") {
+                    body
+                }
+            }
         ');
 
         /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
