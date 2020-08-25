@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Pusher\Pusher;
 
 class PusherBroadcaster implements Broadcaster
 {
@@ -23,10 +24,7 @@ class PusherBroadcaster implements Broadcaster
      */
     protected $storage;
 
-    /**
-     * @param  \Pusher\Pusher  $pusher  TODO make into proper typehint
-     */
-    public function __construct($pusher)
+    public function __construct(Pusher $pusher)
     {
         $this->pusher = $pusher;
         $this->storage = app(StoresSubscriptions::class);
@@ -39,7 +37,7 @@ class PusherBroadcaster implements Broadcaster
     {
         $channel = $request->input('channel_name');
         $socketId = $request->input('socket_id');
-        $data = json_decode(
+        $data = \Safe\json_decode(
             $this->pusher->socket_auth($channel, $socketId),
             true
         );
@@ -74,7 +72,7 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  mixed[]  $data
+     * @param  array<mixed>  $data
      */
     public function broadcast(Subscriber $subscriber, array $data): void
     {

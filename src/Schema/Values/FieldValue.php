@@ -42,13 +42,6 @@ class FieldValue
     protected $resolver;
 
     /**
-     * Text describing by this field is deprecated.
-     *
-     * @var string|null
-     */
-    protected $deprecationReason = null;
-
-    /**
      * A closure that determines the complexity of executing the field.
      *
      * @var \Closure|null
@@ -100,18 +93,6 @@ class FieldValue
     }
 
     /**
-     * Set deprecation reason for field.
-     *
-     * @return $this
-     */
-    public function setDeprecationReason(string $deprecationReason): self
-    {
-        $this->deprecationReason = $deprecationReason;
-
-        return $this;
-    }
-
-    /**
      * Get an instance of the return type of the field.
      */
     public function getReturnType(): Type
@@ -157,7 +138,7 @@ class FieldValue
     /**
      * Return the namespaces configured for the parent type.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function defaultNamespacesForParent(): array
     {
@@ -189,11 +170,6 @@ class FieldValue
     public function getFieldName(): string
     {
         return $this->field->name->value;
-    }
-
-    public function getDeprecationReason(): ?string
-    {
-        return $this->deprecationReason;
     }
 
     /**

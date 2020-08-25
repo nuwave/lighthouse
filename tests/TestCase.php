@@ -2,23 +2,25 @@
 
 namespace Tests;
 
-use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Laravel\Scout\ScoutServiceProvider;
+use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
+use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
+use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends BaseTestCase
@@ -41,7 +43,7 @@ GRAPHQL;
     {
         parent::setUp();
 
-        if (! $this->schema) {
+        if (! isset($this->schema)) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
@@ -60,9 +62,14 @@ GRAPHQL;
             AuthServiceProvider::class,
             ConsoleServiceProvider::class,
             ScoutServiceProvider::class,
+
+            // Lighthouse's own
             LighthouseServiceProvider::class,
-            SoftDeletesServiceProvider::class,
+            GlobalIdServiceProvider::class,
             OrderByServiceProvider::class,
+            PaginationServiceProvider::class,
+            SoftDeletesServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
@@ -107,14 +114,17 @@ GRAPHQL;
             'directives' => [
                 'Tests\\Utils\\Directives',
             ],
+            'validators' => [
+                'Tests\\Utils\\Validators',
+            ],
         ]);
 
         $config->set(
             'lighthouse.debug',
-            Debug::INCLUDE_DEBUG_MESSAGE
-            | Debug::INCLUDE_TRACE
-            /*| Debug::RETHROW_INTERNAL_EXCEPTIONS*/
-            | Debug::RETHROW_UNSAFE_EXCEPTIONS
+            DebugFlag::INCLUDE_DEBUG_MESSAGE
+            | DebugFlag::INCLUDE_TRACE
+            // | Debug::RETHROW_INTERNAL_EXCEPTIONS
+            | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
         );
 
         $config->set(
@@ -125,8 +135,7 @@ GRAPHQL;
             ]
         );
 
-        // TODO remove when the default changes
-        $config->set('lighthouse.force_fill', true);
+        $config->set('lighthouse.guard', null);
 
         $config->set('app.debug', true);
     }
@@ -148,13 +157,6 @@ GRAPHQL;
 
             return new PreLaravel7ExceptionHandler();
         });
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        CountRuns::$runCounter = 0;
     }
 
     /**

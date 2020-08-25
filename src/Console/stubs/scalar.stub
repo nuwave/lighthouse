@@ -45,7 +45,7 @@ class DummyClass extends ScalarType
      * }
      *
      * @param  \GraphQL\Language\AST\Node  $valueNode
-     * @param  mixed[]|null  $variables
+     * @param  array<string, mixed>|null  $variables
      * @return mixed
      */
     public function parseLiteral($valueNode, ?array $variables = null)

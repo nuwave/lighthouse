@@ -140,7 +140,7 @@ class UpdateUserValidationDirective extends ValidationDirective
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -164,7 +164,7 @@ You can customize the messages for the given rules by implementing the `messages
 
 ```php
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function messages(): array
     {

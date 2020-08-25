@@ -4,10 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithCountDirective extends WithRelationDirective implements FieldMiddleware, DefinedDirective
+class WithCountDirective extends WithRelationDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -15,7 +14,7 @@ class WithCountDirective extends WithRelationDirective implements FieldMiddlewar
 """
 Eager-load the count of an Eloquent relation if the field is queried.
 
-Not that this does not return a value for the field, the count is simply
+Note that this does not return a value for the field, the count is simply
 prefetched, assuming it is used to compute the field value. Use `@count`
 if the field should simply return the relation count.
 """
@@ -29,7 +28,7 @@ directive @withCount(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 SDL;
     }
 

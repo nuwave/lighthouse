@@ -3,15 +3,14 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class NeqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class NeqDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Place a not equals operator `!=` on an Eloquent query.
+Use the client given value to add an not-equal conditional to a database query.
 """
 directive @neq(
   """
@@ -19,7 +18,7 @@ directive @neq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -29,7 +28,7 @@ SDL;
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),

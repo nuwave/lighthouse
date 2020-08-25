@@ -17,7 +17,7 @@ To ensure only clients who are subscribed to a certain `post_id` receive an upda
 ```php
 namespace App\GraphQL\Subscriptions;
 
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 
 class PostUpdatedSubscription extends GraphQLSubscription

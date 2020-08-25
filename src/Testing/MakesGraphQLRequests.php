@@ -146,11 +146,7 @@ trait MakesGraphQLRequests
             $this->introspect();
         }
 
-        // TODO Replace with ->json() once we remove support for Laravel 5.5
-        $results = data_get(
-            $this->introspectionResult->decodeResponseJson(),
-            $path
-        );
+        $results = $this->introspectionResult->json($path);
 
         return Arr::first(
             $results,
@@ -165,7 +161,7 @@ trait MakesGraphQLRequests
      */
     protected function graphQLEndpointUrl(): string
     {
-        return config('lighthouse.route.uri');
+        return route(config('lighthouse.route.name'));
     }
 
     /**

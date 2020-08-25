@@ -178,12 +178,9 @@ We can extend our previous implementation of [@create](../api-reference/directiv
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
@@ -191,10 +188,10 @@ class CreateDirective extends BaseDirective implements FieldResolver, ArgResolve
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $argsList
-     * @return \Illuminate\Database\Eloquent\Model[]
+     * @param  array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $argsList
+     * @return array<\Illuminate\Database\Eloquent\Model>
      */
-    public function __invoke($parent, $argsList)
+    public function __invoke($parent, $argsList): array
     {
         $relationName = $this->getRelationName();
 

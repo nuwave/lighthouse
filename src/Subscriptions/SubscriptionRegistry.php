@@ -100,7 +100,7 @@ class SubscriptionRegistry
     public function subscriber(Subscriber $subscriber, string $topic): self
     {
         $this->storage->storeSubscriber($subscriber, $topic);
-        $this->subscribers[$subscriber->operationName] = $subscriber->channel;
+        $this->subscribers[$subscriber->fieldName] = $subscriber->channel;
 
         return $this;
     }

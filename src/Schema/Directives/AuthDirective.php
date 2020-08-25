@@ -5,10 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class AuthDirective extends BaseDirective implements DefinedDirective, FieldResolver
+class AuthDirective extends BaseDirective implements FieldResolver
 {
     /**
      * @var \Illuminate\Contracts\Auth\Factory
@@ -46,6 +45,7 @@ SDL;
 
         return $fieldValue->setResolver(
             function () use ($guard): ?Authenticatable {
+                // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
                 return $this
                     ->authFactory
                     ->guard($guard)

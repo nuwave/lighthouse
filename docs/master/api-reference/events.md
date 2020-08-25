@@ -13,7 +13,7 @@ All events reside in the namespace `\Nuwave\Lighthouse\Events`.
 namespace Nuwave\Lighthouse\Events;
 
 use Carbon\Carbon;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
+use Illuminate\Http\Request;
 
 /**
  * Fires right after a request reaches the GraphQLController.
@@ -26,9 +26,9 @@ use Nuwave\Lighthouse\Execution\GraphQLRequest;
 class StartRequest
 {
     /**
-     * GraphQL request instance.
+     * HTTP request instance.
      *
-     * @var \Nuwave\Lighthouse\Execution\GraphQLRequest
+     * @var \Illuminate\Http\Request
      */
     public $request;
 
@@ -39,7 +39,7 @@ class StartRequest
      */
     public $moment;
 
-    public function __construct(GraphQLRequest $request)
+    public function __construct(Request $request)
     {
         $this->request = $request;
         $this->moment = Carbon::now();
@@ -124,7 +124,7 @@ namespace Nuwave\Lighthouse\Events;
  * Listeners may return one or more strings that are used as the base
  * namespace for locating directives.
  *
- * @see \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+ * @see \Nuwave\Lighthouse\Schema\DirectiveLocator
  */
 class RegisterDirectiveNamespaces
 {

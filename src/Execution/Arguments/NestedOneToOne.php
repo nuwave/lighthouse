@@ -9,7 +9,7 @@ class NestedOneToOne implements ArgResolver
     /**
      * @var string
      */
-    private $relationName;
+    protected $relationName;
 
     public function __construct(string $relationName)
     {

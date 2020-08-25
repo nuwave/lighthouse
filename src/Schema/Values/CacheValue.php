@@ -126,14 +126,11 @@ class CacheValue
      */
     protected function argKeys(): Collection
     {
-        // TODO use ->sortKeys() once we drop support for Laravel 5.5
-        $args = $this->args;
-        ksort($args);
-
-        return (new Collection($args))
+        return (new Collection($this->args))
+            ->sortKeys()
             ->map(function ($value, $key): string {
                 $keyValue = is_array($value)
-                    ? json_encode($value)
+                    ? \Safe\json_encode($value)
                     : $value;
 
                 return "{$key}:{$keyValue}";

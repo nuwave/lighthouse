@@ -11,7 +11,7 @@ class NodeInterfaceTest extends DBTestCase
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
-    private $globalIdResolver;
+    protected $globalIdResolver;
 
     protected function setUp(): void
     {
@@ -21,7 +21,7 @@ class NodeInterfaceTest extends DBTestCase
     }
 
     /**
-     * @var mixed[]
+     * @var array<int, array<string, mixed>>
      */
     protected $testTuples = [
         1 => [
@@ -36,7 +36,7 @@ class NodeInterfaceTest extends DBTestCase
 
     public function testCanResolveNodes(): void
     {
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
@@ -45,7 +45,7 @@ class NodeInterfaceTest extends DBTestCase
         $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[2]['id']);
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             first: node(id: "'.$firstGlobalId.'") {
                 id
@@ -75,7 +75,7 @@ class NodeInterfaceTest extends DBTestCase
     }
 
     /**
-     * @return mixed[]
+     * @return array<mixed>
      */
     public function resolveNode(int $id): array
     {
@@ -87,7 +87,7 @@ class NodeInterfaceTest extends DBTestCase
      */
     public function testCanResolveModelsNodes(string $directiveDefinition): void
     {
-        $this->schema .= "
+        $this->schema .= /** @lang GraphQL */ "
         type User $directiveDefinition {
             name: String!
         }
@@ -98,7 +98,7 @@ class NodeInterfaceTest extends DBTestCase
         ]);
         $globalId = $this->globalIdResolver->encode('User', $user->getKey());
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             node(id: "'.$globalId.'") {
                 id
@@ -118,15 +118,11 @@ class NodeInterfaceTest extends DBTestCase
     }
 
     /**
-     * @return string[][]
+     * @return array<array<string>>
      */
     public function modelNodeDirectiveStyles(): array
     {
         return [
-            /*
-             * @deprecated @model will be repurposed in v5
-             */
-            ['@model'],
             ['@node'],
             ['@node(model: "User")'],
         ];

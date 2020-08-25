@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Exception;
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
@@ -42,34 +41,31 @@ class Authorizer implements AuthorizesSubscriptions
     public function authorize(Request $request): bool
     {
         try {
-            $subscriber = $this->storage->subscriberByRequest(
-                $request->input(),
-                $request->headers->all()
-            );
+            $channel = $request->input('channel_name');
+            if ($channel === null) {
+                return false;
+            }
 
-            if (! $subscriber) {
+            $subscriber = $this->storage->subscriberByChannel($channel);
+            if ($subscriber === null) {
                 return false;
             }
 
             $subscriptions = $this->registry->subscriptions($subscriber);
-
             if ($subscriptions->isEmpty()) {
                 return false;
             }
 
-            $authorized = $subscriptions->reduce(
-                function ($authorized, GraphQLSubscription $subscription) use ($subscriber, $request): bool {
-                    return $authorized === false
-                        ? false
-                        : $subscription->authorize($subscriber, $request);
-                }
-            );
+            /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
+            foreach ($subscriptions as $subscription) {
+                if (! $subscription->authorize($subscriber, $request)) {
+                    $this->storage->deleteSubscriber($subscriber->channel);
 
-            if (! $authorized) {
-                $this->storage->deleteSubscriber($subscriber->channel);
+                    return false;
+                }
             }
 
-            return $authorized;
+            return true;
         } catch (Exception $e) {
             $this->exceptionHandler->handleAuthError($e);
 

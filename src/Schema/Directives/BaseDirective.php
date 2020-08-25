@@ -43,11 +43,8 @@ abstract class BaseDirective implements Directive
 
     /**
      * Returns the name of the used directive.
-     *
-     * TODO: Change to a strongly typed hint in v5
-     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->directiveNode->name->value;
     }
@@ -94,16 +91,6 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the AST definition node associated with the current directive.
-     *
-     * @deprecated in favor of the plain property
-     */
-    protected function directiveDefinition(): DirectiveNode
-    {
-        return $this->directiveNode;
-    }
-
-    /**
      * Get the value of an argument on the directive.
      *
      * @param  mixed|null  $default
@@ -141,8 +128,9 @@ abstract class BaseDirective implements Directive
                 }
                 $type = $documentAST->types[$returnTypeName];
 
-                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')) {
-                    $model = ASTHelper::directiveArgValue($modelClass, 'class');
+                $modelDirective = ASTHelper::directiveDefinition($type, 'model');
+                if ($modelDirective !== null) {
+                    $model = ASTHelper::directiveArgValue($modelDirective, 'class');
                 } else {
                     $model = $returnTypeName;
                 }
@@ -163,7 +151,7 @@ abstract class BaseDirective implements Directive
     /**
      * Find a class name in a set of given namespaces.
      *
-     * @param  string[]  $namespacesToTry
+     * @param  array<string>  $namespacesToTry
      * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -205,7 +193,7 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @return string[] Contains two entries: [string $className, string $methodName]
+     * @return array<string> Contains two entries: [string $className, string $methodName]
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

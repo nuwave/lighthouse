@@ -13,15 +13,20 @@ use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
  */
 class ExtensionErrorHandler implements ErrorHandler
 {
-    public static function handle(Error $error, Closure $next): array
+    public function __invoke(?Error $error, Closure $next): ?array
     {
+        if ($error === null) {
+            return $next(null);
+        }
+
         $underlyingException = $error->getPrevious();
 
         if ($underlyingException instanceof RendersErrorsExtensions) {
             // Reconstruct the error, passing in the extensions of the underlying exception
-            $error = new Error( // @phpstan-ignore-line TODO remove after graphql-php upgrade
-                $error->message,
-                $error->nodes,
+            // @phpstan-ignore-next-line graphql-php and phpstan disagree with themselves
+            $error = new Error(
+                $error->getMessage(),
+                $error->getNodes(),
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),

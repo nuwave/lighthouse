@@ -24,7 +24,7 @@ SDL;
      * Delegate to nested arg resolvers.
      *
      * @param  mixed  $root  The result of the parent resolver.
-     * @param  ArgumentSet|ArgumentSet[]  $args  The slice of arguments that belongs to this nested resolver.
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  The slice of arguments that belongs to this nested resolver.
      */
     public function __invoke($root, $args)
     {

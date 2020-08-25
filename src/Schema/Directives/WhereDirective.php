@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class WhereDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class WhereDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
@@ -26,10 +25,10 @@ directive @where(
   key: String
 
   """
-  Use Laravel\'s where clauses upon the query builder.
+  Use Laravel's where clauses upon the query builder.
   """
   clause: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -39,7 +38,7 @@ SDL;
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $value): object
     {
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
         $clause = $this->directiveArgValue('clause', 'where');

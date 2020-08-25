@@ -124,11 +124,11 @@ class FieldDirectiveTest extends TestCase
     public function testThrowsAnErrorWhenClassIsNotInvokable(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\Foo'");
+        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\MissingInvoke'");
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            bar: String! @field(resolver: "Foo")
+            bar: String! @field(resolver: "MissingInvoke")
         }
         ';
 

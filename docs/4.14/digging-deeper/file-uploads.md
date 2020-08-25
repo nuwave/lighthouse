@@ -44,7 +44,7 @@ class Upload
      * Upload a file, store it on the server and return the path.
      *
      * @param  mixed  $root
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
      * @return string|null
      */
     public function __invoke($root, array $args): ?string

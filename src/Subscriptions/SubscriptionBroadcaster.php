@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -10,7 +10,6 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
-use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionBroadcaster implements BroadcastsSubscriptions
@@ -41,9 +40,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     protected $broadcastManager;
 
     /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Bus\Dispatcher
      */
-    protected $eventsDispatcher;
+    protected $busDispatcher;
 
     public function __construct(
         GraphQL $graphQL,
@@ -51,14 +50,14 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         StoresSubscriptions $storage,
         SubscriptionIterator $iterator,
         BroadcastManager $broadcastManager,
-        EventsDispatcher $eventsDispatcher
+        BusDispatcher $busDispatcher
     ) {
         $this->graphQL = $graphQL;
         $this->auth = $auth;
         $this->storage = $storage;
         $this->iterator = $iterator;
         $this->broadcastManager = $broadcastManager;
-        $this->eventsDispatcher = $eventsDispatcher;
+        $this->busDispatcher = $busDispatcher;
     }
 
     /**
@@ -66,10 +65,10 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
-        // TODO replace with a job dispatch in v5
-        $this->eventsDispatcher->dispatch(
-            new BroadcastSubscriptionEvent($subscription, $fieldName, $root)
-        );
+        $broadcastSubscriptionJob = new BroadcastSubscriptionJob($subscription, $fieldName, $root);
+        $broadcastSubscriptionJob->onQueue(config('lighthouse.subscriptions.broadcasts_queue_name'));
+
+        $this->busDispatcher->dispatch($broadcastSubscriptionJob);
     }
 
     /**
@@ -92,8 +91,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                     $subscriber->query,
                     $subscriber->context,
                     $subscriber->args,
-                    $subscriber->setRoot($root),
-                    $subscriber->operationName
+                    $subscriber->setRoot($root)
                 );
                 dump($data);
 

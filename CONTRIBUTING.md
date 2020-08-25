@@ -67,6 +67,11 @@ Then, add a short description of your change and close it off with a link to you
 
 ## Code guidelines
 
+### `protected` over `private`
+
+Always use class member visibility `protected` over `private`. We cannot foresee every
+possible use case in advance, extending the code should remain possible. 
+
 ### Laravel feature usage
 
 We strive to be compatible with both Lumen and Laravel.
@@ -97,7 +102,7 @@ If known, add additional type information in the PHPDoc.
 /**
  * We know we get an array of strings here.
  *
- * @param  string[]  $bar
+ * @param  array<string>  $bar
  * @return string
  */
 function foo(array $bar): string
@@ -187,13 +192,29 @@ function bar(){
 We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
 at the Laravel coding style.
 
-Look through some code to get a feel for the naming conventions.
-
 Prefer explicit naming and short, focused functions over excessive comments.
 
-### Ternarys
+### Alignment
 
-Ternary's should be spread out across multiple lines.
+Do not align stuff horizontally, it leads to ugly diffs.
+
+```php
+// Right
+[
+    'foo' => 1,
+    'barbaz' => 2,
+]
+
+// Wrong
+[
+    'foo'    => 1,
+    'barbaz' => 2,
+]
+```
+
+### Multiline Ternary Expressions
+
+Ternary expressions must be spread across multiple lines.
 
 ```php
 $foo = $cond
@@ -230,6 +251,37 @@ You can use the following two case-sensitive regexes to search for violations:
 ```regexp
 @(var|param|return|throws).*\|[A-Z]
 @(var|param|return|throws)\s*[A-Z]
+```
+
+### Test Data Setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$user->post()->save();
+
+// Wrong
+$user = factory(Post::class)->create([
+    'user_id' => $post->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
 ```
 
 ## Benchmarks

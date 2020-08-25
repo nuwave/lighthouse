@@ -15,8 +15,6 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
-use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
-use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionListener;
 use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
@@ -25,11 +23,6 @@ class SubscriptionServiceProvider extends ServiceProvider
 {
     public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void
     {
-        $eventsDispatcher->listen(
-            BroadcastSubscriptionEvent::class,
-            BroadcastSubscriptionListener::class
-        );
-
         $eventsDispatcher->listen(
             StartExecution::class,
             SubscriptionRegistry::class.'@handleStartExecution'

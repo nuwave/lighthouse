@@ -8,7 +8,6 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
@@ -19,7 +18,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  * For example `@namespace(field: "App\\GraphQL")` applies the namespace
  * `App\GraphQL` to the `@field` directive.
  */
-class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeExtensionManipulator, DefinedDirective
+class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeExtensionManipulator
 {
     public const NAME = 'namespace';
 
@@ -44,7 +43,8 @@ SDL;
 
         // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($objectType->fields as $fieldDefinition) {
-            if ($existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
+            $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);
+            if ($existingNamespaces !== null) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 

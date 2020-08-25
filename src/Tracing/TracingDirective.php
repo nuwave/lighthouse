@@ -7,11 +7,10 @@ use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class TracingDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class TracingDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Nuwave\Lighthouse\Tracing\Tracing
@@ -34,9 +33,6 @@ directive @tracing on FIELD_DEFINITION
 SDL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $fieldValue = $next($fieldValue);

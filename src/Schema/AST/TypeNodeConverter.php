@@ -21,7 +21,7 @@ abstract class TypeNodeConverter
     /**
      * Convert an AST type and apply wrapping types.
      *
-     * @param  string[]  $wrappers
+     * @param  array<string>  $wrappers
      * @return mixed The wrapped type.
      */
     protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])
@@ -32,7 +32,7 @@ abstract class TypeNodeConverter
             /** @var \GraphQL\Language\AST\NonNullTypeNode|\GraphQL\Language\AST\ListTypeNode $node */
             $wrappers[] = $nodeKind;
 
-            return $this->convertWrappedTypeNode( // @phpstan-ignore-line TODO remove when upgrading graphql-php
+            return $this->convertWrappedTypeNode(
                 $node->type,
                 $wrappers
             );

@@ -2,21 +2,25 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
 class ASTHelper
@@ -49,8 +53,6 @@ class ASTHelper
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
      * @return \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
     {
@@ -142,7 +144,7 @@ class ASTHelper
         /** @var \GraphQL\Language\AST\ArgumentNode|null $arg */
         $arg = self::firstByName($directive->arguments, $name);
 
-        return $arg
+        return $arg !== null
             ? AST::valueFromASTUntyped($arg->value)
             : $default;
     }
@@ -150,15 +152,12 @@ class ASTHelper
     /**
      * Return the PHP internal value of an arguments default value.
      *
+     * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
      * @return mixed The plain PHP value.
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
-        if ($defaultValue instanceof NullValueNode) {
-            return;
-        }
-
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
@@ -170,7 +169,7 @@ class ASTHelper
             return $internalValue->value;
         }
 
-        return AST::valueFromAST($defaultValue, $argumentType);
+        return AST::valueFromAST($defaultValue, $argumentType); // @phpstan-ignore-line Inaccurate type in graphql-php
     }
 
     /**
@@ -214,7 +213,7 @@ class ASTHelper
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
-        return $namespaceDirective
+        return $namespaceDirective !== null
             // The namespace directive can contain an argument with the name of the
             // current directive, in which case it applies here
             ? static::directiveArgValue($namespaceDirective, $directiveName, '')
@@ -255,7 +254,7 @@ class ASTHelper
             ]
         );
 
-        $globalIdFieldDefinition = PartialParser::fieldDefinition(
+        $globalIdFieldDefinition = Parser::fieldDefinition(
             config('lighthouse.global_id_field').': ID! @globalId'
         );
 
@@ -292,16 +291,60 @@ class ASTHelper
             );
         }
 
+        /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator $directiveLocator */
+        $directiveLocator = app(DirectiveLocator::class);
+        $directive = $directiveLocator->resolve($name);
+        $directiveDefinition = Parser::directiveDefinition($directive::definition());
+
         /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
         $fieldDefinitions = $objectType->fields;
         foreach ($fieldDefinitions as $fieldDefinition) {
-            // If the field already has the same directive defined, skip over it.
+            // If the field already has the same directive defined, and it is not
+            // a repeatable directive, skip over it.
             // Field directives are more specific than those defined on a type.
-            if (self::hasDirective($fieldDefinition, $name)) {
+            if (
+                self::hasDirective($fieldDefinition, $name)
+                && ! $directiveDefinition->repeatable
+            ) {
                 continue;
             }
 
             $fieldDefinition->directives = $fieldDefinition->directives->merge([$directiveNode]);
         }
+    }
+
+    /**
+     * Create a fully qualified base for a generated name that belongs to an argument.
+     *
+     * We have to make sure it is unique in the schema. Even though
+     * this name becomes a bit verbose, it is also very unlikely to collide
+     * with a random user defined type.
+     *
+     * @example ParentNameFieldNameArgName
+     */
+    public static function qualifiedArgType(
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): string {
+        return Str::studly($parentType->name->value)
+            .Str::studly($parentField->name->value)
+            .Str::studly($argDefinition->name->value);
+    }
+
+    /**
+     * Given a collection of directives, returns the string value for the deprecation reason.
+     *
+     * @param  \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $node
+     * @return string
+     */
+    public static function deprecationReason(Node $node): ?string
+    {
+        $deprecated = Values::getDirectiveValues(
+            Directive::deprecatedDirective(),
+            $node
+        );
+
+        return $deprecated['reason'] ?? null;
     }
 }

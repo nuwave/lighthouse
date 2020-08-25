@@ -35,7 +35,7 @@ class CustomException extends Exception implements RendersErrorsExtensions
     /**
     * @var @string
     */
-    private $reason;
+    protected $reason;
 
     public function __construct(string $message, string $reason)
     {
@@ -157,17 +157,37 @@ use Nuwave\Lighthouse\Execution\ErrorHandler;
 
 class ExtensionErrorHandler implements ErrorHandler
 {
-    public static function handle(Error $error, Closure $next): array
+    public function __invoke(?Error $error, Closure $next): ?array
     {
-        // TODO do something with $error
+        // You can discard errors by returning null
+        if ($this->shouldBeDiscarded($error)) {
+            return null;
+        }
 
+        // Error handlers are instantiated once per query
+        $this->errorCount++;
+
+        // Keep the pipeline going, last step formats the error into an array
         return $next($error);
     }
 }
 ```
 
-## Collecting Errors
+## Partial Errors
 
 As a GraphQL query may return a partial result, you may not always want to abort
-execution immediately after an error occurred. You can use the [`\Nuwave\Lighthouse\Execution\ErrorBuffer`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorBuffer.php)
+execution immediately after an error occurred.
+
+Use the [`ErrorPool`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorPool.php)
 when you want to collect multiple errors before returning a result.
+
+```php
+try {
+    // Something that might fail but still allows for a partial result
+} catch (\Throwable $error) {
+    $errorPool = app(\Nuwave\Lighthouse\Execution\ErrorPool::class);
+    $errorPool->record($error);
+}
+
+return $result;
+```

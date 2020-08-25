@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Tests\TestCase;
 use Tests\Utils\Models\Category;
@@ -26,7 +26,7 @@ class BaseDirectiveTest extends TestCase
     public function testGetsModelClassFromDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @modelClass(class: "Team") {
+        type User @model(class: "Team") {
             id: ID
         }
         ';
@@ -154,7 +154,7 @@ class BaseDirectiveTest extends TestCase
     protected function constructFieldDirective(string $definitionNode): BaseDirective
     {
         return $this->constructTestDirective(
-            PartialParser::fieldDefinition($definitionNode)
+            Parser::fieldDefinition($definitionNode)
         );
     }
 
@@ -166,10 +166,15 @@ class BaseDirectiveTest extends TestCase
     protected function constructTestDirective($definitionNode): BaseDirective
     {
         $directive = new class extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @baseTest on FIELD_DEFINITION';
+            }
+
             /**
              * Allow to call protected methods from the test.
              *
-             * @param  mixed[]  $args
+             * @param  array<mixed>  $args
              * @return mixed Whatever the method returns.
              */
             public function __call(string $method, array $args)

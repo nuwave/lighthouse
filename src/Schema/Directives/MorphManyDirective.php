@@ -2,17 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class MorphManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
+class MorphManyDirective extends RelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many-polymorphic-relations).
 """
 directive @morphMany(
   """

@@ -26,7 +26,6 @@ class ComplexityDirectiveTest extends TestCase
             ->getComplexityFn();
 
         $this->assertSame(100, $complexityFn(10, ['first' => 10]));
-        $this->assertSame(100, $complexityFn(10, [config('lighthouse.pagination_amount_argument') => 10]));
     }
 
     public function testCanSetCustomComplexityResolver(): void
@@ -62,7 +61,10 @@ GRAPHQL
         }
         ');
 
-        $complexityFn = $schema->getQueryType()
+        /** @var \GraphQL\Type\Definition\ObjectType $queryType */
+        $queryType = $schema->getQueryType();
+
+        $complexityFn = $queryType
             ->getField('foo')
             ->getComplexityFn();
 

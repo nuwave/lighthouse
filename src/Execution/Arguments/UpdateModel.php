@@ -9,10 +9,11 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class UpdateModel implements ArgResolver
 {
     const MISSING_PRIMARY_KEY_FOR_UPDATE = 'Missing primary key for update.';
+
     /**
      * @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
      */
-    private $previous;
+    protected $previous;
 
     /**
      * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use BenSampo\Enum\Enum;
@@ -58,7 +56,7 @@ class LaravelEnumType extends EnumType
     public function serialize($value): string
     {
         if (! $value instanceof Enum) {
-            $value = $this->enumClass::getInstance($value);
+            $value = $this->enumClass::fromValue($value);
         }
 
         return $value->key;

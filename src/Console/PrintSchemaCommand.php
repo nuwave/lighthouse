@@ -5,8 +5,9 @@ namespace Nuwave\Lighthouse\Console;
 use GraphQL\Type\Introspection;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
-use Illuminate\Cache\Repository;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Nuwave\Lighthouse\GraphQL;
 
@@ -15,36 +16,25 @@ class PrintSchemaCommand extends Command
     public const GRAPHQL_FILENAME = 'lighthouse-schema.graphql';
     public const JSON_FILENAME = 'lighthouse-schema.json';
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = '
-        lighthouse:print-schema
-        {--W|write : Write the output to a file}
-        {--json : Output JSON instead of GraphQL SDL}
-    ';
+    protected $signature = <<<'SIGNATURE'
+lighthouse:print-schema
+{--W|write : Write the output to a file}
+{--json : Output JSON instead of GraphQL SDL}
+SIGNATURE;
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Compile the final GraphQL schema and print the result.';
+    protected $description = 'Compile the GraphQL schema and print the result.';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(Repository $cache, Filesystem $storage, GraphQL $graphQL): void
+    public function handle(CacheRepository $cache, ConfigRepository $config, Filesystem $storage, GraphQL $graphQL): void
     {
         // Clear the cache so this always gets the current schema
-        $cache->forget(config('lighthouse.cache.key'));
+        $cache->forget(
+            $config->get('lighthouse.cache.key')
+        );
 
         $schema = $graphQL->prepSchema();
         if ($this->option('json')) {
             $filename = self::JSON_FILENAME;
-            $schemaString = $this->schemaJson($schema);
+            $schemaString = $this->toJson($schema);
         } else {
             $filename = self::GRAPHQL_FILENAME;
             $schemaString = SchemaPrinter::doPrint($schema);
@@ -58,24 +48,20 @@ class PrintSchemaCommand extends Command
         }
     }
 
-    /**
-     * Convert the given schema to a JSON string.
-     */
-    protected function schemaJson(Schema $schema): string
+    protected function toJson(Schema $schema): string
     {
-        // TODO simplify once https://github.com/webonyx/graphql-php/pull/539 is released
-        $introspectionResult = \GraphQL\GraphQL::executeQuery(
-            $schema,
-            Introspection::getIntrospectionQuery()
-        );
+        $introspectionResult = Introspection::fromSchema($schema);
+        if ($introspectionResult === null) {
+            throw new \Exception(<<<'MESSAGE'
+Did not receive a valid introspection result.
+Check if your schema is correct with:
 
-        $json = json_encode($introspectionResult->data);
-        // TODO use \Safe\json_encode
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('Tried to encode invalid JSON while converting schema: '.json_last_error_msg());
+    php artisan lighthouse:validate-schema
+
+MESSAGE
+);
         }
-        /** @var string $json */
 
-        return $json;
+        return \Safe\json_encode($introspectionResult);
     }
 }

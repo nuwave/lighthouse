@@ -41,18 +41,8 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         TypeExtensionManipulator::class,
     ];
 
-    /**
-     * The name of the console command.
-     *
-     * @var string
-     */
     protected $name = 'lighthouse:directive';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Create a class for a custom schema directive.';
 
     /**
@@ -94,8 +84,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * Build the class with the given name.
-     *
      * @param  string  $name
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -142,13 +130,11 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             $stub
         );
 
-        $stub = str_replace(
+        return str_replace(
             '{{ implements }}',
             $this->implements->implode(', '),
             $stub
         );
-
-        return $stub;
     }
 
     /**
