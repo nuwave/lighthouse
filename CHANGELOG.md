@@ -71,6 +71,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
 
+## 4.16.3
+
+### Fixed
+
+- Fix the type hint in `GraphQLContext::user()`
+
+## 4.16.2
+
+### Fixed
+
+- Provide the definition for `@nest`
+
 ## 4.16.1
 
 ### Fixed
