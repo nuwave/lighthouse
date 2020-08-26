@@ -7,7 +7,7 @@ interface GraphQLContext
     /**
      * Get an instance of the authenticated user.
      *
-     * @return \Illuminate\Foundation\Auth\User|null
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function user();
 

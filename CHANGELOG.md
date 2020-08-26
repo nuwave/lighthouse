@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.16.3
+
+### Fixed
+
+- Fix the type hint in `GraphQLContext::user()`
+
 ## 4.16.2
 
 ### Fixed
