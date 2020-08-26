@@ -150,6 +150,33 @@ GRAPHQL;
 
     public function testSubscriptionWithEnumInputCorrectlyResolves(): void
     {
+        $this->graphQL(/** @lang GraphQL */ '
+        subscription {
+            onPostUpdated(status: DELETED) {
+                body
+            }
+        }
+        ');
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updatePost(post: "Foobar") {
+                body
+            }
+        }
+        ');
+
+        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
+        $log = app(BroadcastManager::class)->driver();
+        $this->assertCount(1, $log->broadcasts());
+
+        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertArrayHasKey('onPostUpdated', $broadcasted);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostUpdated']);
+    }
+
+    public function testSubscriptionWithEnumInputVariableCorrectlyResolves(): void
+    {
         $this->postGraphQL([
             'query' => /** @lang GraphQL */ '
                 subscription OnPostUpdated($status: PostStatus!) {
