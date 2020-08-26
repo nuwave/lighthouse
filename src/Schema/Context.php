@@ -39,9 +39,6 @@ class Context implements GraphQLContext
         return $this->user;
     }
 
-    /**
-     * Get instance of request.
-     */
     public function request(): Request
     {
         return $this->request;
