@@ -52,7 +52,7 @@ the [@guard](docs/master/api-reference/directives.md#guard) directive on selecte
 
 ```diff
 type Query {
--   profile: User! @middlware(checks: ["auth"])
+-   profile: User! @middleware(checks: ["auth"])
 +   profile: User! @guard
 }
 ```
