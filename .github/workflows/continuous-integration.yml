@@ -24,8 +24,12 @@ jobs:
           - "7.3"
           - "7.4"
         laravel-version:
-          - "^6.0"
-          - "^7.0"
+          - "^6"
+          - "^7"
+          - "^8"
+        exclude:
+          - php-version: "7.2"
+            laravel-version: "^8"
 
     steps:
       - name: "Checkout"
@@ -71,6 +75,10 @@ jobs:
           - "5.8.*"
           - "^6.0"
           - "^7.0"
+          - "^8"
+        exclude:
+          - php-version: "7.2"
+            laravel-version: "^8"
 
     steps:
       - name: "Checkout"
@@ -114,7 +122,7 @@ jobs:
         php-version:
           - "7.4"
         laravel-version:
-          - "^7.0"
+          - "^8"
 
     steps:
       - name: "Checkout"
@@ -163,7 +171,7 @@ jobs:
         php-version:
           - "7.4"
         laravel-version:
-          - "^7.0"
+          - "^8"
 
     steps:
       - name: "Checkout"
