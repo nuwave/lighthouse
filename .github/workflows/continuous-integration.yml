@@ -26,6 +26,7 @@ jobs:
         laravel-version:
           - "^6.0"
           - "^7.0"
+          - "^8.0"
 
     steps:
       - name: "Checkout"
@@ -71,6 +72,7 @@ jobs:
           - "5.8.*"
           - "^6.0"
           - "^7.0"
+          - "^8.0"
 
     steps:
       - name: "Checkout"
@@ -164,6 +166,7 @@ jobs:
           - "7.4"
         laravel-version:
           - "^7.0"
+          - "^8.0"
 
     steps:
       - name: "Checkout"
