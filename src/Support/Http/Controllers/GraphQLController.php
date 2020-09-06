@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 use GraphQL\Server\Helper;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
-use Laragraph\LaravelGraphQLUtils\RequestParser;
+use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
