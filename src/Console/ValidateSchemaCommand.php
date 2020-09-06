@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
@@ -32,6 +33,8 @@ class ValidateSchemaCommand extends Command
 
         $originalSchema = $graphQL->prepSchema();
         $schemaConfig = $originalSchema->getConfig();
+
+        $schemaConfig->directives = Directive::getInternalDirectives();
 
         // We add schema directive definitions only here, since it is very slow
         $directiveFactory = new DirectiveFactory(

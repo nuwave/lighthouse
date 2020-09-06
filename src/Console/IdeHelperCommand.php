@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Console;
 
 use GraphQL\Language\Parser;
+use GraphQL\Language\Printer;
+use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
@@ -98,14 +100,29 @@ SDL;
      */
     protected function buildSchemaString(array $directiveClasses): string
     {
-        $schema = '';
+        // We include this built in directive by hand, since there is no directive class for it
+        $schema = /** @lang GraphQL */ <<<'SDL'
+"""
+Marks an element of a GraphQL schema as no longer supported.
+"""
+directive @deprecated(
+  """
+  Explains why this element was deprecated, usually also including a
+  suggestion for how to access supported similar data. Formatted
+  in [Markdown](https://daringfireball.net/projects/markdown/).
+  """
+  reason: String = "No longer supported"
+) on FIELD_DEFINITION
+
+
+SDL;
 
         foreach ($directiveClasses as $directiveClass) {
             $definition = $this->define($directiveClass);
 
-            $schema .= "\n"
-                ."# Directive class: $directiveClass\n"
-                .$definition."\n";
+            $schema .= "# Directive class: $directiveClass\n"
+                .$definition."\n"
+                . "\n";
         }
 
         return $schema;
