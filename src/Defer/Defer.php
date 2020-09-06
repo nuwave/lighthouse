@@ -8,7 +8,7 @@ use GraphQL\Server\Helper;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Laragraph\LaravelGraphQLUtils\RequestParser;
+use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;

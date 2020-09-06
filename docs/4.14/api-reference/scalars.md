@@ -55,5 +55,5 @@ This Scalar can only be used as an argument, not as a return type.
 For more information, please refer to the [file uploads guide](../digging-deeper/file-uploads.md).
 
 The multipart form request is handled by Lighthouse, the resolver gets passed
-an instance of [`\Illuminate\Http\UploadedFile`](https://laravel.com/api/Illuminate/Http/UploadedFile.html)
+an instance of [`\Illuminate\Http\UploadedFile`](https://laravel.com/api/7.x/Illuminate/Http/UploadedFile.html)
 in the argument `array $variables`.
