@@ -3,8 +3,6 @@
 namespace Nuwave\Lighthouse\Console;
 
 use GraphQL\Language\Parser;
-use GraphQL\Language\Printer;
-use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
@@ -122,7 +120,7 @@ SDL;
 
             $schema .= "# Directive class: $directiveClass\n"
                 .$definition."\n"
-                . "\n";
+                ."\n";
         }
 
         return $schema;
