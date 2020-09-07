@@ -25,7 +25,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Converts between IDs/types and global IDs.
 When used upon a field, it encodes,
@@ -39,7 +39,7 @@ directive @globalId(
   """
   decode: String = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

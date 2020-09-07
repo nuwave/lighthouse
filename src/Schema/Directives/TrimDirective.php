@@ -9,12 +9,12 @@ class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgD
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run the `trim` function on an input value.
 """
 directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

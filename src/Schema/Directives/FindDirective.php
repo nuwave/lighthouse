@@ -13,7 +13,7 @@ class FindDirective extends BaseDirective implements FieldResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Find a model based on the arguments provided.
 """
@@ -29,7 +29,7 @@ directive @find(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

@@ -8,7 +8,7 @@ class InDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Use the client given list value to add an IN conditional to a database query.
 """
@@ -19,7 +19,7 @@ directive @in(
   """
   key: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

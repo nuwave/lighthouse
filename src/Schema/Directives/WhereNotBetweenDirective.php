@@ -8,7 +8,7 @@ class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirect
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Verify that a column's value lies outside of two values.
 
@@ -22,7 +22,7 @@ directive @whereNotBetween(
   """
   key: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

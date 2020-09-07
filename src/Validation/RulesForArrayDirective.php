@@ -9,7 +9,7 @@ class RulesForArrayDirective extends BaseRulesDirective implements ArgDirectiveF
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
@@ -28,7 +28,7 @@ directive @rulesForArray(
   """
   messages: RulesMessageMap
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function rules(): array

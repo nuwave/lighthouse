@@ -14,7 +14,7 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
 on the relations of a list of models.
@@ -25,7 +25,7 @@ directive @lazyLoad(
   """
   relations: [String!]!
 ) repeatable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
