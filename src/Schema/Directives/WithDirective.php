@@ -9,7 +9,7 @@ class WithDirective extends WithRelationDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Eager-load an Eloquent relation.
 """
@@ -25,7 +25,7 @@ directive @with(
   """
   scopes: [String!]
 ) repeatable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function batchLoaderClass(): string

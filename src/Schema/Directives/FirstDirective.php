@@ -12,7 +12,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Get the first query result from a collection of Eloquent models.
 """
@@ -28,7 +28,7 @@ directive @first(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

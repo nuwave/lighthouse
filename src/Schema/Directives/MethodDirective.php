@@ -12,7 +12,7 @@ class MethodDirective extends BaseDirective implements FieldResolver
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Resolve a field by calling a method on the parent object.
 
@@ -26,7 +26,7 @@ directive @method(
   """
   name: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue

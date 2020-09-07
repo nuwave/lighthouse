@@ -33,7 +33,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
@@ -73,7 +73,7 @@ directive @can(
   """
   args: Mixed
 ) repeatable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

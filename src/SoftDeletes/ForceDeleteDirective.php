@@ -14,7 +14,7 @@ class ForceDeleteDirective extends ModifyModelExistenceDirective
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Permanently remove one or more soft deleted models by their ID.
 The field must have a single non-null argument that may be a list.
@@ -32,7 +32,7 @@ directive @forceDelete(
   """
   model: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     protected function find(string $modelClass, $idOrIds)

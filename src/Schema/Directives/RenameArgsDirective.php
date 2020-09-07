@@ -13,12 +13,12 @@ class RenameArgsDirective extends BaseDirective implements ArgDirective, FieldMi
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Apply the @rename directives on the incoming arguments.
 """
 directive @renameArgs on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next)
