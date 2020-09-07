@@ -18,7 +18,6 @@ use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
-use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Policies\AuthServiceProvider;
@@ -60,7 +59,6 @@ GRAPHQL;
     {
         return [
             AuthServiceProvider::class,
-            ConsoleServiceProvider::class,
             ScoutServiceProvider::class,
 
             // Lighthouse's own
