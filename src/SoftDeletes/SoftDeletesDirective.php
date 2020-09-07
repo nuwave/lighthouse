@@ -31,7 +31,7 @@ GRAPHQL;
 Allows to filter if trashed elements should be fetched.
 """
 trashed: Trashed @trashed
-SDL
+GRAPHQL
         );
         // @phpstan-ignore-next-line NodeList contravariance issue
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, [$softDeletesArgument]);
