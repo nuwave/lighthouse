@@ -36,7 +36,7 @@ class RelationFetcher
         $allModels = [];
 
         foreach (static::groupModelsByClassKey($keys) as $modelsOfSameClass) {
-            $modelsOfSameClass->load($relation);
+            $modelsOfSameClass->loadMissing($relation);
 
             foreach ($modelsOfSameClass as $key => $model) {
                 $allModels[$key] = $model;
