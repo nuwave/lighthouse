@@ -25,9 +25,6 @@ directive @rename(
 GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $attribute = $this->attributeArgValue();
@@ -41,7 +38,6 @@ GRAPHQL;
 
     /**
      * Retrieves the attribute argument for the directive.
-     *
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

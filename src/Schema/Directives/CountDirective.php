@@ -36,9 +36,6 @@ directive @count(
 GRAPHQL;
     }
 
-    /**
-     * Returns the count of a given relationship or model.
-     */
     public function resolveField(FieldValue $value): FieldValue
     {
         return $value->setResolver(
