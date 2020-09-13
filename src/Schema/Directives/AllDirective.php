@@ -31,9 +31,6 @@ directive @all(
 GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(

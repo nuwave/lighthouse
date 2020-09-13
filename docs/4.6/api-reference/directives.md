@@ -183,7 +183,7 @@ directive @belongsToMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: paginator, connection.
   """
   type: String
@@ -1094,7 +1094,7 @@ directive @hasMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: paginator, connection.
   """
   type: String
@@ -1538,7 +1538,7 @@ directive @morphMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: paginator, connection.
   """
   type: String

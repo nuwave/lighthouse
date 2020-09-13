@@ -39,12 +39,6 @@ directive @mock(
 GRAPHQL;
     }
 
-    /**
-     * Set a field resolver on the FieldValue.
-     *
-     * This must call $fieldValue->setResolver() before returning
-     * the FieldValue.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
