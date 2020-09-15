@@ -17,6 +17,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Handle content types `application/graphql` and `application/x-www-form-urlencoded` properly https://github.com/nuwave/lighthouse/pull/1424
 - Mark directives that can be used more than once per location as `repeatable` https://github.com/nuwave/lighthouse/pull/1529
 - Allow configuring global field middleware directives in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1533
+- Support Laravel 8 https://github.com/nuwave/lighthouse/pull/1549
 
 ### Changed
 
