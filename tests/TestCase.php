@@ -137,6 +137,7 @@ GRAPHQL;
 
         $config->set('app.debug', true);
 
+        // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
     }
 
