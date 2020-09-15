@@ -136,6 +136,8 @@ GRAPHQL;
         $config->set('lighthouse.guard', null);
 
         $config->set('app.debug', true);
+
+        $config->set('scout.driver', null);
     }
 
     /**
