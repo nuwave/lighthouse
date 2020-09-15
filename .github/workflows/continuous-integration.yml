@@ -55,6 +55,10 @@ jobs:
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version == '^8'"
+        run: "composer require --dev laravel/legacy-factories"
+
       - name: "Run phpstan/phpstan"
         run: "vendor/bin/phpstan analyse --configuration=phpstan.neon"
 
@@ -104,6 +108,10 @@ jobs:
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version == '^8'"
+        run: "composer require --dev laravel/legacy-factories"
+
       - name: "Set up the database"
         run: |
           sudo systemctl start mysql.service
@@ -147,6 +155,10 @@ jobs:
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version == '^8'"
+        run: "composer require --dev laravel/legacy-factories"
 
       - name: "Set up the database"
         run: |
@@ -193,6 +205,10 @@ jobs:
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version == '^8'"
+        run: "composer require --dev laravel/legacy-factories"
 
       - name: "Collect code coverage with pcov and phpunit/phpunit"
         run: "vendor/bin/phpbench run --progress=none --report=ast"
