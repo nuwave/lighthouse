@@ -40,12 +40,11 @@
         "webonyx/graphql-php": "^14.2"
     },
     "require-dev": {
-        "algolia/algoliasearch-client-php": "^2",
         "bensampo/laravel-enum": "^1.28.3",
         "ergebnis/composer-normalize": "^2.2.2",
         "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laravel/lumen-framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
-        "laravel/scout": "^7 || ^8",
+        "laravel/scout": "^7",
         "mll-lab/graphql-php-scalars": "^3.1",
         "mockery/mockery": "^1.0",
         "nunomaduro/larastan": "^0.6",
@@ -94,6 +93,7 @@
     },
     "scripts": {
         "bench": "phpbench run",
+        "rector": "rector process src/ tests/",
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",
         "test:integration": "phpunit --colors=always --testsuite Integration",
