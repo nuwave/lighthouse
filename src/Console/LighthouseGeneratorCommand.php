@@ -58,7 +58,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
             return reset($namespaces);
         }
 
-        // Save the first namespac
+        // Save the first namespace
         $preferredNamespaceFallback = reset($namespaces);
 
         // If the strings are sorted, any prefix common to all strings
