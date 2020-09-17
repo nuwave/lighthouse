@@ -1,5 +1,6 @@
 includes:
 - vendor/bensampo/laravel-enum/extension.neon
+- vendor/nesbot/carbon/extension.neon
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 - vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon

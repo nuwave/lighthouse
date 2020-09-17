@@ -13,6 +13,7 @@ class Date extends DateScalar
 
     protected function parse($value): Carbon
     {
+        // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
         return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
     }
 }
