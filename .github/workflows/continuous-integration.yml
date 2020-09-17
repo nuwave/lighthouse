@@ -52,12 +52,12 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: "composer remove --dev phpbench/phpbench --no-update"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Ensure compatibility with legacy factories"
-        if: "matrix.laravel-version == '^8'"
-        run: "composer require --dev laravel/legacy-factories"
 
       - name: "Run phpstan/phpstan"
         run: "vendor/bin/phpstan analyse --configuration=phpstan.neon"
@@ -105,12 +105,12 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench --no-update"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Ensure compatibility with legacy factories"
-        if: "matrix.laravel-version == '^8'"
-        run: "composer require --dev laravel/legacy-factories"
 
       - name: "Set up the database"
         run: |
@@ -153,12 +153,12 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: "composer remove --dev phpbench/phpbench --no-update"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Ensure compatibility with legacy factories"
-        if: "matrix.laravel-version == '^8'"
-        run: "composer require --dev laravel/legacy-factories"
 
       - name: "Set up the database"
         run: |
@@ -203,12 +203,12 @@ jobs:
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
-
-      - name: "Ensure compatibility with legacy factories"
-        if: "matrix.laravel-version == '^8'"
-        run: "composer require --dev laravel/legacy-factories"
 
       - name: "Collect code coverage with pcov and phpunit/phpunit"
         run: "vendor/bin/phpbench run --progress=none --report=ast"
