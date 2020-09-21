@@ -93,6 +93,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                     $subscriber->args,
                     $subscriber->setRoot($root)
                 );
+                dump($data);
 
                 $this->broadcastManager->broadcast(
                     $subscriber,
