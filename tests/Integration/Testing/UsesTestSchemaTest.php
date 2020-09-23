@@ -18,6 +18,7 @@ class UsesTestSchemaTest extends DBTestCase
         factory(Color::class, 3)->create();
         factory(Category::class, 4)->create();
 
+        // It passes
         $this->schema = '          
             type Color {                
                 id: ID!
@@ -60,6 +61,7 @@ class UsesTestSchemaTest extends DBTestCase
             }
             ';
 
+        // It fails, because schema cannot be overridden 
         $this->graphQL('
             {
                 categories{
