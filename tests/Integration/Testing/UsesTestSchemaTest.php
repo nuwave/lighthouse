@@ -64,8 +64,7 @@ class UsesTestSchemaTest extends DBTestCase
         // It fails, because schema cannot be overridden 
         $this->graphQL('
             {
-                categories{
-                    id
+                categories{                    
                     name
                 }
             }
