@@ -111,7 +111,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
 
         $builder->whereNested(
             function ($builder) use ($model, $relation, $condition, $additionalArguments): void {
-                $whereHasQuery = $model->whereHas(
+                $whereHasQuery = $model->newQueryWithoutScopes()->whereHas(
                     $relation,
                     function ($builder) use ($relation, $model, $condition): void {
                         if ($condition) {
