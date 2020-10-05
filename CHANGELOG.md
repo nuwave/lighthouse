@@ -70,6 +70,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
+- Add missing field argument in namespace directive. https://github.com/nuwave/lighthouse/pull/1577
 
 ## 4.16.3
 
