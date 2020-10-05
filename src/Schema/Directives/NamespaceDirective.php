@@ -29,7 +29,7 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
 Redefine the default namespaces used in other directives.
 The arguments are a map from directive names to namespaces.
 """
-directive @namespace on FIELD_DEFINITION | OBJECT
+directive @namespace(field: String!) on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
