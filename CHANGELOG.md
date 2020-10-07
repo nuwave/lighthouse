@@ -9,7 +9,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Support Laravel 8
+- Support Laravel 8 https://github.com/nuwave/lighthouse/pull/1578
 
 ## 4.16.3
 
