@@ -15,7 +15,6 @@ use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
-use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Middleware\CountRuns;
@@ -58,7 +57,6 @@ GRAPHQL;
     {
         return [
             AuthServiceProvider::class,
-            ConsoleServiceProvider::class,
             ScoutServiceProvider::class,
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
@@ -129,6 +127,9 @@ GRAPHQL;
         $config->set('lighthouse.force_fill', true);
 
         $config->set('app.debug', true);
+
+        // Defaults to "algolia", which is not needed in our test setup
+        $config->set('scout.driver', null);
     }
 
     /**

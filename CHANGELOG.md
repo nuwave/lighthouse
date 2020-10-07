@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Support Laravel 8
+
 ## 4.16.3
 
 ### Fixed
