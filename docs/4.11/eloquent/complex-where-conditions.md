@@ -106,7 +106,7 @@ want to re-use a list of allowed columns. Here's how your schema could look like
 ```graphql
 type Query {
   allPeople(where: _ @whereConditions(columnsEnum: "PersonColumn")): [Person!]!
-  @all
+    @all
 
   paginatedPeople(
     where: _ @whereConditions(columnsEnum: "PersonColumn")
