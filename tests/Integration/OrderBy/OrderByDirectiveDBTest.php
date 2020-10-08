@@ -70,7 +70,7 @@ class OrderByDirectiveDBTest extends DBTestCase
                 orderBy: [
                     {
                         field: "name"
-                        order: ASC
+                        order: DESC
                     }
                 ]
             ) {
