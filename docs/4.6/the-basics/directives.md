@@ -53,10 +53,10 @@ type Query {
     "Search by title"
     title: String @where(operator: "%LIKE%")
   ): [Post!]!
-  # Resolve as a paginated list
-  @paginate
-  # Reuse existing Laravel authentication middleware
-  @middleware(checks: ["auth:api"])
+    # Resolve as a paginated list
+    @paginate
+    # Reuse existing Laravel authentication middleware
+    @middleware(checks: ["auth:api"])
 }
 ```
 
