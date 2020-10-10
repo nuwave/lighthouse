@@ -8,11 +8,11 @@ class FieldDirective extends BaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
     """
     An alternate @field.
     """
     directive @field on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }

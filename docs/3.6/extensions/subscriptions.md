@@ -159,7 +159,7 @@ directive will broadcast all updates to the `Post` model to the `postUpdated` su
 ```graphql
 type Mutation {
   updatePost(input: UpdatePostInput!): Post
-  @broadcast(subscription: "postUpdated")
+    @broadcast(subscription: "postUpdated")
 }
 ```
 

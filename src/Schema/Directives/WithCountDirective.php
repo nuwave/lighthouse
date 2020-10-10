@@ -10,7 +10,7 @@ class WithCountDirective extends WithRelationDirective implements FieldMiddlewar
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Eager-load the count of an Eloquent relation if the field is queried.
 
@@ -29,7 +29,7 @@ directive @withCount(
   """
   scopes: [String!]
 ) repeatable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function batchLoaderClass(): string

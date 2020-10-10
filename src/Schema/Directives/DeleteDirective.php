@@ -18,7 +18,7 @@ class DeleteDirective extends ModifyModelExistenceDirective implements ArgResolv
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Delete one or more models by their ID.
 The field must have a single non-null argument that may be a list.
@@ -43,7 +43,7 @@ directive @delete(
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     protected function find(string $modelClass, $idOrIds)

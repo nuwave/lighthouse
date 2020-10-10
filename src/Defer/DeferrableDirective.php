@@ -23,13 +23,13 @@ class DeferrableDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Do not use this directive directly, it is automatically added to the schema
 when using the defer extension.
 """
 directive @deferrable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

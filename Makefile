@@ -28,6 +28,10 @@ test: up ## Runs tests with phpunit
 bench: up ## Run benchmarks
 	docker-compose exec php composer bench
 
+.PHONY: rector
+rector: up ## Automatic code fixes with rector
+	docker-compose exec php composer rector
+
 vendor: up composer.json ## Install composer dependencies
 	docker-compose exec php composer validate --strict
 	docker-compose exec php composer install
