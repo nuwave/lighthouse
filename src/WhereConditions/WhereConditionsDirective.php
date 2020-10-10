@@ -6,7 +6,7 @@ class WhereConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Add a dynamically client-controlled WHERE condition to a fields query.
 """
@@ -25,7 +25,7 @@ directive @whereConditions(
     """
     columnsEnum: String
 ) on ARGUMENT_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

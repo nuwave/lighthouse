@@ -35,7 +35,8 @@ class ReportingErrorHandler implements ErrorHandler
 
         // @phpstan-ignore-next-line TODO remove when supporting Laravel 7 and upwards
         $this->exceptionHandler->report(
-            $error->getPrevious());
+            $error->getPrevious()
+        );
 
         return $next($error);
     }

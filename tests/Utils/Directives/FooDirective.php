@@ -8,11 +8,11 @@ class FooDirective extends BaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Maximum bar.
 """
 directive @foo on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }

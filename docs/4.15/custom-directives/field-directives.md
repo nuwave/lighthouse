@@ -20,7 +20,7 @@ as well as the outgoing result of resolving the field.
 ```php
 <?php
 
-namespace App\Directives;
+namespace App\GraphQL\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;

@@ -14,7 +14,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Inject a value from the context object into the arguments.
 """
@@ -33,7 +33,7 @@ directive @inject(
   """
   name: String!
 ) repeatable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

@@ -8,7 +8,7 @@ class BelongsToManyDirective extends RelationDirective implements FieldManipulat
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
@@ -25,7 +25,7 @@ directive @belongsToMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
   type: String
@@ -49,6 +49,6 @@ directive @belongsToMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }

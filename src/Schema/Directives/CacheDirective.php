@@ -32,7 +32,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Cache the result of a resolver.
 """
@@ -50,7 +50,7 @@ directive @cache(
   """
   private: Boolean = false
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

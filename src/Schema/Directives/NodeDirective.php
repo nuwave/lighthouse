@@ -27,7 +27,7 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Register a type for Relay's global object identification.
 
@@ -48,7 +48,7 @@ directive @node(
   """
   model: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

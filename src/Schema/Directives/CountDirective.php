@@ -13,7 +13,7 @@ class CountDirective extends WithRelationDirective implements FieldResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Returns the count of a given relationship or model.
 """
@@ -33,12 +33,9 @@ directive @count(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Returns the count of a given relationship or model.
-     */
     public function resolveField(FieldValue $value): FieldValue
     {
         return $value->setResolver(

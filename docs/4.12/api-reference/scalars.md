@@ -6,7 +6,7 @@ using [`@scalar`](directives.md#scalar) to point them to a FQCN.
 ```graphql
 "A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
 scalar DateTime
-@scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
 type Query {
   "Get the local server time."
@@ -28,7 +28,7 @@ Internally represented as an instance of `Carbon\Carbon`.
 ```graphql
 "A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
 scalar DateTime
-@scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
 Internally represented as an instance of `Carbon\Carbon`.
@@ -38,7 +38,7 @@ Internally represented as an instance of `Carbon\Carbon`.
 ```graphql
 "A datetime and timezone string in ISO 8601 format `Y-m-dTH:i:sO`, e.g. `2020-04-20T13:53:12+02:00`."
 scalar DateTimeTz
-@scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeTz")
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeTz")
 ```
 
 Internally represented as an instance of `Carbon\Carbon`.
@@ -48,7 +48,7 @@ Internally represented as an instance of `Carbon\Carbon`.
 ```graphql
 "Can be used as an argument to upload files using https://github.com/jaydenseric/graphql-multipart-request-spec"
 scalar Upload
-@scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 ```
 
 This Scalar can only be used as an argument, not as a return type.

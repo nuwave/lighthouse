@@ -26,7 +26,7 @@ class MockDirective extends BaseDirective implements FieldResolver
      */
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Allows you to easily hook up a resolver for an endpoint.
 """
@@ -36,15 +36,9 @@ directive @mock(
     """
     key: String = "default"
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Set a field resolver on the FieldValue.
-     *
-     * This must call $fieldValue->setResolver() before returning
-     * the FieldValue.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(

@@ -8,7 +8,7 @@ class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Allows clients to filter a query based on the existence of a related model, using
 a dynamically controlled `WHERE` condition that applies to the relationship.
@@ -37,7 +37,7 @@ directive @whereHasConditions(
     """
     columnsEnum: String
 ) on ARGUMENT_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**
