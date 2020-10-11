@@ -26,7 +26,7 @@ abstract class LoaderRegistry
         // The path to the field serves as the unique key for the instance
         $instanceKey = static::instanceKey($pathToField);
 
-        if (! isset(self::$instances[$instanceKey])) {
+        if (isset(self::$instances[$instanceKey])) {
             return self::$instances[$instanceKey];
         }
 

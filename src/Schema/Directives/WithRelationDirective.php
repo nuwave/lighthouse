@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
@@ -45,21 +44,16 @@ abstract class WithRelationDirective extends BaseDirective
      */
     protected function deferredRelationResolver(callable $resolver): Closure
     {
-        return function (?Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
-            return new Deferred(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
-                if (is_null($parent)) {
+        return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            return $this
+                ->loader($resolveInfo)
+                ->load(
+                    ModelKey::build($parent),
+                    ['parent' => $parent]
+                )
+                ->then(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
                     return $resolver($parent, $args, $context, $resolveInfo);
-                }
-
-                return $this->loader($resolveInfo)
-                    ->load(
-                        ModelKey::build($parent),
-                        ['parent' => $parent]
-                    )
-                    ->then(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
-                        return $resolver($parent, $args, $context, $resolveInfo);
-                    });
-            });
+                });
         };
     }
 
@@ -83,7 +77,7 @@ abstract class WithRelationDirective extends BaseDirective
      */
     protected function decorateBuilder(ResolveInfo $resolveInfo): Closure
     {
-        return function ($query) use ($resolveInfo) {
+        return function (object $query) use ($resolveInfo): void {
             $resolveInfo->argumentSet->enhanceBuilder(
                 $query,
                 $this->directiveArgValue('scopes', [])
