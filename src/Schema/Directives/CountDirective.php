@@ -65,8 +65,8 @@ GRAPHQL;
         if (! is_null($relation)) {
             return $value->setResolver(
                 $this->deferredRelationResolver(
-                    function (?Model $model) use ($relation) {
-                      return $model->{$this->nodeName()};
+                    function (?Model $model) {
+                        return $model->{$this->nodeName()};
                     }
                 )
             );
