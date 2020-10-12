@@ -93,7 +93,7 @@ definition that formally describes them.
 +     */
 +    public static function definition(): string
 +    {
-+        return /** @lang GraphQL */ <<<'SDL'
++        return /** @lang GraphQL */ <<<'GRAPHQL'
 +"""
 +A description of what this directive does.
 +"""
@@ -103,7 +103,7 @@ definition that formally describes them.
 +    """
 +    someArg: String
 +) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-+SDL;
++GRAPHQL;
 +    }
 ```
 

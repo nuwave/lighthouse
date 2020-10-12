@@ -35,7 +35,7 @@ class UpperCaseDirective extends BaseDirective
      */
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 A description of what this directive does.
 """
@@ -45,7 +45,7 @@ directive @upperCase(
     """
     someArg: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }
 ```

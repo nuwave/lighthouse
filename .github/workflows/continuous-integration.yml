@@ -25,8 +25,12 @@ jobs:
           - "7.3"
           - "7.4"
         laravel-version:
-          - "^6.0"
-          - "^7.0"
+          - "^6"
+          - "^7"
+          - "^8"
+        exclude:
+          - php-version: "7.2"
+            laravel-version: "^8"
 
     steps:
       - name: "Checkout"
@@ -49,6 +53,10 @@ jobs:
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: "composer remove --dev phpbench/phpbench --no-update"
+
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
@@ -73,6 +81,10 @@ jobs:
           - "5.8.*"
           - "^6.0"
           - "^7.0"
+          - "^8"
+        exclude:
+          - php-version: "7.2"
+            laravel-version: "^8"
 
     steps:
       - name: "Checkout"
@@ -101,6 +113,10 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench --no-update"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
@@ -122,7 +138,7 @@ jobs:
         php-version:
           - "7.4"
         laravel-version:
-          - "^7.0"
+          - "^8"
 
     steps:
       - name: "Checkout"
@@ -151,6 +167,10 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: "composer remove --dev phpbench/phpbench --no-update"
 
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
+
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
 
@@ -177,7 +197,7 @@ jobs:
         php-version:
           - "7.4"
         laravel-version:
-          - "^7.0"
+          - "^8"
 
     steps:
       - name: "Checkout"
@@ -197,6 +217,10 @@ jobs:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
+
+      - name: "Ensure compatibility with legacy factories"
+        if: "matrix.laravel-version != '^8'"
+        run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
         run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"

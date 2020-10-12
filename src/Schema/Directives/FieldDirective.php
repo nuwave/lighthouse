@@ -12,7 +12,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Assign a resolver function to a field.
 """
@@ -29,12 +29,9 @@ directive @field(
   """
   args: [String!]
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         [$className, $methodName] = $this->getMethodArgumentParts('resolver');

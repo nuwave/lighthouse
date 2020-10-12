@@ -33,7 +33,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run authentication through one or more guards.
 This is run per field and may allow unauthenticated
@@ -46,7 +46,7 @@ directive @guard(
   """
   with: [String!]
 ) on FIELD_DEFINITION | OBJECT
-SDL;
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

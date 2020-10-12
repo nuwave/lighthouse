@@ -6,7 +6,7 @@ class ModelDirective extends NodeDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Map a model class to an object type.
 
@@ -18,6 +18,6 @@ directive @model(
   """
   class: String!
 ) on OBJECT
-SDL;
+GRAPHQL;
     }
 }

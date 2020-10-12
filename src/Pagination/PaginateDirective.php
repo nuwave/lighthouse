@@ -17,7 +17,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Query multiple model entries as a paginated list.
 """
@@ -57,7 +57,7 @@ directive @paginate(
   """
   maxCount: Int
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
@@ -84,9 +84,6 @@ SDL;
             );
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(

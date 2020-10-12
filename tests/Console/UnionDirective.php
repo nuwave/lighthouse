@@ -9,11 +9,11 @@ class UnionDirective extends BaseDirective implements Directive
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Some other definition then the original.
 """
 directive @union on UNION
-SDL;
+GRAPHQL;
     }
 }

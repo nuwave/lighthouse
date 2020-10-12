@@ -10,7 +10,7 @@ class UpdateDirective extends MutationExecutorDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Update an Eloquent model with the input values of the field.
 """
@@ -34,7 +34,7 @@ directive @update(
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     protected function makeExecutionFunction(?Relation $parentRelation = null): callable

@@ -56,12 +56,12 @@ class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgD
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run the `trim` function on an input value.
 """
 directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**
@@ -160,7 +160,7 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirec
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 directive @eq(
   """
   Specify the database column to compare.
@@ -168,7 +168,7 @@ directive @eq(
   """
   key: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**
@@ -202,7 +202,7 @@ Lighthouse's [@whereBetween](../api-reference/directives.md#wherebetween) is one
 ```graphql
 type Query {
   users(createdBetween: DateRange @whereBetween(key: "created_at")): [User!]!
-  @paginate
+    @paginate
 }
 
 input DateRange {
@@ -250,7 +250,7 @@ class ModelArgsDirective extends BaseDirective implements ArgManipulator
      */
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Automatically generates an input argument based on a type.
 """
@@ -260,7 +260,7 @@ directive @typeToInput(
     """
     name: String!
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**

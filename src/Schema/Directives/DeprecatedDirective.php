@@ -8,7 +8,7 @@ class DeprecatedDirective implements Directive
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Marks an element of a GraphQL schema as no longer supported.
 """
@@ -20,6 +20,6 @@ directive @deprecated(
   """
   reason: String = "No longer supported"
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }

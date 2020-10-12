@@ -357,13 +357,34 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
         $users = factory(User::class, 3)->create();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(name: "'.$users->first()->name.'") {
                 id
             }
         }
         ')->assertJsonCount(1, 'data.users');
+    }
+
+    public function testDoesNotProcessUnusedVariable(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Query {
+            users(
+                ids: [ID!] @in
+            ): [User!]! @all
+        }
+        ';
+
+        factory(User::class, 3)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($ids: [ID!]) {
+            users(ids: $ids) {
+                id
+            }
+        }
+        ')->assertJsonCount(3, 'data.users');
     }
 
     public function testAttachMultipleWhereFiltersToQuery(): void

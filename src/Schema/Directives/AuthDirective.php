@@ -21,7 +21,7 @@ class AuthDirective extends BaseDirective implements FieldResolver
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Return the currently authenticated user as the result of a query.
 """
@@ -32,12 +32,9 @@ directive @auth(
   """
   guard: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         /** @var string|null $guard */

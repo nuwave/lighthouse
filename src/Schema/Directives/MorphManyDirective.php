@@ -8,7 +8,7 @@ class MorphManyDirective extends RelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many-polymorphic-relations).
 """
@@ -25,7 +25,7 @@ directive @morphMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
   type: String
@@ -49,6 +49,6 @@ directive @morphMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }
