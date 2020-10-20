@@ -70,7 +70,7 @@ class LighthouseServiceProvider extends ServiceProvider
      *
      * @param  string  $path
      */
-    protected function loadRoutesFrom($path): void
+    protected function loadRoutesFrom($path, array $attributes = []): void
     {
         if (AppVersion::isLumen()) {
             require \Safe\realpath($path);
@@ -78,7 +78,7 @@ class LighthouseServiceProvider extends ServiceProvider
             return;
         }
 
-        parent::loadRoutesFrom($path);
+        parent::loadRoutesFrom($path, $attributes);
     }
 
     /**
