@@ -177,6 +177,26 @@ return [
     | Control the debug level as described in http://webonyx.github.io/graphql-php/error-handling/
     | Debugging is only applied if the global Laravel debug config is set to true.
     |
+    | Instead of using the bitwise "OR" operator https://www.php.net/manual/en/language.operators.bitwise.php
+    | you can specify an integer inside LIGHTHOUSE_DEBUG environment variable.
+    |
+    |    0 => INCLUDE_NONE
+    |    1 => INCLUDE_DEBUG_MESSAGE
+    |    2 => INCLUDE_TRACE
+    |    3 => INCLUDE_TRACE | INCLUDE_DEBUG_MESSAGE
+    |    4 => RETHROW_INTERNAL_EXCEPTIONS
+    |    5 => RETHROW_INTERNAL_EXCEPTIONS | INCLUDE_DEBUG_MESSAGE
+    |    6 => RETHROW_INTERNAL_EXCEPTIONS | INCLUDE_TRACE
+    |    7 => RETHROW_INTERNAL_EXCEPTIONS | INCLUDE_TRACE | INCLUDE_DEBUG_MESSAGE
+    |    8 => RETHROW_UNSAFE_EXCEPTIONS
+    |    9 => RETHROW_UNSAFE_EXCEPTIONS | INCLUDE_DEBUG_MESSAGE
+    |   10 => RETHROW_UNSAFE_EXCEPTIONS | INCLUDE_TRACE
+    |   11 => RETHROW_UNSAFE_EXCEPTIONS | INCLUDE_TRACE | INCLUDE_DEBUG_MESSAGE
+    |   12 => RETHROW_UNSAFE_EXCEPTIONS | RETHROW_INTERNAL_EXCEPTIONS
+    |   13 => RETHROW_UNSAFE_EXCEPTIONS | RETHROW_INTERNAL_EXCEPTIONS | INCLUDE_DEBUG_MESSAGE
+    |   14 => RETHROW_UNSAFE_EXCEPTIONS | RETHROW_INTERNAL_EXCEPTIONS | INCLUDE_TRACE
+    |   15 => RETHROW_UNSAFE_EXCEPTIONS | RETHROW_INTERNAL_EXCEPTIONS | INCLUDE_TRACE | INCLUDE_DEBUG_MESSAGE
+    |
     */
 
     'debug' => env('LIGHTHOUSE_DEBUG', \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\DebugFlag::INCLUDE_TRACE),
