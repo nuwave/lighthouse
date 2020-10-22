@@ -135,6 +135,57 @@ class MorphToDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testCanResolveMorphToWithAlternateMethodName(): void
+    {
+        $this->schema =
+            /** @lang GraphQL */
+            '
+        type Image {
+            id: ID!
+            imageableAlias: Task! @morphTo
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            image (
+                id: ID! @eq
+            ): Image @find
+        }
+        ';
+
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
+        query ($id: ID!) {
+            image(id: $id) {
+                id
+                imageableAlias {
+                    id
+                    name
+                }
+            }
+        }
+        ',
+            [
+                'id' => $this->image->id,
+            ]
+        )->assertJson([
+            'data' => [
+                'image' => [
+                    'id' => $this->image->id,
+                    'imageableAlias' => [
+                        'id' => $this->task->id,
+                        'name' => $this->task->name,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testCanResolveMorphToUsingInterfaces(): void
     {
         /** @var \Tests\Utils\Models\Post $post */

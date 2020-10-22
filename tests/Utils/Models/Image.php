@@ -21,4 +21,9 @@ class Image extends Model
     {
         return $this->morphTo();
     }
+
+    public function imageableAlias(): MorphTo
+    {
+        return $this->morphTo('imageable');
+    }
 }
