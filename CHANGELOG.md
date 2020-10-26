@@ -351,7 +351,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
 - Add support in `@whereConditions` for IN, IS NULL and BETWEEN operators https://github.com/nuwave/lighthouse/pull/1099
-- Add ability to define pivot data on nested mutations within `sync`, `syncWithoutDetach`
+- Add ability to define pivot data on nested mutations within `sync`, `syncWithoutDetaching`
   and `connect` https://github.com/nuwave/lighthouse/pull/1110
 - Allow restricting the columns for `@orderBy` to a given whitelist and generate
   an `enum` definition for it https://github.com/nuwave/lighthouse/pull/1118
