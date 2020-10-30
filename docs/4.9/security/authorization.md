@@ -136,7 +136,7 @@ with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @can(ability: "create", injectArgs: "true")
+  createPost(title: String!): Post @can(ability: "create", injectArgs: true)
 }
 ```
 

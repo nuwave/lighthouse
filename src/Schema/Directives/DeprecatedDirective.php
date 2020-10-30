@@ -19,7 +19,7 @@ directive @deprecated(
   in [Markdown](https://daringfireball.net/projects/markdown/).
   """
   reason: String = "No longer supported"
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | ENUM_VALUE
 GRAPHQL;
     }
 }
