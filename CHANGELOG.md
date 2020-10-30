@@ -69,7 +69,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
-- Delete hirak / prestissimo package from php.dockerfile. Not necessary with Composer 2 https://github.com/nuwave/lighthouse/pull/1602
 
 ## 4.17.0
 
