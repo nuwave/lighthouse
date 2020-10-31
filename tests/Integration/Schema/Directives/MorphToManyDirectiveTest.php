@@ -32,6 +32,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         $this->postTags = Collection::times($this->faker->numberBetween(3, 7))->map(function () {
             $tag = factory(Tag::class)->create();
             $this->post->tags()->attach($tag);
+
             return $tag;
         });
     }
@@ -149,6 +150,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         /** @var \Illuminate\Database\Eloquent\Collection $postTags */
         $postTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($post) {
             $post->tags()->attach($tag);
+
             return $tag;
         });
         /** @var \Tests\Utils\Models\Task $task */
@@ -158,11 +160,12 @@ class MorphToManyDirectiveTest extends DBTestCase
         /** @var \Illuminate\Database\Eloquent\Collection $taskTags */
         $taskTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($task) {
             $task->tags()->attach($tag);
+
             return $tag;
         });
 
         $this->schema = /** @lang GraphQL */ '
-        interface Tag @interface(resolveType: "'. $this->qualifyTestResolver('resolveType') .'") {
+        interface Tag @interface(resolveType: "'.$this->qualifyTestResolver('resolveType').'") {
             id: ID!
         }
         
