@@ -143,7 +143,9 @@ class MorphToManyDirectiveTest extends DBTestCase
 
     public function testCanResolveMorphToManyUsingInterfaces(): void
     {
+        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\Post $post */
         $post = factory(Post::class)->create([
             'user_id' => $user->id,
         ]);
