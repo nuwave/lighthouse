@@ -35,14 +35,13 @@ class ResolverProvider implements ProvidesResolver
                 );
             }
 
-            if (! $resolverClass) {
-                // Since we already know we are on the root type, this is either
-                // query, mutation or subscription
-                $parent = lcfirst($fieldValue->getParentName());
-                $fieldName = $fieldValue->getFieldName();
-                $proposedResolverClass = ucfirst($fieldName);
+            // Since we already know we are on the root type, this is either
+            // query, mutation or subscription
+            $parent = lcfirst($fieldValue->getParentName());
+            $fieldName = $fieldValue->getFieldName();
+            $proposedResolverClass = ucfirst($fieldName);
 
-                throw new DefinitionException(<<<MESSAGE
+            throw new DefinitionException(<<<MESSAGE
 Could not locate a field resolver for the {$parent}: {$fieldName}.
 
 Either add a resolver directive such as @all, @find or @create or add
@@ -51,8 +50,7 @@ a resolver class through:
 php artisan lighthouse:{$parent} {$proposedResolverClass}
 
 MESSAGE
-                );
-            }
+            );
         }
 
         return Closure::fromCallable(
