@@ -20,7 +20,7 @@ class MorphToManyDirectiveTest extends DBTestCase
     protected $post;
 
     /**
-     * @var \Illuminate\Database\Eloquent\Collection
+     * @var \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
      */
     protected $postTags;
 
@@ -271,7 +271,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function resolveType($root)
+    public function resolveType($root): string
     {
         return $root->posts()->count() ? 'PostTag' : 'TaskTag';
     }
