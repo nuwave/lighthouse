@@ -47,6 +47,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change `ErrorHandler` method `handle()` to non-static `__invoke()` and allow discarding
   errors by returning `null`
 - Allow subscriptions without named operations, base channels on the field name
+- Hardcoded `debug` option in `lighthouse.php` config has been replaced to `env('LIGHTHOUSE_DEBUG')` 
 
 ### Removed
 
