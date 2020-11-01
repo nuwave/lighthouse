@@ -2,16 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class MorphToManyDirective extends RelationDirective implements FieldResolver, DefinedDirective
+class MorphToManyDirective extends RelationDirective implements FieldResolver
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'SDL'
 """
-Corresponds to [Eloquent's ManyToMany-Relationship](https://laravel.com/docs/eloquent-relationships#many-to-many-polymorphic-relations).
+Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.com/docs/eloquent-relationships#many-to-many-polymorphic-relations).
 """
 directive @morphToMany(
   """
