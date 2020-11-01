@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 4.18.0
+
+### Added
+
+- Add `@morphToMany` directive https://github.com/nuwave/lighthouse/pull/1604
+
 ## 4.17.0
 
 ### Added
