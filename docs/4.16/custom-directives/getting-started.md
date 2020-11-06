@@ -3,10 +3,10 @@
 As you grow your GraphQL schema, you may find the need for more specialized functionality.
 Learn how you can abstract logic in a composable and reusable manner by using custom directives.
 
-## Naming Conventions
-
 Directives are implemented as PHP classes, each directive available
 in the schema corresponds to a single class.
+
+## Naming Convention
 
 Directive names themselves are typically defined in **camelCase**.
 The class name of a directive must follow the following pattern:

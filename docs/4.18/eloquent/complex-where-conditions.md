@@ -74,9 +74,9 @@ Here are the types that will be included in the compiled schema:
 
 ```graphql
 "Dynamic WHERE conditions for the `where` argument on the query `people`."
-input QueryPeopleWhereWhereConditions {
+input PeopleWhereWhereConditions {
   "The column that is used for the condition."
-  column: QueryPeopleWhereColumn
+  column: PeopleWhereColumn
 
   "The operator that is used for the condition."
   operator: SQLOperator = EQ
@@ -85,36 +85,18 @@ input QueryPeopleWhereWhereConditions {
   value: Mixed
 
   "A set of conditions that requires all conditions to match."
-  AND: [QueryPeopleWhereWhereConditions!]
+  AND: [PeopleWhereWhereConditions!]
 
   "A set of conditions that requires at least one condition to match."
-  OR: [QueryPeopleWhereWhereConditions!]
-
-  "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
-  HAS: QueryPeopleWhereWhereConditionsRelation
+  OR: [PeopleWhereWhereConditions!]
 }
 
 "Allowed column names for the `where` argument on the query `people`."
-enum QueryPeopleWhereColumn {
+enum PeopleWhereColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
   HAIRCOLOUR @enum(value: "haircolour")
   HEIGHT @enum(value: "height")
-}
-
-"Dynamic HAS conditions for WHERE condition queries."
-input QueryPeopleWhereWhereConditionsRelation {
-  "The relation that is checked."
-  relation: String!
-
-  "The comparision operator to test against the amount."
-  operator: SQLOperator = GTE
-
-  "The amount to test."
-  amount: Int = 1
-
-  "Additional condition logic."
-  condition: QueryPeopleWhereWhereConditions
 }
 ```
 
@@ -266,9 +248,9 @@ Again, Lighthouse will auto-generate an `input` and `enum` definition for your q
 
 ```graphql
 "Dynamic WHERE conditions for the `hasRole` argument on the query `people`."
-input QueryPeopleHasRoleWhereConditions {
+input PeopleHasRoleWhereConditions {
   "The column that is used for the condition."
-  column: QueryPeopleHasRoleColumn
+  column: PeopleHasRoleColumn
 
   "The operator that is used for the condition."
   operator: SQLOperator = EQ
@@ -277,14 +259,14 @@ input QueryPeopleHasRoleWhereConditions {
   value: Mixed
 
   "A set of conditions that requires all conditions to match."
-  AND: [QueryPeopleHasRoleWhereConditions!]
+  AND: [PeopleHasRoleWhereConditions!]
 
   "A set of conditions that requires at least one condition to match."
-  OR: [QueryPeopleHasRoleWhereConditions!]
+  OR: [PeopleHasRoleWhereConditions!]
 }
 
 "Allowed column names for the `hasRole` argument on the query `people`."
-enum QueryPeopleHasRoleColumn {
+enum PeopleHasRoleColumn {
   NAME @enum(value: "name")
   ACCESS_LEVEL @enum(value: "access_level")
 }

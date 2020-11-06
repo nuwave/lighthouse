@@ -12,35 +12,10 @@ what your argument should apply to in addition to its function.
 
 You must implement exactly one of those two interfaces in order for an argument directive to work.
 
-## Evaluation Order
+## ArgTransformerDirective
 
-The application of directives that implement the `ArgDirective` interface is
-split into three distinct phases:
-
-- Sanitize: Clean the input, e.g. trim whitespace.
-  Directives can hook into this phase by implementing `ArgSanitizerDirective`.
-- Validate: Ensure the input conforms to the expectations, e.g. check a valid email is given
-- Transform: Change the input before processing it further, e.g. hashing passwords.
-  Directives can hook into this phase by implementing `ArgTransformerDirective`
-
-```graphql
-type Mutation {
-  createUser(
-    password: String @trim @rules(apply: ["min:10,max:20"]) @hash
-  ): User
-}
-```
-
-In the given example, Lighthouse will take the value of the `password` argument and:
-
-1. Trim any whitespace
-1. Run validation on it
-1. Hash it
-
-## ArgSanitizerDirective
-
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgSanitizerDirective.php)
-takes an incoming value and returns a new value.
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
+takes an incoming value an returns a new value.
 
 Let's take a look at the built-in [@trim](../api-reference/directives.md#trim) directive.
 
@@ -49,35 +24,36 @@ Let's take a look at the built-in [@trim](../api-reference/directives.md#trim) d
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
+class TrimDirective extends BaseDirective implements ArgTransformerDirective, DefinedDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'GRAPHQL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run the `trim` function on an input value.
 """
 directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+SDL;
     }
 
     /**
      * Remove whitespace from the beginning and end of a given input.
      *
      * @param  string  $argumentValue
+     * @return string
      */
-    public function sanitize($argumentValue): string
+    public function transform($argumentValue): string
     {
         return trim($argumentValue);
     }
 }
 ```
 
-The `sanitize` method takes an argument which represents the actual incoming value that is given
-to an argument in a query and is expected to modify the value, if needed, and return it.
+The `transform` method takes an argument which represents the actual incoming value that is given
+to an argument in a query and is expected to transform the value and return it.
 
 For example, if we have the following schema.
 
@@ -87,7 +63,7 @@ type Mutation {
 }
 ```
 
-When you resolve the field, the argument will hold the sanitized value.
+When you resolve the field, the argument will hold the "transformed" value.
 
 ```php
 <?php
@@ -108,14 +84,23 @@ class CreateUser
 }
 ```
 
-## ArgTransformerDirective
+### Evaluation Order
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
-works essentially the same as an [`ArgSanitizerDirective`](#argsanitizerdirective).
-Notable differences are:
+Argument directives are evaluated in the order that they are defined in the schema.
 
-- The method to implement is called `transform`
-- Transformations are applied after validation, whereas sanitization is applied before
+```graphql
+type Mutation {
+  createUser(
+    password: String @trim @rules(apply: ["min:10,max:20"]) @hash
+  ): User
+}
+```
+
+In the given example, Lighthouse will take the value of the `password` argument and:
+
+1. Trim any whitespace
+1. Run validation on it
+1. Encrypt the password via `bcrypt`
 
 ## ArgBuilderDirective
 
@@ -153,14 +138,13 @@ So let's take a look at the built-in [@eq](../api-reference/directives.md#eq) di
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'GRAPHQL'
+        return /** @lang GraphQL */ <<<'SDL'
 directive @eq(
   """
   Specify the database column to compare.
@@ -168,7 +152,7 @@ directive @eq(
   """
   key: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+SDL;
     }
 
     /**
@@ -178,7 +162,7 @@ GRAPHQL;
      * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder($builder, $value)
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
@@ -240,8 +224,9 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class ModelArgsDirective extends BaseDirective implements ArgManipulator
+class ModelArgsDirective extends BaseDirective implements ArgManipulator, DefinedDirective
 {
     /**
      * SDL definition of the directive.
@@ -250,7 +235,7 @@ class ModelArgsDirective extends BaseDirective implements ArgManipulator
      */
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'GRAPHQL'
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Automatically generates an input argument based on a type.
 """
@@ -260,7 +245,7 @@ directive @typeToInput(
     """
     name: String!
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+SDL;
     }
 
     /**

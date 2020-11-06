@@ -31,7 +31,7 @@ class MyCustomDirectiveTest extends TestCase
     {
         parent::setUp();
 
-        $this->setUpTestSchema();;
+        $this->setUpTestSchema();
     }
 
     public function testSpecificScenario(): void

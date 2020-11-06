@@ -17,6 +17,19 @@ it using the following `artisan` command:
 php artisan vendor:publish --tag=lighthouse-schema
 ```
 
+## Lumen
+
+Register the service provider in your `bootstrap/app.php` file:
+
+```php
+$app->register(\Nuwave\Lighthouse\LighthouseServiceProvider::class);
+```
+
+The many features Lighthouse provides are split across multiple service providers.
+Since Lumen does not support auto-discovery, you will have to register them individually
+depending on which features you want to use. Check [Lighthouse's composer.json](https://github.com/nuwave/lighthouse/blob/master/composer.json),
+the section `extra.laravel.providers` contains the default service providers.
+
 ## IDE Support
 
 Lighthouse makes heavy use of the SDL and utilizes schema directives.

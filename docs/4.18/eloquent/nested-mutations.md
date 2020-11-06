@@ -690,7 +690,7 @@ type UserMoviePivot {
 }
 ```
 
-Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass
+Laravel's `sync()`, `syncWithoutDetaching()` or `connect()` methods allow you to pass
 an array where the keys are IDs of related models and the values are pivot data.
 
 Lighthouse exposes this capability through the nested operations on many-to-many relations.

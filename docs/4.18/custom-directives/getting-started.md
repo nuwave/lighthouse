@@ -26,28 +26,7 @@ abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class UpperCaseDirective extends BaseDirective
-{
-    /**
-     * Formal directive specification in schema definition language (SDL).
-     *
-     * @return string
-     */
-    public static function definition(): string
-    {
-        return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-A description of what this directive does.
-"""
-directive @upperCase(
-    """
-    Directives can have arguments to parameterize them.
-    """
-    someArg: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
-    }
-}
+class UpperCaseDirective extends BaseDirective {}
 ```
 
 ## Directive Interfaces
@@ -74,8 +53,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class UpperCaseDirective extends BaseDirective implements FieldMiddleware
 {
-    public static function definition(): string {}
-
     /**
      * Wrap around the final field resolver.
      *
