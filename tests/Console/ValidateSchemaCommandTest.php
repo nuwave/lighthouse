@@ -40,6 +40,7 @@ class ValidateSchemaCommandTest extends TestCase
     {
         $this->markTestSkipped('This validation needs to be in the upstream webonyx/graphql-php validation');
 
+        // @phpstan-ignore-next-line unreachable - that is expected though
         $this->schema = /** @lang GraphQL */ '
         type Query @field {
             foo: ID @eq
