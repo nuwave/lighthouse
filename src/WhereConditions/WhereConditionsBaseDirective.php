@@ -109,6 +109,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $additionalArguments[] = $amount;
         }
 
+        /**@phpstan-ignore-next-line */
         $builder->addNestedWhereQuery(
             $model->whereHas(
                 $relation,
