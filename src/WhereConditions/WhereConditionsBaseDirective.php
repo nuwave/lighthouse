@@ -109,26 +109,28 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $additionalArguments[] = $amount;
         }
 
-        // @phpstan-ignore-next-line
+        // @phpstan-ignore-next-line Larastan disagrees with itself here
         $builder->addNestedWhereQuery(
-            $model->whereHas(
-                $relation,
-                function ($builder) use ($relation, $model, $condition): void {
-                    if ($condition) {
-                        $relatedModel = $this->nestedRelatedModel($model, $relation);
+            $model
+                ->whereHas(
+                    $relation,
+                    function ($builder) use ($relation, $model, $condition): void {
+                        if ($condition) {
+                            $relatedModel = $this->nestedRelatedModel($model, $relation);
 
-                        $this->handleWhereConditions(
-                            $builder,
-                            $this->prefixConditionWithTableName(
-                                $condition,
+                            $this->handleWhereConditions(
+                                $builder,
+                                $this->prefixConditionWithTableName(
+                                    $condition,
+                                    $relatedModel
+                                ),
                                 $relatedModel
-                            ),
-                            $relatedModel
-                        );
-                    }
-                },
-                ...$additionalArguments
-            )->getQuery()
+                            );
+                        }
+                    },
+                    ...$additionalArguments
+                )
+                ->getQuery()
         );
     }
 
