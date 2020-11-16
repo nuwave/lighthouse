@@ -110,24 +110,26 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         }
 
         $builder->addNestedWhereQuery(
-            $model->whereHas(
-                $relation,
-                function ($builder) use ($relation, $model, $condition): void {
-                    if ($condition) {
-                        $relatedModel = $this->nestedRelatedModel($model, $relation);
+            $model
+                ->whereHas(
+                    $relation,
+                    function ($builder) use ($relation, $model, $condition): void {
+                        if ($condition) {
+                            $relatedModel = $this->nestedRelatedModel($model, $relation);
 
-                        $this->handleWhereConditions(
-                            $builder,
-                            $this->prefixConditionWithTableName(
-                                $condition,
+                            $this->handleWhereConditions(
+                                $builder,
+                                $this->prefixConditionWithTableName(
+                                    $condition,
+                                    $relatedModel
+                                ),
                                 $relatedModel
-                            ),
-                            $relatedModel
-                        );
-                    }
-                },
-                ...$additionalArguments
-            )
+                            );
+                        }
+                    },
+                    ...$additionalArguments
+                )
+                ->getQuery()
         );
     }
 
