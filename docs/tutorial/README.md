@@ -333,6 +333,13 @@ naming - the type name `Post` is also the name of our Model - and the use of ser
 We add additional type definitions that clearly define the shape of our data:
 
 ```graphql
+type Query {
+    users: [User!]! @paginate(defaultCount: 10)
+    user(id: ID @eq): User @find
+    posts:[Post] @all
+    post(id:Int! @eq): Post @find
+}
+
 type User {
   id: ID!
   name: String!
