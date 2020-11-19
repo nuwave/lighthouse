@@ -14,7 +14,7 @@ class FileUploadTest extends TestCase
     type Mutation {
         upload(file: Upload!): Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     /**
      * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
@@ -123,16 +123,16 @@ class FileUploadTest extends TestCase
                             upload (file: $file)
                         }',
             'variables' => [
-                'file' => null
+                'file' => null,
             ]
         ];
 
         $map = [
-            '0' => ['variables.file']
+            '0' => ['variables.file'],
         ];
 
         $file = [
-            '0' => UploadedFile::fake()->create('test.pdf', 500)
+            '0' => UploadedFile::fake()->create('test.pdf', 500),
         ];
 
         $response = $this->multipartArrayGraphQL($operations, $map, $file);
@@ -153,25 +153,25 @@ class FileUploadTest extends TestCase
                         }',
             'variables' => [
                 'file1' => null,
-                'file2' => null
+                'file2' => null,
             ]
         ];
 
         $map = [
             '0' => ['variables.file1'],
-            '1' => ['variables.file2']
+            '1' => ['variables.file2'],
         ];
 
         $files = [
             '0' => UploadedFile::fake()->create('test.pdf', 500),
-            '1' => UploadedFile::fake()->create('test.pdf', 500)
+            '1' => UploadedFile::fake()->create('test.pdf', 500),
         ];
 
         $response = $this->multipartArrayGraphQL($operations, $map, $files);
         $response->assertJson([
             'data' => [
                 'first' => true,
-                'second' => true
+                'second' => true,
             ],
         ]);
     }
@@ -180,15 +180,15 @@ class FileUploadTest extends TestCase
     {
         $operations = [
             'query' => '{ foo }',
-            'variables' => []
+            'variables' => [],
         ];
 
         $map = [
-            '0' => []
+            '0' => [],
         ];
 
         $file = [
-            '0' => []
+            '0' => [],
         ];
 
         $response = $this->multipartArrayGraphQL($operations, $map, $file);

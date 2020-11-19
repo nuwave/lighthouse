@@ -116,7 +116,7 @@ trait MakesGraphQLRequests
     {
         $data = [
             'operations' => json_encode($operations),
-            'map' => json_encode($map)
+            'map' => json_encode($map),
         ];
 
         return $this->call(
