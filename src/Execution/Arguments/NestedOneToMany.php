@@ -32,7 +32,7 @@ class NestedOneToMany implements ArgResolver
             $idsToDelete = $args->arguments['delete']->toPlain();
             // This check avoids a useless database query
 //            if (count($idsToDelete) > 0) {
-                $relation->getRelated()::destroy($idsToDelete);
+            $relation->getRelated()::destroy($idsToDelete);
 //            }
         }
     }

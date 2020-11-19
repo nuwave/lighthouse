@@ -156,7 +156,7 @@ class HasManyTest extends DBTestCase
 
         $queries = 0;
         DB::listen(function (QueryExecuted $q) use (&$queries): void {
-            if($q->sql === 'select * from `tasks` where 0 = 1 and `tasks`.`deleted_at` is null and `name` != ?') {
+            if ($q->sql === 'select * from `tasks` where 0 = 1 and `tasks`.`deleted_at` is null and `name` != ?') {
                 throw new \Exception($q->sql);
             }
             dump($q->sql);
