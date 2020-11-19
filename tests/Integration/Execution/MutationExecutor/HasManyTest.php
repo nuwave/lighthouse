@@ -148,6 +148,38 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
+    public function testAllowsEmptyListOperations(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateUser(input: {
+                id: 1
+                name: "foo"
+                tasks: {
+                    create: []
+                    update: []
+                    upsert: []
+                    delete: []
+                }
+            }) {
+                name
+                tasks {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'name' => 'foo',
+                    'tasks' => [],
+                ],
+            ],
+        ]);
+    }
+
     public function testCanUpsertWithNewHasMany(): void
     {
         $this->graphQL('
