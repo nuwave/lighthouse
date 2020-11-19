@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
@@ -148,9 +150,18 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testAllowsEmptyListOperations(): void
+    public function testAvoidsUselessQueryOnEmptyList(): void
     {
         factory(User::class)->create();
+
+        $queries = 0;
+        DB::listen(function (QueryExecuted $q) use (&$queries): void {
+            if($q->sql === 'select * from `tasks` where 0 = 1 and `tasks`.`deleted_at` is null and `name` != ?') {
+                throw new \Exception($q->sql);
+            }
+            dump($q->sql);
+            $queries++;
+        });
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -158,26 +169,13 @@ class HasManyTest extends DBTestCase
                 id: 1
                 name: "foo"
                 tasks: {
-                    create: []
-                    update: []
-                    upsert: []
                     delete: []
                 }
             }) {
                 name
-                tasks {
-                    id
-                }
             }
         }
-        ')->assertJson([
-            'data' => [
-                'updateUser' => [
-                    'name' => 'foo',
-                    'tasks' => [],
-                ],
-            ],
-        ]);
+        ');
     }
 
     public function testCanUpsertWithNewHasMany(): void
