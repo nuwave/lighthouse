@@ -102,6 +102,39 @@ trait MakesGraphQLRequests
     }
 
     /**
+     * Send a multipart form request to GraphQL in array format. For mutations that are
+     * very large or contain many files, it becomes much easier to work with array instead of json.
+     *
+     * @param array<string, mixed> $operations
+     * @param array<string, mixed> $map
+     * @param array<int, \Illuminate\Http\Testing\File> $files
+     * @param array<string, string> $headers Will be merged with Content-Type: multipart/form-data
+     *
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function multipartArrayGraphQL(array $operations, array $map, array $files, array $headers = [])
+    {
+        $data = [
+            'operations' => json_encode($operations),
+            'map' => json_encode($map)
+        ];
+
+        return $this->call(
+            'POST',
+            $this->graphQLEndpointUrl(),
+            $data,
+            [],
+            $files,
+            $this->transformHeadersToServerVars(array_merge(
+                [
+                    'Content-Type' => 'multipart/form-data',
+                ],
+                $headers
+            ))
+        );
+    }
+
+    /**
      * Execute the introspection query on the GraphQL server.
      *
      * @return \Illuminate\Testing\TestResponse
