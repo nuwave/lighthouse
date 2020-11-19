@@ -102,8 +102,7 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Send a multipart form request to GraphQL in array format. For mutations that are
-     * very large or contain many files, it becomes much easier to work with array instead of json.
+     * Send a multipart form request to GraphQL.
      *
      * @param array<string, mixed>|array<int, array<string, mixed>> $operations
      * @param array<string, string> $map
