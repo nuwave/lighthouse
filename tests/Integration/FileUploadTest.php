@@ -124,7 +124,7 @@ class FileUploadTest extends TestCase
                         }',
             'variables' => [
                 'file' => null,
-            ]
+            ],
         ];
 
         $map = [
@@ -154,7 +154,7 @@ class FileUploadTest extends TestCase
             'variables' => [
                 'file1' => null,
                 'file2' => null,
-            ]
+            ],
         ];
 
         $map = [
