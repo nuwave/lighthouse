@@ -106,7 +106,7 @@ trait MakesGraphQLRequests
      * very large or contain many files, it becomes much easier to work with array instead of json.
      *
      * @param array<string, mixed> $operations
-     * @param array<string, mixed> $map
+     * @param array<int, string> $map
      * @param array<int, \Illuminate\Http\Testing\File> $files
      * @param array<string, string> $headers Will be merged with Content-Type: multipart/form-data
      *
