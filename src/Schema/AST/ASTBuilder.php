@@ -216,9 +216,10 @@ class ASTBuilder
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);
 
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $extendedObjectLikeType->fields = ASTHelper::mergeUniqueNodeList(
+            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $extendedObjectLikeType->fields,
+            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $typeExtension->fields
         );
     }
@@ -235,9 +236,10 @@ class ASTBuilder
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
 
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
+            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $extendedEnum->values,
+            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $typeExtension->values
         );
     }
