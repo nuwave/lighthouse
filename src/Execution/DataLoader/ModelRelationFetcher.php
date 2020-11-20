@@ -220,8 +220,8 @@ class ModelRelationFetcher
         return $relations
             ->reduce(
                 function (EloquentBuilder $builder, Relation $relation): EloquentBuilder {
-                    // @phpstan-ignore-next-line Laravel is not that strictly typed
                     return $builder->unionAll(
+                        // @phpstan-ignore-next-line Laravel is not that strictly typed
                         $relation->getQuery()
                     );
                 },

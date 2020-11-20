@@ -65,8 +65,8 @@ GRAPHQL
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         $queryType->fields = ASTHelper::mergeNodeList(
+            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $queryType->fields,
             [
                 Parser::fieldDefinition(/** @lang GraphQL */ '
