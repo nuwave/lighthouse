@@ -80,8 +80,8 @@ trait MakesGraphQLRequests
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
      * @param  array<string, mixed>|array<int, array<string, mixed>>  $operations
-     * @param  array<string, array<int, string>>  $map
-     * @param  array<int, \Illuminate\Http\Testing\File>|array<int, array>  $files
+     * @param  array<int|string, array<int, string>>  $map
+     * @param  array<int|string, \Illuminate\Http\Testing\File>|array<int|string, array>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      * @return \Illuminate\Testing\TestResponse
      */

@@ -22,10 +22,11 @@ class FileUploadTest extends TestCase
     public function testResolvesUploadViaMultipartRequest(): void
     {
         $operations = [
-            'operationName' => 'upload',
-            'query' => 'mutation upload ($file: Upload!) {
-                            upload (file: $file)
-                        }',
+            'query' => /** @lang GraphQL */'
+                mutation ($file: Upload!) {
+                    upload(file: $file)
+                }
+            ',
             'variables' => [
                 'file' => null,
             ],
@@ -39,12 +40,13 @@ class FileUploadTest extends TestCase
             '0' => UploadedFile::fake()->create('test.pdf', 500),
         ];
 
-        $response = $this->multipartGraphQL($operations, $map, $file);
-        $response->assertJson([
-            'data' => [
-                'upload' => true,
-            ],
-        ]);
+        $this
+            ->multipartGraphQL($operations, $map, $file)
+            ->assertJson([
+                'data' => [
+                    'upload' => true,
+                ],
+            ]);
     }
 
     /**
@@ -53,11 +55,12 @@ class FileUploadTest extends TestCase
     public function testResolvesUploadViaBatchedMultipartRequest(): void
     {
         $operations = [
-            'operationName' => 'upload',
-            'query' => 'mutation upload ($file1: Upload!, $file2: Upload!) {
-                            first: upload (file: $file1)
-                            second: upload (file: $file2)
-                        }',
+            'query' => /** @lang GraphQL */ '
+                mutation ($file1: Upload!, $file2: Upload!) {
+                    first: upload(file: $file1)
+                    second: upload(file: $file2)
+                }
+            ',
             'variables' => [
                 'file1' => null,
                 'file2' => null,
@@ -74,13 +77,14 @@ class FileUploadTest extends TestCase
             '1' => UploadedFile::fake()->create('test.pdf', 500),
         ];
 
-        $response = $this->multipartGraphQL($operations, $map, $files);
-        $response->assertJson([
-            'data' => [
-                'first' => true,
-                'second' => true,
-            ],
-        ]);
+        $this
+            ->multipartGraphQL($operations, $map, $files)
+            ->assertJson([
+                'data' => [
+                    'first' => true,
+                    'second' => true,
+                ],
+            ]);
     }
 
     public function testResolvesQueryViaMultipartRequest(): void
@@ -98,11 +102,12 @@ class FileUploadTest extends TestCase
             '0' => [],
         ];
 
-        $response = $this->multipartGraphQL($operations, $map, $file);
-        $response->assertJson([
-            'data' => [
-                'foo' => Foo::THE_ANSWER,
-            ],
-        ]);
+        $this
+            ->multipartGraphQL($operations, $map, $file)
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
     }
 }
