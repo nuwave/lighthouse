@@ -90,7 +90,7 @@ trait MakesGraphQLRequestsLumen
      */
     protected function multipartGraphQL(array $operations, array $map, array $files, array $headers = [])
     {
-        $data = [
+        $parameters = [
             'operations' => json_encode($operations),
             'map' => json_encode($map),
         ];
@@ -98,7 +98,7 @@ trait MakesGraphQLRequestsLumen
         $this->call(
             'POST',
             $this->graphQLEndpointUrl(),
-            $data,
+            $parameters,
             [],
             $files,
             $this->transformHeadersToServerVars(array_merge(
