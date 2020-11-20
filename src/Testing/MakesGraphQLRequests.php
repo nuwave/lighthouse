@@ -79,40 +79,13 @@ trait MakesGraphQLRequests
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
-     * @param  array<string, mixed>  $parameters
+     * @param  array<string, mixed>|array<int, array<string, mixed>> $operations
+     * @param  array<string, string> $map
      * @param  array<int, \Illuminate\Http\Testing\File>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function multipartGraphQL(array $parameters, array $files, array $headers = [])
-    {
-        return $this->call(
-            'POST',
-            $this->graphQLEndpointUrl(),
-            $parameters,
-            [],
-            $files,
-            $this->transformHeadersToServerVars(array_merge(
-                [
-                    'Content-Type' => 'multipart/form-data',
-                ],
-                $headers
-            ))
-        );
-    }
-
-    /**
-     * Send a multipart form request to GraphQL in array format. For mutations that are
-     * very large or contain many files, it becomes much easier to work with array instead of json.
-     *
-     * @param array<string, mixed> $operations
-     * @param array<int, string> $map
-     * @param array<int, \Illuminate\Http\Testing\File> $files
-     * @param array<string, string> $headers Will be merged with Content-Type: multipart/form-data
-     *
-     * @return \Illuminate\Testing\TestResponse
-     */
-    public function multipartArrayGraphQL(array $operations, array $map, array $files, array $headers = [])
+    protected function multipartGraphQL(array $operations, array $map, array $files, array $headers = [])
     {
         $data = [
             'operations' => json_encode($operations),
