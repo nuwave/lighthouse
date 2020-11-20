@@ -48,6 +48,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   errors by returning `null`
 - Allow subscriptions without named operations, base channels on the field name
 - Set `lighthouse.debug` config through env `LIGHTHOUSE_DEBUG` https://github.com/nuwave/lighthouse/pull/1592
+- Change multipartGraphQL test method with arrays instead of JSON https://github.com/nuwave/lighthouse/pull/1615/
 
 ### Removed
 
