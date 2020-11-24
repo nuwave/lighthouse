@@ -96,15 +96,23 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
         $stub = parent::buildClass($name);
 
-        if ($this->option('type')) {
+        $forType = $this->option('type');
+        $forField = $this->option('field');
+        $forArgument = $this->option('argument');
+
+        if (! $forType && ! $forField && ! $forArgument) {
+            throw new \Exception('Must specify at least one of: --type, --field or --argument');
+        }
+
+        if ($forType) {
             $this->askForInterfaces(self::TYPE_INTERFACES);
         }
 
-        if ($this->option('field')) {
+        if ($forField) {
             $this->askForInterfaces(self::FIELD_INTERFACES);
         }
 
-        if ($this->option('argument')) {
+        if ($forArgument) {
             // Arg directives always either implement ArgDirective or ArgDirectiveForArray.
             if ($this->confirm('Will your argument directive apply to a list of items?')) {
                 $this->implementInterface(ArgDirectiveForArray::class);

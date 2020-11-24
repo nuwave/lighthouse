@@ -543,7 +543,7 @@ with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
-  createPost(input: PostInput): Post @can(ability: "create", injectArgs: "true")
+  createPost(input: PostInput): Post @can(ability: "create", injectArgs: true)
 }
 ```
 

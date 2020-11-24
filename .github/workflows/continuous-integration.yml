@@ -37,7 +37,7 @@ jobs:
         uses: "actions/checkout@v2.0.0"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "none"
           tools: pecl
@@ -59,7 +59,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Run phpstan/phpstan"
         run: "vendor/bin/phpstan analyse --configuration=phpstan.neon"
@@ -96,7 +96,7 @@ jobs:
           redis-version: "6"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "none"
           tools: pecl
@@ -118,7 +118,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Set up the database"
         run: |
@@ -150,7 +150,7 @@ jobs:
           redis-version: 6
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "pcov"
           tools: pecl
@@ -172,7 +172,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Set up the database"
         run: |
@@ -204,7 +204,7 @@ jobs:
         uses: "actions/checkout@v2.0.0"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "none"
           tools: pecl
@@ -223,7 +223,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Collect code coverage with pcov and phpunit/phpunit"
         run: "vendor/bin/phpbench run --progress=none --report=ast"
