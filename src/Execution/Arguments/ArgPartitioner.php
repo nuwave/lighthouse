@@ -84,7 +84,7 @@ class ArgPartitioner
         $nonNullRelations = new ArgumentSet();
         $nonNullRelations->arguments = array_filter(
             $relations->arguments,
-            static function (?Argument $argument): bool {
+            static function (Argument $argument): bool {
                 return null !== $argument->value;
             }
         );
