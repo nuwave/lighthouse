@@ -152,8 +152,8 @@ GRAPHQL
         }
 
         if ($this->modelClass) {
-            // @phpstan-ignore-next-line NodeList contravariance issue
             $objectType->directives = ASTHelper::mergeNodeList(
+                // @phpstan-ignore-next-line NodeList contravariance issue
                 $objectType->directives,
                 [Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")')]
             );

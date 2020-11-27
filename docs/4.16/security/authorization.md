@@ -120,7 +120,7 @@ You can pass additional arguments to the policy checks by specifying them as `ar
 ```graphql
 type Mutation {
   createPost(input: PostInput): Post
-  @can(ability: "create", args: ["FROM_GRAPHQL"])
+    @can(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
 
@@ -139,7 +139,7 @@ with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @can(ability: "create", injectArgs: "true")
+  createPost(title: String!): Post @can(ability: "create", injectArgs: true)
 }
 ```
 

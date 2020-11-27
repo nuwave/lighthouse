@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse;
 
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
@@ -151,8 +152,8 @@ class GraphQL
         // level from the Lighthouse configuration.
         return $result->toArray(
             config('app.debug')
-                ? config('lighthouse.debug')
-                : false
+                ? (int) config('lighthouse.debug')
+                : DebugFlag::NONE
         );
     }
 

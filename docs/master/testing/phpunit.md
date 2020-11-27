@@ -155,28 +155,25 @@ Since multipart form requests are tricky to construct, you can just use the `mul
 helper method.
 
 ```php
-$this->multipartGraphQL(
-    [
-        'operations' => /** @lang JSON */
-            '
-            {
-                "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
-                "variables": {
-                    "file": null
-                }
-            }
-        ',
-        'map' => /** @lang JSON */
-            '
-            {
-                "0": ["variables.file"]
-            }
-        ',
+$operations = [
+    'operationName' => 'upload',
+    'query' => 'mutation upload ($file: Upload!) {
+                    upload (file: $file)
+                }',
+    'variables' => [
+        'file' => null,
     ],
-    [
-        '0' => UploadedFile::fake()->create('image.jpg', 500),
-    ]
-)
+];
+
+$map = [
+    '0' => ['variables.file'],
+];
+
+$file = [
+    '0' => UploadedFile::fake()->create('test.pdf', 500),
+];
+
+$this->multipartGraphQL($operations, $map, $file);
 ```
 
 ## Introspection

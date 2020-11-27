@@ -26,6 +26,9 @@
     </a>
     <a href="https://beamaustralia.com.au">
       <img src="https://d2kt0g16v1klgn.cloudfront.net/wp-content/uploads/Beam-Logo-Small.png" alt="Beam Australia" title="Beam Australia">
-    </a>      
+    </a>
+    <a href="https://cinemax.co.ao">
+      <img src="https://cinemax.co.ao/logo.png" alt="Cinemas Cinemax" title="Cinemas Cinemax">
+    </a>
   </div>
 </div>

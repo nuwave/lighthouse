@@ -12,8 +12,7 @@ RUN apt-get update && apt-get install -y \
         pdo_mysql \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer \
-    && composer global require hirak/prestissimo --no-progress --no-suggest --no-interaction
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug

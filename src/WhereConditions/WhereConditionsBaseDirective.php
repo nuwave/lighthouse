@@ -109,9 +109,10 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $additionalArguments[] = $amount;
         }
 
-        $builder->whereNested(
-            function ($builder) use ($model, $relation, $condition, $additionalArguments): void {
-                $whereHasQuery = $model->whereHas(
+        $builder->addNestedWhereQuery(
+            // @phpstan-ignore-next-line Larastan disagrees with itself here
+            $model
+                ->whereHas(
                     $relation,
                     function ($builder) use ($relation, $model, $condition): void {
                         if ($condition) {
@@ -128,10 +129,8 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                         }
                     },
                     ...$additionalArguments
-                );
-
-                $builder->mergeWheres($whereHasQuery->getQuery()->wheres, $whereHasQuery->getBindings());
-            }
+                )
+                ->getQuery()
         );
     }
 
