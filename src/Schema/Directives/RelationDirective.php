@@ -16,6 +16,7 @@ use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -27,7 +28,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationName = $this->directiveArgValue('relation', $this->nodeName());
 
-                $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
+                $decorateBuilder = $this->makeBuilderDecorator($resolveInfo, $parent, $relationName);
                 $paginationArgs = $this->paginationArgs($args);
 
                 if (config('lighthouse.batchload_relations')) {
@@ -70,15 +71,27 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         return $value;
     }
 
-    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
+    protected function makeBuilderDecorator(ResolveInfo $resolveInfo, Model $parent, string $relationName): Closure
     {
-        return function ($builder) use ($resolveInfo) {
-            $resolveInfo
+        return function ($builder) use ($resolveInfo, $parent, $relationName) {
+            $builderDecorator = $resolveInfo
                 ->argumentSet
                 ->enhanceBuilder(
                     $builder,
                     $this->directiveArgValue('scopes', [])
                 );
+
+            if (config('lighthouse.optimized_selects')) {
+                $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
+                $selectColumns = SelectHelper::getSelectColumns($this->definitionNode, $fieldSelection, $this->getModelClass());
+                $foreignKeyName = $parent->{$relationName}()->getForeignKeyName();
+
+                if (! in_array($foreignKeyName, $selectColumns)) {
+                    array_push($selectColumns, $foreignKeyName);
+                }
+
+                $builderDecorator->select($selectColumns);
+            }
         };
     }
 

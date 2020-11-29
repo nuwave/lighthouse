@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -102,6 +103,12 @@ GRAPHQL;
                         $query,
                         $this->directiveArgValue('scopes', [])
                     );
+
+                if (config('lighthouse.optimized_selects')) {
+                    $fieldSelection = array_keys($resolveInfo->getFieldSelection(2)['data']);
+                    $selectColumns = SelectHelper::getSelectColumns($this->definitionNode, $fieldSelection, $this->getModelClass());
+                    $query = $query->select($selectColumns);
+                }
 
                 return PaginationArgs
                     ::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())

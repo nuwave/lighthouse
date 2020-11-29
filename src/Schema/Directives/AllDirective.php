@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -35,13 +36,20 @@ GRAPHQL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
-                return $resolveInfo
+                $builder = $resolveInfo
                     ->argumentSet
                     ->enhanceBuilder(
                         $this->getModelClass()::query(),
                         $this->directiveArgValue('scopes', [])
-                    )
-                    ->get();
+                    );
+
+                if (config('lighthouse.optimized_selects')) {
+                    $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
+                    $selectColumns = SelectHelper::getSelectColumns($this->definitionNode, $fieldSelection, $this->getModelClass());
+                    $builder = $builder->select($selectColumns);
+                }
+
+                return $builder->get();
             }
         );
     }
