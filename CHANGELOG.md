@@ -9,8 +9,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Add custom attributes to validations https://github.com/nuwave/lighthouse/pull/1628
-
 ### Added
 
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
@@ -19,6 +17,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Handle content types `application/graphql` and `application/x-www-form-urlencoded` properly https://github.com/nuwave/lighthouse/pull/1424
 - Mark directives that can be used more than once per location as `repeatable` https://github.com/nuwave/lighthouse/pull/1529
 - Allow configuring global field middleware directives in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1533
+- Add custom attributes to validations https://github.com/nuwave/lighthouse/pull/1628
 
 ### Changed
 
