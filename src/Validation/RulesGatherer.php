@@ -126,10 +126,14 @@ class RulesGatherer
         $this->messages += $this->wrap($messages, $argumentPath);
 
         $attributes = $providesRules->attributes();
-        $this->attributes = array_merge(
-            $this->attributes,
-            isset($rules[0]) ? $attributes : $this->wrap($attributes, $argumentPath)
-        );
+        $inputToAttributes = isset($rules[0])
+            // We might be passed just the attribute for a single field
+            // in this case, we just add it to the list.
+            ? $attributes
+            // When we have an associative array, the path is prepended to every attribute.
+            : $this->wrap($attributes, $argumentPath);
+
+        $this->attributes = array_merge($this->attributes, $inputToAttributes);
     }
 
     /**
