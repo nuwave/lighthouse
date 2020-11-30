@@ -24,7 +24,7 @@ interface ProvidesRules
     public function messages(): array;
 
     /**
-     * Get custom attributes for validator errors.
+     * Specify a custom attribute name to use in your validation message.
      *
      * @return array<string, string>
      */
