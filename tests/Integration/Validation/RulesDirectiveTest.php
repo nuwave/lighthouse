@@ -148,17 +148,33 @@ class RulesDirectiveTest extends TestCase
     public function testCustomAttributes(): void
     {
         $this->schema = /** @lang GraphQL */ '
+        input FooInput {
+            name: String @rules(
+                apply: ["required"]
+                attribute: "name"
+            )
+            type: FooTypeInput
+        }
+
+        input FooTypeInput {
+            name: String @rules(
+                apply: ["required"]
+                attribute: "name"
+            )
+            type: String @rules(apply: ["required"])
+        }
+
         type Query {
             foo(
                 bar: ID @rules(
                     apply: ["required"]
                     attribute: "baz"
                 )
-                emails: [String]
-                    @rulesForArray(
-                        apply: ["min:3"]
-                        attribute: "email list"
-                    )
+                emails: [String] @rulesForArray(
+                    apply: ["min:3"]
+                    attribute: "email list"
+                )
+                input: FooInput
             ): String
         }
         ';
@@ -166,11 +182,14 @@ class RulesDirectiveTest extends TestCase
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
-                foo(emails: [])
+                foo(emails: [], input: {type: {}})
             }
             ')
             ->assertGraphQLValidationError('bar', 'The baz field is required.')
-            ->assertGraphQLValidationError('emails', 'The email list must have at least 3 items.');
+            ->assertGraphQLValidationError('emails', 'The email list must have at least 3 items.')
+            ->assertGraphQLValidationError('input.name', 'The name field is required.')
+            ->assertGraphQLValidationError('input.type.name', 'The name field is required.')
+            ->assertGraphQLValidationError('input.type.type', 'The input.type.type field is required.');
     }
 
     public function testUsesCustomRuleClass(): void

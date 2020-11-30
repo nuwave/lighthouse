@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
@@ -126,11 +127,10 @@ class RulesGatherer
         $this->messages += $this->wrap($messages, $argumentPath);
 
         $attributes = $providesRules->attributes();
-        $inputToAttributes = isset($rules[0])
-            // We might be passed just the attribute for a single field
-            // in this case, we just add it to the list.
-            ? $attributes
-            // When we have an associative array, the path is prepended to every attribute.
+        $inputToAttributes = $providesRules instanceof BaseRulesDirective
+            // If we are in a "rule directive" we just add on the path.
+            ? [$this->pathDotNotation($argumentPath) => Arr::get($attributes, last($argumentPath))]
+            // Otherwise, the path is prepended to every attribute.
             : $this->wrap($attributes, $argumentPath);
 
         $this->attributes = array_merge($this->attributes, $inputToAttributes);
