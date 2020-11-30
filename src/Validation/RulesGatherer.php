@@ -27,6 +27,13 @@ class RulesGatherer
      */
     public $messages = [];
 
+    /**
+     * The gathered attributes.
+     *
+     * @var array<string, string>
+     */
+    public $attributes = [];
+
     public function __construct(ArgumentSet $argumentSet)
     {
         $this->gatherRulesRecursively($argumentSet, []);
@@ -117,6 +124,12 @@ class RulesGatherer
 
         $messages = $providesRules->messages();
         $this->messages += $this->wrap($messages, $argumentPath);
+
+        $attributes = $providesRules->attributes();
+        $this->attributes = array_merge(
+            $this->attributes,
+            isset($rules[0]) ? $attributes : $this->wrap($attributes, $argumentPath)
+        );
     }
 
     /**

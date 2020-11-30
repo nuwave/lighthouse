@@ -56,6 +56,11 @@ GRAPHQL;
         return $this->validator()->messages();
     }
 
+    public function attributes(): array
+    {
+        return $this->validator()->attributes();
+    }
+
     protected function validator(): Validator
     {
         if ($this->validator === null) {

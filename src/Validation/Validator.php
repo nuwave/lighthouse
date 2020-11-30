@@ -32,6 +32,16 @@ abstract class Validator
     }
 
     /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [];
+    }
+
+    /**
      * Set the slice of args to validate.
      */
     public function setArgs(ArgumentSet $args): void

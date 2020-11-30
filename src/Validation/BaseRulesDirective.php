@@ -34,6 +34,15 @@ abstract class BaseRulesDirective extends BaseDirective implements ProvidesRules
         return (array) $this->directiveArgValue('messages');
     }
 
+    public function attributes(): array
+    {
+        if ($attribute = $this->directiveArgValue('attribute')) {
+            return [$this->definitionNode->name->value => $attribute];
+        }
+
+        return [];
+    }
+
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,

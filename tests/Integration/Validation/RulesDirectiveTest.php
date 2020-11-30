@@ -145,6 +145,34 @@ class RulesDirectiveTest extends TestCase
             ->assertGraphQLValidationError('bar', 'custom message');
     }
 
+    public function testCustomAttributes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: ID @rules(
+                    apply: ["required"]
+                    attribute: "baz"
+                )
+                emails: [String]
+                    @rulesForArray(
+                        apply: ["min:3"]
+                        attribute: "email list"
+                    )
+            ): String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(emails: [])
+            }
+            ')
+            ->assertGraphQLValidationError('bar', 'The baz field is required.')
+            ->assertGraphQLValidationError('emails', 'The email list must have at least 3 items.');
+    }
+
     public function testUsesCustomRuleClass(): void
     {
         $this->schema = /** @lang GraphQL */ '

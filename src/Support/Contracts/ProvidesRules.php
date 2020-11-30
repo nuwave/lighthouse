@@ -22,4 +22,11 @@ interface ProvidesRules
      * @return array<string, string>
      */
     public function messages(): array;
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes():  array;
 }
