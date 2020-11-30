@@ -61,7 +61,9 @@ You can customize the attribute for a validation message.
 
 ```graphql
 type Mutation {
-  createUser(email: String @rules(apply: ["email"], attribute: "email address")): User
+  createUser(
+    email: String @rules(apply: ["email"], attribute: "email address")
+  ): User
 }
 ```
 
