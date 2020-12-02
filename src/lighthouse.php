@@ -61,6 +61,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Custom Guards
+    |--------------------------------------------------------------------------
+    |
+    | Specify here the guards that you have defined in your application and that are different from guard option.
+    | They will be used to check authentication in directives such as @can.
+    |
+    */
+
+    'custom_guards' => [],
+
+    /*
+    |--------------------------------------------------------------------------
     | Schema Location
     |--------------------------------------------------------------------------
     |
