@@ -8,19 +8,19 @@ use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
-    public function testGetDefaultConfigGuard()
+    public function testGetDefaultConfigGuard(): void
     {
         $this->assertEquals(config('lighthouse.guard'), Authentication::getGuard());
     }
 
-    public function testIfEmptyCustomGuardGetDefault()
+    public function testIfEmptyCustomGuardGetDefault(): void
     {
         config()->set('lighthouse.custom_guards', []);
 
         $this->assertEquals(config('lighthouse.guard'), Authentication::getGuard());
     }
 
-    public function testErrorIfNotExistsCustomGuard()
+    public function testErrorIfNotExistsCustomGuard(): void
     {
         $customGuard = 'some_guard';
 
