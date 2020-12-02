@@ -40,7 +40,7 @@ class AuthenticationTest extends DBTestCase
         config()->set('lighthouse.custom_guards', [$customGuard]);
 
         $this->expectException(InvalidArgumentException::class);
-        $expectedMessage = 'InvalidArgumentException: Auth guard [' . $customGuard . '] is not defined.';
+        $expectedMessage = 'InvalidArgumentException: Auth guard ['.$customGuard.'] is not defined.';
         $this->assertEquals($expectedMessage, Authentication::getGuard());
     }
 }
