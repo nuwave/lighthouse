@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Support;
 class Authentication
 {
     /**
-     * @return int|string
+     * @return string|null
      */
     public static function getGuard()
     {
