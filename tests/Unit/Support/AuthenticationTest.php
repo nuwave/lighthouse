@@ -9,35 +9,32 @@ use Tests\Utils\Models\User;
 
 class AuthenticationTest extends DBTestCase
 {
-    public function testGetDefaultConfigGuard(): void
+    public function testGetDefaultConfigLighthouseGuard(): void
     {
         $this->assertEquals(config('lighthouse.guard'), Authentication::getGuard());
     }
 
-    public function testIfEmptyCustomGuardGetDefault(): void
+    public function testIfEmptyAuthGuardsGetDefault(): void
     {
-        config()->set('lighthouse.custom_guards', []);
+        config()->set('auth.guards', []);
 
         $this->assertEquals(config('lighthouse.guard'), Authentication::getGuard());
     }
 
-    public function testGetCustomConfigGuard(): void
+    public function testGetAuthUserGuard(): void
     {
-        $customGuard = 'web';
-
-        config()->set('lighthouse.custom_guards', [$customGuard]);
-
         $user = factory(User::class)->make();
         $this->be($user);
 
-        $this->assertEquals($customGuard, Authentication::getGuard());
+        $expectedGuard = 'web';
+        $this->assertEquals($expectedGuard, Authentication::getGuard());
     }
 
     public function testErrorIfNotExistsCustomGuard(): void
     {
         $customGuard = 'some_guard';
 
-        config()->set('lighthouse.custom_guards', [$customGuard]);
+        config()->set('auth.guards', [$customGuard]);
 
         $this->expectException(InvalidArgumentException::class);
         $expectedMessage = 'InvalidArgumentException: Auth guard ['.$customGuard.'] is not defined.';

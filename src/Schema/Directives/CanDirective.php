@@ -9,7 +9,6 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -177,8 +176,9 @@ GRAPHQL;
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
+        $authUser = auth()->guard(Authentication::getGuard())->user();
 
-        if (! $gate->forUser(Auth::guard(Authentication::getGuard())->user())->check($ability, $arguments)) {
+        if (! $gate->forUser($authUser)->check($ability, $arguments)) {
             throw new AuthorizationException(
                 "You are not authorized to access {$this->nodeName()}"
             );
