@@ -14,11 +14,11 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
+use Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentValue;
 
-class ValidatorDirective extends BaseDirective implements ArgDirective, ProvidesRules, TypeManipulator, FieldManipulator
+class ValidatorDirective extends BaseDirective implements ArgDirective, ArgumentSetValidation, TypeManipulator, FieldManipulator
 {
     use HasArgumentValue;
 

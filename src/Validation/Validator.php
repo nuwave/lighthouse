@@ -4,8 +4,9 @@ namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation;
 
-abstract class Validator
+abstract class Validator implements ArgumentSetValidation
 {
     /**
      * The slice of incoming arguments to validate.
@@ -14,28 +15,11 @@ abstract class Validator
      */
     protected $args;
 
-    /**
-     * Return the validation rules.
-     *
-     * @return array<string, array<mixed>>
-     */
-    abstract public function rules(): array;
-
-    /**
-     * Return custom messages for failing validations.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [];
     }
 
-    /**
-     * Specify a custom attribute name to use in your validation message.
-     *
-     * @return array<string, string>
-     */
     public function attributes(): array
     {
         return [];
