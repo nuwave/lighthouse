@@ -81,6 +81,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
         $relation = $parent->{$relationName}();
 
         /** @var \Illuminate\Database\Eloquent\Model $related */
+        // @phpstan-ignore-next-line Relation&Builder mixin not recognized
         $related = $relation->make();
 
         return $this->executeMutation($related, $args, $relation);

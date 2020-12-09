@@ -101,6 +101,7 @@ class ModelRelationFetcher
             ->buildRelationsFromModels($relationName, $relationConstraints)
             ->map(
                 function (Relation $relation) use ($paginationArgs) {
+                    /** @var \Illuminate\Database\Eloquent\Relations\Relation&\Illuminate\Database\Eloquent\Builder $relation */
                     return $relation->forPage($paginationArgs->page, $paginationArgs->first);
                 }
             );
@@ -154,12 +155,14 @@ class ModelRelationFetcher
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
 
+                    // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                     $relation->addSelect($select);
                 } elseif (method_exists($relation, 'getSelectColumns')) {
                     $getSelectColumns = new ReflectionMethod(get_class($relation), 'getSelectColumns');
                     $getSelectColumns->setAccessible(true);
                     $select = $getSelectColumns->invoke($relation, ['*']);
 
+                    // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                     $relation->addSelect($select);
                 }
 
