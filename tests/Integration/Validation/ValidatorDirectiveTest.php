@@ -4,6 +4,7 @@ namespace Tests\Integration\Validation;
 
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
+use Tests\Utils\Validators\EmailCustomAttributeValidator;
 use Tests\Utils\Validators\EmailCustomMessageValidator;
 
 class ValidatorDirectiveTest extends TestCase
@@ -106,6 +107,31 @@ class ValidatorDirectiveTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('input.email', EmailCustomMessageValidator::MESSAGE);
+    }
+
+    public function testCustomAttributes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: EmailCustomAttribute): ID
+        }
+
+        input EmailCustomAttribute @validator {
+            email: String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        email: "not an email"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.email', EmailCustomAttributeValidator::MESSAGE);
     }
 
     public function testWithGlobalId(): void

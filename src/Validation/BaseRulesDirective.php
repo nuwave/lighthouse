@@ -9,9 +9,9 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
+use Nuwave\Lighthouse\Support\Contracts\ArgumentValidation;
 
-abstract class BaseRulesDirective extends BaseDirective implements ProvidesRules, ArgManipulator
+abstract class BaseRulesDirective extends BaseDirective implements ArgumentValidation, ArgManipulator
 {
     public function rules(): array
     {
@@ -32,6 +32,11 @@ abstract class BaseRulesDirective extends BaseDirective implements ProvidesRules
     public function messages(): array
     {
         return (array) $this->directiveArgValue('messages');
+    }
+
+    public function attribute(): ?string
+    {
+        return $this->directiveArgValue('attribute');
     }
 
     public function manipulateArgDefinition(

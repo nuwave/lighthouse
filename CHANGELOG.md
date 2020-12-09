@@ -17,6 +17,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Handle content types `application/graphql` and `application/x-www-form-urlencoded` properly https://github.com/nuwave/lighthouse/pull/1424
 - Mark directives that can be used more than once per location as `repeatable` https://github.com/nuwave/lighthouse/pull/1529
 - Allow configuring global field middleware directives in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1533
+- Add custom attributes to validations https://github.com/nuwave/lighthouse/pull/1628
 
 ### Changed
 
@@ -49,7 +50,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow subscriptions without named operations, base channels on the field name
 - Set `lighthouse.debug` config through env `LIGHTHOUSE_DEBUG` https://github.com/nuwave/lighthouse/pull/1592
 - Test helper `multipartGraphQL` now accepts arrays instead of JSON strings https://github.com/nuwave/lighthouse/pull/1615/
-- Use DateTime::ATOM for DateTimeTZ ISO 8601 compatibility https://github.com/nuwave/lighthouse/pull/1622
+- Use `DateTime::ATOM` for DateTimeTZ ISO 8601 compatibility https://github.com/nuwave/lighthouse/pull/1622
+- Split `ProvidesRules` interface into `ArgumentValidation` and `ArgumentSetValidation` https://github.com/nuwave/lighthouse/pull/1628
 
 ### Removed
 

@@ -2098,6 +2098,11 @@ directive @rules(
   apply: [String!]!
 
   """
+  Specify a custom attribute name to use in your validation message.
+  """
+  attribute: String
+
+  """
   Specify the messages to return if the validators fail.
   Specified as an input object that maps rules to messages,
   e.g. { email: "Must be a valid email", max: "The input was too long" }
@@ -2129,6 +2134,11 @@ directive @rulesForArray(
   or the fully qualified class name of a custom validation rule.
   """
   apply: [String!]!
+
+  """
+  Specify a custom attribute name to use in your validation message.
+  """
+  attribute: String
 
   """
   Specify the messages to return if the validators fail.
