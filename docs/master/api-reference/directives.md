@@ -1722,14 +1722,22 @@ type Query {
 }
 ```
 
+You can easily set the default value:
+
+```graphql
+type Query {
+  posts(orderBy: _  = [{ field: TITLE, order: ASC }] @orderBy(columns: ["posted_at", "title"])): [Post!]! @all
+}
+```
+
 Lighthouse will automatically generate an input that takes enumerated column names,
 together with the `SortOrder` enum, and add that to your schema. Here is how it looks:
 
 ```graphql
 "Allows ordering a list of records."
 input QueryPostsOrderByOrderByClause {
-  "The column that is used for ordering."
-  column: QueryPostsOrderByColumn!
+  "The field that is used for ordering."
+  field: QueryPostsOrderByColumn!
 
   "The direction that is used for ordering."
   order: SortOrder!
@@ -1777,7 +1785,7 @@ Querying a field that has an `orderBy` argument looks like this:
 
 ```graphql
 {
-  posts(orderBy: [{ column: POSTED_AT, order: ASC }]) {
+  posts(orderBy: [{ field: POSTED_AT, order: ASC }]) {
     title
   }
 }
@@ -1802,7 +1810,7 @@ This can be queried like this:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ column: "posted_at", order: ASC }] }) {
+  posts(filter: { orderBy: [{ field: "posted_at", order: ASC }] }) {
     title
   }
 }
