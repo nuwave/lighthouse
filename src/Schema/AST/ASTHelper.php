@@ -245,6 +245,7 @@ class ASTHelper
     public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType): ObjectTypeDefinitionNode
     {
         $objectType->interfaces = self::mergeNodeList(
+            // @phpstan-ignore-next-line Covariance not recognized properly
             $objectType->interfaces,
             [
                 Parser::parseType(
