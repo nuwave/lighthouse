@@ -37,7 +37,6 @@ class NestedOneToMany implements ArgResolver
 
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
      */
     public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
     {
