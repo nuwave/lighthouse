@@ -74,6 +74,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
+- Merge type interfaces when extending type https://github.com/nuwave/lighthouse/pull/1635
 
 ## 4.18.0
 
