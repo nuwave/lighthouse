@@ -227,7 +227,7 @@ class ASTBuilder
             /**
              * We know this because we passed assertExtensionMatchesDefinition().
              *
-             * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $interfaces
+             * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $typeExtension
              */
             $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
                 $extendedObjectLikeType->interfaces,
