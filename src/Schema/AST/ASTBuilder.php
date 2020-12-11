@@ -222,6 +222,14 @@ class ASTBuilder
             // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $typeExtension->fields
         );
+
+        // Merge interfaces if both types contains it.
+        if (isset($extendedObjectLikeType->interfaces) && isset($typeExtension->interfaces)) {
+            $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
+                $extendedObjectLikeType->interfaces,
+                $typeExtension->interfaces
+            );
+        }
     }
 
     protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
