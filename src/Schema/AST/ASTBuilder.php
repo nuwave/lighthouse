@@ -225,7 +225,7 @@ class ASTBuilder
 
         if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
             /**
-             * We know this because we passed assertExtensionMatchesDefinition()
+             * We know this because we passed assertExtensionMatchesDefinition().
              *
              * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $interfaces
              */
