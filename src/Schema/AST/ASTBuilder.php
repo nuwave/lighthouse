@@ -223,8 +223,12 @@ class ASTBuilder
             $typeExtension->fields
         );
 
-        // Merge interfaces if both types contains it.
-        if (isset($extendedObjectLikeType->interfaces) && isset($typeExtension->interfaces)) {
+        if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
+            /**
+             * We know this because we passed assertExtensionMatchesDefinition()
+             *
+             * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $interfaces
+             */
             $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
                 $extendedObjectLikeType->interfaces,
                 $typeExtension->interfaces
