@@ -299,7 +299,7 @@ class ASTBuilderTest extends TestCase
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $userType */
         $userType = $documentAST->types['User'];
 
-        $interfaces = Collection::make($userType->interfaces);
+        $interfaces = new Collection($userType->interfaces);
         $this->assertCount(2, $interfaces);
         $this->assertTrue($interfaces->contains('name.value', 'Emailable'));
         $this->assertTrue($interfaces->contains('name.value', 'Nameable'));
