@@ -230,7 +230,9 @@ class ASTBuilder
              * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $typeExtension
              */
             $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
+                // @phpstan-ignore-next-line contravariance issue
                 $extendedObjectLikeType->interfaces,
+                // @phpstan-ignore-next-line contravariance issue
                 $typeExtension->interfaces
             );
         }
