@@ -28,6 +28,7 @@ directive @whereAuth(
   Name of the relationship that links to the user model.
   """
   relation: String!
+
   """
   Specify which guard to use, e.g. "api".
   When not defined, the default from `lighthouse.php` is used.
@@ -49,7 +50,7 @@ GRAPHQL;
         // @phpstan-ignore-next-line phpstan cannot find this method.
         return $builder->whereHas(
             $relation,
-            function ($query) use ($userId) {
+            static function ($query) use ($userId): void {
                 $query->whereKey($userId);
             }
         );

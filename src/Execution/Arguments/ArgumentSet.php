@@ -215,7 +215,7 @@ class ArgumentSet
     {
         $argumentSet->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
-            ->each(function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder) {
+            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder): void {
                 $builder = $fieldBuilderDirective->handleFieldBuilder($builder);
             });
     }
