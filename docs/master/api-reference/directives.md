@@ -2665,16 +2665,16 @@ type Query {
 Filter a type to only return instances owned by the current user.
 """
 directive @whereAuth(
-    """
-    Name of the relationship that links to the user model.
-    """
-    relation: String!
+  """
+  Name of the relationship that links to the user model.
+  """
+  relation: String!
 
-    """
-    Specify which guard to use, e.g. "api".
-    When not defined, the default from `lighthouse.php` is used.
-    """
-    guard: String
+  """
+  Specify which guard to use, e.g. "api".
+  When not defined, the default from `lighthouse.php` is used.
+  """
+  guard: String
 ) on FIELD_DEFINITION
 ```
 
@@ -2683,7 +2683,7 @@ Behind the scenes it is using a `whereHas` query.
 
 ```graphql
 type Query {
-    posts: [Post!]! @all @whereAuth(relation: "user")
+  posts: [Post!]! @all @whereAuth(relation: "user")
 }
 ```
 
