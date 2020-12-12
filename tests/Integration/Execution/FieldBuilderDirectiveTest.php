@@ -71,13 +71,9 @@ class FieldBuilderDirectiveTest extends DBTestCase
             }
             ');
 
-        $this->assertCount(
-            0,
-            $ownedPosts
-                ->map(function (Post $post) {
-                    return $post->getKey();
-                })
-                ->diff($response->json('data.posts.*.id'))
+        $this->assertSame(
+            $ownedPosts->pluck('id')->all(),
+            $response->json('data.posts.*.id')
         );
     }
 }

@@ -67,7 +67,7 @@ GRAPHQL;
 An [`\Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/FieldBuilderDirective.php)
 directive allows modifying the query that Lighthouse creates for a field.
 
-Currently, the following directives use the defined filters for resolving the query:
+Currently, the following directives use the defined filter for resolving the query:
 
 - [@whereAuth](../api-reference/directives.md#whereauth)
 
