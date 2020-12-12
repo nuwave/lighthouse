@@ -10,7 +10,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Post {
-        id: ID!
+        id: Int!
         title: String
     }
     ';
@@ -39,8 +39,8 @@ class FieldBuilderDirectiveTest extends DBTestCase
             ');
 
         $this->assertSame(
-            $ownedPosts->pluck('id'),
-            $response->json('data.posts.*.id'),
+            $ownedPosts->pluck('id')->all(),
+            $response->json('data.posts.*.id')
         );
     }
 
