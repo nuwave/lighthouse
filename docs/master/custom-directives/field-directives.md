@@ -71,7 +71,6 @@ Currently, the following directives use the defined filters for resolving the qu
 
 - [@whereAuth](../api-reference/directives.md#whereauth)
 
-
 ## FieldManipulator
 
 An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
