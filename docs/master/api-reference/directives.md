@@ -2678,7 +2678,7 @@ directive @whereAuth(
 ) on FIELD_DEFINITION
 ```
 
-This example defines a query and filter away any posts where the user relationship is not the authenticated user.  
+The following query returns all posts that belong to the currently authenticated user.  
 Behind the scenes it is using a `whereHas` query.
 
 ```graphql

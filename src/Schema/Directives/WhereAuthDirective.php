@@ -40,17 +40,16 @@ GRAPHQL;
 
     public function handleFieldBuilder(object $builder): object
     {
-        $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
-        $relation = $this->directiveArgValue('relation');
-        $userId = $this
-            ->authFactory
-            ->guard($guard)
-            ->id();
-
-        // @phpstan-ignore-next-line phpstan cannot find this method.
+        // @phpstan-ignore-next-line Mixins are magic
         return $builder->whereHas(
-            $relation,
-            static function ($query) use ($userId): void {
+            $this->directiveArgValue('relation'),
+            static function ($query): void {
+                $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
+                $userId = $this
+                    ->authFactory
+                    ->guard($guard)
+                    ->id();
+
                 $query->whereKey($userId);
             }
         );

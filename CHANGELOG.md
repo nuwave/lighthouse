@@ -18,8 +18,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Mark directives that can be used more than once per location as `repeatable` https://github.com/nuwave/lighthouse/pull/1529
 - Allow configuring global field middleware directives in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1533
 - Add custom attributes to validations https://github.com/nuwave/lighthouse/pull/1628
-- Interface for directives `FieldBuilderDirective` https://github.com/nuwave/lighthouse/pull/1636
-- Directive for filtering a field based on authenticated user `@whereAuth` https://github.com/nuwave/lighthouse/pull/1636
+- Add new directive interface `FieldBuilderDirective` https://github.com/nuwave/lighthouse/pull/1636
+- Add `@whereAuth` directive for filtering a field based on authenticated user https://github.com/nuwave/lighthouse/pull/1636
 
 ### Changed
 
