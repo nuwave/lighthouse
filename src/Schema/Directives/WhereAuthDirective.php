@@ -43,7 +43,7 @@ GRAPHQL;
         // @phpstan-ignore-next-line Mixins are magic
         return $builder->whereHas(
             $this->directiveArgValue('relation'),
-            static function ($query): void {
+            function ($query): void {
                 $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
                 $userId = $this
                     ->authFactory
