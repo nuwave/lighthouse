@@ -54,6 +54,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Test helper `multipartGraphQL` now accepts arrays instead of JSON strings https://github.com/nuwave/lighthouse/pull/1615/
 - Use `DateTime::ATOM` for DateTimeTZ ISO 8601 compatibility https://github.com/nuwave/lighthouse/pull/1622
 - Split `ProvidesRules` interface into `ArgumentValidation` and `ArgumentSetValidation` https://github.com/nuwave/lighthouse/pull/1628
+- Update to PHP 8 compatible mll-lab/graphql-php-scalars 4 (#1638)
 
 ### Removed
 

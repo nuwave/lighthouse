@@ -64,7 +64,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                     )
                     ->setTypeDefinition(
                         Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-                            scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
+                            scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\MixedScalar")
                         ')
                     );
             }
