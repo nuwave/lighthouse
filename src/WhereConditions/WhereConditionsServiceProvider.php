@@ -63,9 +63,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                         )
                     )
                     ->setTypeDefinition(
-                        Parser::scalarTypeDefinition(
-                        /** @lang GraphQL */
-                        '
+                        Parser::scalarTypeDefinition(/** @lang GraphQL */ '
                             scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\MixedScalar")
                         ')
                     );
@@ -75,7 +73,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     public static function createWhereConditionsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
-        $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
+        $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
 
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
@@ -88,9 +86,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
             ->value;
         $operatorDefault = $operator->default();
 
-        return Parser::inputObjectTypeDefinition(
-        /** @lang GraphQL */
-        <<<GRAPHQL
+        return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
                 "The column that is used for the condition."
@@ -111,12 +107,13 @@ class WhereConditionsServiceProvider extends ServiceProvider
                 "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
                 HAS: $hasRelationInputName
             }
-GRAPHQL);
+GRAPHQL
+        );
     }
 
     public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
     {
-        $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
+        $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
@@ -130,9 +127,7 @@ GRAPHQL);
             ->value;
         $operatorDefault = $operator->defaultHasOperator();
 
-        return Parser::inputObjectTypeDefinition(
-        /** @lang GraphQL */
-        <<<GRAPHQL
+        return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $hasRelationInputName {
                 "The relation that is checked."
@@ -147,6 +142,7 @@ GRAPHQL);
                 "Additional condition logic."
                 condition: $name
             }
-GRAPHQL);
+GRAPHQL
+        );
     }
 }
