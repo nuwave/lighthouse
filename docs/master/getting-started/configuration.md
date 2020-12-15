@@ -17,8 +17,8 @@ for your GraphQL endpoint in `config/cors.php`:
 
 ```diff
 return [
--   'paths' => ['api/*'],
-+   'paths' => ['api/*', 'graphql'],
+-   'paths' => ['api/*', 'sanctum/csrf-cookie'],
++   'paths' => ['api/*', 'graphql', 'sanctum/csrf-cookie'],
     ...
 ];
 ```
