@@ -2717,7 +2717,7 @@ Add the service provider to your `config/app.php`
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+    composer require mll-lab/graphql-php-scalars:^3
 
 It contains the scalar type `Mixed`, which enables the dynamic query capabilities.
 

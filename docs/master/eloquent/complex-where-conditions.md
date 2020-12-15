@@ -1,7 +1,7 @@
 # Complex Where Conditions
 
 Adding query conditions ad-hoc can be cumbersome and limiting when you require
-many different ways to filter query results.
+manifold ways to filter query results.
 Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients
 and allow them to apply complex, dynamic WHERE conditions to queries.
 
@@ -19,7 +19,7 @@ Add the service provider to your `config/app.php`
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+    composer require mll-lab/graphql-php-scalars:^4
 
 ## Usage
 

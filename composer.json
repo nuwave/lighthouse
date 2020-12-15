@@ -46,7 +46,7 @@
         "laravel/legacy-factories": "^1.0",
         "laravel/lumen-framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laravel/scout": "^7 || ^8",
-        "mll-lab/graphql-php-scalars": "^3.1",
+        "mll-lab/graphql-php-scalars": "^4",
         "mockery/mockery": "^1.0",
         "nunomaduro/larastan": "^0.6",
         "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || ^6",
