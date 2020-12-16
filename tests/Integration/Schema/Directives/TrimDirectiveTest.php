@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 
 class TrimDirectiveTest extends DBTestCase
 {
-    public function testTrimsArgument(): void
+    public function testTrimsStringArgument(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Company {
@@ -22,6 +22,42 @@ class TrimDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createCompany(name: "    foo     ") {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createCompany' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    public function testTrimsInputArgument(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        input CompanyInput {
+            name: String!
+        }
+
+        type Company {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createCompany(input: CompanyInput @trim @spread): Company @create
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createCompany(input: {
+                name: "    foo     "
+            }) {
                 id
                 name
             }

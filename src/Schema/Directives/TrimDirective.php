@@ -18,11 +18,11 @@ class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgD
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Run the `trim` function on the input.
+Remove whitespace from the beginning and end of a given input.
 
 This can be used on:
-- a single argument or input field to surgically trim a single string
-- a field to trim all strings within the given input
+- a single argument or input field to sanitize that subtree
+- a field to trim all strings
 """
 directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 GRAPHQL;
@@ -30,12 +30,17 @@ GRAPHQL;
 
     /**
      * Remove whitespace from the beginning and end of a given input.
-     *
-     * @param  string  $argumentValue
      */
-    public function sanitize($argumentValue): string
+    public function sanitize($argumentValue)
     {
-        return trim($argumentValue);
+        return Utils::applyEach(
+            function ($value) {
+                return $value instanceof ArgumentSet
+                    ? $this->transformArgumentSet($value)
+                    : $this->transformLeaf($value);
+            },
+            $argumentValue
+        );
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
@@ -45,7 +50,7 @@ GRAPHQL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
+                    $resolveInfo->argumentSet = $this->transformArgumentSet($resolveInfo->argumentSet);
 
                     return $resolver(
                         $root,
@@ -58,17 +63,10 @@ GRAPHQL;
         );
     }
 
-    public function transformRecursively(ArgumentSet $argumentSet): ArgumentSet
+    public function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $argument) {
-            $argument->value = Utils::applyEach(
-                function ($value) {
-                    return $value instanceof ArgumentSet
-                        ? $this->transformRecursively($value)
-                        : $this->transform($value);
-                },
-                $argument->value
-            );
+            $argument->value = $this->sanitize($argument->value);
         }
 
         return $argumentSet;
@@ -78,7 +76,7 @@ GRAPHQL;
      * @param  mixed  $value The client given value
      * @return mixed The transformed value
      */
-    protected function transform($value)
+    protected function transformLeaf($value)
     {
         if (is_string($value)) {
             return trim($value);

@@ -20,6 +20,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add custom attributes to validations https://github.com/nuwave/lighthouse/pull/1628
 - Add new directive interface `FieldBuilderDirective` https://github.com/nuwave/lighthouse/pull/1636
 - Add `@whereAuth` directive for filtering a field based on authenticated user https://github.com/nuwave/lighthouse/pull/1636
+- Use the `@trim` directive on fields to sanitize all input strings https://github.com/nuwave/lighthouse/pull/1641
 
 ### Changed
 
