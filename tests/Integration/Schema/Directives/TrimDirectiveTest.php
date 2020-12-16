@@ -88,6 +88,7 @@ class TrimDirectiveTest extends DBTestCase
         input FooInput {
             foo: String!
             bar: [String!]!
+            baz: Int!
         }
 
         type Mutation {
