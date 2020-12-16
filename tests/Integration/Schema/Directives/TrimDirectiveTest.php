@@ -82,6 +82,7 @@ class TrimDirectiveTest extends DBTestCase
         type Foo {
             foo: String!
             bar: [String!]!
+            baz: Int!
         }
 
         input FooInput {
@@ -99,9 +100,11 @@ class TrimDirectiveTest extends DBTestCase
             foo(input: {
                 foo: " foo "
                 bar: [" bar "]
+                baz: 3
             }) {
                 foo
                 bar
+                baz
             }
         }
         ')->assertJson([
@@ -109,6 +112,7 @@ class TrimDirectiveTest extends DBTestCase
                 'foo' => [
                     'foo' => 'foo',
                     'bar' => ['bar'],
+                    'baz' => 3,
                 ],
             ],
         ]);
