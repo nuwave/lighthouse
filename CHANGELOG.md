@@ -56,6 +56,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Use `DateTime::ATOM` for DateTimeTZ ISO 8601 compatibility https://github.com/nuwave/lighthouse/pull/1622
 - Split `ProvidesRules` interface into `ArgumentValidation` and `ArgumentSetValidation` https://github.com/nuwave/lighthouse/pull/1628
 - Update to PHP 8 compatible mll-lab/graphql-php-scalars 4 https://github.com/nuwave/lighthouse/pull/1639
+- Add `TrimDirective` to the default `field_middleware` config in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1641
 
 ### Removed
 
