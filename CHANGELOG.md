@@ -20,6 +20,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add custom attributes to validations https://github.com/nuwave/lighthouse/pull/1628
 - Add new directive interface `FieldBuilderDirective` https://github.com/nuwave/lighthouse/pull/1636
 - Add `@whereAuth` directive for filtering a field based on authenticated user https://github.com/nuwave/lighthouse/pull/1636
+- Use the `@trim` directive on fields to sanitize all input strings https://github.com/nuwave/lighthouse/pull/1641
 
 ### Changed
 
@@ -55,6 +56,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Use `DateTime::ATOM` for DateTimeTZ ISO 8601 compatibility https://github.com/nuwave/lighthouse/pull/1622
 - Split `ProvidesRules` interface into `ArgumentValidation` and `ArgumentSetValidation` https://github.com/nuwave/lighthouse/pull/1628
 - Update to PHP 8 compatible mll-lab/graphql-php-scalars 4 https://github.com/nuwave/lighthouse/pull/1639
+- Add `TrimDirective` to the default `field_middleware` config in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1641
 
 ### Removed
 
