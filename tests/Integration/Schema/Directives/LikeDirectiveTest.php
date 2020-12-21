@@ -26,7 +26,7 @@ class LikeDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            user(name: "Al") {
+            users(name: "Al") {
                 name
             }
         }
@@ -61,7 +61,7 @@ class LikeDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            user(name: "l") {
+            users(name: "l") {
                 name
             }
         }
@@ -96,7 +96,7 @@ class LikeDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            user(name: "ar%") {
+            users(name: "ar%") {
                 name
             }
         }
