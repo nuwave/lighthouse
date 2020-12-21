@@ -52,7 +52,7 @@ GRAPHQL;
     {
         $valueEscaped = $this->escapePercentage($value);
 
-        $percentage = $this->directiveArgValue('key', 'BOTH');
+        $percentage = $this->directiveArgValue('percentage', 'BOTH');
         switch ($percentage) {
             case 'START':
                 $valueEscaped = '%'.$valueEscaped;
