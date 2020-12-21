@@ -108,5 +108,4 @@ class LikeDirectiveTest extends DBTestCase
             ],
         ]);
     }
-
 }
