@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 
 class LikeDirectiveTest extends DBTestCase
@@ -25,13 +24,13 @@ class LikeDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            user(name: \"Al\") {
+            user(name: "Al") {
                 name
             }
         }
-        ")->assertJsonFragment([
+        ')->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alan',
@@ -60,13 +59,13 @@ class LikeDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            user(name: \"l\") {
+            user(name: "l") {
                 name
             }
         }
-        ")->assertJsonFragment([
+        ')->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alan',
@@ -95,13 +94,13 @@ class LikeDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
-            user(name: \"ar%\") {
+            user(name: "ar%") {
                 name
             }
         }
-        ")->assertJsonFragment([
+        ')->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Aar%on',
