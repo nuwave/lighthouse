@@ -37,7 +37,7 @@ GRAPHQL;
     {
         return str_replace(
             [$char, '%', '_'],
-            [$char . $char, $char . '%', $char . '_'],
+            [$char.$char, $char.'%', $char.'_'],
             $value
         );
     }
@@ -55,13 +55,13 @@ GRAPHQL;
         $percentage = $this->directiveArgValue('key', $this->nodeName(), 'BOTH');
         switch ($percentage) {
             case 'START':
-                $valueEscaped = '%' . $valueEscaped;
+                $valueEscaped = '%'.$valueEscaped;
                 break;
             case 'END':
-                $valueEscaped = $valueEscaped . '%';
+                $valueEscaped = $valueEscaped.'%';
                 break;
             case 'BOTH';
-                $valueEscaped = '%' . $valueEscaped . '%';
+                $valueEscaped = '%'.$valueEscaped.'%';
                 break;
         }
 
