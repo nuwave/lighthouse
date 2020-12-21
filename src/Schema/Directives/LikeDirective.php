@@ -60,7 +60,7 @@ GRAPHQL;
             case 'END':
                 $valueEscaped = $valueEscaped.'%';
                 break;
-            case 'BOTH';
+            case 'BOTH':
                 $valueEscaped = '%'.$valueEscaped.'%';
                 break;
         }

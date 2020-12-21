@@ -38,7 +38,7 @@ class LikeDirectiveTest extends DBTestCase
                 [
                     'name' => 'Alex',
                 ]
-            ],
+            ]
         ]);
     }
 
@@ -73,7 +73,7 @@ class LikeDirectiveTest extends DBTestCase
                 [
                     'name' => 'Alex',
                 ]
-            ],
+            ]
         ]);
     }
 
@@ -105,7 +105,7 @@ class LikeDirectiveTest extends DBTestCase
                 [
                     'name' => 'Aar%on',
                 ]
-            ],
+            ]
         ]);
     }
 
