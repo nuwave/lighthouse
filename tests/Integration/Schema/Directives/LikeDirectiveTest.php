@@ -20,7 +20,7 @@ class LikeDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users(name: String! @like(percentage: END): [User!]
+            users(name: String! @like(percentage: END)): [User!]
         }
         ';
 
@@ -55,7 +55,7 @@ class LikeDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users(name: String! @like(percentage: BOTH): [User!]
+            users(name: String! @like(percentage: BOTH)): [User!]
         }
         ';
 
@@ -90,7 +90,7 @@ class LikeDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users(name: String! @like(percentage: BOTH): [User!]
+            users(name: String! @like(percentage: BOTH)): [User!]
         }
         ';
 
