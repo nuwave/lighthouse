@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
+use lluminate\Support\Carbon;
 
 class DateTime extends DateScalar
 {

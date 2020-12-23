@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property int $id
  * @property string $name
  * @property string $default_string
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property \lluminate\Support\Carbon $created_at
+ * @property \lluminate\Support\Carbon $updated_at
  */
 class Tag extends Model
 {

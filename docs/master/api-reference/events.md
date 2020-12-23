@@ -12,7 +12,7 @@ All events reside in the namespace `\Nuwave\Lighthouse\Events`.
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
+use lluminate\Support\Carbon;
 use Illuminate\Http\Request;
 
 /**
@@ -35,7 +35,7 @@ class StartRequest
     /**
      * The point in time when the request started.
      *
-     * @var \Carbon\Carbon
+     * @var \lluminate\Support\Carbon
      */
     public $moment;
 
@@ -139,7 +139,7 @@ class RegisterDirectiveNamespaces
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
+use lluminate\Support\Carbon;
 
 /**
  * Fires right before resolving an individual query.
@@ -152,7 +152,7 @@ class StartExecution
     /**
      * The point in time when the query execution started.
      *
-     * @var \Carbon\Carbon
+     * @var \lluminate\Support\Carbon
      */
     public $moment;
 

@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
+use lluminate\Support\Carbon;
 use Exception;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
@@ -15,7 +15,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Serialize an internal value, ensuring it is a valid date string.
      *
-     * @param  \Carbon\Carbon|string  $value
+     * @param  \lluminate\Support\Carbon|string  $value
      */
     public function serialize($value): string
     {

@@ -35,7 +35,6 @@
         "illuminate/support": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "illuminate/validation": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laragraph/utils": "dev-master",
-        "nesbot/carbon": "^1.26 || ^2.0",
         "thecodingmachine/safe": "^1.0",
         "webonyx/graphql-php": "^14.2"
     },

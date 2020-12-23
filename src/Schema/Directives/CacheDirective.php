@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Carbon\Carbon;
+use lluminate\Support\Carbon;
 use Closure;
 use GraphQL\Deferred;
 use GraphQL\Language\AST\NamedTypeNode;

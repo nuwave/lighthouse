@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
+use lluminate\Support\Carbon;
 use Illuminate\Http\Request;
 
 /**
@@ -25,7 +25,7 @@ class StartRequest
     /**
      * The point in time when the request started.
      *
-     * @var \Carbon\Carbon
+     * @var \lluminate\Support\Carbon
      */
     public $moment;
 

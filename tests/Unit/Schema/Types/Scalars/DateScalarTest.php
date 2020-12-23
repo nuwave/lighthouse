@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Carbon\Carbon;
+use lluminate\Support\Carbon;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
