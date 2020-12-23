@@ -24,6 +24,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
+- Use `Illuminate\Support\Carbon` instead of `Carbon\Carbon`
 - `\Nuwave\Lighthouse\Exceptions\ValidationException` no longer extends `\Illuminate\Validation\ValidationException` https://github.com/nuwave/lighthouse/pull/1185
 - Move validation related classes into namespace `Nuwave\Lighthouse\Validation` https://github.com/nuwave/lighthouse/pull/1185
 - Run `ArgDirectives` in distinct phases: Sanitize, Validate, Transform https://github.com/nuwave/lighthouse/pull/1185
