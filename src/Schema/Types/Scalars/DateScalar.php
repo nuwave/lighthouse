@@ -15,7 +15,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Serialize an internal value, ensuring it is a valid date string.
      *
-     * @param  \lluminate\Support\Carbon|string  $value
+     * @param  \Illuminate\Support\Carbon|string  $value
      */
     public function serialize($value): string
     {

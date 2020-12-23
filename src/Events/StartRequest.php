@@ -25,7 +25,7 @@ class StartRequest
     /**
      * The point in time when the request started.
      *
-     * @var \lluminate\Support\Carbon
+     * @var \Illuminate\Support\Carbon
      */
     public $moment;
 

@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ResolveInfo;
-use lluminate\Support\Carbon;
+use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -17,7 +17,7 @@ class Tracing
     /**
      * The timestamp the request was initially started.
      *
-     * @var \lluminate\Support\Carbon
+     * @var \Illuminate\Support\Carbon
      */
     protected $requestStart;
 
