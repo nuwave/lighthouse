@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Events;
 
-use lluminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * Fires right after a request reaches the GraphQLController.

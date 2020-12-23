@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use lluminate\Support\Carbon;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ResolveInfo;
+use lluminate\Support\Carbon;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\StartExecution;
