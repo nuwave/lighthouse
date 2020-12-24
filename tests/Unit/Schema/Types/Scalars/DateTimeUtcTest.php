@@ -13,7 +13,7 @@ class DateTimeUtcTest extends DateScalarTest
         parent::setUp();
 
         if (AppVersion::below(5.8)) {
-            $this->markTestSkipped('This only works with Carbon\Carbon::createFromIsoFormat().');
+            $this->markTestSkipped('This only works with Illuminate\Support\Carbon::createFromIsoFormat().');
         }
     }
 
