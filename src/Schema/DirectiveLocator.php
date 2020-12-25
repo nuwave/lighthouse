@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
@@ -126,7 +127,6 @@ class DirectiveLocator
     {
         $definitions = [];
 
-        /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
         foreach ($this->classes() as $directiveClass) {
             $definitions [] = Parser::directiveDefinition($directiveClass::definition());
         }
@@ -245,6 +245,8 @@ class DirectiveLocator
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
+     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function exclusiveOfType(Node $node, string $directiveClass): ?Directive
@@ -254,7 +256,7 @@ class DirectiveLocator
         if ($directives->count() > 1) {
             $directiveNames = $directives
                 ->map(function (Directive $directive): string {
-                    $definition = Parser::directiveDefinition(
+                    $definition = ASTHelper::extractDirectiveDefinition(
                         $directive::definition()
                     );
 

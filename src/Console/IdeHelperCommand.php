@@ -11,6 +11,7 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -120,33 +121,12 @@ GRAPHQL;
      */
     protected function define(string $directiveClass): string
     {
-        $definitionString = $directiveClass::definition();
+        $definition = $directiveClass::definition();
 
-        try {
-            $document = Parser::parse($definitionString);
-        } catch (SyntaxError $error) {
-            throw new DefinitionException(
-                "Encountered syntax error while parsing the definition of {$directiveClass}.",
-                $error->getCode(),
-                $error
-            );
-        }
+        // Throws if the definition is invalid
+        ASTHelper::extractDirectiveDefinition($definition);
 
-        /** @var \GraphQL\Language\AST\DirectiveDefinitionNode|null $directive */
-        $directive = null;
-        foreach ($document->definitions as $definitionNode) {
-            if ($definitionNode instanceof DirectiveDefinitionNode) {
-                if ($directive !== null) {
-                    throw new DefinitionException(
-                        "Found more than one directives while parsing the definition of {$directiveClass}."
-                    );
-                }
-
-                $directive = $definitionNode;
-            }
-        }
-
-        return trim($definitionString);
+        return trim($definition);
     }
 
     public static function schemaDirectivesPath(): string

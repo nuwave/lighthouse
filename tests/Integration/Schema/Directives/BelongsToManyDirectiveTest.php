@@ -107,7 +107,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: PAGINATION)
+            roles: [Role!]! @belongsToMany(type: PAGINATOR)
         }
 
         type Role {

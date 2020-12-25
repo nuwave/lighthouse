@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -347,5 +349,39 @@ class ASTHelper
         );
 
         return $deprecated['reason'] ?? null;
+    }
+
+    /**
+     * @param class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $definitionString
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    public static function extractDirectiveDefinition(string $definitionString): DirectiveDefinitionNode
+    {
+        try {
+            $document = Parser::parse($definitionString);
+        } catch (SyntaxError $error) {
+            throw new DefinitionException(
+                "Encountered syntax error while parsing the definition of {$definitionString}.",
+                $error->getCode(),
+                $error
+            );
+        }
+
+        /** @var \GraphQL\Language\AST\DirectiveDefinitionNode|null $directive */
+        $directive = null;
+        foreach ($document->definitions as $definitionNode) {
+            if ($definitionNode instanceof DirectiveDefinitionNode) {
+                if ($directive !== null) {
+                    throw new DefinitionException(
+                        "Found more than one directives while parsing the definition of {$definitionString}."
+                    );
+                }
+
+                $directive = $definitionNode;
+            }
+        }
+
+        return $directive;
     }
 }
