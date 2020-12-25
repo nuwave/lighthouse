@@ -380,6 +380,12 @@ class ASTHelper
             }
         }
 
+        if ($directive === null) {
+            throw new DefinitionException(
+                "Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}"
+            );
+        }
+
         return $directive;
     }
 }
