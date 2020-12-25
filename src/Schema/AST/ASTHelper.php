@@ -297,7 +297,7 @@ class ASTHelper
         /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator $directiveLocator */
         $directiveLocator = app(DirectiveLocator::class);
         $directive = $directiveLocator->resolve($name);
-        $directiveDefinition = Parser::directiveDefinition($directive::definition());
+        $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
 
         /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
         $fieldDefinitions = $objectType->fields;

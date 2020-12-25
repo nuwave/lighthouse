@@ -128,7 +128,7 @@ class DirectiveLocator
         $definitions = [];
 
         foreach ($this->classes() as $directiveClass) {
-            $definitions [] = Parser::directiveDefinition($directiveClass::definition());
+            $definitions [] = ASTHelper::extractDirectiveDefinition($directiveClass::definition());
         }
 
         return $definitions;
