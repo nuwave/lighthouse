@@ -82,6 +82,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
 - Merge type interfaces when extending type https://github.com/nuwave/lighthouse/pull/1635
 
+### Deprecated
+
+- Deprecate values for the `type` argument of `@paginate` that are not `PAGINATOR` or `CONNECTION`
+
 ## 4.18.0
 
 ### Added

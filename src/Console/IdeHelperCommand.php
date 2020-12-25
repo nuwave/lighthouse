@@ -2,12 +2,15 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -111,15 +114,39 @@ GRAPHQL;
         return $schema;
     }
 
+    /**
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
     protected function define(string $directiveClass): string
     {
         /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
-        $definition = $directiveClass::definition();
+        $definitionString = $directiveClass::definition();
 
-        // This operation throws if the schema definition is invalid
-        Parser::directiveDefinition($definition);
+        try {
+            $document = Parser::parse($definitionString);
+        } catch (SyntaxError $error) {
+            throw new DefinitionException(
+                "Encountered syntax error while parsing the definition of {$directiveClass}.",
+                $error->getCode(),
+                $error
+            );
+        }
 
-        return trim($definition);
+        /** @var \GraphQL\Language\AST\DirectiveDefinitionNode|null $directive */
+        $directive = null;
+        foreach ($document->definitions as $definitionNode) {
+            if ($definitionNode instanceof DirectiveDefinitionNode) {
+                if ($directive !== null) {
+                    throw new DefinitionException(
+                        "Found more than one directives while parsing the definition of {$directiveClass}."
+                    );
+                }
+
+                $directive = $definitionNode;
+            }
+        }
+
+        return trim($definitionString);
     }
 
     public static function schemaDirectivesPath(): string

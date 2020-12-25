@@ -200,7 +200,7 @@ type User {
 }
 ```
 
-When using the connection `type` argument, you may create your own
+When using the `type` argument with pagination style `CONNECTION`, you may create your own
 [Edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) which
 may have fields that resolve from the model [pivot](https://laravel.com/docs/eloquent-relationships#many-to-many)
 data. You may also add a custom field resolver for fields you want to resolve yourself.
@@ -210,7 +210,7 @@ look for a {type}Edge type to be defined. In this case it would be `RoleEdge`.
 
 ```graphql
 type User {
-  roles: [Role!]! @belongsToMany(type: "connection", edgeType: "CustomRoleEdge")
+  roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
 }
 
 type CustomRoleEdge implements Edge {
@@ -228,7 +228,7 @@ Broadcast the results of a mutation to subscribed clients.
 """
 directive @broadcast(
   """
-  Name of the subscription that should be retriggered as a result of this operation..
+  Name of the subscription that should be retriggered as a result of this operation.
   """
   subscription: String!
 
@@ -1085,8 +1085,8 @@ You can return the related models paginated by setting the `type`.
 
 ```graphql
 type User {
-  postsPaginated: [Post!]! @hasMany(type: "paginator")
-  postsRelayConnection: [Post!]! @hasMany(type: "connection")
+  postsPaginated: [Post!]! @hasMany(type: PAGINATOR)
+  postsRelayConnection: [Post!]! @hasMany(type: CONNECTION)
 }
 ```
 
@@ -1901,15 +1901,15 @@ And can be queried like this:
 
 ### Pagination type
 
-The `type` of pagination defaults to `paginator`, but may also be set to a Relay
-compliant `connection`.
+The `type` of pagination defaults to `PAGINATOR`, but may also be set to a Relay
+compliant `CONNECTION`.
 
 > Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
 > Under the hood, the "cursor" is decoded into a page offset.
 
 ```graphql
 type Query {
-  posts: [Post!]! @paginate(type: "connection")
+  posts: [Post!]! @paginate(type: CONNECTION)
 }
 ```
 
@@ -1941,15 +1941,15 @@ type PostEdge {
 
 ### Default count
 
-You can supply a `defaultCount` to set a default count for any kind of paginator.
+You can supply a `defaultCount` to set a default count for any type of pagination.
 
 ```graphql
 type Query {
-  posts: [Post!]! @paginate(type: "connection", defaultCount: 25)
+  posts: [Post!]! @paginate(type: CONNECTION, defaultCount: 25)
 }
 ```
 
-This let's you omit the `count` argument when querying:
+This lets you omit the `count` argument when querying:
 
 ```graphql
 query {
