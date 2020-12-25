@@ -352,8 +352,6 @@ class ASTHelper
     }
 
     /**
-     * @param class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $definitionString
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function extractDirectiveDefinition(string $definitionString): DirectiveDefinitionNode
@@ -362,7 +360,7 @@ class ASTHelper
             $document = Parser::parse($definitionString);
         } catch (SyntaxError $error) {
             throw new DefinitionException(
-                "Encountered syntax error while parsing the definition of {$definitionString}.",
+                "Encountered syntax error while parsing this directive definition::\n\n{$definitionString}",
                 $error->getCode(),
                 $error
             );
@@ -374,7 +372,7 @@ class ASTHelper
             if ($definitionNode instanceof DirectiveDefinitionNode) {
                 if ($directive !== null) {
                     throw new DefinitionException(
-                        "Found more than one directives while parsing the definition of {$definitionString}."
+                        "Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}"
                     );
                 }
 
