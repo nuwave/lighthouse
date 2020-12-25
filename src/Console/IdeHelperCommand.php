@@ -2,15 +2,11 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use GraphQL\Error\SyntaxError;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
