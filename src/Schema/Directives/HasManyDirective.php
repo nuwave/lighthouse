@@ -28,7 +28,7 @@ directive @hasMany(
   Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: HasManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -49,6 +49,21 @@ directive @hasMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@hasMany`.
+"""
+enum HasManyType {
+    """
+    Offset-based pagination, similar to the Laravel default.
+    """
+    PAGINATOR
+
+    """
+    Cursor-based pagination, compatible with the Relay specification.
+    """
+    CONNECTION
+}
 GRAPHQL;
     }
 }

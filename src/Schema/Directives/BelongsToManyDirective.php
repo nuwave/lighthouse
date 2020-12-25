@@ -26,9 +26,8 @@ directive @belongsToMany(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: BelongsToManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -49,6 +48,21 @@ directive @belongsToMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@belongsToMany`.
+"""
+enum PaginateType {
+    """
+    Offset-based pagination, similar to the Laravel default.
+    """
+    PAGINATOR
+
+    """
+    Cursor-based pagination, compatible with the Relay specification.
+    """
+    CONNECTION
+}
 GRAPHQL;
     }
 }

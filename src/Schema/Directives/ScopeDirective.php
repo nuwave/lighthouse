@@ -20,7 +20,7 @@ directive @scope(
   """
   The name of the scope.
   """
-  name: String
+  name: String!
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
