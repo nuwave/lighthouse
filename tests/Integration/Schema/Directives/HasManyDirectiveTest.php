@@ -324,7 +324,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: PAGINATOR, maxCount: 3)
+            tasks: [Task!]! @hasMany(type: CONNECTION, maxCount: 3)
         }
 
         type Task {
