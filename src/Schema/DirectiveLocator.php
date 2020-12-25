@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
-use GraphQL\Language\Parser;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
