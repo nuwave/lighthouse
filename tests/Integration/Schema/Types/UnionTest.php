@@ -70,11 +70,11 @@ class UnionTest extends DBTestCase
             : '';
 
         $customResolver = $withCustomTypeResolver
-            ? '@union(resolveType: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
+            ? /** @lang GraphQL */ '@union(resolveType: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
             : '';
 
         return [
-            "
+            /** @lang GraphQL */ "
             union Stuff {$customResolver} = {$prefix}User | {$prefix}Post
 
             type {$prefix}User {
@@ -89,7 +89,7 @@ class UnionTest extends DBTestCase
                 stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver()}\")
             }
             ",
-            "
+            /** @lang GraphQL */ "
             {
                 stuff {
                     ... on {$prefix}User {

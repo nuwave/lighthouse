@@ -67,7 +67,7 @@ class SearchDirectiveTest extends DBTestCase
         type Query {
             posts(
                 search: String @search
-            ): [Post!]! @paginate(type: "paginator")
+            ): [Post!]! @paginate
         }
         ';
 
@@ -203,7 +203,7 @@ class SearchDirectiveTest extends DBTestCase
         type Query {
             posts(
                 search: String @search
-            ): [Post!]! @paginate(type: "paginator")
+            ): [Post!]! @paginate
         }
         ';
 

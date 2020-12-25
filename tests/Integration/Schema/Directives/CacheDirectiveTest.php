@@ -220,7 +220,7 @@ class CacheDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User] @paginate(type: "paginator", model: "User") @cache
+            users: [User] @paginate(type: PAGINATOR, model: "User") @cache
         }
         ';
 
@@ -258,7 +258,7 @@ class CacheDirectiveTest extends DBTestCase
         type User {
             id: ID!
             name: String!
-            posts: [Post] @hasMany(type: "paginator") @cache
+            posts: [Post] @hasMany(type: PAGINATOR) @cache
         }
 
         type Query {
@@ -322,7 +322,7 @@ class CacheDirectiveTest extends DBTestCase
         type User {
             id: ID!
             name: String!
-            posts: [Post] @hasMany(type: "paginator") @cache
+            posts: [Post] @hasMany(type: PAGINATOR) @cache
         }
 
         type Query {
