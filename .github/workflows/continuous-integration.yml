@@ -7,9 +7,10 @@ on:
       - "master"
 
 env:
-  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
+  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql, redis"
   LIGHTHOUSE_TEST_DB_HOST: "127.0.0.1"
   LIGHTHOUSE_TEST_DB_PASSWORD: "root"
+  LIGHTHOUSE_TEST_REDIS_HOST: "127.0.0.1"
 
 jobs:
   static-code-analysis:
@@ -39,6 +40,7 @@ jobs:
         uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "none"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
@@ -88,10 +90,16 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
+      - name: "Start Redis"
+        uses: "supercharge/redis-github-action@1.1.0"
+        with:
+          redis-version: "6"
+
       - name: "Install PHP with extensions"
         uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "none"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
@@ -136,10 +144,16 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@v2.0.0"
 
+      - name: "Start Redis"
+        uses: "supercharge/redis-github-action@1.1.0"
+        with:
+          redis-version: 6
+
       - name: "Install PHP with extensions"
         uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "pcov"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
@@ -193,6 +207,7 @@ jobs:
         uses: "shivammathur/setup-php@2.7.0"
         with:
           coverage: "none"
+          tools: pecl
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 

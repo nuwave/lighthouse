@@ -4,6 +4,7 @@ namespace Tests\Console;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Utils\SchemaPrinter;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
@@ -16,7 +17,7 @@ class IdeHelperCommandTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
+        $config = $app->make(ConfigRepository::class);
 
         $config->set('lighthouse.namespaces.directives', [
             // Contains an overwritten UnionDirective

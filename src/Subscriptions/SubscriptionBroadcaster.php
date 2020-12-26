@@ -60,9 +60,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $this->busDispatcher = $busDispatcher;
     }
 
-    /**
-     * Queue pushing subscription data to subscribers.
-     */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
         $broadcastSubscriptionJob = new BroadcastSubscriptionJob($subscription, $fieldName, $root);
@@ -71,9 +68,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $this->busDispatcher->dispatch($broadcastSubscriptionJob);
     }
 
-    /**
-     * Push subscription data to subscribers.
-     */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
         $topic = $subscription->decodeTopic($fieldName, $root);
@@ -102,9 +96,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         );
     }
 
-    /**
-     * Authorize the subscription.
-     */
     public function authorize(Request $request): Response
     {
         return $this->auth->authorize($request)

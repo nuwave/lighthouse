@@ -31,8 +31,8 @@ interface Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  array<mixed>  $data
+     * @param  mixed  $data The data to broadcast
      * @return void
      */
-    public function broadcast(Subscriber $subscriber, array $data);
+    public function broadcast(Subscriber $subscriber, $data);
 }
