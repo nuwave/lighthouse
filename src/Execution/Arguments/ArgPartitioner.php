@@ -74,12 +74,22 @@ class ArgPartitioner
     ): array {
         $modelReflection = new ReflectionClass($model);
 
-        return static::partition(
+        [$relations, $remaining] = static::partition(
             $argumentSet,
             static function (string $name) use ($modelReflection, $relationClass): bool {
                 return static::methodReturnsRelation($modelReflection, $name, $relationClass);
             }
         );
+
+        $nonNullRelations = new ArgumentSet();
+        $nonNullRelations->arguments = array_filter(
+            $relations->arguments,
+            static function (Argument $argument): bool {
+                return null !== $argument->value;
+            }
+        );
+
+        return [$nonNullRelations, $remaining];
     }
 
     /**

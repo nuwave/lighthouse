@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
-use Carbon\Carbon;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;

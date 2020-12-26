@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\NodeKind;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -272,5 +273,35 @@ class ASTBuilderTest extends TestCase
         $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage('The type extension Foo of kind '.NodeKind::INTERFACE_TYPE_EXTENSION.' can not extend a definition of kind '.NodeKind::OBJECT_TYPE_DEFINITION.'.');
         $this->astBuilder->documentAST();
+    }
+
+    public function testCanMergeTypeExtensionInterfaces(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User implements Emailable {
+            email: String!
+        }
+
+        interface Emailable {
+            email: String!
+        }
+
+        interface Nameable {
+            name: String!
+        }
+
+        extend type User implements Nameable {
+            name: String!
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $userType */
+        $userType = $documentAST->types['User'];
+
+        $interfaces = new Collection($userType->interfaces);
+        $this->assertCount(2, $interfaces);
+        $this->assertTrue($interfaces->contains('name.value', 'Emailable'));
+        $this->assertTrue($interfaces->contains('name.value', 'Nameable'));
     }
 }

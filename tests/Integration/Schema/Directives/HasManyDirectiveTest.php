@@ -32,9 +32,9 @@ class HasManyDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->user = factory(User::class)->create();
-        $this->tasks = factory(Task::class, 3)->create([
-            'user_id' => $this->user->getKey(),
-        ]);
+        $this->tasks = factory(Task::class, 3)->make();
+        $this->user->tasks()->saveMany($this->tasks);
+
         factory(Task::class)->create([
             'user_id' => $this->user->getKey(),
             // This task should be ignored via global scope on the Task model
@@ -77,6 +77,44 @@ class HasManyDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(3, 'data.user.tasks');
+    }
+
+    public function testCanQueryHasManyWithCondition(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks(
+                id: ID @eq
+            ): [Task!]! @hasMany
+        }
+
+        type Task {
+            id: Int
+            foo: String
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        /** @var Task $firstTask */
+        $firstTask = $this->user->tasks->first();
+
+        // Ensure global scopes are respected here
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID){
+                user {
+                    tasks(id: $id) {
+                        id
+                    }
+                }
+            }
+            ', [
+                'id' => $firstTask->id,
+            ])
+            ->assertJsonCount(1, 'data.user.tasks');
     }
 
     public function testCallsScopeWithResolverArgs(): void

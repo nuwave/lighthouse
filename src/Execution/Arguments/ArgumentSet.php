@@ -6,6 +6,7 @@ use Closure;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentSet
@@ -149,6 +150,7 @@ class ArgumentSet
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
+        self::applyFieldBuilderDirectives($this, $builder);
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($this->toArray());
@@ -198,6 +200,24 @@ class ArgumentSet
                 $argument->value
             );
         }
+    }
+
+    /**
+     * Apply the FieldBuilderDirectives onto the builder.
+     *
+     * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
+     * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
+     *
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     */
+    protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder): void
+    {
+        $argumentSet->directives
+            ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
+            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder): void {
+                $builder = $fieldBuilderDirective->handleFieldBuilder($builder);
+            });
     }
 
     /**

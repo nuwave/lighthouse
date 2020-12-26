@@ -93,6 +93,7 @@ class PaginationArgs
             return $builder->paginate($this->first, 'page', $this->page);
         }
 
+        // @phpstan-ignore-next-line Relation&Builder mixin not recognized
         return $builder->paginate($this->first, ['*'], 'page', $this->page);
     }
 }

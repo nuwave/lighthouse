@@ -55,6 +55,18 @@ You can customize the error message for a particular argument.
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
 ```
 
+### Custom Validation Attribute
+
+You can customize the attribute for a validation message.
+
+```graphql
+type Mutation {
+  createUser(
+    email: String @rules(apply: ["email"], attribute: "email address")
+  ): User
+}
+```
+
 ### Custom Validation Rules
 
 Reference custom validation rules by their fully qualified class name.

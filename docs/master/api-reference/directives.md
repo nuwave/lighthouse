@@ -2098,6 +2098,11 @@ directive @rules(
   apply: [String!]!
 
   """
+  Specify a custom attribute name to use in your validation message.
+  """
+  attribute: String
+
+  """
   Specify the messages to return if the validators fail.
   Specified as an input object that maps rules to messages,
   e.g. { email: "Must be a valid email", max: "The input was too long" }
@@ -2129,6 +2134,11 @@ directive @rulesForArray(
   or the fully qualified class name of a custom validation rule.
   """
   apply: [String!]!
+
+  """
+  Specify a custom attribute name to use in your validation message.
+  """
+  attribute: String
 
   """
   Specify the messages to return if the validators fail.
@@ -2402,9 +2412,13 @@ type Query {
 
 ```graphql
 """
-Run the `trim` function on an input value.
+Remove whitespace from the beginning and end of a given input.
+
+This can be used on:
+- a single argument or input field to sanitize that subtree
+- a field to trim all strings
 """
-directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
 Whitespace around the passed in string will be removed.
@@ -2413,6 +2427,24 @@ Whitespace around the passed in string will be removed.
 type Mutation {
   createUser(name: String @trim): User
 }
+```
+
+Usage on a field applies `trim` recursively to all inputs.
+
+```graphql
+type Mutation {
+  createUser(input: CreateUserInput): User @trim
+}
+```
+
+If you want this for all your fields, consider adding this directive to your
+global field middleware in `lighthouse.php`:
+
+```php
+    'field_middleware' => [
+        \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
+        ...
+    ],
 ```
 
 ## @union
@@ -2645,6 +2677,35 @@ Or use the additional clauses that Laravel provides:
 ```graphql
 type Query {
   postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @all
+}
+```
+
+## @whereAuth
+
+```graphql
+"""
+Filter a type to only return instances owned by the current user.
+"""
+directive @whereAuth(
+  """
+  Name of the relationship that links to the user model.
+  """
+  relation: String!
+
+  """
+  Specify which guard to use, e.g. "api".
+  When not defined, the default from `lighthouse.php` is used.
+  """
+  guard: String
+) on FIELD_DEFINITION
+```
+
+The following query returns all posts that belong to the currently authenticated user.  
+Behind the scenes it is using a `whereHas` query.
+
+```graphql
+type Query {
+  posts: [Post!]! @all @whereAuth(relation: "user")
 }
 ```
 

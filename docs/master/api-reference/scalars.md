@@ -21,7 +21,7 @@ type Query {
 scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
 ```
 
-Internally represented as an instance of `Carbon\Carbon`.
+Internally represented as an instance of `Illuminate\Support\Carbon`.
 
 ## DateTime
 
@@ -31,7 +31,7 @@ scalar DateTime
   @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
-Internally represented as an instance of `Carbon\Carbon`.
+Internally represented as an instance of `Illuminate\Support\Carbon`.
 
 ## DateTimeTz
 
@@ -41,7 +41,7 @@ scalar DateTimeTz
   @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeTz")
 ```
 
-Internally represented as an instance of `Carbon\Carbon`.
+Internally represented as an instance of `Illuminate\Support\Carbon`.
 
 ## DateTimeUtc
 
@@ -51,7 +51,7 @@ scalar DateTimeUtc
   @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeUtc")
 ```
 
-Internally represented as an instance of `Carbon\Carbon`.
+Internally represented as an instance of `Illuminate\Support\Carbon`.
 
 > Only works with Carbon 2.
 

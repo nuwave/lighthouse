@@ -62,9 +62,18 @@ GRAPHQL;
 }
 ```
 
+## FieldBuilderDirective
+
+A [`\Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/FieldBuilderDirective.php)
+directive allows modifying the database query that Lighthouse creates for a field.
+
+The following directives use the defined filter for resolving the query:
+
+- [@whereAuth](../api-reference/directives.md#whereauth)
+
 ## FieldManipulator
 
-An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
+A [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
 directive can be used to manipulate the schema AST.
 
 ## ValidationDirective

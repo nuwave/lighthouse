@@ -12,8 +12,8 @@ All events reside in the namespace `\Nuwave\Lighthouse\Events`.
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * Fires right after a request reaches the GraphQLController.
@@ -35,7 +35,7 @@ class StartRequest
     /**
      * The point in time when the request started.
      *
-     * @var \Carbon\Carbon
+     * @var \Illuminate\Support\Carbon
      */
     public $moment;
 
@@ -139,7 +139,7 @@ class RegisterDirectiveNamespaces
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 /**
  * Fires right before resolving an individual query.
@@ -152,7 +152,7 @@ class StartExecution
     /**
      * The point in time when the query execution started.
      *
-     * @var \Carbon\Carbon
+     * @var \Illuminate\Support\Carbon
      */
     public $moment;
 

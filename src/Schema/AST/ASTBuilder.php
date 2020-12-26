@@ -222,6 +222,20 @@ class ASTBuilder
             // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $typeExtension->fields
         );
+
+        if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
+            /**
+             * We know this because we passed assertExtensionMatchesDefinition().
+             *
+             * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $typeExtension
+             */
+            $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
+                // @phpstan-ignore-next-line contravariance issue
+                $extendedObjectLikeType->interfaces,
+                // @phpstan-ignore-next-line contravariance issue
+                $typeExtension->interfaces
+            );
+        }
     }
 
     protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
