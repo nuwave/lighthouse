@@ -36,18 +36,15 @@ class Authorizer implements AuthorizesSubscriptions
         $this->exceptionHandler = $exceptionHandler;
     }
 
-    /**
-     * Authorize subscription request.
-     */
     public function authorize(Request $request): bool
     {
         try {
-            if ($request->missing('channel_name')) {
+            $channel = $request->input('channel_name');
+            if (! is_string($channel)) {
                 return false;
             }
-            $channel = $this->sanitizeChannelName(
-                $request->input('channel_name')
-            );
+
+            $channel = $this->sanitizeChannelName($channel);
 
             $subscriber = $this->storage->subscriberByChannel($channel);
             if ($subscriber === null) {
@@ -79,9 +76,7 @@ class Authorizer implements AuthorizesSubscriptions
     /**
      * Removes the prefix "presence-" from the channel name.
      *
-     * When connecting to a presence channel named "private-lighthouse-subscription-1234"
-     * Laravel Echo prefixes the channel with "presence-", but we store the channel
-     * without the "presence-" prefix, which is what we have to remove here.
+     * Laravel Echo prefixes channel names with "presence-", but we don't.
      */
     private function sanitizeChannelName(string $channelName): string
     {
