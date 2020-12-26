@@ -26,7 +26,7 @@ class EchoBroadcasterTest extends SubscriptionTestCase
         $subscriber = $this->createMock(Subscriber::class);
         $subscriber->channel = 'test-123';
 
-        $redisBroadcaster->broadcast($subscriber, ['data' => 'foo']);
+        $redisBroadcaster->broadcast($subscriber, 'foo');
     }
 
     public function testAuthorized(): void
