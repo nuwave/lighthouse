@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -13,7 +12,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 class EchoBroadcaster implements Broadcaster
 {
     /**
-     * @var BroadcastManager
+     * @var \Illuminate\Broadcasting\BroadcastManager
      */
     protected $broadcaster;
 
@@ -22,31 +21,33 @@ class EchoBroadcaster implements Broadcaster
         $this->broadcaster = $broadcaster;
     }
 
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    public function broadcast(Subscriber $subscriber, array $data): void
+    public function broadcast(Subscriber $subscriber, $data): void
     {
         $this->broadcaster->event(
-            new EchoSubscriptionEvent($subscriber->channel, Arr::get($data, 'data', $data))
+            new EchoSubscriptionEvent($subscriber->channel, $data)
         );
     }
 
     public function authorized(Request $request): JsonResponse
     {
-        $userId = md5($request->input('channel_name').$request->input('socket_id'));
+        $userId = md5(
+            $request->input('channel_name')
+            . $request->input('socket_id')
+        );
 
         return new JsonResponse([
             'channel_data' => [
                 'user_id' => $userId,
                 'user_info' => [],
             ],
-        ]);
+        ], 200);
     }
 
     public function unauthorized(Request $request): JsonResponse
     {
-        return new JsonResponse(['message' => 'Unauthorized'], 403);
+        return new JsonResponse([
+            'message' => 'Unauthorized'
+        ], 403);
     }
 
     public function hook(Request $request): JsonResponse
@@ -54,6 +55,8 @@ class EchoBroadcaster implements Broadcaster
         // Does nothing.
         // The redis broadcaster has the lighthouse:subscribe command to take care of cleaning vacant channels.
 
-        return new JsonResponse(['message' => 'okay'], 200);
+        return new JsonResponse([
+            'message' => 'okay'
+        ], 200);
     }
 }
