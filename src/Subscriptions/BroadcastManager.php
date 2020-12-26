@@ -19,35 +19,24 @@ use RuntimeException;
  */
 class BroadcastManager extends DriverManager
 {
-    /**
-     * Get configuration key.
-     */
     protected function configKey(): string
     {
         return 'lighthouse.subscriptions.broadcasters';
     }
 
-    /**
-     * Get configuration driver key.
-     */
     protected function driverKey(): string
     {
         return 'lighthouse.subscriptions.broadcaster';
     }
 
-    /**
-     * The interface the driver should implement.
-     */
     protected function interface(): string
     {
         return Broadcaster::class;
     }
 
     /**
-     * Create instance of pusher driver.
-     *
      * @param  array<string, mixed>  $config
-     * @throws \Pusher\PusherException
+     * @throws \RuntimeException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
     {
@@ -69,8 +58,6 @@ class BroadcastManager extends DriverManager
     }
 
     /**
-     * Create instance of log driver.
-     *
      * @param  array<string, mixed>  $config
      */
     protected function createLogDriver(array $config): LogBroadcaster

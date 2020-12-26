@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Subscriptions;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Redis\RedisServiceProvider;
 use Illuminate\Support\Facades\Redis;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
@@ -25,7 +26,7 @@ class SubscriptionTestCase extends TestCase
         parent::getEnvironmentSetUp($app);
 
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
+        $config = $app->make(ConfigRepository::class);
 
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),

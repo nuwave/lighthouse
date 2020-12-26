@@ -11,6 +11,7 @@ class AuthorizeRequestsTest extends EchoTestCase
         id: ID!
         name: String!
     }
+
     type Subscription {
         taskUpdated(id: ID!): Task
     }

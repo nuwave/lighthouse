@@ -53,16 +53,18 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @return Collection<Subscriber>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic): Collection
     {
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.
         // We can retrieve all members of a set using the command smembers.
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
+
         // Since we store the individual subscribers with a prefix,
         // but not in the set, we have to add the prefix here.
         $subscriberIds = array_map([$this, 'channelKey'], $subscriberIds);
+
         // Using the mget command, we can retrieve multiple values from redis.
         // This is like using multiple get calls (getSubscriber uses the get command).
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
@@ -79,23 +81,23 @@ class RedisStorageManager implements StoresSubscriptions
         $subscriber->topic = $topic;
 
         // In contrast to the CacheStorageManager, we use redis sets.
-        // So instead of reading the entire list, adding the subscriber and storing the list
+        // Instead of reading the entire list, adding the subscriber and storing the list;
         // we simply add the name of the subscriber to the set of subscribers of this topic using the sadd command...
         $topicKey = $this->topicKey($topic);
         $this->connection->command('sadd', [
             $topicKey,
             $subscriber->channel,
         ]);
-        // ... and refresh the ttl of this set as well.
+        // ...and refresh the ttl of this set as well.
         if (isset($this->ttl)) {
             $this->connection->command('expire', [$topicKey, $this->ttl]);
         }
 
-        // Lastly, we store the subscriber as a serialized string ...
+        // Lastly, we store the subscriber as a serialized string...
         $this->connection->command('set', array_merge([
             $this->channelKey($subscriber->channel),
             $this->serialize($subscriber),
-            // ... and set the EX option to set the ttl in one command.
+            // ...and set the EX option to set the ttl in one command.
         ], $this->ttl ? ['EX', $this->ttl] : []));
     }
 
@@ -107,7 +109,7 @@ class RedisStorageManager implements StoresSubscriptions
         if ($subscriber) {
             // Like in storeSubscriber (but in reverse), we delete the subscriber...
             $this->connection->command('del', [$key]);
-            // ... and remove it from the set of subscribers of this topic.
+            // ...and remove it from the set of subscribers of this topic.
             $this->connection->command('srem', [
                 $this->topicKey($subscriber->topic),
                 $channel,
@@ -149,7 +151,7 @@ class RedisStorageManager implements StoresSubscriptions
     protected function serialize($value)
     {
         $isProperNumber = is_numeric($value)
-            && ! in_array($value, [INF, -INF])
+            && ! ($value === INF || $value === -INF)
             && ! is_nan(floatval($value));
 
         return $isProperNumber

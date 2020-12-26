@@ -14,6 +14,7 @@ class RedisStorageManagerTest extends EchoTestCase
         id: ID!
         name: String!
     }
+
     type Subscription {
         taskUpdated(id: ID!): Task
         taskCreated: Task
@@ -50,6 +51,7 @@ class RedisStorageManagerTest extends EchoTestCase
         // when it's the only subscriber to a topic, the topic gets deleted with the subscriber
         $this->assertRedisHas('graphql.subscriber.'.$channel);
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
+
         $storage->deleteSubscriber($channel);
         $this->assertRedisMissing('graphql.subscriber.'.$channel);
         $this->assertRedisMissing('graphql.topic.TASK_UPDATED');
@@ -60,8 +62,10 @@ class RedisStorageManagerTest extends EchoTestCase
         $secondResponse = $this->querySubscription();
         $secondChannel = $secondResponse->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
+
         $storage->deleteSubscriber($firstChannel);
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
+
         $storage->deleteSubscriber($secondChannel);
         $this->assertRedisMissing('graphql.topic.TASK_UPDATED');
     }
@@ -89,15 +93,15 @@ class RedisStorageManagerTest extends EchoTestCase
     /**
      * @return \Illuminate\Testing\TestResponse
      */
-    private function querySubscription(string $topic = 'taskUpdated(id: 123)')
+    private function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)')
     {
-        return $this->graphQL('
+        return $this->graphQL(/** @lang GraphQL */ "
         subscription {
-            '.$topic.' {
+            {$topic} {
                 id
                 name
             }
         }
-        ');
+        ");
     }
 }
