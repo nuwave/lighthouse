@@ -28,17 +28,37 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Converts between IDs/types and global IDs.
-When used upon a field, it encodes,
+
+When used upon a field, it encodes;
 when used upon an argument, it decodes.
 """
 directive @globalId(
   """
-  By default, an array of `[$type, $id]` is returned when decoding.
-  You may limit this to returning just one of both.
-  Allowed values: ARRAY, TYPE, ID
+  Decoding a global id produces a tuple of `$type` and `$id`.
+  This setting controls which of those is passed along.
   """
-  decode: String = ARRAY
+  decode: GlobalIdDecode = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Options for the `decode` argument of `@globalId`.
+"""
+enum GlobalIdDecode {
+    """
+    Return an array of `[$type, $id]`.
+    """
+    ARRAY
+
+    """
+    Return just `$type`.
+    """
+    TYPE
+
+    """
+    Return just `$id`.
+    """
+    ID
+}
 GRAPHQL;
     }
 

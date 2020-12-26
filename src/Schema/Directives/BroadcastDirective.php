@@ -18,7 +18,7 @@ Broadcast the results of a mutation to subscribed clients.
 """
 directive @broadcast(
   """
-  Name of the subscription that should be retriggered as a result of this operation..
+  Name of the subscription that should be retriggered as a result of this operation.
   """
   subscription: String!
 

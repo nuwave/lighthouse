@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -111,13 +111,16 @@ GRAPHQL;
         return $schema;
     }
 
+    /**
+     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
     protected function define(string $directiveClass): string
     {
-        /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
         $definition = $directiveClass::definition();
 
-        // This operation throws if the schema definition is invalid
-        Parser::directiveDefinition($definition);
+        // Throws if the definition is invalid
+        ASTHelper::extractDirectiveDefinition($definition);
 
         return trim($definition);
     }

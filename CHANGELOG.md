@@ -22,6 +22,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add `@whereAuth` directive for filtering a field based on authenticated user https://github.com/nuwave/lighthouse/pull/1636
 - Use the `@trim` directive on fields to sanitize all input strings https://github.com/nuwave/lighthouse/pull/1641
 - Add Laravel Echo compatible subscription broadcaster https://github.com/nuwave/lighthouse/pull/1370
+- Allow auxiliary types in directive definitions https://github.com/nuwave/lighthouse/pull/1649
 
 ### Changed
 
@@ -82,6 +83,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
 - Merge type interfaces when extending type https://github.com/nuwave/lighthouse/pull/1635
+
+### Deprecated
+
+- Deprecate values for the `type` argument of `@paginate` that are not `PAGINATOR` or `CONNECTION`
 
 ## 4.18.0
 

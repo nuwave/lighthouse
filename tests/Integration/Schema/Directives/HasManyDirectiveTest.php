@@ -151,8 +151,8 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator")
-            posts: [Post!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
+            posts: [Post!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -202,7 +202,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [NotTheModelNameTask!]! @hasMany(type: "paginator")
+            tasks: [NotTheModelNameTask!]! @hasMany(type: PAGINATOR)
         }
 
         type NotTheModelNameTask {
@@ -250,7 +250,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator", maxCount: 3)
+            tasks: [Task!]! @hasMany(type: PAGINATOR, maxCount: 3)
         }
 
         type Task {
@@ -285,7 +285,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID
-            tasks: [Task!] @hasMany(type: "paginator")
+            tasks: [Task!] @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -324,7 +324,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay", maxCount: 3)
+            tasks: [Task!]! @hasMany(type: CONNECTION, maxCount: 3)
         }
 
         type Task {
@@ -362,7 +362,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -398,7 +398,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay")
+            tasks: [Task!]! @hasMany(type: CONNECTION)
         }
 
         type Task {
@@ -435,7 +435,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany (
-                type: "relay"
+                type: CONNECTION
                 edgeType: "TaskEdge"
             )
         }
@@ -481,7 +481,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator", defaultCount: 2)
+            tasks: [Task!]! @hasMany(type: PAGINATOR, defaultCount: 2)
         }
 
         type Task {
@@ -527,7 +527,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay")
+            tasks: [Task!]! @hasMany(type: CONNECTION)
         }
 
         type Task {
@@ -571,7 +571,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay", defaultCount: 2)
+            tasks: [Task!]! @hasMany(type: CONNECTION, defaultCount: 2)
         }
 
         type Task {
@@ -615,7 +615,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay")
+            tasks: [Task!]! @hasMany(type: CONNECTION)
         }
 
         type Task {
@@ -760,7 +760,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
-            tasks: [Task!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -795,7 +795,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         type User {
             id: Int!
-            tasks: [Task!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {
