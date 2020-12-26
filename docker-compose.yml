@@ -25,6 +25,9 @@ services:
       MYSQL_DATABASE: test
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
+  redis:
+    image: redis:6
+
   node:
     build:
       context: .

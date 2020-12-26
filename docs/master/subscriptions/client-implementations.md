@@ -1,12 +1,12 @@
 # Client Implementations
 
-To get you up and running quickly, the following sections show how to use subcriptions
+To get you up and running quickly, the following sections show how to use subscriptions
 with common GraphQL client libraries.
 
-## Apollo
+## Apollo for Pusher
 
-To use Lighthouse subscriptions with the [Apollo](https://www.apollographql.com/docs/react/)
-client library you will need to create an `apollo-link`
+To use Lighthouse Pusher subscriptions with the [Apollo](https://www.apollographql.com/docs/react/)
+client library you will need to create an `apollo-link`:
 
 ```js
 import { ApolloLink, Observable } from "apollo-link";
@@ -142,9 +142,14 @@ const pusherLink = new PusherLink({
 const link = ApolloLink.from([pusherLink, httpLink(`${API_LOCATION}/graphql`)]);
 ```
 
+## Apollo for Laravel Echo
+
+If you are using the Laravel Echo subscription driver with Apollo
+you can use [this apollo link](https://github.com/thekonz/apollo-lighthouse-subscription-link).
+
 ## Relay Modern
 
-To use Lighthouse's subscriptions with Relay Modern you will
+To use Lighthouse's Pusher subscriptions with Relay Modern you will
 need to create a custom handler and inject it into Relay's environment.
 
 ```js

@@ -54,7 +54,7 @@ class BroadcastManagerTest extends SubscriptionTestCase
                 return new Response();
             }
 
-            public function broadcast(Subscriber $subscriber, array $data)
+            public function broadcast(Subscriber $subscriber, $data)
             {
             }
         };
@@ -69,11 +69,7 @@ class BroadcastManagerTest extends SubscriptionTestCase
         $resolvedBroadcaster = $this->broadcastManager->driver('foo');
 
         $this->assertSame(['driver' => 'foo'], $broadcasterConfig);
-
-        $this->assertSame(
-            $broadcaster,
-            $resolvedBroadcaster
-        );
+        $this->assertSame($broadcaster, $resolvedBroadcaster);
     }
 
     public function testThrowsIfDriverDoesNotImplementInterface(): void

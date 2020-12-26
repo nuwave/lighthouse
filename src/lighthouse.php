@@ -350,6 +350,11 @@ return [
                 'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
                 'connection' => 'pusher',
             ],
+            'echo' => [
+                'driver' => 'echo',
+                'connection' => env('LIGHTHOUSE_SUBSCRIPTION_REDIS_CONNECTION', 'default'),
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@echoRoutes',
+            ],
         ],
     ],
 

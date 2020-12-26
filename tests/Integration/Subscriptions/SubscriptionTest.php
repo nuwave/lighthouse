@@ -4,7 +4,7 @@ namespace Tests\Integration\Subscriptions;
 
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
-use Nuwave\Lighthouse\Subscriptions\StorageManager;
+use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\TestCase;
@@ -47,7 +47,7 @@ GRAPHQL;
     public function testSendsSubscriptionChannelInResponse(): void
     {
         $response = $this->subscribe();
-        $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
+        $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertSame(
@@ -79,7 +79,7 @@ GRAPHQL;
             ],
         ]);
 
-        $subscribers = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED');
+        $subscribers = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED');
         $this->assertCount(2, $subscribers);
 
         $response->assertExactJson([
@@ -122,7 +122,7 @@ GRAPHQL;
         }
         ');
 
-        $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
+        $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $response->assertJson([
             'data' => [

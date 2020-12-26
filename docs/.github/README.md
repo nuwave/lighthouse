@@ -42,7 +42,7 @@ Then, start Vue Press in development mode (with hot reloading).
     yarn
     yarn start
 
-> Keep a eye on the console when editing pages.
+> Keep an eye on the console when editing pages.
 > If an error occurs, it might be necessary to restart the compilation process.
 
 If you use Docker you can start up the environment (including docs) by running:
