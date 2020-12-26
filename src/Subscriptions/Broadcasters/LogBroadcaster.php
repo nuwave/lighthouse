@@ -35,21 +35,21 @@ class LogBroadcaster implements Broadcaster
     public function authorized(Request $request): JsonResponse
     {
         return new JsonResponse([
-            'message' => 'ok'
+            'message' => 'ok',
         ], 200);
     }
 
     public function unauthorized(Request $request): JsonResponse
     {
         return new JsonResponse([
-            'error' => 'unauthorized'
+            'error' => 'unauthorized',
         ], 403);
     }
 
     public function hook(Request $request): JsonResponse
     {
         return new JsonResponse([
-            'message' => 'okay'
+            'message' => 'okay',
         ], 200);
     }
 

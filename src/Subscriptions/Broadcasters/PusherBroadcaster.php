@@ -44,13 +44,13 @@ class PusherBroadcaster implements Broadcaster
     public function unauthorized(Request $request): JsonResponse
     {
         return new JsonResponse([
-            'error' => 'unauthorized'
+            'error' => 'unauthorized',
         ], 403);
     }
 
     public function hook(Request $request): JsonResponse
     {
-        foreach($request->input('events', []) as $event) {
+        foreach ($request->input('events', []) as $event) {
             if ($event['name'] === 'channel_vacated') {
                 $this->storage->deleteSubscriber($event['channel']);
             }

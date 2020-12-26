@@ -32,7 +32,7 @@ class EchoBroadcaster implements Broadcaster
     {
         $userId = md5(
             $request->input('channel_name')
-            . $request->input('socket_id')
+            .$request->input('socket_id')
         );
 
         return new JsonResponse([
@@ -46,7 +46,7 @@ class EchoBroadcaster implements Broadcaster
     public function unauthorized(Request $request): JsonResponse
     {
         return new JsonResponse([
-            'message' => 'Unauthorized'
+            'message' => 'Unauthorized',
         ], 403);
     }
 
@@ -56,7 +56,7 @@ class EchoBroadcaster implements Broadcaster
         // The redis broadcaster has the lighthouse:subscribe command to take care of cleaning vacant channels.
 
         return new JsonResponse([
-            'message' => 'okay'
+            'message' => 'okay',
         ], 200);
     }
 }
