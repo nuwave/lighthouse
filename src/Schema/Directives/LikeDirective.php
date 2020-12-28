@@ -16,7 +16,7 @@ enum LikePercentageLocation {
 }
 
 """
-Uses a LIKE query.
+Use the client given value to add a `LIKE` conditional to a database query.
 """
 directive @like(
   """
