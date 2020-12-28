@@ -30,9 +30,9 @@ ARG USER_ID
 ARG GROUP_ID
 
 RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
-    groupadd -f -g ${GROUP_ID} ${USER} &&\
-    useradd -l -u ${USER_ID} -g ${GROUP_ID} ${USER} &&\
-    install -d -m 0755 -o ${USER} -g ${GROUP_ID} /home/${USER} &&\
+    groupadd --force --gid ${GROUP_ID} ${USER} &&\
+    useradd --no-log-init --uid ${USER_ID} --gid ${GROUP_ID} ${USER} &&\
+    install --directory --mode 0755 --owner ${USER} --group ${GROUP_ID} /home/${USER} &&\
     chown --changes --silent --no-dereference --recursive ${USER_ID}:${GROUP_ID} /home/${USER} \
 ;fi
 
