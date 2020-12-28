@@ -33,8 +33,9 @@ directive @like(
 GRAPHQL;
     }
 
-    protected function escapePercentage(string $value, string $char = '\\'): string
+    protected function escapePercentage(string $value): string
     {
+        $char = '\\';
         return str_replace(
             [$char, '%', '_'],
             [$char.$char, $char.'%', $char.'_'],
