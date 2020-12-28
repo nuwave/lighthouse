@@ -21,7 +21,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add new directive interface `FieldBuilderDirective` https://github.com/nuwave/lighthouse/pull/1636
 - Add `@whereAuth` directive for filtering a field based on authenticated user https://github.com/nuwave/lighthouse/pull/1636
 - Use the `@trim` directive on fields to sanitize all input strings https://github.com/nuwave/lighthouse/pull/1641
-- Added the `@like` directive https://github.com/nuwave/lighthouse/issues/1644
+- Add `@like` directive to use a client given value to add a `LIKE` conditional to a database query https://github.com/nuwave/lighthouse/issues/1644
 
 ### Changed
 
