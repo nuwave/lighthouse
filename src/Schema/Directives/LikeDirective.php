@@ -52,6 +52,10 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $value): object
     {
+        if (!$value) {
+            return $builder;
+        }
+
         $valueEscaped = $this->escapePercentage($value);
 
         $percentage = $this->directiveArgValue('percentage', 'BOTH');
