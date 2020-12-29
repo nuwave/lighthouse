@@ -6,6 +6,8 @@ use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class LikeDirective extends BaseDirective implements ArgBuilderDirective
 {
+    const ESCAPE_CHAR = "\\";
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -35,10 +37,9 @@ GRAPHQL;
 
     protected function escapePercentage(string $value): string
     {
-        $char = '\\';
         return str_replace(
-            [$char, '%', '_'],
-            [$char.$char, $char.'%', $char.'_'],
+            [self::ESCAPE_CHAR, '%', '_'],
+            [self::ESCAPE_CHAR.self::ESCAPE_CHAR, self::ESCAPE_CHAR.'%', self::ESCAPE_CHAR.'_'],
             $value
         );
     }
