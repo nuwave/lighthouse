@@ -52,7 +52,7 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $value): object
     {
-        if (!$value) {
+        if ($value === null) {
             return $builder;
         }
 
