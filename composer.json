@@ -34,8 +34,8 @@
         "illuminate/routing": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "illuminate/support": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "illuminate/validation": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
-        "laragraph/utils": "dev-master",
-        "thecodingmachine/safe": "^1.0",
+        "laragraph/utils": "^1",
+        "thecodingmachine/safe": "^1",
         "webonyx/graphql-php": "^14.2"
     },
     "require-dev": {
@@ -68,6 +68,9 @@
     },
     "extra": {
         "laravel": {
+            "aliases": {
+                "graphql": "Nuwave\\Lighthouse\\GraphQL"
+            },
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
@@ -75,10 +78,7 @@
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
                 "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
-            ],
-            "aliases": {
-                "graphql": "Nuwave\\Lighthouse\\GraphQL"
-            }
+            ]
         }
     },
     "autoload": {
