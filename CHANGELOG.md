@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.0.0
+
 ### Added
 
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
