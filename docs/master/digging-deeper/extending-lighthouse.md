@@ -99,7 +99,7 @@ This factory class needs to implement `\Nuwave\Lighthouse\Support\Contracts\Crea
 ```php
 <?php
 
-namespace App;
+namespace App\GraphQL;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;

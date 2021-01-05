@@ -98,7 +98,7 @@ type Post {
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -177,7 +177,7 @@ type User {
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -289,7 +289,7 @@ type Query {
 ```
 
 ```php
-namespace App;
+namespace App\Models;
 
 class MyClass
 {
@@ -2001,7 +2001,7 @@ Your method receives the typical resolver arguments and has to return an instanc
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
