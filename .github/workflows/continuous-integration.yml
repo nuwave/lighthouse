@@ -34,10 +34,10 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.7.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
           tools: "pecl"
@@ -45,7 +45,7 @@ jobs:
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
@@ -79,8 +79,8 @@ jobs:
           - "5.6.*"
           - "5.7.*"
           - "5.8.*"
-          - "^6.0"
-          - "^7.0"
+          - "^6"
+          - "^7"
           - "^8"
         exclude:
           - php-version: "7.2"
@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
 
       - name: "Start Redis"
         uses: "supercharge/redis-github-action@1.1.0"
@@ -96,7 +96,7 @@ jobs:
           redis-version: "6"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.7.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
           tools: "pecl"
@@ -104,7 +104,7 @@ jobs:
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
@@ -142,7 +142,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
 
       - name: "Start Redis"
         uses: "supercharge/redis-github-action@1.1.0"
@@ -150,7 +150,7 @@ jobs:
           redis-version: "6"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.7.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "pcov"
           tools: "pecl"
@@ -158,7 +158,7 @@ jobs:
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
@@ -201,10 +201,10 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.7.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
           tools: "pecl"
@@ -212,7 +212,7 @@ jobs:
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
