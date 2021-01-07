@@ -14,7 +14,10 @@ use Serializable;
 class Subscriber implements Serializable
 {
     /**
-     * A unique key for the subscriber.
+     * A unique key for the subscriber's channel.
+     *
+     * This has to be unique for each subscriber, because each of them can send a different
+     * query and must receive a response that is specifically tailored towards that.
      *
      * @var string
      */
@@ -135,6 +138,7 @@ class Subscriber implements Serializable
      * Set root data.
      *
      * @return $this
+     * @deprecated set the attribute directly
      */
     public function setRoot($root): self
     {
