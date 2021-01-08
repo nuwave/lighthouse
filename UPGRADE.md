@@ -390,4 +390,9 @@ class ExtensionErrorHandler implements ErrorHandler
 }
 ```
 
+### Update `mll-lab/graphql-php-scalars`
+
+If you depend on `mll-lab/graphql-php-scalars`, please upgrade it.  
+Now the minimal required version is v4.
+
 You can now discard errors by returning `null` from the handler.
