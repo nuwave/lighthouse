@@ -135,7 +135,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get($cacheKey));
     }
 
-    public function testCanStoreResolverResultInCacheWhenUseModelDirective(): void
+    public function testCanStoreResolverResultInCacheWhenUsingNodeDirective(): void
     {
         $this->mockResolver([
             'id' => 1,
@@ -147,7 +147,7 @@ class CacheDirectiveTest extends DBTestCase
             id: ID!
         }
 
-        type User @model {
+        type User @node {
             name: String @cache
             posts: [Post!]!
         }
