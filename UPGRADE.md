@@ -392,6 +392,9 @@ class ExtensionErrorHandler implements ErrorHandler
 
 You can now discard errors by returning `null` from the handler.
 
-### Update `mll-lab/graphql-php-scalars` to v4
+### Upgrade to `mll-lab/graphql-php-scalars` v4
 
-If you depend on `mll-lab/graphql-php-scalars`, upgrade it to v4.  
+If you use complex where condition directives, such as `@whereConditions`,
+upgrade `mll-lab/graphql-php-scalars` to v4:
+
+    composer require mll-lab/graphql-php-scalars:^4
