@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.0.1
+
+### Fixed
+
+- Make `@model` not extend `@node` accidentally
+
 ### Deprecated
 
 - Deprecate `\Nuwave\Lighthouse\Subscriptions\Subscriber::setRoot()` in favour of property access
