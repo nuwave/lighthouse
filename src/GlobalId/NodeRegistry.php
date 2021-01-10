@@ -76,7 +76,10 @@ class NodeRegistry
     {
         [$decodedType, $decodedId] = $args['id'];
 
-        // Load the type and register it if it hasn't been loaded yet
+        // This check forces Lighthouse to eagerly load the type, which might not have
+        // happened if the client only references it indirectly through an interface.
+        // Loading the type in turn causes the TypeMiddleware to run and thus register
+        // the type in the NodeRegistry.
         if (! $this->typeRegistry->has($decodedType)) {
             throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
         }
