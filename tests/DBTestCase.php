@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 
 abstract class DBTestCase extends TestCase
 {
@@ -39,11 +40,15 @@ abstract class DBTestCase extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        /*Event::listen('Illuminate\Database\Events\QueryExecuted', function ($query) {
+            error_log($query->sql . ' - ' . serialize($query->bindings));
+        });*/
+
         $app['config']->set('database.default', 'mysql');
         $app['config']->set('database.connections.mysql', [
             'driver' => 'mysql',
             'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
-            'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
+            'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'localhost'),
             'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
             'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
         ]);

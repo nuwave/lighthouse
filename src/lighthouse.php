@@ -297,6 +297,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Optimized Selects
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Eloquent will only select the columns neccessary to resolve
+    | a query. You must use the select directive to resolve advanced field dependencies
+    | on other columns.
+    |
+    */
+
+    'optimized_selects' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
