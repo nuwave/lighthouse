@@ -74,6 +74,38 @@ class NodeInterfaceTest extends DBTestCase
         ]);
     }
 
+    public function testCanResolveNodesViaInterface(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        interface IUser {
+            name: String!        
+        }
+        type User implements IUser @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+            name: String!
+        }
+        ';
+
+        $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            node: node(id: "'.$firstGlobalId.'") {
+                id
+                ...on IUser {
+                    name
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'node' => [
+                    'id' => $firstGlobalId,
+                    'name' => $this->testTuples[1]['name'],
+                ],
+            ],
+        ]);
+    }
+
     /**
      * @return array<mixed>
      */

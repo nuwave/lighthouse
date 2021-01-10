@@ -76,6 +76,11 @@ class NodeRegistry
     {
         [$decodedType, $decodedId] = $args['id'];
 
+        // Load the type and register it if it hasn't been loaded yet
+        if (!$this->typeRegistry->has($decodedType)) {
+            throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
+        }
+
         // Check if we have a resolver registered for the given type
         if (! $resolver = Arr::get($this->nodeResolver, $decodedType)) {
             throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
