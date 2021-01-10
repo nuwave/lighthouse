@@ -77,7 +77,7 @@ class NodeRegistry
         [$decodedType, $decodedId] = $args['id'];
 
         // Load the type and register it if it hasn't been loaded yet
-        if (!$this->typeRegistry->has($decodedType)) {
+        if (! $this->typeRegistry->has($decodedType)) {
             throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
         }
 
