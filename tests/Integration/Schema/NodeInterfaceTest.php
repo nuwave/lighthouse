@@ -48,13 +48,13 @@ class NodeInterfaceTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            first: node(id: "' . $firstGlobalId . '") {
+            first: node(id: "'.$firstGlobalId.'") {
                 id
                 ...on User {
                     name
                 }
             }
-            second: node(id: "' . $secondGlobalId . '") {
+            second: node(id: "'.$secondGlobalId.'") {
                 id
                 ...on User {
                     name
@@ -91,7 +91,7 @@ class NodeInterfaceTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            node: node(id: "' . $globalId . '") {
+            node: node(id: "'.$globalId.'") {
                 id
                 ...on IUser {
                     name
@@ -120,19 +120,19 @@ class NodeInterfaceTest extends DBTestCase
         $globalId = $this->globalIdResolver->encode('WrongClass', $this->testTuples[1]['id']);
         $this->graphQL(/** @lang GraphQL */ '
         {
-            node: node(id: "' . $globalId . '") {
+            node: node(id: "'.$globalId.'") {
                 id
             }
         }
         ')->assertJson([
             'data' => [
-                'node' => null
+                'node' => null,
             ],
             'errors' => [
                 [
                     'message' => '[WrongClass] is not a type and cannot be resolved.',
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -152,19 +152,19 @@ class NodeInterfaceTest extends DBTestCase
         $globalId = $this->globalIdResolver->encode('User2', $this->testTuples[1]['id']);
         $this->graphQL(/** @lang GraphQL */ '
         {
-            node: node(id: "' . $globalId . '") {
+            node: node(id: "'.$globalId.'") {
                 id
             }
         }
         ')->assertJson([
             'data' => [
-                'node' => null
+                'node' => null,
             ],
             'errors' => [
                 [
                     'message' => '[User2] is not a registered node and cannot be resolved.',
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -195,7 +195,7 @@ class NodeInterfaceTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            node(id: "' . $globalId . '") {
+            node(id: "'.$globalId.'") {
                 id
                 ...on User {
                     name
