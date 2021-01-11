@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.0.2
+
 ### Fixed
 
 - Make `@node` force load the type if it has not been loaded
