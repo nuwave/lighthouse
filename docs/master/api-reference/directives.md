@@ -581,6 +581,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @delete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -609,12 +611,13 @@ type Mutation {
 }
 ```
 
-If you use global ids, you can set the `globalId` argument to `true`.
-Lighthouse will decode the id for you automatically.
+The `@delete`, `@forceDelete` and `@restore` directives no longer offer the
+`globalId` argument. Use `@globalId` on the argument instead.
 
-```graphql
+```diff
 type Mutation {
-  deletePost(id: ID!): Post @delete(globalId: true)
+-   deleteUser(id: ID!): User! @delete(globalId: true)
++   deleteUser(id: ID! @globalId): User! @delete
 }
 ```
 
@@ -820,6 +823,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @forceDelete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -2055,6 +2060,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @restore(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -2532,12 +2539,6 @@ directive @update(
   This is only needed when the default model detection does not work.
   """
   model: String
-
-  """
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
 
   """
   Specify the name of the relation on the parent model.
