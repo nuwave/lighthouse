@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Make `@node` force load the type if it has not been loaded
+- Make `@node` force load the type if it has not been loaded https://github.com/nuwave/lighthouse/pull/1659
 
 ## 5.0.1
 
