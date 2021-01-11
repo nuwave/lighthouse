@@ -580,26 +580,26 @@ Delete one or more models by their ID.
 The field must have a single non-null argument that may be a list.
 """
 directive @delete(
-    """
-    DEPRECATED use @globalId, will be removed in v6
+  """
+  DEPRECATED use @globalId, will be removed in v6
 
-    Set to `true` to use global ids for finding the model.
-    If set to `false`, regular non-global ids are used.
-    """
-    globalId: Boolean = false
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
 
-    """
-    Specify the class name of the model to use.
-    This is only needed when the default model detection does not work.
-    """
-    model: String
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
-    """
-    Specify the name of the relation on the parent model.
-    This is only needed when using this directive as a nested arg
-    resolver and if the name of the relation is not the arg name.
-    """
-    relation: String
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -822,19 +822,19 @@ Permanently remove one or more soft deleted models by their ID.
 The field must have a single non-null argument that may be a list.
 """
 directive @forceDelete(
-    """
-    DEPRECATED use @globalId, will be removed in v6
+  """
+  DEPRECATED use @globalId, will be removed in v6
 
-    Set to `true` to use global ids for finding the model.
-    If set to `false`, regular non-global ids are used.
-    """
-    globalId: Boolean = false
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
 
-    """
-    Specify the class name of the model to use.
-    This is only needed when the default model detection does not work.
-    """
-    model: String
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 ) on FIELD_DEFINITION
 ```
 
@@ -2059,19 +2059,19 @@ Un-delete one or more soft deleted models by their ID.
 The field must have a single non-null argument that may be a list.
 """
 directive @restore(
-    """
-    DEPRECATED use @globalId, will be removed in v6
+  """
+  DEPRECATED use @globalId, will be removed in v6
 
-    Set to `true` to use global ids for finding the model.
-    If set to `false`, regular non-global ids are used.
-    """
-    globalId: Boolean = false
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
 
-    """
-    Specify the class name of the model to use.
-    This is only needed when the default model detection does not work.
-    """
-    model: String
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 ) on FIELD_DEFINITION
 ```
 
