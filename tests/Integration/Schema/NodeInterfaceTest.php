@@ -36,8 +36,7 @@ class NodeInterfaceTest extends DBTestCase
 
     public function testCanResolveNodes(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */ '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
@@ -77,10 +76,9 @@ class NodeInterfaceTest extends DBTestCase
 
     public function testCanResolveNodesViaInterface(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */ '
         interface IUser {
-            name: String!        
+            name: String!
         }
         type User implements IUser @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
@@ -110,8 +108,7 @@ class NodeInterfaceTest extends DBTestCase
 
     public function testUnknownNodeType(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */ '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
@@ -138,12 +135,11 @@ class NodeInterfaceTest extends DBTestCase
 
     public function testTypeWithoutNodeDirective(): void
     {
-        $this->schema .= /** @lang GraphQL */
-            '
+        $this->schema .= /** @lang GraphQL */ '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
-        
+
         type User2 {
             name: String!
         }
@@ -181,8 +177,7 @@ class NodeInterfaceTest extends DBTestCase
      */
     public function testCanResolveModelsNodes(string $directiveDefinition): void
     {
-        $this->schema .= /** @lang GraphQL */
-            "
+        $this->schema .= /** @lang GraphQL */ "
         type User $directiveDefinition {
             name: String!
         }
