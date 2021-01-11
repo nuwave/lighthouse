@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Deprecated
+
+- Deprecate the `globalId` argument on the `@delete`, `@forceDelete` and `@restore` directives
+
+### Fixed
+
+- Remove non-functional `globalId` argument definition from `@update`
+
 ## 5.0.2
 
 ### Fixed
