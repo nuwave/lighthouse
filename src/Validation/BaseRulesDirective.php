@@ -31,7 +31,41 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
 
     public function messages(): array
     {
-        return (array) $this->directiveArgValue('messages');
+        $messages = $this->directiveArgValue('messages');
+        if ($messages === null) {
+            return [];
+        }
+
+        if (! is_array($messages)) {
+            $this->invalidMessageArgument($messages);
+        }
+
+        if (isset($messages[0])) {
+            /** @var array<string, string> $flattened */
+            $flattened = [];
+
+            foreach ($messages as $messageMap) {
+                if (! is_array($messageMap)) {
+                    $this->invalidMessageArgument($messages);
+                }
+
+                $rule = $messageMap['rule'] ?? null;
+                if (! is_string($rule)) {
+                    $this->invalidMessageArgument($messages);
+                }
+
+                $message = $messageMap['message'] ?? null;
+                if (! is_string($message)) {
+                    $this->invalidMessageArgument($messages);
+                }
+
+                $flattened[$rule] = $message;
+            }
+
+            return $flattened;
+        }
+
+        return $messages;
     }
 
     public function attribute(): ?string
@@ -48,7 +82,20 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         $rules = $this->directiveArgValue('apply');
 
         if (! is_array($rules)) {
-            throw new DefinitionException("The apply argument of @{$this->name()} on {$this->nodeName()} has to be an array, got: {$rules}");
+            throw new DefinitionException(
+                "The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$rules}"
+            );
         }
+    }
+
+    /**
+     * @param  mixed  $messages Whatever faulty value was given for messages
+     * @throws DefinitionException
+     */
+    protected function invalidMessageArgument($messages): void
+    {
+        throw new DefinitionException(
+            "The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$messages}"
+        );
     }
 }
