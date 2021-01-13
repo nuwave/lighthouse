@@ -128,42 +128,56 @@ type Post {
 Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
 directive @belongsToMany(
-  """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
-  """
-  relation: String
+    """
+    Specify the relationship method name in the model class,
+    if it is named different from the field in the schema.
+    """
+    relation: String
 
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+    """
+    Apply scopes to the underlying query.
+    """
+    scopes: [String!]
 
-  """
-  Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
-  """
-  type: String
+    """
+    Allows to resolve the relation as a paginated list.
+    """
+    type: BelongsToManyType
 
-  """
-  Allow clients to query paginated lists without specifying the amount of items.
-  Overrules the `pagination.default_count` setting from `lighthouse.php`.
-  """
-  defaultCount: Int
+    """
+    Allow clients to query paginated lists without specifying the amount of items.
+    Overrules the `pagination.default_count` setting from `lighthouse.php`.
+    """
+    defaultCount: Int
 
-  """
-  Limit the maximum amount of items that clients can request from paginated lists.
-  Overrules the `pagination.max_count` setting from `lighthouse.php`.
-  """
-  maxCount: Int
+    """
+    Limit the maximum amount of items that clients can request from paginated lists.
+    Overrules the `pagination.max_count` setting from `lighthouse.php`.
+    """
+    maxCount: Int
 
-  """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
-  Only applies when using Relay style "connection" pagination.
-  """
-  edgeType: String
+    """
+    Specify a custom type that implements the Edge interface
+    to extend edge object.
+    Only applies when using Relay style "connection" pagination.
+    """
+    edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@belongsToMany`.
+"""
+enum BelongsToManyType {
+    """
+    Offset-based pagination, similar to the Laravel default.
+    """
+    PAGINATOR
+
+    """
+    Cursor-based pagination, compatible with the Relay specification.
+    """
+    CONNECTION
+}
 ```
 
 It assumes both the field and the relationship method to have the same name.
@@ -611,7 +625,7 @@ type Mutation {
 }
 ```
 
-The `@delete`, `@forceDelete` and `@restore` directives no longer offer the
+In the upcoming `v6`, the `@delete`, `@forceDelete` and `@restore` directives no longer offer the
 `globalId` argument. Use `@globalId` on the argument instead.
 
 ```diff
@@ -945,17 +959,37 @@ class PlacedOrder
 ```graphql
 """
 Converts between IDs/types and global IDs.
-When used upon a field, it encodes,
+
+When used upon a field, it encodes;
 when used upon an argument, it decodes.
 """
 directive @globalId(
-  """
-  By default, an array of `[$type, $id]` is returned when decoding.
-  You may limit this to returning just one of both.
-  Allowed values: ARRAY, TYPE, ID
-  """
-  decode: String = ARRAY
+    """
+    Decoding a global id produces a tuple of `$type` and `$id`.
+    This setting controls which of those is passed along.
+    """
+    decode: GlobalIdDecode = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Options for the `decode` argument of `@globalId`.
+"""
+enum GlobalIdDecode {
+    """
+    Return an array of `[$type, $id]`.
+    """
+    ARRAY
+
+    """
+    Return just `$type`.
+    """
+    TYPE
+
+    """
+    Return just `$id`.
+    """
+    ID
+}
 ```
 
 Instead of the original ID, the `id` field will now return a base64-encoded String
@@ -1047,35 +1081,57 @@ type Mutation {
 Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
 """
 directive @hasMany(
-  """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
-  """
-  relation: String
+    """
+    Specify the relationship method name in the model class,
+    if it is named different from the field in the schema.
+    """
+    relation: String
 
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+    """
+    Apply scopes to the underlying query.
+    """
+    scopes: [String!]
 
-  """
-  Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
-  """
-  type: String
+    """
+    Allows to resolve the relation as a paginated list.
+    Allowed values: `paginator`, `connection`.
+    """
+    type: HasManyType
 
-  """
-  Allow clients to query paginated lists without specifying the amount of items.
-  Overrules the `pagination.default_count` setting from `lighthouse.php`.
-  """
-  defaultCount: Int
+    """
+    Allow clients to query paginated lists without specifying the amount of items.
+    Overrules the `pagination.default_count` setting from `lighthouse.php`.
+    """
+    defaultCount: Int
 
-  """
-  Limit the maximum amount of items that clients can request from paginated lists.
-  Overrules the `pagination.max_count` setting from `lighthouse.php`.
-  """
-  maxCount: Int
+    """
+    Limit the maximum amount of items that clients can request from paginated lists.
+    Overrules the `pagination.max_count` setting from `lighthouse.php`.
+    """
+    maxCount: Int
+
+    """
+    Specify a custom type that implements the Edge interface
+    to extend edge object.
+    Only applies when using Relay style "connection" pagination.
+    """
+    edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@hasMany`.
+"""
+enum HasManyType {
+    """
+    Offset-based pagination, similar to the Laravel default.
+    """
+    PAGINATOR
+
+    """
+    Cursor-based pagination, compatible with the Relay specification.
+    """
+    CONNECTION
+}
 ```
 
 ```graphql
@@ -1413,42 +1469,56 @@ type Post @model(class: "\\App\\BlogPost") {
 Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many-polymorphic-relations).
 """
 directive @morphMany(
-  """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
-  """
-  relation: String
+    """
+    Specify the relationship method name in the model class,
+    if it is named different from the field in the schema.
+    """
+    relation: String
 
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+    """
+    Apply scopes to the underlying query.
+    """
+    scopes: [String!]
 
-  """
-  Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
-  """
-  type: String
+    """
+    Allows to resolve the relation as a paginated list.
+    """
+    type: MorphManyType
 
-  """
-  Allow clients to query paginated lists without specifying the amount of items.
-  Overrules the `pagination.default_count` setting from `lighthouse.php`.
-  """
-  defaultCount: Int
+    """
+    Allow clients to query paginated lists without specifying the amount of items.
+    Overrules the `pagination.default_count` setting from `lighthouse.php`.
+    """
+    defaultCount: Int
 
-  """
-  Limit the maximum amount of items that clients can request from paginated lists.
-  Overrules the `pagination.max_count` setting from `lighthouse.php`.
-  """
-  maxCount: Int
+    """
+    Limit the maximum amount of items that clients can request from paginated lists.
+    Overrules the `pagination.max_count` setting from `lighthouse.php`.
+    """
+    maxCount: Int
 
-  """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
-  Only applies when using Relay style "connection" pagination.
-  """
-  edgeType: String
+    """
+    Specify a custom type that implements the Edge interface
+    to extend edge object.
+    Only applies when using Relay style "connection" pagination.
+    """
+    edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@morphMany`.
+"""
+enum MorphManyType {
+    """
+    Offset-based pagination, similar to the Laravel default.
+    """
+    PAGINATOR
+
+    """
+    Cursor-based pagination, compatible with the Relay specification.
+    """
+    CONNECTION
+}
 ```
 
 ```graphql
@@ -1818,41 +1888,55 @@ This can be queried like this:
 Query multiple model entries as a paginated list.
 """
 directive @paginate(
-  """
-  Which pagination style to use.
-  Allowed values: `paginator`, `connection`.
-  """
-  type: String = "paginator"
+    """
+    Which pagination style should be used.
+    """
+    type: PaginateType = PAGINATOR
 
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model detection does not work.
-  """
-  model: String
+    """
+    Specify the class name of the model to use.
+    This is only needed when the default model detection does not work.
+    """
+    model: String
 
-  """
-  Point to a function that provides a Query Builder instance.
-  This replaces the use of a model.
-  """
-  builder: String
+    """
+    Point to a function that provides a Query Builder instance.
+    This replaces the use of a model.
+    """
+    builder: String
 
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+    """
+    Apply scopes to the underlying query.
+    """
+    scopes: [String!]
 
-  """
-  Allow clients to query paginated lists without specifying the amount of items.
-  Overrules the `pagination.default_count` setting from `lighthouse.php`.
-  """
-  defaultCount: Int
+    """
+    Allow clients to query paginated lists without specifying the amount of items.
+    Overrules the `pagination.default_count` setting from `lighthouse.php`.
+    """
+    defaultCount: Int
 
-  """
-  Limit the maximum amount of items that clients can request from paginated lists.
-  Overrules the `pagination.max_count` setting from `lighthouse.php`.
-  """
-  maxCount: Int
+    """
+    Limit the maximum amount of items that clients can request from paginated lists.
+    Overrules the `pagination.max_count` setting from `lighthouse.php`.
+    """
+    maxCount: Int
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@paginate`.
+"""
+enum PaginateType {
+    """
+    Offset-based pagination, similar to the Laravel default.
+    """
+    PAGINATOR
+
+    """
+    Cursor-based pagination, compatible with the Relay specification.
+    """
+    CONNECTION
+}
 ```
 
 ### Basic usage
@@ -2208,7 +2292,7 @@ directive @scope(
   """
   The name of the scope.
   """
-  name: String
+  name: String!
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
