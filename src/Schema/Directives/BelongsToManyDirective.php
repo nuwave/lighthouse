@@ -52,7 +52,7 @@ directive @belongsToMany(
 """
 Options for the `type` argument of `@belongsToMany`.
 """
-enum PaginateType {
+enum BelongsToManyType {
     """
     Offset-based pagination, similar to the Laravel default.
     """
