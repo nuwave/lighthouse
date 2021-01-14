@@ -266,7 +266,7 @@ class RulesDirectiveTest extends TestCase
         $this->expectException(DefinitionException::class);
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {
-            foo(bar: ID @rules(apply: '. $applyArgument . ')): ID
+            foo(bar: ID @rules(apply: '.$applyArgument.')): ID
         }
         ');
     }
