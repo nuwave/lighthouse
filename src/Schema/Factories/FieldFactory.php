@@ -63,19 +63,20 @@ class FieldFactory
             $fieldValue = $fieldValue->useDefaultResolver();
         }
 
-        $fieldMiddleware = $this->directiveFactory->associatedOfType($fieldDefinitionNode, FieldMiddleware::class);
+        // Middleware resolve in reversed order
 
-        $globalFieldMiddleware = config('lighthouse.field_middleware');
-        $fieldMiddleware->push(...$globalFieldMiddleware);
+        $globalFieldMiddleware = array_reverse(
+            config('lighthouse.field_middleware')
+        );
+
+        $fieldMiddleware = $this->directiveFactory
+            ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
+            ->reverse()
+            ->all();
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through(
-                $fieldMiddleware
-                    // Middleware resolve in reversed order
-                    ->reverse()
-                    ->all()
-            )
+            ->through(array_merge($fieldMiddleware, $globalFieldMiddleware))
             ->via('handleField')
             // TODO replace when we cut support for Laravel 5.6
             //->thenReturn()
