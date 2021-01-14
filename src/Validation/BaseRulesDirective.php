@@ -17,16 +17,19 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     {
         $rules = $this->directiveArgValue('apply');
 
-        // Custom rules may be referenced through their fully qualified class name.
-        // The Laravel validator expects a class instance to be passed, so we
-        // resolve any given rule where a corresponding class exists.
-        foreach ($rules as $key => $rule) {
-            if (class_exists($rule)) {
-                $rules[$key] = app($rule);
-            }
-        }
+        return array_map(
+            static function (string $rule) {
+                // Custom rules may be referenced through their fully qualified class name.
+                // The Laravel validator expects a class instance to be passed, so we
+                // resolve any given rule where a corresponding class exists.
+                if (class_exists($rule)) {
+                    return app($rule);
+                }
 
-        return $rules;
+                return $rule;
+            },
+            $rules
+        );
     }
 
     public function messages(): array
@@ -36,30 +39,12 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             return [];
         }
 
-        if (! is_array($messages)) {
-            $this->invalidMessageArgument($messages);
-        }
-
         if (isset($messages[0])) {
             /** @var array<string, string> $flattened */
             $flattened = [];
 
             foreach ($messages as $messageMap) {
-                if (! is_array($messageMap)) {
-                    $this->invalidMessageArgument($messages);
-                }
-
-                $rule = $messageMap['rule'] ?? null;
-                if (! is_string($rule)) {
-                    $this->invalidMessageArgument($messages);
-                }
-
-                $message = $messageMap['message'] ?? null;
-                if (! is_string($message)) {
-                    $this->invalidMessageArgument($messages);
-                }
-
-                $flattened[$rule] = $message;
+                $flattened[$messageMap['rule']] = $messageMap['message'];
             }
 
             return $flattened;
@@ -79,12 +64,66 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ) {
+        $this->validateRulesArg();
+        $this->validateMessageArg();
+    }
+
+    protected function validateRulesArg(): void
+    {
         $rules = $this->directiveArgValue('apply');
 
         if (! is_array($rules)) {
-            throw new DefinitionException(
-                "The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$rules}"
-            );
+            $this->invalidApplyArgument($rules);
+        }
+
+        if (count($rules) === 0) {
+            $this->invalidApplyArgument($rules);
+        }
+
+        foreach ($rules as $rule) {
+            if (! is_string($rule)) {
+                $this->invalidApplyArgument($rules);
+            }
+        }
+    }
+
+    protected function validateMessageArg(): void
+    {
+        $messages = $this->directiveArgValue('messages');
+        if ($messages === null) {
+            return;
+        }
+
+        if (! is_array($messages)) {
+            $this->invalidMessageArgument($messages);
+        }
+
+        if (isset($messages[0])) {
+            foreach ($messages as $messageMap) {
+                if (! is_array($messageMap)) {
+                    $this->invalidMessageArgument($messages);
+                }
+
+                $rule = $messageMap['rule'] ?? null;
+                if (! is_string($rule)) {
+                    $this->invalidMessageArgument($messages);
+                }
+
+                $message = $messageMap['message'] ?? null;
+                if (! is_string($message)) {
+                    $this->invalidMessageArgument($messages);
+                }
+            }
+        } else {
+            foreach ($messages as $rule => $message) {
+                if (! is_string($rule)) {
+                    $this->invalidMessageArgument($messages);
+                }
+
+                if (! is_string($message)) {
+                    $this->invalidMessageArgument($messages);
+                }
+            }
         }
     }
 
@@ -94,8 +133,22 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
      */
     protected function invalidMessageArgument($messages): void
     {
+        $encoded = \Safe\json_encode($messages);
         throw new DefinitionException(
-            "The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$messages}"
+            "The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$encoded}"
+        );
+    }
+
+    /**
+     * @param $rules
+     * @throws DefinitionException
+     * @throws \Safe\Exceptions\JsonException
+     */
+    protected function invalidApplyArgument($rules): void
+    {
+        $encoded = \Safe\json_encode($rules);
+        throw new DefinitionException(
+            "The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$encoded}"
         );
     }
 }

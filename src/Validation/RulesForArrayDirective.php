@@ -29,13 +29,13 @@ directive @rulesForArray(
   """
   Specify the messages to return if the validators fail.
   """
-  messages: [RulesForArrayMessageMap!]
+  messages: [RulesForArrayMessage!]
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 """
 Input for the `messages` argument of `@rulesForArray`.
 """
-input RulesForArrayMessageMap {
+input RulesForArrayMessage {
     """
     Name of the rule, e.g. `"email"`.
     """

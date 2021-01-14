@@ -52,7 +52,15 @@ mutation {
 You can customize the error message for a particular argument.
 
 ```graphql
-@rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
+@rules(
+    apply: ["max:140"],
+    messages: [
+        {
+            rule: "max"
+            message: "Tweets have a limit of 140 characters"
+        }
+    ]
+)
 ```
 
 ### Custom Validation Attribute

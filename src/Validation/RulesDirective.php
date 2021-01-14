@@ -31,13 +31,13 @@ directive @rules(
   """
   Specify the messages to return if the validators fail.
   """
-  messages: [RulesMessageMap!]
+  messages: [RulesMessage!]
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 """
 Input for the `messages` argument of `@rules`.
 """
-input RulesMessageMap {
+input RulesMessage {
     """
     Name of the rule, e.g. `"email"`.
     """

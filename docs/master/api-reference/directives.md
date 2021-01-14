@@ -2092,28 +2092,41 @@ Works very similar to the [@delete](#delete) directive.
 Validate an argument using [Laravel validation](https://laravel.com/docs/validation).
 """
 directive @rules(
-  """
-  Specify the validation rules to apply to the field.
-  This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules),
-  or the fully qualified class name of a custom validation rule.
+    """
+    Specify the validation rules to apply to the field.
+    This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules),
+    or the fully qualified class name of a custom validation rule.
 
-  Rules that mutate the incoming arguments, such as `exclude_if`, are not supported
-  by Lighthouse. Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
-  """
-  apply: [String!]!
+    Rules that mutate the incoming arguments, such as `exclude_if`, are not supported
+    by Lighthouse. Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
+    """
+    apply: [String!]!
 
-  """
-  Specify a custom attribute name to use in your validation message.
-  """
-  attribute: String
+    """
+    Specify a custom attribute name to use in your validation message.
+    """
+    attribute: String
 
-  """
-  Specify the messages to return if the validators fail.
-  Specified as an input object that maps rules to messages,
-  e.g. { email: "Must be a valid email", max: "The input was too long" }
-  """
-  messages: RulesMessageMap
+    """
+    Specify the messages to return if the validators fail.
+    """
+    messages: [RulesMessage!]
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Input for the `messages` argument of `@rules`.
+"""
+input RulesMessage {
+"""
+Name of the rule, e.g. `"email"`.
+"""
+rule: String!
+
+"""
+Message to display if the rule fails, e.g. `"Must be a valid email"`.
+"""
+message: String!
+}
 ```
 
 For example, this rule ensures that users pass a valid 2 character country code:
@@ -2133,25 +2146,38 @@ Read more in the [validation docs](../security/validation.md#single-arguments).
 Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
 directive @rulesForArray(
-  """
-  Specify the validation rules to apply to the field.
-  This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
-  or the fully qualified class name of a custom validation rule.
-  """
-  apply: [String!]!
+    """
+    Specify the validation rules to apply to the field.
+    This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
+    or the fully qualified class name of a custom validation rule.
+    """
+    apply: [String!]!
 
-  """
-  Specify a custom attribute name to use in your validation message.
-  """
-  attribute: String
+    """
+    Specify a custom attribute name to use in your validation message.
+    """
+    attribute: String
 
-  """
-  Specify the messages to return if the validators fail.
-  Specified as an input object that maps rules to messages,
-  e.g. { email: "Must be a valid email", max: "The input was too long" }
-  """
-  messages: RulesMessageMap
+    """
+    Specify the messages to return if the validators fail.
+    """
+    messages: [RulesForArrayMessage!]
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Input for the `messages` argument of `@rulesForArray`.
+"""
+input RulesForArrayMessage {
+"""
+Name of the rule, e.g. `"email"`.
+"""
+rule: String!
+
+"""
+Message to display if the rule fails, e.g. `"Must be a valid email"`.
+"""
+message: String!
+}
 ```
 
 This is typically used to assert a certain number of elements is given in a list.
