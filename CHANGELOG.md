@@ -11,13 +11,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray`
-- Validate correct usage of `@rules` and `@rulesForArray`
+- Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
+- Validate correct usage of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 
 ### Deprecated
 
 - Deprecate the `globalId` argument on the `@delete`, `@forceDelete` and `@restore` directives https://github.com/nuwave/lighthouse/pull/1660
-- Deprecate passing the `messages` argument on `@rules` and `@rulesForArray` as a map with arbitrary keys
+- Deprecate passing the `messages` argument on `@rules` and `@rulesForArray` as a map with arbitrary keys https://github.com/nuwave/lighthouse/pull/1662
 
 ### Fixed
 
