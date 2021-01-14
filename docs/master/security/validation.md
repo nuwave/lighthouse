@@ -53,11 +53,11 @@ You can customize the error message for a particular argument.
 
 ```graphql
 @rules(
-    apply: ["max:140"],
+    apply: ["max:280"],
     messages: [
         {
             rule: "max"
-            message: "Tweets have a limit of 140 characters"
+            message: "Tweets have a limit of 280 characters"
         }
     ]
 )
