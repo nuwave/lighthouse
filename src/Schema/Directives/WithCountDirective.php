@@ -2,7 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Deferred;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -32,11 +36,6 @@ directive @withCount(
 GRAPHQL;
     }
 
-    public function batchLoaderClass(): string
-    {
-        return RelationCountBatchLoader::class;
-    }
-
     public function relationName(): string
     {
         $relation = $this->directiveArgValue('relation');
@@ -45,5 +44,14 @@ GRAPHQL;
         }
 
         return $relation;
+    }
+
+    protected function loadRelation(RelationBatchLoader $loader, string $relationName, ResolveInfo $resolveInfo, Model $parent): Deferred
+    {
+        if (!$loader->hasRelationToCountMeta($relationName)) {
+            $loader->registerRelationToCountMeta($relationName, $this->relationMeta($resolveInfo));
+        }
+
+        return $loader->relationToCount($relationName, $parent);
     }
 }

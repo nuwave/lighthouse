@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Deferred;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -28,13 +31,18 @@ directive @with(
 GRAPHQL;
     }
 
-    public function batchLoaderClass(): string
-    {
-        return RelationBatchLoader::class;
-    }
-
     public function relationName(): string
     {
-        return $this->directiveArgValue('relation', $this->nodeName());
+        return $this->directiveArgValue('relation')
+            ?? $this->nodeName();
+    }
+
+    protected function loadRelation(RelationBatchLoader $loader, string $relationName, ResolveInfo $resolveInfo, Model $parent): Deferred
+    {
+        if (!$loader->hasRelationMeta($relationName)) {
+            $loader->registerRelationMeta($relationName, $this->relationMeta($resolveInfo));
+        }
+
+        return $loader->relation($relationName, $parent);
     }
 }

@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -65,7 +66,7 @@ GRAPHQL;
         if (! is_null($relation)) {
             return $value->setResolver(
                 $this->deferredRelationResolver(
-                    function (?Model $model) {
+                    function (Model $model) {
                         return $model->{$this->nodeName()};
                     }
                 )
@@ -73,17 +74,26 @@ GRAPHQL;
         }
 
         throw new DefinitionException(
-            "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}"
+            "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'."
         );
-    }
-
-    public function batchLoaderClass(): string
-    {
-        return RelationCountBatchLoader::class;
     }
 
     public function relationName(): string
     {
-        return "{$this->directiveArgValue('relation')} as {$this->nodeName()}";
+        $relation = $this->directiveArgValue('relation');
+        if (! $relation) {
+            throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
+        }
+
+        return "{$relation} as {$this->nodeName()}";
+    }
+
+    protected function loadRelation(RelationBatchLoader $loader, string $relationName, ResolveInfo $resolveInfo, Model $parent): Deferred
+    {
+        if (!$loader->hasRelationToCountMeta($relationName)) {
+            $loader->registerRelationToCountMeta($relationName, $this->relationMeta($resolveInfo));
+        }
+
+        return $loader->relationToCount($relationName, $parent);
     }
 }

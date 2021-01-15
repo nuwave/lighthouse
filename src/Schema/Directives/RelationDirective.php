@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\LoaderRegistry;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\Utils\ModelKey;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationMeta;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -31,27 +31,21 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 $paginationArgs = $this->paginationArgs($args);
 
                 if (config('lighthouse.batchload_relations')) {
-                    $constructorArgs = [
-                        'relationName' => $relationName,
-                        'decorateBuilder' => $decorateBuilder,
-                    ];
+                    /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $loader */
+                    $loader = LoaderRegistry::instance(
+                        RelationBatchLoader::class,
+                        $resolveInfo->path
+                    );
 
-                    if ($paginationArgs !== null) {
-                        $constructorArgs += [
-                            'paginationArgs' => $paginationArgs,
-                        ];
+                    if (! $loader->hasRelationMeta($relationName)) {
+                        $relationMeta = new RelationMeta();
+                        $relationMeta->decorateBuilder = $decorateBuilder;
+                        $relationMeta->paginationArgs = $paginationArgs;
+
+                        $loader->registerRelationMeta($relationName, $relationMeta);
                     }
 
-                    return LoaderRegistry
-                        ::instance(
-                            RelationBatchLoader::class,
-                            $this->buildPath($resolveInfo, $parent),
-                            $constructorArgs
-                        )
-                        ->load(
-                            ModelKey::build($parent),
-                            ['parent' => $parent]
-                        );
+                    return $loader->relation($relationName, $parent);
                 }
 
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */

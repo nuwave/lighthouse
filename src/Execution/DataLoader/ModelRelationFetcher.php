@@ -32,7 +32,7 @@ class ModelRelationFetcher
 
     /**
      * @param  \Illuminate\Database\Eloquent\Collection  $models  The parent models that relations should be loaded for
-     * @param  array<mixed>  $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
+     * @param  array<string, mixed>  $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
      */
     public function __construct(EloquentCollection $models, array $relations)
     {
