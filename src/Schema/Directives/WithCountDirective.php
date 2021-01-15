@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class WithCountDirective extends WithRelationDirective implements FieldMiddleware
@@ -48,7 +47,7 @@ GRAPHQL;
 
     protected function loadRelation(RelationBatchLoader $loader, string $relationName, ResolveInfo $resolveInfo, Model $parent): Deferred
     {
-        if (!$loader->hasRelationToCountMeta($relationName)) {
+        if (! $loader->hasRelationToCountMeta($relationName)) {
             $loader->registerRelationToCountMeta($relationName, $this->relationMeta($resolveInfo));
         }
 

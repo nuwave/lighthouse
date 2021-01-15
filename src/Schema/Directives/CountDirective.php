@@ -90,7 +90,7 @@ GRAPHQL;
 
     protected function loadRelation(RelationBatchLoader $loader, string $relationName, ResolveInfo $resolveInfo, Model $parent): Deferred
     {
-        if (!$loader->hasRelationToCountMeta($relationName)) {
+        if (! $loader->hasRelationToCountMeta($relationName)) {
             $loader->registerRelationToCountMeta($relationName, $this->relationMeta($resolveInfo));
         }
 

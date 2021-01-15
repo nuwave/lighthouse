@@ -38,7 +38,6 @@ abstract class WithRelationDirective extends BaseDirective
     protected function deferredRelationResolver(callable $resolver): Closure
     {
         return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-
             $relationName = $this->relationName();
             $loader = $this->loader($resolveInfo);
 
