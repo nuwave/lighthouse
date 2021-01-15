@@ -1,16 +1,17 @@
 <?php
 
-namespace Tests\Unit\Subscriptions;
+namespace Tests\Unit\Subscriptions\Storage;
 
 use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
-use Nuwave\Lighthouse\Subscriptions\StorageManager;
+use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\Unit\Subscriptions\SubscriptionTestCase;
 
-class StorageManagerTest extends SubscriptionTestCase
+class CacheStorageManagerTest extends SubscriptionTestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager
      */
     protected $storage;
 
@@ -18,7 +19,7 @@ class StorageManagerTest extends SubscriptionTestCase
     {
         parent::setUp();
 
-        $this->storage = app(StorageManager::class);
+        $this->storage = app(CacheStorageManager::class);
     }
 
     /**

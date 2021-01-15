@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Auth\Factory as Auth;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Http\Request;
 
 /**
@@ -14,11 +14,11 @@ class AttemptAuthentication
     /**
      * @var \Illuminate\Contracts\Auth\Factory
      */
-    protected $auth;
+    protected $authFactory;
 
-    public function __construct(Auth $auth)
+    public function __construct(AuthFactory $authFactory)
     {
-        $this->auth = $auth;
+        $this->authFactory = $authFactory;
     }
 
     /**
@@ -42,8 +42,8 @@ class AttemptAuthentication
         }
 
         foreach ($guards as $guard) {
-            if ($this->auth->guard($guard)->check()) {
-                $this->auth->shouldUse($guard);
+            if ($this->authFactory->guard($guard)->check()) {
+                $this->authFactory->shouldUse($guard);
 
                 return;
             }

@@ -7,7 +7,8 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
+use Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation;
+use Nuwave\Lighthouse\Support\Contracts\ArgumentValidation;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentValue;
 use Nuwave\Lighthouse\Support\Utils;
 
@@ -27,6 +28,13 @@ class RulesGatherer
      */
     public $messages = [];
 
+    /**
+     * The gathered attributes.
+     *
+     * @var array<string, string>
+     */
+    public $attributes = [];
+
     public function __construct(ArgumentSet $argumentSet)
     {
         $this->gatherRulesRecursively($argumentSet, []);
@@ -37,7 +45,7 @@ class RulesGatherer
      */
     public function gatherRulesRecursively(ArgumentSet $argumentSet, array $argumentPath): void
     {
-        $this->gatherRulesFromProviders($argumentSet, $argumentSet->directives, $argumentPath);
+        $this->gatherRulesForArgumentSet($argumentSet, $argumentSet->directives, $argumentPath);
 
         $argumentsWithUndefined = $argumentSet->argumentsWithUndefined();
         foreach ($argumentsWithUndefined as $name => $argument) {
@@ -46,7 +54,7 @@ class RulesGatherer
             $directivesForArray = $argument->directives->filter(
                 Utils::instanceofMatcher(ArgDirectiveForArray::class)
             );
-            $this->gatherRulesFromProviders($argument, $directivesForArray, $nestedPath);
+            $this->gatherRulesForArgument($argument, $directivesForArray, $nestedPath);
 
             $directivesForArgument = $argument->directives->filter(
                 Utils::instanceofMatcher(ArgDirective::class)
@@ -66,33 +74,52 @@ class RulesGatherer
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $value
      * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
-    public function gatherRulesFromProviders($value, Collection $directives, array $path): void
+    public function gatherRulesForArgumentSet(ArgumentSet $argumentSet, Collection $directives, array $path): void
     {
         foreach ($directives as $directive) {
-            if ($directive instanceof ProvidesRules) {
+            if ($directive instanceof ArgumentSetValidation) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
-                    /** @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ProvidesRules&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive */
+                    /** @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive */
                     // @phpstan-ignore-next-line using trait in typehint
-                    $directive->setArgumentValue($value);
+                    $directive->setArgumentValue($argumentSet);
                 }
 
-                $this->extractRulesAndMessages($directive, $path);
+                $this->extractValidationForArgumentSet($directive, $path);
             }
         }
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $value
+     * @param  mixed  $value  Any argument value is possible
+     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  array<int|string>  $path
+     */
+    public function gatherRulesForArgument($value, Collection $directives, array $path): void
+    {
+        foreach ($directives as $directive) {
+            if ($directive instanceof ArgumentValidation) {
+                if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
+                    /** @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive */
+                    // @phpstan-ignore-next-line using trait in typehint
+                    $directive->setArgumentValue($value);
+                }
+
+                $this->extractValidationForArgument($directive, $path);
+            }
+        }
+    }
+
+    /**
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed  $value
      * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
     protected function handleArgumentValue($value, Collection $directives, array $path): void
     {
-        $this->gatherRulesFromProviders($value, $directives, $path);
+        $this->gatherRulesForArgument($value, $directives, $path);
 
         if ($value instanceof ArgumentSet) {
             $this->gatherRulesRecursively($value, $path);
@@ -102,21 +129,40 @@ class RulesGatherer
     /**
      * @param  array<int|string>  $argumentPath
      */
-    public function extractRulesAndMessages(ProvidesRules $providesRules, array $argumentPath): void
+    public function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
-        $rules = $providesRules->rules();
+        $this->rules = array_merge_recursive(
+            $this->rules,
+            $this->wrap($directive->rules(), $argumentPath)
+        );
 
-        $inputToRules = isset($rules[0])
-            // We might be passed just the rules for a single field, without any
-            // field names. In this case, we just add on the path.
-            ? [$this->pathDotNotation($argumentPath) => $rules]
-            // When we have an associative array of rules, the path is prepended to every key.
-            : $this->wrap($rules, $argumentPath);
+        $this->messages += $this->wrap($directive->messages(), $argumentPath);
 
-        $this->rules = array_merge_recursive($this->rules, $inputToRules);
+        $this->attributes = array_merge(
+            $this->attributes,
+            $this->wrap($directive->attributes(), $argumentPath)
+        );
+    }
 
-        $messages = $providesRules->messages();
-        $this->messages += $this->wrap($messages, $argumentPath);
+    /**
+     * @param  array<int|string>  $argumentPath
+     */
+    public function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
+    {
+        $this->rules = array_merge_recursive(
+            $this->rules,
+            [$this->pathDotNotation($argumentPath) => $directive->rules()]
+        );
+
+        $this->messages += $this->wrap($directive->messages(), $argumentPath);
+
+        $attribute = $directive->attribute();
+        if (null !== $attribute) {
+            $this->attributes = array_merge(
+                $this->attributes,
+                [$this->pathDotNotation($argumentPath) => $attribute]
+            );
+        }
     }
 
     /**

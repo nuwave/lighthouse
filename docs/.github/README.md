@@ -42,7 +42,7 @@ Then, start Vue Press in development mode (with hot reloading).
     yarn
     yarn start
 
-> Keep a eye on the console when editing pages.
+> Keep an eye on the console when editing pages.
 > If an error occurs, it might be necessary to restart the compilation process.
 
 If you use Docker you can start up the environment (including docs) by running:
@@ -105,7 +105,7 @@ in a single PR.
 1.  Enter a new version number. We only tag minor releases, so `3.1` will get separate
     docs, but `3.1.4` will not.
 
-        yarn bump-version 3.1
+        yarn bump 3.1
 
 This will copy the contents of `docs/master/` into `docs/<version>/`
 and place a new version number in `docs/.vuepress/versions.json`.

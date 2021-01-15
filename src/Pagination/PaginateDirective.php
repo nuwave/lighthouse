@@ -23,10 +23,9 @@ Query multiple model entries as a paginated list.
 """
 directive @paginate(
   """
-  Which pagination style to use.
-  Allowed values: `paginator`, `connection`.
+  Which pagination style should be used.
   """
-  type: String = "paginator"
+  type: PaginateType = PAGINATOR
 
   """
   Specify the class name of the model to use.
@@ -57,6 +56,21 @@ directive @paginate(
   """
   maxCount: Int
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@paginate`.
+"""
+enum PaginateType {
+    """
+    Offset-based pagination, similar to the Laravel default.
+    """
+    PAGINATOR
+
+    """
+    Cursor-based pagination, compatible with the Relay specification.
+    """
+    CONNECTION
+}
 GRAPHQL;
     }
 
@@ -78,8 +92,7 @@ GRAPHQL;
                 $this->paginationType(),
                 $fieldDefinition,
                 $parentType,
-                $this->directiveArgValue('defaultCount')
-                    ?? config('lighthouse.pagination.default_count'),
+                $this->defaultCount(),
                 $this->paginateMaxCount()
             );
     }
@@ -113,13 +126,16 @@ GRAPHQL;
     protected function paginationType(): PaginationType
     {
         return new PaginationType(
-            $this->directiveArgValue('type', PaginationType::TYPE_PAGINATOR)
+            $this->directiveArgValue('type', PaginationType::PAGINATOR)
         );
     }
 
-    /**
-     * Get either the specific max or the global setting.
-     */
+    protected function defaultCount(): ?int
+    {
+        return $this->directiveArgValue('defaultCount')
+            ?? config('lighthouse.pagination.default_count');
+    }
+
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')

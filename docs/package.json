@@ -14,6 +14,6 @@
         "start": "vuepress dev .",
         "build": "vuepress build .",
         "prettify": "prettier --write --tab-width=2 **/**/*.md",
-        "bump-version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'"
+        "bump": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'"
     }
 }

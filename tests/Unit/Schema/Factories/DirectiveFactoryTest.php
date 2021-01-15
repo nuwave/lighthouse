@@ -65,7 +65,7 @@ class DirectiveFactoryTest extends TestCase
         $directive = new class implements FieldMiddleware {
             public static function definition(): string
             {
-                return 'foo';
+                return /** @lang GraphQL */ 'foo';
             }
 
             public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

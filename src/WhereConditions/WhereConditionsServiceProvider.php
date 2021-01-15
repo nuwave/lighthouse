@@ -17,17 +17,11 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     public const DEFAULT_WHERE_RELATION_CONDITIONS = 'Relation';
 
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         $this->app->bind(Operator::class, SQLOperator::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
@@ -64,7 +58,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                     )
                     ->setTypeDefinition(
                         Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-                            scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
+                            scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\MixedScalar")
                         ')
                     );
             }

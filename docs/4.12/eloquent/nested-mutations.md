@@ -586,7 +586,7 @@ And you will get the following response:
 }
 ```
 
-It is also possible to use the `sync` and `syncWithoutDetach` operations.
+It is also possible to use the `sync` and `syncWithoutDetaching` operations.
 
 ## MorphTo
 

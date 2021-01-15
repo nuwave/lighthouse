@@ -161,7 +161,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: PAGINATOR)
         }
 
         type Image {
@@ -214,7 +214,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator", maxCount: 3)
+            images: [Image!] @morphMany(type: PAGINATOR, maxCount: 3)
         }
 
         type Image {
@@ -256,7 +256,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: PAGINATOR)
         }
 
         type Image {
@@ -296,7 +296,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: PAGINATOR)
         }
 
         type Image {
@@ -339,7 +339,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "paginator", defaultCount: 3)
+            images: [Image!] @morphMany(type: PAGINATOR, defaultCount: 3)
         }
 
         type Image {
@@ -393,7 +393,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay")
+            images: [Image!] @morphMany(type: CONNECTION)
         }
 
         type Image {
@@ -447,7 +447,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay", maxCount: 3)
+            images: [Image!] @morphMany(type: CONNECTION, maxCount: 3)
         }
 
         type Image {
@@ -491,7 +491,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay")
+            images: [Image!] @morphMany(type: CONNECTION)
         }
 
         type Image {
@@ -533,7 +533,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay", defaultCount: 3)
+            images: [Image!] @morphMany(type: CONNECTION, defaultCount: 3)
         }
 
         type Image {

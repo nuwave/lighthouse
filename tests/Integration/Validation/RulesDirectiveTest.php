@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Validation;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -13,8 +14,11 @@ class RulesDirectiveTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app->make(ConfigRepository::class);
+
         // Ensure we test for the result the end user receives
-        $app['config']->set('app.debug', false);
+        $config->set('app.debug', false);
     }
 
     public function testRequired(): void
@@ -52,6 +56,7 @@ class RulesDirectiveTest extends TestCase
     {
         $this->markTestSkipped('Not working right now, not sure how it can be fixed.');
 
+        // @phpstan-ignore-next-line unreachable - that is expected though
         $this->schema = /** @lang GraphQL */ '
         "A date string with format `Y-m-d`, e.g. `2011-05-23`."
         scalar Date @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Date")
@@ -142,6 +147,53 @@ class RulesDirectiveTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('bar', 'custom message');
+    }
+
+    public function testCustomAttributes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        input FooInput {
+            name: String @rules(
+                apply: ["required"]
+                attribute: "name"
+            )
+            type: FooTypeInput
+        }
+
+        input FooTypeInput {
+            name: String @rules(
+                apply: ["required"]
+                attribute: "name"
+            )
+            type: String @rules(apply: ["required"])
+        }
+
+        type Query {
+            foo(
+                bar: ID @rules(
+                    apply: ["required"]
+                    attribute: "baz"
+                )
+                emails: [String] @rulesForArray(
+                    apply: ["min:3"]
+                    attribute: "email list"
+                )
+                input: FooInput
+            ): String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(emails: [], input: {type: {}})
+            }
+            ')
+            ->assertGraphQLValidationError('bar', 'The baz field is required.')
+            ->assertGraphQLValidationError('emails', 'The email list must have at least 3 items.')
+            ->assertGraphQLValidationError('input.name', 'The name field is required.')
+            ->assertGraphQLValidationError('input.type.name', 'The name field is required.')
+            ->assertGraphQLValidationError('input.type.type', 'The input.type.type field is required.');
     }
 
     public function testUsesCustomRuleClass(): void

@@ -18,8 +18,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $name
  * @property string|null $email
  * @property string|null $password
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts

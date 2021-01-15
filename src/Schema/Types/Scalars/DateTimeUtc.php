@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 /**
  * Only works with Carbon 2.

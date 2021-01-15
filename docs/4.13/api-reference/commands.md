@@ -30,7 +30,6 @@ is to add it to your `composer.json`:
 "scripts": {
     ...
     "post-update-cmd": [
-        "Illuminate\\Foundation\\ComposerScripts::postUpdate",
         "php artisan lighthouse:ide-helper"
     ],
 ```

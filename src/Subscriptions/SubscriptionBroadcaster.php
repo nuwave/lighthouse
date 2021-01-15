@@ -22,17 +22,17 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions
      */
-    protected $auth;
+    protected $subscriptionAuthorizer;
 
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
      */
-    protected $storage;
+    protected $subscriptionStorage;
 
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator
      */
-    protected $iterator;
+    protected $subscriptionIterator;
 
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
@@ -46,23 +46,20 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
     public function __construct(
         GraphQL $graphQL,
-        AuthorizesSubscriptions $auth,
-        StoresSubscriptions $storage,
-        SubscriptionIterator $iterator,
+        AuthorizesSubscriptions $subscriptionAuthorizer,
+        StoresSubscriptions $subscriptionStorage,
+        SubscriptionIterator $subscriptionIterator,
         BroadcastManager $broadcastManager,
         BusDispatcher $busDispatcher
     ) {
         $this->graphQL = $graphQL;
-        $this->auth = $auth;
-        $this->storage = $storage;
-        $this->iterator = $iterator;
+        $this->subscriptionAuthorizer = $subscriptionAuthorizer;
+        $this->subscriptionStorage = $subscriptionStorage;
+        $this->subscriptionIterator = $subscriptionIterator;
         $this->broadcastManager = $broadcastManager;
         $this->busDispatcher = $busDispatcher;
     }
 
-    /**
-     * Queue pushing subscription data to subscribers.
-     */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
         $broadcastSubscriptionJob = new BroadcastSubscriptionJob($subscription, $fieldName, $root);
@@ -71,27 +68,26 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $this->busDispatcher->dispatch($broadcastSubscriptionJob);
     }
 
-    /**
-     * Push subscription data to subscribers.
-     */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
         $topic = $subscription->decodeTopic($fieldName, $root);
 
-        $subscribers = $this->storage
+        $subscribers = $this->subscriptionStorage
             ->subscribersByTopic($topic)
             ->filter(function (Subscriber $subscriber) use ($subscription, $root): bool {
                 return $subscription->filter($subscriber, $root);
             });
 
-        $this->iterator->process(
+        $this->subscriptionIterator->process(
             $subscribers,
             function (Subscriber $subscriber) use ($root): void {
+                $subscriber->root = $root;
+
                 $data = $this->graphQL->executeQuery(
                     $subscriber->query,
                     $subscriber->context,
                     $subscriber->args,
-                    $subscriber->setRoot($root)
+                    $subscriber
                 );
 
                 $this->broadcastManager->broadcast(
@@ -102,12 +98,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         );
     }
 
-    /**
-     * Authorize the subscription.
-     */
     public function authorize(Request $request): Response
     {
-        return $this->auth->authorize($request)
+        return $this->subscriptionAuthorizer->authorize($request)
             ? $this->broadcastManager->authorized($request)
             : $this->broadcastManager->unauthorized($request);
     }

@@ -17,8 +17,8 @@ use Laravel\Scout\Searchable;
  * @property int|null $user_id
  * @property int $task_id
  * @property int|null $parent_id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property \lluminate\Support\Carbon $created_at
+ * @property \lluminate\Support\Carbon $updated_at
  *
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Activity> $activity

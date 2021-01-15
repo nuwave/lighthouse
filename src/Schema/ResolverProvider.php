@@ -21,15 +21,13 @@ class ResolverProvider implements ProvidesResolver
     {
         if ($fieldValue->parentIsRootType()) {
             $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
-            if ($resolverClass) {
-                return Closure::fromCallable(
-                    [app($resolverClass), '__invoke']
-                );
-            }
-
-            if (! $resolverClass) {
+            if ($resolverClass === null) {
                 $this->throwMissingResolver($fieldValue);
             }
+
+            return Closure::fromCallable(
+                [app($resolverClass), '__invoke']
+            );
         }
 
         return Closure::fromCallable(

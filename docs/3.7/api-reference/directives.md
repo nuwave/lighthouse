@@ -2186,7 +2186,7 @@ First, enable the service provider:
 
 It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+    composer require mll-lab/graphql-php-scalars:^3
 
 Finally, add an enum type `Operator` to your schema. Depending on your
 database, you may want to allow different internal values. This default

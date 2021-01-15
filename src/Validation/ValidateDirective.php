@@ -47,7 +47,8 @@ GRAPHQL;
                         ->make(
                             $args,
                             $rulesGatherer->rules,
-                            $rulesGatherer->messages
+                            $rulesGatherer->messages,
+                            $rulesGatherer->attributes
                         );
 
                     if ($validator->fails()) {

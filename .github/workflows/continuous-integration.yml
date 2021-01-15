@@ -7,9 +7,10 @@ on:
       - "master"
 
 env:
-  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql"
+  REQUIRED_PHP_EXTENSIONS: "mbstring, mysqli, pdo_mysql, redis"
   LIGHTHOUSE_TEST_DB_HOST: "127.0.0.1"
   LIGHTHOUSE_TEST_DB_PASSWORD: "root"
+  LIGHTHOUSE_TEST_REDIS_HOST: "127.0.0.1"
 
 jobs:
   static-code-analysis:
@@ -33,17 +34,18 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
+          tools: "pecl"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
@@ -57,7 +59,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Run phpstan/phpstan"
         run: "vendor/bin/phpstan analyse --configuration=phpstan.neon"
@@ -77,8 +79,8 @@ jobs:
           - "5.6.*"
           - "5.7.*"
           - "5.8.*"
-          - "^6.0"
-          - "^7.0"
+          - "^6"
+          - "^7"
           - "^8"
         exclude:
           - php-version: "7.2"
@@ -86,17 +88,23 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
+
+      - name: "Start Redis"
+        uses: "supercharge/redis-github-action@1.1.0"
+        with:
+          redis-version: "6"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
+          tools: "pecl"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
@@ -110,7 +118,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Set up the database"
         run: |
@@ -134,17 +142,23 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
+
+      - name: "Start Redis"
+        uses: "supercharge/redis-github-action@1.1.0"
+        with:
+          redis-version: "6"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "pcov"
+          tools: "pecl"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
@@ -158,7 +172,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Set up the database"
         run: |
@@ -187,17 +201,18 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+        uses: "actions/checkout@v2"
 
       - name: "Install PHP with extensions"
-        uses: "shivammathur/setup-php@2.1.0"
+        uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
+          tools: "pecl"
           extensions: "${{ env.REQUIRED_PHP_EXTENSIONS }}"
           php-version: "${{ matrix.php-version }}"
 
       - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v1.0.3"
+        uses: "actions/cache@v1"
         with:
           path: "~/.composer/cache"
           key: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}"
@@ -208,7 +223,7 @@ jobs:
         run: "composer remove --dev laravel/legacy-factories --no-update"
 
       - name: "Install dependencies with composer"
-        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest"
+        run: "composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction"
 
       - name: "Collect code coverage with pcov and phpunit/phpunit"
         run: "vendor/bin/phpbench run --progress=none --report=ast"

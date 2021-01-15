@@ -37,11 +37,11 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        /** @var string|null $guard */
-        $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
-
         return $fieldValue->setResolver(
-            function () use ($guard): ?Authenticatable {
+            function (): ?Authenticatable {
+                /** @var string|null $guard */
+                $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
+
                 // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
                 return $this
                     ->authFactory

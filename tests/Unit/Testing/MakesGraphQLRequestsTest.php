@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Testing;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
 class MakesGraphQLRequestsTest extends TestCase
@@ -11,7 +12,7 @@ class MakesGraphQLRequestsTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
+        $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.route.prefix', 'prefix');
     }
 
