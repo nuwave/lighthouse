@@ -63,18 +63,17 @@ class RelationBatchLoader
     public function load(Model $parent): Deferred
     {
         $modelKey = ModelKey::build($parent);
+        $this->parents[$modelKey] = $parent;
 
-        // When we are deep inside a nested query, we can come across the
-        // same model in two different paths. At this point, we can just
-        // ignore the extra instance and remember only one to eager load.
-        if (! isset($this->parents[$modelKey])) {
-            $this->parents[$modelKey] = $parent;
-        }
-
-        return new Deferred(function () use ($parent) {
+        return new Deferred(function () use ($modelKey) {
             if (! $this->hasResolved) {
                 $this->resolve();
             }
+
+            // When we are deep inside a nested query, we can come across the
+            // same model in two different paths, so this might be another
+            // model instance then $parent.
+            $parent = $this->parents[$modelKey];
 
             return $this->relationLoader->extract($parent, $this->relationName);
         });
