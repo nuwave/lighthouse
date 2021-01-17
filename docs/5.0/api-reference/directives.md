@@ -141,9 +141,8 @@ directive @belongsToMany(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: BelongsToManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -164,6 +163,21 @@ directive @belongsToMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@belongsToMany`.
+"""
+enum BelongsToManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 It assumes both the field and the relationship method to have the same name.
@@ -289,8 +303,6 @@ type Query {
 ```
 
 ```php
-namespace App\Models;
-
 class MyClass
 {
 
@@ -583,6 +595,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @delete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -611,12 +625,13 @@ type Mutation {
 }
 ```
 
-If you use global ids, you can set the `globalId` argument to `true`.
-Lighthouse will decode the id for you automatically.
+In the upcoming `v6`, the `@delete`, `@forceDelete` and `@restore` directives no longer offer the
+`globalId` argument. Use `@globalId` on the argument instead.
 
-```graphql
+```diff
 type Mutation {
-  deletePost(id: ID!): Post @delete(globalId: true)
+-   deleteUser(id: ID!): User! @delete(globalId: true)
++   deleteUser(id: ID! @globalId): User! @delete
 }
 ```
 
@@ -822,6 +837,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @forceDelete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -942,17 +959,37 @@ class PlacedOrder
 ```graphql
 """
 Converts between IDs/types and global IDs.
-When used upon a field, it encodes,
+
+When used upon a field, it encodes;
 when used upon an argument, it decodes.
 """
 directive @globalId(
   """
-  By default, an array of `[$type, $id]` is returned when decoding.
-  You may limit this to returning just one of both.
-  Allowed values: ARRAY, TYPE, ID
+  Decoding a global id produces a tuple of `$type` and `$id`.
+  This setting controls which of those is passed along.
   """
-  decode: String = ARRAY
+  decode: GlobalIdDecode = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Options for the `decode` argument of `@globalId`.
+"""
+enum GlobalIdDecode {
+  """
+  Return an array of `[$type, $id]`.
+  """
+  ARRAY
+
+  """
+  Return just `$type`.
+  """
+  TYPE
+
+  """
+  Return just `$id`.
+  """
+  ID
+}
 ```
 
 Instead of the original ID, the `id` field will now return a base64-encoded String
@@ -1059,7 +1096,7 @@ directive @hasMany(
   Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: HasManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -1072,7 +1109,29 @@ directive @hasMany(
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
+
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@hasMany`.
+"""
+enum HasManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ```graphql
@@ -1423,9 +1482,8 @@ directive @morphMany(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: MorphManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -1446,6 +1504,21 @@ directive @morphMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@morphMany`.
+"""
+enum MorphManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ```graphql
@@ -1816,10 +1889,9 @@ Query multiple model entries as a paginated list.
 """
 directive @paginate(
   """
-  Which pagination style to use.
-  Allowed values: `paginator`, `connection`.
+  Which pagination style should be used.
   """
-  type: String = "paginator"
+  type: PaginateType = PAGINATOR
 
   """
   Specify the class name of the model to use.
@@ -1850,6 +1922,21 @@ directive @paginate(
   """
   maxCount: Int
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@paginate`.
+"""
+enum PaginateType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ### Basic usage
@@ -2057,6 +2144,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @restore(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -2203,7 +2292,7 @@ directive @scope(
   """
   The name of the scope.
   """
-  name: String
+  name: String!
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -2534,12 +2623,6 @@ directive @update(
   This is only needed when the default model detection does not work.
   """
   model: String
-
-  """
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
 
   """
   Specify the name of the relation on the parent model.
