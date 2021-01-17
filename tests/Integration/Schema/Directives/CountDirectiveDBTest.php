@@ -95,7 +95,6 @@ class CountDirectiveDBTest extends DBTestCase
 
         $queries = 0;
         DB::listen(function ($q) use (&$queries): void {
-            dump($q);
             $queries++;
         });
 

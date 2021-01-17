@@ -44,7 +44,7 @@ GRAPHQL;
         return $relation;
     }
 
-    protected function relationFetcher(ResolveInfo $resolveInfo): RelationLoader
+    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
     {
         return new RelationCountLoader(
             $this->decorateBuilder($resolveInfo)

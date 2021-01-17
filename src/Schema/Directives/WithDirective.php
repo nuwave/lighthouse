@@ -36,7 +36,7 @@ GRAPHQL;
             ?? $this->nodeName();
     }
 
-    protected function relationFetcher(ResolveInfo $resolveInfo): RelationLoader
+    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
     {
         return new SimpleRelationLoader(
             $this->decorateBuilder($resolveInfo)

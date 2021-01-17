@@ -18,7 +18,7 @@ abstract class WithRelationDirective extends BaseDirective
      */
     abstract protected function relationName(): string;
 
-    abstract protected function relationFetcher(ResolveInfo $resolveInfo): RelationLoader;
+    abstract protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader;
 
     /**
      * Eager load a relation on the parent instance.
@@ -41,7 +41,7 @@ abstract class WithRelationDirective extends BaseDirective
 
             $relationName = $this->relationName();
             if (! $loader->hasRelationLoader($relationName)) {
-                $loader->registerRelationLoader($relationName, $this->relationFetcher($resolveInfo));
+                $loader->registerRelationLoader($relationName, $this->relationLoader($resolveInfo));
             }
 
             $deferred = $loader->load($relationName, $parent);
