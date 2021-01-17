@@ -60,8 +60,7 @@ abstract class BatchLoaderRegistry
                 return ! is_numeric($segment);
             }
         );
-        $pathIgnoringLists = implode('.', $significantPathSegments);
 
-        return "nuwave/lighthouse/batchloader/{$pathIgnoringLists}";
+        return implode('.', $significantPathSegments);
     }
 }

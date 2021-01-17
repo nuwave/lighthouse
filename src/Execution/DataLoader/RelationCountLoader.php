@@ -66,7 +66,7 @@ class RelationCountLoader implements RelationLoader
         $models = $parents->first()->newModelQuery()
             ->whereKey($parents->modelKeys())
             ->select($parents->first()->getKeyName())
-            ->withAggregate($relations, '*', 'count')
+            ->withCount($relations)
             ->get()
             ->keyBy($parents->first()->getKeyName());
 
