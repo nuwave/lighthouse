@@ -40,6 +40,11 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             /** @var array<string, string> $flattened */
             $flattened = [];
 
+            /**
+             * We know this holds true, because it has been validated before.
+             *
+             * @var array{rule: string, message: string} $messageMap
+             */
             foreach ($messages as $messageMap) {
                 $flattened[$messageMap['rule']] = $messageMap['message'];
             }
