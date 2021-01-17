@@ -51,10 +51,7 @@ GRAPHQL;
                         ->namespaceModelClass($modelArg)
                         ::query();
 
-                    $query = $resolveInfo->argumentSet->enhanceBuilder(
-                        $query,
-                        $this->directiveArgValue('scopes')
-                    );
+                    $this->decorateBuilder($resolveInfo)($query);
 
                     return $query->count();
                 }
