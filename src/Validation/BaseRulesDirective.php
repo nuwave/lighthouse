@@ -17,19 +17,16 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     {
         $rules = $this->directiveArgValue('apply');
 
-        return array_map(
-            static function (string $rule) {
-                // Custom rules may be referenced through their fully qualified class name.
-                // The Laravel validator expects a class instance to be passed, so we
-                // resolve any given rule where a corresponding class exists.
-                if (class_exists($rule)) {
-                    return app($rule);
-                }
+        // Custom rules may be referenced through their fully qualified class name.
+        // The Laravel validator expects a class instance to be passed, so we
+        // resolve any given rule where a corresponding class exists.
+        foreach ($rules as $key => $rule) {
+            if (class_exists($rule)) {
+                $rules[$key] = app($rule);
+            }
+        }
 
-                return $rule;
-            },
-            $rules
-        );
+        return $rules;
     }
 
     public function messages(): array
@@ -140,13 +137,13 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param $rules
-     * @throws DefinitionException
-     * @throws \Safe\Exceptions\JsonException
+     * @param  mixed  $apply Any invalid value
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    protected function invalidApplyArgument($rules): void
+    protected function invalidApplyArgument($apply): void
     {
-        $encoded = \Safe\json_encode($rules);
+        $encoded = \Safe\json_encode($apply);
         throw new DefinitionException(
             "The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$encoded}"
         );

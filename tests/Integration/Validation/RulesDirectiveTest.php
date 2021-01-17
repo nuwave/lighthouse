@@ -287,7 +287,7 @@ class RulesDirectiveTest extends TestCase
     /**
      * @dataProvider invalidMessageArguments
      */
-    public function testValidateMessageArgument(string $messageArgument)
+    public function testValidateMessageArgument(string $messageArgument): void
     {
         $this->expectException(DefinitionException::class);
         $this->buildSchema(/** @lang GraphQL */ "
