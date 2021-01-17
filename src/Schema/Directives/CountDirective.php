@@ -75,10 +75,12 @@ GRAPHQL;
 
     protected function relationName(): string
     {
+        /**
+         * We only got to this point because we already know this argument is set.
+         *
+         * @var string $relation
+         */
         $relation = $this->directiveArgValue('relation');
-        if (! $relation) {
-            throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
-        }
 
         return $relation;
     }
