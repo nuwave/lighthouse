@@ -11,7 +11,7 @@ use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class PaginatedRelationLoaderTest extends DBTestCase
+class PaginatedRelationFetcherTest extends DBTestCase
 {
     public function testLoadRelationshipsWithLimitsOnCollection(): void
     {
