@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -58,17 +60,10 @@ class PaginatedRelationLoader implements RelationLoader
 
                 ($this->decorateBuilder)($relation, $model);
 
-                if (method_exists($relation, 'shouldSelect')) {
+                if ($relation instanceof BelongsToMany || $relation instanceof HasManyThrough) {
                     $shouldSelect = new ReflectionMethod(get_class($relation), 'shouldSelect');
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
-
-                    // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-                    $relation->addSelect($select);
-                } elseif (method_exists($relation, 'getSelectColumns')) {
-                    $getSelectColumns = new ReflectionMethod(get_class($relation), 'getSelectColumns');
-                    $getSelectColumns->setAccessible(true);
-                    $select = $getSelectColumns->invoke($relation, ['*']);
 
                     // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                     $relation->addSelect($select);
