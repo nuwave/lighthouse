@@ -11,16 +11,20 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
+- Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
+- Validate correct usage of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Allow eager-loading multiple relations on a single field using `@with` https://github.com/nuwave/lighthouse/pull/1528
 
 ### Deprecated
 
 - Deprecate the `globalId` argument on the `@delete`, `@forceDelete` and `@restore` directives https://github.com/nuwave/lighthouse/pull/1660
+- Deprecate passing the `messages` argument on `@rules` and `@rulesForArray` as a map with arbitrary keys https://github.com/nuwave/lighthouse/pull/1662
 
 ### Fixed
 
 - Remove non-functional `globalId` argument definition from `@update` https://github.com/nuwave/lighthouse/pull/1660
 - Resolve field middleware directives in lexical order https://github.com/nuwave/lighthouse/pull/1666
+- Fix Laravel 5.6 compatibility for `@withCount` and paginated relationship directives https://github.com/nuwave/lighthouse/pull/1528
 
 ## 5.0.2
 
