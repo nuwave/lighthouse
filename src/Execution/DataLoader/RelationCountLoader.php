@@ -78,7 +78,11 @@ class RelationCountLoader implements RelationLoader
         foreach ($parents as $model) {
             $extraAttributes = Arr::only($models->get($model->getKey())->getAttributes(), $attributes);
 
-            $model->forceFill($extraAttributes)->syncOriginalAttributes($attributes);
+            $model->forceFill($extraAttributes);
+
+            foreach ($attributes as $attribute) {
+                $model->syncOriginalAttribute($attribute);
+            }
         }
     }
 }
