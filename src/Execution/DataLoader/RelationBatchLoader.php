@@ -10,18 +10,21 @@ use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 class RelationBatchLoader
 {
     /**
-     * A map from relation names to responsible fetcher instances.
-     *
-     * @var array<string, \Nuwave\Lighthouse\Execution\DataLoader\RelationLoader>
-     */
-    protected $relationLoaders = [];
-
-    /**
      * A map from unique keys to parent model instances.
      *
      * @var array<string, \Illuminate\Database\Eloquent\Model>
      */
     protected $parents = [];
+
+    /**
+     * @var \Nuwave\Lighthouse\Execution\DataLoader\RelationLoader
+     */
+    protected $relationLoader;
+
+    /**
+     * @var string
+     */
+    protected $relationName;
 
     /**
      * Marks when the actual batch loading happened.
@@ -31,21 +34,22 @@ class RelationBatchLoader
     protected $hasResolved = false;
 
     /**
-     * Check if a loader has been registered for the given relation name.
+     * Check if a loader has been registered.
      */
-    public function hasRelationLoader(string $relationName): bool
+    public function hasRelationLoader(): bool
     {
-        return isset($this->relationLoaders[$relationName]);
+        return isset($this->relationLoader);
     }
 
     /**
-     * Register a relation loader for a given relation name.
+     * Register a relation loader.
      *
      * Check hasRelation() before to avoid re-instantiating and re-registering the same loader.
      */
-    public function registerRelationLoader(string $relationName, RelationLoader $relationLoader): void
+    public function registerRelationLoader(RelationLoader $relationLoader, string $relationName): void
     {
-        $this->relationLoaders[$relationName] = $relationLoader;
+        $this->relationLoader = $relationLoader;
+        $this->relationName = $relationName;
     }
 
     /**
@@ -56,19 +60,17 @@ class RelationBatchLoader
      *
      * As a side-effect, the parent will then hold the relation.
      */
-    public function load(string $relationName, Model $parent): Deferred
+    public function load(Model $parent): Deferred
     {
         $modelKey = ModelKey::build($parent);
         $this->parents[$modelKey] = $parent;
 
-        return new Deferred(function () use ($parent, $relationName) {
+        return new Deferred(function () use ($parent) {
             if (! $this->hasResolved) {
                 $this->resolve();
             }
 
-            $relationFetcher = $this->relationLoaders[$relationName];
-
-            return $relationFetcher->extract($parent, $relationName);
+            return $this->relationLoader->extract($parent, $this->relationName);
         });
     }
 
@@ -87,10 +89,8 @@ class RelationBatchLoader
             true
         );
 
-        foreach ($this->relationLoaders as $relation => $relationLoader) {
-            foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-                $relationLoader->load($parentsOfSameClass, $relation);
-            }
+        foreach ($parentsGroupedByClass as $parentsOfSameClass) {
+            $this->relationLoader->load($parentsOfSameClass, $this->relationName);
         }
 
         $this->hasResolved = true;

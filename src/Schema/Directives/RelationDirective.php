@@ -32,23 +32,23 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 $paginationArgs = $this->paginationArgs($args);
 
                 if (config('lighthouse.batchload_relations')) {
-                    /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $loader */
-                    $loader = BatchLoaderRegistry::instance(
+                    /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
+                    $relationBatchLoader = BatchLoaderRegistry::instance(
                         RelationBatchLoader::class,
                         $resolveInfo->path
                     );
 
-                    if (! $loader->hasRelationLoader($relationName)) {
+                    if (! $relationBatchLoader->hasRelationLoader()) {
                         if ($paginationArgs !== null) {
-                            $relationFetcher = new PaginatedRelationLoader($decorateBuilder, $paginationArgs);
+                            $relationLoader = new PaginatedRelationLoader($decorateBuilder, $paginationArgs);
                         } else {
-                            $relationFetcher = new SimpleRelationLoader($decorateBuilder);
+                            $relationLoader = new SimpleRelationLoader($decorateBuilder);
                         }
 
-                        $loader->registerRelationLoader($relationName, $relationFetcher);
+                        $relationBatchLoader->registerRelationLoader($relationLoader, $relationName);
                     }
 
-                    return $loader->load($relationName, $parent);
+                    return $relationBatchLoader->load($parent);
                 }
 
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */

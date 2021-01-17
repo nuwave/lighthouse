@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationCountLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
@@ -61,7 +62,9 @@ GRAPHQL;
         $relation = $this->directiveArgValue('relation');
         if (! is_null($relation)) {
             return $value->setResolver(
-                $this->deferredRelationResolver()
+                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+                    return $this->loadRelation($parent, $resolveInfo);
+                }
             );
         }
 

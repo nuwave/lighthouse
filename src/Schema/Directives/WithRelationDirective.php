@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
@@ -25,44 +26,37 @@ abstract class WithRelationDirective extends BaseDirective
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
+        $previousResolver = $fieldValue->getResolver();
+
         return $next(
             $fieldValue->setResolver(
-                $this->deferredRelationResolver(
-                    $fieldValue->getResolver()
-                )
+                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+                    return $this
+                        ->loadRelation($parent, $resolveInfo)
+                        ->then(function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
+                            return $previousResolver($parent, $args, $context, $resolveInfo);
+                        });
+                }
             )
         );
     }
 
-    protected function deferredRelationResolver(?callable $resolver = null): Closure
+    protected function loadRelation(Model $parent, ResolveInfo $resolveInfo): Deferred
     {
-        return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $loader = $this->loader($resolveInfo);
+        $relationName = $this->relationName();
 
-            $relationName = $this->relationName();
-            if (! $loader->hasRelationLoader($relationName)) {
-                $loader->registerRelationLoader($relationName, $this->relationLoader($resolveInfo));
-            }
+        // There might be multiple directives on the same field, so we differentiate by relation too
+        $uniquePath = $resolveInfo->path;
+        $uniquePath []= $relationName;
 
-            $deferred = $loader->load($relationName, $parent);
-
-            return $resolver === null
-                ? $deferred
-                : $deferred->then(function () use ($resolver, $parent, $args, $context, $resolveInfo) {
-                    return $resolver($parent, $args, $context, $resolveInfo);
-                });
-        };
-    }
-
-    protected function loader(ResolveInfo $resolveInfo): RelationBatchLoader
-    {
         /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
-        $relationBatchLoader = BatchLoaderRegistry::instance(
-            RelationBatchLoader::class,
-            $resolveInfo->path
-        );
+        $relationBatchLoader = BatchLoaderRegistry::instance(RelationBatchLoader::class, $uniquePath);
 
-        return $relationBatchLoader;
+        if (! $relationBatchLoader->hasRelationLoader()) {
+            $relationBatchLoader->registerRelationLoader($this->relationLoader($resolveInfo), $relationName);
+        }
+
+        return $relationBatchLoader->load($parent);
     }
 
     /**
