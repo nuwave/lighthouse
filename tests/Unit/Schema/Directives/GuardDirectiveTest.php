@@ -23,7 +23,7 @@ class GuardDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => AuthenticationException::UNAUTHENTICATED,
+                    'message' => AuthenticationException::MESSAGE,
                 ],
             ],
         ]);
@@ -44,7 +44,7 @@ class GuardDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => AuthenticationException::UNAUTHENTICATED,
+                    'message' => AuthenticationException::MESSAGE,
                     'extensions' => [
                         'guards' => [
                             'api',
@@ -58,6 +58,7 @@ class GuardDirectiveTest extends TestCase
     public function testPassesOneFieldButThrowsInAnother(): void
     {
         $this->be(new User());
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @guard
@@ -80,7 +81,7 @@ class GuardDirectiveTest extends TestCase
                     'path' => [
                         'bar',
                     ],
-                    'message' => AuthenticationException::UNAUTHENTICATED,
+                    'message' => AuthenticationException::MESSAGE,
                 ],
             ],
         ]);
