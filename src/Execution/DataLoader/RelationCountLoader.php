@@ -4,9 +4,11 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
-class RelationCountFetcher implements RelationFetcher
+class RelationCountLoader implements RelationLoader
 {
     /**
      * @var \Closure
@@ -18,9 +20,33 @@ class RelationCountFetcher implements RelationFetcher
         $this->decorateBuilder = $decorateBuilder;
     }
 
-    public function fetch(EloquentCollection $parents, string $relationName): void
+    public function load(EloquentCollection $parents, string $relationName): void
     {
         self::loadCount($parents, [$relationName => $this->decorateBuilder]);
+    }
+
+    public function extract(Model $model, string $relationName)
+    {
+        return self::extractCount($model, $relationName);
+    }
+
+    public static function extractCount(Model $model, string $relationName): int
+    {
+        /**
+         * This is the name that Eloquent gives to the attribute that contains the count.
+         *
+         * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withCount()
+         */
+        $countAttributeName = Str::snake("${relationName}_count");
+
+        /**
+         * We just assert this is an int and let PHP run into a type error if not.
+         *
+         * @var int $count
+         */
+        $count = $model->getAttribute($countAttributeName);
+
+        return $count;
     }
 
     /**

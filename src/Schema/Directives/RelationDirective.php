@@ -8,10 +8,10 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\LoaderRegistry;
-use Nuwave\Lighthouse\Execution\DataLoader\PaginatedRelationFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\DataLoader\PaginatedRelationLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -33,22 +33,22 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
                 if (config('lighthouse.batchload_relations')) {
                     /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $loader */
-                    $loader = LoaderRegistry::instance(
+                    $loader = BatchLoaderRegistry::instance(
                         RelationBatchLoader::class,
                         $resolveInfo->path
                     );
 
-                    if (! $loader->hasRelation($relationName)) {
+                    if (! $loader->hasRelationLoader($relationName)) {
                         if ($paginationArgs !== null) {
-                            $relationFetcher = new PaginatedRelationFetcher($decorateBuilder, $paginationArgs);
+                            $relationFetcher = new PaginatedRelationLoader($decorateBuilder, $paginationArgs);
                         } else {
-                            $relationFetcher = new SimpleRelationFetcher($decorateBuilder);
+                            $relationFetcher = new SimpleRelationLoader($decorateBuilder);
                         }
 
-                        $loader->registerRelation($relationName, $relationFetcher);
+                        $loader->registerRelationLoader($relationName, $relationFetcher);
                     }
 
-                    return $loader->relation($relationName, $parent);
+                    return $loader->load($relationName, $parent);
                 }
 
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */

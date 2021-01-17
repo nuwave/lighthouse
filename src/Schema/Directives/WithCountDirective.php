@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountFetcher;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationCountLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class WithCountDirective extends WithRelationDirective implements FieldMiddleware
@@ -44,9 +44,9 @@ GRAPHQL;
         return $relation;
     }
 
-    protected function relationFetcher(ResolveInfo $resolveInfo): RelationFetcher
+    protected function relationFetcher(ResolveInfo $resolveInfo): RelationLoader
     {
-        return new RelationCountFetcher(
+        return new RelationCountLoader(
             $this->decorateBuilder($resolveInfo)
         );
     }

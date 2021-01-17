@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-abstract class LoaderRegistry
+abstract class BatchLoaderRegistry
 {
     /**
      * Active BatchLoader instances.

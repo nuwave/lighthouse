@@ -14,48 +14,14 @@ use Tests\Utils\Models\User;
 
 class CountDirectiveDBTest extends DBTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            activity: [Activity!] @all
-            completed_tasks: Int @count(model: "Task", scopes: ["completed"])
-            tasks_count: Int @count(model: "Task")
-            tasks: Int @count
-            user: User @first
-            users: [User!] @all
-        }
-
-        type Post {
-            id: ID
-            images_count: Int @count(relation: "images")
-        }
-
-        type Task {
-            id: ID
-            images_count: Int @count(relation: "images")
-        }
-
-        union ActivityContent = Post | Task
-
-        type Activity {
-            id: ID
-            content: ActivityContent! @morphTo
-        }
-
-        type User {
-            completed_tasks: Int! @count(relation: "tasks", scopes: ["completed"])
-            tasks: Int @count(relation: "tasks")
-            tasks_count: Int @count(relation: "tasks")
-            foo: Int @count
-        }
-        ';
-    }
-
     public function testItRequiresARelationOrModelArgument(): void
     {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count
+        }
+        ';
+
         $this->expectException(DefinitionException::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -66,6 +32,12 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testItCanCountAModel(): void
     {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks_count: Int @count(model: "Task")
+        }
+        ';
+
         factory(Task::class, 3)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -81,6 +53,12 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testItCanCountAModelWithScopes(): void
     {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            completed_tasks: Int @count(model: "Task", scopes: ["completed"])
+        }
+        ';
+
         factory(Task::class, 3)->create();
         factory(Task::class, 2)->create([
             'completed_at' => now(),
@@ -99,9 +77,15 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testItCountsARelationAndEagerLoadsTheCount(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users: [User!] @all
         }
+
+        type User {
+            tasks_count: Int @count(relation: "tasks")
+        }
+        ';
 
         factory(User::class, 3)->create()
             ->each(function (User $user, int $index): void {
@@ -111,7 +95,8 @@ class CountDirectiveDBTest extends DBTestCase
             });
 
         $queries = 0;
-        DB::listen(function () use (&$queries): void {
+        DB::listen(function ($q) use (&$queries): void {
+            dump($q);
             $queries++;
         });
 
@@ -142,9 +127,15 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testItCountsARelationThatIsNotSuffixedWithCount(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User! @first
         }
+
+        type User {
+            tasks: Int @count(relation: "tasks")
+        }
+        ';
 
         factory(Task::class, 3)->create([
             'user_id' => factory(User::class)->create(),
@@ -167,9 +158,15 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testItCountsARelationshipWithScopesApplied(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User @first
         }
+
+        type User {
+            completed_tasks: Int! @count(relation: "tasks", scopes: ["completed"])
+        }
+        ';
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
@@ -198,9 +195,28 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testItCanCountPolymorphicRelations(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            activity: [Activity!] @all
         }
+
+        type Post {
+            id: ID
+            images_count: Int @count(relation: "images")
+        }
+
+        type Task {
+            id: ID
+            images_count: Int @count(relation: "images")
+        }
+
+        union ActivityContent = Post | Task
+
+        type Activity {
+            id: ID
+            content: ActivityContent! @morphTo
+        }
+        ';
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
@@ -319,10 +335,6 @@ class CountDirectiveDBTest extends DBTestCase
 
     public function testCanResolveCountByRelation(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
-        }
-
         /** @var User $user */
         $user = factory(User::class)->create();
 

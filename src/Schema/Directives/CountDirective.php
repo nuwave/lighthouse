@@ -3,10 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountFetcher;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationCountLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -62,11 +61,7 @@ GRAPHQL;
         $relation = $this->directiveArgValue('relation');
         if (! is_null($relation)) {
             return $value->setResolver(
-                $this->deferredRelationResolver(
-                    function (Model $model) {
-                        return $model->{$this->nodeName()};
-                    }
-                )
+                $this->deferredRelationResolver()
             );
         }
 
@@ -82,12 +77,12 @@ GRAPHQL;
             throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
         }
 
-        return "{$relation} as {$this->nodeName()}";
+        return $relation;
     }
 
-    protected function relationFetcher(ResolveInfo $resolveInfo): RelationFetcher
+    protected function relationFetcher(ResolveInfo $resolveInfo): RelationLoader
     {
-        return new RelationCountFetcher(
+        return new RelationCountLoader(
             $this->decorateBuilder($resolveInfo)
         );
     }

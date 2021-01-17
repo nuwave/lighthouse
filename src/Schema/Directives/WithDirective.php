@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationFetcher;
-use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class WithDirective extends WithRelationDirective implements FieldMiddleware
@@ -36,9 +36,9 @@ GRAPHQL;
             ?? $this->nodeName();
     }
 
-    protected function relationFetcher(ResolveInfo $resolveInfo): RelationFetcher
+    protected function relationFetcher(ResolveInfo $resolveInfo): RelationLoader
     {
-        return new SimpleRelationFetcher(
+        return new SimpleRelationLoader(
             $this->decorateBuilder($resolveInfo)
         );
     }
