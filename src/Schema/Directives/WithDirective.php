@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationFetcher;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class WithDirective extends WithRelationDirective implements FieldMiddleware
@@ -31,18 +30,16 @@ directive @with(
 GRAPHQL;
     }
 
-    public function relationName(): string
+    protected function relationName(): string
     {
         return $this->directiveArgValue('relation')
             ?? $this->nodeName();
     }
 
-    protected function loadRelation(RelationBatchLoader $loader, string $relationName, ResolveInfo $resolveInfo, Model $parent): Deferred
+    protected function relationFetcher(ResolveInfo $resolveInfo): RelationFetcher
     {
-        if (! $loader->hasRelationMeta($relationName)) {
-            $loader->registerRelationMeta($relationName, $this->relationMeta($resolveInfo));
-        }
-
-        return $loader->relation($relationName, $parent);
+        return new SimpleRelationFetcher(
+            $this->decorateBuilder($resolveInfo)
+        );
     }
 }

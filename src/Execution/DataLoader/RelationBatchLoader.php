@@ -10,18 +10,11 @@ use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 class RelationBatchLoader
 {
     /**
-     * A map from relation names and meta information about them.
+     * A map from relation names to responsible fetcher instances.
      *
-     * @var array<string, \Nuwave\Lighthouse\Execution\DataLoader\RelationMeta>
+     * @var array<string, \Nuwave\Lighthouse\Execution\DataLoader\RelationFetcher>
      */
     protected $relations = [];
-
-    /**
-     * A map from relation names and meta information about them.
-     *
-     * @var array<string, \Nuwave\Lighthouse\Execution\DataLoader\RelationMeta>
-     */
-    protected $relationsToCount = [];
 
     /**
      * A map from unique keys to parent model instances.
@@ -35,45 +28,17 @@ class RelationBatchLoader
      */
     protected $hasLoaded;
 
-    public function hasRelationMeta(string $relationName): bool
+    public function hasRelation(string $relationName): bool
     {
         return isset($this->relations[$relationName]);
     }
 
-    public function registerRelationMeta(string $relationName, RelationMeta $relationMeta): void
+    public function registerRelation(string $relationName, RelationFetcher $relationFetcher): void
     {
-        // TODO what happens if the name exists? throw, bail, overwrite?
-
-        $this->relations[$relationName] = $relationMeta;
-    }
-
-    public function hasRelationToCountMeta(string $relationName): bool
-    {
-        return isset($this->relationsToCount[$relationName]);
-    }
-
-    public function registerRelationToCountMeta(string $relationName, RelationMeta $relationMeta): void
-    {
-        // TODO what happens if the name exists? throw, bail, overwrite?
-
-        $this->relationsToCount[$relationName] = $relationMeta;
+        $this->relations[$relationName] = $relationFetcher;
     }
 
     public function relation(string $relationName, Model $parent): Deferred
-    {
-        $modelKey = ModelKey::build($parent);
-        $this->parents[$modelKey] = $parent;
-
-        return new Deferred(function () use ($parent, $relationName) {
-            if (! $this->hasLoaded) {
-                $this->load();
-            }
-
-            return $this->extractRelation($parent, $relationName);
-        });
-    }
-
-    public function relationToCount(string $relationName, Model $parent): Deferred
     {
         $modelKey = ModelKey::build($parent);
         $this->parents[$modelKey] = $parent;
@@ -100,27 +65,9 @@ class RelationBatchLoader
             true
         );
 
-        foreach ($this->relations as $relation => $relationMeta) {
-            // TODO split paginated and non-paginated relations, maybe do each set at once?
-            $relation = [$relation => $relationMeta->decorateBuilder];
-
+        foreach ($this->relations as $relation => $relationFetcher) {
             foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-                $parentsOfSameClass->load($relation);
-            }
-
-            // TODO mutates the models in a destructive way
-//            if ($relationMeta->paginationArgs !== null) {
-//                $modelRelationFetcher = new ModelRelationFetcher($parentModels, $relation);
-//                $models = $modelRelationFetcher->loadRelationsForPage($relationMeta->paginationArgs);
-//            } else {
-//            }
-        }
-
-        foreach ($this->relationsToCount as $relation => $relationMeta) {
-            $relation = [$relation => $relationMeta->decorateBuilder];
-
-            foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-                $parentsOfSameClass->loadCount($relation);
+                $relationFetcher->fetch($parentsOfSameClass, $relation);
             }
         }
     }

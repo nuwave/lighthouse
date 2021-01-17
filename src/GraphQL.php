@@ -18,6 +18,7 @@ use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\LoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -267,5 +268,8 @@ class GraphQL
     {
         LoaderRegistry::forgetInstances();
         $this->errorPool->clear();
+
+        // TODO remove in v6
+        BatchLoader::forgetInstances();
     }
 }

@@ -3,7 +3,7 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\PaginatedRelationFetcher;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
@@ -11,9 +11,9 @@ use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class ModelRelationFetcherTest extends DBTestCase
+class PaginatedRelationLoaderTest extends DBTestCase
 {
-    public function testCanLoadRelationshipsWithLimitsOnCollection(): void
+    public function testLoadRelationshipsWithLimitsOnCollection(): void
     {
         /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
@@ -28,10 +28,11 @@ class ModelRelationFetcherTest extends DBTestCase
         );
 
         $pageSize = 3;
-        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage(
-                $this->makePaginationArgs($pageSize)
-            );
+        $users = User::all();
+        (new PaginatedRelationFetcher(
+            static function () {},
+            $this->makePaginationArgs($pageSize)
+        ))->fetch($users, 'tasks');
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -51,7 +52,7 @@ class ModelRelationFetcherTest extends DBTestCase
         $this->assertEquals($secondUser->getKey(), $secondTask->user_id);
     }
 
-    public function testCanLoadCountOnCollection(): void
+    public function testLoadCountOnCollection(): void
     {
         /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
@@ -67,8 +68,12 @@ class ModelRelationFetcherTest extends DBTestCase
             factory(Task::class, $secondTasksCount)->make()
         );
 
-        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->reloadModelsWithRelationCount();
+        $users = User::all();
+
+        (new PaginatedRelationFetcher(
+            static function () {},
+            $this->makePaginationArgs(10)
+        ))->fetch($users, 'tasks');
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -90,10 +95,18 @@ class ModelRelationFetcherTest extends DBTestCase
             factory(Post::class, 3)->make()
         );
 
-        $users = (new ModelRelationFetcher(User::all(), ['tasks', 'posts']))
-            ->loadRelationsForPage(
-                $this->makePaginationArgs(4)
-            );
+
+        $users = User::all();
+
+        (new PaginatedRelationFetcher(
+            static function () {},
+            $this->makePaginationArgs(4)
+        ))->fetch($users, 'tasks');
+
+        (new PaginatedRelationFetcher(
+            static function () {},
+            $this->makePaginationArgs(4)
+        ))->fetch($users, 'posts');
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -128,10 +141,12 @@ class ModelRelationFetcherTest extends DBTestCase
         $user2->tasks()->save($softDeletedTaskUser2);
         $softDeletedTaskUser2->delete();
 
-        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
-            ->loadRelationsForPage(
-                $this->makePaginationArgs(4)
-            );
+        $users = User::all();
+
+        (new PaginatedRelationFetcher(
+            static function () {},
+            $this->makePaginationArgs(4)
+        ))->fetch($users, 'tasks');
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -155,10 +170,12 @@ class ModelRelationFetcherTest extends DBTestCase
         $this->assertCount(3, $task->tags);
 
         $first = 2;
-        $tasks = (new ModelRelationFetcher(Task::all(), ['tags']))
-            ->loadRelationsForPage(
-                $this->makePaginationArgs($first)
-            );
+        $tasks = Task::all();
+
+        (new PaginatedRelationFetcher(
+            static function () {},
+            $this->makePaginationArgs($first)
+        ))->fetch($tasks, 'tags');
 
         /** @var \Tests\Utils\Models\Task $firstTask */
         $firstTask = $tasks[0];

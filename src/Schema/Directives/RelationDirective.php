@@ -9,8 +9,9 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\LoaderRegistry;
+use Nuwave\Lighthouse\Execution\DataLoader\PaginatedRelationFetcher;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationMeta;
+use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationFetcher;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -37,12 +38,14 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                         $resolveInfo->path
                     );
 
-                    if (! $loader->hasRelationMeta($relationName)) {
-                        $relationMeta = new RelationMeta();
-                        $relationMeta->decorateBuilder = $decorateBuilder;
-                        $relationMeta->paginationArgs = $paginationArgs;
+                    if (! $loader->hasRelation($relationName)) {
+                        if ($paginationArgs !== null) {
+                            $relationFetcher = new PaginatedRelationFetcher($decorateBuilder, $paginationArgs);
+                        } else {
+                            $relationFetcher = new SimpleRelationFetcher($decorateBuilder);
+                        }
 
-                        $loader->registerRelationMeta($relationName, $relationMeta);
+                        $loader->registerRelation($relationName, $relationFetcher);
                     }
 
                     return $loader->relation($relationName, $parent);

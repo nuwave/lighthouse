@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationCountFetcher;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationFetcher;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -78,7 +78,7 @@ GRAPHQL;
         );
     }
 
-    public function relationName(): string
+    protected function relationName(): string
     {
         $relation = $this->directiveArgValue('relation');
         if (! $relation) {
@@ -88,12 +88,10 @@ GRAPHQL;
         return "{$relation} as {$this->nodeName()}";
     }
 
-    protected function loadRelation(RelationBatchLoader $loader, string $relationName, ResolveInfo $resolveInfo, Model $parent): Deferred
+    protected function relationFetcher(ResolveInfo $resolveInfo): RelationFetcher
     {
-        if (! $loader->hasRelationToCountMeta($relationName)) {
-            $loader->registerRelationToCountMeta($relationName, $this->relationMeta($resolveInfo));
-        }
-
-        return $loader->relationToCount($relationName, $parent);
+        return new RelationCountFetcher(
+            $this->decorateBuilder($resolveInfo)
+        );
     }
 }
