@@ -30,7 +30,8 @@ class PaginatedRelationLoaderTest extends DBTestCase
         $pageSize = 3;
         $users = User::all();
         (new PaginatedRelationFetcher(
-            static function () {},
+            static function () {
+            },
             $this->makePaginationArgs($pageSize)
         ))->fetch($users, 'tasks');
 
@@ -71,7 +72,8 @@ class PaginatedRelationLoaderTest extends DBTestCase
         $users = User::all();
 
         (new PaginatedRelationFetcher(
-            static function () {},
+            static function () {
+            },
             $this->makePaginationArgs(10)
         ))->fetch($users, 'tasks');
 
@@ -95,16 +97,17 @@ class PaginatedRelationLoaderTest extends DBTestCase
             factory(Post::class, 3)->make()
         );
 
-
         $users = User::all();
 
         (new PaginatedRelationFetcher(
-            static function () {},
+            static function () {
+            },
             $this->makePaginationArgs(4)
         ))->fetch($users, 'tasks');
 
         (new PaginatedRelationFetcher(
-            static function () {},
+            static function () {
+            },
             $this->makePaginationArgs(4)
         ))->fetch($users, 'posts');
 
@@ -144,7 +147,8 @@ class PaginatedRelationLoaderTest extends DBTestCase
         $users = User::all();
 
         (new PaginatedRelationFetcher(
-            static function () {},
+            static function () {
+            },
             $this->makePaginationArgs(4)
         ))->fetch($users, 'tasks');
 
@@ -173,7 +177,8 @@ class PaginatedRelationLoaderTest extends DBTestCase
         $tasks = Task::all();
 
         (new PaginatedRelationFetcher(
-            static function () {},
+            static function () {
+            },
             $this->makePaginationArgs($first)
         ))->fetch($tasks, 'tags');
 

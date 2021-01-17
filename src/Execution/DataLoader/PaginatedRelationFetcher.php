@@ -74,7 +74,8 @@ class PaginatedRelationFetcher implements RelationFetcher
      *
      * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Relations\Relation>
      */
-    protected function initializeRelationBuilders(EloquentCollection $parents, string $relationName): Collection {
+    protected function initializeRelationBuilders(EloquentCollection $parents, string $relationName): Collection
+    {
         return $parents
             ->toBase()
             ->map(function (Model $model) use ($parents, $relationName): Relation {
