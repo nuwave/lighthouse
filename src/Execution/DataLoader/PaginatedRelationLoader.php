@@ -82,7 +82,6 @@ class PaginatedRelationLoader implements RelationLoader
 
         // Merge all the relation queries into a single query with UNION ALL.
 
-
         /**
          * Use the first query as the initial starting point.
          *

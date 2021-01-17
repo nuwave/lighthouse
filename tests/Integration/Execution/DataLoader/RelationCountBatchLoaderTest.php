@@ -4,7 +4,6 @@ namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;

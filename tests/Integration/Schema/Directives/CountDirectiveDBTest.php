@@ -4,7 +4,6 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Image;
