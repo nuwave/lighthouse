@@ -201,7 +201,6 @@ class PaginatedRelationLoader implements RelationLoader
                 ]
             );
 
-            dump($model);
             $model->setRelation($relationName, $paginator);
         }
     }
