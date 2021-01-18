@@ -107,7 +107,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Control how Lighthouse handles security related query validation.
-    | This configures the options from http://webonyx.github.io/graphql-php/security/
+    | This configures the options from https://webonyx.github.io/graphql-php/security/
     |
     */
 
@@ -148,7 +148,7 @@ return [
     | Debug
     |--------------------------------------------------------------------------
     |
-    | Control the debug level as described in http://webonyx.github.io/graphql-php/error-handling/
+    | Control the debug level as described in https://webonyx.github.io/graphql-php/error-handling/
     | Debugging is only applied if the global Laravel debug config is set to true.
     |
     */
