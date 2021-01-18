@@ -186,7 +186,7 @@ You can also provide a custom type resolver. Run `php artisan lighthouse:interfa
 a custom interface class. It is automatically put in the default namespace where Lighthouse can discover it by itself.
 
 Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#interfaces) and the
-[docs for graphql-php](http://webonyx.github.io/graphql-php/type-system/interfaces/)
+[docs for graphql-php](https://webonyx.github.io/graphql-php/type-system/interfaces/)
 
 ## Union
 
@@ -212,4 +212,4 @@ own using `php artisan lighthouse:union <Union name>`.
 It is automatically put in the default namespace where Lighthouse can discover it by itself.
 
 Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#union-types) and the
-[docs for graphql-php](http://webonyx.github.io/graphql-php/type-system/unions/)
+[docs for graphql-php](https://webonyx.github.io/graphql-php/type-system/unions/)

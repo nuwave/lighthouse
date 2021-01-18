@@ -129,7 +129,7 @@ function foo(): Collection
 ```
 
 Use `self` to annotate that a class returns an instance of itself (or its child).
-Use [PHPDoc type hints](http://docs.phpdoc.org/guides/types.html#keywords) to
+Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to
 differentiate between cases where you return the original object instance and
 other cases where you instantiate a new class.
 

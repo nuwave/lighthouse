@@ -10,6 +10,6 @@ In both of these cases, the client can potentially take your GraphQL server down
 _This intro was taken from HowToGraphQL, we recommend reading their full chapter on security https://www.howtographql.com/advanced/4-security/_
 
 You can utilize the built-in security options through `config/lighthouse.php`.
-Read up on [the security options offered by webonyx/graphql-php](http://webonyx.github.io/graphql-php/security/)
+Read up on [the security options offered by webonyx/graphql-php](https://webonyx.github.io/graphql-php/security/)
 
 If you implemented some additional security feature, we are welcoming contributions!

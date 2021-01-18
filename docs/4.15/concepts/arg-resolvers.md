@@ -47,7 +47,7 @@ mutation CreateTaskWithNotes {
     id: 45
     name: "Do something"
     notes: [
-      { content: "Foo bar", link: "http://foo.bar" }
+      { content: "Foo bar", link: "https://foo.bar" }
       { content: "Awesome note" }
     ]
   ) {

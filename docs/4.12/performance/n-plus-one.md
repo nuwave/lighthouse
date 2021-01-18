@@ -50,6 +50,6 @@ you can use the [`@with`](../api-reference/directives.md#with) directive.
 ## Data Loader
 
 `webonyx/graphql-php` allows deferring the actual resolution of a field until it is actually needed,
-read more [in their documentation](http://webonyx.github.io/graphql-php/data-fetching/#solving-n1-problem).
+read more [in their documentation](https://webonyx.github.io/graphql-php/data-fetching/#solving-n1-problem).
 
 You can extend `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader` if you require custom batch loading.
