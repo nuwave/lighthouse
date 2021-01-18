@@ -79,10 +79,11 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
-        $this->assertSame($firstTasksCount, $firstUser->tasks()->count());
+        $this->assertSame($firstTasksCount, $firstUser->getAttributes()['tasks_count'] ?? null);
+
         /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
-        $this->assertSame($secondTasksCount, $secondUser->tasks->count());
+        $this->assertSame($secondTasksCount, $secondUser->getAttributes()['tasks_count'] ?? null);
     }
 
     public function testLoadsMultipleRelations(): void
