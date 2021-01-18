@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Exception;
 use GraphQL\Error\Error;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
@@ -54,12 +55,18 @@ class MorphManyDirectiveTest extends DBTestCase
         ]);
         $this->taskImages = Collection
             ::times(10)
-            ->map(function () {
-                return $this->task
+            ->map(function (): Image {
+                $image = $this->task
                     ->images()
                     ->save(
                         factory(Image::class)->create()
                     );
+
+                if ($image === false) {
+                    throw new Exception('Failed to save Image');
+                }
+
+                return $image;
             });
 
         $this->post = factory(Post::class)->create([
@@ -70,11 +77,17 @@ class MorphManyDirectiveTest extends DBTestCase
                 $this->faker()->numberBetween(1, 10)
             )
             ->map(function () {
-                return $this->post
+                $image = $this->post
                     ->images()
                     ->save(
                         factory(Image::class)->create()
                     );
+
+                if ($image === false) {
+                    throw new Exception('Failed to save Image');
+                }
+
+                return $image;
             });
     }
 
