@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\GraphQL;
  * Provides information about where client directives
  * were placed in the query and what arguments were given to them.
  *
- * TODO implement accessors for other locations http://spec.graphql.org/draft/#ExecutableDirectiveLocation
+ * TODO implement accessors for other locations https://spec.graphql.org/draft/#ExecutableDirectiveLocation
  */
 class ClientDirective
 {

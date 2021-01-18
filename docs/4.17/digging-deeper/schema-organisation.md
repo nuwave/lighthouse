@@ -51,7 +51,7 @@ graphql/
 ```
 
 Instead of naming each individual file, you can import multiple files that matches a pattern.
-It will be loaded using PHP's [glob function](http://php.net/manual/function.glob.php).
+It will be loaded using PHP's [glob function](https://php.net/manual/function.glob.php).
 
 ```graphql
 #import post/*.graphql

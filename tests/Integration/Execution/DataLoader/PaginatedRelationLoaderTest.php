@@ -40,14 +40,14 @@ class PaginatedRelationLoaderTest extends DBTestCase
         /** @var \Illuminate\Pagination\LengthAwarePaginator<\Tests\Utils\Models\Task> $tasksPaginator */
         $tasksPaginator = $firstUser->tasks;
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
-        $this->assertSame($pageSize, $tasksPaginator->count());
+        $this->assertCount($pageSize, $tasksPaginator);
         /** @var \Tests\Utils\Models\Task $firstTask */
         $firstTask = $tasksPaginator[0];
         $this->assertEquals($firstUser->getKey(), $firstTask->user_id);
 
         /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
-        $this->assertSame(2, $secondUser->tasks->count());
+        $this->assertCount(2, $secondUser->tasks);
         /** @var \Tests\Utils\Models\Task $secondTask */
         $secondTask = $secondUser->tasks[0];
         $this->assertEquals($secondUser->getKey(), $secondTask->user_id);

@@ -38,4 +38,4 @@ function (int $childrenComplexity, array $args): int
 2. `array $args`: The arguments that were passed into the field.
    For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
 
-Read more about query complexity in the [webonyx/graphql-php docs](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+Read more about query complexity in the [webonyx/graphql-php docs](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)

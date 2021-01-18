@@ -1,7 +1,7 @@
 # Error Handling
 
 Most of the error handling in Lighthouse is pretty closely based upon **webonyx/graphql-php**,
-so you can find a lot of valuable information [in their documentation](http://webonyx.github.io/graphql-php/error-handling/).
+so you can find a lot of valuable information [in their documentation](https://webonyx.github.io/graphql-php/error-handling/).
 
 ## User-friendly Errors
 
