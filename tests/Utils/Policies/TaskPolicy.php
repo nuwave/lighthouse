@@ -2,7 +2,6 @@
 
 namespace Tests\Utils\Policies;
 
-use Exception;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
