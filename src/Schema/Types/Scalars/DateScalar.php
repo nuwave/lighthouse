@@ -59,7 +59,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
-     * @param  string  $value
+     * @param  mixed  $value  Any value that might be a Date
      * @param  class-string<\Exception>  $exceptionClass
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
@@ -68,7 +68,12 @@ abstract class DateScalar extends ScalarType
     {
         try {
             if (is_object($value) && get_class($value) === \Carbon\Carbon::class) {
-                return Carbon::create(
+                /**
+                 * Given we had a valid \Carbon\Carbon before, this can not fail.
+                 *
+                 * @var \Illuminate\Support\Carbon $carbon
+                 */
+                $carbon = Carbon::create(
                     $value->year,
                     $value->month,
                     $value->day,
@@ -77,6 +82,8 @@ abstract class DateScalar extends ScalarType
                     $value->second,
                     $value->timezone
                 );
+
+                return $carbon;
             }
 
             return $this->parse($value);
