@@ -67,6 +67,18 @@ abstract class DateScalar extends ScalarType
     protected function tryParsingDate($value, string $exceptionClass): Carbon
     {
         try {
+            if (is_object($value) && get_class($value) === \Carbon\Carbon::class) {
+                return Carbon::create(
+                    $value->year,
+                    $value->month,
+                    $value->day,
+                    $value->hour,
+                    $value->minute,
+                    $value->second,
+                    $value->timezone
+                );
+            }
+
             return $this->parse($value);
         } catch (Exception $e) {
             throw new $exceptionClass(
