@@ -118,17 +118,17 @@ GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
-        $fieldDefinition->arguments []= Parser::inputValueDefinition(
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments []= Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 "A cursor after which elements are returned."
 after: String
 GRAPHQL
         );
 
         $fieldDefinition->type = Parser::namedType($connectionTypeName);
-        $parentType->fields []= $fieldDefinition;
+        $parentType->fields [] = $fieldDefinition;
     }
 
     /**
@@ -151,7 +151,7 @@ GRAPHQL
         }
 
         if ($this->modelClass) {
-            $objectType->directives []= Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")');
+            $objectType->directives [] = Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")');
         }
 
         $this->documentAST->setTypeDefinition($objectType);
@@ -183,13 +183,13 @@ GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $fieldDefinition->arguments []= Parser::inputValueDefinition(
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments []= Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
 
         $fieldDefinition->type = Parser::namedType($paginatorTypeName);
-        $parentType->fields []= $fieldDefinition;
+        $parentType->fields [] = $fieldDefinition;
     }
 
     /**
