@@ -18,7 +18,7 @@ class LimitDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users(limit: Int @limit): [User!]! @all(model: "User")
+            users(limit: Int @limit): [User!]! @all
         }
         ';
 
@@ -34,8 +34,13 @@ class LimitDirectiveTest extends DBTestCase
         ])->assertJsonCount($limit, 'data.users');
     }
 
+    /**
+     * TODO support this and add INPUT_FIELD_DEFINITION back as an allowed location
+     */
     public function testLimitOnInputField(): void
     {
+        $this->markTestSkipped('Not implemented yet because a naive implementation would cause a performance hit on all fields.');
+
         factory(User::class, 2)->create();
 
         $this->schema = /** @lang GraphQL */ '
@@ -48,7 +53,7 @@ class LimitDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users(filter: UserFilter): [User!]! @all(model: "User")
+            users(filter: UserFilter): [User!]! @all
         }
         ';
 
@@ -88,7 +93,7 @@ class LimitDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @all(model: "User")
+            users: [User!]! @all
         }
         ';
 
