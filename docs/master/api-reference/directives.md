@@ -1391,7 +1391,7 @@ Place this on any argument to a field that returns a list of results.
 
 ```graphql
 type Query {
-    users(limit: Int @limit): [User!]!
+  users(limit: Int @limit): [User!]!
 }
 ```
 
@@ -1399,22 +1399,22 @@ Lighthouse will return at most the number of results that the client requested.
 
 ```graphql
 {
-    users(limit: 5) {
-        name
-    }
+  users(limit: 5) {
+    name
+  }
 }
 ```
 
 ```json
 {
-    "data": {
-        "users": [
-            { "name": "Never" },
-            { "name": "more" },
-            { "name": "than" },
-            { "name": "5" }
-        ]
-    }
+  "data": {
+    "users": [
+      { "name": "Never" },
+      { "name": "more" },
+      { "name": "than" },
+      { "name": "5" }
+    ]
+  }
 }
 ```
 
