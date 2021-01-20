@@ -26,14 +26,12 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $softDeletesArgument = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        $fieldDefinition->arguments []= Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 """
 Allows to filter if trashed elements should be fetched.
 """
 trashed: Trashed @trashed
 GRAPHQL
         );
-        // @phpstan-ignore-next-line NodeList contravariance issue
-        $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, [$softDeletesArgument]);
     }
 }

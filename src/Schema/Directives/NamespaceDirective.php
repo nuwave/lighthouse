@@ -48,7 +48,7 @@ GRAPHQL;
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$namespaceDirective]);
+            $fieldDefinition->directives []= $namespaceDirective;
         }
     }
 
