@@ -1825,7 +1825,7 @@ directive @node(
   This is only needed when the default model detection does not work.
   """
   model: String
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 Lighthouse defaults to resolving types through the underlying model,

@@ -3,9 +3,13 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\GlobalId\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -47,13 +51,10 @@ directive @node(
   This is only needed when the default model detection does not work.
   """
   model: String
-) on FIELD_DEFINITION
+) on OBJECT
 GRAPHQL;
     }
 
-    /**
-     * Handle type construction.
-     */
     public function handleNode(TypeValue $value, Closure $next): Type
     {
         if ($this->directiveHasArgument('resolver')) {
@@ -76,12 +77,23 @@ GRAPHQL;
     }
 
     /**
-     * Apply manipulations from a type definition node.
-     *
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $typeDefinition
+     * @param DocumentAST $documentAST
+     * @param TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
+     * @throws DefinitionException
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        ASTHelper::attachNodeInterfaceToObjectType($typeDefinition);
+        if (! $typeDefinition instanceof ObjectTypeDefinitionNode) {
+            throw new DefinitionException(
+                "The {$this->name()} directive must only be used on object type definitions, not on {$typeDefinition->kind} {$typeDefinition->name->value}."
+            );
+        }
+
+        /** @var \GraphQL\Language\AST\NamedTypeNode $namedTypeNode */
+        $namedTypeNode = Parser::parseType('Node', ['noLocation' => true]);
+        $typeDefinition->interfaces []= $namedTypeNode;
+
+        $globalIdFieldName = config('lighthouse.global_id_field');
+        $typeDefinition->fields []= Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
     }
 }
