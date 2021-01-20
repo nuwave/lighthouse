@@ -297,24 +297,21 @@ and the argument value, and can apply additional constraints to the query.
 ```graphql
 type Query {
     users(
-        limit: Int @builder(method: "App\MyClass@limit")
+        minimumHighscore: Int @builder(method: "App\MyClass@minimumHighscore")
     ): [User!]! @all
 }
 ```
 
 ```php
+use Illuminate\Database\Eloquent\Builder;
+
 class MyClass
 {
-
-     * Add a limit constrained upon the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function limit($builder, int $value)
+    public function limit(Builder $builder, int $minimumHighscore): Builder
     {
-        return $builder->limit($value);
+        return $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
+            $builder->where('score', '>', $minimumHighscore);
+        });
     }
 }
 ```
@@ -1378,6 +1375,46 @@ This is often useful when loading relationships with the [@hasMany](#hasmany) di
 ```graphql
 type Post {
   comments: [Comment!]! @hasMany @lazyLoad(relations: ["replies"])
+}
+```
+
+## @limit
+
+```graphql
+"""
+Allow clients to specify the maximum number of results to return.
+"""
+directive @limit on ARGUMENT_DEFINITION
+```
+
+Place this on any argument to a field that returns a list of results.
+
+```graphql
+type Query {
+  users(limit: Int @limit): [User!]!
+}
+```
+
+Lighthouse will return at most the number of results that the client requested.
+
+```graphql
+{
+  users(limit: 5) {
+    name
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "users": [
+      { "name": "Never" },
+      { "name": "more" },
+      { "name": "than" },
+      { "name": "5" }
+    ]
+  }
 }
 ```
 
