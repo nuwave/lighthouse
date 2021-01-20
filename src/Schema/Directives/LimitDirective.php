@@ -23,7 +23,7 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgManipulat
 {
     public static function definition(): string
     {
-        return /* @lang GraphQL */ <<<GRAPHQL
+        return /* @lang GraphQL */ <<<'GRAPHQL'
 """
 Allow the client to limit the amount of returned results.
 """
@@ -40,12 +40,12 @@ GRAPHQL;
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
         if ($argType !== Type::INT) {
             throw new DefinitionException(
-                "The {$this->name()} directive must only be used on arguments of type " . Type::INT
-                . ", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
+                "The {$this->name()} directive must only be used on arguments of type ".Type::INT
+                .", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
             );
         }
 
-        $parentField->directives []= $this->directiveNode;
+        $parentField->directives [] = $this->directiveNode;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next)
@@ -102,7 +102,7 @@ GRAPHQL;
             }
             $limit--;
 
-            $limited []= $value;
+            $limited [] = $value;
         }
 
         return $limited;
