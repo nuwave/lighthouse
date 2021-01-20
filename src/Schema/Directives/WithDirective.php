@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class WithDirective extends WithRelationDirective implements FieldMiddleware
@@ -28,13 +30,16 @@ directive @with(
 GRAPHQL;
     }
 
-    public function batchLoaderClass(): string
+    protected function relationName(): string
     {
-        return RelationBatchLoader::class;
+        return $this->directiveArgValue('relation')
+            ?? $this->nodeName();
     }
 
-    public function relationName(): string
+    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
     {
-        return $this->directiveArgValue('relation', $this->nodeName());
+        return new SimpleRelationLoader(
+            $this->decorateBuilder($resolveInfo)
+        );
     }
 }

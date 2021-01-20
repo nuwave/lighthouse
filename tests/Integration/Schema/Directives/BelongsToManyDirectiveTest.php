@@ -12,14 +12,14 @@ use Tests\Utils\Models\User;
 class BelongsToManyDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
-     * User's tasks.
+     * Roles of the authenticated user.
      *
      * @var \Illuminate\Support\Collection
      */
@@ -37,12 +37,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->user = factory(User::class)->create();
         $this->roles = factory(Role::class, $this->rolesCount)->create();
 
-        $this->user
-            ->roles()
-            ->attach(
-                $this->roles,
-                ['meta' => 'new']
-            );
+        $this->user->roles()->attach($this->roles, ['meta' => 'new']);
 
         $this->be($this->user);
     }

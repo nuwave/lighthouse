@@ -3,8 +3,7 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\AppVersion;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
@@ -13,46 +12,34 @@ use Tests\Utils\Models\User;
 
 class RelationCountBatchLoaderTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
-    type Task {
-        id: ID
-        name: String
-    }
-
-    type User {
-        name: String
-        email: String
-        tasks: [Task] @hasMany
-        tasks_count: Int! @withCount(relation: "tasks")
-    }
-
-    type Query {
-        user(id: ID! @eq): User @find
-        users: [User!]! @all
-    }
-    ';
-
-    /** @var \Illuminate\Support\Collection<User> */
-    protected $users;
-
-    protected function setUp(): void
+    public function testCanResolveBatchedCountsFromBatchedRequests(): void
     {
-        parent::setUp();
-
-        $this->users = factory(User::class, 2)
+        $users = factory(User::class, 2)
             ->create()
             ->each(function (User $user): void {
                 factory(Task::class, 3)->create([
                     'user_id' => $user->getKey(),
                 ]);
             });
-    }
 
-    public function testCanResolveBatchedCountsFromBatchedRequests(): void
-    {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
+        $this->schema = /** @lang GraphQL */ '
+        type Task {
+            id: ID
+            name: String
         }
+
+        type User {
+            name: String
+            email: String
+            tasks: [Task] @hasMany
+            tasks_count: Int! @withCount(relation: "tasks")
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+            users: [User!]! @all
+        }
+        ';
 
         $query = /** @lang GraphQL */ '
         query ($id: ID!) {
@@ -67,13 +54,13 @@ class RelationCountBatchLoaderTest extends DBTestCase
                 [
                     'query' => $query,
                     'variables' => [
-                        'id' => $this->users[0]->getKey(),
+                        'id' => $users[0]->getKey(),
                     ],
                 ],
                 [
                     'query' => $query,
                     'variables' => [
-                        'id' => $this->users[1]->getKey(),
+                        'id' => $users[1]->getKey(),
                     ],
                 ],
             ])
@@ -98,10 +85,6 @@ class RelationCountBatchLoaderTest extends DBTestCase
 
     public function testCanResolveFieldsByCustomBatchLoader(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
-        }
-
         $users = factory(User::class, 3)
             ->create()
             ->each(function (User $user, int $index): void {
@@ -112,7 +95,7 @@ class RelationCountBatchLoaderTest extends DBTestCase
 
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoaderRegistry::instance(UserLoader::class, $info->path);
 
                 return $loader->load($args['id']);
             },
@@ -120,7 +103,7 @@ class RelationCountBatchLoaderTest extends DBTestCase
         );
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path);
+                $loader = BatchLoaderRegistry::instance(UserLoader::class, $info->path);
 
                 return $loader->loadMany($args['ids']);
             },
