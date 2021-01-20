@@ -46,22 +46,22 @@ class NodeDirectiveDBTest extends DBTestCase
         $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[2]['id']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            first: node(id: "'.$firstGlobalId.'") {
+            first: node(id: \"{$firstGlobalId}\") {
                 id
                 ...on User {
                     name
                 }
             }
-            second: node(id: "'.$secondGlobalId.'") {
+            second: node(id: \"{$secondGlobalId}\") {
                 id
                 ...on User {
                     name
                 }
             }
         }
-        ')->assertExactJson([
+        ")->assertExactJson([
             'data' => [
                 'first' => [
                     'id' => $firstGlobalId,
@@ -88,16 +88,16 @@ class NodeDirectiveDBTest extends DBTestCase
 
         $globalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node: node(id: "'.$globalId.'") {
+            node: node(id: \"{$globalId}\") {
                 id
                 ...on IUser {
                     name
                 }
             }
         }
-        ')->assertExactJson([
+        ")->assertExactJson([
             'data' => [
                 'node' => [
                     'id' => $globalId,
@@ -116,13 +116,13 @@ class NodeDirectiveDBTest extends DBTestCase
         ';
 
         $globalId = $this->globalIdResolver->encode('WrongClass', $this->testTuples[1]['id']);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node: node(id: "'.$globalId.'") {
+            node: node(id: \"{$globalId}\") {
                 id
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
                 'node' => null,
             ],
@@ -147,13 +147,13 @@ class NodeDirectiveDBTest extends DBTestCase
         ';
 
         $globalId = $this->globalIdResolver->encode('User2', $this->testTuples[1]['id']);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node: node(id: "'.$globalId.'") {
+            node: node(id: \"{$globalId}\") {
                 id
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
                 'node' => null,
             ],
@@ -178,8 +178,8 @@ class NodeDirectiveDBTest extends DBTestCase
      */
     public function testCanResolveModelsNodes(string $directiveDefinition): void
     {
-        $this->schema .= /** @lang GraphQL */ "
-        type User $directiveDefinition {
+        $this->schema .= /** @lang GraphQL */"
+        type User {$directiveDefinition} {
             name: String!
         }
         ";
@@ -189,16 +189,16 @@ class NodeDirectiveDBTest extends DBTestCase
         ]);
         $globalId = $this->globalIdResolver->encode('User', $user->getKey());
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node(id: "'.$globalId.'") {
+            node(id: \"{$globalId}\") {
                 id
                 ...on User {
                     name
                 }
             }
         }
-        ')->assertExactJson([
+        ")->assertExactJson([
             'data' => [
                 'node' => [
                     'id' => $globalId,
