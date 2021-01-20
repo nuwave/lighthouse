@@ -30,6 +30,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Remove non-functional `globalId` argument definition from `@update` https://github.com/nuwave/lighthouse/pull/1660
 - Resolve field middleware directives in lexical order https://github.com/nuwave/lighthouse/pull/1666
+- Ensure `Carbon\Carbon` is cast to `Illuminate\Support\Carbon` in date scalars https://github.com/nuwave/lighthouse/pull/1672
 - Fix Laravel 5.6 compatibility for `@withCount` and paginated relationship directives https://github.com/nuwave/lighthouse/pull/1528
 
 ## 5.0.2
