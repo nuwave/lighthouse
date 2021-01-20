@@ -2,8 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationCountLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class WithCountDirective extends WithRelationDirective implements FieldMiddleware
@@ -32,12 +34,7 @@ directive @withCount(
 GRAPHQL;
     }
 
-    public function batchLoaderClass(): string
-    {
-        return RelationCountBatchLoader::class;
-    }
-
-    public function relationName(): string
+    protected function relationName(): string
     {
         $relation = $this->directiveArgValue('relation');
         if (! $relation) {
@@ -45,5 +42,12 @@ GRAPHQL;
         }
 
         return $relation;
+    }
+
+    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
+    {
+        return new RelationCountLoader(
+            $this->decorateBuilder($resolveInfo)
+        );
     }
 }
