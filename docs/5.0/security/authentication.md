@@ -42,7 +42,7 @@ You can configure a default guard to use for authenticating GraphQL requests in 
 ```
 
 This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
-such as [@guard](../api-reference/directives.md#guard), or when applying the `AttempAuthentication` middleware.
+such as [@guard](../api-reference/directives.md#guard), or when applying the `AttemptAuthentication` middleware.
 
 Stateless guards are recommended for most use cases, such as the default `api` guard.
 
