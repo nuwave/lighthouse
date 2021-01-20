@@ -12,18 +12,18 @@ class AllDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */'
         type User {
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users: [User!]! @all(model: "User")
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users {
                 id
@@ -40,7 +40,7 @@ class AllDirectiveTest extends DBTestCase
             'task_id' => 1,
         ]);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */'
         type User {
             posts: [Post!]! @all
         }
@@ -54,7 +54,7 @@ class AllDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users {
                 posts {
@@ -95,24 +95,24 @@ class AllDirectiveTest extends DBTestCase
         $users = factory(User::class, 3)->create();
         $userName = $users->first()->name;
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */'
         type User {
             id: ID!
             name: String!
         }
-        
+
         type Query {
             users(name: String @neq): [User!]! @all
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            users(name: "'.$userName.'") {
+            users(name: \"{$userName}\") {
                 id
                 name
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ")->assertJsonCount(2, 'data.users');
     }
 }
