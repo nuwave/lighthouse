@@ -2,11 +2,12 @@
 
 namespace Tests\Integration\Schema;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class NodeInterfaceTest extends DBTestCase
+class NodeDirectiveDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
@@ -37,7 +38,7 @@ class NodeInterfaceTest extends DBTestCase
     public function testCanResolveNodes(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
@@ -80,7 +81,7 @@ class NodeInterfaceTest extends DBTestCase
         interface IUser {
             name: String!
         }
-        type User implements IUser @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User implements IUser @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
@@ -109,7 +110,7 @@ class NodeInterfaceTest extends DBTestCase
     public function testUnknownNodeType(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
@@ -136,7 +137,7 @@ class NodeInterfaceTest extends DBTestCase
     public function testTypeWithoutNodeDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
 
@@ -216,5 +217,15 @@ class NodeInterfaceTest extends DBTestCase
             ['@node'],
             ['@node(model: "User")'],
         ];
+    }
+
+    public function testThrowsWhenNodeDirectiveIsDefinedOnNonObjectType(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        input Foo @node {
+            bar: ID
+        }
+        ');
     }
 }

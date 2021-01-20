@@ -1809,6 +1809,7 @@ type User {
 ```graphql
 """
 Register a type for Relay's global object identification.
+
 When used without any arguments, Lighthouse will attempt
 to resolve the type through a model with the same name.
 """
@@ -1817,12 +1818,16 @@ directive @node(
   Reference to a function that receives the decoded `id` and returns a result.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
+
+  Mutually exclusive with the `model` argument.
   """
   resolver: String
 
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+
+  Mutually exclusive with the `model` argument.
   """
   model: String
 ) on OBJECT
