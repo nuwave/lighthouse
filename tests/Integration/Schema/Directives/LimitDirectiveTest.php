@@ -39,9 +39,9 @@ class LimitDirectiveTest extends DBTestCase
      */
     public function testLimitOnInputField(): void
     {
-        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan-phpunit/issues/52
         $this->markTestSkipped('Not implemented yet because a naive implementation would cause a performance hit on all fields.');
 
+        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan-phpunit/issues/52
         factory(User::class, 2)->create();
 
         $this->schema = /** @lang GraphQL */ '
