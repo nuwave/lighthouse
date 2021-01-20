@@ -30,8 +30,7 @@ rector: up ## Automatic code fixes with rector
 	docker-compose exec php composer rector
 
 vendor: up composer.json ## Install composer dependencies
-	# TODO reenable once laragraph/utils is stable
-	# docker-compose exec php composer validate --strict
+	docker-compose exec php composer validate --strict
 	docker-compose exec php composer install
 	docker-compose exec php composer normalize
 
