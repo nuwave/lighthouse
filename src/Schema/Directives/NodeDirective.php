@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
@@ -11,7 +10,6 @@ use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\GlobalId\NodeRegistry;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
@@ -77,7 +75,6 @@ GRAPHQL;
     }
 
     /**
-     * @param DocumentAST $documentAST
      * @param TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
      * @throws DefinitionException
      */
@@ -91,9 +88,9 @@ GRAPHQL;
 
         /** @var \GraphQL\Language\AST\NamedTypeNode $namedTypeNode */
         $namedTypeNode = Parser::parseType('Node', ['noLocation' => true]);
-        $typeDefinition->interfaces []= $namedTypeNode;
+        $typeDefinition->interfaces [] = $namedTypeNode;
 
         $globalIdFieldName = config('lighthouse.global_id_field');
-        $typeDefinition->fields []= Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
+        $typeDefinition->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
     }
 }
