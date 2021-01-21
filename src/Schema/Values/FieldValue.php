@@ -183,7 +183,7 @@ class FieldValue
     }
 
     /**
-     * @param callable(mixed $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
+     * @param callable(mixed $result, array<string, mixed> $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
      */
     public function registerResultHandler(callable $handle): void
     {
