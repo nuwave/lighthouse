@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -53,61 +52,42 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
-        $previousResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-            $result = $previousResolver($root, $args, $context, $resolveInfo);
-
-            if ($result instanceof Deferred) {
-                return $result->then(function ($result) use ($resolveInfo) {
-                    return $this->limitResult($result, $resolveInfo);
-                });
+        $fieldValue->resultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
+            if ($result === null) {
+                return null;
             }
 
-            return $this->limitResult($result, $resolveInfo);
+            $limit = null;
+            foreach ($resolveInfo->argumentSet->arguments as $argument) {
+                $argumentIsUsedToLimit = $argument->directives->contains(
+                    Utils::instanceofMatcher(self::class)
+                );
+
+                if ($argumentIsUsedToLimit) {
+                    $limit = $argument->value;
+                    break;
+                }
+            }
+
+            // Do not apply a limit if the client passes null explicitly
+            if (! is_integer($limit)) {
+                return $result;
+            }
+
+            $limited = [];
+
+            foreach ($result as $value) {
+                if ($limit === 0) {
+                    break;
+                }
+                $limit--;
+
+                $limited [] = $value;
+            }
+
+            return $limited;
         });
 
-        return $fieldValue;
-    }
-
-    /**
-     * @param  iterable<mixed>|null  $result
-     * @return iterable<mixed>
-     */
-    protected function limitResult(?iterable $result, ResolveInfo $resolveInfo): ?iterable
-    {
-        if ($result === null) {
-            return null;
-        }
-
-        $limit = null;
-        foreach ($resolveInfo->argumentSet->arguments as $argument) {
-            $argumentIsUsedToLimit = $argument->directives->contains(
-                Utils::instanceofMatcher(self::class)
-            );
-
-            if ($argumentIsUsedToLimit) {
-                $limit = $argument->value;
-                break;
-            }
-        }
-
-        // Do not apply a limit if the client passes null explicitly
-        if (! is_integer($limit)) {
-            return $result;
-        }
-
-        $limited = [];
-
-        foreach ($result as $value) {
-            if ($limit === 0) {
-                break;
-            }
-            $limit--;
-
-            $limited [] = $value;
-        }
-
-        return $limited;
+        return $next($fieldValue);
     }
 }

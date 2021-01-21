@@ -3,13 +3,13 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Deferred;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
@@ -67,7 +67,7 @@ GRAPHQL;
         $maxAge = $this->directiveArgValue('maxAge');
         $isPrivate = $this->directiveArgValue('private', false);
 
-        return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
             $cacheValue = new CacheValue(
                 $root,
                 $args,
@@ -90,24 +90,22 @@ GRAPHQL;
                 return $value;
             }
 
-            $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
+            $resolved = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
-                ? function ($value) use ($cacheKey, $maxAge, $cache): void {
-                    $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
+                ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
+                    $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
                 }
-            : function ($value) use ($cacheKey, $cache): void {
-                $cache->forever($cacheKey, $value);
+            : static function ($result) use ($cacheKey, $cache): void {
+                $cache->forever($cacheKey, $result);
             };
 
-            $resolvedValue instanceof Deferred
-                ? $resolvedValue->then(function ($result) use ($storeInCache): void {
-                    $storeInCache($result);
-                })
-                : $storeInCache($resolvedValue);
+            Resolved::handle($resolved, $storeInCache);
 
-            return $resolvedValue;
+            return $resolved;
         });
+
+        return $fieldValue;
     }
 
     /**

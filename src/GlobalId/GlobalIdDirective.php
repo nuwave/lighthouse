@@ -65,20 +65,12 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();
-        $resolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function () use ($type, $resolver): string {
-                    $resolvedValue = $resolver(...func_get_args());
+        $fieldValue->resultHandler(function ($result) use ($type) {
+            return $this->globalId->encode($type, $result);
+        });
 
-                    return $this->globalId->encode(
-                        $type,
-                        $resolvedValue
-                    );
-                }
-            )
-        );
+        return $next($fieldValue);
     }
 
     /**

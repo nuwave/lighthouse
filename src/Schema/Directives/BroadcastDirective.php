@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Deferred;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -35,23 +34,16 @@ GRAPHQL;
     {
         // Ensure this is run after the other field middleware directives
         $fieldValue = $next($fieldValue);
-        $resolver = $fieldValue->getResolver();
 
-        return $fieldValue->setResolver(function () use ($resolver) {
-            $resolved = $resolver(...func_get_args());
-
+        $fieldValue->resultHandler(function ($root) {
             $subscriptionField = $this->directiveArgValue('subscription');
             $shouldQueue = $this->directiveArgValue('shouldQueue');
 
-            if ($resolved instanceof Deferred) {
-                $resolved->then(function ($root) use ($subscriptionField, $shouldQueue): void {
-                    Subscription::broadcast($subscriptionField, $root, $shouldQueue);
-                });
-            } else {
-                Subscription::broadcast($subscriptionField, $resolved, $shouldQueue);
-            }
+            Subscription::broadcast($subscriptionField, $root, $shouldQueue);
 
-            return $resolved;
+            return $root;
         });
+
+        return $fieldValue;
     }
 }
