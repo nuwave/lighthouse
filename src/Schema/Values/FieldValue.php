@@ -134,7 +134,7 @@ class FieldValue
      */
     public function getResolver(): callable
     {
-        return $this->resolver; // @phpstan-ignore-line This must only be called after setResolver() was called
+        return $this->resolver;
     }
 
     /**
@@ -183,9 +183,32 @@ class FieldValue
     }
 
     /**
+     * Register a function that will receive the final result and resolver arguments.
+     *
+     * For example, the following handler tries to double the result.
+     * This is somewhat non-sensical, but shows the range of what you can do.
+     *
+     * function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+     *     if (is_numeric($result)) {
+     *         // A common use-case is to transform the result
+     *         $result = $result * 2;
+     *     }
+     *
+     *     // You can also filter results conditionally
+     *     if ($result === 42) {
+     *          return null;
+     *     }
+     *
+     *     // You can also run side-effects
+     *     Log::debug("Doubled to {$result}.");
+     *
+     *     // Don't forget to return something
+     *     return $result;
+     * }
+     *
      * @param callable(mixed $result, array<string, mixed> $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
      */
-    public function registerResultHandler(callable $handle): void
+    public function resultHandler(callable $handle): void
     {
         $previousResolver = $this->resolver;
 

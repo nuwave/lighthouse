@@ -29,7 +29,7 @@ GRAPHQL;
     {
         $relations = $this->directiveArgValue('relations', []);
 
-        $fieldValue->registerResultHandler(static function (Collection $items) use ($relations): Collection {
+        $fieldValue->resultHandler(static function (Collection $items) use ($relations): Collection {
             $items->load($relations);
 
             return $items;

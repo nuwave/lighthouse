@@ -52,7 +52,7 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
-        $fieldValue->registerResultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
+        $fieldValue->resultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
             if ($result === null) {
                 return null;
             }
