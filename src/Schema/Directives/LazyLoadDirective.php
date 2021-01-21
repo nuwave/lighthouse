@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -31,25 +31,19 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations', []);
-        $resolver = $fieldValue->getResolver();
+        $previousResolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $relations) {
-                    /** @var \GraphQL\Deferred|\Illuminate\Database\Eloquent\Model $result */
-                    $result = $resolver($root, $args, $context, $resolveInfo);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $relations) {
+            return Resolved::handle(
+                $previousResolver($root, $args, $context, $resolveInfo),
+                static function (Collection $items) use ($relations): Collection {
+                    $items->load($relations);
 
-                    $result instanceof Deferred
-                        ? $result->then(function (Collection &$items) use ($relations): Collection {
-                            $items->load($relations);
-
-                            return $items;
-                        })
-                        : $result->load($relations);
-
-                    return $result;
+                    return $items;
                 }
-            )
-        );
+            );
+        });
+
+        return $next($fieldValue);
     }
 }

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -41,22 +42,22 @@ GRAPHQL;
     {
         $previousResolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function () use ($previousResolver) {
-                    $result = $previousResolver(...func_get_args());
+        $fieldValue->setResolver(function () use ($previousResolver) {
+            $resolved = $previousResolver(...func_get_args());
 
-                    $eventClassName = $this->namespaceClassName(
-                        $this->directiveArgValue('dispatch')
-                    );
+            Resolved::handle($resolved, function ($result): void {
+                $eventClassName = $this->namespaceClassName(
+                    $this->directiveArgValue('dispatch')
+                );
 
-                    $this->eventsDispatcher->dispatch(
-                        new $eventClassName($result)
-                    );
+                $this->eventsDispatcher->dispatch(
+                    new $eventClassName($result)
+                );
+            });
 
-                    return $result;
-                }
-            )
-        );
+            return $resolved;
+        });
+
+        return $next($fieldValue);
     }
 }

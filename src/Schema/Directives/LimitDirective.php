@@ -3,13 +3,13 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -56,18 +56,15 @@ GRAPHQL;
         $previousResolver = $fieldValue->getResolver();
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-            $result = $previousResolver($root, $args, $context, $resolveInfo);
-
-            if ($result instanceof Deferred) {
-                return $result->then(function ($result) use ($resolveInfo) {
+            return Resolved::handle(
+                $previousResolver($root, $args, $context, $resolveInfo),
+                function (?iterable $result) use ($resolveInfo): ?iterable {
                     return $this->limitResult($result, $resolveInfo);
-                });
-            }
-
-            return $this->limitResult($result, $resolveInfo);
+                }
+            );
         });
 
-        return $fieldValue;
+        return $next($fieldValue);
     }
 
     /**

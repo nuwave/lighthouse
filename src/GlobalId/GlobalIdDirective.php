@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\GlobalId;
 
 use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
@@ -65,20 +66,18 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();
-        $resolver = $fieldValue->getResolver();
+        $previousResolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function () use ($type, $resolver): string {
-                    $resolvedValue = $resolver(...func_get_args());
-
-                    return $this->globalId->encode(
-                        $type,
-                        $resolvedValue
-                    );
+        $fieldValue->setResolver(function () use ($type, $previousResolver): string {
+            return Resolved::handle(
+                $previousResolver(...func_get_args()),
+                function ($result) use ($type) {
+                    return $this->globalId->encode($type, $result);
                 }
-            )
-        );
+            );
+        });
+
+        return $next($fieldValue);
     }
 
     /**
