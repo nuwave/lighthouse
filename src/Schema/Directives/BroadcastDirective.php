@@ -35,7 +35,7 @@ GRAPHQL;
         // Ensure this is run after the other field middleware directives
         $fieldValue = $next($fieldValue);
 
-        $fieldValue->registerResultHandler(function ($root) {
+        $fieldValue->resultHandler(function ($root) {
             $subscriptionField = $this->directiveArgValue('subscription');
             $shouldQueue = $this->directiveArgValue('shouldQueue');
 
