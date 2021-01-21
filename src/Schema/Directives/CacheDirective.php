@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Carbon\Carbon;
 use Closure;
 use GraphQL\Deferred;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;

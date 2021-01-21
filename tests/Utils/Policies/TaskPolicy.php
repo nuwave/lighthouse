@@ -16,6 +16,11 @@ class TaskPolicy
 
     public function delete(User $user, Task $task): bool
     {
-        return $user->id === $task->user->id;
+        $taskUser = $task->user;
+        if ($taskUser === null) {
+            return false;
+        }
+
+        return $user->id === $taskUser->id;
     }
 }

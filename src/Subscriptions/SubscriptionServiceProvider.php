@@ -17,6 +17,8 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
+use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
+use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
@@ -58,7 +60,16 @@ class SubscriptionServiceProvider extends ServiceProvider
     {
         $this->app->singleton(BroadcastManager::class);
         $this->app->singleton(SubscriptionRegistry::class);
-        $this->app->singleton(StoresSubscriptions::class, StorageManager::class);
+        $this->app->singleton(StoresSubscriptions::class, function () {
+            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
+            $configRepository = $this->app->make(ConfigRepository::class);
+            switch ($configRepository->get('lighthouse.subscriptions.storage')) {
+                case 'redis':
+                    return $this->app->make(RedisStorageManager::class);
+                default:
+                    return $this->app->make(CacheStorageManager::class);
+            }
+        });
 
         $this->app->bind(ContextSerializer::class, Serializer::class);
         $this->app->bind(AuthorizesSubscriptions::class, Authorizer::class);

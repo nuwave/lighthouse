@@ -34,7 +34,11 @@ class SerializerTest extends DBTestCase
 
         $context = $contextFactory->generate($request);
 
-        $this->assertSame($user, $context->user());
+        /** @var \Tests\Utils\Models\User|null $userFromContext */
+        $userFromContext = $context->user();
+        $this->assertNotNull($userFromContext);
+
+        $this->assertSame($user, $userFromContext);
 
         $retrievedFromDatabase = false;
 
@@ -48,9 +52,10 @@ class SerializerTest extends DBTestCase
 
         $this->assertTrue($retrievedFromDatabase);
 
+        /** @var \Tests\Utils\Models\User|null $unserializedUser */
         $unserializedUser = $unserialized->user();
-        $this->assertInstanceOf(User::class, $unserializedUser);
-        /** @var \Tests\Utils\Models\User $unserializedUser */
+        $this->assertNotNull($unserializedUser);
+
         $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }
 }

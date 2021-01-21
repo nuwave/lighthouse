@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Validation;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -13,8 +14,11 @@ class RulesDirectiveTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app->make(ConfigRepository::class);
+
         // Ensure we test for the result the end user receives
-        $app['config']->set('app.debug', false);
+        $config->set('app.debug', false);
     }
 
     public function testRequired(): void
@@ -121,7 +125,34 @@ class RulesDirectiveTest extends TestCase
             ->assertGraphQLValidationKeys(['early']);
     }
 
-    public function testCustomMessage(): void
+    public function testCustomMessages(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: ID @rules(
+                    apply: ["required"]
+                    messages: [
+                        {
+                            rule: "required",
+                            message: "custom message"
+                        }
+                    ]
+                )
+            ): String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertGraphQLValidationError('bar', 'custom message');
+    }
+
+    public function testCustomMessagesWithMap(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -227,13 +258,58 @@ class RulesDirectiveTest extends TestCase
             ]);
     }
 
-    public function testRulesHaveToBeArray(): void
+    /**
+     * @dataProvider invalidApplyArguments
+     */
+    public function testValidateApplyArgument(string $applyArgument): void
     {
         $this->expectException(DefinitionException::class);
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {
-            foo(bar: ID @rules(apply: 123)): ID
+            foo(bar: ID @rules(apply: '.$applyArgument.')): ID
         }
         ');
+    }
+
+    /**
+     * @return array<array<int, string>>
+     */
+    public function invalidApplyArguments(): array
+    {
+        return [
+            [/** @lang GraphQL */ '123'],
+            [/** @lang GraphQL */ '"123"'],
+            [/** @lang GraphQL */ '[]'],
+            [/** @lang GraphQL */ '[123]'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidMessageArguments
+     */
+    public function testValidateMessageArgument(string $messageArgument): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->buildSchema(/** @lang GraphQL */ "
+        type Query {
+            foo(bar: ID @rules(apply: [\"email\"], messages: {$messageArgument})): ID
+        }
+        ");
+    }
+
+    /**
+     * @return array<array<int, string>>
+     */
+    public function invalidMessageArguments(): array
+    {
+        return [
+            [/** @lang GraphQL */ '"foo"'],
+            [/** @lang GraphQL */ '{foo: 3}'],
+            [/** @lang GraphQL */ '[1, 2]'],
+            [/** @lang GraphQL */ '[{foo: 3}]'],
+            [/** @lang GraphQL */ '[{rule: "email"}]'],
+            [/** @lang GraphQL */ '[{rule: "email", message: null}]'],
+            [/** @lang GraphQL */ '[{rule: 3, message: "asfd"}]'],
+        ];
     }
 }

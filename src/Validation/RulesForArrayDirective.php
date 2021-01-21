@@ -28,11 +28,24 @@ directive @rulesForArray(
 
   """
   Specify the messages to return if the validators fail.
-  Specified as an input object that maps rules to messages,
-  e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: RulesMessageMap
+  messages: [RulesForArrayMessage!]
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Input for the `messages` argument of `@rulesForArray`.
+"""
+input RulesForArrayMessage {
+    """
+    Name of the rule, e.g. `"email"`.
+    """
+    rule: String!
+
+    """
+    Message to display if the rule fails, e.g. `"Must be a valid email"`.
+    """
+    message: String!
+}
 GRAPHQL;
     }
 

@@ -49,7 +49,7 @@ All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG
 
 ## Upgrade Guide
 
-When upgrading between major versions of Lighthouse, consider [`UPGRADE.MD`](UPGRADE.md).
+When upgrading between major versions of Lighthouse, consider [`UPGRADE.md`](UPGRADE.md).
 
 ## Contributing
 

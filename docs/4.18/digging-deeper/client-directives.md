@@ -119,5 +119,5 @@ For the example query above, it will look like this:
 You are then free to implement whatever logic on top of that. Some client directives may require
 only one field node to have it set, whereas others might require all of them to have the same configuration.
 
-> There are other locations where client directives may be used on: http://spec.graphql.org/draft/#ExecutableDirectiveLocation
+> There are other locations where client directives may be used on: https://spec.graphql.org/draft/#ExecutableDirectiveLocation
 > You can add a PR to Lighthouse if you need them.

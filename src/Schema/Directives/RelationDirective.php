@@ -8,9 +8,10 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\DataLoader\PaginatedRelationLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\Utils\ModelKey;
+use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -31,27 +32,23 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 $paginationArgs = $this->paginationArgs($args);
 
                 if (config('lighthouse.batchload_relations')) {
-                    $constructorArgs = [
-                        'relationName' => $relationName,
-                        'decorateBuilder' => $decorateBuilder,
-                    ];
+                    /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
+                    $relationBatchLoader = BatchLoaderRegistry::instance(
+                        RelationBatchLoader::class,
+                        $resolveInfo->path
+                    );
 
-                    if ($paginationArgs !== null) {
-                        $constructorArgs += [
-                            'paginationArgs' => $paginationArgs,
-                        ];
+                    if (! $relationBatchLoader->hasRelationLoader()) {
+                        if ($paginationArgs !== null) {
+                            $relationLoader = new PaginatedRelationLoader($decorateBuilder, $paginationArgs);
+                        } else {
+                            $relationLoader = new SimpleRelationLoader($decorateBuilder);
+                        }
+
+                        $relationBatchLoader->registerRelationLoader($relationLoader, $relationName);
                     }
 
-                    return BatchLoader
-                        ::instance(
-                            RelationBatchLoader::class,
-                            $this->buildPath($resolveInfo, $parent),
-                            $constructorArgs
-                        )
-                        ->load(
-                            ModelKey::build($parent),
-                            ['parent' => $parent]
-                        );
+                    return $relationBatchLoader->load($parent);
                 }
 
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
@@ -72,7 +69,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
     protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
     {
-        return function ($builder) use ($resolveInfo) {
+        return function (object $builder) use ($resolveInfo) {
             $resolveInfo
                 ->argumentSet
                 ->enhanceBuilder(

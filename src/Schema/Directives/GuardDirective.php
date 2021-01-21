@@ -98,7 +98,7 @@ GRAPHQL;
     protected function unauthenticated(array $guards): void
     {
         throw new AuthenticationException(
-            AuthenticationException::UNAUTHENTICATED,
+            AuthenticationException::MESSAGE,
             $guards
         );
     }

@@ -6,7 +6,8 @@ use Illuminate\Auth\AuthenticationException as IlluminateAuthenticationException
 
 class AuthenticationException extends IlluminateAuthenticationException implements RendersErrorsExtensions
 {
-    public const UNAUTHENTICATED = 'Unauthenticated.';
+    public const MESSAGE = 'Unauthenticated.';
+    public const CATEGORY = 'authentication';
 
     public function isClientSafe(): bool
     {
@@ -15,7 +16,7 @@ class AuthenticationException extends IlluminateAuthenticationException implemen
 
     public function getCategory(): string
     {
-        return 'authentication';
+        return self::CATEGORY;
     }
 
     /**

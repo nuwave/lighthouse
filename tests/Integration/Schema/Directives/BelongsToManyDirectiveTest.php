@@ -12,14 +12,14 @@ use Tests\Utils\Models\User;
 class BelongsToManyDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
-     * User's tasks.
+     * Roles of the authenticated user.
      *
      * @var \Illuminate\Support\Collection
      */
@@ -37,12 +37,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->user = factory(User::class)->create();
         $this->roles = factory(Role::class, $this->rolesCount)->create();
 
-        $this->user
-            ->roles()
-            ->attach(
-                $this->roles,
-                ['meta' => 'new']
-            );
+        $this->user->roles()->attach($this->roles, ['meta' => 'new']);
 
         $this->be($this->user);
     }
@@ -107,7 +102,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "paginator")
+            roles: [Role!]! @belongsToMany(type: PAGINATOR)
         }
 
         type Role {
@@ -154,7 +149,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay")
+            roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
 
         type Role {
@@ -199,7 +194,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+            roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
         }
 
         type Role {
@@ -250,7 +245,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+            roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
         }
 
         type Role {
@@ -285,7 +280,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay")
+            roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
 
         type Role {
@@ -340,7 +335,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
-            roles: [Role!]! @belongsToMany(type: "relay")
+            roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
 
         type ACL {

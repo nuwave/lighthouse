@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
@@ -41,9 +42,6 @@ trait TestsSerialization
 
     protected function useSerializingArrayStore(Container $app): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
-
         /** @var \Illuminate\Cache\CacheManager $cache */
         $cache = $app->make(CacheManager::class);
         $cache->extend('serializing-array', function () {
@@ -51,6 +49,9 @@ trait TestsSerialization
                 new SerializingArrayStore()
             );
         });
+
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app->make(ConfigRepository::class);
         $config->set('cache.stores.array.driver', 'serializing-array');
     }
 }

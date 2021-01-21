@@ -11,6 +11,49 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
+- Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
+- Validate correct usage of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
+- Allow eager-loading multiple relations on a single field using `@with` https://github.com/nuwave/lighthouse/pull/1528
+- Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` to instantiate arbitrary batch loaders https://github.com/nuwave/lighthouse/pull/1528
+- Add `@limit` directive to allow clients to specify the maximum number of results to return https://github.com/nuwave/lighthouse/pull/1674
+
+### Changed
+
+- Improve batch loading performance https://github.com/nuwave/lighthouse/pull/1528
+
+### Deprecated
+
+- Deprecate the `globalId` argument on the `@delete`, `@forceDelete` and `@restore` directives https://github.com/nuwave/lighthouse/pull/1660
+- Deprecate passing the `messages` argument on `@rules` and `@rulesForArray` as a map with arbitrary keys https://github.com/nuwave/lighthouse/pull/1662
+- Deprecate `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader` in favour of `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` https://github.com/nuwave/lighthouse/pull/1528
+
+### Fixed
+
+- Remove non-functional `globalId` argument definition from `@update` https://github.com/nuwave/lighthouse/pull/1660
+- Resolve field middleware directives in lexical order https://github.com/nuwave/lighthouse/pull/1666
+- Ensure `Carbon\Carbon` is cast to `Illuminate\Support\Carbon` in date scalars https://github.com/nuwave/lighthouse/pull/1672
+- Fix Laravel 5.6 compatibility for `@withCount` and paginated relationship directives https://github.com/nuwave/lighthouse/pull/1528
+
+## 5.0.2
+
+### Fixed
+
+- Make `@node` force load the type if it has not been loaded https://github.com/nuwave/lighthouse/pull/1659
+
+## 5.0.1
+
+### Fixed
+
+- Make `@model` not extend `@node` accidentally
+
+### Deprecated
+
+- Deprecate `\Nuwave\Lighthouse\Subscriptions\Subscriber::setRoot()` in favour of property access
+
+## 5.0.0
+
+### Added
+
 - Apply validation rules to input types by providing a validator class https://github.com/nuwave/lighthouse/pull/1185
 - Include schema directives when running `php artisan lighthouse:validate-schema` https://github.com/nuwave/lighthouse/pull/1494
 - Add ability to query for the existence of relations in where conditions https://github.com/nuwave/lighthouse/pull/1412
@@ -21,9 +64,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add new directive interface `FieldBuilderDirective` https://github.com/nuwave/lighthouse/pull/1636
 - Add `@whereAuth` directive for filtering a field based on authenticated user https://github.com/nuwave/lighthouse/pull/1636
 - Use the `@trim` directive on fields to sanitize all input strings https://github.com/nuwave/lighthouse/pull/1641
+- Add Laravel Echo compatible subscription broadcaster https://github.com/nuwave/lighthouse/pull/1370
+- Allow auxiliary types in directive definitions https://github.com/nuwave/lighthouse/pull/1649
 
 ### Changed
 
+- Use `Illuminate\Support\Carbon` instead of `Carbon\Carbon`
 - `\Nuwave\Lighthouse\Exceptions\ValidationException` no longer extends `\Illuminate\Validation\ValidationException` https://github.com/nuwave/lighthouse/pull/1185
 - Move validation related classes into namespace `Nuwave\Lighthouse\Validation` https://github.com/nuwave/lighthouse/pull/1185
 - Run `ArgDirectives` in distinct phases: Sanitize, Validate, Transform https://github.com/nuwave/lighthouse/pull/1185
@@ -44,7 +90,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change default configuration options in `lighthouse.php`:
   - `'guard' => 'api'`
   - `'forceFill' => true`
-- Use `laragraph/laravel-graphql-utils` for parsing HTTP requests https://github.com/nuwave/lighthouse/pull/1424
+- Use `laragraph/utils` for parsing HTTP requests https://github.com/nuwave/lighthouse/pull/1424
 - Replace the subscription broadcast queued event handler with a queued job to allow the queue name to be specified https://github.com/nuwave/lighthouse/pull/1507
 - Make `@method` call the underlying method with the arguments as ordered parameters instead
   of the full resolver arguments https://github.com/nuwave/lighthouse/pull/1509
@@ -57,6 +103,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Split `ProvidesRules` interface into `ArgumentValidation` and `ArgumentSetValidation` https://github.com/nuwave/lighthouse/pull/1628
 - Update to PHP 8 compatible mll-lab/graphql-php-scalars 4 https://github.com/nuwave/lighthouse/pull/1639
 - Add `TrimDirective` to the default `field_middleware` config in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/1641
+- Field keys in validation errors now match the client given input, ignoring transformations such as `@spread` https://github.com/nuwave/lighthouse/issues/1631
 
 ### Removed
 
@@ -80,6 +127,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Prefix complex conditions with table name to avoid ambiguous SQL https://github.com/nuwave/lighthouse/pull/1530
 - Merge type interfaces when extending type https://github.com/nuwave/lighthouse/pull/1635
+
+### Deprecated
+
+- Deprecate values for the `type` argument of `@paginate` that are not `PAGINATOR` or `CONNECTION`
 
 ## 4.18.0
 

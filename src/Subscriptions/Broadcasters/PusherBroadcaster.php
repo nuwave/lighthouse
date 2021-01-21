@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -30,9 +29,6 @@ class PusherBroadcaster implements Broadcaster
         $this->storage = app(StoresSubscriptions::class);
     }
 
-    /**
-     * Authorize subscription request.
-     */
     public function authorized(Request $request): JsonResponse
     {
         $channel = $request->input('channel_name');
@@ -42,39 +38,28 @@ class PusherBroadcaster implements Broadcaster
             true
         );
 
-        return response()->json($data, 200);
+        return new JsonResponse($data, 200);
     }
 
-    /**
-     * Handle unauthorized subscription request.
-     */
     public function unauthorized(Request $request): JsonResponse
     {
-        return response()->json(['error' => 'unauthorized'], 403);
+        return new JsonResponse([
+            'error' => 'unauthorized',
+        ], 403);
     }
 
-    /**
-     * Handle subscription web hook.
-     */
     public function hook(Request $request): JsonResponse
     {
-        (new Collection($request->input('events', [])))
-            ->filter(function (array $event): bool {
-                return $event['name'] === 'channel_vacated';
-            })
-            ->each(function (array $event): void {
+        foreach ($request->input('events', []) as $event) {
+            if ($event['name'] === 'channel_vacated') {
                 $this->storage->deleteSubscriber($event['channel']);
-            });
+            }
+        }
 
-        return response()->json(['message' => 'okay']);
+        return new JsonResponse(['message' => 'okay']);
     }
 
-    /**
-     * Send data to subscriber.
-     *
-     * @param  array<mixed>  $data
-     */
-    public function broadcast(Subscriber $subscriber, array $data): void
+    public function broadcast(Subscriber $subscriber, $data): void
     {
         $this->pusher->trigger(
             $subscriber->channel,

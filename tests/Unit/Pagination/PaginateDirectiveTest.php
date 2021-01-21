@@ -6,13 +6,14 @@ use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
+use Nuwave\Lighthouse\Pagination\PaginationType;
 use Tests\TestCase;
 
 class PaginateDirectiveTest extends TestCase
 {
     public function testCanAliasRelayToConnection(): void
     {
-        $connection = $this->getConnectionQueryField('connection');
+        $connection = $this->getConnectionQueryField(PaginationType::CONNECTION);
         $relay = $this->getConnectionQueryField('relay');
 
         $this->assertSame($connection, $relay);
@@ -26,7 +27,7 @@ class PaginateDirectiveTest extends TestCase
         }
 
         type Query {
-            users: [User!]! @paginate(type: \"$type\")
+            users: [User!]! @paginate(type: {$type})
         }
         ");
 
@@ -42,14 +43,14 @@ class PaginateDirectiveTest extends TestCase
         type User {
             name: String
             users: [User!]! @paginate
-            users2: [User!]! @paginate(type: "relay")
-            users3: [User!]! @paginate(type: "connection")
+            users2: [User!]! @paginate(type: CONNECTION)
+            users3: [User!]! @paginate(type: "relay")
         }
 
         type Query {
             users: [User!]! @paginate
-            users2: [User!]! @paginate(type: "relay")
-            users3: [User!]! @paginate(type: "connection")
+            users2: [User!]! @paginate(type: CONNECTION)
+            users3: [User!]! @paginate(type: "relay")
         }
         ');
         $typeMap = $schema->getTypeMap();
@@ -100,9 +101,9 @@ class PaginateDirectiveTest extends TestCase
             ->buildSchema(/** @lang GraphQL */ '
             type Query {
                 defaultPaginated: [User!]! @paginate
-                defaultRelay: [User!]! @paginate(type: "relay")
+                defaultRelay: [User!]! @paginate(type: CONNECTION)
                 customPaginated:  [User!]! @paginate(maxCount: 10)
-                customRelay:  [User!]! @paginate(maxCount: 10, type: "relay")
+                customRelay:  [User!]! @paginate(maxCount: 10, type: CONNECTION)
             }
 
             type User {
@@ -202,7 +203,7 @@ class PaginateDirectiveTest extends TestCase
 
         type Query {
             users1: [User!]! @paginate
-            users2: [User!]! @paginate(type: "relay")
+            users2: [User!]! @paginate(type: CONNECTION)
         }
         ';
 

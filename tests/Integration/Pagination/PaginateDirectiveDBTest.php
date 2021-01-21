@@ -246,7 +246,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @paginate(type: "relay")
+            users: [User!]! @paginate(type: CONNECTION)
         }
         ';
 
@@ -284,7 +284,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @paginate(type: "relay")
+            users: [User!]! @paginate(type: CONNECTION)
         }
         ';
 

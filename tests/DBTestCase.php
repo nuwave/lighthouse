@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
@@ -39,8 +40,11 @@ abstract class DBTestCase extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('database.default', 'mysql');
-        $app['config']->set('database.connections.mysql', [
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app->make(ConfigRepository::class);
+
+        $config->set('database.default', 'mysql');
+        $config->set('database.connections.mysql', [
             'driver' => 'mysql',
             'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
             'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),

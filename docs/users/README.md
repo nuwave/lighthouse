@@ -6,7 +6,7 @@
 
 <div class="showcase">
   <div class="logos">
-    <a href="http://nuwavecommerce.com/">
+    <a href="https://nuwavecommerce.com/">
       <img src="./nuwave.png" alt="NuWave Commerce" title="NuWave Commerce">
     </a>
     <a href="https://mll.com/">

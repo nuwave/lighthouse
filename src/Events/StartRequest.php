@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * Fires right after a request reaches the GraphQLController.
@@ -25,7 +25,7 @@ class StartRequest
     /**
      * The point in time when the request started.
      *
-     * @var \Carbon\Carbon
+     * @var \Illuminate\Support\Carbon
      */
     public $moment;
 

@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -295,7 +297,7 @@ class ASTHelper
         /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator $directiveLocator */
         $directiveLocator = app(DirectiveLocator::class);
         $directive = $directiveLocator->resolve($name);
-        $directiveDefinition = Parser::directiveDefinition($directive::definition());
+        $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
 
         /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
         $fieldDefinitions = $objectType->fields;
@@ -347,5 +349,43 @@ class ASTHelper
         );
 
         return $deprecated['reason'] ?? null;
+    }
+
+    /**
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    public static function extractDirectiveDefinition(string $definitionString): DirectiveDefinitionNode
+    {
+        try {
+            $document = Parser::parse($definitionString);
+        } catch (SyntaxError $error) {
+            throw new DefinitionException(
+                "Encountered syntax error while parsing this directive definition::\n\n{$definitionString}",
+                $error->getCode(),
+                $error
+            );
+        }
+
+        /** @var \GraphQL\Language\AST\DirectiveDefinitionNode|null $directive */
+        $directive = null;
+        foreach ($document->definitions as $definitionNode) {
+            if ($definitionNode instanceof DirectiveDefinitionNode) {
+                if ($directive !== null) {
+                    throw new DefinitionException(
+                        "Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}"
+                    );
+                }
+
+                $directive = $definitionNode;
+            }
+        }
+
+        if ($directive === null) {
+            throw new DefinitionException(
+                "Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}"
+            );
+        }
+
+        return $directive;
     }
 }
