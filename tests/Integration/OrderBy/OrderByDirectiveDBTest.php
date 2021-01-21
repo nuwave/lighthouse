@@ -226,16 +226,17 @@ class OrderByDirectiveDBTest extends DBTestCase
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
 
-        $this->buildSchema(/** @lang GraphQL */ <<<'GQL'
-type Query {
-    latestUsers: [User!]! @all @orderBy(column: "created_at" direction: "DESC")
-}
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            latestUsers: [User!]!
+                @all
+                @orderBy(column: "created_at" direction: DESC)
+        }
 
-type User {
-    name: String
-}
-GQL
-        );
+        type User {
+            name: String
+        }
+        ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {

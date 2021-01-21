@@ -50,11 +50,25 @@ directive @orderBy(
 
     """
     The direction of the order by clause.
-    Can be either `ASC` or `DESC`.
     Only used when the directive is added on a field.
     """
-    direction: String = "ASC"
+    direction: OrderByDirection = ASC
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
+
+"""
+Options for the `direction` argument on `@orderBy`.
+"""
+enum OrderByDirection {
+    """
+    Sort in ascending order.
+    """
+    ASC
+
+    """
+    Sort in descending order.
+    """
+    DESC
+}
 GRAPHQL;
     }
 
