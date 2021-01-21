@@ -187,8 +187,10 @@ class FieldValue
      */
     public function registerResultHandler(callable $handle): void
     {
-        $this->resolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($handle) {
-            $resolved = ($this->resolver)($root, $args, $context, $resolveInfo);
+        $previousResolver = $this->resolver;
+
+        $this->resolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $handle) {
+            $resolved = $previousResolver($root, $args, $context, $resolveInfo);
 
             if ($resolved instanceof Deferred) {
                 return $resolved->then(static function ($result) use ($handle, $args, $context, $resolveInfo) {
