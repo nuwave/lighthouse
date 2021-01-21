@@ -3,12 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
-use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class LazyLoadDirective extends BaseDirective implements FieldMiddleware
 {
@@ -31,17 +28,11 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations', []);
-        $previousResolver = $fieldValue->getResolver();
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $relations) {
-            return Resolved::handle(
-                $previousResolver($root, $args, $context, $resolveInfo),
-                static function (Collection $items) use ($relations): Collection {
-                    $items->load($relations);
+        $fieldValue->registerResultHandler(static function (Collection $items) use ($relations): Collection {
+            $items->load($relations);
 
-                    return $items;
-                }
-            );
+            return $items;
         });
 
         return $next($fieldValue);

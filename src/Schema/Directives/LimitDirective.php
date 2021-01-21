@@ -53,58 +53,42 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
-        $previousResolver = $fieldValue->getResolver();
+        $fieldValue->registerResultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
+            if ($result === null) {
+                return null;
+            }
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-            return Resolved::handle(
-                $previousResolver($root, $args, $context, $resolveInfo),
-                function (?iterable $result) use ($resolveInfo): ?iterable {
-                    return $this->limitResult($result, $resolveInfo);
+            $limit = null;
+            foreach ($resolveInfo->argumentSet->arguments as $argument) {
+                $argumentIsUsedToLimit = $argument->directives->contains(
+                    Utils::instanceofMatcher(self::class)
+                );
+
+                if ($argumentIsUsedToLimit) {
+                    $limit = $argument->value;
+                    break;
                 }
-            );
+            }
+
+            // Do not apply a limit if the client passes null explicitly
+            if (! is_integer($limit)) {
+                return $result;
+            }
+
+            $limited = [];
+
+            foreach ($result as $value) {
+                if ($limit === 0) {
+                    break;
+                }
+                $limit--;
+
+                $limited [] = $value;
+            }
+
+            return $limited;
         });
 
         return $next($fieldValue);
-    }
-
-    /**
-     * @param  iterable<mixed>|null  $result
-     * @return iterable<mixed>
-     */
-    protected function limitResult(?iterable $result, ResolveInfo $resolveInfo): ?iterable
-    {
-        if ($result === null) {
-            return null;
-        }
-
-        $limit = null;
-        foreach ($resolveInfo->argumentSet->arguments as $argument) {
-            $argumentIsUsedToLimit = $argument->directives->contains(
-                Utils::instanceofMatcher(self::class)
-            );
-
-            if ($argumentIsUsedToLimit) {
-                $limit = $argument->value;
-                break;
-            }
-        }
-
-        // Do not apply a limit if the client passes null explicitly
-        if (! is_integer($limit)) {
-            return $result;
-        }
-
-        $limited = [];
-
-        foreach ($result as $value) {
-            if ($limit === 0) {
-                break;
-            }
-            $limit--;
-
-            $limited [] = $value;
-        }
-
-        return $limited;
     }
 }

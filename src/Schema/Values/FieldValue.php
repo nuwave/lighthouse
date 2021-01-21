@@ -3,11 +3,15 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
+use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -37,7 +41,9 @@ class FieldValue
     /**
      * The actual field resolver.
      *
-     * @var callable|null
+     * Lazily initialized through setResolver().
+     *
+     * @var callable
      */
     protected $resolver;
 
@@ -106,9 +112,6 @@ class FieldValue
         return $this->returnType;
     }
 
-    /**
-     * @return \Nuwave\Lighthouse\Schema\Values\TypeValue
-     */
     public function getParent(): TypeValue
     {
         return $this->parent;
@@ -178,5 +181,23 @@ class FieldValue
     public function parentIsRootType(): bool
     {
         return RootType::isRootType($this->getParentName());
+    }
+
+    /**
+     * @param callable(mixed $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
+     */
+    public function registerResultHandler(callable $handle): void
+    {
+        $this->resolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($handle) {
+            $resolved = ($this->resolver)($root, $args, $context, $resolveInfo);
+
+            if ($resolved instanceof Deferred) {
+                return $resolved->then(static function ($result) use ($handle, $args, $context, $resolveInfo) {
+                    return $handle($result, $args, $context, $resolveInfo);
+                });
+            }
+
+            return $handle($resolved, $args, $context, $resolveInfo);
+        };
     }
 }
