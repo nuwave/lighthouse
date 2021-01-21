@@ -154,7 +154,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective
 {
