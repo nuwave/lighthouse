@@ -220,4 +220,40 @@ class OrderByDirectiveDBTest extends DBTestCase
         }
         ');
     }
+
+    public function testCanOrderColumnOnField(): void
+    {
+        factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
+
+        $this->buildSchema(/** @lang GraphQL */ <<<'GQL'
+type Query {
+    latestUsers: [User!]! @all @orderBy(column: "created_at" direction: "DESC")
+}
+
+type User {
+    name: String
+}
+GQL
+        );
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            latestUsers {
+                name
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'latestUsers' => [
+                    [
+                        'name' => 'B',
+                    ],
+                    [
+                        'name' => 'A',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
