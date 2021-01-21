@@ -36,19 +36,13 @@ GRAPHQL;
         // Ensure this is run after the other field middleware directives
         $fieldValue = $next($fieldValue);
 
-        $previousResolver = $fieldValue->getResolver();
+        $fieldValue->registerResultHandler(function ($root) {
+            $subscriptionField = $this->directiveArgValue('subscription');
+            $shouldQueue = $this->directiveArgValue('shouldQueue');
 
-        $fieldValue->setResolver(function () use ($previousResolver) {
-            $resolved = $previousResolver(...func_get_args());
+            Subscription::broadcast($subscriptionField, $root, $shouldQueue);
 
-            Resolved::handle($resolved, function ($root): void {
-                $subscriptionField = $this->directiveArgValue('subscription');
-                $shouldQueue = $this->directiveArgValue('shouldQueue');
-
-                Subscription::broadcast($subscriptionField, $root, $shouldQueue);
-            });
-
-            return $resolved;
+            return $root;
         });
 
         return $fieldValue;
