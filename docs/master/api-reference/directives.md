@@ -1806,48 +1806,48 @@ type Query {
 Sort a result list by one or more given columns.
 """
 directive @orderBy(
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
-    Only used when the directive is added on an argument.
-    """
-    columns: [String!]
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with the `columnsEnum` argument.
+  Only used when the directive is added on an argument.
+  """
+  columns: [String!]
 
-    """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
-    Only used when the directive is added on an argument.
-    """
-    columnsEnum: String
+  """
+  Use an existing enumeration type to restrict the allowed columns to a predefined list.
+  This allowes you to re-use the same enum for multiple fields.
+  Mutually exclusive with the `columns` argument.
+  Only used when the directive is added on an argument.
+  """
+  columnsEnum: String
 
-    """
-    The database column for which the order by clause will be applied on.
-    Only used when the directive is added on a field.
-    """
-    column: String
+  """
+  The database column for which the order by clause will be applied on.
+  Only used when the directive is added on a field.
+  """
+  column: String
 
-    """
-    The direction of the order by clause.
-    Only used when the directive is added on a field.
-    """
-    direction: OrderByDirection = ASC
+  """
+  The direction of the order by clause.
+  Only used when the directive is added on a field.
+  """
+  direction: OrderByDirection = ASC
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 
 """
 Options for the `direction` argument on `@orderBy`.
 """
 enum OrderByDirection {
-    """
-    Sort in ascending order.
-    """
-    ASC
+  """
+  Sort in ascending order.
+  """
+  ASC
 
-    """
-    Sort in descending order.
-    """
-    DESC
+  """
+  Sort in descending order.
+  """
+  DESC
 }
 ```
 
@@ -1931,7 +1931,7 @@ To predefine a default order for your field, use this directive on a field:
 
 ```graphql
 type Query {
-    latestUsers: [User!]! @all @orderBy(column: "created_at" direction: "DESC")
+  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: "DESC")
 }
 ```
 
