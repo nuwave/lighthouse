@@ -16,6 +16,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow eager-loading multiple relations on a single field using `@with` https://github.com/nuwave/lighthouse/pull/1528
 - Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` to instantiate arbitrary batch loaders https://github.com/nuwave/lighthouse/pull/1528
 - Add `@limit` directive to allow clients to specify the maximum number of results to return https://github.com/nuwave/lighthouse/pull/1674
+- Predefine default field ordering by using `@orderBy` on fields https://github.com/nuwave/lighthouse/pull/1678
 
 ### Changed
 
