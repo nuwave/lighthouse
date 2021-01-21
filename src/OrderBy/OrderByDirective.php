@@ -12,9 +12,10 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
 
-class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator
+class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, FieldBuilderDirective
 {
     use GeneratesColumnsEnum;
 
@@ -29,6 +30,7 @@ directive @orderBy(
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
     Mutually exclusive with the `columnsEnum` argument.
+    Only used when the directive is added on an argument.
     """
     columns: [String!]
 
@@ -36,9 +38,37 @@ directive @orderBy(
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
     This allowes you to re-use the same enum for multiple fields.
     Mutually exclusive with the `columns` argument.
+    Only used when the directive is added on an argument.
     """
     columnsEnum: String
-) on ARGUMENT_DEFINITION
+
+    """
+    The database column for which the order by clause will be applied on.
+    Only used when the directive is added on a field.
+    """
+    column: String
+
+    """
+    The direction of the order by clause.
+    Only used when the directive is added on a field.
+    """
+    direction: OrderByDirection = ASC
+) on ARGUMENT_DEFINITION | FIELD_DEFINITION
+
+"""
+Options for the `direction` argument on `@orderBy`.
+"""
+enum OrderByDirection {
+    """
+    Sort in ascending order.
+    """
+    ASC
+
+    """
+    Sort in descending order.
+    """
+    DESC
+}
 GRAPHQL;
     }
 
@@ -83,5 +113,17 @@ GRAPHQL;
         } else {
             $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
         }
+    }
+
+    /**
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function handleFieldBuilder(object $builder): object
+    {
+        return $builder->orderBy(
+            $this->directiveArgValue('column'),
+            $this->directiveArgValue('direction', 'ASC')
+        );
     }
 }
