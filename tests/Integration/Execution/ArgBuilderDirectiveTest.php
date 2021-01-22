@@ -15,7 +15,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
     }
     ';
 
-    public function testCanAttachEqFilterToQuery(): void
+    public function testAttachEqFilterFromFieldArgument(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -37,7 +37,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ->assertJsonCount(1, 'data.users');
     }
 
-    public function testCanAttachEqFilterFromInputObject(): void
+    public function testAttachEqFilterFromInputObject(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -67,7 +67,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ->assertJsonCount(1, 'data.users');
     }
 
-    public function testCanAttachEqFilterFromInputObjectWithinList(): void
+    public function testAttachEqFilterFromInputObjectWithinList(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -96,6 +96,27 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ', [
                 'id' => $users->first()->getKey(),
             ])
+            ->assertJsonCount(1, 'data.users');
+    }
+
+    public function testAttachEqFilterFromField(): void
+    {
+        $users = factory(User::class, 2)->create();
+
+        $this->schema .= /** @lang GraphQL */"
+        type Query {
+            users: [User!]! @all @eq(key: \"id\", value: {$users->first()->getKey()})
+        }
+        ";
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    id
+                }
+            }
+            ')
             ->assertJsonCount(1, 'data.users');
     }
 
