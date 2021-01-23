@@ -50,7 +50,7 @@ If you use Docker you can start up the environment (including docs) by running:
     make setup
     make node
 
-Finally, navigate to http://localhost:8080
+Finally, navigate to http://localhost:8081
 
 ## Files
 

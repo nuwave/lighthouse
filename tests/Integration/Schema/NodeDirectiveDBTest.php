@@ -2,11 +2,12 @@
 
 namespace Tests\Integration\Schema;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class NodeInterfaceTest extends DBTestCase
+class NodeDirectiveDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
@@ -37,7 +38,7 @@ class NodeInterfaceTest extends DBTestCase
     public function testCanResolveNodes(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
@@ -45,22 +46,22 @@ class NodeInterfaceTest extends DBTestCase
         $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[2]['id']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            first: node(id: "'.$firstGlobalId.'") {
+            first: node(id: \"{$firstGlobalId}\") {
                 id
                 ...on User {
                     name
                 }
             }
-            second: node(id: "'.$secondGlobalId.'") {
+            second: node(id: \"{$secondGlobalId}\") {
                 id
                 ...on User {
                     name
                 }
             }
         }
-        ')->assertExactJson([
+        ")->assertExactJson([
             'data' => [
                 'first' => [
                     'id' => $firstGlobalId,
@@ -80,23 +81,23 @@ class NodeInterfaceTest extends DBTestCase
         interface IUser {
             name: String!
         }
-        type User implements IUser @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User implements IUser @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
 
         $globalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node: node(id: "'.$globalId.'") {
+            node: node(id: \"{$globalId}\") {
                 id
                 ...on IUser {
                     name
                 }
             }
         }
-        ')->assertExactJson([
+        ")->assertExactJson([
             'data' => [
                 'node' => [
                     'id' => $globalId,
@@ -109,19 +110,19 @@ class NodeInterfaceTest extends DBTestCase
     public function testUnknownNodeType(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
 
         $globalId = $this->globalIdResolver->encode('WrongClass', $this->testTuples[1]['id']);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node: node(id: "'.$globalId.'") {
+            node: node(id: \"{$globalId}\") {
                 id
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
                 'node' => null,
             ],
@@ -136,7 +137,7 @@ class NodeInterfaceTest extends DBTestCase
     public function testTypeWithoutNodeDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
 
@@ -146,13 +147,13 @@ class NodeInterfaceTest extends DBTestCase
         ';
 
         $globalId = $this->globalIdResolver->encode('User2', $this->testTuples[1]['id']);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node: node(id: "'.$globalId.'") {
+            node: node(id: \"{$globalId}\") {
                 id
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
                 'node' => null,
             ],
@@ -177,8 +178,8 @@ class NodeInterfaceTest extends DBTestCase
      */
     public function testCanResolveModelsNodes(string $directiveDefinition): void
     {
-        $this->schema .= /** @lang GraphQL */ "
-        type User $directiveDefinition {
+        $this->schema .= /** @lang GraphQL */"
+        type User {$directiveDefinition} {
             name: String!
         }
         ";
@@ -188,16 +189,16 @@ class NodeInterfaceTest extends DBTestCase
         ]);
         $globalId = $this->globalIdResolver->encode('User', $user->getKey());
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ "
         {
-            node(id: "'.$globalId.'") {
+            node(id: \"{$globalId}\") {
                 id
                 ...on User {
                     name
                 }
             }
         }
-        ')->assertExactJson([
+        ")->assertExactJson([
             'data' => [
                 'node' => [
                     'id' => $globalId,
@@ -216,5 +217,15 @@ class NodeInterfaceTest extends DBTestCase
             ['@node'],
             ['@node(model: "User")'],
         ];
+    }
+
+    public function testThrowsWhenNodeDirectiveIsDefinedOnNonObjectType(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        input Foo @node {
+            bar: ID
+        }
+        ');
     }
 }

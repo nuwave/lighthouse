@@ -242,33 +242,6 @@ class ASTHelper
     }
 
     /**
-     * Add the "Node" interface and a global ID field to an object type.
-     */
-    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType): ObjectTypeDefinitionNode
-    {
-        $objectType->interfaces = self::mergeNodeList(
-            // @phpstan-ignore-next-line Covariance not recognized properly
-            $objectType->interfaces,
-            [
-                Parser::parseType(
-                    'Node',
-                    ['noLocation' => true]
-                ),
-            ]
-        );
-
-        $globalIdFieldDefinition = Parser::fieldDefinition(
-            config('lighthouse.global_id_field').': ID! @globalId'
-        );
-
-        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\FieldDefinitionNode> $originalFields */
-        $originalFields = $objectType->fields;
-        $objectType->fields = $originalFields->merge([$globalIdFieldDefinition]);
-
-        return $objectType;
-    }
-
-    /**
      * Checks the given type to see whether it implements the given interface.
      */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool

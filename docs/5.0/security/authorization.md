@@ -186,11 +186,10 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CanAccessDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class CanAccessDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {

@@ -1445,7 +1445,7 @@ directive @node(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   """
   resolver: String!
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 ## @notIn

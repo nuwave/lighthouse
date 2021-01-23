@@ -297,24 +297,21 @@ and the argument value, and can apply additional constraints to the query.
 ```graphql
 type Query {
     users(
-        limit: Int @builder(method: "App\MyClass@limit")
+        minimumHighscore: Int @builder(method: "App\MyClass@minimumHighscore")
     ): [User!]! @all
 }
 ```
 
 ```php
+use Illuminate\Database\Eloquent\Builder;
+
 class MyClass
 {
-
-     * Add a limit constrained upon the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function limit($builder, int $value)
+    public function limit(Builder $builder, int $minimumHighscore): Builder
     {
-        return $builder->limit($value);
+        return $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
+            $builder->where('score', '>', $minimumHighscore);
+        });
     }
 }
 ```
@@ -1381,6 +1378,46 @@ type Post {
 }
 ```
 
+## @limit
+
+```graphql
+"""
+Allow clients to specify the maximum number of results to return.
+"""
+directive @limit on ARGUMENT_DEFINITION
+```
+
+Place this on any argument to a field that returns a list of results.
+
+```graphql
+type Query {
+  users(limit: Int @limit): [User!]!
+}
+```
+
+Lighthouse will return at most the number of results that the client requested.
+
+```graphql
+{
+  users(limit: 5) {
+    name
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "users": [
+      { "name": "Never" },
+      { "name": "more" },
+      { "name": "than" },
+      { "name": "5" }
+    ]
+  }
+}
+```
+
 ## @method
 
 ```graphql
@@ -1696,15 +1733,19 @@ directive @node(
   Reference to a function that receives the decoded `id` and returns a result.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
+
+  Mutually exclusive with the `model` argument.
   """
   resolver: String
 
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+
+  Mutually exclusive with the `model` argument.
   """
   model: String
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 Lighthouse defaults to resolving types through the underlying model,
@@ -1772,8 +1813,8 @@ directive @orderBy(
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  If not given, the column names can be passed as a String by clients.
   Mutually exclusive with the `columnsEnum` argument.
+  Only used when the directive is added on an argument.
   """
   columns: [String!]
 
@@ -1781,13 +1822,43 @@ directive @orderBy(
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
   This allowes you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
+  Only used when the directive is added on an argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION
+
+  """
+  The database column for which the order by clause will be applied on.
+  Only used when the directive is added on a field.
+  """
+  column: String
+
+  """
+  The direction of the order by clause.
+  Only used when the directive is added on a field.
+  """
+  direction: OrderByDirection = ASC
+) on ARGUMENT_DEFINITION | FIELD_DEFINITION
+
+"""
+Options for the `direction` argument on `@orderBy`.
+"""
+enum OrderByDirection {
+  """
+  Sort in ascending order.
+  """
+  ASC
+
+  """
+  Sort in descending order.
+  """
+  DESC
+}
 ```
 
-Use it on a field argument of an Eloquent query. The type of the argument
-can be left blank as `_` , as it will be automatically generated.
+### Client Controlled Ordering
+
+To enable clients to control the ordering, use this directive on an argument of
+a field that is backed by a database query.
 
 ```graphql
 type Query {
@@ -1795,8 +1866,9 @@ type Query {
 }
 ```
 
-Lighthouse will automatically generate an input that takes enumerated column names,
-together with the `SortOrder` enum, and add that to your schema. Here is how it looks:
+The type of the argument can be left blank as `_` ,
+as Lighthouse will automatically generate an input that takes enumerated column names,
+together with the `SortOrder` enum, and add that to your schema:
 
 ```graphql
 "Allows ordering a list of records."
@@ -1824,8 +1896,7 @@ enum SortOrder {
 }
 ```
 
-If you want to re-use a list of allowed columns, you can define your own enumeration type and use the `columnsEnum` argument instead of `columns`.
-Here's an example of how you could define it in your schema:
+To re-use a list of allowed columns, define your own enumeration type and use the `columnsEnum` argument instead of `columns`:
 
 ```graphql
 type Query {
@@ -1858,28 +1929,17 @@ Querying a field that has an `orderBy` argument looks like this:
 
 You may pass more than one sorting option to add a secondary ordering.
 
-The [@orderBy](#orderby) directive can also be applied inside an input field definition
-when used in conjunction with the [@spread](#spread) directive.
+### Predefined Ordering
+
+To predefine a default order for your field, use this directive on a field:
 
 ```graphql
 type Query {
-  posts(filter: PostFilterInput @spread): Posts
-}
-
-input PostFilterInput {
-  orderBy: [OrderByClause!] @orderBy
+  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: "DESC")
 }
 ```
 
-This can be queried like this:
-
-```graphql
-{
-  posts(filter: { orderBy: [{ column: "posted_at", order: ASC }] }) {
-    title
-  }
-}
-```
+Clients won't have to pass any arguments to the field and still receive ordered results by default.
 
 ## @paginate
 
