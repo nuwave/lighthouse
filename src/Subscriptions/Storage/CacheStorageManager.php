@@ -40,11 +40,8 @@ class CacheStorageManager implements StoresSubscriptions
      */
     protected $ttl;
 
-    public function __construct(CacheManager $cacheManager)
+    public function __construct(CacheManager $cacheManager, ConfigRepository $config)
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
-
         $storage = $config->get('lighthouse.subscriptions.storage') ?? 'file';
         if (! is_string($storage)) {
             throw new Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: '.\Safe\json_encode($storage));
