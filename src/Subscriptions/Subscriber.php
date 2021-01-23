@@ -62,6 +62,13 @@ class Subscriber implements Serializable
     public $args;
 
     /**
+     * The variables passed to the subscription query.
+     *
+     * @var array<string, mixed>
+     */
+    public $variables;
+
+    /**
      * The context passed to the query.
      *
      * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
@@ -79,6 +86,7 @@ class Subscriber implements Serializable
         $this->fieldName = $resolveInfo->fieldName;
         $this->channel = self::uniqueChannelName();
         $this->args = $args;
+        $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
 
         /**
@@ -112,6 +120,7 @@ class Subscriber implements Serializable
         );
         $this->fieldName = $data['field_name'];
         $this->args = $data['args'];
+        $this->variables = $data['variables'];
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
@@ -130,6 +139,7 @@ class Subscriber implements Serializable
             ),
             'field_name' => $this->fieldName,
             'args' => $this->args,
+            'variables' => $this->variables,
             'context' => $this->contextSerializer()->serialize($this->context),
         ]);
     }
