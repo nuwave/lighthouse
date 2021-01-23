@@ -86,7 +86,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                 $data = $this->graphQL->executeQuery(
                     $subscriber->query,
                     $subscriber->context,
-                    $subscriber->args,
+                    $subscriber->variables,
                     $subscriber
                 );
 
