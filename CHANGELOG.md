@@ -9,6 +9,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+- Add field support to `@builder` directive https://github.com/nuwave/lighthouse/pull/1687
+
 ## 5.1.0
 
 ### Added
