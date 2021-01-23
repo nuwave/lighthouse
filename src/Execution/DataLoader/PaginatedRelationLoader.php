@@ -65,7 +65,6 @@ class PaginatedRelationLoader implements RelationLoader
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
 
-                    // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                     $relation->addSelect($select);
                 }
 
@@ -92,7 +91,7 @@ class PaginatedRelationLoader implements RelationLoader
         $mergedRelationQuery = $relations->reduce(
             static function (EloquentBuilder $builder, Relation $relation): EloquentBuilder {
                 return $builder->unionAll(
-                    // @phpstan-ignore-next-line Laravel is not that strictly typed
+                    // @phpstan-ignore-next-line Laravel can deal with an EloquentBuilder just fine
                     $relation->getQuery()
                 );
             },
