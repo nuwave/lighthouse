@@ -34,6 +34,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Resolve field middleware directives in lexical order https://github.com/nuwave/lighthouse/pull/1666
 - Ensure `Carbon\Carbon` is cast to `Illuminate\Support\Carbon` in date scalars https://github.com/nuwave/lighthouse/pull/1672
 - Fix Laravel 5.6 compatibility for `@withCount` and paginated relationship directives https://github.com/nuwave/lighthouse/pull/1528
+- Fix issue with TTL breaking subscriptions https://github.com/nuwave/lighthouse/pull/1685
 
 ## 5.0.2
 
