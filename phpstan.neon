@@ -12,7 +12,7 @@ parameters:
   - benchmarks
   - src
   - tests
-  excludes_analyse:
+  excludePaths:
   - tests/database/migrations/*
 
   # Indirectly refers to \App\User (maybe through larastan?)

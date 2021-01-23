@@ -3,6 +3,7 @@
 ## Plugins
 
 - [joselfonseca/lighthouse-graphql-passport-auth](https://github.com/joselfonseca/lighthouse-graphql-passport-auth)
+- [thekonz/lighthouse-redis-broadcaster](https://github.com/thekonz/lighthouse-redis-broadcaster)
 
 ## Tutorials
 

@@ -1990,31 +1990,6 @@ Querying a field that has an `orderBy` argument looks like this:
 
 You may pass more than one sorting option to add a secondary ordering.
 
-### Input Definition Example
-
-The [@orderBy](#orderby) directive can also be applied inside an input field definition
-when used in conjunction with the [@spread](#spread) directive. See below for example:
-
-```graphql
-type Query {
-  posts(filter: PostFilterInput @spread): Posts
-}
-
-input PostFilterInput {
-  orderBy: [OrderByClause!] @orderBy
-}
-```
-
-And usage example:
-
-```graphql
-{
-  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
-    title
-  }
-}
-```
-
 ## @paginate
 
 ```graphql
