@@ -35,6 +35,7 @@ class ReportingErrorHandler implements ErrorHandler
 
         $previous = $error->getPrevious();
         if ($previous !== null) {
+            // @phpstan-ignore-next-line Laravel versions prior to 7 are limited to accepting \Exception
             $this->exceptionHandler->report($previous);
         }
 

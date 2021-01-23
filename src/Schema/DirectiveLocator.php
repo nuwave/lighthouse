@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use HaydenPierce\ClassFinder\ClassFinder;
@@ -212,6 +213,10 @@ class DirectiveLocator
      */
     public function associated(Node $node): Collection
     {
+        if (! property_exists($node, 'directives')) {
+            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($node));
+        }
+
         return (new Collection($node->directives))
             ->map(function (DirectiveNode $directiveNode) use ($node): Directive {
                 $directive = $this->create($directiveNode->name->value);
@@ -261,6 +266,10 @@ class DirectiveLocator
                     return '@'.$definition->name->value;
                 })
                 ->implode(', ');
+
+            if (! property_exists($node, 'name')) {
+                throw new Exception('Expected Node class with property `name`, got: ' . get_class($node));
+            }
 
             throw new DirectiveException(
                 "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."
