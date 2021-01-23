@@ -65,15 +65,9 @@ GRAPHQL
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
-        $queryType->fields = ASTHelper::mergeNodeList(
-            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
-            $queryType->fields,
-            [
-                Parser::fieldDefinition(/** @lang GraphQL */ '
-                    node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolve")
-                '),
-            ]
-        );
+        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
+            node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolve")
+        ');
     }
 
     /**

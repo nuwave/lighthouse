@@ -118,18 +118,17 @@ GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
-        $countArgumentDefinition = self::countArgument($defaultCount, $maxCount);
-        $afterArgumentDefinition = "\"A cursor after which elements are returned.\"\nafter: String";
-        $connectionArguments = [
-            Parser::inputValueDefinition($countArgumentDefinition),
-            Parser::inputValueDefinition($afterArgumentDefinition),
-        ];
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
+            self::countArgument($defaultCount, $maxCount)
+        );
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"A cursor after which elements are returned."
+after: String
+GRAPHQL
+        );
 
-        // @phpstan-ignore-next-line NodeList contravariance issue
-        $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = Parser::namedType($connectionTypeName);
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
-        $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
+        $parentType->fields [] = $fieldDefinition;
     }
 
     /**
@@ -152,11 +151,7 @@ GRAPHQL
         }
 
         if ($this->modelClass) {
-            $objectType->directives = ASTHelper::mergeNodeList(
-                // @phpstan-ignore-next-line NodeList contravariance issue
-                $objectType->directives,
-                [Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")')]
-            );
+            $objectType->directives [] = Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")');
         }
 
         $this->documentAST->setTypeDefinition($objectType);
@@ -188,18 +183,13 @@ GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $countArgumentDefinition = self::countArgument($defaultCount, $maxCount);
-        $pageArgumentDefinition = "\"The offset from which elements are returned.\"\npage: Int";
-        $paginationArguments = [
-            Parser::inputValueDefinition($countArgumentDefinition),
-            Parser::inputValueDefinition($pageArgumentDefinition),
-        ];
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
+            self::countArgument($defaultCount, $maxCount)
+        );
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
 
-        // @phpstan-ignore-next-line NodeList contravariance issue
-        $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
         $fieldDefinition->type = Parser::namedType($paginatorTypeName);
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
-        $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
+        $parentType->fields [] = $fieldDefinition;
     }
 
     /**

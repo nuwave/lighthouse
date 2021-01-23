@@ -235,7 +235,7 @@ class ASTHelper
                 /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
                 $fieldDefinitions = $typeDefinition->fields;
                 foreach ($fieldDefinitions as $fieldDefinition) {
-                    $fieldDefinition->directives = $fieldDefinition->directives->merge([$directive]);
+                    $fieldDefinition->directives [] = $directive;
                 }
             }
         }
@@ -285,7 +285,7 @@ class ASTHelper
                 continue;
             }
 
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$directiveNode]);
+            $fieldDefinition->directives [] = $directiveNode;
         }
     }
 
