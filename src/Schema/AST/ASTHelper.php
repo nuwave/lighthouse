@@ -196,7 +196,7 @@ class ASTHelper
     {
         foreach ($nodes as $node) {
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected a Node with a name property, got: ' . get_class($node));
+                throw new Exception('Expected a Node with a name property, got: '.get_class($node));
             }
 
             if ($node->name->value === $name) {

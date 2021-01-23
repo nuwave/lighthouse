@@ -26,7 +26,6 @@ class ASTHelperTest extends TestCase
 
         $this->expectException(DefinitionException::class);
 
-
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
             $objectType2->fields

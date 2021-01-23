@@ -165,7 +165,6 @@ class DirectiveLocator
                     throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass */
-
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;

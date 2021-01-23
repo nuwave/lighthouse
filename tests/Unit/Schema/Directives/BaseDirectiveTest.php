@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
