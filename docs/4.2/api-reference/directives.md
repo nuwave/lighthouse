@@ -1639,7 +1639,7 @@ directive @node(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 ## @notIn
