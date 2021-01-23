@@ -27,7 +27,7 @@ parameters:
   - tests/PreLaravel7ExceptionHandler.php
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
-#  reportUnmatchedIgnoredErrors: false
+  reportUnmatchedIgnoredErrors: false
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
@@ -41,6 +41,9 @@ parameters:
   # Can not specify a class-string for traits
   - path: src/Schema/Directives/SearchDirective.php
     message: '#PHPDoc tag @var for variable \$modelClass contains unresolvable type\.#'
+
+  # This class or an equivalent of it will be present in a Laravel install
+  - '#.* unknown class App\\User\.#'
 
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
