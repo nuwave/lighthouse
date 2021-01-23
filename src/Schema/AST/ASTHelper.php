@@ -172,7 +172,7 @@ class ASTHelper
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
+            throw new Exception('Expected Node class with property `directives`, got: '.get_class($definitionNode));
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
