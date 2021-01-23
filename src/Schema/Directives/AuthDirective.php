@@ -42,7 +42,6 @@ GRAPHQL;
                 /** @var string|null $guard */
                 $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
 
-                // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
                 return $this
                     ->authFactory
                     ->guard($guard)

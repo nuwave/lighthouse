@@ -166,7 +166,6 @@ class DirectiveLocator
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass */
 
-                // @phpstan-ignore-next-line We validated that $directiveClass has the correct type
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;
@@ -219,6 +218,7 @@ class DirectiveLocator
                 $directive = $this->create($directiveNode->name->value);
 
                 if ($directive instanceof BaseDirective) {
+                    // @phpstan-ignore-next-line If there were directives on the given Node, it must be of an allowed type
                     $directive->hydrate($directiveNode, $node);
                 }
 

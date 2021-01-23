@@ -52,10 +52,6 @@ parameters:
   - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
   - '#PHPDoc tag @param for parameter \$definition with type GraphQL\\Language\\AST\\FieldDefinitionNode\|GraphQL\\Language\\AST\\TypeDefinitionNode is not subtype of native type GraphQL\\Language\\AST\\Node\.#'
 
-  # Should work once we update to a version of graphql-php that has more accurate types
-  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
-  - '#.* does not accept GraphQL\\Language\\AST\\NodeList.*#'
-
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'
 

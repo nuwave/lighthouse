@@ -253,7 +253,6 @@ EOL
         /** @var array<string, array<string, mixed>> $values */
         $values = [];
 
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($enumDefinition->values as $enumValue) {
             /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
             $enumDirective = $this->directiveFactory->exclusiveOfType($enumValue, EnumDirective::class);
@@ -346,8 +345,6 @@ EOL
                 $typeValue = new TypeValue($typeDefinition);
                 $fields = [];
 
-                // Might be a NodeList, so we can not use array_map()
-                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
                     $fieldFactory = app(FieldFactory::class);
@@ -371,7 +368,6 @@ EOL
                  * @return array<string, array<string, mixed>>
                  */
                 function () use ($inputDefinition): array {
-                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                     return $this->argumentFactory->toTypeMap($inputDefinition->fields);
                 },
         ]);
@@ -464,8 +460,6 @@ EOL
                 function () use ($unionDefinition): array {
                     $types = [];
 
-                    // Might be a NodeList, so we can not use array_map()
-                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                     foreach ($unionDefinition->types as $type) {
                         $types[] = $this->get($type->name->value);
                     }

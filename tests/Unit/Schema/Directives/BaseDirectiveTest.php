@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -151,20 +152,10 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    protected function constructFieldDirective(string $definitionNode): BaseDirective
+    protected function constructFieldDirective(string $definition): BaseDirective
     {
-        return $this->constructTestDirective(
-            Parser::fieldDefinition($definitionNode)
-        );
-    }
+        $fieldDefinition = Parser::fieldDefinition($definition);
 
-    /**
-     * Get a testable instance of the BaseDirective that allows calling protected methods.
-     *
-     * @param  \GraphQL\Language\AST\Node  $definitionNode
-     */
-    protected function constructTestDirective($definitionNode): BaseDirective
-    {
         $directive = new class extends BaseDirective {
             public static function definition(): string
             {
@@ -184,8 +175,8 @@ class BaseDirectiveTest extends TestCase
         };
 
         $directive->hydrate(
-            $definitionNode->directives[0],
-            $definitionNode
+            $fieldDefinition->directives[0],
+            $fieldDefinition
         );
 
         return $directive;

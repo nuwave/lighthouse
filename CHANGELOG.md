@@ -21,6 +21,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Changed
 
 - Improve batch loading performance https://github.com/nuwave/lighthouse/pull/1528
+- Require `webonyx/graphql-php` version `^14.5`
 
 ### Deprecated
 

@@ -107,9 +107,16 @@ class Subscriber implements Serializable
 
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
-        $this->query = AST::fromArray( // @phpstan-ignore-line We know this will be exactly a DocumentNode and nothing else
+
+        /**
+         * We know the type since it is set during construction and serialized.
+         *
+         * @var \GraphQL\Language\AST\DocumentNode $documentNode
+         */
+        $documentNode = AST::fromArray(
             unserialize($data['query'])
         );
+        $this->query = $documentNode;
         $this->fieldName = $data['field_name'];
         $this->args = $data['args'];
         $this->context = $this->contextSerializer()->unserialize(

@@ -56,7 +56,7 @@ class RulesDirectiveTest extends TestCase
     {
         $this->markTestSkipped('Not working right now, not sure how it can be fixed.');
 
-        // @phpstan-ignore-next-line unreachable - that is expected though
+        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan-phpunit/issues/52
         $this->schema = /** @lang GraphQL */ '
         "A date string with format `Y-m-d`, e.g. `2011-05-23`."
         scalar Date @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Date")
