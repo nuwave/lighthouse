@@ -33,6 +33,8 @@ parameters:
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
+  - '#Function factory invoked with 2 parameters, 0 required\.#'
+  - '#Function factory invoked with 1 parameter, 0 required\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
