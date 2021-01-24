@@ -56,10 +56,9 @@ GRAPHQL;
             return $builder;
         }
 
-        $wildcardsTemplate = $this->directiveArgValue('template');
-        if (is_string($wildcardsTemplate)) {
-            $escaped = $this->escapeWildcards($value);
-            $value = str_replace(self::PLACEHOLDER, $escaped, $wildcardsTemplate);
+        $template = $this->directiveArgValue('template');
+        if (is_string($template)) {
+            $value = $this->fillTemplate($template, $value);
         }
 
         return $builder->where(
@@ -74,6 +73,15 @@ GRAPHQL;
         return $this->handleBuilder(
             $builder,
             $this->directiveArgValue('value')
+        );
+    }
+
+    protected function fillTemplate(string $wildcardsTemplate, string $value): string
+    {
+        return str_replace(
+            self::PLACEHOLDER,
+            $this->escapeWildcards($value),
+            $wildcardsTemplate
         );
     }
 
