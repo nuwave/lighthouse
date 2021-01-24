@@ -71,6 +71,7 @@ GRAPHQL;
     public function handleFieldBuilder(object $builder): object
     {
         return $this->handleBuilder(
+            // @phpstan-ignore-next-line TODO fix scout builder handling
             $builder,
             $this->directiveArgValue('value')
         );
