@@ -81,6 +81,7 @@ class RedisStorageManagerTest extends SubscriptionTestCase
                         'channel' => 'private-lighthouse-foo',
                         'topic' => 'some-topic',
                     ]).'}',
+                    null,
                 ]]
             );
 
