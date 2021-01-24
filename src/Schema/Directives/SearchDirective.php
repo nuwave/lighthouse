@@ -44,11 +44,10 @@ GRAPHQL;
         }
 
         if (! Utils::classUsesTrait($model, Searchable::class)) {
-            throw new Exception('Model class ' . get_class($model) . ' does not implement trait ' . Searchable::class);
+            throw new Exception('Model class '.get_class($model).' does not implement trait '.Searchable::class);
         }
         // @phpstan-ignore-next-line Can not use traits as types
         /** @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $model */
-
         $scoutBuilder = $model::search($value);
 
         if ($within = $this->directiveArgValue('within')) {
