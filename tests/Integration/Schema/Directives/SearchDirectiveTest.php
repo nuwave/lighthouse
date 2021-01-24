@@ -13,12 +13,12 @@ use Tests\Utils\Models\Post;
 class SearchDirectiveTest extends DBTestCase
 {
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface&\Laravel\Scout\EngineManager
      */
     protected $engineManager;
 
     /**
-     * @var \Mockery\MockInterface
+     * @var \Mockery\MockInterface&\Laravel\Scout\Engines\NullEngine
      */
     protected $engine;
 

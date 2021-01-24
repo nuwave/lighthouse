@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use Closure;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Utils;
@@ -14,22 +15,23 @@ class ArgumentSet
     /**
      * An associative array from argument names to arguments.
      *
-     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     * @var array<string, Argument>
      */
     public $arguments = [];
 
     /**
      * An associative array of arguments that were not given.
      *
-     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     * @var array<string, Argument>
      */
     public $undefined = [];
 
     /**
      * A list of directives.
      *
-     * This may be coming from the field the arguments are a part of
-     * or the parent argument when in a tree of nested inputs.
+     * This may be coming from
+     * - the field the arguments are a part of
+     * - the parent argument when in a tree of nested inputs.
      *
      * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
@@ -149,6 +151,11 @@ class ArgumentSet
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
+        $scoutEnhancer = new ScoutEnhancer($this, $builder);
+        if ($scoutEnhancer->containsSearch()) {
+            return $scoutEnhancer->enhance();
+        }
+
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
         self::applyFieldBuilderDirectives($this, $builder);
 
@@ -258,7 +265,7 @@ class ArgumentSet
     /**
      * The contained arguments, including all that were not passed.
      *
-     * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     * @return array<string, Argument>
      */
     public function argumentsWithUndefined(): array
     {
