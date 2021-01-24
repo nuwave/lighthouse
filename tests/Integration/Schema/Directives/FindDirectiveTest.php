@@ -196,4 +196,36 @@ class FindDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testReturnsMagicGetter()
+    {
+        $user = factory(User::class)->create();
+
+        $this->schema = '
+        type User {
+            id: ID!
+            magicGetterField: String!
+        }
+
+        type Query {
+            user(id: ID @eq): User @find(model: "User")
+        }
+        ';
+
+        $this->graphQL("
+        {
+            user(id: {$user->id}) {
+                id
+                magicGetterField
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => (string) $user->id,
+                    'magicGetterField' => 'Hello magicGetterField',
+                ],
+            ],
+        ]);
+    }
 }

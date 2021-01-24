@@ -98,4 +98,13 @@ class User extends Authenticatable
                 ->first()
                 ->relationLoaded('comments');
     }
+
+    public function __get($key)
+    {
+        if ($key === 'magicGetterField') {
+            return 'Hello magicGetterField';
+        }
+
+        return parent::__get($key);
+    }
 }
