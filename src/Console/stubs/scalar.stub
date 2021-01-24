@@ -5,7 +5,7 @@ namespace DummyNamespace;
 use GraphQL\Type\Definition\ScalarType;
 
 /**
- * Read more about scalars here http://webonyx.github.io/graphql-php/type-system/scalar-types/
+ * Read more about scalars here https://webonyx.github.io/graphql-php/type-system/scalar-types/
  */
 class DummyClass extends ScalarType
 {

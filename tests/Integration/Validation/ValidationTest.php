@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Validation;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
 /**
@@ -13,8 +14,11 @@ class ValidationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app->make(ConfigRepository::class);
+
         // Ensure we test for the result the end user receives
-        $app['config']->set('app.debug', false);
+        $config->set('app.debug', false);
     }
 
     public function testRunsValidationBeforeCallingTheResolver(): void

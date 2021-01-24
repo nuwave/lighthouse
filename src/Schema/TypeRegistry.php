@@ -58,6 +58,8 @@ class TypeRegistry
     protected $argumentFactory;
 
     /**
+     * Lazily initialized.
+     *
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
@@ -163,7 +165,7 @@ EOL
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
         // ever used through its association to an interface
-        /** @var \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition */
+        /** @var \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition */
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
@@ -190,6 +192,8 @@ EOL
 
     /**
      * Transform a definition node to an executable type.
+     *
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $definition
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -217,6 +221,9 @@ EOL
     /**
      * The default type transformations.
      *
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
+     *
+     * @throws \GraphQL\Error\InvariantViolation
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
@@ -234,7 +241,6 @@ EOL
                 return $this->resolveInterfaceType($typeDefinition);
             case UnionTypeDefinitionNode::class:
                 return $this->resolveUnionType($typeDefinition);
-            // Ignore TypeExtensionNode since they are merged before we get here
             default:
                 throw new InvariantViolation(
                     "Unknown type for definition [{$typeDefinition->name->value}]"
@@ -247,7 +253,6 @@ EOL
         /** @var array<string, array<string, mixed>> $values */
         $values = [];
 
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($enumDefinition->values as $enumValue) {
             /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
             $enumDirective = $this->directiveFactory->exclusiveOfType($enumValue, EnumDirective::class);
@@ -340,8 +345,6 @@ EOL
                 $typeValue = new TypeValue($typeDefinition);
                 $fields = [];
 
-                // Might be a NodeList, so we can not use array_map()
-                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
                     $fieldFactory = app(FieldFactory::class);
@@ -365,7 +368,6 @@ EOL
                  * @return array<string, array<string, mixed>>
                  */
                 function () use ($inputDefinition): array {
-                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                     return $this->argumentFactory->toTypeMap($inputDefinition->fields);
                 },
         ]);
@@ -458,8 +460,6 @@ EOL
                 function () use ($unionDefinition): array {
                     $types = [];
 
-                    // Might be a NodeList, so we can not use array_map()
-                    // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                     foreach ($unionDefinition->types as $type) {
                         $types[] = $this->get($type->name->value);
                     }

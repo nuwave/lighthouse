@@ -76,7 +76,6 @@ class ResolverProviderTest extends TestCase
 
         return new FieldValue(
             $typeValue,
-            // @phpstan-ignore-next-line can not be null
             $queryType->fields[0]
         );
     }

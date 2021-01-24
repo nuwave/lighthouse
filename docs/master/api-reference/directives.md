@@ -98,7 +98,7 @@ type Post {
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -141,9 +141,8 @@ directive @belongsToMany(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: BelongsToManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -164,6 +163,21 @@ directive @belongsToMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@belongsToMany`.
+"""
+enum BelongsToManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 It assumes both the field and the relationship method to have the same name.
@@ -177,7 +191,7 @@ type User {
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -200,7 +214,7 @@ type User {
 }
 ```
 
-When using the connection `type` argument, you may create your own
+When using the `type` argument with pagination style `CONNECTION`, you may create your own
 [Edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) which
 may have fields that resolve from the model [pivot](https://laravel.com/docs/eloquent-relationships#many-to-many)
 data. You may also add a custom field resolver for fields you want to resolve yourself.
@@ -210,7 +224,7 @@ look for a {type}Edge type to be defined. In this case it would be `RoleEdge`.
 
 ```graphql
 type User {
-  roles: [Role!]! @belongsToMany(type: "connection", edgeType: "CustomRoleEdge")
+  roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
 }
 
 type CustomRoleEdge implements Edge {
@@ -228,7 +242,7 @@ Broadcast the results of a mutation to subscribed clients.
 """
 directive @broadcast(
   """
-  Name of the subscription that should be retriggered as a result of this operation..
+  Name of the subscription that should be retriggered as a result of this operation.
   """
   subscription: String!
 
@@ -283,26 +297,21 @@ and the argument value, and can apply additional constraints to the query.
 ```graphql
 type Query {
     users(
-        limit: Int @builder(method: "App\MyClass@limit")
+        minimumHighscore: Int @builder(method: "App\MyClass@minimumHighscore")
     ): [User!]! @all
 }
 ```
 
 ```php
-namespace App;
+use Illuminate\Database\Eloquent\Builder;
 
 class MyClass
 {
-
-     * Add a limit constrained upon the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function limit($builder, int $value)
+    public function limit(Builder $builder, int $minimumHighscore): Builder
     {
-        return $builder->limit($value);
+        return $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
+            $builder->where('score', '>', $minimumHighscore);
+        });
     }
 }
 ```
@@ -449,7 +458,7 @@ directive @complexity(
 ) on FIELD_DEFINITION
 ```
 
-[Read More about query complexity analysis](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+[Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ```graphql
 type Query {
@@ -583,6 +592,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @delete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -611,12 +622,13 @@ type Mutation {
 }
 ```
 
-If you use global ids, you can set the `globalId` argument to `true`.
-Lighthouse will decode the id for you automatically.
+In the upcoming `v6`, the `@delete`, `@forceDelete` and `@restore` directives no longer offer the
+`globalId` argument. Use `@globalId` on the argument instead.
 
-```graphql
+```diff
 type Mutation {
-  deletePost(id: ID!): Post @delete(globalId: true)
+-   deleteUser(id: ID!): User! @delete(globalId: true)
++   deleteUser(id: ID! @globalId): User! @delete
 }
 ```
 
@@ -822,6 +834,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @forceDelete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -942,17 +956,37 @@ class PlacedOrder
 ```graphql
 """
 Converts between IDs/types and global IDs.
-When used upon a field, it encodes,
+
+When used upon a field, it encodes;
 when used upon an argument, it decodes.
 """
 directive @globalId(
   """
-  By default, an array of `[$type, $id]` is returned when decoding.
-  You may limit this to returning just one of both.
-  Allowed values: ARRAY, TYPE, ID
+  Decoding a global id produces a tuple of `$type` and `$id`.
+  This setting controls which of those is passed along.
   """
-  decode: String = ARRAY
+  decode: GlobalIdDecode = ARRAY
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Options for the `decode` argument of `@globalId`.
+"""
+enum GlobalIdDecode {
+  """
+  Return an array of `[$type, $id]`.
+  """
+  ARRAY
+
+  """
+  Return just `$type`.
+  """
+  TYPE
+
+  """
+  Return just `$id`.
+  """
+  ID
+}
 ```
 
 Instead of the original ID, the `id` field will now return a base64-encoded String
@@ -1059,7 +1093,7 @@ directive @hasMany(
   Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: HasManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -1072,7 +1106,29 @@ directive @hasMany(
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
   """
   maxCount: Int
+
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@hasMany`.
+"""
+enum HasManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ```graphql
@@ -1085,8 +1141,8 @@ You can return the related models paginated by setting the `type`.
 
 ```graphql
 type User {
-  postsPaginated: [Post!]! @hasMany(type: "paginator")
-  postsRelayConnection: [Post!]! @hasMany(type: "connection")
+  postsPaginated: [Post!]! @hasMany(type: PAGINATOR)
+  postsRelayConnection: [Post!]! @hasMany(type: CONNECTION)
 }
 ```
 
@@ -1322,6 +1378,46 @@ type Post {
 }
 ```
 
+## @limit
+
+```graphql
+"""
+Allow clients to specify the maximum number of results to return.
+"""
+directive @limit on ARGUMENT_DEFINITION
+```
+
+Place this on any argument to a field that returns a list of results.
+
+```graphql
+type Query {
+  users(limit: Int @limit): [User!]!
+}
+```
+
+Lighthouse will return at most the number of results that the client requested.
+
+```graphql
+{
+  users(limit: 5) {
+    name
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "users": [
+      { "name": "Never" },
+      { "name": "more" },
+      { "name": "than" },
+      { "name": "5" }
+    ]
+  }
+}
+```
+
 ## @method
 
 ```graphql
@@ -1423,9 +1519,8 @@ directive @morphMany(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
-  type: String
+  type: MorphManyType
 
   """
   Allow clients to query paginated lists without specifying the amount of items.
@@ -1446,6 +1541,21 @@ directive @morphMany(
   """
   edgeType: String
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@morphMany`.
+"""
+enum MorphManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ```graphql
@@ -1623,15 +1733,19 @@ directive @node(
   Reference to a function that receives the decoded `id` and returns a result.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
+
+  Mutually exclusive with the `model` argument.
   """
   resolver: String
 
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+
+  Mutually exclusive with the `model` argument.
   """
   model: String
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 Lighthouse defaults to resolving types through the underlying model,
@@ -1699,8 +1813,8 @@ directive @orderBy(
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  If not given, the column names can be passed as a String by clients.
   Mutually exclusive with the `columnsEnum` argument.
+  Only used when the directive is added on an argument.
   """
   columns: [String!]
 
@@ -1708,13 +1822,43 @@ directive @orderBy(
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
   This allowes you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
+  Only used when the directive is added on an argument.
   """
   columnsEnum: String
-) on ARGUMENT_DEFINITION
+
+  """
+  The database column for which the order by clause will be applied on.
+  Only used when the directive is added on a field.
+  """
+  column: String
+
+  """
+  The direction of the order by clause.
+  Only used when the directive is added on a field.
+  """
+  direction: OrderByDirection = ASC
+) on ARGUMENT_DEFINITION | FIELD_DEFINITION
+
+"""
+Options for the `direction` argument on `@orderBy`.
+"""
+enum OrderByDirection {
+  """
+  Sort in ascending order.
+  """
+  ASC
+
+  """
+  Sort in descending order.
+  """
+  DESC
+}
 ```
 
-Use it on a field argument of an Eloquent query. The type of the argument
-can be left blank as `_` , as it will be automatically generated.
+### Client Controlled Ordering
+
+To enable clients to control the ordering, use this directive on an argument of
+a field that is backed by a database query.
 
 ```graphql
 type Query {
@@ -1722,8 +1866,9 @@ type Query {
 }
 ```
 
-Lighthouse will automatically generate an input that takes enumerated column names,
-together with the `SortOrder` enum, and add that to your schema. Here is how it looks:
+The type of the argument can be left blank as `_` ,
+as Lighthouse will automatically generate an input that takes enumerated column names,
+together with the `SortOrder` enum, and add that to your schema:
 
 ```graphql
 "Allows ordering a list of records."
@@ -1751,8 +1896,7 @@ enum SortOrder {
 }
 ```
 
-If you want to re-use a list of allowed columns, you can define your own enumeration type and use the `columnsEnum` argument instead of `columns`.
-Here's an example of how you could define it in your schema:
+To re-use a list of allowed columns, define your own enumeration type and use the `columnsEnum` argument instead of `columns`:
 
 ```graphql
 type Query {
@@ -1785,28 +1929,17 @@ Querying a field that has an `orderBy` argument looks like this:
 
 You may pass more than one sorting option to add a secondary ordering.
 
-The [@orderBy](#orderby) directive can also be applied inside an input field definition
-when used in conjunction with the [@spread](#spread) directive.
+### Predefined Ordering
+
+To predefine a default order for your field, use this directive on a field:
 
 ```graphql
 type Query {
-  posts(filter: PostFilterInput @spread): Posts
-}
-
-input PostFilterInput {
-  orderBy: [OrderByClause!] @orderBy
+  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: "DESC")
 }
 ```
 
-This can be queried like this:
-
-```graphql
-{
-  posts(filter: { orderBy: [{ column: "posted_at", order: ASC }] }) {
-    title
-  }
-}
-```
+Clients won't have to pass any arguments to the field and still receive ordered results by default.
 
 ## @paginate
 
@@ -1816,10 +1949,9 @@ Query multiple model entries as a paginated list.
 """
 directive @paginate(
   """
-  Which pagination style to use.
-  Allowed values: `paginator`, `connection`.
+  Which pagination style should be used.
   """
-  type: String = "paginator"
+  type: PaginateType = PAGINATOR
 
   """
   Specify the class name of the model to use.
@@ -1850,6 +1982,21 @@ directive @paginate(
   """
   maxCount: Int
 ) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@paginate`.
+"""
+enum PaginateType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ### Basic usage
@@ -1901,15 +2048,15 @@ And can be queried like this:
 
 ### Pagination type
 
-The `type` of pagination defaults to `paginator`, but may also be set to a Relay
-compliant `connection`.
+The `type` of pagination defaults to `PAGINATOR`, but may also be set to a Relay
+compliant `CONNECTION`.
 
 > Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
 > Under the hood, the "cursor" is decoded into a page offset.
 
 ```graphql
 type Query {
-  posts: [Post!]! @paginate(type: "connection")
+  posts: [Post!]! @paginate(type: CONNECTION)
 }
 ```
 
@@ -1941,15 +2088,15 @@ type PostEdge {
 
 ### Default count
 
-You can supply a `defaultCount` to set a default count for any kind of paginator.
+You can supply a `defaultCount` to set a default count for any type of pagination.
 
 ```graphql
 type Query {
-  posts: [Post!]! @paginate(type: "connection", defaultCount: 25)
+  posts: [Post!]! @paginate(type: CONNECTION, defaultCount: 25)
 }
 ```
 
-This let's you omit the `count` argument when querying:
+This lets you omit the `count` argument when querying:
 
 ```graphql
 query {
@@ -2001,7 +2148,7 @@ Your method receives the typical resolver arguments and has to return an instanc
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
@@ -2057,6 +2204,8 @@ The field must have a single non-null argument that may be a list.
 """
 directive @restore(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -2104,11 +2253,24 @@ directive @rules(
 
   """
   Specify the messages to return if the validators fail.
-  Specified as an input object that maps rules to messages,
-  e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: RulesMessageMap
+  messages: [RulesMessage!]
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Input for the `messages` argument of `@rules`.
+"""
+input RulesMessage {
+  """
+  Name of the rule, e.g. `"email"`.
+  """
+  rule: String!
+
+  """
+  Message to display if the rule fails, e.g. `"Must be a valid email"`.
+  """
+  message: String!
+}
 ```
 
 For example, this rule ensures that users pass a valid 2 character country code:
@@ -2142,11 +2304,24 @@ directive @rulesForArray(
 
   """
   Specify the messages to return if the validators fail.
-  Specified as an input object that maps rules to messages,
-  e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: RulesMessageMap
+  messages: [RulesForArrayMessage!]
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Input for the `messages` argument of `@rulesForArray`.
+"""
+input RulesForArrayMessage {
+  """
+  Name of the rule, e.g. `"email"`.
+  """
+  rule: String!
+
+  """
+  Message to display if the rule fails, e.g. `"Must be a valid email"`.
+  """
+  message: String!
+}
 ```
 
 This is typically used to assert a certain number of elements is given in a list.
@@ -2178,7 +2353,7 @@ directive @scalar(
 If you follow the namespace convention, you do not need this directive.
 Lighthouse looks into your configured scalar namespace for a class with the same name.
 
-[Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
@@ -2203,7 +2378,7 @@ directive @scope(
   """
   The name of the scope.
   """
-  name: String
+  name: String!
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -2341,7 +2516,7 @@ mutation {
     id: 12
     input: {
       title: "My awesome title"
-      content: { imageUrl: "http://some.site/image.jpg" }
+      content: { imageUrl: "https://some.site/image.jpg" }
     }
   ) {
     id
@@ -2356,7 +2531,7 @@ they are passed along to the resolver:
 [
     'id' => 12,
     'title' => 'My awesome title',
-    'imageUrl' = 'http://some.site/image.jpg',
+    'imageUrl' = 'https://some.site/image.jpg',
 ]
 ```
 
@@ -2534,12 +2709,6 @@ directive @update(
   This is only needed when the default model detection does not work.
   """
   model: String
-
-  """
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
 
   """
   Specify the name of the relation on the parent model.

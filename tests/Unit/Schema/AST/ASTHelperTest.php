@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\AST;
 
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -26,9 +27,7 @@ class ASTHelperTest extends TestCase
         $this->expectException(DefinitionException::class);
 
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
-            // @phpstan-ignore-next-line
             $objectType1->fields,
-            // @phpstan-ignore-next-line
             $objectType2->fields
         );
     }
@@ -50,9 +49,7 @@ class ASTHelperTest extends TestCase
         ');
 
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
-            // @phpstan-ignore-next-line
             $objectType1->fields,
-            // @phpstan-ignore-next-line
             $objectType2->fields,
             true
         );
@@ -170,6 +167,57 @@ class ASTHelperTest extends TestCase
         $this->assertSame(
             'guard',
             $object->fields[1]->directives[0]->name->value
+        );
+    }
+
+    public function testExtractDirectiveDefinition(): void
+    {
+        $this->assertInstanceOf(
+            DirectiveDefinitionNode::class,
+            ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ 'directive @foo on OBJECT')
+        );
+    }
+
+    public function testExtractDirectiveDefinitionAllowsAuxiliaryTypes(): void
+    {
+        $this->assertInstanceOf(
+            DirectiveDefinitionNode::class,
+            ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+directive @foo on OBJECT
+scalar Bar
+GRAPHQL
+)
+        );
+    }
+
+    public function testThrowsOnSyntaxError(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+invalid GraphQL
+GRAPHQL
+        );
+    }
+
+    public function testThrowsIfMissingDirectiveDefinitions(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+scalar Foo
+GRAPHQL
+        );
+    }
+
+    public function testThrowsOnMultipleDirectiveDefinitions(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+directive @foo on OBJECT
+directive @bar on OBJECT
+GRAPHQL
         );
     }
 }

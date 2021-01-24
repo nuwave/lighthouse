@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $id
  * @property int $activity_id
  * @property string $activity_type
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property \lluminate\Support\Carbon $created_at
+ * @property \lluminate\Support\Carbon $updated_at
  *
  * Relations
  * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content

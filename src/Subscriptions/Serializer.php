@@ -23,9 +23,6 @@ class Serializer implements ContextSerializer
         $this->createsContext = $createsContext;
     }
 
-    /**
-     * Serialize the context.
-     */
     public function serialize(GraphQLContext $context): string
     {
         $request = $context->request();
@@ -44,9 +41,6 @@ class Serializer implements ContextSerializer
         ]);
     }
 
-    /**
-     * Unserialize the context.
-     */
     public function unserialize(string $context): GraphQLContext
     {
         [

@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 /**
  * Fires right before resolving an individual query.
@@ -15,7 +15,7 @@ class StartExecution
     /**
      * The point in time when the query execution started.
      *
-     * @var \Carbon\Carbon
+     * @var \Illuminate\Support\Carbon
      */
     public $moment;
 

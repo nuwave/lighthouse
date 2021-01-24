@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Carbon\Carbon;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
+use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Tests\TestCase;
 
@@ -34,6 +34,14 @@ abstract class DateScalarTest extends TestCase
         $this->expectException(Error::class);
 
         $this->scalarInstance()->parseValue($value);
+    }
+
+    public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
+    {
+        $this->assertInstanceOf(
+            \Illuminate\Support\Carbon::class,
+            $this->scalarInstance()->parseValue(\Carbon\Carbon::now())
+        );
     }
 
     /**
@@ -86,7 +94,7 @@ abstract class DateScalarTest extends TestCase
 
     public function testSerializesCarbonInstance(): void
     {
-        $now = now();
+        $now = Carbon::now();
         $result = $this->scalarInstance()->serialize($now);
 
         $this->assertInternalType('string', $result);
@@ -108,9 +116,9 @@ abstract class DateScalarTest extends TestCase
     abstract protected function scalarInstance(): DateScalar;
 
     /**
-     * Data provider for valid date values.
+     * Data provider for valid date strings.
      *
-     * @return array<array<mixed>>
+     * @return array<array<string>>
      */
     abstract public function validDates(): array;
 

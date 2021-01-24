@@ -6,22 +6,29 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 1. Fork the project
 1. Create a new branch
-1. Code, commit and push
+1. Code
+1. Commit and push
 1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ## Setup
 
-The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/).
-For convenience, common tasks are wrapped up in the [Makefile](Makefile) for usage with [GNU make](https://www.gnu.org/software/make/).
+The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/)
+and [GNU make](https://www.gnu.org/software/make/).
 
 Just clone the project and run the following in the project root:
 
     make setup
-    make
 
+## Usage
+
+For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
 To see the available commands, run:
 
     make help
+
+Before you commit changes, you can run all validation steps with:
+
+    make
 
 ## Testing
 
@@ -122,7 +129,7 @@ function foo(): Collection
 ```
 
 Use `self` to annotate that a class returns an instance of itself (or its child).
-Use [PHPDoc type hints](http://docs.phpdoc.org/guides/types.html#keywords) to
+Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to
 differentiate between cases where you return the original object instance and
 other cases where you instantiate a new class.
 

@@ -3,6 +3,8 @@ includes:
 - vendor/nesbot/carbon/extension.neon
 - vendor/nunomaduro/larastan/extension.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
+- vendor/phpstan/phpstan-phpunit/extension.neon
+- vendor/phpstan/phpstan-phpunit/rules.neon
 - vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon
 parameters:
   level: max
@@ -10,7 +12,7 @@ parameters:
   - benchmarks
   - src
   - tests
-  excludes_analyse:
+  excludePaths:
   - tests/database/migrations/*
 
   # Indirectly refers to \App\User (maybe through larastan?)
@@ -33,7 +35,6 @@ parameters:
     message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
-  - '#Parameter \#1 \$callback of method Illuminate\\Support\\Collection<mixed,mixed>::mapWithKeys\(\) expects callable\(mixed, mixed\): array, Closure\(Illuminate\\Support\\Collection\): Illuminate\\Database\\Eloquent\\Collection given\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -42,17 +43,6 @@ parameters:
   # Can not specify a class-string for traits
   - path: src/Schema/Directives/SearchDirective.php
     message: '#PHPDoc tag @var for variable \$modelClass contains unresolvable type\.#'
-
-  # Correctly writing out the union of all the subtypes of AST nodes is too much work
-  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$name\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$directives\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$kind\.#'
-  - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
-  - '#PHPDoc tag @param for parameter \$definition with type GraphQL\\Language\\AST\\FieldDefinitionNode\|GraphQL\\Language\\AST\\TypeDefinitionNode is not subtype of native type GraphQL\\Language\\AST\\Node\.#'
-
-  # Should work once we update to a version of graphql-php that has more accurate types
-  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
-  - '#.* does not accept GraphQL\\Language\\AST\\NodeList.*#'
 
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'

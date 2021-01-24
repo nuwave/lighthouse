@@ -512,7 +512,7 @@ type Query {
 }
 ```
 
-[Read More about query complexity analysis](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+[Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ### Definition
 
@@ -1445,7 +1445,7 @@ directive @node(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   """
   resolver: String!
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 ## @notIn
@@ -1798,7 +1798,7 @@ directive @rulesForArray(
 ## @scalar
 
 Reference a class implementing a scalar definition.
-[Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")

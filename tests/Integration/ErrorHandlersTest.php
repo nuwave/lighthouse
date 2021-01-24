@@ -31,7 +31,6 @@ class ErrorHandlersTest extends TestCase
             'data' => [
                 'foo' => null,
             ],
-            'errors' => [],
         ]);
     }
 }

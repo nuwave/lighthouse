@@ -1,6 +1,3 @@
-USER_ID=$(id -u)
-GROUP_ID=$(id -g)
-
 .PHONY: it
 it: up vendor stan test ## Run useful checks before commits
 
@@ -17,7 +14,7 @@ up: ## Bring up the docker-compose stack
 	docker-compose up -d
 
 .PHONY: stan
-stan: up ## Runs a static analysis with phpstan
+stan: up ## Runs static analysis with phpstan
 	docker-compose exec php composer stan
 
 .PHONY: test
@@ -33,8 +30,7 @@ rector: up ## Automatic code fixes with rector
 	docker-compose exec php composer rector
 
 vendor: up composer.json ## Install composer dependencies
-	# TODO reenable once laragraph/utils is stable
-	# docker-compose exec php composer validate --strict
+	docker-compose exec php composer validate --strict
 	docker-compose exec php composer install
 	docker-compose exec php composer normalize
 

@@ -216,10 +216,11 @@ class ASTBuilder
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);
 
+        // @phpstan-ignore-next-line we know the types of fields will match because we passed assertExtensionMatchesDefinition().
         $extendedObjectLikeType->fields = ASTHelper::mergeUniqueNodeList(
-            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+            // @phpstan-ignore-next-line
             $extendedObjectLikeType->fields,
-            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
+            // @phpstan-ignore-next-line
             $typeExtension->fields
         );
 
@@ -230,9 +231,7 @@ class ASTBuilder
              * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $typeExtension
              */
             $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
-                // @phpstan-ignore-next-line contravariance issue
                 $extendedObjectLikeType->interfaces,
-                // @phpstan-ignore-next-line contravariance issue
                 $typeExtension->interfaces
             );
         }
@@ -251,9 +250,7 @@ class ASTBuilder
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
 
         $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
-            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $extendedEnum->values,
-            // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
             $typeExtension->values
         );
     }
@@ -288,7 +285,6 @@ class ASTBuilder
     {
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
@@ -309,7 +305,6 @@ class ASTBuilder
     {
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */

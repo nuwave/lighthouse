@@ -217,7 +217,7 @@ function resolveUserAttribute(User $user, array $args, GraphQLContext $context, 
 }
 ```
 
-Fortunately, the underlying GraphQL implementation already provides [a sensible default resolver](http://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver),
+Fortunately, the underlying GraphQL implementation already provides [a sensible default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver),
 that plays quite nicely with the data you would typically return from
 a root resolver, e.g. `Eloquent` models or associative arrays.
 

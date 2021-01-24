@@ -157,12 +157,12 @@ Begin by defining models and migrations for your posts and comments
 
     php artisan make:model -m Post
 
-Replace the newly generated `app/Post.php` and the `create_posts_table.php` with this:
+Replace the newly generated `app/Models/Post.php` and the `create_posts_table.php` with this:
 
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -216,7 +216,7 @@ Let's do the same for the Comment model:
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -260,12 +260,12 @@ Remember to run the migrations:
 
     php artisan migrate
 
-Finally, add the `posts` relation to `app/User.php`
+Finally, add the `posts` relation to `app/Models/User.php`
 
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;

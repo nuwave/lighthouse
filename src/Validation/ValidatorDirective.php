@@ -117,12 +117,13 @@ GRAPHQL;
      *
      * This allows accessing it straight away when resolving the query.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $definition
+     * @param  (\GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node)|\GraphQL\Language\AST\FieldDefinitionNode  $definition
      */
     protected function setFullClassnameOnDirective(Node &$definition, string $classCandidate): void
     {
         $validatorClass = $this->namespaceValidatorClass($classCandidate);
 
+        // @phpstan-ignore-next-line The passed in Node types all have the property $directives
         foreach ($definition->directives as $directive) {
             if ($directive->name->value === $this->name()) {
                 $directive->arguments = ASTHelper::mergeUniqueNodeList(

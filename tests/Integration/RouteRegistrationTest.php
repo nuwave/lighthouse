@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Routing\Route;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase;
@@ -26,11 +27,8 @@ class RouteRegistrationTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
-        $config->set(
-            'lighthouse.route.prefix',
-            'foo'
-        );
+        $config = $app->make(ConfigRepository::class);
+        $config->set('lighthouse.route.prefix', 'foo');
     }
 
     public function testRegisterRouteWithCustomConfig(): void

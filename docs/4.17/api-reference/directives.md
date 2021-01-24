@@ -495,7 +495,7 @@ type Query {
 }
 ```
 
-[Read More about query complexity analysis](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+[Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ### Definition
 
@@ -1807,6 +1807,7 @@ type User {
 ```graphql
 """
 Register a type for Relay's global object identification.
+
 When used without any arguments, Lighthouse will attempt
 to resolve the type through a model with the same name.
 """
@@ -1815,15 +1816,19 @@ directive @node(
   Reference to a function that receives the decoded `id` and returns a result.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
+
+  Mutually exclusive with the `model` argument.
   """
   resolver: String
 
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+
+  Mutually exclusive with the `model` argument.
   """
   model: String
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 Lighthouse defaults to resolving types through the underlying model,
@@ -1984,31 +1989,6 @@ Querying a field that has an `orderBy` argument looks like this:
 ```
 
 You may pass more than one sorting option to add a secondary ordering.
-
-### Input Definition Example
-
-The [@orderBy](#orderby) directive can also be applied inside an input field definition
-when used in conjunction with the [@spread](#spread) directive. See below for example:
-
-```graphql
-type Query {
-  posts(filter: PostFilterInput @spread): Posts
-}
-
-input PostFilterInput {
-  orderBy: [OrderByClause!] @orderBy
-}
-```
-
-And usage example:
-
-```graphql
-{
-  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
-    title
-  }
-}
-```
 
 ## @paginate
 
@@ -2355,7 +2335,7 @@ Read more in the [validation docs](../security/validation.md#validating-arrays).
 ## @scalar
 
 Reference a class implementing a scalar definition.
-[Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
@@ -2546,7 +2526,7 @@ mutation {
     id: 12
     input: {
       title: "My awesome title"
-      content: { imageUrl: "http://some.site/image.jpg" }
+      content: { imageUrl: "https://some.site/image.jpg" }
     }
   ) {
     id
@@ -2561,7 +2541,7 @@ they are passed along to the resolver:
 [
     'id' => 12,
     'title' => 'My awesome title',
-    'imageUrl' = 'http://some.site/image.jpg',
+    'imageUrl' = 'https://some.site/image.jpg',
 ]
 ```
 

@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use Closure;
-use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -35,26 +35,23 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
+        // Make sure this middleware is applied last
         $fieldValue = $next($fieldValue);
 
-        $resolver = $fieldValue->getResolver();
+        $previousResolver = $fieldValue->getResolver();
 
-        return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             $start = $this->tracing->getTime();
-
-            $result = $resolver($root, $args, $context, $resolveInfo);
-
+            $result = $previousResolver($root, $args, $context, $resolveInfo);
             $end = $this->tracing->getTime();
 
-            if ($result instanceof Deferred) {
-                $result->then(function () use ($resolveInfo, $start, $end): void {
-                    $this->tracing->record($resolveInfo, $start, $end);
-                });
-            } else {
+            Resolved::handle($result, function () use ($resolveInfo, $start, $end): void {
                 $this->tracing->record($resolveInfo, $start, $end);
-            }
+            });
 
             return $result;
         });
+
+        return $fieldValue;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-class ModelDirective extends NodeDirective
+class ModelDirective extends BaseDirective
 {
     public static function definition(): string
     {

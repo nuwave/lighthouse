@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
@@ -18,35 +19,24 @@ use RuntimeException;
  */
 class BroadcastManager extends DriverManager
 {
-    /**
-     * Get configuration key.
-     */
     protected function configKey(): string
     {
         return 'lighthouse.subscriptions.broadcasters';
     }
 
-    /**
-     * Get configuration driver key.
-     */
     protected function driverKey(): string
     {
         return 'lighthouse.subscriptions.broadcaster';
     }
 
-    /**
-     * The interface the driver should implement.
-     */
     protected function interface(): string
     {
         return Broadcaster::class;
     }
 
     /**
-     * Create instance of pusher driver.
-     *
      * @param  array<string, mixed>  $config
-     * @throws \Pusher\PusherException
+     * @throws \RuntimeException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
     {
@@ -68,12 +58,15 @@ class BroadcastManager extends DriverManager
     }
 
     /**
-     * Create instance of log driver.
-     *
      * @param  array<string, mixed>  $config
      */
     protected function createLogDriver(array $config): LogBroadcaster
     {
         return new LogBroadcaster($config);
+    }
+
+    protected function createEchoDriver(): EchoBroadcaster
+    {
+        return $this->app->make(EchoBroadcaster::class);
     }
 }

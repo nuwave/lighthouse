@@ -2,15 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
-use GraphQL\Language\Parser;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
@@ -126,9 +127,8 @@ class DirectiveLocator
     {
         $definitions = [];
 
-        /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directiveClass */
         foreach ($this->classes() as $directiveClass) {
-            $definitions [] = Parser::directiveDefinition($directiveClass::definition());
+            $definitions [] = ASTHelper::extractDirectiveDefinition($directiveClass::definition());
         }
 
         return $definitions;
@@ -166,8 +166,6 @@ class DirectiveLocator
                     throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass */
-
-                // @phpstan-ignore-next-line We validated that $directiveClass has the correct type
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;
@@ -215,11 +213,16 @@ class DirectiveLocator
      */
     public function associated(Node $node): Collection
     {
+        if (! property_exists($node, 'directives')) {
+            throw new Exception('Expected Node class with property `directives`, got: '.get_class($node));
+        }
+
         return (new Collection($node->directives))
             ->map(function (DirectiveNode $directiveNode) use ($node): Directive {
                 $directive = $this->create($directiveNode->name->value);
 
                 if ($directive instanceof BaseDirective) {
+                    // @phpstan-ignore-next-line If there were directives on the given Node, it must be of an allowed type
                     $directive->hydrate($directiveNode, $node);
                 }
 
@@ -245,6 +248,8 @@ class DirectiveLocator
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
+     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function exclusiveOfType(Node $node, string $directiveClass): ?Directive
@@ -254,13 +259,17 @@ class DirectiveLocator
         if ($directives->count() > 1) {
             $directiveNames = $directives
                 ->map(function (Directive $directive): string {
-                    $definition = Parser::directiveDefinition(
+                    $definition = ASTHelper::extractDirectiveDefinition(
                         $directive::definition()
                     );
 
                     return '@'.$definition->name->value;
                 })
                 ->implode(', ');
+
+            if (! property_exists($node, 'name')) {
+                throw new Exception('Expected Node class with property `name`, got: '.get_class($node));
+            }
 
             throw new DirectiveException(
                 "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."

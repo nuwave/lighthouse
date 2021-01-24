@@ -7,6 +7,41 @@ This document provides guidance for upgrading between major versions of Lighthou
 The configuration options often change between major versions.
 Compare your `lighthouse.php` against the latest [default configuration](src/lighthouse.php).
 
+## v5 to v6
+
+### `messages` on `@rules` and `@rulesForArray`
+
+Lighthouse previously allowed passing a map with arbitrary keys as the `messages`
+argument on `@rules` and `@rulesForArray`. Such a construct is impossible to define
+within the directive definition and leads to static validation errors.
+
+```diff
+@rules(
+    apply: ["max:280"],
+-   messages: {
+-       max: "Tweets have a limit of 280 characters"
+-   }
++   messages: [
++       {
++           rule: "max"
++           message: "Tweets have a limit of 280 characters"
++       }
++   ]
+)
+```
+
+### Use `@globalId` over `@delete(globalId: true)`
+
+The `@delete`, `@forceDelete` and `@restore` directives no longer offer the
+`globalId` argument. Use `@globalId` on the argument instead.
+
+```diff
+type Mutation {
+-   deleteUser(id: ID!): User! @delete(globalId: true)
++   deleteUser(id: ID! @globalId): User! @delete
+}
+```
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit
@@ -391,3 +426,10 @@ class ExtensionErrorHandler implements ErrorHandler
 ```
 
 You can now discard errors by returning `null` from the handler.
+
+### Upgrade to `mll-lab/graphql-php-scalars` v4
+
+If you use complex where condition directives, such as `@whereConditions`,
+upgrade `mll-lab/graphql-php-scalars` to v4:
+
+    composer require mll-lab/graphql-php-scalars:^4
