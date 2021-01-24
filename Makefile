@@ -1,5 +1,5 @@
 .PHONY: it
-it: up vendor stan test ## Run useful checks before commits
+it: vendor stan test ## Run useful checks before commits
 
 .PHONY: help
 help: ## Displays this list of targets with descriptions
