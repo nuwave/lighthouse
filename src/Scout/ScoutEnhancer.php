@@ -117,7 +117,7 @@ class ScoutEnhancer
                 ->contains(Utils::instanceofMatcher(SearchDirective::class));
 
             if ($argumentHasSearchDirective && is_string($argument->value)) {
-                $this->searchArguments []= $argument;
+                $this->searchArguments [] = $argument;
             }
 
             $argumentHasArgBuilderDirective = $argument
@@ -129,11 +129,11 @@ class ScoutEnhancer
                 ->contains(Utils::instanceofMatcher(ScoutBuilderDirective::class));
 
             if ($argumentHasArgBuilderDirective && ! $argumentHasScoutBuilderDirective) {
-                $this->argumentsWithOnlyArgBuilders []= $argument;
+                $this->argumentsWithOnlyArgBuilders [] = $argument;
             }
 
             if ($argumentHasScoutBuilderDirective) {
-                $this->argumentsWithScoutBuilderDirectives []= $argument;
+                $this->argumentsWithScoutBuilderDirectives [] = $argument;
             }
 
             Utils::applyEach(

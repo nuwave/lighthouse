@@ -48,18 +48,17 @@ GRAPHQL;
 
         /** @var Builder&SoftDeletes $builder */
         switch ($value) {
-            case 'with': {
+            case 'with':
                 $builder->withTrashed();
-            }
-            case 'only': {
+
+            case 'only':
                 $builder->onlyTrashed();
-            }
-            case 'without': {
+
+            case 'without':
                 $builder->withoutTrashed();
-            }
-            default: {
+
+            default:
                 throw new InvalidArgument('Unexpected value for Trashed filter');
-            }
         }
 
         return $builder;
@@ -76,15 +75,14 @@ GRAPHQL;
         }
 
         switch ($value) {
-            case 'with': {
+            case 'with':
                 $builder->withTrashed();
-            }
-            case 'only': {
+
+            case 'only':
                 $builder->onlyTrashed();
-            }
-            default: {
+
+            default:
                 throw new ScoutException('Unexpected value for Trashed filter');
-            }
         }
     }
 
