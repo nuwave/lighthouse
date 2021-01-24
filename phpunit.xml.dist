@@ -26,4 +26,14 @@
             <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
+    <php>
+        <env name="LIGHTHOUSE_TEST_DB_DATABASE" value="test"/>
+        <env name="LIGHTHOUSE_TEST_DB_HOST" value="mysql"/>
+        <env name="LIGHTHOUSE_TEST_DB_USERNAME" value="root"/>
+        <env name="LIGHTHOUSE_TEST_DB_PASSWORD" value=""/>
+        <env name="LIGHTHOUSE_TEST_REDIS_HOST" value="redis"/>
+        <env name="LIGHTHOUSE_TEST_REDIS_PASSWORD" value="null"/>
+        <env name="LIGHTHOUSE_TEST_REDIS_PORT" value="6379"/>
+        <env name="LIGHTHOUSE_TEST_REDIS_DB" value="0"/>
+    </php>
 </phpunit>

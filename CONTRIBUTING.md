@@ -300,3 +300,19 @@ Run the reports that are defined in `phpbench.json` via the command line,
 for example:
 
     vendor/bin/phpbench run --report=ast
+
+## Local setup
+It is also possible to setup the test environment without usage of the docker and make files.
+You would need the following:
+
+- PHP (at least 7.2)
+- Composer
+- Mysql 8
+- Redis 6
+
+For setting everything up, you would need to execute the following:
+
+1. run `composer install`.
+2. copy phpunit dist file to a local `cp ./phpunit.xml.dist ./phpunit.xml`.
+3. Change env parameter to your MySql and Redis connection.
+4. run `composer test`.
