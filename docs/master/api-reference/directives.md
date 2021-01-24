@@ -298,7 +298,7 @@ directive @builder(
 ```
 
 You must point to a `method` which will receive the builder instance
-can then apply additional constraints to the query.
+and can apply additional constraints to the query.
 
 When used on an argument, the value is supplied as the second parameter to the method.
 When used on a field, the value argument inside the directive is applied as the second
@@ -309,7 +309,7 @@ type Query {
     users(
         minimumHighscore: Int @builder(method: "App\MyClass@minimumHighscore")
     ): [User!]! @all
-    highrankedUsers: [User!]! @all @builder(method: "App\MyClass@minimumHighscore" value: 1000)
+    highrankedUsers: [User!]! @all @builder(method: "App\MyClass@minimumHighscore", value: 1000)
 }
 ```
 
