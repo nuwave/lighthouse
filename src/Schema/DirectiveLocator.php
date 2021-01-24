@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use HaydenPierce\ClassFinder\ClassFinder;
@@ -165,8 +166,6 @@ class DirectiveLocator
                     throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
                 /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass */
-
-                // @phpstan-ignore-next-line We validated that $directiveClass has the correct type
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;
@@ -214,11 +213,16 @@ class DirectiveLocator
      */
     public function associated(Node $node): Collection
     {
+        if (! property_exists($node, 'directives')) {
+            throw new Exception('Expected Node class with property `directives`, got: '.get_class($node));
+        }
+
         return (new Collection($node->directives))
             ->map(function (DirectiveNode $directiveNode) use ($node): Directive {
                 $directive = $this->create($directiveNode->name->value);
 
                 if ($directive instanceof BaseDirective) {
+                    // @phpstan-ignore-next-line If there were directives on the given Node, it must be of an allowed type
                     $directive->hydrate($directiveNode, $node);
                 }
 
@@ -262,6 +266,10 @@ class DirectiveLocator
                     return '@'.$definition->name->value;
                 })
                 ->implode(', ');
+
+            if (! property_exists($node, 'name')) {
+                throw new Exception('Expected Node class with property `name`, got: '.get_class($node));
+            }
 
             throw new DirectiveException(
                 "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."

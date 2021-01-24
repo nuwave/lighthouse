@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
@@ -28,33 +29,14 @@ use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 class ASTHelper
 {
     /**
-     * This function exists as a workaround for an issue within webonyx/graphql-php.
-     *
-     * The problem is that lists of definitions are usually NodeList objects - except
-     * when the list is empty, then it is []. This function corrects that inconsistency
-     * and allows the rest of our code to not worry about it until it is fixed.
-     *
-     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $original
-     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $addition
-     * @return \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>
-     */
-    public static function mergeNodeList($original, $addition): NodeList
-    {
-        if (! $original instanceof NodeList) {
-            $original = new NodeList($original);
-        }
-
-        return $original->merge($addition);
-    }
-
-    /**
      * Merge two lists of AST nodes.
      *
-     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $original
-     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>|array<\GraphQL\Language\AST\Node>  $addition
+     * @template TNode of \GraphQL\Language\AST\Node
+     * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
+     * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
-     * @return \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\Node>
+     * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
     {
@@ -79,7 +61,14 @@ class ASTHelper
             ->values()
             ->all();
 
-        return self::mergeNodeList($remainingDefinitions, $addition);
+        /**
+         * Since we did not modify the passed in lists, the types did not change.
+         *
+         * @var \GraphQL\Language\AST\NodeList<TNode> $merged
+         */
+        $merged = (new NodeList($remainingDefinitions))->merge($addition);
+
+        return $merged;
     }
 
     public static function duplicateDefinition(string $oldName): string
@@ -166,12 +155,13 @@ class ASTHelper
             /** @var \GraphQL\Language\AST\EnumValueNode $defaultValue */
 
             /** @var \GraphQL\Type\Definition\EnumValueDefinition $internalValue */
-            $internalValue = $argumentType->getValue($defaultValue->value); // @phpstan-ignore-line
+            $internalValue = $argumentType->getValue($defaultValue->value);
 
             return $internalValue->value;
         }
 
-        return AST::valueFromAST($defaultValue, $argumentType); // @phpstan-ignore-line Inaccurate type in graphql-php
+        // @phpstan-ignore-next-line any ValueNode is fine
+        return AST::valueFromAST($defaultValue, $argumentType);
     }
 
     /**
@@ -181,7 +171,13 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        return self::firstByName($definitionNode->directives, $name); // @phpstan-ignore-line Lack of proper generics
+        if (! property_exists($definitionNode, 'directives')) {
+            throw new Exception('Expected Node class with property `directives`, got: '.get_class($definitionNode));
+        }
+        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
+        $directives = $definitionNode->directives;
+
+        return self::firstByName($directives, $name);
     }
 
     /**
@@ -195,11 +191,17 @@ class ASTHelper
     /**
      * Out of a list of nodes, get the first that matches the given name.
      *
-     * @param  iterable<\GraphQL\Language\AST\Node> $nodes
+     * @template TNode of \GraphQL\Language\AST\Node
+     * @param  iterable<TNode> $nodes
+     * @return TNode|null
      */
     public static function firstByName($nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
+            if (! property_exists($node, 'name')) {
+                throw new Exception('Expected a Node with a name property, got: '.get_class($node));
+            }
+
             if ($node->name->value === $name) {
                 return $node;
             }
@@ -235,37 +237,10 @@ class ASTHelper
                 /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
                 $fieldDefinitions = $typeDefinition->fields;
                 foreach ($fieldDefinitions as $fieldDefinition) {
-                    $fieldDefinition->directives = $fieldDefinition->directives->merge([$directive]);
+                    $fieldDefinition->directives [] = $directive;
                 }
             }
         }
-    }
-
-    /**
-     * Add the "Node" interface and a global ID field to an object type.
-     */
-    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType): ObjectTypeDefinitionNode
-    {
-        $objectType->interfaces = self::mergeNodeList(
-            // @phpstan-ignore-next-line Covariance not recognized properly
-            $objectType->interfaces,
-            [
-                Parser::parseType(
-                    'Node',
-                    ['noLocation' => true]
-                ),
-            ]
-        );
-
-        $globalIdFieldDefinition = Parser::fieldDefinition(
-            config('lighthouse.global_id_field').': ID! @globalId'
-        );
-
-        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\FieldDefinitionNode> $originalFields */
-        $originalFields = $objectType->fields;
-        $objectType->fields = $originalFields->merge([$globalIdFieldDefinition]);
-
-        return $objectType;
     }
 
     /**
@@ -312,7 +287,7 @@ class ASTHelper
                 continue;
             }
 
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$directiveNode]);
+            $fieldDefinition->directives [] = $directiveNode;
         }
     }
 

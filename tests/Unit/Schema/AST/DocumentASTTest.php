@@ -81,7 +81,6 @@ class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(
             FieldDefinitionNode::class,
-            // @phpstan-ignore-next-line can not be null
             $queryType->fields[0]
         );
 

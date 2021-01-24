@@ -52,12 +52,13 @@ abstract class BaseDirective implements Directive
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
+     * @param  ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode  $definitionNode
      * @return $this
      */
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
-        $this->definitionNode = $definitionNode; // @phpstan-ignore-line Dealing with union types properly is hard in PHP
+        $this->definitionNode = $definitionNode;
 
         return $this;
     }
@@ -227,13 +228,19 @@ abstract class BaseDirective implements Directive
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
-        // @phpstan-ignore-next-line The callback ensures we get a Model class
-        return $this->namespaceClassName(
+        /**
+         * The callback ensures this holds true.
+         *
+         * @var class-string<\Illuminate\Database\Eloquent\Model> $modelClass
+         */
+        $modelClass = $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),
-            function (string $classCandidate): bool {
+            static function (string $classCandidate): bool {
                 return is_subclass_of($classCandidate, Model::class);
             }
         );
+
+        return $modelClass;
     }
 }

@@ -87,7 +87,7 @@ class SubscriptionServiceProvider extends ServiceProvider
             [$routesProviderClass, $method] = Str::parseCallback($routesMethod, 'pusher');
             /** @var class-string $routesProviderClass */
             /** @var string $method */
-            $routesProvider = $this->app->make($routesProviderClass); // @phpstan-ignore-line
+            $routesProvider = $this->app->make($routesProviderClass);
             $router = $this->app->make('router');
 
             $routesProvider->{$method}($router);

@@ -466,7 +466,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertNotNull($user);
         /** @var array<string, mixed> $user */
         $tasks = Arr::first(
-            $user['fields'], // @phpstan-ignore-line
+            $user['fields'],
             function (array $field): bool {
                 return $field['name'] === 'tasks';
             }
