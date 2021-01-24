@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Exception;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class NotInDirective extends BaseDirective implements ArgBuilderDirective
@@ -24,12 +26,13 @@ GRAPHQL;
 
     /**
      * Apply a simple "WHERE NOT IN $values" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $values): object
     {
+        if ($builder instanceof ScoutBuilder) {
+            throw new Exception("Using {$this->name()} on queries that use a Scout search is not supported.");
+        }
+
         return $builder->whereNotIn(
             $this->directiveArgValue('key', $this->nodeName()),
             $values

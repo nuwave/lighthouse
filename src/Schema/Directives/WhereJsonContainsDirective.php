@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Exception;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereJsonContainsDirective extends BaseDirective implements ArgBuilderDirective
@@ -24,12 +26,13 @@ GRAPHQL;
 
     /**
      * Add a "WHERE JSON_CONTAINS()" clause to the builder.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value): object
     {
+        if ($builder instanceof ScoutBuilder) {
+            throw new Exception("Using {$this->name()} on queries that use a Scout search is not supported.");
+        }
+
         return $builder->whereJsonContains(
             $this->directiveArgValue('key', $this->nodeName()),
             $value

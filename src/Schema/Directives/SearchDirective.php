@@ -2,7 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Exception;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Laravel\Scout\Builder as ScoutBuilder;
+use Laravel\Scout\Searchable;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Utils;
 
 class SearchDirective extends BaseDirective implements ArgBuilderDirective
 {
@@ -24,22 +29,32 @@ GRAPHQL;
     /**
      * Apply a scout search to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return \Laravel\Scout\Builder
      */
     public function handleBuilder($builder, $value): object
     {
-        /**
-         * TODO make class-string once PHPStan can handle it.
-         * @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $modelClass
-         */
-        $modelClass = get_class($builder->getModel());
-        $builder = $modelClass::search($value);
-
-        if ($within = $this->directiveArgValue('within')) {
-            $builder->within($within);
+        if ($builder instanceof ScoutBuilder) {
+            throw new Exception("Cannot apply {$this->name()} twice on a single query.");
         }
 
-        return $builder;
+        if ($builder instanceof EloquentBuilder) {
+            $model = $builder->getModel();
+        } else {
+            throw new Exception('Can not get model from builder of class: '.get_class($builder));
+        }
+
+        if (! Utils::classUsesTrait($model, Searchable::class)) {
+            throw new Exception('Model class ' . get_class($model) . ' does not implement trait ' . Searchable::class);
+        }
+        // @phpstan-ignore-next-line Can not use traits as types
+        /** @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $model */
+
+        $scoutBuilder = $model::search($value);
+
+        if ($within = $this->directiveArgValue('within')) {
+            $scoutBuilder->within($within);
+        }
+
+        return $scoutBuilder;
     }
 }

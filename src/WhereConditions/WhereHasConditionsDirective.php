@@ -2,7 +2,10 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
+use Exception;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
+use Laravel\Scout\Builder as ScoutBuilder;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
@@ -41,9 +44,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
-     * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Eloquent\Builder The modified builder.
+     * @param  array<string, mixed>|null  $whereConditions The client given conditions
      */
     public function handleBuilder($builder, $whereConditions): object
     {
@@ -52,9 +53,19 @@ GRAPHQL;
             return $builder;
         }
 
+        if ($builder instanceof ScoutBuilder) {
+            throw new Exception("Using {$this->name()} on queries that use a Scout search is not supported.");
+        }
+
+        if ($builder instanceof EloquentBuilder) {
+            $model = $builder->getModel();
+        } else {
+            throw new Exception('Can not get model from builder of class: '.get_class($builder));
+        }
+
         $this->handleHasCondition(
             $builder,
-            $builder->getModel(),
+            $model,
             $this->getRelationName(),
             $whereConditions
         );

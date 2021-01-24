@@ -24,9 +24,6 @@ GRAPHQL;
 
     /**
      * Apply a "WHERE = $value" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value): object
     {

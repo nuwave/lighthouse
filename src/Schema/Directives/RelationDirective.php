@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\DataLoader\PaginatedRelationLoader;
@@ -70,6 +71,10 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
     {
         return function (object $builder) use ($resolveInfo) {
+            if ($builder instanceof Relation) {
+                $builder = $builder->getQuery();
+            }
+
             $resolveInfo
                 ->argumentSet
                 ->enhanceBuilder(

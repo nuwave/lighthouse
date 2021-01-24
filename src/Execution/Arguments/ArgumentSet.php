@@ -141,11 +141,11 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string>  $scopes
      * @param  \Closure  $directiveFilter
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
@@ -166,7 +166,7 @@ class ArgumentSet
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      */
     protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
     {
@@ -209,7 +209,7 @@ class ArgumentSet
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      */
     protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder): void
     {
@@ -223,8 +223,7 @@ class ArgumentSet
     /**
      * Add a value at the dot-separated path.
      *
-     * Works just like the Laravel Arr::add() function.
-     * @see \Illuminate\Support\Arr
+     * Works just like @see \Illuminate\Support\Arr::add().
      *
      * @param  mixed  $value Any value to inject.
      * @return $this
@@ -263,9 +262,6 @@ class ArgumentSet
      */
     public function argumentsWithUndefined(): array
     {
-        return array_merge(
-            $this->arguments,
-            $this->undefined
-        );
+        return array_merge($this->arguments, $this->undefined);
     }
 }
