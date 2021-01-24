@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -37,10 +37,10 @@ class RedisStorageManager implements StoresSubscriptions
      */
     protected $ttl;
 
-    public function __construct(Repository $config, Factory $redis)
+    public function __construct(ConfigRepository $config, RedisFactory $redis)
     {
         $this->connection = $redis->connection(
-            $config->get('lighthouse.broadcasters.echo.connection', 'default')
+            $config->get('lighthouse.broadcasters.echo.connection') ?? 'default'
         );
         $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl');
     }
