@@ -3,45 +3,45 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 
-class LikeDirective extends BaseDirective implements ArgBuilderDirective
+class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
-    const ESCAPE_CHAR = "\\";
+    const ESCAPE = '\\';
+    const PERCENTAGE = '%';
+    const UNDERSCORE = '_';
+    const PLACEHOLDER = '{}';
 
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-enum LikePercentageLocation {
-    START
-    END
-    BOTH
-}
-
 """
-Use the client given value to add a `LIKE` conditional to a database query.
+Add a `LIKE` conditional to a database query.
 """
 directive @like(
   """
   Specify the database column to compare.
-  Only required if database column has a different name than the attribute in your schema.
+  Required if the directive is:
+  - used on an argument and the database column has a different name
+  - used on a field
   """
   key: String
 
   """
-  Specify the positions of the % in the LIKE comparison. The default is BOTH.
+  Fixate the positions of wildcards (`%`, `_`) in the LIKE comparison around the
+  placeholder `{}`, e.g. `%{}`, `__{}` or `%{}%`.
+  If specified, wildcard characters in the client-given input are escaped.
+  If not specified, the client can pass wildcards unescaped.
   """
-  percentage: LikePercentageLocation
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
-    }
+  template: String
 
-    protected function escapePercentage(string $value): string
-    {
-        return str_replace(
-            [self::ESCAPE_CHAR, '%', '_'],
-            [self::ESCAPE_CHAR.self::ESCAPE_CHAR, self::ESCAPE_CHAR.'%', self::ESCAPE_CHAR.'_'],
-            $value
-        );
+  """
+  Provide a value to compare against.
+  Only used when the directive is added on a field.
+  """
+  value: String
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+GRAPHQL;
     }
 
     /**
@@ -56,25 +56,33 @@ GRAPHQL;
             return $builder;
         }
 
-        $valueEscaped = $this->escapePercentage($value);
-
-        $percentage = $this->directiveArgValue('percentage', 'BOTH');
-        switch ($percentage) {
-            case 'START':
-                $valueEscaped = '%'.$valueEscaped;
-                break;
-            case 'END':
-                $valueEscaped = $valueEscaped.'%';
-                break;
-            case 'BOTH':
-                $valueEscaped = '%'.$valueEscaped.'%';
-                break;
+        $wildcardsTemplate = $this->directiveArgValue('template');
+        if (is_string($wildcardsTemplate)) {
+            $escaped = $this->escapeWildcards($value);
+            $value = str_replace(self::PLACEHOLDER, $escaped, $wildcardsTemplate);
         }
 
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
             'LIKE',
-            $valueEscaped
+            $value
+        );
+    }
+
+    public function handleFieldBuilder(object $builder): object
+    {
+        return $this->handleBuilder(
+            $builder,
+            $this->directiveArgValue('value')
+        );
+    }
+
+    protected function escapeWildcards(string $value): string
+    {
+        return str_replace(
+            [self::ESCAPE, self::PERCENTAGE, self::UNDERSCORE],
+            [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::PERCENTAGE, self::ESCAPE.self::UNDERSCORE],
+            $value
         );
     }
 }

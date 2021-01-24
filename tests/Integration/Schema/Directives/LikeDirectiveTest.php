@@ -7,26 +7,27 @@ use Tests\Utils\Models\User;
 
 class LikeDirectiveTest extends DBTestCase
 {
-    public function testLikeEnd(): void
+    public function testLikeClientsCanPassWildcards(): void
     {
-        $userA = factory(User::class)->create(['name' => 'Alan']);
-        $userB = factory(User::class)->create(['name' => 'Alex']);
-        $userC = factory(User::class)->create(['name' => 'Aaron']);
+        factory(User::class)->create(['name' => 'Alan']);
+        factory(User::class)->create(['name' => 'Alex']);
+        factory(User::class)->create(['name' => 'Aaron']);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            id: ID!
             name: String!
         }
 
         type Query {
-            users(name: String! @like(percentage: END)): [User!] @all
+            users(
+                name: String! @like
+            ): [User!]! @all
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users(name: "Al") {
+            users(name: "Al%") {
                 name
             }
         }
@@ -42,20 +43,21 @@ class LikeDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testLikeBoth(): void
+    public function testLikeWithWildcardsInTemplate(): void
     {
-        $userA = factory(User::class)->create(['name' => 'Alan']);
-        $userB = factory(User::class)->create(['name' => 'Alex']);
-        $userC = factory(User::class)->create(['name' => 'Aaron']);
+        factory(User::class)->create(['name' => 'Alan']);
+        factory(User::class)->create(['name' => 'Alex']);
+        factory(User::class)->create(['name' => 'Aaron']);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            id: ID!
             name: String!
         }
 
         type Query {
-            users(name: String! @like(percentage: BOTH)): [User!] @all
+            users(
+                name: String! @like(template: "%{}%")
+            ): [User!]! @all
         }
         ';
 
@@ -77,11 +79,12 @@ class LikeDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testLikeEscape(): void
+    public function testLikeClientWildcardsAreEscapedFromTemplate(): void
     {
-        $userA = factory(User::class)->create(['name' => 'Alan']);
-        $userB = factory(User::class)->create(['name' => 'Alex']);
-        $userC = factory(User::class)->create(['name' => 'Aar%on']);
+        factory(User::class)->create(['name' => 'Aaron']);
+        factory(User::class)->create(['name' => 'Aar%on']);
+        factory(User::class)->create(['name' => 'Aar%']);
+        factory(User::class)->create(['name' => 'Aar%toomuch']);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -90,7 +93,9 @@ class LikeDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users(name: String! @like(percentage: BOTH)): [User!] @all
+            users(
+                name: String! @like(template: "%{}__")
+            ): [User!] @all
         }
         ';
 
@@ -104,6 +109,39 @@ class LikeDirectiveTest extends DBTestCase
             'users' => [
                 [
                     'name' => 'Aar%on',
+                ],
+            ],
+        ]);
+    }
+
+    public function testLikeOnField(): void
+    {
+        factory(User::class)->create(['name' => 'Alex']);
+        factory(User::class)->create(['name' => 'Aaron']);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!]
+                @all
+                @like(key: "name", value: "%ex")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                name
+            }
+        }
+        ')->assertJsonFragment([
+            'users' => [
+                [
+                    'name' => 'Alex',
                 ],
             ],
         ]);
