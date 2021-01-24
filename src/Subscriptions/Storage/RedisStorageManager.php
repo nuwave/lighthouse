@@ -94,11 +94,14 @@ class RedisStorageManager implements StoresSubscriptions
         }
 
         // Lastly, we store the subscriber as a serialized string...
-        $this->connection->command('set', [
+        $setArguments = [
             $this->channelKey($subscriber->channel),
             $this->serialize($subscriber),
-            $this->ttl,
-        ]);
+        ];
+        if (isset($this->ttl)) {
+            $setArguments []= $this->ttl;
+        }
+        $this->connection->command('set', $setArguments);
     }
 
     public function deleteSubscriber(string $channel): ?Subscriber
