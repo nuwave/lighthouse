@@ -99,7 +99,7 @@ class RedisStorageManager implements StoresSubscriptions
             $this->serialize($subscriber),
         ];
         if (isset($this->ttl)) {
-            $setArguments []= $this->ttl;
+            $setArguments [] = $this->ttl;
         }
         $this->connection->command('set', $setArguments);
     }
