@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.1.0
+
 ### Added
 
 - Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
