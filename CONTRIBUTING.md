@@ -12,23 +12,49 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 ## Setup
 
-The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/)
-and [GNU make](https://www.gnu.org/software/make/).
+This section describes the setup of  a local development environment to run tests
+and other quality tools.
 
-Just clone the project and run the following in the project root:
+### Docker + Make
 
-    make setup
+A reproducible environment with minimal dependencies:
 
-## Usage
+- [docker-compose](https://docs.docker.com/compose/install/)
+- [GNU Make](https://www.gnu.org/software/make/) (optional)
 
 For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
 To see the available commands, run:
 
     make help
 
-Before you commit changes, you can run all validation steps with:
+Clone the project and run the following in the project root:
+
+    make setup
+
+Before you commit changes, run all validation steps with:
 
     make
+
+### Native Tools
+
+You can use native tools instead of Docker + Make, with the following requirements:
+
+- PHP (see [composer.json](composer.json) for the minimal required version)
+- Composer (Version 2 is recommended)
+- MySQL (any Laravel supported version should work)
+- Redis 6
+
+Clone the project and run the following in the project root:
+
+    composer install
+
+Copy the PHPUnit configuration:
+
+    cp phpunit.xml.dist phpunit.xml
+
+Change the `env` parameters to connect to MySQL and Redis test instances.
+
+Common tasks during development are listed in the `scripts` section of [composer.json](composer.json).
 
 ## Testing
 
@@ -300,19 +326,3 @@ Run the reports that are defined in `phpbench.json` via the command line,
 for example:
 
     vendor/bin/phpbench run --report=ast
-
-## Local setup
-It is also possible to setup the test environment without usage of the docker and make files.
-You would need the following:
-
-- PHP (at least 7.2)
-- Composer
-- Mysql 8
-- Redis 6
-
-For setting everything up, you would need to execute the following:
-
-1. run `composer install`.
-2. copy phpunit dist file to a local `cp ./phpunit.xml.dist ./phpunit.xml`.
-3. Change env parameter to your MySql and Redis connection.
-4. run `composer test`.
