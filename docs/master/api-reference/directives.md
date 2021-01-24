@@ -282,18 +282,18 @@ type Mutation {
 Manipulate the query builder with a method.
 """
 directive @builder(
-    """
-    Reference a method that is passed the query builder.
-    Consists of two parts: a class name and a method name, separated by an `@` symbol.
-    If you pass only a class name, the method name defaults to `__invoke`.
-    """
-    method: String!
+  """
+  Reference a method that is passed the query builder.
+  Consists of two parts: a class name and a method name, separated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  method: String!
 
-    """
-    Pass a value to the method as the second argument after the query builder.
-    Only used when the directive is added on a field.
-    """
-    value: Mixed
+  """
+  Pass a value to the method as the second argument after the query builder.
+  Only used when the directive is added on a field.
+  """
+  value: Mixed
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
