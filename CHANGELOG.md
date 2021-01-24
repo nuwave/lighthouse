@@ -11,6 +11,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
+- Allow using the `@builder` directive on fields https://github.com/nuwave/lighthouse/pull/1687
+
+## 5.1.0
+
+### Added
+
 - Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Validate correct usage of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Allow eager-loading multiple relations on a single field using `@with` https://github.com/nuwave/lighthouse/pull/1528

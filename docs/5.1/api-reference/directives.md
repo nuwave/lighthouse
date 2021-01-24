@@ -279,7 +279,7 @@ type Mutation {
 
 ```graphql
 """
-Manipulate the query builder with a method.
+Use an argument to modify the query builder for a field.
 """
 directive @builder(
   """
@@ -288,28 +288,17 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-
-  """
-  Pass a value to the method as the second argument after the query builder.
-  Only used when the directive is added on a field.
-  """
-  value: Mixed
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 You must point to a `method` which will receive the builder instance
-and can apply additional constraints to the query.
-
-When used on an argument, the value is supplied as the second parameter to the method.
-When used on a field, the value argument inside the directive is applied as the second
-parameter to the method.
+and the argument value, and can apply additional constraints to the query.
 
 ```graphql
 type Query {
     users(
         minimumHighscore: Int @builder(method: "App\MyClass@minimumHighscore")
     ): [User!]! @all
-    highrankedUsers: [User!]! @all @builder(method: "App\MyClass@minimumHighscore", value: 1000)
 }
 ```
 
