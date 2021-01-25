@@ -40,7 +40,7 @@ Before you commit changes, run all validation steps with:
 You can use native tools instead of Docker + Make, with the following requirements:
 
 - PHP (see [composer.json](composer.json) for the minimal required version)
-- Composer (Version 2 is recommended)
+- Composer (version 2 is recommended)
 - MySQL (any Laravel supported version should work)
 - Redis 6
 
