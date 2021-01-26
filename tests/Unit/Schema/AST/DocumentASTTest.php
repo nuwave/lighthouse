@@ -30,7 +30,7 @@ class DocumentASTTest extends TestCase
     public function testThrowsOnInvalidSchema(): void
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessageMatches('/^Syntax Error/');
+        $this->expectExceptionMessage('Syntax Error: Unexpected Name "foo"');
 
         DocumentAST::fromSource('foo');
     }
