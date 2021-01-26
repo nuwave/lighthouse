@@ -44,10 +44,7 @@ GRAPHQL;
             );
         }
 
-        // TODO change once we can depend on https://github.com/webonyx/graphql-php/pull/767
-        // $parentField->directives [] = $this->directiveNode;
-        // @phpstan-ignore-next-line covariance bug
-        $parentField->directives = ASTHelper::mergeNodeList($parentField->directives, [$this->directiveNode]);
+        $parentField->directives [] = $this->directiveNode;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next)

@@ -11,16 +11,29 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
+- Allow using the `@builder` directive on fields https://github.com/nuwave/lighthouse/pull/1687
+- Add dedicated `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective` https://github.com/nuwave/lighthouse/pull/1691
+
+### Changed
+
+- Clarify semantics of combining `@search` with other directives https://github.com/nuwave/lighthouse/pull/1691
+
+## 5.1.0
+
+### Added
+
 - Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Validate correct usage of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Allow eager-loading multiple relations on a single field using `@with` https://github.com/nuwave/lighthouse/pull/1528
 - Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` to instantiate arbitrary batch loaders https://github.com/nuwave/lighthouse/pull/1528
 - Add `@limit` directive to allow clients to specify the maximum number of results to return https://github.com/nuwave/lighthouse/pull/1674
 - Predefine default field ordering by using `@orderBy` on fields https://github.com/nuwave/lighthouse/pull/1678
+- Add `@like` directive to use a client given value to add a `LIKE` conditional to a database query https://github.com/nuwave/lighthouse/issues/1644
 
 ### Changed
 
 - Improve batch loading performance https://github.com/nuwave/lighthouse/pull/1528
+- Require `webonyx/graphql-php` version `^14.5`
 
 ### Deprecated
 
@@ -34,6 +47,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Resolve field middleware directives in lexical order https://github.com/nuwave/lighthouse/pull/1666
 - Ensure `Carbon\Carbon` is cast to `Illuminate\Support\Carbon` in date scalars https://github.com/nuwave/lighthouse/pull/1672
 - Fix Laravel 5.6 compatibility for `@withCount` and paginated relationship directives https://github.com/nuwave/lighthouse/pull/1528
+- Fix issue where argument names where used instead of variable names in subscription queries https://github.com/nuwave/lighthouse/pull/1683
+- Fix issue with TTL breaking subscriptions https://github.com/nuwave/lighthouse/pull/1685
 
 ## 5.0.2
 

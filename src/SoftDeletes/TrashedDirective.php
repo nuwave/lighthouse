@@ -2,13 +2,19 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
+use Exception;
+use GraphQL\Exception\InvalidArgument;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Scout\ScoutBuilderDirective;
+use Nuwave\Lighthouse\Scout\ScoutException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class TrashedDirective extends BaseDirective implements ArgBuilderDirective
+class TrashedDirective extends BaseDirective implements ArgBuilderDirective, ScoutBuilderDirective
 {
     public const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
 
@@ -22,35 +28,57 @@ directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * Apply withTrashed, onlyTrashed or withoutTrashed to given $builder if needed.
-     *
-     * @param string|null $value "with", "without" or "only"
-     */
     public function handleBuilder($builder, $value): object
     {
-        if ($builder instanceof Relation) {
-            $model = $builder->getRelated();
-        } elseif ($builder instanceof ScoutBuilder) {
-            $model = $builder->model;
-        } elseif ($builder instanceof EloquentBuilder) {
-            $model = $builder->getModel();
-        } else {
-            throw new \Exception('Can not get model from builder of class: '.get_class($builder));
+        if (! $builder instanceof EloquentBuilder) {
+            throw new Exception('Can not get model from builder of class: '.get_class($builder));
+        }
+        $model = $builder->getModel();
+
+        $this->assertModelUsesSoftDeletes($model);
+
+        if ($value === null) {
+            return $builder;
         }
 
+        /** @var Builder&SoftDeletes $builder */
+        switch ($value) {
+            case 'with':
+                return $builder->withTrashed();
+            case 'only':
+                return $builder->onlyTrashed();
+            case 'without':
+                return $builder->withoutTrashed();
+            default:
+                throw new InvalidArgument('Unexpected value for Trashed filter: '.$value);
+        }
+    }
+
+    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
+    {
+        $model = $builder->model;
+
+        $this->assertModelUsesSoftDeletes($model);
+
+        if ($value === null) {
+            return $builder;
+        }
+
+        switch ($value) {
+            case 'with':
+                return $builder->withTrashed();
+            case 'only':
+                return $builder->onlyTrashed();
+            default:
+                throw new ScoutException('Unexpected value for Trashed filter: '.$value);
+        }
+    }
+
+    protected function assertModelUsesSoftDeletes(Model $model): void
+    {
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
             get_class($model),
             self::MODEL_MUST_USE_SOFT_DELETES
         );
-
-        if (! isset($value)) {
-            return $builder;
-        }
-
-        $trashedModificationMethod = "{$value}Trashed";
-        $builder->{$trashedModificationMethod}();
-
-        return $builder;
     }
 }

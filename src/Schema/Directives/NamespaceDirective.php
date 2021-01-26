@@ -41,14 +41,13 @@ GRAPHQL;
         /** @var \GraphQL\Language\AST\DirectiveNode $namespaceDirective */
         $namespaceDirective = $this->directiveNode->cloneDeep();
 
-        // @phpstan-ignore-next-line graphql-php types are unnecessarily nullable
         foreach ($objectType->fields as $fieldDefinition) {
             $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);
             if ($existingNamespaces !== null) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$namespaceDirective]);
+            $fieldDefinition->directives [] = $namespaceDirective;
         }
     }
 

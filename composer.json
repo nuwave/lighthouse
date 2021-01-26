@@ -36,7 +36,7 @@
         "illuminate/validation": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laragraph/utils": "^1",
         "thecodingmachine/safe": "^1",
-        "webonyx/graphql-php": "^14.2"
+        "webonyx/graphql-php": "^14.5"
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3",
@@ -49,13 +49,13 @@
         "mockery/mockery": "^1.0",
         "nunomaduro/larastan": "^0.6",
         "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || ^6",
-        "phpbench/phpbench": "^0.17",
+        "phpbench/phpbench": "1.0.0-alpha4",
         "phpstan/phpstan-mockery": "^0.12.5",
         "phpstan/phpstan-phpunit": "^0.12.17",
-        "phpunit/phpunit": "^7.5 || ^8.4",
+        "phpunit/phpunit": "^7.5 || ^8.4 || ^9",
         "predis/predis": "^1.1",
-        "pusher/pusher-php-server": "^3.2",
-        "rector/rector": "^0.7.64",
+        "pusher/pusher-php-server": "^4",
+        "rector/rector": "^0.9",
         "thecodingmachine/phpstan-safe-rule": "^1.0"
     },
     "suggest": {

@@ -85,7 +85,7 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder
+     * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      */
     public function applyToBuilder(object $builder): LengthAwarePaginator
     {

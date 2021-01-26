@@ -109,29 +109,29 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $additionalArguments[] = $amount;
         }
 
-        $builder->addNestedWhereQuery(
-            // @phpstan-ignore-next-line Larastan disagrees with itself here
-            $model
-                ->whereHas(
-                    $relation,
-                    function ($builder) use ($relation, $model, $condition): void {
-                        if ($condition) {
-                            $relatedModel = $this->nestedRelatedModel($model, $relation);
+        /** @var \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> $whereHasQuery */
+        $whereHasQuery = $model
+            ->whereHas(
+                $relation,
+                function ($builder) use ($relation, $model, $condition): void {
+                    if ($condition) {
+                        $relatedModel = $this->nestedRelatedModel($model, $relation);
 
-                            $this->handleWhereConditions(
-                                $builder,
-                                $this->prefixConditionWithTableName(
-                                    $condition,
-                                    $relatedModel
-                                ),
+                        $this->handleWhereConditions(
+                            $builder,
+                            $this->prefixConditionWithTableName(
+                                $condition,
                                 $relatedModel
-                            );
-                        }
-                    },
-                    ...$additionalArguments
-                )
-                ->getQuery()
-        );
+                            ),
+                            $relatedModel
+                        );
+                    }
+                },
+                ...$additionalArguments
+            )
+            ->getQuery();
+
+        $builder->addNestedWhereQuery($whereHasQuery);
     }
 
     public static function invalidColumnName(string $column): string

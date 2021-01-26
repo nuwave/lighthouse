@@ -279,7 +279,7 @@ type Mutation {
 
 ```graphql
 """
-Use an argument to modify the query builder for a field.
+Manipulate the query builder with a method.
 """
 directive @builder(
   """
@@ -288,17 +288,28 @@ directive @builder(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+  """
+  Pass a value to the method as the second argument after the query builder.
+  Only used when the directive is added on a field.
+  """
+  value: Mixed
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
 You must point to a `method` which will receive the builder instance
-and the argument value, and can apply additional constraints to the query.
+and can apply additional constraints to the query.
+
+When used on an argument, the value is supplied as the second parameter to the method.
+When used on a field, the value argument inside the directive is applied as the second
+parameter to the method.
 
 ```graphql
 type Query {
     users(
         minimumHighscore: Int @builder(method: "App\MyClass@minimumHighscore")
     ): [User!]! @all
+    highrankedUsers: [User!]! @all @builder(method: "App\MyClass@minimumHighscore", value: 1000)
 }
 ```
 
@@ -1733,15 +1744,19 @@ directive @node(
   Reference to a function that receives the decoded `id` and returns a result.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
+
+  Mutually exclusive with the `model` argument.
   """
   resolver: String
 
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+
+  Mutually exclusive with the `model` argument.
   """
   model: String
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 Lighthouse defaults to resolving types through the underlying model,
@@ -2409,9 +2424,11 @@ type Query {
 }
 ```
 
-The [@search](#search) directive does not work in combination with other filter directives.
-The usual query builder `Eloquent\Builder` will be replaced by a `Scout\Builder`,
-which does not support the same methods and operations.
+The [@search](#search) directive only works in combination with filter directives that
+implement `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
+
+- [@eq](#eq)
+- [@softDeletes](#softdeletes)
 
 Normally the search will be performed using the index specified by the model's `searchableAs` method.
 However, in some situation a custom index might be needed, this can be achieved by using the argument `within`.

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use Closure;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Utils;
@@ -28,8 +29,9 @@ class ArgumentSet
     /**
      * A list of directives.
      *
-     * This may be coming from the field the arguments are a part of
-     * or the parent argument when in a tree of nested inputs.
+     * This may be coming from
+     * - the field the arguments are a part of
+     * - the parent argument when in a tree of nested inputs.
      *
      * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
@@ -141,14 +143,19 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string>  $scopes
      * @param  \Closure  $directiveFilter
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
+        $scoutEnhancer = new ScoutEnhancer($this, $builder);
+        if ($scoutEnhancer->hasSearchArguments()) {
+            return $scoutEnhancer->enhanceBuilder();
+        }
+
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
         self::applyFieldBuilderDirectives($this, $builder);
 
@@ -166,7 +173,7 @@ class ArgumentSet
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      */
     protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
     {
@@ -209,7 +216,7 @@ class ArgumentSet
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      */
     protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder): void
     {
@@ -223,8 +230,7 @@ class ArgumentSet
     /**
      * Add a value at the dot-separated path.
      *
-     * Works just like the Laravel Arr::add() function.
-     * @see \Illuminate\Support\Arr
+     * Works just like @see \Illuminate\Support\Arr::add().
      *
      * @param  mixed  $value Any value to inject.
      * @return $this
@@ -263,9 +269,6 @@ class ArgumentSet
      */
     public function argumentsWithUndefined(): array
     {
-        return array_merge(
-            $this->arguments,
-            $this->undefined
-        );
+        return array_merge($this->arguments, $this->undefined);
     }
 }

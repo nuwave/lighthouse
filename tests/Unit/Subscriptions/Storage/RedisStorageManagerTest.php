@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Subscriptions\Storage;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Redis\Factory;
-use Illuminate\Redis\Connections\Connection;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Redis\Factory as RedisFactory;
+use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Unit\Subscriptions\SubscriptionTestCase;
@@ -14,9 +14,9 @@ class RedisStorageManagerTest extends SubscriptionTestCase
 {
     public function testSubscriberByChannel(): void
     {
-        /** @var MockObject&Repository $config */
-        $config = $this->createMock(Repository::class);
-        $redisConnection = $this->createMock(Connection::class);
+        /** @var \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Config\Repository $config */
+        $config = $this->createMock(ConfigRepository::class);
+        $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
@@ -32,13 +32,10 @@ class RedisStorageManagerTest extends SubscriptionTestCase
         $this->assertEquals($subscriber, $retrievedSubscriber);
     }
 
-    /**
-     * @group foo
-     */
     public function testDeleteSubscriber(): void
     {
-        $config = $this->createMock(Repository::class);
-        $redisConnection = $this->createMock(Connection::class);
+        $config = $this->createMock(ConfigRepository::class);
+        $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
@@ -62,25 +59,35 @@ class RedisStorageManagerTest extends SubscriptionTestCase
 
     public function testStoreSubscriber(): void
     {
-        $config = $this->createMock(Repository::class);
-        $redisConnection = $this->createMock(Connection::class);
+        $config = $this->createMock(ConfigRepository::class);
+        $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
-        $subscriber = new DummySubscriber('private-lighthouse-foo', 'dummy-topic');
+        $ttl = 1000;
+        $config->method('get')->willReturn($ttl);
 
-        $redisConnection->expects($this->exactly(2))
+        $channel = 'private-lighthouse-foo';
+        $subscriber = new DummySubscriber($channel, 'dummy-topic');
+
+        $topicKey = 'graphql.topic.some-topic';
+        $redisConnection->expects($this->exactly(3))
             ->method('command')
             ->withConsecutive(
                 ['sadd', [
-                    'graphql.topic.some-topic',
-                    'private-lighthouse-foo',
+                    $topicKey,
+                    $channel,
+                ]],
+                ['expire', [
+                    $topicKey,
+                    $ttl,
                 ]],
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
                     'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
-                        'channel' => 'private-lighthouse-foo',
+                        'channel' => $channel,
                         'topic' => 'some-topic',
                     ]).'}',
+                    $ttl,
                 ]]
             );
 
@@ -90,8 +97,8 @@ class RedisStorageManagerTest extends SubscriptionTestCase
 
     public function testSubscribersByTopic(): void
     {
-        $config = $this->createMock(Repository::class);
-        $redisConnection = $this->createMock(Connection::class);
+        $config = $this->createMock(ConfigRepository::class);
+        $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $topic = 'bar';
@@ -122,12 +129,12 @@ class RedisStorageManagerTest extends SubscriptionTestCase
     }
 
     /**
-     * @param MockObject&Connection $redisConnection
-     * @return MockObject&Factory
+     * @param \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Redis\Connections\Connection $redisConnection
+     * @return \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Redis\Factory
      */
     private function getRedisFactory(MockObject $redisConnection): MockObject
     {
-        $redisFactory = $this->createMock(Factory::class);
+        $redisFactory = $this->createMock(RedisFactory::class);
         $redisFactory->expects($this->once())
             ->method('connection')
             ->willReturn($redisConnection);

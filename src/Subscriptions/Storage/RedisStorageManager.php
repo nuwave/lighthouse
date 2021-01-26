@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -37,10 +37,10 @@ class RedisStorageManager implements StoresSubscriptions
      */
     protected $ttl;
 
-    public function __construct(Repository $config, Factory $redis)
+    public function __construct(ConfigRepository $config, RedisFactory $redis)
     {
         $this->connection = $redis->connection(
-            $config->get('lighthouse.broadcasters.echo.connection', 'default')
+            $config->get('lighthouse.broadcasters.echo.connection') ?? 'default'
         );
         $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl');
     }
@@ -94,11 +94,14 @@ class RedisStorageManager implements StoresSubscriptions
         }
 
         // Lastly, we store the subscriber as a serialized string...
-        $this->connection->command('set', array_merge([
+        $setArguments = [
             $this->channelKey($subscriber->channel),
             $this->serialize($subscriber),
-            // ...and set the EX option to set the ttl in one command.
-        ], $this->ttl ? ['EX', $this->ttl] : []));
+        ];
+        if (isset($this->ttl)) {
+            $setArguments [] = $this->ttl;
+        }
+        $this->connection->command('set', $setArguments);
     }
 
     public function deleteSubscriber(string $channel): ?Subscriber

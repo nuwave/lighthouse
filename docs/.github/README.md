@@ -50,7 +50,7 @@ If you use Docker you can start up the environment (including docs) by running:
     make setup
     make node
 
-Finally, navigate to http://localhost:8080
+Finally, navigate to http://localhost:8081
 
 ## Files
 
@@ -109,3 +109,11 @@ in a single PR.
 
 This will copy the contents of `docs/master/` into `docs/<version>/`
 and place a new version number in `docs/.vuepress/versions.json`.
+
+## Deployment
+
+The docs are automatically built and deployed on pushes to `master`.
+@chrissm79 set up the deployment.
+
+When the docs are down, check https://www.netlifystatus.com for problems on their part.
+

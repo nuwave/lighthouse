@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
+use Exception;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -34,16 +36,23 @@ class CacheStorageManager implements StoresSubscriptions
     /**
      * The time to live for items in the cache.
      *
-     * @var \DateInterval|int|null
+     * @var int|null
      */
     protected $ttl;
 
-    public function __construct(CacheManager $cacheManager)
+    public function __construct(CacheManager $cacheManager, ConfigRepository $config)
     {
-        $this->cache = $cacheManager->store(
-            config('lighthouse.subscriptions.storage', 'file')
-        );
-        $this->ttl = config('lighthouse.subscriptions.storage_ttl');
+        $storage = $config->get('lighthouse.subscriptions.storage') ?? 'file';
+        if (! is_string($storage)) {
+            throw new Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: '.\Safe\json_encode($storage));
+        }
+        $this->cache = $cacheManager->store($storage);
+
+        $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
+        if (! is_null($ttl) && ! is_int($ttl)) {
+            throw new Exception('Config setting lighthouse.subscriptions.storage_ttl must be a int or `null`, got: '.\Safe\json_encode($ttl));
+        }
+        $this->ttl = $ttl;
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber
@@ -53,13 +62,15 @@ class CacheStorageManager implements StoresSubscriptions
 
     public function subscribersByTopic(string $topic): Collection
     {
-        // @phpstan-ignore-next-line filter makes the list contain only non-null elements
-        return $this
+        /** @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber> $subscribers */
+        $subscribers = $this
             ->retrieveTopic(self::topicKey($topic))
             ->map(function (string $channel): ?Subscriber {
                 return $this->subscriberByChannel($channel);
             })
             ->filter();
+
+        return $subscribers;
     }
 
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
@@ -72,7 +83,6 @@ class CacheStorageManager implements StoresSubscriptions
             $this->cache->forever($channelKey, $subscriber);
         } else {
             // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
-            // @phpstan-ignore-next-line
             $this->cache->put($channelKey, $subscriber, Carbon::now()->addSeconds($this->ttl));
         }
     }
@@ -99,7 +109,6 @@ class CacheStorageManager implements StoresSubscriptions
             $this->cache->forever($key, $topic);
         } else {
             // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
-            // @phpstan-ignore-next-line
             $this->cache->put($key, $topic, Carbon::now()->addSeconds($this->ttl));
         }
     }

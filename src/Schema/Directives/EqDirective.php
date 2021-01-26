@@ -6,11 +6,13 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Scout\ScoutBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective, FieldManipulator
+class EqDirective extends BaseDirective implements ArgBuilderDirective, ScoutBuilderDirective, FieldBuilderDirective, FieldManipulator
 {
     public static function definition(): string
     {
@@ -36,16 +38,18 @@ directive @eq(
 GRAPHQL;
     }
 
-    /**
-     * Apply a "WHERE = $value" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
     public function handleBuilder($builder, $value): object
     {
         return $builder->where(
-            $this->directiveArgValue('key', $this->nodeName()),
+            $this->directiveArgValue('key') ?? $this->nodeName(),
+            $value
+        );
+    }
+
+    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
+    {
+        return $builder->where(
+            $this->directiveArgValue('key') ?? $this->nodeName(),
             $value
         );
     }

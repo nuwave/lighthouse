@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-class SearchDirective extends BaseDirective implements ArgBuilderDirective
+class SearchDirective extends BaseDirective
 {
     public static function definition(): string
     {
@@ -21,25 +22,17 @@ directive @search(
 GRAPHQL;
     }
 
-    /**
-     * Apply a scout search to the builder.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Laravel\Scout\Builder
-     */
-    public function handleBuilder($builder, $value): object
+    public function search(ScoutBuilder $builder): void
     {
-        /**
-         * TODO make class-string once PHPStan can handle it.
-         * @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $modelClass
-         */
-        $modelClass = get_class($builder->getModel());
-        $builder = $modelClass::search($value);
+        $within = $this->directiveArgValue('within');
+        if (null !== $within) {
+            if (! is_string($within)) {
+                throw new DefinitionException(
+                    "Expected the value of the `within` argument of @{$this->name()} on {$this->nodeName()} to be a string, got: ".\Safe\json_encode($within)
+                );
+            }
 
-        if ($within = $this->directiveArgValue('within')) {
             $builder->within($within);
         }
-
-        return $builder;
     }
 }

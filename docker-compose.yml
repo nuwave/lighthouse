@@ -13,9 +13,6 @@ services:
       - label:disable
     depends_on:
       - mysql
-    environment:
-      XDEBUG_CONFIG: "remote_enable=1 remote_mode=req remote_port=9000 remote_connect_back=0 remote_host=host.docker.internal"
-      PHP_IDE_CONFIG: "serverName=lighthouse"
     tty: true
 
   mysql:
@@ -40,5 +37,5 @@ services:
     environment:
       - NODE_OPTIONS="--max-old-space-size=8192"
     ports:
-      - 8080:8080
+      - 8081:8080
     tty: true
