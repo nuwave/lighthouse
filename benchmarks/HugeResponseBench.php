@@ -9,7 +9,12 @@ use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
 
 class HugeResponseBench extends QueryBench
 {
-    private $parent = null;
+    /**
+     * Cached value of parent with recursive children
+     *
+     * @var array<string, string|array>
+     */
+    protected $parent = null;
 
     protected $schema = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
@@ -33,6 +38,7 @@ GRAPHQL;
      * Resolves parent
      *
      * @skip
+     * @return array<string, string|array>
      */
     public function resolve() : array {
         if($this->parent)

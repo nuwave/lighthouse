@@ -29,9 +29,18 @@ abstract class QueryBench extends TestCase
     use MakesHttpRequests;
 
     /**
+     * Schema, that will be loaded before request
+     *
      * @var string
      */
-    private $graphQLEndpoint;
+    protected $schema;
+
+    /**
+     * Cached graphQL endpoint
+     *
+     * @var string
+     */
+    protected $graphQLEndpoint;
 
     public function setUp() : void {
         parent::setUp();
