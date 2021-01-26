@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
 use Mockery;
@@ -40,14 +40,17 @@ class SearchDirectiveTest extends DBTestCase
             ->andReturn($this->engine);
     }
 
-    public function testCanSearch(): void
+    public function testSearch(): void
     {
+        /** @var \Tests\Utils\Models\Post $postA */
         $postA = factory(Post::class)->create([
             'title' => 'great title',
         ]);
+        /** @var \Tests\Utils\Models\Post $postB */
         $postB = factory(Post::class)->create([
             'title' => 'Really bad title',
         ]);
+        /** @var \Tests\Utils\Models\Post $postC */
         $postC = factory(Post::class)->create([
             'title' => 'another great title',
         ]);
@@ -55,7 +58,7 @@ class SearchDirectiveTest extends DBTestCase
         $this->engine
             ->shouldReceive('map')
             ->andReturn(
-                new Collection([$postA, $postC])
+                new EloquentCollection([$postA, $postC])
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -67,29 +70,25 @@ class SearchDirectiveTest extends DBTestCase
         type Query {
             posts(
                 search: String @search
-            ): [Post!]! @paginate
+            ): [Post!]! @all
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            posts(first: 10 search: "great") {
-                data {
-                    id
-                    title
-                }
+            posts(search: "great") {
+                id
+                title
             }
         }
         ')->assertJson([
             'data' => [
                 'posts' => [
-                    'data' => [
-                        [
-                            'id' => $postA->id,
-                        ],
-                        [
-                            'id' => $postC->id,
-                        ],
+                    [
+                        'id' => $postA->id,
+                    ],
+                    [
+                        'id' => $postC->id,
                     ],
                 ],
             ],
@@ -98,25 +97,21 @@ class SearchDirectiveTest extends DBTestCase
 
     public function testCanSearchWithCustomIndex(): void
     {
+        /** @var \Tests\Utils\Models\Post $postA */
         $postA = factory(Post::class)->create([
             'title' => 'great title',
         ]);
+        /** @var \Tests\Utils\Models\Post $postB */
         $postB = factory(Post::class)->create([
             'title' => 'Really great title',
         ]);
+        /** @var \Tests\Utils\Models\Post $postC */
         $postC = factory(Post::class)->create([
             'title' => 'bad title',
         ]);
 
         $this->engine
             ->shouldReceive('map')
-            ->andReturn(
-                new Collection([$postA, $postB])
-            )
-            ->once();
-
-        $this->engine
-            ->shouldReceive('paginate')
             ->with(
                 Mockery::on(
                     function ($argument): bool {
@@ -126,7 +121,9 @@ class SearchDirectiveTest extends DBTestCase
                 Mockery::any(),
                 Mockery::any()
             )
-            ->andReturn(new Collection([$postA, $postB]))
+            ->andReturn(
+                new EloquentCollection([$postA, $postB])
+            )
             ->once();
 
         $this->schema = /** @lang GraphQL */ '
@@ -138,29 +135,25 @@ class SearchDirectiveTest extends DBTestCase
         type Query {
             posts(
                 search: String @search(within: "my.index")
-            ): [Post!]! @paginate
+            ): [Post!]! @all
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            posts(first: 10 search: "great") {
-                data {
-                    id
-                    title
-                }
+            posts(search: "great") {
+                id
+                title
             }
         }
         ')->assertJson([
             'data' => [
                 'posts' => [
-                    'data' => [
-                        [
-                            'id' => "$postA->id",
-                        ],
-                        [
-                            'id' => "$postB->id",
-                        ],
+                    [
+                        'id' => "$postA->id",
+                    ],
+                    [
+                        'id' => "$postB->id",
                     ],
                 ],
             ],
@@ -169,19 +162,22 @@ class SearchDirectiveTest extends DBTestCase
 
     public function testHandlesScoutBuilderPaginationArguments(): void
     {
+        /** @var \Tests\Utils\Models\Post $postA */
         $postA = factory(Post::class)->create([
             'title' => 'great title',
         ]);
+        /** @var \Tests\Utils\Models\Post $postB */
         $postB = factory(Post::class)->create([
             'title' => 'Really great title',
         ]);
+        /** @var \Tests\Utils\Models\Post $postC */
         $postC = factory(Post::class)->create([
             'title' => 'bad title',
         ]);
 
         $this->engine->shouldReceive('map')
             ->andReturn(
-                new Collection([$postA, $postB])
+                new EloquentCollection([$postA, $postB])
             )
             ->once();
 
@@ -191,7 +187,7 @@ class SearchDirectiveTest extends DBTestCase
                 Mockery::any(),
                 Mockery::not('page')
             )
-            ->andReturn(new Collection([$postA, $postB]))
+            ->andReturn(new EloquentCollection([$postA, $postB]))
             ->once();
 
         $this->schema = /** @lang GraphQL */ '
@@ -209,7 +205,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            posts(first: 10 search: "great") {
+            posts(first: 10, search: "great") {
                 data {
                     id
                     title
