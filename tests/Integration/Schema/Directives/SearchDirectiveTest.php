@@ -133,7 +133,7 @@ class SearchDirectiveTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'posts' => [],
-            ]
+            ],
         ]);
     }
 
@@ -168,8 +168,8 @@ class SearchDirectiveTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'posts' => []
-            ]
+                'posts' => [],
+            ],
         ]);
     }
 
@@ -233,7 +233,7 @@ class SearchDirectiveTest extends DBTestCase
 
     public function testWithinMustBeString(): void
     {
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
         }
@@ -243,7 +243,7 @@ class SearchDirectiveTest extends DBTestCase
                 search: String @search(within: 123)
             ): [Post!]! @all
         }
-        ";
+        ';
 
         $this->expectException(DefinitionException::class);
 
@@ -258,7 +258,7 @@ class SearchDirectiveTest extends DBTestCase
 
     public function testMultipleSearchesAreNotAllowed(): void
     {
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
         }
@@ -269,7 +269,7 @@ class SearchDirectiveTest extends DBTestCase
                 second: String @search
             ): [Post!]! @all
         }
-        ";
+        ';
 
         $this->expectException(ScoutException::class);
 
@@ -284,7 +284,7 @@ class SearchDirectiveTest extends DBTestCase
 
     public function testIncompatibleArgBuildersAreNotAllowed(): void
     {
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
         }
@@ -295,7 +295,7 @@ class SearchDirectiveTest extends DBTestCase
                 nope: String @neq
             ): [Post!]! @all
         }
-        ";
+        ';
 
         $this->expectException(ScoutException::class);
 
@@ -310,7 +310,7 @@ class SearchDirectiveTest extends DBTestCase
 
     public function testModelMustBeSearchable(): void
     {
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -320,7 +320,7 @@ class SearchDirectiveTest extends DBTestCase
                 search: String @search
             ): [Task!]! @all
         }
-        ";
+        ';
 
         $this->expectException(ScoutException::class);
 
