@@ -901,15 +901,23 @@ is an identical string. [Read more about enum types](../the-basics/types.md#enum
 
 ```graphql
 """
-Use the client given value to add an equal conditional to a database query.
+Add an equal conditional to a database query.
 """
 directive @eq(
-  """
-  Specify the database column to compare.
-  Only required if database column has a different name than the attribute in your schema.
-  """
-  key: String
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+    """
+    Specify the database column to compare.
+    Required if the directive is:
+    - used on an argument and the database column has a different name
+    - used on a field
+    """
+    key: String
+
+    """
+    Provide a value to compare against.
+    Only required when this directive is used on a field.
+    """
+    value: Mixed
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
 ```graphql
@@ -924,6 +932,14 @@ pass the actual column name as the `key`.
 ```graphql
 type User {
   posts(category: String @eq(key: "cat")): [Post!]! @hasMany
+}
+```
+
+You can also use this on a field to define a default filter:
+
+```graphql
+type User {
+  sportPosts: [Post!]! @hasMany @eq(key: "category", value: "sport")
 }
 ```
 

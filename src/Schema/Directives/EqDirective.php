@@ -18,7 +18,7 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective, ScoutBui
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Use the client given value to add an equal conditional to a database query.
+Add an equal conditional to a database query.
 """
 directive @eq(
   """
@@ -34,7 +34,7 @@ directive @eq(
   Only required when this directive is used on a field.
   """
   value: Mixed
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 GRAPHQL;
     }
 
