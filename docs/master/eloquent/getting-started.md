@@ -96,10 +96,10 @@ And can be queried like this:
 
 ## Adding Query Constraints
 
-Lighthouse provides built-in directives to enhance your queries by giving
-additional query capabilities to the client.
+Lighthouse provides directives such as [@eq](../api-reference/directives.md#eq)
+to enhance your queries with additional constraints.
 
-The following field definition allows you to fetch a single User by ID.
+The following field definition allows clients to fetch a single User by ID.
 
 ```graphql
 type Query {
@@ -107,7 +107,7 @@ type Query {
 }
 ```
 
-You can query this field like this:
+Query the field like this:
 
 ```graphql
 {
@@ -117,7 +117,7 @@ You can query this field like this:
 }
 ```
 
-And, if a result is found, receive a result like this:
+If found, the result will look like this:
 
 ```json
 {
@@ -128,6 +128,11 @@ And, if a result is found, receive a result like this:
   }
 }
 ```
+
+## Ordering
+
+Use the [@orderBy](../api-reference/directives.md#orderby) directive to sort
+a result list by one or more given columns.
 
 ## Local Scopes
 

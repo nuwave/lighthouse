@@ -12,23 +12,49 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 ## Setup
 
-The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/)
-and [GNU make](https://www.gnu.org/software/make/).
+This section describes the setup of  a local development environment to run tests
+and other quality tools.
 
-Just clone the project and run the following in the project root:
+### Docker + Make
 
-    make setup
+A reproducible environment with minimal dependencies:
 
-## Usage
+- [docker-compose](https://docs.docker.com/compose/install/)
+- [GNU Make](https://www.gnu.org/software/make/) (optional)
 
 For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
 To see the available commands, run:
 
     make help
 
-Before you commit changes, you can run all validation steps with:
+Clone the project and run the following in the project root:
+
+    make setup
+
+Before you commit changes, run all validation steps with:
 
     make
+
+### Native Tools
+
+You can use native tools instead of Docker + Make, with the following requirements:
+
+- PHP (see [composer.json](composer.json) for the minimal required version)
+- Composer (version 2 is recommended)
+- MySQL (any Laravel supported version should work)
+- Redis 6
+
+Clone the project and run the following in the project root:
+
+    composer install
+
+Copy the PHPUnit configuration:
+
+    cp phpunit.xml.dist phpunit.xml
+
+Change the `env` parameters to connect to MySQL and Redis test instances.
+
+Common tasks during development are listed in the `scripts` section of [composer.json](composer.json).
 
 ## Testing
 

@@ -77,11 +77,8 @@ class PostUpdated extends GraphQLSubscription
      */
     public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
-        // Optionally create a unique topic name based on the
-        // `author` argument.
-        $args = $subscriber->args;
-
-        return Str::snake($fieldName).':'.$args['author'];
+        // Create a unique topic name based on the `author` argument
+        return Str::snake($fieldName).':'.$subscriber->args['author'];
     }
 
     /**

@@ -23,6 +23,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` to instantiate arbitrary batch loaders https://github.com/nuwave/lighthouse/pull/1528
 - Add `@limit` directive to allow clients to specify the maximum number of results to return https://github.com/nuwave/lighthouse/pull/1674
 - Predefine default field ordering by using `@orderBy` on fields https://github.com/nuwave/lighthouse/pull/1678
+- Add `@like` directive to use a client given value to add a `LIKE` conditional to a database query https://github.com/nuwave/lighthouse/issues/1644
 
 ### Changed
 

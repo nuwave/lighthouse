@@ -29,8 +29,10 @@ abstract class DBTestCase extends TestCase
 
         // Ensure we start from a clean slate each time
         // We cannot use transactions, as they do not reset autoincrement
+        $databaseName = env('LIGHTHOUSE_TEST_DB_DATABASE') ?? 'lighthouse';
+        $columnName = "Tables_in_{$databaseName}";
         foreach (DB::select('SHOW TABLES') as $table) {
-            DB::table($table->Tables_in_test)->truncate();
+            DB::table($table->{$columnName})->truncate();
         }
 
         $this->withFactories(__DIR__.'/database/factories');
