@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Scout;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Laravel\Scout\Builder as ScoutBuilder;
