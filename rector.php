@@ -18,10 +18,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $parameters->set(Option::SKIP, [
         // Does not fit autoloading standards
-        __DIR__ . '/tests/database/migrations',
+        __DIR__.'/tests/database/migrations',
 
         // Gets stuck on WhereConditionsBaseDirective for some reason
-        __DIR__ . '/src/WhereConditions',
+        __DIR__.'/src/WhereConditions',
 
         // Having unused parameters can increase clarity, e.g. in event handlers
         RemoveUnusedParameterRector::class,
