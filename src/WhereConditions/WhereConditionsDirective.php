@@ -2,9 +2,6 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
-use Exception;
-use Laravel\Scout\Builder as ScoutBuilder;
-
 class WhereConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string

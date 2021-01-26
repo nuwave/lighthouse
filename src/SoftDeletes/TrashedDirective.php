@@ -50,7 +50,7 @@ GRAPHQL;
             case 'without':
                 return $builder->withoutTrashed();
             default:
-                throw new InvalidArgument('Unexpected value for Trashed filter: ' . $value);
+                throw new InvalidArgument('Unexpected value for Trashed filter: '.$value);
         }
     }
 
@@ -70,7 +70,7 @@ GRAPHQL;
             case 'only':
                 return $builder->onlyTrashed();
             default:
-                throw new ScoutException('Unexpected value for Trashed filter: ' . $value);
+                throw new ScoutException('Unexpected value for Trashed filter: '.$value);
         }
     }
 

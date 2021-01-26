@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\WhereConditions;
 use Exception;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
-use Laravel\Scout\Builder as ScoutBuilder;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
