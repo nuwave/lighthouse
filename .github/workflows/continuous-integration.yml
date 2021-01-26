@@ -32,6 +32,16 @@ jobs:
         exclude:
           - php-version: "7.2"
             laravel-version: "^8"
+          - php-version: "8.0"
+            laravel-version: "5.6.*"
+          - php-version: "8.0"
+            laravel-version: "5.7.*"
+          - php-version: "8.0"
+            laravel-version: "5.8.*"
+          - php-version: "8.0"
+            laravel-version: "^6"
+          - php-version: "8.0"
+            laravel-version: "^7"
 
     steps:
       - name: "Checkout"
@@ -53,7 +63,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: "composer remove --dev phpbench/phpbench --no-update"
+        run: "composer remove --dev phpbench/phpbench rector/rector --no-update"
 
       - name: "Ensure compatibility with legacy factories"
         if: "matrix.laravel-version != '^8'"
@@ -123,7 +133,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rectorphp/rector --no-update"
+        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update"
 
       - name: "Ensure compatibility with legacy factories"
         if: "matrix.laravel-version != '^8'"
@@ -177,7 +187,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: "composer remove --dev phpbench/phpbench rectorphp/rector --no-update"
+        run: "composer remove --dev phpbench/phpbench rector/rector --no-update"
 
       - name: "Ensure compatibility with legacy factories"
         if: "matrix.laravel-version != '^8'"
