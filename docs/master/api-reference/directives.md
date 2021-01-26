@@ -2424,9 +2424,11 @@ type Query {
 }
 ```
 
-The [@search](#search) directive does not work in combination with other filter directives.
-The usual query builder `Eloquent\Builder` will be replaced by a `Scout\Builder`,
-which does not support the same methods and operations.
+The [@search](#search) directive only works in combination with filter directives that
+implement `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
+
+- [@eq](#eq)
+- [@softDeletes](#softdeletes)
 
 Normally the search will be performed using the index specified by the model's `searchableAs` method.
 However, in some situation a custom index might be needed, this can be achieved by using the argument `within`.

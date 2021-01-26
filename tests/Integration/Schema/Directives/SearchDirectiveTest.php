@@ -103,19 +103,15 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->engine
             ->shouldReceive('map')
-            ->with(
-                Mockery::on(function (ScoutBuilder $builder) use ($id): bool {
-                    return $builder->wheres === ['id' => $id];
-                }),
-                Mockery::any(),
-                Mockery::any()
-            )
-            ->andReturn(new EloquentCollection());
+            ->withArgs(function (ScoutBuilder $builder) use ($id): bool {
+                return $builder->wheres === ['id' => $id];
+            })
+            ->andReturn(new EloquentCollection())
+            ->once();
 
         $this->schema = /** @lang GraphQL */ '
         type Post {
             id: Int!
-            title: String!
         }
 
         type Query {
@@ -130,11 +126,50 @@ class SearchDirectiveTest extends DBTestCase
         query ($id: Int) {
             posts(id: $id, search: "great") {
                 id
-                title
             }
         }
         ', [
             'id' => $id,
+        ])->assertJson([
+            'data' => [
+                'posts' => [],
+            ]
+        ]);
+    }
+
+    public function testSearchWithTrashed(): void
+    {
+        $this->engine
+            ->shouldReceive('map')
+            ->withArgs(function (ScoutBuilder $builder): bool {
+                return $builder->wheres === ['__soft_deleted' => 1];
+            })
+            ->andReturn(new EloquentCollection())
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: Int!
+        }
+
+        type Query {
+            posts(
+                id: Int @eq
+                search: String @search
+            ): [Post!]! @all @softDeletes
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts(search: "foo", trashed: ONLY) {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'posts' => []
+            ]
         ]);
     }
 
@@ -156,13 +191,9 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->engine
             ->shouldReceive('map')
-            ->with(
-                Mockery::on(function (ScoutBuilder $builder) use ($myIndex): bool {
-                    return $builder->index === $myIndex;
-                }),
-                Mockery::any(),
-                Mockery::any()
-            )
+            ->withArgs(function (ScoutBuilder $builder) use ($myIndex): bool {
+                return $builder->index === $myIndex;
+            })
             ->andReturn(
                 new EloquentCollection([$postA, $postB])
             )
@@ -171,7 +202,6 @@ class SearchDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ "
         type Post {
             id: ID!
-            title: String!
         }
 
         type Query {
@@ -185,7 +215,6 @@ class SearchDirectiveTest extends DBTestCase
         {
             posts(search: "great") {
                 id
-                title
             }
         }
         ')->assertJson([
@@ -336,7 +365,6 @@ class SearchDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
-            title: String!
         }
 
         type Query {
@@ -351,7 +379,6 @@ class SearchDirectiveTest extends DBTestCase
             posts(first: 10, search: "great") {
                 data {
                     id
-                    title
                 }
             }
         }

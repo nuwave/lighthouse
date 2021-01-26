@@ -12,6 +12,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Allow using the `@builder` directive on fields https://github.com/nuwave/lighthouse/pull/1687
+- Add dedicated `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective` https://github.com/nuwave/lighthouse/pull/1691
+
+### Changed
+
+- Clarify semantics of combining `@search` with other directives https://github.com/nuwave/lighthouse/pull/1691
 
 ## 5.1.0
 
