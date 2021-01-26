@@ -1,12 +1,9 @@
 <?php
 
-
 namespace Benchmarks;
-
 
 use Exception;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
@@ -29,20 +26,21 @@ abstract class QueryBench extends TestCase
     use MakesHttpRequests;
 
     /**
-     * Schema, that will be loaded before request
+     * Schema, that will be loaded before request.
      *
      * @var string
      */
     protected $schema;
 
     /**
-     * Cached graphQL endpoint
+     * Cached graphQL endpoint.
      *
      * @var string
      */
     protected $graphQLEndpoint;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->app->bind(
@@ -133,5 +131,4 @@ abstract class QueryBench extends TestCase
             $params
         );
     }
-
 }

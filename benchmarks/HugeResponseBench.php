@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Benchmarks;
-
 
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
 use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
@@ -10,7 +8,7 @@ use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
 class HugeResponseBench extends QueryBench
 {
     /**
-     * Cached value of parent with recursive children
+     * Cached value of parent with recursive children.
      *
      * @var array<string, string|array>
      */
@@ -35,26 +33,29 @@ type Children {
 GRAPHQL;
 
     /**
-     * Resolves parent
+     * Resolves parent.
      *
      * @skip
      * @return array<string, string|array>
      */
-    public function resolve() : array {
-        if($this->parent)
+    public function resolve(): array
+    {
+        if ($this->parent) {
             return $this->parent;
+        }
 
         $this->parent = [
             'name' => 'parent',
             'children' => [],
         ];
 
-        for ($i = 0; $i < 100; $i++){
+        for ($i = 0; $i < 100; $i++) {
             $this->parent['children'][] = [
-                'name' => 'children' . $i,
+                'name' => 'children'.$i,
                 'parent' => $this->parent,
             ];
         }
+
         return $this->parent;
     }
 
@@ -62,22 +63,24 @@ GRAPHQL;
      * @Iterations(10)
      * @OutputTimeUnit("seconds", precision=3)
      */
-    public function benchmark1() : void {
-        $this->graphQL(/** @lang GraphQL */ "
+    public function benchmark1(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '
         {
             parent {
                 name
             }
         }
-        ");
+        ');
     }
 
     /**
      * @Iterations(10)
      * @OutputTimeUnit("seconds", precision=3)
      */
-    public function benchmark100() : void {
-        $this->graphQL(/** @lang GraphQL */ "
+    public function benchmark100(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '
         {
             parent {
                 children {
@@ -85,15 +88,16 @@ GRAPHQL;
                 }
             }
         }
-        ");
+        ');
     }
 
     /**
      * @Iterations(10)
      * @OutputTimeUnit("seconds", precision=3)
      */
-    public function benchmark10k() : void {
-        $this->graphQL(/** @lang GraphQL */ "
+    public function benchmark10k(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '
         {
             parent {
                 children {
@@ -105,6 +109,6 @@ GRAPHQL;
                 }
             }
         }
-        ");
+        ');
     }
 }
