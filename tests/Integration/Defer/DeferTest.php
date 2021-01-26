@@ -38,11 +38,9 @@ class DeferTest extends TestCase
         }
         ');
 
-        $this->assertTrue(
-            in_array(
-                'defer',
-                $introspection->json('data.__schema.directives.*.name')
-            )
+        $this->assertContains(
+            'defer',
+            $introspection->json('data.__schema.directives.*.name')
         );
     }
 

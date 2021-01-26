@@ -62,7 +62,9 @@ class DocumentAST implements Serializable
             // Throw our own error class instead, since otherwise a schema definition
             // error would get rendered to the Client.
             throw new ParseException(
-                $syntaxError->getMessage()
+                $syntaxError->getMessage(),
+                $syntaxError->getCode(),
+                $syntaxError
             );
         }
 

@@ -52,7 +52,9 @@ class SchemaStitcher implements SchemaSourceProvider
                         $realpath = \Safe\realpath($importFilePath);
                     } catch (FilesystemException $exception) {
                         throw new FileNotFoundException(
-                            "Did not find GraphQL schema import at {$importFilePath}."
+                            "Did not find GraphQL schema import at {$importFilePath}.",
+                            $exception->getCode(),
+                            $exception
                         );
                     }
 

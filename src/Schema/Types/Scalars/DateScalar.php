@@ -67,7 +67,12 @@ abstract class DateScalar extends ScalarType
     protected function tryParsingDate($value, string $exceptionClass): Carbon
     {
         try {
-            if (is_object($value) && get_class($value) === \Carbon\Carbon::class) {
+            if (
+                is_object($value)
+                // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
+                // @noRector Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector
+                && get_class($value) === \Carbon\Carbon::class
+            ) {
                 /**
                  * Given we had a valid \Carbon\Carbon before, this can not fail.
                  *

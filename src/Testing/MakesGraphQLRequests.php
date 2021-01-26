@@ -45,7 +45,7 @@ trait MakesGraphQLRequests
     {
         $params = ['query' => $query];
 
-        if ($variables) {
+        if ($variables !== []) {
             $params += ['variables' => $variables];
         }
 
@@ -114,7 +114,7 @@ trait MakesGraphQLRequests
      */
     protected function introspect()
     {
-        if ($this->introspectionResult) {
+        if ($this->introspectionResult !== null) {
             return $this->introspectionResult;
         }
 
@@ -148,7 +148,7 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if (! $this->introspectionResult) {
+        if ($this->introspectionResult === null) {
             $this->introspect();
         }
 
