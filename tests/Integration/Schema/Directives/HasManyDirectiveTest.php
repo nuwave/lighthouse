@@ -735,11 +735,11 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
+        $this->expectExceptionMessage('Found invalid pagination type: foo');
 
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
-            tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
+            tasks(first: Int! after: Int): [Task!]! @hasMany(type: "foo")
         }
 
         type Task {

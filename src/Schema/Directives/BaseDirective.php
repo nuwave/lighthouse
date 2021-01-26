@@ -180,7 +180,7 @@ abstract class BaseDirective implements Directive
 
         if (! $className) {
             throw new DefinitionException(
-                "No class '{$classCandidate}' was found for directive '{$this->name()}'"
+                "No class `{$classCandidate}` was found for directive `@{$this->name()}`"
             );
         }
 

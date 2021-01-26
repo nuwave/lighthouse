@@ -26,6 +26,7 @@ class ResolverProvider implements ProvidesResolver
             }
 
             return Closure::fromCallable(
+                // @phpstan-ignore-next-line this works
                 [app($resolverClass), '__invoke']
             );
         }
