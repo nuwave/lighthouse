@@ -15,119 +15,19 @@ class ArgBuilderDirectiveTest extends DBTestCase
     }
     ';
 
-    public function testAttachEqFilterFromFieldArgument(): void
-    {
-        $this->schema .= /** @lang GraphQL */ '
-        type Query {
-            users(id: ID @eq): [User!]! @all
-        }
-        ';
-        $users = factory(User::class, 2)->create();
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            query ($id: ID) {
-                users(id: $id) {
-                    id
-                }
-            }
-            ', [
-                'id' => $users->first()->getKey(),
-            ])
-            ->assertJsonCount(1, 'data.users');
-    }
-
-    public function testAttachEqFilterFromInputObject(): void
-    {
-        $this->schema .= /** @lang GraphQL */ '
-        type Query {
-            users(input: UserInput!): [User!]! @all
-        }
-
-        input UserInput {
-            id: ID @eq
-        }
-        ';
-        $users = factory(User::class, 2)->create();
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            query ($id: ID) {
-                users(
-                    input: {
-                        id: $id
-                    }
-                ) {
-                    id
-                }
-            }
-            ', [
-                'id' => $users->first()->getKey(),
-            ])
-            ->assertJsonCount(1, 'data.users');
-    }
-
-    public function testAttachEqFilterFromInputObjectWithinList(): void
-    {
-        $this->schema .= /** @lang GraphQL */ '
-        type Query {
-            users(input: [UserInput!]!): [User!]! @all
-        }
-
-        input UserInput {
-            id: ID @eq
-        }
-        ';
-        $users = factory(User::class, 2)->create();
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            query ($id: ID) {
-                users(
-                    input: [
-                        {
-                            id: $id
-                        }
-                    ]
-                ) {
-                    id
-                }
-            }
-            ', [
-                'id' => $users->first()->getKey(),
-            ])
-            ->assertJsonCount(1, 'data.users');
-    }
-
-    public function testAttachEqFilterFromField(): void
-    {
-        $users = factory(User::class, 2)->create();
-
-        $this->schema .= /** @lang GraphQL */"
-        type Query {
-            users: [User!]! @all @eq(key: \"id\", value: {$users->first()->getKey()})
-        }
-        ";
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                users {
-                    id
-                }
-            }
-            ')
-            ->assertJsonCount(1, 'data.users');
-    }
-
     public function testCanAttachNeqFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $users = factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
         type Query {
             users(id: ID @neq): [User!]! @all
         }
         ';
-        $users = factory(User::class, 3)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -144,15 +44,19 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testCanAttachInFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $user1 = factory(User::class)->create();
+        factory(User::class, 3)->create();
+        $user2 = factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
         type Query {
             users(include: [Int] @in(key: "id")): [User!]! @all
         }
         ';
-
-        $user1 = factory(User::class)->create();
-        factory(User::class, 3)->create();
-        $user2 = factory(User::class)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -172,15 +76,19 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testCanAttachNotInFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $user1 = factory(User::class)->create();
+        factory(User::class, 3)->create();
+        $user2 = factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
         type Query {
             users(exclude: [Int] @notIn(key: "id")): [User!]! @all
         }
         ';
-
-        $user1 = factory(User::class)->create();
-        factory(User::class, 3)->create();
-        $user2 = factory(User::class)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -200,12 +108,17 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testCanAttachWhereFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $users = factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
         type Query {
             users(id: Int @where(operator: ">")): [User!]! @all
         }
         ';
-        $users = factory(User::class, 3)->create();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -222,7 +135,13 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        factory(User::class, 5)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
         type Query {
             users(
                 start: Int @where(key: "id", operator: ">")
@@ -230,7 +149,6 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ): [User!]! @all
         }
         ';
-        factory(User::class, 5)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -246,7 +164,11 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testCanAttachWhereBetweenFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
         type Query {
             users(
                 createdBetween: [String!]! @whereBetween(key: "created_at")
