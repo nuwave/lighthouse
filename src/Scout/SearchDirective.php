@@ -1,9 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Scout;
 
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class SearchDirective extends BaseDirective
 {

@@ -7,7 +7,6 @@ use Laravel\Scout\Builder as ScoutBuilder;
 use Laravel\Scout\Searchable;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Schema\Directives\SearchDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
@@ -87,7 +86,7 @@ class ScoutEnhancer
         /**
          * We know this argument has this directive, because that is how we found it.
          *
-         * @var \Nuwave\Lighthouse\Schema\Directives\SearchDirective $searchDirective
+         * @var \Nuwave\Lighthouse\Scout\SearchDirective $searchDirective
          */
         $searchDirective = $searchArgument
             ->directives
