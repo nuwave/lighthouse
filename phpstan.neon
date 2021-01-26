@@ -40,10 +40,6 @@ parameters:
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
     message: '#Call to protected method getModelClass\(\) of class Nuwave\\Lighthouse\\Schema\\Directives\\BaseDirective\.#'
 
-  # Can not specify a class-string for traits
-  - path: src/Schema/Directives/SearchDirective.php
-    message: '#PHPDoc tag @var for variable \$modelClass contains unresolvable type\.#'
-
   # This class or an equivalent of it will be present in a Laravel install
   - '#.* unknown class App\\User\.#'
 

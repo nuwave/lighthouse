@@ -22,12 +22,6 @@ directive @in(
 GRAPHQL;
     }
 
-    /**
-     * Apply a simple "WHERE IN $values" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
     public function handleBuilder($builder, $values): object
     {
         return $builder->whereIn(

@@ -29,14 +29,11 @@ GRAPHQL;
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string, mixed>|null  $whereConditions
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $whereConditions): object
     {
-        // The value `null` should be allowed but have no effect on the query.
-        if (is_null($whereConditions)) {
+        if (null === $whereConditions) {
             return $builder;
         }
 

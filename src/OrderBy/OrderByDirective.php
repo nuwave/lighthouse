@@ -73,11 +73,7 @@ GRAPHQL;
     }
 
     /**
-     * Apply an "ORDER BY" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array<array<string, string>>  $value
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @param  array<array{column: string, order: string}>  $value
      */
     public function handleBuilder($builder, $value): object
     {
@@ -115,10 +111,6 @@ GRAPHQL;
         }
     }
 
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
     public function handleFieldBuilder(object $builder): object
     {
         return $builder->orderBy(

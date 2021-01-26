@@ -44,12 +44,6 @@ directive @like(
 GRAPHQL;
     }
 
-    /**
-     * Apply a "WHERE LIKE $value" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
     public function handleBuilder($builder, $value): object
     {
         if ($value === null) {
@@ -71,7 +65,6 @@ GRAPHQL;
     public function handleFieldBuilder(object $builder): object
     {
         return $this->handleBuilder(
-            // @phpstan-ignore-next-line TODO fix scout builder handling
             $builder,
             $this->directiveArgValue('value')
         );

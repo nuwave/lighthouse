@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
+use Exception;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
@@ -41,20 +43,22 @@ GRAPHQL;
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
-     * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Eloquent\Builder The modified builder.
+     * @param  array<string, mixed>|null  $whereConditions The client given conditions
      */
     public function handleBuilder($builder, $whereConditions): object
     {
-        // The value `null` should be allowed but have no effect on the query.
-        if (is_null($whereConditions)) {
+        if (null === $whereConditions) {
             return $builder;
         }
 
+        if (! $builder instanceof EloquentBuilder) {
+            throw new Exception('Can not get model from builder of class: '.get_class($builder));
+        }
+        $model = $builder->getModel();
+
         $this->handleHasCondition(
             $builder,
-            $builder->getModel(),
+            $model,
             $this->getRelationName(),
             $whereConditions
         );
