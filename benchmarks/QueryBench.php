@@ -60,7 +60,7 @@ abstract class QueryBench extends TestCase
      * @param \Illuminate\Foundation\Application $app
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders(Application $app): array
+    protected function getPackageProviders($app): array
     {
         return [
             AuthServiceProvider::class,
@@ -81,7 +81,7 @@ abstract class QueryBench extends TestCase
      *
      * @param \Illuminate\Foundation\Application $app
      */
-    protected function getEnvironmentSetUp(Application $app): void
+    protected function getEnvironmentSetUp($app): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
