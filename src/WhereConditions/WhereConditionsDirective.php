@@ -36,13 +36,8 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $whereConditions): object
     {
-        // The value `null` should be allowed but have no effect on the query.
-        if (is_null($whereConditions)) {
+        if (null === $whereConditions) {
             return $builder;
-        }
-
-        if ($builder instanceof ScoutBuilder) {
-            throw new Exception("Using {$this->name()} on queries that use a Scout search is not supported.");
         }
 
         return $this->handleWhereConditions($builder, $whereConditions);

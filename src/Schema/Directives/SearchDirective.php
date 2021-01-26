@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class SearchDirective extends BaseDirective
 {
@@ -24,7 +25,13 @@ GRAPHQL;
     public function search(ScoutBuilder $builder): void
     {
         $within = $this->directiveArgValue('within');
-        if (is_string($within)) {
+        if (null !== $within) {
+            if (! is_string($within)) {
+                throw new DefinitionException(
+                    "Expected the value of the `within` argument of @{$this->name()} on {$this->nodeName()} to be a string, got: " . \Safe\json_encode($within)
+                );
+            }
+
             $builder->within($within);
         }
     }

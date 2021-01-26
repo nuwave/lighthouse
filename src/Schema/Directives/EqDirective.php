@@ -32,7 +32,7 @@ GRAPHQL;
         );
     }
 
-    public function handleScoutBuilder(ScoutBuilder $builder, $value)
+    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
     {
         return $builder->where(
             $this->directiveArgValue('key') ?? $this->nodeName(),

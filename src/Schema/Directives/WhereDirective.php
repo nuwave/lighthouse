@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Exception;
-use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereDirective extends BaseDirective implements ArgBuilderDirective
@@ -34,15 +32,8 @@ directive @where(
 GRAPHQL;
     }
 
-    /**
-     * Add any "WHERE" clause to the builder.
-     */
     public function handleBuilder($builder, $value): object
     {
-        if ($builder instanceof ScoutBuilder) {
-            throw new Exception("Using {$this->name()} on queries that use a Scout search is not supported.");
-        }
-
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
         $clause = $this->directiveArgValue('clause', 'where');
 

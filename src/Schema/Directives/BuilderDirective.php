@@ -30,9 +30,6 @@ directive @builder(
 GRAPHQL;
     }
 
-    /**
-     * Dynamically call a user-defined method to enhance the builder.
-     */
     public function handleBuilder($builder, $value): object
     {
         $resolver = $this->getResolverFromArgument('method');
@@ -40,12 +37,6 @@ GRAPHQL;
         return $resolver($builder, $value, $this->definitionNode);
     }
 
-    /**
-     * Dynamically call a user-defined method to enhance the builder on a field.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
     public function handleFieldBuilder(object $builder): object
     {
         $resolver = $this->getResolverFromArgument('method');

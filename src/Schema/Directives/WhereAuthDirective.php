@@ -44,7 +44,9 @@ GRAPHQL;
         return $builder->whereHas(
             $this->directiveArgValue('relation'),
             function ($query): void {
-                $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
+                $guard = $this->directiveArgValue('guard')
+                    ?? config('lighthouse.guard');
+
                 $userId = $this
                     ->authFactory
                     ->guard($guard)

@@ -14,12 +14,12 @@ use Nuwave\Lighthouse\Support\Utils;
 class ScoutEnhancer
 {
     /**
-     * @var ArgumentSet
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     protected $argumentSet;
 
     /**
-     * @var object
+     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     protected $builder;
 
@@ -29,11 +29,6 @@ class ScoutEnhancer
      * @var array<Argument>
      */
     protected $searchArguments = [];
-
-    /**
-     * @var array<ScoutBuilderDirective>
-     */
-    protected $scoutBuilderDirectives = [];
 
     /**
      * Should not be there when @search is used.
@@ -49,6 +44,9 @@ class ScoutEnhancer
      */
     protected $argumentsWithScoutBuilderDirectives = [];
 
+    /**
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     */
     public function __construct(ArgumentSet $argumentSet, object $builder)
     {
         $this->argumentSet = $argumentSet;
@@ -57,12 +55,12 @@ class ScoutEnhancer
         $this->gather($this->argumentSet);
     }
 
-    public function containsSearch(): bool
+    public function hasSearchArguments(): bool
     {
         return count($this->searchArguments) > 0;
     }
 
-    public function enhance(): ScoutBuilder
+    public function enhanceBuilder(): ScoutBuilder
     {
         if (count($this->searchArguments) > 1) {
             throw new ScoutException('Found more than 1 argument with @search.');
@@ -109,7 +107,7 @@ class ScoutEnhancer
         return $scoutBuilder;
     }
 
-    public function gather(ArgumentSet $argumentSet)
+    protected function gather(ArgumentSet $argumentSet): void
     {
         foreach ($argumentSet->arguments as $argument) {
             $argumentHasSearchDirective = $argument
@@ -137,9 +135,9 @@ class ScoutEnhancer
             }
 
             Utils::applyEach(
-                static function ($value) {
+                function ($value) {
                     if ($value instanceof ArgumentSet) {
-                        self::gather($value);
+                        $this->gather($value);
                     }
                 },
                 $argument->value

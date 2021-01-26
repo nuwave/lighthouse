@@ -28,11 +28,6 @@ directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * Apply withTrashed, onlyTrashed or withoutTrashed to given $builder if needed.
-     *
-     * @param string|null $value "with", "without" or "only"
-     */
     public function handleBuilder($builder, $value): object
     {
         if (! $builder instanceof EloquentBuilder) {
@@ -49,22 +44,17 @@ GRAPHQL;
         /** @var Builder&SoftDeletes $builder */
         switch ($value) {
             case 'with':
-                $builder->withTrashed();
-
+                return $builder->withTrashed();
             case 'only':
-                $builder->onlyTrashed();
-
+                return $builder->onlyTrashed();
             case 'without':
-                $builder->withoutTrashed();
-
+                return $builder->withoutTrashed();
             default:
-                throw new InvalidArgument('Unexpected value for Trashed filter');
+                throw new InvalidArgument('Unexpected value for Trashed filter: ' . $value);
         }
-
-        return $builder;
     }
 
-    public function handleScoutBuilder(ScoutBuilder $builder, $value)
+    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
     {
         $model = $builder->model;
 
@@ -76,13 +66,11 @@ GRAPHQL;
 
         switch ($value) {
             case 'with':
-                $builder->withTrashed();
-
+                return $builder->withTrashed();
             case 'only':
-                $builder->onlyTrashed();
-
+                return $builder->onlyTrashed();
             default:
-                throw new ScoutException('Unexpected value for Trashed filter');
+                throw new ScoutException('Unexpected value for Trashed filter: ' . $value);
         }
     }
 

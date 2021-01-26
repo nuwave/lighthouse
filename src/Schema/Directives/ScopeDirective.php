@@ -26,8 +26,6 @@ GRAPHQL;
     }
 
     /**
-     * Add additional constraints to the builder based on the given argument value.
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function handleBuilder($builder, $value): object

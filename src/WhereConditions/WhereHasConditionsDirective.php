@@ -48,20 +48,14 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $whereConditions): object
     {
-        // The value `null` should be allowed but have no effect on the query.
-        if (is_null($whereConditions)) {
+        if (null === $whereConditions) {
             return $builder;
         }
 
-        if ($builder instanceof ScoutBuilder) {
-            throw new Exception("Using {$this->name()} on queries that use a Scout search is not supported.");
-        }
-
-        if ($builder instanceof EloquentBuilder) {
-            $model = $builder->getModel();
-        } else {
+        if (! $builder instanceof EloquentBuilder) {
             throw new Exception('Can not get model from builder of class: '.get_class($builder));
         }
+        $model = $builder->getModel();
 
         $this->handleHasCondition(
             $builder,

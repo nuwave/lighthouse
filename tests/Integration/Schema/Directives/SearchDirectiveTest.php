@@ -26,7 +26,7 @@ class SearchDirectiveTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->engineManager = Mockery::mock();
+        $this->engineManager = Mockery::mock(EngineManager::class);
         $this->engine = Mockery
             ::mock(NullEngine::class)
             ->makePartial();

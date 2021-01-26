@@ -15,14 +15,14 @@ class ArgumentSet
     /**
      * An associative array from argument names to arguments.
      *
-     * @var array<string, Argument>
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public $arguments = [];
 
     /**
      * An associative array of arguments that were not given.
      *
-     * @var array<string, Argument>
+     * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public $undefined = [];
 
@@ -152,8 +152,8 @@ class ArgumentSet
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
         $scoutEnhancer = new ScoutEnhancer($this, $builder);
-        if ($scoutEnhancer->containsSearch()) {
-            return $scoutEnhancer->enhance();
+        if ($scoutEnhancer->hasSearchArguments()) {
+            return $scoutEnhancer->enhanceBuilder();
         }
 
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
@@ -265,7 +265,7 @@ class ArgumentSet
     /**
      * The contained arguments, including all that were not passed.
      *
-     * @return array<string, Argument>
+     * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
     public function argumentsWithUndefined(): array
     {

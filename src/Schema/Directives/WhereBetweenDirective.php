@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Exception;
-use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
@@ -27,15 +25,8 @@ directive @whereBetween(
 GRAPHQL;
     }
 
-    /**
-     * Apply a "WHERE BETWEEN" clause.
-     */
     public function handleBuilder($builder, $values): object
     {
-        if ($builder instanceof ScoutBuilder) {
-            throw new Exception("Using {$this->name()} on queries that use a Scout search is not supported.");
-        }
-
         return $builder->whereBetween(
             $this->directiveArgValue('key', $this->nodeName()),
             $values
