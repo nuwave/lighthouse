@@ -296,7 +296,7 @@ class PaginateDirectiveTest extends TestCase
     public function testThrowsIfBuilderIsNotPresent(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessageRegExp('/NonexistingClass/');
+        $this->expectExceptionMessageMatches('/NonexistingClass/');
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {
             users: [Query!] @paginate(builder: "NonexistingClass@notFound")

@@ -735,7 +735,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
+        $this->expectExceptionMessageMatches('/^Found invalid pagination type/');
 
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {

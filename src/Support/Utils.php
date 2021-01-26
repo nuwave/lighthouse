@@ -42,7 +42,7 @@ class Utils
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param  string  $className This class is resolved through the container.
+     * @param  class-string  $className This class is resolved through the container.
      * @param  string  $methodName The method that gets passed the arguments of the closure.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -53,7 +53,10 @@ class Utils
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
-        return Closure::fromCallable([app($className), $methodName]);
+        return Closure::fromCallable(
+            // @phpstan-ignore-next-line this works
+            [app($className), $methodName]
+        );
     }
 
     /**
