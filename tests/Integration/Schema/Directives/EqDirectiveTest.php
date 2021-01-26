@@ -136,7 +136,7 @@ class EqDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */"
+        $this->buildSchema(/** @lang GraphQL */'
         type User {
             id: ID!
         }
@@ -144,14 +144,14 @@ class EqDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all @eq
         }
-        ");
+        ');
     }
 
     public function testEqOnFieldRequiresKey(): void
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */"
+        $this->buildSchema(/** @lang GraphQL */'
         type User {
             id: ID!
         }
@@ -159,6 +159,6 @@ class EqDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all @eq(value: 3)
         }
-        ");
+        ');
     }
 }
