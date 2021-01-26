@@ -123,7 +123,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench --no-update"
+        run: "composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rectorphp/rector --no-update"
 
       - name: "Ensure compatibility with legacy factories"
         if: "matrix.laravel-version != '^8'"
@@ -177,7 +177,7 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-"
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: "composer remove --dev phpbench/phpbench --no-update"
+        run: "composer remove --dev phpbench/phpbench rectorphp/rector --no-update"
 
       - name: "Ensure compatibility with legacy factories"
         if: "matrix.laravel-version != '^8'"
