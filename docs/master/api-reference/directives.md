@@ -904,19 +904,19 @@ is an identical string. [Read more about enum types](../the-basics/types.md#enum
 Add an equal conditional to a database query.
 """
 directive @eq(
-    """
-    Specify the database column to compare.
-    Required if the directive is:
-    - used on an argument and the database column has a different name
-    - used on a field
-    """
-    key: String
+  """
+  Specify the database column to compare.
+  Required if the directive is:
+  - used on an argument and the database column has a different name
+  - used on a field
+  """
+  key: String
 
-    """
-    Provide a value to compare against.
-    Only required when this directive is used on a field.
-    """
-    value: Mixed
+  """
+  Provide a value to compare against.
+  Only required when this directive is used on a field.
+  """
+  value: Mixed
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
