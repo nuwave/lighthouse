@@ -38,7 +38,7 @@ class RelationBatchLoader
      */
     public function hasRelationLoader(): bool
     {
-        return isset($this->relationLoader);
+        return $this->relationLoader !== null;
     }
 
     /**

@@ -44,7 +44,7 @@ GRAPHQL;
     {
         parent::setUp();
 
-        if (! isset($this->schema)) {
+        if ($this->schema === null) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 

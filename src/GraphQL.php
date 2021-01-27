@@ -252,7 +252,7 @@ class GraphQL
      */
     public function prepSchema(): Schema
     {
-        if (! isset($this->executableSchema)) {
+        if ($this->executableSchema === null) {
             $this->executableSchema = $this->schemaBuilder->build(
                 $this->astBuilder->documentAST()
             );

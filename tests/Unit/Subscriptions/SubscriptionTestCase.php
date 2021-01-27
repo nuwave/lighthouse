@@ -31,7 +31,7 @@ class SubscriptionTestCase extends TestCase
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
             'host' => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
-            'password' => env('LIGHTHOUSE_TEST_REDIS_PASSWORD', null),
+            'password' => env('LIGHTHOUSE_TEST_REDIS_PASSWORD'),
             'port' => env('LIGHTHOUSE_TEST_REDIS_PORT', '6379'),
             'database' => env('LIGHTHOUSE_TEST_REDIS_DB', '0'),
         ]);
@@ -43,11 +43,11 @@ class SubscriptionTestCase extends TestCase
 
     protected function assertRedisHas(string $key): void
     {
-        $this->assertTrue(Redis::exists($key) >= 1);
+        $this->assertGreaterThanOrEqual(1, Redis::exists($key));
     }
 
     protected function assertRedisMissing(string $key): void
     {
-        $this->assertTrue(Redis::exists($key) === 0);
+        $this->assertSame(0, Redis::exists($key));
     }
 }

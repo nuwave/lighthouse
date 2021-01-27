@@ -1,6 +1,6 @@
 <?php
 
-namespace Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;

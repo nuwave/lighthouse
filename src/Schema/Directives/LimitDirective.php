@@ -67,7 +67,7 @@ GRAPHQL;
             }
 
             // Do not apply a limit if the client passes null explicitly
-            if (! is_integer($limit)) {
+            if (! is_int($limit)) {
                 return $result;
             }
 
