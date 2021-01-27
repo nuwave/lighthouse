@@ -22,7 +22,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- add `@sanitize` to the `node` field definition if `SanitizeDirective` is not listed in the global `field_middleware` list
+- Add `@sanitize` to the `node` field definition if `SanitizeDirective` is not listed in the global `field_middleware` list
 
 ## 5.1.0
 
