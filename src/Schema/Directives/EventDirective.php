@@ -39,11 +39,11 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $fieldValue->resultHandler(function ($result) {
-            $eventClassName = $this->namespaceClassName(
-                $this->directiveArgValue('dispatch')
-            );
+        $eventClassName = $this->namespaceClassName(
+            $this->directiveArgValue('dispatch')
+        );
 
+        $fieldValue->resultHandler(function ($result) use ($eventClassName) {
             $this->eventsDispatcher->dispatch(
                 new $eventClassName($result)
             );

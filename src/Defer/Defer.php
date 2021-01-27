@@ -34,12 +34,12 @@ class Defer implements CreatesResponse
     protected $container;
 
     /**
-     * @var array<mixed>
+     * @var array<string, mixed>
      */
     protected $result = [];
 
     /**
-     * @var array<mixed>
+     * @var array<string, \Closure(): mixed>
      */
     protected $deferred = [];
 
@@ -107,6 +107,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Register deferred field.
      *
+     * @param  \Closure(): mixed  $resolver
      * @return mixed The data if it is already available.
      */
     public function defer(Closure $resolver, string $path)
@@ -125,6 +126,7 @@ directive @defer(if: Boolean = true) on FIELD
     }
 
     /**
+     * @param  \Closure(): mixed  $originalResolver
      * @return mixed The loaded data.
      */
     public function findOrResolve(Closure $originalResolver, string $path)
@@ -143,6 +145,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Resolve field with data or resolver.
      *
+     * @param  \Closure(): mixed  $originalResolver
      * @return mixed The result of calling the resolver.
      */
     public function resolve(Closure $originalResolver, string $path)

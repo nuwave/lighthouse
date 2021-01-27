@@ -62,12 +62,14 @@ GRAPHQL;
         // Ensure we run this after all other field middleware
         $fieldValue = $next($fieldValue);
 
+        $shouldUseTags = $this->shouldUseTags();
         $resolver = $fieldValue->getResolver();
-
         $maxAge = $this->directiveArgValue('maxAge');
         $isPrivate = $this->directiveArgValue('private', false);
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+            use ($fieldValue, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
             $cacheValue = new CacheValue(
                 $root,
                 $args,
@@ -80,7 +82,7 @@ GRAPHQL;
             $cacheKey = $cacheValue->getKey();
 
             /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
-            $cache = $this->shouldUseTags()
+            $cache = $shouldUseTags
                 ? $this->cacheRepository->tags($cacheValue->getTags())
                 : $this->cacheRepository;
 

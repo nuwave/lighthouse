@@ -35,10 +35,10 @@ GRAPHQL;
         // Ensure this is run after the other field middleware directives
         $fieldValue = $next($fieldValue);
 
-        $fieldValue->resultHandler(function ($root) {
-            $subscriptionField = $this->directiveArgValue('subscription');
-            $shouldQueue = $this->directiveArgValue('shouldQueue');
+        $subscriptionField = $this->directiveArgValue('subscription');
+        $shouldQueue = $this->directiveArgValue('shouldQueue');
 
+        $fieldValue->resultHandler(function ($root) use ($subscriptionField, $shouldQueue) {
             Subscription::broadcast($subscriptionField, $root, $shouldQueue);
 
             return $root;
