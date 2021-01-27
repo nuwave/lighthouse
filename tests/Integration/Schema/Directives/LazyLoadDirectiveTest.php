@@ -4,7 +4,6 @@ namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
-use Tests\Utils\Models\User;
 
 class LazyLoadDirectiveTest extends DBTestCase
 {
