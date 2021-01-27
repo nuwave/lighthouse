@@ -51,6 +51,7 @@ GRAPHQL;
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
                     dump($resolveInfo->path);
+                    // TODO when we are in a nested field that is inside a list, this is run multiple times
                     $resolveInfo->argumentSet = $this->transformArgumentSet($resolveInfo->argumentSet);
 
                     return $resolver(
