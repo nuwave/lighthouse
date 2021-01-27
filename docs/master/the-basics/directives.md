@@ -51,12 +51,12 @@ type Query {
     "Show only posts that match one of the given topics"
     topics: [String!] @in(key: "topic")
     "Search by title"
-    title: String @where(operator: "%LIKE%")
+    title: String @like(template: "%{}%")
   ): [Post!]!
     # Resolve as a paginated list
     @paginate
     # Require authentication
-    @guard(with: "api")
+    @guard
 }
 ```
 

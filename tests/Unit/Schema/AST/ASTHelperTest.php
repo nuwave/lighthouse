@@ -150,7 +150,7 @@ class ASTHelperTest extends TestCase
     {
         $object = Parser::objectTypeDefinition(/** @lang GraphQL */ '
         type Query {
-            foo: Int @guard(with: "api")
+            foo: Int @guard(with: ["api"])
             bar: String
         }
         ');

@@ -12,7 +12,7 @@ class HugeResponseBench extends QueryBench
      *
      * @var array{name: string, children: array<int, array{name: string, array<string, mixed>}>}
      */
-    protected $parent = null;
+    protected $parent;
 
     protected $schema = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
@@ -40,7 +40,7 @@ GRAPHQL;
      */
     public function resolve(): array
     {
-        if ($this->parent) {
+        if (isset($this->parent)) {
             return $this->parent;
         }
 

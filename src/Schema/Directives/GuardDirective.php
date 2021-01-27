@@ -52,8 +52,11 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
-        $with = $this->directiveArgValue('with')
-            ?? [config('lighthouse.guard')];
+        // TODO remove cast in v6
+        $with = (array) (
+            $this->directiveArgValue('with')
+            ?? [config('lighthouse.guard')]
+        );
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($with, $previousResolver) {
