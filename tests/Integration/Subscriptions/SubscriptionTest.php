@@ -11,15 +11,7 @@ use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    protected function getPackageProviders($app): array
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
-
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -42,6 +34,14 @@ class SubscriptionTest extends TestCase
             foo: String
         }
 GRAPHQL;
+    }
+
+    protected function getPackageProviders($app): array
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
     }
 
     public function testSendsSubscriptionChannelInResponse(): void

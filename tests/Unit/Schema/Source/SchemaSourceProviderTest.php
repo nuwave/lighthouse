@@ -20,7 +20,7 @@ class SchemaSourceProviderTest extends TestCase
      */
     protected $filesystem;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

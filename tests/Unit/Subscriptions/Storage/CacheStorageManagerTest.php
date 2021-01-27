@@ -15,7 +15,7 @@ class CacheStorageManagerTest extends SubscriptionTestCase
      */
     protected $storage;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

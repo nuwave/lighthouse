@@ -44,7 +44,7 @@ class MorphManyDirectiveTest extends DBTestCase
      */
     protected $postImages;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

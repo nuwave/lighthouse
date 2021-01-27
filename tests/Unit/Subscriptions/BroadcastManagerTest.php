@@ -18,7 +18,7 @@ class BroadcastManagerTest extends SubscriptionTestCase
      */
     protected $broadcastManager;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

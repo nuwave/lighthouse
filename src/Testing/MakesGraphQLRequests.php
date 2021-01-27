@@ -196,7 +196,7 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Set up the stream to make queries with @defer.
+     * Set up the stream to make queries with `@defer`.
      */
     protected function setUpDeferStream(): void
     {

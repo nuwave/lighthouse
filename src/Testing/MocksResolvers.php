@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 trait MocksResolvers
 {
     /**
-     * Create and register a PHPUnit mock to be called through the @mock directive.
+     * Create and register a PHPUnit mock to be called through the `@mock` directive.
      *
      * @param  callable|mixed|null  $resolverOrValue
      */
@@ -28,7 +28,7 @@ trait MocksResolvers
     }
 
     /**
-     * Register a resolver for @mock.
+     * Register a resolver for `@mock`.
      *
      * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
      */
@@ -44,7 +44,7 @@ trait MocksResolvers
     }
 
     /**
-     * Register a mock resolver that will be called through the @mock directive.
+     * Register a mock resolver that will be called through the `@mock` directive.
      */
     protected function registerMockResolver(callable $mock, string $key): void
     {

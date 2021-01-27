@@ -38,7 +38,7 @@ class BroadcastDBTest extends DBTestCase
         );
     }
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

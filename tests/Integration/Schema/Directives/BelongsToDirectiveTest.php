@@ -32,7 +32,7 @@ class BelongsToDirectiveTest extends DBTestCase
      */
     protected $company;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
