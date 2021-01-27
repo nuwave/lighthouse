@@ -10,7 +10,7 @@ class HugeResponseBench extends QueryBench
     /**
      * Cached value of parent with recursive children.
      *
-     * @var array{name: string, children: array<int, array{name: string, array<string, mixed>}>}
+     * @var array<string, mixed>
      */
     protected $parent;
 
@@ -36,7 +36,7 @@ GRAPHQL;
      * Resolves parent.
      *
      * @skip
-     * @return array{name: string, children: array<int, array{name: string, array<string, mixed>}>}
+     * @return array<string, mixed>
      */
     public function resolve(): array
     {

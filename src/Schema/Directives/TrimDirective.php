@@ -63,7 +63,7 @@ GRAPHQL;
         );
     }
 
-    public function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet
+    protected function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $argument) {
             $argument->value = $this->sanitize($argument->value);
