@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\SanitizeDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 
@@ -63,11 +64,19 @@ GRAPHQL
             )
         );
 
+        if(in_array(SanitizeDirective::class, config('lighthouse.field_middleware'))){
+            $fieldDefinition = /** @lang GraphQL */ '
+                node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolve")
+            ';
+        } else {
+            $fieldDefinition = /** @lang GraphQL */ '
+                node(id: ID! @globalId): Node @sanitize @field(resolver: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolve")
+            ';
+        }
+
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
-        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
-            node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolve")
-        ');
+        $queryType->fields [] = Parser::fieldDefinition($fieldDefinition);
     }
 
     /**

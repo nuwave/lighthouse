@@ -75,6 +75,37 @@ class NodeDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testCanResolveNodesWithoutGlobalMiddleware(): void
+    {
+        $this->app->make('config')->set('lighthouse.field_middleware', []);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
+            name: String!
+        }
+        ';
+
+        $globalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            first: node(id: \"{$globalId}\") {
+                id
+                ...on User {
+                    name
+                }
+            }
+        }
+        ")->assertExactJson([
+            'data' => [
+                'first' => [
+                    'id' => $globalId,
+                    'name' => $this->testTuples[1]['name'],
+                ],
+            ],
+        ]);
+    }
+
     public function testCanResolveNodesViaInterface(): void
     {
         $this->schema .= /** @lang GraphQL */ '
