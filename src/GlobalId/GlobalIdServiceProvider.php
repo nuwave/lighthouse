@@ -64,7 +64,7 @@ GRAPHQL
             )
         );
 
-        if(in_array(SanitizeDirective::class, config('lighthouse.field_middleware'))){
+        if (in_array(SanitizeDirective::class, config('lighthouse.field_middleware'))) {
             $fieldDefinition = /** @lang GraphQL */ '
                 node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolve")
             ';
