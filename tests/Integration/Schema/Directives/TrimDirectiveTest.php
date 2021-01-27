@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Company;
 
 class TrimDirectiveTest extends DBTestCase
 {
@@ -67,6 +68,35 @@ class TrimDirectiveTest extends DBTestCase
                 'createCompany' => [
                     'id' => '1',
                     'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    public function testTrimsOnNonRootField(): void
+    {
+        factory(Company::class, 3)->create();
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Company {
+            id(foo: String @trim): ID!
+        }
+
+        type Query {
+            companies: [Company!]! @all
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            companies {
+                id(foo: " bar ")
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'companies' => [
+                    'id' => '1',
                 ],
             ],
         ]);
