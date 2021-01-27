@@ -34,7 +34,7 @@ class RelationBatchLoaderTest extends DBTestCase
     /** @var \Illuminate\Support\Collection<User> */
     protected $users;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

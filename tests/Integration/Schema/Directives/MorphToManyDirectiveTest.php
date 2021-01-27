@@ -24,7 +24,7 @@ class MorphToManyDirectiveTest extends DBTestCase
      */
     protected $postTags;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -170,7 +170,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         interface Tag @interface(resolveType: "'.$this->qualifyTestResolver('resolveType').'") {
             id: ID!
         }
-        
+
         type PostTag implements Tag {
             id: ID!
             name: String!
@@ -215,7 +215,7 @@ class MorphToManyDirectiveTest extends DBTestCase
                             id
                             name
                         }
-                        
+
                         ... on TaskTag {
                             id
                             title
@@ -229,7 +229,7 @@ class MorphToManyDirectiveTest extends DBTestCase
                             id
                             name
                         }
-                        
+
                         ... on TaskTag {
                             id
                             title

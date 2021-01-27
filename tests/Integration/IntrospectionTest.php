@@ -19,7 +19,7 @@ class IntrospectionTest extends TestCase
      */
     protected $introspectionResult;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

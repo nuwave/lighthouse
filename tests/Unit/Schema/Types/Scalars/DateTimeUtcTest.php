@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\AppVersion;
 
 class DateTimeUtcTest extends DateScalarTest
 {
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

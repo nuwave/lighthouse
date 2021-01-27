@@ -14,7 +14,7 @@ abstract class DBTestCase extends TestCase
      */
     protected static $migrated = false;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

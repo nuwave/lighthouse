@@ -30,7 +30,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
      */
     protected $rolesCount = 4;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

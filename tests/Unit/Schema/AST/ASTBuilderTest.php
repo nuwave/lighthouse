@@ -17,7 +17,7 @@ class ASTBuilderTest extends TestCase
      */
     protected $astBuilder;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

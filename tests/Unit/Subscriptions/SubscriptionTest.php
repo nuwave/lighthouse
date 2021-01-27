@@ -29,15 +29,7 @@ class SubscriptionTest extends SubscriptionTestCase
      */
     protected $broadcaster;
 
-    protected function getPackageProviders($app): array
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
-
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -55,6 +47,14 @@ class SubscriptionTest extends SubscriptionTestCase
 
         $this->broadcaster = $this->createMock(SubscriptionBroadcaster::class);
         $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster);
+    }
+
+    protected function getPackageProviders($app): array
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
     }
 
     public function testCanSendSubscriptionToBroadcaster(): void
