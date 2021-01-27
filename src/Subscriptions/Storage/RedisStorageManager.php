@@ -89,7 +89,7 @@ class RedisStorageManager implements StoresSubscriptions
             $subscriber->channel,
         ]);
         // ...and refresh the ttl of this set as well.
-        if (isset($this->ttl)) {
+        if ($this->ttl !== null) {
             $this->connection->command('expire', [$topicKey, $this->ttl]);
         }
 
@@ -98,7 +98,7 @@ class RedisStorageManager implements StoresSubscriptions
             $this->channelKey($subscriber->channel),
             $this->serialize($subscriber),
         ];
-        if (isset($this->ttl)) {
+        if ($this->ttl !== null) {
             $setArguments [] = $this->ttl;
         }
         $this->connection->command('set', $setArguments);
@@ -109,7 +109,7 @@ class RedisStorageManager implements StoresSubscriptions
         $key = $this->channelKey($channel);
         $subscriber = $this->getSubscriber($key);
 
-        if ($subscriber) {
+        if ($subscriber !== null) {
             // Like in storeSubscriber (but in reverse), we delete the subscriber...
             $this->connection->command('del', [$key]);
             // ...and remove it from the set of subscribers of this topic.
@@ -154,7 +154,7 @@ class RedisStorageManager implements StoresSubscriptions
     protected function serialize($value)
     {
         $isProperNumber = is_numeric($value)
-            && ! ($value === INF || $value === -INF)
+            && ($value !== INF && $value !== -INF)
             && ! is_nan(floatval($value));
 
         return $isProperNumber

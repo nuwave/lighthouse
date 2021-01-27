@@ -901,15 +901,23 @@ is an identical string. [Read more about enum types](../the-basics/types.md#enum
 
 ```graphql
 """
-Use the client given value to add an equal conditional to a database query.
+Add an equal conditional to a database query.
 """
 directive @eq(
   """
   Specify the database column to compare.
-  Only required if database column has a different name than the attribute in your schema.
+  Required if the directive is:
+  - used on an argument and the database column has a different name
+  - used on a field
   """
   key: String
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+  """
+  Provide a value to compare against.
+  Only required when this directive is used on a field.
+  """
+  value: Mixed
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
 ```graphql
@@ -924,6 +932,14 @@ pass the actual column name as the `key`.
 ```graphql
 type User {
   posts(category: String @eq(key: "cat")): [Post!]! @hasMany
+}
+```
+
+You can also use this on a field to define a default filter:
+
+```graphql
+type User {
+  sportPosts: [Post!]! @hasMany @eq(key: "category", value: "sport")
 }
 ```
 
@@ -2424,9 +2440,11 @@ type Query {
 }
 ```
 
-The [@search](#search) directive does not work in combination with other filter directives.
-The usual query builder `Eloquent\Builder` will be replaced by a `Scout\Builder`,
-which does not support the same methods and operations.
+The [@search](#search) directive only works in combination with filter directives that
+implement `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
+
+- [@eq](#eq)
+- [@softDeletes](#softdeletes)
 
 Normally the search will be performed using the index specified by the model's `searchableAs` method.
 However, in some situation a custom index might be needed, this can be achieved by using the argument `within`.

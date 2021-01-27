@@ -6,6 +6,7 @@ use Closure;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
@@ -64,9 +65,13 @@ abstract class WithRelationDirective extends BaseDirective
      */
     protected function decorateBuilder(ResolveInfo $resolveInfo): Closure
     {
-        return function (object $query) use ($resolveInfo): void {
+        return function (object $builder) use ($resolveInfo): void {
+            if ($builder instanceof Relation) {
+                $builder = $builder->getQuery();
+            }
+
             $resolveInfo->argumentSet->enhanceBuilder(
-                $query,
+                $builder,
                 $this->directiveArgValue('scopes', [])
             );
         };

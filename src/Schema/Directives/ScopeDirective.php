@@ -26,16 +26,12 @@ GRAPHQL;
     }
 
     /**
-     * Add additional constraints to the builder based on the given argument value.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function handleBuilder($builder, $value): object
     {
         $scope = $this->directiveArgValue('name');
+
         try {
             return $builder->{$scope}($value);
         } catch (BadMethodCallException $exception) {

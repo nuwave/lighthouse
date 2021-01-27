@@ -3,7 +3,6 @@
 use Rector\Core\Configuration\Option;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector;
 use Rector\Set\ValueObject\SetList;
-use Rector\SOLID\Rector\ClassMethod\UseInterfaceOverImplementationInConstructorRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -17,9 +16,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         SetList::PHPUNIT_YIELD_DATA_PROVIDER,
     ]);
 
-    $parameters->set(Option::EXCLUDE_RECTORS, [
-        // Laravel classes are sometimes multi-purpose or magical
-        UseInterfaceOverImplementationInConstructorRector::class,
+    $parameters->set(Option::SKIP, [
+        // Does not fit autoloading standards
+        __DIR__.'/tests/database/migrations',
+
+        // Gets stuck on WhereConditionsBaseDirective for some reason
+        __DIR__.'/src/WhereConditions',
+
         // Having unused parameters can increase clarity, e.g. in event handlers
         RemoveUnusedParameterRector::class,
     ]);

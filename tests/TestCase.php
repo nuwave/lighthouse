@@ -7,12 +7,13 @@ use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Laravel\Scout\ScoutServiceProvider;
+use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
+use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
@@ -43,7 +44,7 @@ GRAPHQL;
     {
         parent::setUp();
 
-        if (! isset($this->schema)) {
+        if ($this->schema === null) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
@@ -60,13 +61,14 @@ GRAPHQL;
     {
         return [
             AuthServiceProvider::class,
-            ScoutServiceProvider::class,
+            LaravelScoutServiceProvider::class,
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
             GlobalIdServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
+            LighthouseScoutServiceProvider::class,
             SoftDeletesServiceProvider::class,
             ValidationServiceProvider::class,
         ];

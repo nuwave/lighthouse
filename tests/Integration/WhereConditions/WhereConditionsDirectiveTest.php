@@ -838,19 +838,29 @@ class WhereConditionsDirectiveTest extends DBTestCase
         /** @var array<string, mixed> $enum */
 
         // TODO: Replace with dms/phpunit-arraysubset-asserts when we require PHPUnit 9 + PHP 7.3
-        $this->assertArraySubset(
+        $this->assertSame(
             [
                 'kind' => 'ENUM',
                 'name' => $expectedEnumName,
                 'description' => 'Allowed column names for the `where` argument on field `whitelistedColumns` on type `Query`.',
+                'fields' => null,
+                'inputFields' => null,
+                'interfaces' => null,
                 'enumValues' => [
                     [
                         'name' => 'ID',
+                        'description' => null,
+                        'isDeprecated' => false,
+                        'deprecationReason' => null,
                     ],
                     [
                         'name' => 'CAMEL_CASE',
+                        'description' => null,
+                        'isDeprecated' => false,
+                        'deprecationReason' => null,
                     ],
                 ],
+                'possibleTypes' => null,
             ],
             $enum
         );

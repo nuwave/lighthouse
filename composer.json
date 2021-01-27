@@ -49,13 +49,13 @@
         "mockery/mockery": "^1.0",
         "nunomaduro/larastan": "^0.6",
         "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || ^6",
-        "phpbench/phpbench": "^0.17",
+        "phpbench/phpbench": "1.0.0-alpha4",
         "phpstan/phpstan-mockery": "^0.12.5",
         "phpstan/phpstan-phpunit": "^0.12.17",
-        "phpunit/phpunit": "^7.5 || ^8.4",
+        "phpunit/phpunit": "^7.5 || ^8.4 || ^9",
         "predis/predis": "^1.1",
-        "pusher/pusher-php-server": "^3.2",
-        "rector/rector": "^0.7.64",
+        "pusher/pusher-php-server": "^4",
+        "rector/rector": "^0.9",
         "thecodingmachine/phpstan-safe-rule": "^1.0"
     },
     "suggest": {
@@ -77,6 +77,7 @@
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
+                "Nuwave\\Lighthouse\\Scout\\ScoutServiceProvider",
                 "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
             ]
@@ -95,7 +96,7 @@
     },
     "scripts": {
         "bench": "phpbench run",
-        "rector": "rector process src/ tests/",
+        "rector": "rector process -v src/ tests/",
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",
         "test:integration": "phpunit --colors=always --testsuite Integration",

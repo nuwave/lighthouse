@@ -383,7 +383,7 @@ EOL
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
             $typeResolver =
-                $this->findTypeResolverClass(
+                $this->typeResolverFromClass(
                     $nodeName,
                     (array) config('lighthouse.namespaces.interfaces')
                 )
@@ -401,7 +401,7 @@ EOL
     /**
      * @param  array<string>  $namespaces
      */
-    protected function findTypeResolverClass(string $nodeName, array $namespaces): ?Closure
+    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?Closure
     {
         $className = Utils::namespaceClassname(
             $nodeName,
@@ -410,8 +410,10 @@ EOL
                 return method_exists($className, '__invoke');
             }
         );
+
         if ($className) {
             return Closure::fromCallable(
+                // @phpstan-ignore-next-line this works
                 [app($className), '__invoke']
             );
         }
@@ -443,7 +445,7 @@ EOL
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
             $typeResolver =
-                $this->findTypeResolverClass(
+                $this->typeResolverFromClass(
                     $nodeName,
                     (array) config('lighthouse.namespaces.unions')
                 )

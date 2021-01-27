@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 
 class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 {
-    public function testCanBeUsedWithAllDirective(): void
+    public function testWithAllDirective(): void
     {
         $tasks = factory(Task::class, 3)->create();
         $taskToRemove = $tasks[2];
@@ -18,7 +18,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -30,7 +29,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             tasks(trashed: ONLY) {
                 id
-                name
             }
         }
         ')->assertJson([
@@ -38,7 +36,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 'tasks' => [
                     [
                         'id'   => $taskToRemove->id,
-                        'name' => $taskToRemove->name,
                     ],
                 ],
             ],
@@ -48,7 +45,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             tasks(trashed: WITH) {
                 id
-                name
             }
         }
         ')->assertJsonCount(3, 'data.tasks');
@@ -57,7 +53,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             tasks(trashed: WITHOUT) {
                 id
-                name
             }
         }
         ')->assertJsonCount(2, 'data.tasks');
@@ -66,13 +61,48 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             tasks {
                 id
-                name
             }
         }
         ')->assertJsonCount(2, 'data.tasks');
     }
 
-    public function testCanBeUsedWithFindDirective(): void
+    public function testNullDoesNothing(): void
+    {
+        $tasks = factory(Task::class, 2)->create();
+
+        $taskToRemove = $tasks[0];
+        $taskToRemove->delete();
+
+        $leftoverTask = $tasks[1];
+
+        $this->schema = /** @lang GraphQL */ '
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            tasks: [Task!]! @all @softDeletes
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks(trashed: null) {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'tasks' => [
+                    [
+                        'id'   => $leftoverTask->id,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWithFindDirective(): void
     {
         /** @var \Tests\Utils\Models\Task $taskToRemove */
         $taskToRemove = factory(Task::class)->create();
@@ -81,7 +111,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -93,14 +122,12 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             task(id: 1, trashed: ONLY) {
                 id
-                name
             }
         }
         ')->assertJson([
             'data' => [
                 'task' => [
                     'id'   => $taskToRemove->id,
-                    'name' => $taskToRemove->name,
                 ],
             ],
         ]);
@@ -109,14 +136,12 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             task(id: 1, trashed: WITH) {
                 id
-                name
             }
         }
         ')->assertJson([
             'data' => [
                 'task' => [
                     'id'   => $taskToRemove->id,
-                    'name' => $taskToRemove->name,
                 ],
             ],
         ]);
@@ -125,7 +150,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             task(id: 1, trashed: WITHOUT) {
                 id
-                name
             }
         }
         ')->assertJson([
@@ -138,7 +162,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         {
             task(id: 1) {
                 id
-                name
             }
         }
         ')->assertJson([
@@ -148,7 +171,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanCanBeUsedWithPaginateDirective(): void
+    public function testWithPaginateDirective(): void
     {
         $tasks = factory(Task::class, 3)->create();
         /** @var \Tests\Utils\Models\Task $taskToRemove */
@@ -158,7 +181,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */'
         type Task {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -171,7 +193,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             tasks(first: 10, trashed: ONLY) {
                 data {
                     id
-                    name
                 }
             }
         }
@@ -181,7 +202,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                     'data' => [
                         [
                             'id'   => $taskToRemove->id,
-                            'name' => $taskToRemove->name,
                         ],
                     ],
                 ],
@@ -193,7 +213,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             tasks(first: 10, trashed: WITH) {
                 data {
                     id
-                    name
                 }
             }
         }
@@ -204,7 +223,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             tasks(first: 10, trashed: WITHOUT) {
                 data {
                     id
-                    name
                 }
             }
         }
@@ -215,14 +233,13 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             tasks(first: 10) {
                 data {
                     id
-                    name
                 }
             }
         }
         ')->assertJsonCount(2, 'data.tasks.data');
     }
 
-    public function testCanBeUsedNested(): void
+    public function testNested(): void
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
@@ -240,7 +257,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
-            name: String!
         }
 
         type User {
@@ -260,7 +276,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             users {
                 tasks(trashed: ONLY) {
                     id
-                    name
                 }
             }
         }
@@ -271,7 +286,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                         'tasks' => [
                             [
                                 'id'   => $taskToRemove->id,
-                                'name' => $taskToRemove->name,
                             ],
                         ],
                     ],
@@ -285,7 +299,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 data {
                     tasks(trashed: ONLY) {
                         id
-                        name
                     }
                 }
             }
@@ -298,7 +311,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                             'tasks' => [
                                 [
                                     'id'   => $taskToRemove->id,
-                                    'name' => $taskToRemove->name,
                                 ],
                             ],
                         ],
@@ -312,7 +324,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             user(id: 1) {
                 tasks(trashed: ONLY) {
                     id
-                    name
                 }
             }
         }
@@ -322,7 +333,6 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                     'tasks' => [
                         [
                             'id'   => $taskToRemove->id,
-                            'name' => $taskToRemove->name,
                         ],
                     ],
                 ],

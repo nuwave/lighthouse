@@ -403,11 +403,11 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
+        $this->expectExceptionMessage('Found invalid pagination type: foo');
 
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
-            roles(first: Int! after: Int): [Role!]! @belongsToMany(type:"foo")
+            roles(first: Int! after: Int): [Role!]! @belongsToMany(type: "foo")
         }
 
         type Role {
