@@ -40,7 +40,7 @@ type Query {
 
 GRAPHQL;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -120,6 +120,7 @@ GRAPHQL;
             ],
         ]);
 
+        $config->set('app.debug', true);
         $config->set(
             'lighthouse.debug',
             DebugFlag::INCLUDE_DEBUG_MESSAGE
@@ -137,8 +138,6 @@ GRAPHQL;
         );
 
         $config->set('lighthouse.guard', null);
-
-        $config->set('app.debug', true);
 
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);

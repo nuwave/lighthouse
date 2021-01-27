@@ -2,9 +2,9 @@
 
 namespace Benchmarks;
 
-use PhpBench\Benchmark\Metadata\Annotations\Iterations;
-use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
-
+/**
+ * @BeforeMethods({"setUp"})
+ */
 class HugeResponseBench extends QueryBench
 {
     /**
@@ -104,7 +104,7 @@ GRAPHQL;
                     parent {
                         children {
                             name
-                        }                    
+                        }
                     }
                 }
             }
