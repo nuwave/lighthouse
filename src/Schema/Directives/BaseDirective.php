@@ -14,6 +14,7 @@ use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Utils\AST;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -40,6 +41,15 @@ abstract class BaseDirective implements Directive
      * @var ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode
      */
     protected $definitionNode;
+
+    /**
+     * Cached directive arguments.
+     *
+     * Lazily initialized.
+     *
+     * @var array<string, mixed>
+     */
+    protected $directiveArgs;
 
     /**
      * Returns the name of the used directive.
@@ -76,19 +86,31 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Does the current directive have an argument with the given name?
+     * Loads directive argument values from AST and caches them in $directiveArgs.
      */
-    public function directiveHasArgument(string $name): bool
+    protected function loadArgValues(): void
     {
-        return ASTHelper::directiveHasArgument($this->directiveNode, $name);
+        $this->directiveArgs = [];
+        foreach ($this->directiveNode->arguments as $node) {
+            if (array_key_exists($node->name->value, $this->directiveArgs)) {
+                throw new DefinitionException("Directive {$this->directiveNode->name->value} has two arguments with the same name {$node->name->value}");
+            }
+
+            $this->directiveArgs[$node->name->value] = AST::valueFromASTUntyped($node->value);
+        }
     }
 
     /**
-     * The name of the node the directive is defined upon.
+     * Does the current directive have an argument with the given name?
+     * TODO change to protected in v6.
      */
-    protected function nodeName(): string
+    public function directiveHasArgument(string $name): bool
     {
-        return $this->definitionNode->name->value;
+        if (! isset($this->directiveArgs)) {
+            $this->loadArgValues();
+        }
+
+        return array_key_exists($name, $this->directiveArgs);
     }
 
     /**
@@ -99,7 +121,21 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, $default = null)
     {
-        return ASTHelper::directiveArgValue($this->directiveNode, $name, $default);
+        if (! isset($this->directiveArgs)) {
+            $this->loadArgValues();
+        }
+
+        return array_key_exists($name, $this->directiveArgs)
+            ? $this->directiveArgs[$name]
+            : $default;
+    }
+
+    /**
+     * The name of the node the directive is defined upon.
+     */
+    protected function nodeName(): string
+    {
+        return $this->definitionNode->name->value;
     }
 
     /**
@@ -157,8 +193,11 @@ abstract class BaseDirective implements Directive
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
-    {
+    protected function namespaceClassName(
+        string $classCandidate,
+        array $namespacesToTry = [],
+        callable $determineMatch = null
+    ): string {
         // Always try the explicitly set namespace first
         array_unshift(
             $namespacesToTry,
