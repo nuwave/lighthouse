@@ -107,6 +107,7 @@ abstract class BaseDirective implements Directive
 
     /**
      * Does the current directive have an argument with the given name?
+     * TODO change to protected in v6
      */
     public function directiveHasArgument(string $name): bool
     {
