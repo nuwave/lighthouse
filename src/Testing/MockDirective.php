@@ -11,14 +11,14 @@ class MockDirective extends BaseDirective implements FieldResolver
     /**
      * @var array<string, callable>
      */
-    protected $mocks;
+    protected static $mocks;
 
     /**
      * Register a mock resolver that will be called through this resolver.
      */
-    public function register(callable $mock, string $key): void
+    public static function register(callable $mock, string $key): void
     {
-        $this->mocks[$key] = $mock;
+        self::$mocks[$key] = $mock;
     }
 
     /**
@@ -44,7 +44,7 @@ GRAPHQL;
         return $fieldValue->setResolver(
             function () {
                 $key = $this->directiveArgValue('key', 'default');
-                $resolver = $this->mocks[$key];
+                $resolver = self::$mocks[$key];
 
                 return $resolver(...func_get_args());
             }

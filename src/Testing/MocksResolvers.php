@@ -48,8 +48,6 @@ trait MocksResolvers
      */
     protected function registerMockResolver(callable $mock, string $key): void
     {
-        /** @var \Nuwave\Lighthouse\Testing\MockDirective $mockDirective */
-        $mockDirective = app(MockDirective::class);
-        $mockDirective->register($mock, $key);
+        MockDirective::register($mock, $key);
     }
 }
