@@ -157,11 +157,13 @@ class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             'argValue',
+            /** @phpstan-ignore-next-line protected method is called via wrapper below */
             $directive->directiveArgValue('argName')
         );
 
         $this->assertSame(
             'argValue2',
+            /** @phpstan-ignore-next-line protected method is called via wrapper below */
             $directive->directiveArgValue('argName2')
         );
     }
@@ -171,6 +173,7 @@ class BaseDirectiveTest extends TestCase
         $directive = $this->constructFieldDirective('foo: ID @dummy(argName:"argValue", argName:"argValue2")');
 
         $this->expectException(DefinitionException::class);
+        /** @phpstan-ignore-next-line protected method is called via wrapper below */
         $directive->directiveArgValue('argName');
     }
 
