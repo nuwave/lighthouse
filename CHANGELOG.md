@@ -19,6 +19,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Clarify semantics of combining `@search` with other directives https://github.com/nuwave/lighthouse/pull/1691
 - Move Scout related classes into `\Nuwave\Lighthouse\Scout` https://github.com/nuwave/lighthouse/pull/1698
+- `BaseDirective` loads all arguments and caches them after the first `directiveHasArgument`/`directiveArgValue` call https://github.com/nuwave/lighthouse/pull/1707
 
 ## 5.1.0
 
