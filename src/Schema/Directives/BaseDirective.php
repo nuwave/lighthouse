@@ -130,7 +130,9 @@ abstract class BaseDirective implements Directive
             $this->loadArgValues();
         }
 
-        return array_key_exists($name, $this->directiveArgs) ? $this->directiveArgs[$name] : $default;
+        return array_key_exists($name, $this->directiveArgs)
+            ? $this->directiveArgs[$name]
+            : $default;
     }
 
     /**
