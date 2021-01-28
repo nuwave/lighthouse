@@ -18,7 +18,7 @@ class MockResolverService
     }
 
     /**
-     * Return a mock resolver that was previously registered
+     * Return a mock resolver that was previously registered.
      */
     public function get(string $key): callable
     {
