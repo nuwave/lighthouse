@@ -103,6 +103,7 @@ abstract class BaseDirective implements Directive
 
     /**
      * Does the current directive have an argument with the given name?
+     * TODO change to protected in v6
      */
     public function directiveHasArgument(string $name): bool
     {
@@ -125,7 +126,9 @@ abstract class BaseDirective implements Directive
             $this->loadArgValues();
         }
 
-        return array_key_exists($name, $this->directiveArgs) ? $this->directiveArgs[$name] : $default;
+        return array_key_exists($name, $this->directiveArgs)
+            ? $this->directiveArgs[$name]
+            : $default;
     }
 
     /**
