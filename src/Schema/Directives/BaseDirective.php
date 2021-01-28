@@ -44,7 +44,7 @@ abstract class BaseDirective implements Directive
     protected $definitionNode;
 
     /**
-     * Cached directive arguments
+     * Cached directive arguments.
      *
      * @var array<string, mixed>|null
      */
@@ -86,13 +86,13 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Loads directive argument values from AST and caches them in $directiveArgs
+     * Loads directive argument values from AST and caches them in $directiveArgs.
      */
     protected function loadArgValues(): void
     {
         $this->directiveArgs = [];
         foreach ($this->directiveNode->arguments as $node) {
-            if ( !property_exists($node, 'name')) {
+            if (! property_exists($node, 'name')) {
                 throw new Exception('Expected a Node with a name property, got: ' . get_class($node));
             }
 
@@ -106,9 +106,6 @@ abstract class BaseDirective implements Directive
 
     /**
      * Does the current directive have an argument with the given name?
-     *
-     * @param string $name
-     * @return bool
      */
     public function directiveHasArgument(string $name): bool
     {
@@ -122,7 +119,6 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param string $name
      * @param mixed|null $default
      * @return mixed|null
      */
@@ -156,14 +152,14 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if ( !$model) {
+        if (! $model) {
             if ($this->definitionNode instanceof FieldDefinitionNode) {
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
                 /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
                 $documentAST = app(ASTBuilder::class)->documentAST();
 
-                if ( !isset($documentAST->types[$returnTypeName])) {
+                if (! isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(
                         "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
                     );
@@ -181,7 +177,7 @@ abstract class BaseDirective implements Directive
             }
         }
 
-        if ( !$model) {
+        if (! $model) {
             throw new DefinitionException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
             );
@@ -212,7 +208,7 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if ( !$determineMatch) {
+        if (! $determineMatch) {
             $determineMatch = 'class_exists';
         }
 
@@ -222,7 +218,7 @@ abstract class BaseDirective implements Directive
             $determineMatch
         );
 
-        if ( !$className) {
+        if (! $className) {
             throw new DefinitionException(
                 "No class `{$classCandidate}` was found for directive `@{$this->name()}`"
             );
@@ -279,7 +275,7 @@ abstract class BaseDirective implements Directive
          */
         $modelClass = $this->namespaceClassName(
             $modelClassCandidate,
-            (array)config('lighthouse.namespaces.models'),
+            (array) config('lighthouse.namespaces.models'),
             static function (string $classCandidate): bool {
                 return is_subclass_of($classCandidate, Model::class);
             }
