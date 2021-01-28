@@ -46,9 +46,11 @@ abstract class BaseDirective implements Directive
     /**
      * Cached directive arguments.
      *
-     * @var array<string, mixed>|null
+     * Lazily initialized.
+     *
+     * @var array<string, mixed>
      */
-    protected $directiveArgs = null;
+    protected $directiveArgs;
 
     /**
      * Returns the name of the used directive.
@@ -68,7 +70,6 @@ abstract class BaseDirective implements Directive
     {
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
-        $this->directiveArgs = null;
 
         return $this;
     }
@@ -109,7 +110,7 @@ abstract class BaseDirective implements Directive
      */
     public function directiveHasArgument(string $name): bool
     {
-        if ($this->directiveArgs == null) {
+        if (! isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
@@ -124,7 +125,7 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, $default = null)
     {
-        if ($this->directiveArgs == null) {
+        if (! isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
