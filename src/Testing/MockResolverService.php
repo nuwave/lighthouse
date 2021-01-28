@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Testing;
-
 
 class MockResolverService
 {
@@ -21,11 +19,8 @@ class MockResolverService
 
     /**
      * Return a mock resolver that was previously registered
-     *
-     * @param  string  $key
-     * @return callable
      */
-    public function get(string $key) : callable
+    public function get(string $key): callable
     {
         return $this->mocks[$key];
     }

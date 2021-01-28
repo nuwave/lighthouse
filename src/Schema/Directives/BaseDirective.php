@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;

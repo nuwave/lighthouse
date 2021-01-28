@@ -13,7 +13,8 @@ class MockDirective extends BaseDirective implements FieldResolver
      */
     protected $mockResolverService;
 
-    public function __construct(MockResolverService $mockResolverService){
+    public function __construct(MockResolverService $mockResolverService)
+    {
         $this->mockResolverService = $mockResolverService;
     }
 
