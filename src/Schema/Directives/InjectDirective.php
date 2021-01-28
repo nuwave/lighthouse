@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -61,11 +60,15 @@ GRAPHQL;
             $fieldValue->setResolver(
                 function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolver) {
                     $valueFromContext = data_get($context, $contextAttributeName);
-                    $args = Arr::add($args, $argumentName, $valueFromContext);
 
                     $resolveInfo->argumentSet->addValue($argumentName, $valueFromContext);
 
-                    return $previousResolver($rootValue, $args, $context, $resolveInfo);
+                    return $previousResolver(
+                        $rootValue,
+                        $resolveInfo->argumentSet->toArray(),
+                        $context,
+                        $resolveInfo
+                    );
                 }
             )
         );

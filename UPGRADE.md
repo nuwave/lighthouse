@@ -42,6 +42,18 @@ type Mutation {
 }
 ```
 
+### Specify `@guard(with: "api")` as `@guard(with: ["api"])`
+
+Due to Lighthouse's ongoing effort to provide static schema validation,
+the `with` argument of `@guard` must now be provided as a list of strings.
+
+```diff
+type Mutation {
+-   somethingSensitive: Boolean @guard(with: "api")
++   somethingSensitive: Boolean @guard(with: ["api"])
+}
+```
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit

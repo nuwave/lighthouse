@@ -42,6 +42,9 @@ GRAPHQL;
     {
         $resolver = $fieldValue->getResolver();
 
+        // If you have any work to do that does not require the resolver arguments, do it here.
+        // This code is executed only once per field, whereas the resolver can be called often.
+
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             // Do something before the resolver, e.g. validate $args, check authentication
 

@@ -82,22 +82,22 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
+        $ability = $this->directiveArgValue('ability');
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    $gate = $this->gate->forUser($context->user());
-                    $ability = $this->directiveArgValue('ability');
-                    $checkArguments = $this->buildCheckArguments($args);
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($ability, $previousResolver) {
+                $gate = $this->gate->forUser($context->user());
+                $checkArguments = $this->buildCheckArguments($args);
 
-                    foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
-                        $this->authorize($gate, $ability, $model, $checkArguments);
-                    }
-
-                    return $previousResolver($root, $args, $context, $resolveInfo);
+                foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
+                    $this->authorize($gate, $ability, $model, $checkArguments);
                 }
-            )
+
+                return $previousResolver($root, $args, $context, $resolveInfo);
+            }
         );
+
+        return $next($fieldValue);
     }
 
     /**
@@ -166,7 +166,7 @@ GRAPHQL;
     /**
      * @param  string|array<string>  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array<mixed>  $arguments
+     * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -186,7 +186,7 @@ GRAPHQL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array<mixed>  $args
+     * @param  array<string, mixed>  $args
      * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array

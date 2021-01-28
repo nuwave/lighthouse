@@ -5,11 +5,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class RenameArgsDirective extends BaseDirective implements ArgDirective, FieldMiddleware
+class RenameArgsDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {

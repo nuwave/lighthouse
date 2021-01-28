@@ -21,6 +21,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Move Scout related classes into `\Nuwave\Lighthouse\Scout` https://github.com/nuwave/lighthouse/pull/1698
 - `BaseDirective` loads all arguments and caches them after the first `directiveHasArgument`/`directiveArgValue` call https://github.com/nuwave/lighthouse/pull/1707
 
+### Deprecated
+
+- Specify `@guard(with: "api")` should be changed to `@guard(with: ["api"])`https://github.com/nuwave/lighthouse/pull/1705
+
 ## 5.1.0
 
 ### Added
