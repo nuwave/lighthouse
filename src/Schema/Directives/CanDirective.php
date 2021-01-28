@@ -166,7 +166,7 @@ GRAPHQL;
     /**
      * @param  string|array<string>  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array<mixed>  $arguments
+     * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -186,7 +186,7 @@ GRAPHQL;
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array<mixed>  $args
+     * @param  array<string, mixed>  $args
      * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
