@@ -93,7 +93,7 @@ abstract class BaseDirective implements Directive
         $this->directiveArgs = [];
         foreach ($this->directiveNode->arguments as $node) {
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected a Node with a name property, got: ' . get_class($node));
+                throw new Exception('Expected a Node with a name property, got: '.get_class($node));
             }
 
             if (array_key_exists($node->name->value, $this->directiveArgs)) {
