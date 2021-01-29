@@ -13,7 +13,7 @@ class ThrottleDirectiveTest extends TestCase
     {
         /** @var RateLimiter $rateLimiter */
         $rateLimiter = $this->app->make(RateLimiter::class);
-        if (! method_exists($rateLimiter, 'limiter')) {
+        if (! method_exists($rateLimiter, 'limiter') || ! class_exists('Illuminate\Cache\RateLimiting\Limit')) {
             return;
         }
 
@@ -26,6 +26,7 @@ class ThrottleDirectiveTest extends TestCase
         $queriedKeys = [];
         $this->app->singleton(RateLimiter::class, function () use (&$queriedKeys) {
             $rateLimiter = $this->createMock(RateLimiter::class);
+            /** @phpstan-ignore-next-line error for old versions of Laravel */
             $rateLimiter->expects(self::once())
                 ->method('limiter')
                 ->with('test')
@@ -71,7 +72,7 @@ class ThrottleDirectiveTest extends TestCase
     {
         /** @var RateLimiter $rateLimiter */
         $rateLimiter = $this->app->make(RateLimiter::class);
-        if (! method_exists($rateLimiter, 'limiter')) {
+        if (! method_exists($rateLimiter, 'limiter') || ! class_exists('Illuminate\Cache\RateLimiting\Limit')) {
             return;
         }
 
@@ -83,6 +84,7 @@ class ThrottleDirectiveTest extends TestCase
 
         $this->app->singleton(RateLimiter::class, function () {
             $rateLimiter = $this->createMock(RateLimiter::class);
+            /** @phpstan-ignore-next-line error for old versions of Laravel */
             $rateLimiter->expects(self::once())
                 ->method('limiter')
                 ->with('test')

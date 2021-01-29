@@ -66,6 +66,10 @@ class ThrottleDirectiveTest extends TestCase
         /** @var RateLimiter $rateLimiter */
         $rateLimiter = $this->app->make(RateLimiter::class);
 
+        if (! method_exists($rateLimiter, 'for') || ! class_exists('Illuminate\Cache\RateLimiting\Limit')) {
+            return;
+        }
+
         $this->schema = /** @lang GraphQL */
             '
         type Query {
@@ -73,19 +77,6 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        if (! method_exists($rateLimiter, 'for')) {
-            // old Laravel, that doesn't support named limiters
-            $this->expectException(DirectiveException::class);
-            $this->graphQL(
-/** @lang GraphQL */ '
-        {
-            foo
-        }
-        '
-            );
-
-            return;
-        }
 
         $rateLimiter->for(
             'test',
