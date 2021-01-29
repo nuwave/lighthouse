@@ -2600,7 +2600,7 @@ Sets rate limit to access the field. Does the same as ThrottleRequests Laravel M
 """
 directive @throttle (
     """
-    Named preconfigured rate limiter.
+    Named preconfigured rate limiter. Requires Larave 8.x or later.
     """
     name: String
 

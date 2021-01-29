@@ -46,7 +46,7 @@ Sets rate limit to access the field. Does the same as ThrottleRequests Laravel M
 """
 directive @throttle (
     """
-    Named preconfigured rate limiter.
+    Named preconfigured rate limiter. Requires Larave 8.x or later.
     """
     name: String
 
@@ -76,6 +76,10 @@ GRAPHQL;
         $limits = [];
         $name = $this->directiveArgValue('name', null);
         if ($name !== null) {
+            if(!method_exists($this->limiter, 'limiter')){
+                throw new DirectiveException("Named limiter requires Laravel 8.x or later");
+            }
+
             $limiter = $this->limiter->limiter($name);
             /** @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc */
             if (is_null($limiter)) {

@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Support\Facades\RateLimiter;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
 use Tests\TestCase;
@@ -22,7 +22,7 @@ class ThrottleDirectiveTest extends TestCase
 
         $this->expectException(DirectiveException::class);
         $this->graphQL(
-/** @lang GraphQL */ '
+        /** @lang GraphQL */ '
         {
             foo
         }
@@ -32,6 +32,9 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiterReturnsRequest(): void
     {
+        /** @var RateLimiter $rateLimiter */
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
         $this->schema = /** @lang GraphQL */
             '
         type Query {
@@ -39,16 +42,18 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        RateLimiter::for(
-            'test',
-            function () {
-                return response('Custom response...', 429);
-            }
-        );
+        if (method_exists($rateLimiter, 'for')) {
+            $rateLimiter->for(
+                'test',
+                function () {
+                    return response('Custom response...', 429);
+                }
+            );
+        }
 
         $this->expectException(DirectiveException::class);
         $this->graphQL(
-/** @lang GraphQL */ '
+        /** @lang GraphQL */ '
         {
             foo
         }
@@ -58,24 +63,44 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        /** @var RateLimiter $rateLimiter */
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $this->schema = /** @lang GraphQL */
+            '
         type Query {
             foo: Int @throttle(name: "test")
         }
         ';
 
-        RateLimiter::for(
+        if (! method_exists($rateLimiter, 'limiter')) {
+            // old Laravel, that doesn't support named limiters
+            $this->expectException(DirectiveException::class);
+            $this->graphQL(
+            /** @lang GraphQL */ '
+        {
+            foo
+        }
+        '
+            );
+
+            return;
+        }
+
+        $rateLimiter->for(
             'test',
             function () {
                 return Limit::perMinute(1);
             }
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+        /** @lang GraphQL */ '
         {
             foo
         }
-        ')->assertJson(
+        '
+        )->assertJson(
             [
                 'data' => [
                     'foo' => Foo::THE_ANSWER,
@@ -83,11 +108,13 @@ class ThrottleDirectiveTest extends TestCase
             ]
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+        /** @lang GraphQL */ '
         {
             foo
         }
-        ')->assertJson(
+        '
+        )->assertJson(
             [
                 'errors' => [
                     [
@@ -98,19 +125,23 @@ class ThrottleDirectiveTest extends TestCase
         );
     }
 
+
     public function testInlineLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */
+            '
         type Query {
             foo: Int @throttle(maxAttempts: 1)
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+        /** @lang GraphQL */ '
         {
             foo
         }
-        ')->assertJson(
+        '
+        )->assertJson(
             [
                 'data' => [
                     'foo' => Foo::THE_ANSWER,
@@ -118,11 +149,13 @@ class ThrottleDirectiveTest extends TestCase
             ]
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+        /** @lang GraphQL */ '
         {
             foo
         }
-        ')->assertJson(
+        '
+        )->assertJson(
             [
                 'errors' => [
                     [
