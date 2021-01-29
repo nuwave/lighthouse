@@ -88,7 +88,7 @@ GRAPHQL;
 
             if ($limiterResponse instanceof Response) {
                 throw new DirectiveException(
-                    "Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse)
+                    "Expected named limiter {$name} to return an array, got instance of ".get_class($limiterResponse)
                 );
             }
 
