@@ -87,7 +87,7 @@ GRAPHQL;
             }
 
             $limiterResponse = call_user_func($limiter, $this->request);
-            if ($limiterResponse instanceof Unlimited) {
+            if (class_exists(Unlimited::class) && $limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);
             }
 

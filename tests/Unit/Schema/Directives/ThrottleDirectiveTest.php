@@ -11,6 +11,12 @@ class ThrottleDirectiveTest extends TestCase
 {
     public function testNamedLimiter(): void
     {
+        /** @var RateLimiter $rateLimiter */
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        if (! method_exists($rateLimiter, 'limiter')) {
+            return;
+        }
+
         $this->schema = /** @lang GraphQL */'
         type Query {
             foo: Int @throttle(name: "test")
@@ -63,6 +69,12 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testUnlimitedNamedLimiter(): void
     {
+        /** @var RateLimiter $rateLimiter */
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        if (! method_exists($rateLimiter, 'limiter')) {
+            return;
+        }
+
         $this->schema = /** @lang GraphQL */'
         type Query {
             foo: Int @throttle(name: "test")
