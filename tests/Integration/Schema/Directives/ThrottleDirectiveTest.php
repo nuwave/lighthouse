@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
@@ -32,8 +33,9 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiterReturnsRequest(): void
     {
-        /** @var RateLimiter $rateLimiter */
-        $rateLimiter = $this->app->make(RateLimiter::class);
+        if (AppVersion::below(8.0)) {
+            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
+        }
 
         $this->schema = /** @lang GraphQL */
             '
@@ -42,14 +44,15 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        if (method_exists($rateLimiter, 'for')) {
-            $rateLimiter->for(
-                'test',
-                function () {
-                    return response('Custom response...', 429);
-                }
-            );
-        }
+        /** @var RateLimiter $rateLimiter */
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $this->assertTrue(method_exists($rateLimiter, 'for'));
+        $rateLimiter->for(
+            'test',
+            function () {
+                return response('Custom response...', 429);
+            }
+        );
 
         $this->expectException(DirectiveException::class);
         $this->graphQL(
@@ -63,11 +66,8 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiter(): void
     {
-        /** @var RateLimiter $rateLimiter */
-        $rateLimiter = $this->app->make(RateLimiter::class);
-
-        if (! method_exists($rateLimiter, 'for') || ! class_exists('Illuminate\Cache\RateLimiting\Limit')) {
-            return;
+        if (AppVersion::below(8.0)) {
+            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
         }
 
         $this->schema = /** @lang GraphQL */
@@ -77,10 +77,13 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
+        /** @var RateLimiter $rateLimiter */
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $this->assertTrue(method_exists($rateLimiter, 'for'));
         $rateLimiter->for(
             'test',
             function () {
-                /** @phpstan-ignore-next-line phpstan ignores class_exists */
+                /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
                 return Limit::perMinute(1);
             }
         );

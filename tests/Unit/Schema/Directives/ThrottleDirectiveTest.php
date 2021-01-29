@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\Directives;
 
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
@@ -11,10 +12,8 @@ class ThrottleDirectiveTest extends TestCase
 {
     public function testNamedLimiter(): void
     {
-        /** @var RateLimiter $rateLimiter */
-        $rateLimiter = $this->app->make(RateLimiter::class);
-        if (! method_exists($rateLimiter, 'limiter') || ! class_exists('Illuminate\Cache\RateLimiting\Limit')) {
-            return;
+        if (AppVersion::below(8.0)) {
+            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
         }
 
         $this->schema = /** @lang GraphQL */'
@@ -26,17 +25,17 @@ class ThrottleDirectiveTest extends TestCase
         $queriedKeys = [];
         $this->app->singleton(RateLimiter::class, function () use (&$queriedKeys) {
             $rateLimiter = $this->createMock(RateLimiter::class);
-            /** @phpstan-ignore-next-line error for old versions of Laravel */
+            /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
             $rateLimiter->expects(self::once())
                 ->method('limiter')
                 ->with('test')
                 ->willReturn(function () {
                     return [
-                        /** @phpstan-ignore-next-line phpstan ignores class_exists */
+                        /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
                         Limit::perMinute(1),
-                        /** @phpstan-ignore-next-line phpstan ignores class_exists */
+                        /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
                         Limit::perMinute(2)->by('another_key'),
-                        /** @phpstan-ignore-next-line phpstan ignores class_exists */
+                        /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
                         Limit::perMinute(3),
                     ];
                 });
@@ -73,10 +72,8 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testUnlimitedNamedLimiter(): void
     {
-        /** @var RateLimiter $rateLimiter */
-        $rateLimiter = $this->app->make(RateLimiter::class);
-        if (! method_exists($rateLimiter, 'limiter') || ! class_exists('Illuminate\Cache\RateLimiting\Limit')) {
-            return;
+        if (AppVersion::below(8.0)) {
+            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
         }
 
         $this->schema = /** @lang GraphQL */'
@@ -87,12 +84,12 @@ class ThrottleDirectiveTest extends TestCase
 
         $this->app->singleton(RateLimiter::class, function () {
             $rateLimiter = $this->createMock(RateLimiter::class);
-            /** @phpstan-ignore-next-line error for old versions of Laravel */
+            /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
             $rateLimiter->expects(self::once())
                 ->method('limiter')
                 ->with('test')
                 ->willReturn(function () {
-                    /** @phpstan-ignore-next-line phpstan ignores class_exists */
+                    /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
                     return Limit::none();
                 });
 
