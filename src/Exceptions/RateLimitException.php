@@ -6,7 +6,7 @@ use GraphQL\Error\ClientAware;
 use RuntimeException;
 
 /**
- * Thrown when the user have reached request rate limit.
+ * Thrown when the user has reached the rate limit for a field.
  */
 class RateLimitException extends RuntimeException implements ClientAware
 {

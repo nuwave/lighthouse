@@ -2596,11 +2596,11 @@ type Subscription {
 
 ```graphql
 """
-Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
+Sets rate limit to access the field, just like Laravel's `ThrottleRequests` middleware.
 """
 directive @throttle (
     """
-    Named preconfigured rate limiter. Requires Larave 8.x or later.
+    Named preconfigured rate limiter. Requires Laravel 8 or later.
     """
     name: String
 
@@ -2618,7 +2618,6 @@ directive @throttle (
     Prefix to distinguish several field groups.
     """
     prefix: String
-
 ) on FIELD_DEFINITION
 ```
 

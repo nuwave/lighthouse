@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 class ThrottleDirective extends BaseDirective implements FieldMiddleware
 {
     /**
-     * The rate limiter instance.
-     *
      * @var \Illuminate\Cache\RateLimiter
      */
     protected $limiter;
@@ -29,9 +27,6 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware
      */
     protected $request;
 
-    /**
-     * Create a new request throttler.
-     */
     public function __construct(RateLimiter $limiter, Request $request)
     {
         $this->limiter = $limiter;
@@ -74,7 +69,7 @@ GRAPHQL;
         $originalResolver = $fieldValue->getResolver();
 
         $limits = [];
-        $name = $this->directiveArgValue('name', null);
+        $name = $this->directiveArgValue('name') ?? null;
         if ($name !== null) {
             if (! method_exists($this->limiter, 'limiter')) {
                 throw new DirectiveException('Named limiter requires Laravel 8.x or later');
@@ -86,14 +81,14 @@ GRAPHQL;
                 throw new DirectiveException("Named limiter $name is not found.");
             }
 
-            $limiterResponse = call_user_func($limiter, $this->request);
+            $limiterResponse = $limiter($this->request);
             if (class_exists(Unlimited::class) && $limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);
             }
 
             if ($limiterResponse instanceof Response) {
                 throw new DirectiveException(
-                    "Named limiter $name returns instance of Responst which is not supported."
+                    "Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse)
                 );
             }
 
