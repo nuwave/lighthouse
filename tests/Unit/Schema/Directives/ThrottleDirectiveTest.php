@@ -32,8 +32,11 @@ class ThrottleDirectiveTest extends TestCase
                 ->with('test')
                 ->willReturn(function () {
                     return [
+                        /** @phpstan-ignore-next-line phpstan ignores class_exists */
                         Limit::perMinute(1),
+                        /** @phpstan-ignore-next-line phpstan ignores class_exists */
                         Limit::perMinute(2)->by('another_key'),
+                        /** @phpstan-ignore-next-line phpstan ignores class_exists */
                         Limit::perMinute(3),
                     ];
                 });
@@ -89,6 +92,7 @@ class ThrottleDirectiveTest extends TestCase
                 ->method('limiter')
                 ->with('test')
                 ->willReturn(function () {
+                    /** @phpstan-ignore-next-line phpstan ignores class_exists */
                     return Limit::none();
                 });
 

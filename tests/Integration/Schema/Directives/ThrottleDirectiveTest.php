@@ -80,6 +80,7 @@ class ThrottleDirectiveTest extends TestCase
         $rateLimiter->for(
             'test',
             function () {
+                /** @phpstan-ignore-next-line phpstan ignores class_exists */
                 return Limit::perMinute(1);
             }
         );
