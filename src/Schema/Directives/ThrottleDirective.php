@@ -76,8 +76,8 @@ GRAPHQL;
         $limits = [];
         $name = $this->directiveArgValue('name', null);
         if ($name !== null) {
-            if(!method_exists($this->limiter, 'limiter')){
-                throw new DirectiveException("Named limiter requires Laravel 8.x or later");
+            if (! method_exists($this->limiter, 'limiter')) {
+                throw new DirectiveException('Named limiter requires Laravel 8.x or later');
             }
 
             $limiter = $this->limiter->limiter($name);

@@ -22,7 +22,7 @@ class ThrottleDirectiveTest extends TestCase
 
         $this->expectException(DirectiveException::class);
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -53,7 +53,7 @@ class ThrottleDirectiveTest extends TestCase
 
         $this->expectException(DirectiveException::class);
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -77,7 +77,7 @@ class ThrottleDirectiveTest extends TestCase
             // old Laravel, that doesn't support named limiters
             $this->expectException(DirectiveException::class);
             $this->graphQL(
-            /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -95,7 +95,7 @@ class ThrottleDirectiveTest extends TestCase
         );
 
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -109,7 +109,7 @@ class ThrottleDirectiveTest extends TestCase
         );
 
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -125,7 +125,6 @@ class ThrottleDirectiveTest extends TestCase
         );
     }
 
-
     public function testInlineLimiter(): void
     {
         $this->schema = /** @lang GraphQL */
@@ -136,7 +135,7 @@ class ThrottleDirectiveTest extends TestCase
         ';
 
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -150,7 +149,7 @@ class ThrottleDirectiveTest extends TestCase
         );
 
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
