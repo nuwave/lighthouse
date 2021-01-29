@@ -73,7 +73,7 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        if (! method_exists($rateLimiter, 'limiter')) {
+        if (! method_exists($rateLimiter, 'for')) {
             // old Laravel, that doesn't support named limiters
             $this->expectException(DirectiveException::class);
             $this->graphQL(
