@@ -77,7 +77,6 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-
         $rateLimiter->for(
             'test',
             function () {
