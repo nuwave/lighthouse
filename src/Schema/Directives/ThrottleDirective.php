@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Request;
@@ -14,6 +13,7 @@ use Nuwave\Lighthouse\Exceptions\RateLimitException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleDirective extends BaseDirective implements FieldMiddleware
 {
@@ -31,9 +31,6 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware
 
     /**
      * Create a new request throttler.
-     *
-     * @param  \Illuminate\Cache\RateLimiter  $limiter
-     * @param  \Illuminate\Http\Request  $request
      */
     public function __construct(RateLimiter $limiter, Request $request)
     {
@@ -43,7 +40,7 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return <<<GRAPHQL
+        return <<<'GRAPHQL'
 """
 Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
 """
@@ -132,7 +129,7 @@ GRAPHQL;
     }
 
     /**
-     * Checks throttling limit
+     * Checks throttling limit.
      */
     protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes): void
     {

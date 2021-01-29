@@ -22,7 +22,7 @@ class ThrottleDirectiveTest extends TestCase
 
         $this->expectException(DirectiveException::class);
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -40,7 +40,7 @@ class ThrottleDirectiveTest extends TestCase
         ';
 
         RateLimiter::for(
-            "test",
+            'test',
             function () {
                 return response('Custom response...', 429);
             }
@@ -48,7 +48,7 @@ class ThrottleDirectiveTest extends TestCase
 
         $this->expectException(DirectiveException::class);
         $this->graphQL(
-        /** @lang GraphQL */ '
+/** @lang GraphQL */ '
         {
             foo
         }
@@ -65,7 +65,7 @@ class ThrottleDirectiveTest extends TestCase
         ';
 
         RateLimiter::for(
-            "test",
+            'test',
             function () {
                 return Limit::perMinute(1);
             }
@@ -78,8 +78,8 @@ class ThrottleDirectiveTest extends TestCase
         ')->assertJson(
             [
                 'data' => [
-                    'foo' => Foo::THE_ANSWER
-                ]
+                    'foo' => Foo::THE_ANSWER,
+                ],
             ]
         );
 
@@ -92,8 +92,8 @@ class ThrottleDirectiveTest extends TestCase
                 'errors' => [
                     [
                         'message' => RateLimitException::MESSAGE,
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
     }
@@ -113,8 +113,8 @@ class ThrottleDirectiveTest extends TestCase
         ')->assertJson(
             [
                 'data' => [
-                    'foo' => Foo::THE_ANSWER
-                ]
+                    'foo' => Foo::THE_ANSWER,
+                ],
             ]
         );
 
@@ -127,10 +127,9 @@ class ThrottleDirectiveTest extends TestCase
                 'errors' => [
                     [
                         'message' => RateLimitException::MESSAGE,
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
     }
-
 }

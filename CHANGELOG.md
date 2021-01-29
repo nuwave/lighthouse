@@ -14,7 +14,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow using the `@builder` directive on fields https://github.com/nuwave/lighthouse/pull/1687
 - Add dedicated `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective` https://github.com/nuwave/lighthouse/pull/1691
 - Allow `@eq` directive on fields https://github.com/nuwave/lighthouse/pull/1681
-- Add `@throttle` directive to set field rate limit using Laravel rate limiting services.
+- Add `@throttle` directive to set field rate limit using Laravel rate limiting services https://github.com/nuwave/lighthouse/pull/1708
 
 ### Changed
 

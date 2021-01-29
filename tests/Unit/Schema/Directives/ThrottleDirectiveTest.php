@@ -33,8 +33,9 @@ class ThrottleDirectiveTest extends TestCase
 
             $rateLimiter->expects(self::exactly(3))
                 ->method('tooManyAttempts')
-                ->willReturnCallback(function ($key, $maxAttempts) use (&$queriedKeys){
+                ->willReturnCallback(function ($key, $maxAttempts) use (&$queriedKeys) {
                     $queriedKeys[$maxAttempts] = $key;
+
                     return false;
                 });
 
@@ -51,8 +52,8 @@ class ThrottleDirectiveTest extends TestCase
         ')->assertJson(
             [
                 'data' => [
-                    'foo' => Foo::THE_ANSWER
-                ]
+                    'foo' => Foo::THE_ANSWER,
+                ],
             ]
         );
 
@@ -93,8 +94,8 @@ class ThrottleDirectiveTest extends TestCase
         ')->assertJson(
             [
                 'data' => [
-                    'foo' => Foo::THE_ANSWER
-                ]
+                    'foo' => Foo::THE_ANSWER,
+                ],
             ]
         );
     }
