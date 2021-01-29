@@ -77,9 +77,11 @@ GRAPHQL;
         $limits = [];
         $name = $this->directiveArgValue('name') ?? null;
         if ($name !== null) {
+            /** @phpstan-ignore-next-line won't be executed on Laravel < 8 */
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
+            /** @phpstan-ignore-next-line won't be executed on Laravel < 8 */
             if ($limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);
             }
@@ -133,6 +135,7 @@ GRAPHQL;
                 throw new DefinitionException('Named limiter requires Laravel 8.x or later');
             }
 
+            /** @phpstan-ignore-next-line won't be executed on Laravel < 8 */
             $limiter = $this->limiter->limiter($name);
             /** @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc */
             if (is_null($limiter)) {
