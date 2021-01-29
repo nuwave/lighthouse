@@ -26,7 +26,7 @@ class ThrottleDirectiveTest extends TestCase
         $this->app->singleton(RateLimiter::class, function () use (&$queriedKeys) {
             $rateLimiter = $this->createMock(RateLimiter::class);
             /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-            $rateLimiter->expects(self::once())
+            $rateLimiter->expects(self::atLeast(1))
                 ->method('limiter')
                 ->with('test')
                 ->willReturn(function () {
@@ -85,7 +85,7 @@ class ThrottleDirectiveTest extends TestCase
         $this->app->singleton(RateLimiter::class, function () {
             $rateLimiter = $this->createMock(RateLimiter::class);
             /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-            $rateLimiter->expects(self::once())
+            $rateLimiter->expects(self::atLeast(1))
                 ->method('limiter')
                 ->with('test')
                 ->willReturn(function () {

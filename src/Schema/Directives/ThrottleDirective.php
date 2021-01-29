@@ -3,19 +3,25 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\AppVersion;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Symfony\Component\HttpFoundation\Response;
 
-class ThrottleDirective extends BaseDirective implements FieldMiddleware
+class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     /**
      * @var \Illuminate\Cache\RateLimiter
@@ -71,18 +77,10 @@ GRAPHQL;
         $limits = [];
         $name = $this->directiveArgValue('name') ?? null;
         if ($name !== null) {
-            if (! method_exists($this->limiter, 'limiter')) {
-                throw new DirectiveException('Named limiter requires Laravel 8.x or later');
-            }
-
             $limiter = $this->limiter->limiter($name);
-            /** @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc */
-            if (is_null($limiter)) {
-                throw new DirectiveException("Named limiter $name is not found.");
-            }
 
             $limiterResponse = $limiter($this->request);
-            if (class_exists(Unlimited::class) && $limiterResponse instanceof Unlimited) {
+            if ($limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);
             }
 
@@ -125,6 +123,22 @@ GRAPHQL;
                 }
             )
         );
+    }
+
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    {
+        $name = $this->directiveArgValue('name') ?? null;
+        if ($name !== null) {
+            if (AppVersion::below(8.0)) {
+                throw new DefinitionException('Named limiter requires Laravel 8.x or later');
+            }
+
+            $limiter = $this->limiter->limiter($name);
+            /** @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc */
+            if (is_null($limiter)) {
+                throw new DefinitionException("Named limiter $name is not found.");
+            }
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
 use Nuwave\Lighthouse\Support\AppVersion;
@@ -21,7 +22,7 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
         $this->graphQL(
 /** @lang GraphQL */ '
         {
