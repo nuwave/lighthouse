@@ -7,9 +7,6 @@ use Tests\Constants;
 
 class CreateTestbenchTagsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('tags', function (Blueprint $table): void {
@@ -21,9 +18,6 @@ class CreateTestbenchTagsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('tags');
