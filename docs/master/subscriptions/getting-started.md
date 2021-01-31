@@ -27,7 +27,7 @@ If you want to use the Laravel Echo driver, you need to set the env `LIGHTHOUSE_
 
 Lighthouse can return channels in two different formats.
 
-If you want to use version 2, set the env `LIGHTHOUSE_SUBSCRIPTION_VERSION=2`.
+If you want to use version 2, set `subscriptions.version` = `2` in the lighthouse configuration.
 
 Examples of responses for the two versions:
 
@@ -41,7 +41,7 @@ Examples of responses for the two versions:
       "channels": {
         "subscriptionName": "channel-name"
       },
-      "channel": "channel-name" // Only exists in Lighthouse 5.2 and above
+      "channel": "channel-name"
     }
   }
 }

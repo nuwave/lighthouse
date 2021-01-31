@@ -358,7 +358,7 @@ return [
         ],
 
         /*
-         * Subscription version.
+         * Controls the format of the extensions response.
          */
         'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
     ],
