@@ -226,36 +226,25 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasBelongsToManyOrNestedConditions(): void
     {
-        /*
-         * Categories
-         */
-
-        // Top-level category
         $category1 = factory(Category::class)->create();
 
-        // 2nd level category, with a parent of previous category
         $category2 = factory(Category::class)->create();
         $category2->parent()->associate($category1);
         $category2->save();
 
-        // 3rd level category, with a parent of previous category
         $category3 = factory(Category::class)->create();
         $category3->parent()->associate($category2);
         $category3->save();
 
-        // 4th level category, with a parent of previous category
         $category4 = factory(Category::class)->create();
         $category4->parent()->associate($category3);
         $category4->save();
 
-        // 5th level category, with a parent of previous category
         $category5 = factory(Category::class)->create();
         $category5->parent()->associate($category4);
         $category5->save();
-        /*
-         * Posts
-         */
-        factory(Post::class)->create();
+
+        $post1 = factory(Post::class)->create();
 
         $post2 = factory(Post::class)->create();
         $post2->categories()->attach($category2);
@@ -270,13 +259,13 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         $post5->categories()->attach($category5);
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
+        query ($categoryId: Mixed!) {
             posts(
                 hasCategories: {
                     OR: [
                         {
                             column: "categories.category_id",
-                            value: '.$category3->getKey().'
+                            value: $categoryId
                         },
                         {
                             HAS: {
@@ -285,14 +274,14 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                                     OR: [
                                         {
                                             column: "category_id",
-                                            value: '.$category3->getKey().'
+                                            value: $categoryId
                                         },
                                         {
                                             HAS: {
                                                 relation: "parent",
                                                 condition: {
                                                     column: "category_id",
-                                                    value: '.$category3->getKey().'
+                                                    value: $categoryId
                                                 }
                                             }
                                         }
@@ -306,7 +295,9 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        ', [
+            'categoryId' => $category3->getKey(),
+        ])->assertExactJson([
             'data' => [
                 'posts' => [
                     [
