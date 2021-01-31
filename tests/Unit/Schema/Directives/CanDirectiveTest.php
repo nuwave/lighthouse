@@ -35,6 +35,39 @@ class CanDirectiveTest extends TestCase
         ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
+    public function testThrowsWithCustomMessageIfNotAuthorized(): void
+    {
+        $this->be(new User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User!
+                @can(ability: "superAdminOnly")
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ');
+        $response->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        $response->assertJson([
+            'errors' => [
+                [
+                    'message' => 'Only super admins allowed'
+                ]
+            ]
+        ]);
+    }
+
     public function testPassesAuthIfAuthorized(): void
     {
         $user = new User;
