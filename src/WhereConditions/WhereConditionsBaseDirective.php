@@ -74,7 +74,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                 $hasRelationConditions['relation'],
                 $hasRelationConditions['operator'],
                 $hasRelationConditions['amount'],
-                $hasRelationConditions['condition']
+                $hasRelationConditions['condition'] ?? null
             );
 
             // @phpstan-ignore-next-line Simply wrong, maybe from Larastan?

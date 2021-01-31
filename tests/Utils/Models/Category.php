@@ -16,8 +16,6 @@ class Category extends Model
 {
     protected $primaryKey = 'category_id';
 
-    protected $guarded = [];
-
     public function parent(): BelongsTo
     {
     	return $this->belongsTo(Category::class, 'parent_id');
