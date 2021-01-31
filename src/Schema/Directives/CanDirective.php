@@ -182,7 +182,7 @@ GRAPHQL;
             Utils::applyEach(
                 function ($ab) use ($gate, $arguments) {
                     $response = $gate->inspect($ab, $arguments);
-    
+
                     if ($response->denied()) {
                         throw new AuthorizationException($response->message(), $response->code());
                     }
