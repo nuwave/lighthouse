@@ -37,6 +37,10 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
     {
+        if (AppVersion::below(6.0)) {
+            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
+        }
+
         $this->be(new User);
 
         $this->schema = /** @lang GraphQL */ '
@@ -70,6 +74,10 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
     {
+        if (AppVersion::below(6.0)) {
+            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
+        }
+
         $this->be(new User);
 
         $this->schema = /** @lang GraphQL */ '
