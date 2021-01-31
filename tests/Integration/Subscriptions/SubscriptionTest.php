@@ -133,6 +133,7 @@ GRAPHQL;
                     'channels' => [
                         'onPostCreated' => $subscriber->channel,
                     ],
+                    'channel' => $subscriber->channel,
                 ],
             ],
         ]);
