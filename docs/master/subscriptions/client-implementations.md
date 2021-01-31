@@ -177,7 +177,8 @@ const createHandler = (options) => {
           return response.json();
         })
         .then((json) => {
-          channelName = response?.extensions?.lighthouse_subscriptions.channel ?? null;
+          channelName =
+            response?.extensions?.lighthouse_subscriptions.channel ?? null;
 
           if (!channelName) {
             return;
