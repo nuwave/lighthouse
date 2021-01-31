@@ -62,7 +62,7 @@ class CanDirectiveTest extends TestCase
         $response->assertJson([
             'errors' => [
                 [
-                    'message' => 'Only super admins allowed',
+                    'message' => UserPolicy::SUPER_ADMINS_ONLY_MESSAGE,
                 ],
             ],
         ]);
@@ -95,7 +95,7 @@ class CanDirectiveTest extends TestCase
         $response->assertJson([
             'errors' => [
                 [
-                    'message' => 'Only super admins allowed',
+                    'message' => UserPolicy::SUPER_ADMINS_ONLY_MESSAGE,
                 ],
             ],
         ]);

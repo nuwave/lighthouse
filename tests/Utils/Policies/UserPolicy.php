@@ -10,6 +10,8 @@ class UserPolicy
     public const SUPER_ADMIN = 'super admin';
     public const ADMIN = 'admin';
 
+    public const SUPER_ADMINS_ONLY_MESSAGE = 'Only super admins allowed';
+
     public function adminOnly(User $user): bool
     {
         return $user->name === self::ADMIN;
@@ -21,7 +23,7 @@ class UserPolicy
             return Response::allow();
         }
 
-        return Response::deny('Only super admins allowed');
+        return Response::deny(self::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function alwaysTrue(): bool
