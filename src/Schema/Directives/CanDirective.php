@@ -176,10 +176,20 @@ GRAPHQL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        if (! $gate->check($ability, $arguments)) {
-            throw new AuthorizationException(
-                "You are not authorized to access {$this->nodeName()}"
-            );
+        if (is_array($ability)) {
+            foreach ($ability as $ab) {
+                $response = $gate->inspect($ab, $arguments);
+
+                if ($response->denied()) {
+                    throw new AuthorizationException($response->message());
+                }
+            }
+        } else {
+            $response = $gate->inspect($ability, $arguments);
+
+            if ($response->denied()) {
+                throw new AuthorizationException($response->message());
+            }
         }
     }
 
