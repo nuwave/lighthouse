@@ -18,10 +18,10 @@ class UserPolicy
     public function superAdminOnly(User $user): Response
     {
         if ($user->name === self::SUPER_ADMIN) {
-            return true;
+            return Response::allow();
         }
 
-        return new Response(false, 'Only super admins allowed');
+        return Response::deny('Only super admins allowed');
     }
 
     public function alwaysTrue(): bool
