@@ -3,6 +3,8 @@
 namespace Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int $category_id
@@ -13,4 +15,14 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $primaryKey = 'category_id';
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function posts(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'category_post', 'post_id', 'category_id');
+    }
 }

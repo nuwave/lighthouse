@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTestbenchAclsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('acls', function (Blueprint $table): void {
@@ -20,9 +17,6 @@ class CreateTestbenchAclsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('acls');
