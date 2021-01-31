@@ -92,11 +92,8 @@ class PusherLink extends ApolloLink {
 
   getChannelFromResponse(response, operation) {
     return !!response.extensions &&
-      !!response.extensions.lighthouse_subscriptions &&
-      !!response.extensions.lighthouse_subscriptions.channels
-      ? response.extensions.lighthouse_subscriptions.channels[
-          operation.operationName
-        ]
+      !!response.extensions.lighthouse_subscriptions
+      ? response.extensions.lighthouse_subscriptions.channel
       : null;
   }
 }
@@ -185,11 +182,8 @@ const createHandler = (options) => {
         .then((json) => {
           channelName =
             !!response.extensions &&
-            !!response.extensions.lighthouse_subscriptions &&
-            !!response.extensions.lighthouse_subscriptions.channels
-              ? response.extensions.lighthouse_subscriptions.channels[
-                  operation.name
-                ]
+            !!response.extensions.lighthouse_subscriptions
+              ? response.extensions.lighthouse_subscriptions.channel
               : null;
 
           if (!channelName) {
