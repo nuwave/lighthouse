@@ -2,8 +2,6 @@
 
 namespace Tests\Integration\WhereConditions;
 
-use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
@@ -311,9 +309,9 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                     ],
                     [
                         'id' => (string) $post5->getKey(),
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }

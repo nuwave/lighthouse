@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTestbenchCategoryPostTable extends Migration
 {
-   /**
+    /**
      * Run the migrations.
      */
     public function up(): void

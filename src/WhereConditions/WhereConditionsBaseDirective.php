@@ -107,7 +107,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                 $condition
                     ? function ($builder) use ($relation, $model, $condition): void {
                         $relatedModel = $this->nestedRelatedModel($model, $relation);
-    
+
                         $this->handleWhereConditions(
                             $builder,
                             $this->prefixConditionWithTableName(
