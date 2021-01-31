@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
@@ -203,17 +204,19 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         $user->roles()->attach($role);
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
+        query ($id: Mixed!) {
             users(
                 hasRoles: {
                     column: "id",
-                    value: '.$role->getKey().'
+                    value: $id
                 }
             ) {
                 id
             }
         }
-        ')->assertExactJson([
+        ', [
+            'id' => $role->getKey(),
+        ])->assertExactJson([
             'data' => [
                 'users' => [
                     [
