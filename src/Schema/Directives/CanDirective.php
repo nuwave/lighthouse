@@ -176,21 +176,16 @@ GRAPHQL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        if (is_array($ability)) {
-            foreach ($ability as $ab) {
+        Utils::applyEach(
+            function ($ab) use ($gate, $arguments) {
                 $response = $gate->inspect($ab, $arguments);
 
                 if ($response->denied()) {
                     throw new AuthorizationException($response->message(), $response->code());
                 }
-            }
-        } else {
-            $response = $gate->inspect($ability, $arguments);
-
-            if ($response->denied()) {
-                throw new AuthorizationException($response->message(), $response->code());
-            }
-        }
+            },
+            $ability
+        );
     }
 
     /**
