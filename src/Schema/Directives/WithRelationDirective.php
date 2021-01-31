@@ -5,15 +5,17 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-abstract class WithRelationDirective extends BaseDirective
+abstract class WithRelationDirective extends BaseDirective implements FieldBuilderDirective
 {
     /**
      * The name of the relation to be loaded.
@@ -27,19 +29,34 @@ abstract class WithRelationDirective extends BaseDirective
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
+        if ($fieldValue->parentIsRootType()) {
+            return $next($fieldValue);
+        }
+
         $previousResolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    return $this
-                        ->loadRelation($parent, $resolveInfo)
-                        ->then(function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
-                            return $previousResolver($parent, $args, $context, $resolveInfo);
-                        });
-                }
-            )
+        $fieldValue->setResolver(
+            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+                return $this
+                    ->loadRelation($parent, $resolveInfo)
+                    ->then(function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
+                        return $previousResolver($parent, $args, $context, $resolveInfo);
+                    });
+            }
         );
+
+        return $next($fieldValue);
+    }
+
+    public function handleFieldBuilder(object $builder): object
+    {
+        if ($builder instanceof EloquentBuilder) {
+            return $builder->with([$this->relationName() => function (object $builder): void {
+                // TODO apply scopes
+            }]);
+        }
+
+        return $builder;
     }
 
     protected function loadRelation(Model $parent, ResolveInfo $resolveInfo): Deferred
