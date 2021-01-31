@@ -181,14 +181,14 @@ GRAPHQL;
                 $response = $gate->inspect($ab, $arguments);
 
                 if ($response->denied()) {
-                    throw new AuthorizationException($response->message());
+                    throw new AuthorizationException($response->message(), $response->code());
                 }
             }
         } else {
             $response = $gate->inspect($ability, $arguments);
 
             if ($response->denied()) {
-                throw new AuthorizationException($response->message());
+                throw new AuthorizationException($response->message(), $response->code());
             }
         }
     }
