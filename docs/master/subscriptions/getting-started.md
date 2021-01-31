@@ -32,29 +32,31 @@ If you want to use version 2, set the env `LIGHTHOUSE_SUBSCRIPTION_VERSION=2`.
 Examples of responses for the two versions:
 
 **Version 1**
+
 ```json
 {
-    "extensions": {
-        "lighthouse_subscriptions": {
-            "version": 1,
-            "channels": {
-                "subscriptionName": "channel-name"
-            },
-            "channel": "channel-name" // Only exists in Lighthouse 5.2 and above
-        }
+  "extensions": {
+    "lighthouse_subscriptions": {
+      "version": 1,
+      "channels": {
+        "subscriptionName": "channel-name"
+      },
+      "channel": "channel-name" // Only exists in Lighthouse 5.2 and above
     }
+  }
 }
 ```
 
 **Version 2**
+
 ```json
 {
-    "extensions": {
-        "lighthouse_subscriptions": {
-            "version": 2,
-            "channel": "channel-name"
-        }
+  "extensions": {
+    "lighthouse_subscriptions": {
+      "version": 2,
+      "channel": "channel-name"
     }
+  }
 }
 ```
 
