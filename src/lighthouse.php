@@ -356,6 +356,11 @@ return [
                 'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@echoRoutes',
             ],
         ],
+
+        /*
+         * Subscription version.
+         */
+        'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
     ],
 
     /*
