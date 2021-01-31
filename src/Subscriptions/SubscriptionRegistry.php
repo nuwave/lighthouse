@@ -155,7 +155,7 @@ class SubscriptionRegistry
     {
         $channel = count($this->subscribers) > 0 ? reset($this->subscribers) : null;
 
-        if (config('lighthouse.subscriptions.version') == "2") {
+        if (config('lighthouse.subscriptions.version') == '2') {
             return new ExtensionsResponse(
                 'lighthouse_subscriptions',
                 [
