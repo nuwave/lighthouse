@@ -20,7 +20,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Clarify semantics of combining `@search` with other directives https://github.com/nuwave/lighthouse/pull/1691
 - Move Scout related classes into `\Nuwave\Lighthouse\Scout` https://github.com/nuwave/lighthouse/pull/1698
 - `BaseDirective` loads all arguments and caches them after the first `directiveHasArgument`/`directiveArgValue` call https://github.com/nuwave/lighthouse/pull/1707
-- `@can` will pass the message given in a `\Illuminate\Auth\Access\AuthorizationException` response returned by a policy method to the thrown GraphQL error https://github.com/nuwave/lighthouse/pull/1715
+- Use gate response in authorization errors of `@can` directive https://github.com/nuwave/lighthouse/pull/1715
 
 ### Deprecated
 

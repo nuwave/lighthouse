@@ -178,10 +178,11 @@ GRAPHQL;
         array_unshift($arguments, $model);
 
         // Gate responses were introduced in Laravel 6
+        // TODO remove with Laravel < 6 support
         if (AppVersion::atLeast(6.0)) {
             Utils::applyEach(
-                function ($ab) use ($gate, $arguments) {
-                    $response = $gate->inspect($ab, $arguments);
+                function ($ability) use ($gate, $arguments) {
+                    $response = $gate->inspect($ability, $arguments);
 
                     if ($response->denied()) {
                         throw new AuthorizationException($response->message(), $response->code());

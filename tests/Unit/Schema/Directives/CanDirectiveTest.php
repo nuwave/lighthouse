@@ -37,6 +37,7 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
     {
+        // TODO remove with Laravel < 6 support
         if (AppVersion::below(6.0)) {
             $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
         }
@@ -74,6 +75,7 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
     {
+        // TODO remove with Laravel < 6 support
         if (AppVersion::below(6.0)) {
             $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
         }
