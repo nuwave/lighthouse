@@ -2598,7 +2598,7 @@ type Subscription {
 """
 Sets rate limit to access the field, just like Laravel's `ThrottleRequests` middleware.
 """
-directive @throttle (
+directive @throttle(
     """
     Named preconfigured rate limiter. Requires Laravel 8 or later.
     """

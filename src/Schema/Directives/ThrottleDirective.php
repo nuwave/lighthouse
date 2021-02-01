@@ -45,7 +45,7 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
 """
 Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
 """
-directive @throttle (
+directive @throttle(
     """
     Named preconfigured rate limiter. Requires Larave 8.x or later.
     """
@@ -109,10 +109,7 @@ GRAPHQL;
 
         return $next(
             $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use (
-                    $originalResolver,
-                    $limits
-                ) {
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver, $limits) {
                     foreach ($limits as $limit) {
                         $this->handleLimit(
                             $limit['key'],
@@ -127,9 +124,9 @@ GRAPHQL;
         );
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $name = $this->directiveArgValue('name') ?? null;
+        $name = $this->directiveArgValue('name');
         if ($name !== null) {
             if (AppVersion::below(8.0)) {
                 throw new DefinitionException('Named limiter requires Laravel 8.x or later');
