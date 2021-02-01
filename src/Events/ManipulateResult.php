@@ -19,8 +19,19 @@ class ManipulateResult
      */
     public $result;
 
-    public function __construct(ExecutionResult &$result)
+    /**
+     * @var \GraphQL\Language\AST\DocumentNode|string
+     */
+    public $query;
+
+    /**
+     * ManipulateResult constructor.
+     * @param ExecutionResult $result
+     * @param \GraphQL\Language\AST\DocumentNode|string $query
+     */
+    public function __construct(ExecutionResult &$result, $query)
     {
         $this->result = $result;
+        $this->query = $query;
     }
 }

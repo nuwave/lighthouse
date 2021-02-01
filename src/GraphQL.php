@@ -239,7 +239,7 @@ class GraphQL
 
         // Allow listeners to manipulate the result after each resolved query
         $this->eventDispatcher->dispatch(
-            new ManipulateResult($result)
+            new ManipulateResult($result, $query)
         );
 
         $this->cleanUp();
