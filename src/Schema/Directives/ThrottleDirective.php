@@ -41,7 +41,7 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
 
     public static function definition(): string
     {
-        return <<<'GRAPHQL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
 """
@@ -54,34 +54,33 @@ directive @throttle(
     """
     Maximum number of attempts in a specified time interval.
     """
-    maxAttempts: Int
+    maxAttempts: Int = 60
 
     """
     Time in minutes to reset attempts.
     """
-    decayMinutes: Float
+    decayMinutes: Float = 1.0
 
     """
     Prefix to distinguish several field groups.
     """
     prefix: String
-
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $originalResolver = $fieldValue->getResolver();
-
+        /** @var array<int, array{key: string, maxAttempts: int, decayMinutes: float}> $limits */
         $limits = [];
-        $name = $this->directiveArgValue('name') ?? null;
+
+        $name = $this->directiveArgValue('name');
         if ($name !== null) {
-            /** @phpstan-ignore-next-line won't be executed on Laravel < 8 */
+            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
-            /** @phpstan-ignore-next-line won't be executed on Laravel < 8 */
+            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             if ($limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);
             }
@@ -102,26 +101,28 @@ GRAPHQL;
         } else {
             $limits[] = [
                 'key' => sha1($this->directiveArgValue('prefix', '').$this->request->ip()),
-                'maxAttempts' => $this->directiveArgValue('maxAttempts', 60),
-                'decayMinutes' => $this->directiveArgValue('decayMinutes', 1),
+                'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
+                'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
             ];
         }
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver, $limits) {
-                    foreach ($limits as $limit) {
-                        $this->handleLimit(
-                            $limit['key'],
-                            $limit['maxAttempts'],
-                            $limit['decayMinutes']
-                        );
-                    }
+        $resolver = $fieldValue->getResolver();
 
-                    return $originalResolver($root, $args, $context, $resolveInfo);
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
+                foreach ($limits as $limit) {
+                    $this->handleLimit(
+                        $limit['key'],
+                        $limit['maxAttempts'],
+                        $limit['decayMinutes']
+                    );
                 }
-            )
+
+                return $resolver($root, $args, $context, $resolveInfo);
+            }
         );
+
+        return $next($fieldValue);
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
@@ -132,11 +133,11 @@ GRAPHQL;
                 throw new DefinitionException('Named limiter requires Laravel 8.x or later');
             }
 
-            /** @phpstan-ignore-next-line won't be executed on Laravel < 8 */
+            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
-            /** @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc */
+            // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
             if (is_null($limiter)) {
-                throw new DefinitionException("Named limiter $name is not found.");
+                throw new DefinitionException("Named limiter {$name} is not found.");
             }
         }
     }

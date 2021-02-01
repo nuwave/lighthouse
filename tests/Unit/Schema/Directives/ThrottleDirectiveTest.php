@@ -23,34 +23,35 @@ class ThrottleDirectiveTest extends TestCase
         ';
 
         $queriedKeys = [];
-        $this->app->singleton(RateLimiter::class, function () use (&$queriedKeys) {
-            $rateLimiter = $this->createMock(RateLimiter::class);
-            /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-            $rateLimiter->expects(self::atLeast(1))
-                ->method('limiter')
-                ->with('test')
-                ->willReturn(function () {
-                    return [
-                        /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-                        Limit::perMinute(1),
-                        /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-                        Limit::perMinute(2)->by('another_key'),
-                        /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-                        Limit::perMinute(3),
-                    ];
-                });
 
-            $rateLimiter->expects(self::exactly(3))
-                ->method('tooManyAttempts')
-                ->willReturnCallback(function ($key, $maxAttempts) use (&$queriedKeys) {
-                    $queriedKeys[$maxAttempts] = $key;
+        $rateLimiter = $this->createMock(RateLimiter::class);
+        // @phpstan-ignore-next-line phpstan ignores markTestSkipped
+        $rateLimiter->expects(self::atLeast(1))
+            ->method('limiter')
+            ->with('test')
+            ->willReturn(static function (): array {
+                return [
+                    // @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                    Limit::perMinute(1),
+                    // @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                    Limit::perMinute(2)->by('another_key'),
+                    /// @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                    Limit::perMinute(3),
+                ];
+            });
 
-                    return false;
-                });
+        $rateLimiter->expects(self::exactly(3))
+            ->method('tooManyAttempts')
+            ->willReturnCallback(static function ($key, $maxAttempts) use (&$queriedKeys): bool {
+                $queriedKeys[$maxAttempts] = $key;
 
-            $rateLimiter->expects(self::exactly(3))
-                ->method('hit');
+                return false;
+            });
 
+        $rateLimiter->expects(self::exactly(3))
+            ->method('hit');
+
+        $this->app->singleton(RateLimiter::class, static function () use ($rateLimiter): RateLimiter {
             return $rateLimiter;
         });
 
@@ -58,13 +59,11 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson(
-            [
-                'data' => [
-                    'foo' => Foo::THE_ANSWER,
-                ],
-            ]
-        );
+        ')->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
 
         $this->assertNotEquals($queriedKeys[1], $queriedKeys[2]);
         $this->assertEquals($queriedKeys[1], $queriedKeys[3]);
@@ -82,23 +81,23 @@ class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        $this->app->singleton(RateLimiter::class, function () {
-            $rateLimiter = $this->createMock(RateLimiter::class);
-            /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-            $rateLimiter->expects(self::atLeast(1))
-                ->method('limiter')
-                ->with('test')
-                ->willReturn(function () {
-                    /** @phpstan-ignore-next-line phpstan ignores markTestSkipped */
-                    return Limit::none();
-                });
+        $rateLimiter = $this->createMock(RateLimiter::class);
+        // @phpstan-ignore-next-line phpstan ignores markTestSkipped
+        $rateLimiter->expects(self::atLeast(1))
+            ->method('limiter')
+            ->with('test')
+            ->willReturn(static function (): Limit {
+                // @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                return Limit::none();
+            });
 
-            $rateLimiter->expects(self::never())
-                ->method('tooManyAttempts');
+        $rateLimiter->expects(self::never())
+            ->method('tooManyAttempts');
 
-            $rateLimiter->expects(self::never())
-                ->method('hit');
+        $rateLimiter->expects(self::never())
+            ->method('hit');
 
+        $this->app->singleton(RateLimiter::class, static function () use ($rateLimiter): RateLimiter {
             return $rateLimiter;
         });
 
@@ -106,12 +105,10 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson(
-            [
-                'data' => [
-                    'foo' => Foo::THE_ANSWER,
-                ],
-            ]
-        );
+        ')->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
     }
 }

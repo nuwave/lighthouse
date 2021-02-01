@@ -2596,23 +2596,23 @@ type Subscription {
 
 ```graphql
 """
-Sets rate limit to access the field, just like Laravel's `ThrottleRequests` middleware.
+Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
 """
 directive @throttle(
     """
-    Named preconfigured rate limiter. Requires Laravel 8 or later.
+    Named preconfigured rate limiter. Requires Larave 8.x or later.
     """
     name: String
 
     """
     Maximum number of attempts in a specified time interval.
     """
-    maxAttempts: Int
+    maxAttempts: Int = 60
 
     """
     Time in minutes to reset attempts.
     """
-    decayMinutes: Float
+    decayMinutes: Float = 1.0
 
     """
     Prefix to distinguish several field groups.
