@@ -53,6 +53,10 @@ class BroadcastManager extends DriverManager
         $options = Arr::get($driverConfig, 'options', []);
 
         $pusher = new Pusher($appKey, $appSecret, $appId, $options);
+        
+        if ($driverConfig['log'] ?? false) {
+            $pusher->setLogger($this->app->make(LoggerInterface::class));
+        }
 
         return new PusherBroadcaster($pusher);
     }
