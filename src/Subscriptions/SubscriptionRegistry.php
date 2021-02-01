@@ -157,7 +157,7 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
-        if (config('lighthouse.subscriptions.version') == '2') {
+        if (2 === (int) config('lighthouse.subscriptions.version')) {
             return new ExtensionsResponse(
                 'lighthouse_subscriptions',
                 [
