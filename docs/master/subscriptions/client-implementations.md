@@ -91,7 +91,7 @@ class PusherLink extends ApolloLink {
   }
 
   getChannelFromResponse(response, operation) {
-    return response?.extensions?.lighthouse_subscriptions.channel ?? null;
+    return response?.extensions?.lighthouse_subscriptions?.channel ?? null;
   }
 }
 
