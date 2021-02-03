@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Validate that `@with` and `@withCount` are not used on root fields https://github.com/nuwave/lighthouse/pull/1714
+
 ## 5.2.0
 
 ### Added
