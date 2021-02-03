@@ -19,6 +19,7 @@ class EchoBroadcasterTest extends TestCase
         $broadcastManager = $this->createMock(BroadcastManager::class);
         $broadcastManager->expects($this->once())
             ->method('event')
+            // @phpstan-ignore-next-line Unable to resolve the template type CallbackInput in call to method PHPUnit\Framework\Assert::callback()    
             ->with($this->callback(function (EchoSubscriptionEvent $event) {
                 return $event->broadcastAs() === 'lighthouse.subscription' &&
                     $event->broadcastOn()->name === 'presence-test-123' &&
