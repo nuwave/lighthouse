@@ -5,19 +5,13 @@ namespace Tests\Integration\Subscriptions;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Subscriptions\Serializer;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\DBTestCase;
+use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
 class SerializerTest extends DBTestCase
 {
-    protected function getPackageProviders($app): array
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
+    use TestsSubscriptions;
 
     public function testWillSerializeUserModelAndRetrieveItFromTheDatabaseWhenUnserializing(): void
     {

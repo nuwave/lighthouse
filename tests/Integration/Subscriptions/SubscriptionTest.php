@@ -6,11 +6,13 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\TestCase;
+use Tests\TestsSubscriptions;
 
 class SubscriptionTest extends TestCase
 {
+    use TestsSubscriptions;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -36,23 +38,14 @@ class SubscriptionTest extends TestCase
 GRAPHQL;
     }
 
-    protected function getPackageProviders($app): array
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
-
     public function testSendsSubscriptionChannelInResponse(): void
     {
         $response = $this->subscribe();
         $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
-        $this->assertSame(
-            $this->buildResponse('onPostCreated', $subscriber->channel),
-            $response->json()
+        $response->assertExactJson(
+            $this->buildResponse('onPostCreated', $subscriber->channel)
         );
     }
 
@@ -122,14 +115,21 @@ GRAPHQL;
         }
         ');
 
-        $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
+        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager $cache */
+        $cache = $this->app->make(CacheStorageManager::class);
 
-        $response->assertJson([
+        $subscriber = $cache
+            ->subscribersByTopic('ON_POST_CREATED')
+            ->first();
+
+        $response->assertExactJson([
             'data' => [
                 'alias' => null,
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
+                    'version' => 1,
+                    'channel' => $subscriber->channel,
                     'channels' => [
                         'onPostCreated' => $subscriber->channel,
                     ],
@@ -154,16 +154,13 @@ GRAPHQL;
      */
     protected function subscribe()
     {
-        return $this->postGraphQL([
-            'query' => /** @lang GraphQL */ '
-                subscription OnPostCreated {
-                    onPostCreated {
-                        body
-                    }
+        return $this->graphQL(/** @lang GraphQL */ '
+            subscription OnPostCreated {
+                onPostCreated {
+                    body
                 }
-            ',
-            'operationName' => 'OnPostCreated',
-        ]);
+            }
+        ');
     }
 
     /**
@@ -180,6 +177,7 @@ GRAPHQL;
             'extensions' => [
                 'lighthouse_subscriptions' => [
                     'version' => 1,
+                    'channel' => $channel,
                     'channels' => [
                         $channelName => $channel,
                     ],

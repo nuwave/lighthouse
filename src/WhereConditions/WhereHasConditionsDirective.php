@@ -56,11 +56,17 @@ GRAPHQL;
         }
         $model = $builder->getModel();
 
-        $this->handleHasCondition(
+        $this->handleWhereConditions(
             $builder,
-            $model,
-            $this->getRelationName(),
-            $whereConditions
+            [
+                'HAS' => [
+                    'relation' => $this->getRelationName(),
+                    'amount' => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
+                    'operator' => '>=',
+                    'condition' => $whereConditions,
+                ],
+            ],
+            $model
         );
 
         return $builder;

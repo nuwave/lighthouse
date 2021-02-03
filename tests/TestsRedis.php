@@ -1,24 +1,17 @@
 <?php
 
-namespace Tests\Unit\Subscriptions;
+namespace Tests;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Redis\RedisServiceProvider;
 use Illuminate\Support\Facades\Redis;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Tests\TestCase;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRouter;
 
-class SubscriptionTestCase extends TestCase
+trait TestsRedis
 {
-    protected function getPackageProviders($app): array
+    protected function tearDown(): void
     {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [
-                RedisServiceProvider::class,
-                SubscriptionServiceProvider::class,
-            ]
-        );
+        Redis::flushall();
+        parent::tearDown();
     }
 
     protected function getEnvironmentSetUp($app): void
@@ -38,6 +31,18 @@ class SubscriptionTestCase extends TestCase
 
         $config->set('database.redis.options', [
             'prefix' => 'lighthouse-test-',
+        ]);
+
+        $config->set('lighthouse.subscriptions', [
+            'version' => 1,
+            'storage' => 'redis',
+            'broadcaster' => 'echo',
+            'broadcasters' => [
+                'echo' => [
+                    'driver' => 'echo',
+                    'routes' => SubscriptionRouter::class.'@echoRoutes',
+                ],
+            ],
         ]);
     }
 

@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
@@ -176,10 +177,25 @@ GRAPHQL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        if (! $gate->check($ability, $arguments)) {
-            throw new AuthorizationException(
-                "You are not authorized to access {$this->nodeName()}"
+        // Gate responses were introduced in Laravel 6
+        // TODO remove with Laravel < 6 support
+        if (AppVersion::atLeast(6.0)) {
+            Utils::applyEach(
+                function ($ability) use ($gate, $arguments) {
+                    $response = $gate->inspect($ability, $arguments);
+
+                    if ($response->denied()) {
+                        throw new AuthorizationException($response->message(), $response->code());
+                    }
+                },
+                $ability
             );
+        } else {
+            if (! $gate->check($ability, $arguments)) {
+                throw new AuthorizationException(
+                    "You are not authorized to access {$this->nodeName()}"
+                );
+            }
         }
     }
 

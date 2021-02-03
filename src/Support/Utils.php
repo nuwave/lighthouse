@@ -90,11 +90,11 @@ class Utils
      */
     public static function applyEach(\Closure $callback, $valueOrValues)
     {
-        if (! is_array($valueOrValues)) {
-            return $callback($valueOrValues);
+        if (is_array($valueOrValues)) {
+            return array_map($callback, $valueOrValues);
         }
 
-        return array_map($callback, $valueOrValues);
+        return $callback($valueOrValues);
     }
 
     /**

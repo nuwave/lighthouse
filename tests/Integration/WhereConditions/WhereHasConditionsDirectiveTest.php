@@ -4,6 +4,8 @@ namespace Tests\Integration\WhereConditions;
 
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Category;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
@@ -21,6 +23,13 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         id: ID!
         title: String
         body: String
+        categories: [Category!] @belongsToMany
+    }
+
+    type Category {
+        category_id: ID!
+        name: String
+        parent: Category @belongsTo
     }
 
     type Company {
@@ -36,6 +45,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
     type Query {
         posts(
             hasUser: _ @whereHasConditions(relation: "user")
+            hasCategories: _ @whereHasConditions(relation: "categories")
         ): [Post!]! @all
 
         users(
@@ -192,21 +202,113 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         $user->roles()->attach($role);
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
+        query ($id: Mixed!) {
             users(
                 hasRoles: {
                     column: "id",
-                    value: '.$role->getKey().'
+                    value: $id
                 }
             ) {
                 id
             }
         }
-        ')->assertExactJson([
+        ', [
+            'id' => $role->getKey(),
+        ])->assertExactJson([
             'data' => [
                 'users' => [
                     [
                         'id' => (string) $user->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasBelongsToManyOrNestedConditions(): void
+    {
+        $category1 = factory(Category::class)->create();
+
+        $category2 = factory(Category::class)->create();
+        $category2->parent()->associate($category1);
+        $category2->save();
+
+        $category3 = factory(Category::class)->create();
+        $category3->parent()->associate($category2);
+        $category3->save();
+
+        $category4 = factory(Category::class)->create();
+        $category4->parent()->associate($category3);
+        $category4->save();
+
+        $category5 = factory(Category::class)->create();
+        $category5->parent()->associate($category4);
+        $category5->save();
+
+        $post1 = factory(Post::class)->create();
+
+        $post2 = factory(Post::class)->create();
+        $post2->categories()->attach($category2);
+
+        $post3 = factory(Post::class)->create();
+        $post3->categories()->attach($category3);
+
+        $post4 = factory(Post::class)->create();
+        $post4->categories()->attach($category4);
+
+        $post5 = factory(Post::class)->create();
+        $post5->categories()->attach($category5);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($categoryId: Mixed!) {
+            posts(
+                hasCategories: {
+                    OR: [
+                        {
+                            column: "categories.category_id",
+                            value: $categoryId
+                        },
+                        {
+                            HAS: {
+                                relation: "parent",
+                                condition: {
+                                    OR: [
+                                        {
+                                            column: "category_id",
+                                            value: $categoryId
+                                        },
+                                        {
+                                            HAS: {
+                                                relation: "parent",
+                                                condition: {
+                                                    column: "category_id",
+                                                    value: $categoryId
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                    ]
+                }
+            ) {
+                id
+            }
+        }
+        ', [
+            'categoryId' => $category3->getKey(),
+        ])->assertExactJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => (string) $post3->getKey(),
+                    ],
+                    [
+                        'id' => (string) $post4->getKey(),
+                    ],
+                    [
+                        'id' => (string) $post5->getKey(),
                     ],
                 ],
             ],

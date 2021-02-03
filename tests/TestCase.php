@@ -7,6 +7,7 @@ use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
@@ -62,13 +63,14 @@ GRAPHQL;
         return [
             AuthServiceProvider::class,
             LaravelScoutServiceProvider::class,
+            RedisServiceProvider::class,
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
             GlobalIdServiceProvider::class,
+            LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
-            LighthouseScoutServiceProvider::class,
             SoftDeletesServiceProvider::class,
             ValidationServiceProvider::class,
         ];
@@ -121,23 +123,32 @@ GRAPHQL;
         ]);
 
         $config->set('app.debug', true);
-        $config->set(
-            'lighthouse.debug',
+        $config->set('lighthouse.debug',
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
             | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
         );
 
-        $config->set(
-            'lighthouse.subscriptions',
-            [
-                'storage' => 'array',
-                'broadcaster' => 'log',
-            ]
-        );
-
         $config->set('lighthouse.guard', null);
+
+        $config->set('lighthouse.subscriptions', [
+            'version' => 1,
+            'storage' => 'array',
+            'broadcaster' => 'log',
+        ]);
+
+        $config->set('database.redis.default', [
+            'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
+            'host' => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
+            'password' => env('LIGHTHOUSE_TEST_REDIS_PASSWORD'),
+            'port' => env('LIGHTHOUSE_TEST_REDIS_PORT', '6379'),
+            'database' => env('LIGHTHOUSE_TEST_REDIS_DB', '0'),
+        ]);
+
+        $config->set('database.redis.options', [
+            'prefix' => 'lighthouse-test-',
+        ]);
 
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);

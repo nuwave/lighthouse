@@ -9,6 +9,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -68,14 +69,16 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         }
 
         if (($hasRelationConditions = $whereConditions['HAS'] ?? null) && $model) {
-            $this->handleHasCondition(
-                $builder,
+            $nestedBuilder = $this->handleHasCondition(
                 $model,
                 $hasRelationConditions['relation'],
-                $hasRelationConditions['condition'] ?? null,
-                $hasRelationConditions['amount'] ?? null,
-                $hasRelationConditions['operator'] ?? null
+                $hasRelationConditions['operator'],
+                $hasRelationConditions['amount'],
+                $hasRelationConditions['condition'] ?? null
             );
+
+            // @phpstan-ignore-next-line Simply wrong, maybe from Larastan?
+            $builder->addNestedWhereQuery($nestedBuilder, $boolean);
         }
 
         if ($column = $whereConditions['column'] ?? null) {
@@ -88,33 +91,21 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
      * @param array<string, mixed>|null $condition
      */
     public function handleHasCondition(
-        object $builder,
         Model $model,
         string $relation,
-        ?array $condition = null,
-        ?int $amount = null,
-        ?string $operator = null
-    ): void {
-        $additionalArguments = [];
-
-        if ($operator !== null) {
-            $additionalArguments[] = $operator;
-        }
-
-        if ($amount !== null) {
-            $additionalArguments[] = $amount;
-        }
-
-        /** @var \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> $whereHasQuery */
-        $whereHasQuery = $model
+        string $operator,
+        int $amount,
+        ?array $condition = null
+    ): QueryBuilder {
+        return $model
+            ->newQuery()
             ->whereHas(
                 $relation,
-                function ($builder) use ($relation, $model, $condition): void {
-                    if ($condition) {
+                $condition
+                    ? function ($builder) use ($relation, $model, $condition): void {
                         $relatedModel = $this->nestedRelatedModel($model, $relation);
 
                         $this->handleWhereConditions(
@@ -126,12 +117,11 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                             $relatedModel
                         );
                     }
-                },
-                ...$additionalArguments
+                    : null,
+                $operator,
+                $amount
             )
             ->getQuery();
-
-        $builder->addNestedWhereQuery($whereHasQuery);
     }
 
     public static function invalidColumnName(string $column): string

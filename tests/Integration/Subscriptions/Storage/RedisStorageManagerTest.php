@@ -5,10 +5,15 @@ namespace Tests\Integration\Subscriptions\Storage;
 use Illuminate\Support\Facades\Redis;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\Integration\Subscriptions\EchoBroadcaster\EchoTestCase;
+use Tests\TestCase;
+use Tests\TestsRedis;
+use Tests\TestsSubscriptions;
 
-class RedisStorageManagerTest extends EchoTestCase
+class RedisStorageManagerTest extends TestCase
 {
+    use TestsRedis;
+    use TestsSubscriptions;
+
     protected $schema = /** @lang GraphQL */'
     type Task {
         id: ID!

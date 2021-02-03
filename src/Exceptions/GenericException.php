@@ -6,17 +6,10 @@ use GraphQL\Error\Error;
 
 class GenericException extends Error
 {
-    /**
-     * The category.
-     *
-     * @var string
-     */
     protected $category = 'generic';
 
     /**
-     * Set the contents that will be rendered under the "extensions" key of the error response.
-     *
-     * @param  array<mixed, mixed>  $extensions
+     * @param  array<string, mixed>  $extensions
      * @return $this
      */
     public function setExtensions(array $extensions): self
@@ -27,8 +20,6 @@ class GenericException extends Error
     }
 
     /**
-     * Set the category that will be rendered under the "extensions" key of the error response.
-     *
      * @return $this
      */
     public function setCategory(string $category): self
