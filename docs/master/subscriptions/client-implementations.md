@@ -41,7 +41,7 @@ class PusherLink extends ApolloLink {
       forward(operation).subscribe({
         next: (data) => {
           // If the operation has the subscription channel, it's a subscription
-          subscriptionChannel = this.getChannelFromResponse(data, operation);
+          subscriptionChannel = data?.extensions?.lighthouse_subscriptions.channel ?? null;
 
           // No subscription found in the response, pipe data through
           if (!subscriptionChannel) {
@@ -88,10 +88,6 @@ class PusherLink extends ApolloLink {
 
   unsubscribeFromChannel(subscriptionChannel) {
     this.pusher.unsubscribe(subscriptionChannel);
-  }
-
-  getChannelFromResponse(response, operation) {
-    return response?.extensions?.lighthouse_subscriptions?.channel ?? null;
   }
 }
 
@@ -177,8 +173,7 @@ const createHandler = (options) => {
           return response.json();
         })
         .then((json) => {
-          channelName =
-            response?.extensions?.lighthouse_subscriptions?.channel ?? null;
+          channelName = response?.extensions?.lighthouse_subscriptions.channel ?? null;
 
           if (!channelName) {
             return;

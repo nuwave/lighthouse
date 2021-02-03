@@ -7,6 +7,7 @@ use GraphQL\Language\AST\OperationDefinitionNode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -148,32 +149,31 @@ class SubscriptionRegistry
         $this->subscribers = [];
     }
 
-    /**
-     * Get all current subscribers.
-     */
     public function handleBuildExtensionsResponse(): ExtensionsResponse
     {
         $channel = count($this->subscribers) > 0
             ? reset($this->subscribers)
             : null;
 
-        if (2 === (int) config('lighthouse.subscriptions.version')) {
-            return new ExtensionsResponse(
-                'lighthouse_subscriptions',
-                [
-                    'version' => 2,
-                    'channel' => $channel,
-                ]
-            );
-        } else {
-            return new ExtensionsResponse(
-                'lighthouse_subscriptions',
-                [
+        $version = config('lighthouse.subscriptions.version');
+        switch ((int) $version) {
+            case 1:
+                $content = [
                     'version' => 1,
                     'channels' => $this->subscribers,
                     'channel' => $channel,
-                ]
-            );
+                ];
+                break;
+            case 2:
+                $content = [
+                    'version' => 2,
+                    'channel' => $channel,
+                ];
+                break;
+            default:
+                throw new DefinitionException("Expected lighthouse.subscriptions.version to be 1 or 2, got: {$version}");
         }
+
+        return new ExtensionsResponse('lighthouse_subscriptions', $content);
     }
 }
