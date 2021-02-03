@@ -14,6 +14,7 @@ class ManipulateResultTest extends TestCase
         Event::listen(
             ManipulateResult::class,
             function (ManipulateResult $manipulateResult): void {
+                $this->assertStringContainsString('foo', (string) $manipulateResult->query);
                 $manipulateResult->result->data = [
                     'foo' => Foo::THE_ANSWER + 1,
                 ];
