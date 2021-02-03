@@ -23,6 +23,43 @@ If you want to use the Pusher driver, you need to install the [Pusher PHP Librar
 
 If you want to use the Laravel Echo driver, you need to set the env `LIGHTHOUSE_BROADCASTER=echo`.
 
+### Subscriptions version
+
+Lighthouse can return channels in two different formats.
+
+If you want to use version 2, set `subscriptions.version` = `2` in the lighthouse configuration.
+
+Examples of responses for the two versions:
+
+**Version 1**
+
+```json
+{
+  "extensions": {
+    "lighthouse_subscriptions": {
+      "version": 1,
+      "channels": {
+        "subscriptionName": "channel-name"
+      },
+      "channel": "channel-name"
+    }
+  }
+}
+```
+
+**Version 2**
+
+```json
+{
+  "extensions": {
+    "lighthouse_subscriptions": {
+      "version": 2,
+      "channel": "channel-name"
+    }
+  }
+}
+```
+
 ## Expiring Subscriptions
 
 Subscriptions do not expire by themselves.

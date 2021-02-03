@@ -153,12 +153,27 @@ class SubscriptionRegistry
      */
     public function handleBuildExtensionsResponse(): ExtensionsResponse
     {
-        return new ExtensionsResponse(
-            'lighthouse_subscriptions',
-            [
-                'version' => 1,
-                'channels' => $this->subscribers,
-            ]
-        );
+        $channel = count($this->subscribers) > 0
+            ? reset($this->subscribers)
+            : null;
+
+        if (2 === (int) config('lighthouse.subscriptions.version')) {
+            return new ExtensionsResponse(
+                'lighthouse_subscriptions',
+                [
+                    'version' => 2,
+                    'channel' => $channel,
+                ]
+            );
+        } else {
+            return new ExtensionsResponse(
+                'lighthouse_subscriptions',
+                [
+                    'version' => 1,
+                    'channels' => $this->subscribers,
+                    'channel' => $channel,
+                ]
+            );
+        }
     }
 }
