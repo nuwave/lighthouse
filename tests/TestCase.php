@@ -133,6 +133,7 @@ GRAPHQL;
         $config->set('lighthouse.guard', null);
 
         $config->set('lighthouse.subscriptions', [
+            'version' => 1,
             'storage' => 'array',
             'broadcaster' => 'log',
         ]);
@@ -148,8 +149,6 @@ GRAPHQL;
         $config->set('database.redis.options', [
             'prefix' => 'lighthouse-test-',
         ]);
-
-        $config->set('lighthouse.subscriptions.version', 1);
 
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
