@@ -53,10 +53,10 @@ your clients no longer depend on the redundant `channels` key from version 1.
   "extensions": {
     "lighthouse_subscriptions": {
       "version": 1,
+      "channel": "channel-name",
       "channels": {
         "subscriptionName": "channel-name"
-      },
-      "channel": "channel-name"
+      }
     }
   }
 }

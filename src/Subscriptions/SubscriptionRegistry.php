@@ -149,7 +149,7 @@ class SubscriptionRegistry
         $this->subscribers = [];
     }
 
-    public function handleBuildExtensionsResponse(): ExtensionsResponse
+    public function handleBuildExtensionsResponse(): ?ExtensionsResponse
     {
         $channel = count($this->subscribers) > 0
             ? reset($this->subscribers)
@@ -160,8 +160,8 @@ class SubscriptionRegistry
             case 1:
                 $content = [
                     'version' => 1,
-                    'channels' => $this->subscribers,
                     'channel' => $channel,
+                    'channels' => $this->subscribers,
                 ];
                 break;
             case 2:

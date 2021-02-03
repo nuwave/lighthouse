@@ -64,11 +64,11 @@ The previous version 1 contained a redundant key `channels` and is no longer sup
   "extensions": {
     "lighthouse_subscriptions": {
 -     "version": 1,
++     "version": 2,
+      "channel": "channel-name"
 -     "channels": {
 -       "subscriptionName": "channel-name"
 -     },
-+     "version": 2,
-      "channel": "channel-name"
     }
   }
 }
