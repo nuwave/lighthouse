@@ -86,7 +86,7 @@ class ThrottleDirectiveTest extends TestCase
         $rateLimiter->expects(self::atLeast(1))
             ->method('limiter')
             ->with('test')
-            ->willReturn(static function (): Limit {
+            ->willReturn(static function () {
                 // @phpstan-ignore-next-line phpstan ignores markTestSkipped
                 return Limit::none();
             });

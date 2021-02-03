@@ -77,7 +77,7 @@ class ThrottleDirectiveTest extends TestCase
         $this->assertTrue(method_exists($rateLimiter, 'for'));
         $rateLimiter->for(
             'test',
-            static function (): Limit {
+            static function () {
                 // @phpstan-ignore-next-line phpstan ignores markTestSkipped
                 return Limit::perMinute(1);
             }
