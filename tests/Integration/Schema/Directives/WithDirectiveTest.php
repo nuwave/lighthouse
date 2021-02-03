@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Comment;
@@ -286,42 +287,14 @@ class WithDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testWithDirectiveOnQueryFieldEagerLoads(): void
+    public function testWithDirectiveOnRootFieldThrows(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->expectException(DefinitionException::class);
+
+        $this->buildSchema(/** @lang GraphQL */ '
         type Query {
-            user: User @first @with(relation: "tasks")
+            foo: Int @with(relation: "tasks")
         }
-
-        type User {
-            tasksLoaded: Boolean!
-                @method
-        }
-        ';
-
-        /** @var \Tests\Utils\Models\User $user */
-        $user = factory(User::class)->create();
-        factory(Task::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
-
-        // Sanity check
-        $this->assertFalse(
-            $user->tasksLoaded()
-        );
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                tasksLoaded
-            }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'user' => [
-                    'tasksLoaded' => true,
-                ],
-            ],
-        ]);
+        ');
     }
 }
