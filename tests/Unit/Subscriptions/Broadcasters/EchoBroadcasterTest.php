@@ -7,16 +7,20 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\Unit\Subscriptions\SubscriptionTestCase;
+use PHPUnit\Framework\Constraint\Callback;
+use Tests\TestCase;
+use Tests\TestsSubscriptions;
 
-class EchoBroadcasterTest extends SubscriptionTestCase
+class EchoBroadcasterTest extends TestCase
 {
+    use TestsSubscriptions;
+
     public function testBroadcast(): void
     {
         $broadcastManager = $this->createMock(BroadcastManager::class);
         $broadcastManager->expects($this->once())
             ->method('event')
-            ->with($this->callback(function (EchoSubscriptionEvent $event) {
+            ->with(new Callback(function (EchoSubscriptionEvent $event) {
                 return $event->broadcastAs() === 'lighthouse.subscription' &&
                     $event->broadcastOn()->name === 'presence-test-123' &&
                     $event->data === 'foo';

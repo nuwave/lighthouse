@@ -5,12 +5,14 @@ namespace Tests\Integration\Subscriptions\Broadcast;
 use Mockery\MockInterface;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\DBTestCase;
+use Tests\TestsSubscriptions;
 use Tests\Utils\Models\Task;
 
 class BroadcastDBTest extends DBTestCase
 {
+    use TestsSubscriptions;
+
     protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
@@ -29,14 +31,6 @@ class BroadcastDBTest extends DBTestCase
         taskUpdated: Task
     }
     ';
-
-    protected function getPackageProviders($app): array
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
-        );
-    }
 
     public function setUp(): void
     {
@@ -59,15 +53,13 @@ class BroadcastDBTest extends DBTestCase
             ->shouldReceive('broadcast')
             ->once();
 
-        $this->postGraphQL([
-            'query' => '
-                subscription UserUpdated {
-                    taskUpdated {
-                        name
-                    }
+        $this->graphQL(/** @lang GraphQL */ '
+            subscription UserUpdated {
+                taskUpdated {
+                    name
                 }
-            ',
-        ]);
+            }
+        ');
 
         Subscription::broadcast('taskUpdated', []);
     }
@@ -78,24 +70,20 @@ class BroadcastDBTest extends DBTestCase
             ->shouldReceive('broadcast')
             ->once();
 
-        $this->postGraphQL([
-            'query' => '
-                subscription TaskUpdated {
-                    taskUpdated {
-                        name
-                    }
+        $this->graphQL(/** @lang GraphQL */ '
+            subscription TaskUpdated {
+                taskUpdated {
+                    name
                 }
-            ',
-        ]);
+            }
+        ');
 
-        $this->postGraphQL([
-            'query' => '
-                mutation {
-                    updateTask(id: 1, name: "New name") {
-                        name
-                    }
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation {
+                updateTask(id: 1, name: "New name") {
+                    name
                 }
-            ',
-        ]);
+            }
+        ');
     }
 }

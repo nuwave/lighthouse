@@ -54,6 +54,29 @@ type Mutation {
 }
 ```
 
+### Use subscriptions response format version 2
+
+The previous version 1 contained a redundant key `channels` and is no longer supported.
+
+```diff
+{
+  "data": {...},
+  "extensions": {
+    "lighthouse_subscriptions": {
+-     "version": 1,
++     "version": 2,
+      "channel": "channel-name"
+-     "channels": {
+-       "subscriptionName": "channel-name"
+-     },
+    }
+  }
+}
+```
+
+It is recommended to switch to version 2 before upgrading Lighthouse to give clients
+a smooth transition period.
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit

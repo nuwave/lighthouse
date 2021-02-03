@@ -23,38 +23,40 @@ If you want to use the Pusher driver, you need to install the [Pusher PHP Librar
 
 If you want to use the Laravel Echo driver, you need to set the env `LIGHTHOUSE_BROADCASTER=echo`.
 
-### Subscriptions version
+### Subscriptions Versions
 
-Lighthouse can return channels in two different formats.
+Lighthouse returns the subscription channel as part of the response under `extensions`.
+You can configure which format is used with `subscriptions.version` in `lighthouse.php`.
 
-If you want to use version 2, set `subscriptions.version` = `2` in the lighthouse configuration.
+For new applications, version 2 is recommended. When upgrading, make sure
+your clients no longer depend on the redundant `channels` key from version 1.
 
-Examples of responses for the two versions:
-
-**Version 1**
+**Version 2 (Recommended)**
 
 ```json
 {
+  "data": {...},
   "extensions": {
     "lighthouse_subscriptions": {
-      "version": 1,
-      "channels": {
-        "subscriptionName": "channel-name"
-      },
+      "version": 2,
       "channel": "channel-name"
     }
   }
 }
 ```
 
-**Version 2**
+**Version 1 (Legacy)**
 
 ```json
 {
+  "data": {...},
   "extensions": {
     "lighthouse_subscriptions": {
-      "version": 2,
-      "channel": "channel-name"
+      "version": 1,
+      "channel": "channel-name",
+      "channels": {
+        "subscriptionName": "channel-name"
+      }
     }
   }
 }

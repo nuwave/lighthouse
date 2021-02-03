@@ -3,9 +3,15 @@
 namespace Tests\Integration\Subscriptions\EchoBroadcaster;
 
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
+use Tests\TestCase;
+use Tests\TestsRedis;
+use Tests\TestsSubscriptions;
 
-class AuthorizeRequestsTest extends EchoTestCase
+class AuthorizeRequestsTest extends TestCase
 {
+    use TestsRedis;
+    use TestsSubscriptions;
+
     protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
@@ -39,9 +45,11 @@ class AuthorizeRequestsTest extends EchoTestCase
         $response = $this->querySubscription();
 
         $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
-        $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-'.$channel.'plain-wrong',
-        ])->assertForbidden();
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'presence-'.$channel.'plain-wrong',
+            ])
+            ->assertForbidden();
     }
 
     public function testEchoClientAuthorizeFailsAfterDelete(): void
@@ -49,9 +57,11 @@ class AuthorizeRequestsTest extends EchoTestCase
         $response = $this->querySubscription();
 
         $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
-        $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-'.$channel,
-        ])->assertSuccessful()
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'presence-'.$channel,
+            ])
+            ->assertSuccessful()
             ->assertJsonStructure([
                 'channel_data' => ['user_id', 'user_info'],
             ]);
@@ -59,9 +69,11 @@ class AuthorizeRequestsTest extends EchoTestCase
         $this->app->make(RedisStorageManager::class)
             ->deleteSubscriber($channel);
 
-        $this->postJson('graphql/subscriptions/auth', [
-            'channel_name' => 'presence-'.$channel,
-        ])->assertForbidden();
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'presence-'.$channel,
+            ])
+            ->assertForbidden();
     }
 
     /**
