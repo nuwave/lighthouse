@@ -25,8 +25,6 @@ class ManipulateResult
     public $query;
 
     /**
-     * ManipulateResult constructor.
-     * @param ExecutionResult $result
      * @param \GraphQL\Language\AST\DocumentNode|string $query
      */
     public function __construct(ExecutionResult &$result, $query)
