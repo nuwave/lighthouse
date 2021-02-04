@@ -356,7 +356,7 @@ We will start off by defining a mutation to update a `User`.
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateeUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User @update
 }
 ```
 
