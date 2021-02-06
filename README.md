@@ -18,7 +18,7 @@
 [![GitHub license](https://img.shields.io/github/license/nuwave/lighthouse.svg)](https://github.com/nuwave/lighthouse/blob/master/LICENSE)
 
 [![Ask on Stack Overflow](https://img.shields.io/badge/StackOverflow-ask-orange.svg)](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
-[![Get on Slack](https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)](https://join.slack.com/t/lighthouse-php/shared_invite/https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
+[![Get on Slack](https://img.shields.io/badge/Slack-join-blueviolet.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
 
 **A framework for serving GraphQL from Laravel**
 
