@@ -70,7 +70,6 @@ class PaginatedRelationLoader implements RelationLoader
 
                 $relation->initRelation([$model], $relationName);
 
-                /** @var \Illuminate\Database\Eloquent\Relations\Relation&\Illuminate\Database\Eloquent\Builder $relation */
                 return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
             });
 

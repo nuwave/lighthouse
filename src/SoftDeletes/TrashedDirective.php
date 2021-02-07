@@ -41,7 +41,7 @@ GRAPHQL;
             return $builder;
         }
 
-        /** @var Builder&SoftDeletes $builder */
+        /** @var \Illuminate\Database\Eloquent\SoftDeletes $builder */
         switch ($value) {
             case 'with':
                 return $builder->withTrashed();
