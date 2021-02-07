@@ -48,10 +48,12 @@ parameters:
 
   # Compatibility fix because Laravel moved the TestResponse class
   - '#.*TestResponse.*#'
-  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
 
   # We are monkeypatching ResolveInfo to pass information through resolver middleware
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
   # This really has no type in root resolvers
   - '#Method .* has parameter \$root with no typehint specified\.#'
+
+  # PHPStan and PHPUnit disagree with themselves
+  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
