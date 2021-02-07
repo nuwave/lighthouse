@@ -41,12 +41,14 @@ GRAPHQL;
     protected function find(string $modelClass, $idOrIds)
     {
         /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+        // @phpstan-ignore-next-line because it involves mixins
         return $modelClass::withTrashed()->find($idOrIds);
     }
 
     protected function modifyExistence(Model $model): bool
     {
         /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+        // @phpstan-ignore-next-line because it involves mixins
         return (bool) $model->restore();
     }
 

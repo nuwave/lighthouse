@@ -42,10 +42,13 @@ GRAPHQL;
         /** @see \Illuminate\Database\Eloquent\SoftDeletes */
         switch ($value) {
             case 'with':
+                // @phpstan-ignore-next-line because it involves mixins
                 return $builder->withTrashed();
             case 'only':
+                // @phpstan-ignore-next-line because it involves mixins
                 return $builder->onlyTrashed();
             case 'without':
+                // @phpstan-ignore-next-line because it involves mixins
                 return $builder->withoutTrashed();
             default:
                 throw new InvalidArgument('Unexpected value for Trashed filter: '.$value);

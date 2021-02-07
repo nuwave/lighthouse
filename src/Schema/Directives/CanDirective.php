@@ -122,6 +122,7 @@ GRAPHQL;
             );
             if ($directivesContainsForceDelete) {
                 /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+                // @phpstan-ignore-next-line because it involves mixins
                 $queryBuilder->withTrashed();
             }
 
@@ -130,6 +131,7 @@ GRAPHQL;
             );
             if ($directivesContainsRestore) {
                 /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+                // @phpstan-ignore-next-line because it involves mixins
                 $queryBuilder->onlyTrashed();
             }
 
