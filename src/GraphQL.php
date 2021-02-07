@@ -6,6 +6,7 @@ use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Language\Parser;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
@@ -16,6 +17,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\EndExecution;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
@@ -165,7 +167,7 @@ class GraphQL
      * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
      *
      * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  array<mixed>|null  $variables
+     * @param  array<string, mixed>|null  $variables
      * @param  mixed|null  $rootValue
      */
     public function executeQuery(
@@ -180,8 +182,12 @@ class GraphQL
         // This allows tracking the time for batched queries independently.
         $this->prepSchema();
 
+        if (is_string($query)) {
+            $query = Parser::parse($query);
+        }
+
         $this->eventDispatcher->dispatch(
-            new StartExecution
+            new StartExecution($query, $variables, $operationName)
         );
 
         $result = GraphQLBase::executeQuery(
@@ -242,6 +248,10 @@ class GraphQL
             new ManipulateResult($result)
         );
 
+        $this->eventDispatcher->dispatch(
+            new EndExecution($result)
+        );
+    
         $this->cleanUp();
 
         return $result;

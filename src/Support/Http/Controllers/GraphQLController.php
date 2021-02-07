@@ -6,6 +6,7 @@ use GraphQL\Server\Helper;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
 use Laragraph\Utils\RequestParser;
+use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
@@ -27,6 +28,12 @@ class GraphQLController
 
         $result = $graphQL->executeRequest($request, $requestParser, $graphQLHelper);
 
-        return $createsResponse->createResponse($result);
+        $response = $createsResponse->createResponse($result);
+
+        $eventsDispatcher->dispatch(
+            new EndRequest($response)
+        );
+
+        return $response;
     }
 }
