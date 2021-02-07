@@ -50,7 +50,6 @@ GRAPHQL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    dump($resolveInfo->path);
                     $resolveInfo->argumentSet = $this->transformArgumentSet($resolveInfo->argumentSet);
 
                     return $resolver(
