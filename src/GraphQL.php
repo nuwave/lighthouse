@@ -251,7 +251,7 @@ class GraphQL
         $this->eventDispatcher->dispatch(
             new EndExecution($result)
         );
-    
+
         $this->cleanUp();
 
         return $result;
