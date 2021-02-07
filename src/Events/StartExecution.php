@@ -40,6 +40,9 @@ class StartExecution
      */
     public $moment;
 
+    /**
+     * @param array<string, mixed>|null $variables
+     */
     public function __construct(DocumentNode $query, ?array $variables, ?string $operationName)
     {
         $this->query = $query;
