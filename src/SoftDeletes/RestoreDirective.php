@@ -40,13 +40,13 @@ GRAPHQL;
 
     protected function find(string $modelClass, $idOrIds)
     {
-        /** @var \Illuminate\Database\Eloquent\SoftDeletes $modelClass */
+        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
         return $modelClass::withTrashed()->find($idOrIds);
     }
 
     protected function modifyExistence(Model $model): bool
     {
-        /** @var \Illuminate\Database\Eloquent\SoftDeletes $model */
+        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
         return (bool) $model->restore();
     }
 

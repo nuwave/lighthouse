@@ -39,7 +39,7 @@ GRAPHQL;
             return $builder;
         }
 
-        /** @var \Illuminate\Database\Eloquent\SoftDeletes $builder */
+        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
         switch ($value) {
             case 'with':
                 return $builder->withTrashed();

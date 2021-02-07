@@ -121,7 +121,7 @@ GRAPHQL;
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
-                /** @var \Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                /** @see \Illuminate\Database\Eloquent\SoftDeletes */
                 $queryBuilder->withTrashed();
             }
 
@@ -129,7 +129,7 @@ GRAPHQL;
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
-                /** @var \Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                /** @see \Illuminate\Database\Eloquent\SoftDeletes */
                 $queryBuilder->onlyTrashed();
             }
 

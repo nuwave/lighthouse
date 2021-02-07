@@ -70,6 +70,7 @@ class PaginatedRelationLoader implements RelationLoader
 
                 $relation->initRelation([$model], $relationName);
 
+                // @phpstan-ignore-next-line Builder mixin is not understood
                 return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
             });
 
