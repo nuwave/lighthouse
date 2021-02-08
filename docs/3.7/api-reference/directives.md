@@ -467,7 +467,7 @@ type Query {
 }
 ```
 
-[Read More about query complexity analysis](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+[Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ### Definition
 
@@ -1765,7 +1765,7 @@ type Mutation {
 ## @scalar
 
 Reference a class implementing a scalar definition.
-[Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
@@ -2186,7 +2186,7 @@ First, enable the service provider:
 
 It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+    composer require mll-lab/graphql-php-scalars:^3
 
 Finally, add an enum type `Operator` to your schema. Depending on your
 database, you may want to allow different internal values. This default

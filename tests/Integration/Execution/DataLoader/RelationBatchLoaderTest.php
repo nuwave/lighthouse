@@ -4,7 +4,7 @@ namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\DB;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
@@ -34,7 +34,7 @@ class RelationBatchLoaderTest extends DBTestCase
     /** @var \Illuminate\Support\Collection<User> */
     protected $users;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -133,7 +133,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
+                $loader = BatchLoaderRegistry::instance(UserLoader::class, $info->path);
 
                 return $loader->load($args['id']);
             },
@@ -141,7 +141,7 @@ class RelationBatchLoaderTest extends DBTestCase
         );
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoader::instance(UserLoader::class, $info->path); // @phpstan-ignore-line TODO remove after graphql-php update
+                $loader = BatchLoaderRegistry::instance(UserLoader::class, $info->path);
 
                 return $loader->loadMany($args['ids']);
             },

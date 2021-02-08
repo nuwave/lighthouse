@@ -62,7 +62,9 @@ class DocumentAST implements Serializable
             // Throw our own error class instead, since otherwise a schema definition
             // error would get rendered to the Client.
             throw new ParseException(
-                $syntaxError->getMessage()
+                $syntaxError->getMessage(),
+                $syntaxError->getCode(),
+                $syntaxError
             );
         }
 
@@ -130,6 +132,8 @@ class DocumentAST implements Serializable
      *
      * This operation will overwrite existing definitions with the same name.
      *
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $type
+     *
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
@@ -143,6 +147,8 @@ class DocumentAST implements Serializable
      * Set a directive definition in the AST.
      *
      * This operation will overwrite existing definitions with the same name.
+     *
+     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node  $directive
      *
      * @return $this
      */

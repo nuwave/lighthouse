@@ -10,37 +10,22 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective, ArgResolver
+abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
     /**
-     * The database manager.
-     *
      * @var \Illuminate\Database\DatabaseManager
      */
     protected $databaseManager;
 
-    /**
-     * The GlobalId resolver.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
-     */
-    protected $globalId;
-
-    public function __construct(DatabaseManager $databaseManager, GlobalId $globalId)
+    public function __construct(DatabaseManager $databaseManager)
     {
         $this->databaseManager = $databaseManager;
-        $this->globalId = $globalId;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
@@ -72,8 +57,8 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $args
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
+     * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
     public function __invoke($parent, $args)
     {
@@ -85,14 +70,15 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
         $relation = $parent->{$relationName}();
 
         /** @var \Illuminate\Database\Eloquent\Model $related */
+        // @phpstan-ignore-next-line Relation&Builder mixin not recognized
         $related = $relation->make();
 
         return $this->executeMutation($related, $args, $relation);
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $args
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
+     * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
     protected function executeMutation(Model $model, $args, ?Relation $parentRelation = null)
     {

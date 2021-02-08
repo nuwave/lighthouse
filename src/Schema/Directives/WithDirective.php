@@ -2,22 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Deferred;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class WithDirective extends RelationDirective implements FieldMiddleware, DefinedDirective
+class WithDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Eager-load an Eloquent relation.
 """
@@ -32,50 +32,27 @@ directive @with(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION
-SDL;
+) repeatable on FIELD_DEFINITION
+GRAPHQL;
     }
 
-    /**
-     * Eager load a relation on the parent instance.
-     */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        $resolver = $fieldValue->getResolver();
+        if (RootType::isRootType($parentType->name->value)) {
+            throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");
+        }
+    }
 
-        return $next(
-            $fieldValue->setResolver(
-                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
-                    $loader = BatchLoader::instance( // @phpstan-ignore-line TODO remove when updating graphql-php
-                        RelationBatchLoader::class,
-                        $resolveInfo->path,
-                        [
-                            'relationName' => $this->directiveArgValue('relation', $this->nodeName()),
-                            'decorateBuilder' => function ($query) use ($resolveInfo) {
-                                $resolveInfo
-                                    ->argumentSet
-                                    ->enhanceBuilder(
-                                        $query,
-                                        $this->directiveArgValue('scopes', [])
-                                    );
-                            },
-                        ]
-                    );
+    protected function relationName(): string
+    {
+        return $this->directiveArgValue('relation')
+            ?? $this->nodeName();
+    }
 
-                    return new Deferred(function () use ($loader, $resolver, $parent, $args, $context, $resolveInfo) {
-                        return $loader
-                            ->load(
-                                $parent->getKey(),
-                                ['parent' => $parent]
-                            )
-                            ->then(
-                                function () use ($resolver, $parent, $args, $context, $resolveInfo) {
-                                    return $resolver($parent, $args, $context, $resolveInfo);
-                                }
-                            );
-                    });
-                }
-            )
+    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
+    {
+        return new SimpleRelationLoader(
+            $this->decorateBuilder($resolveInfo)
         );
     }
 }

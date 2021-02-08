@@ -11,18 +11,33 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
  */
 class ReportingErrorHandler implements ErrorHandler
 {
-    public static function handle(Error $error, Closure $next): array
+    /**
+     * @var \Illuminate\Contracts\Debug\ExceptionHandler
+     */
+    protected $exceptionHandler;
+
+    public function __construct(ExceptionHandler $exceptionHandler)
     {
+        $this->exceptionHandler = $exceptionHandler;
+    }
+
+    public function __invoke(?Error $error, Closure $next): ?array
+    {
+        if ($error === null) {
+            return $next(null);
+        }
+
         // Client-safe errors are assumed to be something that a client can handle
         // or is expected to happen, e.g. wrong syntax, authentication or validation
         if ($error->isClientSafe()) {
             return $next($error);
         }
 
-        // TODO inject through constructor once handle is non-static
-        /** @var \Illuminate\Contracts\Debug\ExceptionHandler $reporter */
-        $reporter = app(ExceptionHandler::class);
-        $reporter->report($error->getPrevious()); // @phpstan-ignore-line TODO remove when supporting Laravel 7 and upwards
+        $previous = $error->getPrevious();
+        if ($previous !== null) {
+            // @phpstan-ignore-next-line Laravel versions prior to 7 are limited to accepting \Exception
+            $this->exceptionHandler->report($previous);
+        }
 
         return $next($error);
     }

@@ -13,19 +13,20 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective, ArgResolver, ArgManipulator
+class DeleteDirective extends ModifyModelExistenceDirective implements ArgResolver, ArgManipulator
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Delete one or more models by their ID.
 The field must have a single non-null argument that may be a list.
 """
 directive @delete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -44,34 +45,24 @@ directive @delete(
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Find one or more models by id.
-     *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @param  string|int|string[]|int[]  $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
-     */
     protected function find(string $modelClass, $idOrIds)
     {
         return $modelClass::find($idOrIds);
     }
 
-    /**
-     * Bring a model in or out of existence.
-     */
-    protected function modifyExistence(Model $model): void
+    protected function modifyExistence(Model $model): bool
     {
-        $model->delete();
+        return (bool) $model->delete();
     }
 
     /**
      * Delete on ore more related models.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  mixed|mixed[]  $idOrIds
+     * @param  mixed|array<mixed>  $idOrIds
      */
     public function __invoke($parent, $idOrIds): void
     {
@@ -103,6 +94,7 @@ SDL;
             }
         } else {
             /** @var \Illuminate\Database\Eloquent\Model $related */
+            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $related = $relation->make();
             $related::destroy($idOrIds);
         }

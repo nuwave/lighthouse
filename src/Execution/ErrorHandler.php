@@ -5,17 +5,19 @@ namespace Nuwave\Lighthouse\Execution;
 use Closure;
 use GraphQL\Error\Error;
 
+/**
+ * Instantiated through the container, once per query.
+ */
 interface ErrorHandler
 {
     /**
-     * This function receives all GraphQL errors and may alter them or do something else with them.
+     * Called with each GraphQL error, allows doing anything with them.
      *
-     * Always call $next($error) to keep the Pipeline going. Multiple such Handlers may be registered
-     * as an array in the config.
+     * Multiple such Handlers may be registered as an array in the config.
+     * Always call $next($error) to keep the Pipeline going.
+     * Returning null discards the error.
      *
-     * TODO change to non-static in v5
-     *
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null
      */
-    public static function handle(Error $error, Closure $next): array;
+    public function __invoke(?Error $error, Closure $next): ?array;
 }

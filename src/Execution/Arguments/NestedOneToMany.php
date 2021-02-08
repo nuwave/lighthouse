@@ -10,7 +10,7 @@ class NestedOneToMany implements ArgResolver
     /**
      * @var string
      */
-    private $relationName;
+    protected $relationName;
 
     public function __construct(string $relationName)
     {
@@ -20,9 +20,8 @@ class NestedOneToMany implements ArgResolver
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
         $relation = $parent->{$this->relationName}();
@@ -45,6 +44,7 @@ class NestedOneToMany implements ArgResolver
             $saveModel = new ResolveNested(new SaveModel($relation));
 
             foreach ($args->arguments['create']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $saveModel($relation->make(), $childArgs);
             }
         }
@@ -53,6 +53,7 @@ class NestedOneToMany implements ArgResolver
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             foreach ($args->arguments['update']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $updateModel($relation->make(), $childArgs);
             }
         }
@@ -61,6 +62,7 @@ class NestedOneToMany implements ArgResolver
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $upsertModel($relation->make(), $childArgs);
             }
         }

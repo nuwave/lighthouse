@@ -25,7 +25,7 @@ class SchemaStitcherTest extends TestCase
      */
     protected $filesystem;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +60,6 @@ class SchemaStitcherTest extends TestCase
     public function testThrowsIfRootSchemaIsNotFound(): void
     {
         $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessageRegExp('/'.self::ROOT_SCHEMA_FILENAME.'/');
 
         $this->assertSchemaResultIsSame('');
     }
@@ -68,7 +67,6 @@ class SchemaStitcherTest extends TestCase
     public function testThrowsIfSchemaImportIsNotFound(): void
     {
         $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessageRegExp('/does-not-exist.graphql/');
 
         $foo = <<<'EOT'
 #import does-not-exist.graphql

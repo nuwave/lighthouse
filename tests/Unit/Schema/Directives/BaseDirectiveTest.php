@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Tests\TestCase;
 use Tests\Utils\Models\Category;
@@ -26,7 +26,7 @@ class BaseDirectiveTest extends TestCase
     public function testGetsModelClassFromDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @modelClass(class: "Team") {
+        type User @model(class: "Team") {
             id: ID
         }
         ';
@@ -151,25 +151,46 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    protected function constructFieldDirective(string $definitionNode): BaseDirective
+    public function testGetsArgumentFromDirective(): void
     {
-        return $this->constructTestDirective(
-            PartialParser::fieldDefinition($definitionNode)
+        $directive = $this->constructFieldDirective('foo: ID @dummy(argName:"argValue", argName2:"argValue2")');
+
+        $this->assertSame(
+            'argValue',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('argName')
+        );
+
+        $this->assertSame(
+            'argValue2',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('argName2')
         );
     }
 
-    /**
-     * Get a testable instance of the BaseDirective that allows calling protected methods.
-     *
-     * @param  \GraphQL\Language\AST\Node  $definitionNode
-     */
-    protected function constructTestDirective($definitionNode): BaseDirective
+    public function testTwoArgumentsWithSameName(): void
     {
+        $directive = $this->constructFieldDirective('foo: ID @dummy(argName:"argValue", argName:"argValue2")');
+
+        $this->expectException(DefinitionException::class);
+        // @phpstan-ignore-next-line protected method is called via wrapper below
+        $directive->directiveArgValue('argName');
+    }
+
+    protected function constructFieldDirective(string $definition): BaseDirective
+    {
+        $fieldDefinition = Parser::fieldDefinition($definition);
+
         $directive = new class extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @baseTest on FIELD_DEFINITION';
+            }
+
             /**
              * Allow to call protected methods from the test.
              *
-             * @param  mixed[]  $args
+             * @param  array<mixed>  $args
              * @return mixed Whatever the method returns.
              */
             public function __call(string $method, array $args)
@@ -179,8 +200,8 @@ class BaseDirectiveTest extends TestCase
         };
 
         $directive->hydrate(
-            $definitionNode->directives[0],
-            $definitionNode
+            $fieldDefinition->directives[0],
+            $fieldDefinition
         );
 
         return $directive;

@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTestbenchCompaniesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('companies', function (Blueprint $table): void {
@@ -19,9 +16,6 @@ class CreateTestbenchCompaniesTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('companies');

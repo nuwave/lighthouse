@@ -183,7 +183,7 @@ directive @belongsToMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
   type: String
@@ -444,8 +444,10 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
+
+  You may pass the string in dot notation to use nested inputs.
   """
   find: String
 
@@ -492,7 +494,7 @@ type Query {
 }
 ```
 
-[Read More about query complexity analysis](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+[Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ### Definition
 
@@ -1125,7 +1127,7 @@ directive @hasMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
   type: String
@@ -1584,7 +1586,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1609,7 +1611,7 @@ directive @morphMany(
   scopes: [String!]
 
   """
-  ALlows to resolve the relation as a paginated list.
+  Allows to resolve the relation as a paginated list.
   Allowed values: `paginator`, `connection`.
   """
   type: String
@@ -1645,7 +1647,7 @@ type Post {
 }
 
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1677,7 +1679,7 @@ Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/el
 
 ```graphql
 type Image {
-  imagable: Imageable! @morphTo
+  imageable: Imageable! @morphTo
 }
 
 union Imageable = Post | User
@@ -1807,6 +1809,7 @@ type User {
 ```graphql
 """
 Register a type for Relay's global object identification.
+
 When used without any arguments, Lighthouse will attempt
 to resolve the type through a model with the same name.
 """
@@ -1815,15 +1818,19 @@ directive @node(
   Reference to a function that receives the decoded `id` and returns a result.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
+
+  Mutually exclusive with the `model` argument.
   """
   resolver: String
 
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+
+  Mutually exclusive with the `model` argument.
   """
   model: String
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 Lighthouse defaults to resolving types through the underlying model,
@@ -1910,6 +1917,8 @@ directive @orderBy(
   columnsEnum: String
 ) on ARGUMENT_DEFINITION
 ```
+
+**It is recommended to change the `lighthouse.php` setting `orderBy` when using this directive.**
 
 Use it on a field argument of an Eloquent query. The type of the argument
 can be left blank as `_` , as it will be automatically generated.
@@ -2001,7 +2010,7 @@ And usage example:
 
 ```graphql
 {
-  posts(filter: { orderBy: [{ field: "postedAt", order: ASC }] }) {
+  posts(filter: { orderBy: [{ column: "postedAt", order: ASC }] }) {
     title
   }
 }
@@ -2351,7 +2360,7 @@ directive @rulesForArray(
 ## @scalar
 
 Reference a class implementing a scalar definition.
-[Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
@@ -2543,7 +2552,7 @@ mutation {
     id: 12
     input: {
       title: "My awesome title"
-      content: { imageUrl: "http://some.site/image.jpg" }
+      content: { imageUrl: "https://some.site/image.jpg" }
     }
   ) {
     id
@@ -2558,7 +2567,7 @@ they are passed along to the resolver:
 [
     'id' => 12,
     'title' => 'My awesome title',
-    'imageUrl' = 'http://some.site/image.jpg',
+    'imageUrl' = 'https://some.site/image.jpg',
 ]
 ```
 

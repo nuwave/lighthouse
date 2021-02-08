@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Events;
 
+use GraphQL\Language\Parser;
 use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Tests\TestCase;
 
 class ManipulateASTTest extends TestCase
@@ -19,7 +19,7 @@ class ManipulateASTTest extends TestCase
 
         Event::listen(ManipulateAST::class, function (ManipulateAST $manipulateAST): void {
             $manipulateAST->documentAST->setTypeDefinition(
-                PartialParser::objectTypeDefinition(self::PLACEHOLDER_QUERY)
+                Parser::objectTypeDefinition(self::PLACEHOLDER_QUERY)
             );
         });
 

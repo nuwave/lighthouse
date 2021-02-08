@@ -5,10 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class AuthDirective extends BaseDirective implements DefinedDirective, FieldResolver
+class AuthDirective extends BaseDirective implements FieldResolver
 {
     /**
      * @var \Illuminate\Contracts\Auth\Factory
@@ -22,7 +21,7 @@ class AuthDirective extends BaseDirective implements DefinedDirective, FieldReso
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Return the currently authenticated user as the result of a query.
 """
@@ -33,19 +32,17 @@ directive @auth(
   """
   guard: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        /** @var string|null $guard */
-        $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
-
         return $fieldValue->setResolver(
-            function () use ($guard): ?Authenticatable {
+            function (): ?Authenticatable {
+                /** @var string|null $guard */
+                $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
+
+                // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
                 return $this
                     ->authFactory
                     ->guard($guard)

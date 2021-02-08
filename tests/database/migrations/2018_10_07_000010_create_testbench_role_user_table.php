@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTestbenchRoleUserTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('role_user', function (Blueprint $table): void {
@@ -20,9 +17,6 @@ class CreateTestbenchRoleUserTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('role_user');

@@ -11,7 +11,6 @@ use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
@@ -20,7 +19,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 /**
  * @see \Illuminate\Auth\Middleware\Authenticate
  */
-class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator, DefinedDirective
+class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     /**
      * @var \Illuminate\Contracts\Auth\Factory
@@ -34,7 +33,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run authentication through one or more guards.
 This is run per field and may allow unauthenticated
@@ -47,42 +46,38 @@ directive @guard(
   """
   with: [String!]
 ) on FIELD_DEFINITION | OBJECT
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
-
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    $this->authenticate(
-                        (array) $this->directiveArgValue('with')
-                    );
-
-                    return $previousResolver($root, $args, $context, $resolveInfo);
-                }
-            )
+        // TODO remove cast in v6
+        $with = (array) (
+            $this->directiveArgValue('with')
+            ?? [config('lighthouse.guard')]
         );
+
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($with, $previousResolver) {
+                $this->authenticate($with);
+
+                return $previousResolver($root, $args, $context, $resolveInfo);
+            }
+        );
+
+        return $next($fieldValue);
     }
 
     /**
      * Determine if the user is logged in to any of the given guards.
      *
-     * @param  string[]  $guards
+     * @param  array<string>  $guards
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function authenticate(array $guards): void
     {
-        if (empty($guards)) {
-            $guards = [config('lighthouse.guard')];
-        }
-
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
                 $this->auth->shouldUse($guard);
@@ -102,7 +97,7 @@ SDL;
     protected function unauthenticated(array $guards): void
     {
         throw new AuthenticationException(
-            AuthenticationException::UNAUTHENTICATED,
+            AuthenticationException::MESSAGE,
             $guards
         );
     }

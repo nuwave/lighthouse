@@ -47,7 +47,7 @@ mutation CreateTaskWithNotes {
     id: 45
     name: "Do something"
     notes: [
-      { content: "Foo bar", link: "http://foo.bar" }
+      { content: "Foo bar", link: "https://foo.bar" }
       { content: "Awesome note" }
     ]
   ) {
@@ -191,10 +191,10 @@ class CreateDirective extends BaseDirective implements FieldResolver, ArgResolve
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]  $argsList
-     * @return \Illuminate\Database\Eloquent\Model[]
+     * @param  array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $argsList
+     * @return array<\Illuminate\Database\Eloquent\Model>
      */
-    public function __invoke($parent, $argsList)
+    public function __invoke($parent, $argsList): array
     {
         $relationName = $this->getRelationName();
 

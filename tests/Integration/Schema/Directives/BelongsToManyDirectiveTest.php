@@ -2,8 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -11,14 +12,14 @@ use Tests\Utils\Models\User;
 class BelongsToManyDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
-     * User's tasks.
+     * Roles of the authenticated user.
      *
      * @var \Illuminate\Support\Collection
      */
@@ -29,19 +30,14 @@ class BelongsToManyDirectiveTest extends DBTestCase
      */
     protected $rolesCount = 4;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->user = factory(User::class)->create();
         $this->roles = factory(Role::class, $this->rolesCount)->create();
 
-        $this->user
-            ->roles()
-            ->attach(
-                $this->roles,
-                ['meta' => 'new']
-            );
+        $this->user->roles()->attach($this->roles, ['meta' => 'new']);
 
         $this->be($this->user);
     }
@@ -106,7 +102,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "paginator")
+            roles: [Role!]! @belongsToMany(type: PAGINATOR)
         }
 
         type Role {
@@ -153,7 +149,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay")
+            roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
 
         type Role {
@@ -198,7 +194,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+            roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
         }
 
         type Role {
@@ -249,7 +245,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+            roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
         }
 
         type Role {
@@ -262,7 +258,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -284,7 +280,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay")
+            roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
 
         type Role {
@@ -339,7 +335,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
-            roles: [Role!]! @belongsToMany(type: "relay")
+            roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
 
         type ACL {
@@ -395,10 +391,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue($result->jsonGet('data.user.roles.pageInfo.hasNextPage'));
+        $this->assertTrue($result->json('data.user.roles.pageInfo.hasNextPage'));
 
-        $userRolesEdges = $result->jsonGet('data.user.roles.edges');
-        $nestedUserRolesEdges = $result->jsonGet('data.user.roles.edges.0.node.users.0.roles.edges');
+        $userRolesEdges = $result->json('data.user.roles.edges');
+        $nestedUserRolesEdges = $result->json('data.user.roles.edges.0.node.users.0.roles.edges');
         $this->assertCount(2, $userRolesEdges);
         $this->assertCount(2, $nestedUserRolesEdges);
         $this->assertSame(Arr::get($userRolesEdges, 'node.0.acl.id'), Arr::get($nestedUserRolesEdges, 'node.0.acl.id'));
@@ -407,11 +403,11 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
+        $this->expectExceptionMessage('Found invalid pagination type: foo');
 
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
-            roles(first: Int! after: Int): [Role!]! @belongsToMany(type:"foo")
+            roles(first: Int! after: Int): [Role!]! @belongsToMany(type: "foo")
         }
 
         type Role {
@@ -420,6 +416,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ');
 
         $type = $schema->getType('User');
+
+        $this->assertInstanceOf(Type::class, $type);
+        /** @var \GraphQL\Type\Definition\Type $type */
         $type->config['fields']();
     }
 }

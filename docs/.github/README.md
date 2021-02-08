@@ -13,9 +13,9 @@ docs/
 │
 ├── master/
 │   ├── guides/
-│   │   └── auth.md       # http://mysite.com/master/guides/auth.html
+│   │   └── auth.md       # https://mysite.com/master/guides/auth.html
 │   ├── the-basics/
-│   │   └── fields.md     # http://mysite.com/master/the-basics/fields.html
+│   │   └── fields.md     # https://mysite.com/master/the-basics/fields.html
 │   │
 │   └── sidebar.js        # versioned sidebar for this version
 │
@@ -42,7 +42,7 @@ Then, start Vue Press in development mode (with hot reloading).
     yarn
     yarn start
 
-> Keep a eye on the console when editing pages.
+> Keep an eye on the console when editing pages.
 > If an error occurs, it might be necessary to restart the compilation process.
 
 If you use Docker you can start up the environment (including docs) by running:
@@ -50,7 +50,7 @@ If you use Docker you can start up the environment (including docs) by running:
     make setup
     make node
 
-Finally, navigate to http://localhost:8080
+Finally, navigate to http://localhost:8081
 
 ## Files
 
@@ -86,9 +86,9 @@ Version specific changes are handled by keeping the docs for each version separa
 
 | Path                                 | Web route                                           |
 | ------------------------------------ | --------------------------------------------------- |
-| `docs/master/guides/installation.md` | `http://mysite.com/master/guides/installation.html` |
-| `docs/2.6/guides/installation.md`    | `http://mysite.com/2.6/guides/installation.html`    |
-| `docs/pages/users.md`                | `http://mysite.com/pages/users.html`                |
+| `docs/master/guides/installation.md` | `https://mysite.com/master/guides/installation.html` |
+| `docs/2.6/guides/installation.md`    | `https://mysite.com/2.6/guides/installation.html`    |
+| `docs/pages/users.md`                | `https://mysite.com/pages/users.html`                |
 
 ### Updating existing versions
 
@@ -105,7 +105,15 @@ in a single PR.
 1.  Enter a new version number. We only tag minor releases, so `3.1` will get separate
     docs, but `3.1.4` will not.
 
-        yarn bump-version 3.1
+        yarn bump 3.1
 
 This will copy the contents of `docs/master/` into `docs/<version>/`
 and place a new version number in `docs/.vuepress/versions.json`.
+
+## Deployment
+
+The docs are automatically built and deployed on pushes to `master`.
+@chrissm79 set up the deployment.
+
+When the docs are down, check https://www.netlifystatus.com for problems on their part.
+

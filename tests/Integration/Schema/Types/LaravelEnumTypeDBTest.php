@@ -4,7 +4,6 @@ namespace Tests\Integration\Schema\Types;
 
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\Models\WithEnum;
@@ -16,7 +15,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
      */
     protected $typeRegistry;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -66,10 +65,6 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
-        if (AppVersion::below(5.6)) {
-            $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
-        }
-
         // We use the "name" field to store the "type" JSON
         $this->schema = /** @lang GraphQL */ '
         type Query {

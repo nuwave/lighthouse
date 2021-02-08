@@ -9,7 +9,7 @@ class Argument
     /**
      * The value given by the client.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]|mixed|mixed[]
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
      */
     public $value;
 
@@ -52,8 +52,8 @@ class Argument
     /**
      * Convert the given value to plain PHP values recursively.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]|mixed|mixed[]  $value
-     * @return mixed|mixed[]
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
+     * @return mixed|array<mixed>
      */
     protected static function toPlainRecursive($value)
     {
@@ -62,7 +62,6 @@ class Argument
         }
 
         if (is_array($value)) {
-            // @phpstan-ignore-next-line This callable works just fine
             return array_map([static::class, 'toPlainRecursive'], $value);
         }
 

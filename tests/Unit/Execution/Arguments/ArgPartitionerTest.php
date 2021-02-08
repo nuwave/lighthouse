@@ -14,7 +14,7 @@ use Tests\Utils\Models\WithoutRelationClassImport;
 
 class ArgPartitionerTest extends TestCase
 {
-    public function testPartitionArgsWithArResolvers(): void
+    public function testPartitionArgsWithArgResolvers(): void
     {
         $argumentSet = new ArgumentSet();
 
@@ -46,7 +46,12 @@ class ArgPartitionerTest extends TestCase
         $argumentSet->arguments['regular'] = $regular;
 
         $tasksRelation = new Argument();
+        $tasksRelation->value = new ArgumentSet();
         $argumentSet->arguments['tasks'] = $tasksRelation;
+
+        $postsRelation = new Argument();
+        $postsRelation->value = null;
+        $argumentSet->arguments['posts'] = $postsRelation;
 
         [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
             $argumentSet,
@@ -74,7 +79,7 @@ class ArgPartitionerTest extends TestCase
 
         $this->expectException(DefinitionException::class);
 
-        [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
+        ArgPartitioner::relationMethods(
             $argumentSet,
             new WithoutRelationClassImport(),
             HasMany::class

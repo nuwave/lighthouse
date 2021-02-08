@@ -15,12 +15,12 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class CanDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Illuminate\Contracts\Auth\Access\Gate
@@ -34,7 +34,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDire
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
@@ -48,10 +48,10 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
 
-  You may pass the string as a dot notation to search in a array.
+  You may pass the string in dot notation to use nested inputs.
   """
   find: String
 
@@ -73,8 +73,8 @@ directive @can(
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: Mixed
-) on FIELD_DEFINITION
-SDL;
+) repeatable on FIELD_DEFINITION
+GRAPHQL;
     }
 
     /**
@@ -83,22 +83,22 @@ SDL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
+        $ability = $this->directiveArgValue('ability');
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    $gate = $this->gate->forUser($context->user());
-                    $ability = $this->directiveArgValue('ability');
-                    $checkArguments = $this->buildCheckArguments($args);
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($ability, $previousResolver) {
+                $gate = $this->gate->forUser($context->user());
+                $checkArguments = $this->buildCheckArguments($args);
 
-                    foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
-                        $this->authorize($gate, $ability, $model, $checkArguments);
-                    }
-
-                    return $previousResolver($root, $args, $context, $resolveInfo);
+                foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
+                    $this->authorize($gate, $ability, $model, $checkArguments);
                 }
-            )
+
+                return $previousResolver($root, $args, $context, $resolveInfo);
+            }
         );
+
+        return $next($fieldValue);
     }
 
     /**
@@ -121,7 +121,8 @@ SDL;
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
-                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+                // @phpstan-ignore-next-line because it involves mixins
                 $queryBuilder->withTrashed();
             }
 
@@ -129,7 +130,8 @@ SDL;
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
-                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+                // @phpstan-ignore-next-line because it involves mixins
                 $queryBuilder->onlyTrashed();
             }
 
@@ -165,9 +167,9 @@ SDL;
     }
 
     /**
-     * @param  string|string[]  $ability
+     * @param  string|array<string>  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array<mixed>  $arguments
+     * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -177,17 +179,32 @@ SDL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        if (! $gate->check($ability, $arguments)) {
-            throw new AuthorizationException(
-                "You are not authorized to access {$this->nodeName()}"
+        // Gate responses were introduced in Laravel 6
+        // TODO remove with Laravel < 6 support
+        if (AppVersion::atLeast(6.0)) {
+            Utils::applyEach(
+                function ($ability) use ($gate, $arguments) {
+                    $response = $gate->inspect($ability, $arguments);
+
+                    if ($response->denied()) {
+                        throw new AuthorizationException($response->message(), $response->code());
+                    }
+                },
+                $ability
             );
+        } else {
+            if (! $gate->check($ability, $arguments)) {
+                throw new AuthorizationException(
+                    "You are not authorized to access {$this->nodeName()}"
+                );
+            }
         }
     }
 
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array<mixed>  $args
+     * @param  array<string, mixed>  $args
      * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array

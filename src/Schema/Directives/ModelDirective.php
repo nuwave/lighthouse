@@ -2,17 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-class ModelDirective extends NodeDirective
+class ModelDirective extends BaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Enable fetching an Eloquent model by its global id through the `node` query.
+Map a model class to an object type.
 
-@deprecated(reason: "Use @node instead. This directive will be repurposed and do what @modelClass does now in v5.")
+This can be used when the name of the model differs from the name of the type.
 """
-directive @model on OBJECT
-SDL;
+directive @model(
+  """
+  The class name of the corresponding model.
+  """
+  class: String!
+) on OBJECT
+GRAPHQL;
     }
 }

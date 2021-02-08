@@ -119,7 +119,7 @@ as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super pow
 
 Then publish default schema to `graphql/schema.graphql`.
 
-    php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
+    php artisan vendor:publish --tag=lighthouse-schema
 
 To make sure everything is working, access Laravel GraphQL Playground on `/graphql-playground`
 and try the following query:
@@ -157,12 +157,12 @@ Begin by defining models and migrations for your posts and comments
 
     php artisan make:model -m Post
 
-Replace the newly generated `app/Posts.php` and the `create_posts_table.php` with this:
+Replace the newly generated `app/Models/Post.php` and the `create_posts_table.php` with this:
 
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -172,7 +172,7 @@ class Post extends Model
 {
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     public function comments(): HasMany
@@ -216,7 +216,7 @@ Let's do the same for the Comment model:
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -260,12 +260,12 @@ Remember to run the migrations:
 
     php artisan migrate
 
-Finally, add the `posts` relation to `app/User.php`
+Finally, add the `posts` relation to `app/Models/User.php`
 
 ```php
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;

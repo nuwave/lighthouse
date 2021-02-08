@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 trait MocksResolvers
 {
     /**
-     * Create and register a PHPUnit mock to be called through the @mock directive.
+     * Create and register a PHPUnit mock to be called through the `@mock` directive.
      *
      * @param  callable|mixed|null  $resolverOrValue
      */
@@ -28,11 +28,11 @@ trait MocksResolvers
     }
 
     /**
-     * Register a resolver for @mock.
+     * Register a resolver for `@mock`.
      *
      * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
      */
-    protected function mockResolverExpects(/* TODO add strong type hint when bumping PHPUnit */ $invocationOrder, string $key = 'default'): InvocationMocker
+    protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
     {
         $mock = $this->createMock(MockResolver::class);
 
@@ -44,12 +44,12 @@ trait MocksResolvers
     }
 
     /**
-     * Register a mock resolver that will be called through the @mock directive.
+     * Register a mock resolver that will be called through the `@mock` directive.
      */
     protected function registerMockResolver(callable $mock, string $key): void
     {
-        /** @var \Nuwave\Lighthouse\Testing\MockDirective $mockDirective */
-        $mockDirective = app(MockDirective::class);
-        $mockDirective->register($mock, $key);
+        /** @var \Nuwave\Lighthouse\Testing\MockResolverService $mockResolverService */
+        $mockResolverService = app(MockResolverService::class);
+        $mockResolverService->register($mock, $key);
     }
 }

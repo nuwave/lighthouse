@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
 use Tests\TestsSerialization;
@@ -11,12 +12,12 @@ class SchemaCachingTest extends TestCase
 {
     use TestsSerialization;
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
+        $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.cache.enable', true);
 
         $this->useSerializingArrayStore($app);

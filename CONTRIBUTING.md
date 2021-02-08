@@ -6,22 +6,55 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 1. Fork the project
 1. Create a new branch
-1. Code, commit and push
+1. Code
+1. Commit and push
 1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ## Setup
 
-The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/).
-For convenience, common tasks are wrapped up in the [Makefile](Makefile) for usage with [GNU make](https://www.gnu.org/software/make/).
+This section describes the setup of  a local development environment to run tests
+and other quality tools.
 
-Just clone the project and run the following in the project root:
+### Docker + Make
 
-    make setup
-    make
+A reproducible environment with minimal dependencies:
 
+- [docker-compose](https://docs.docker.com/compose/install/)
+- [GNU Make](https://www.gnu.org/software/make/) (optional)
+
+For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
 To see the available commands, run:
 
     make help
+
+Clone the project and run the following in the project root:
+
+    make setup
+
+Before you commit changes, run all validation steps with:
+
+    make
+
+### Native Tools
+
+You can use native tools instead of Docker + Make, with the following requirements:
+
+- PHP (see [composer.json](composer.json) for the minimal required version)
+- Composer (version 2 is recommended)
+- MySQL (any Laravel supported version should work)
+- Redis 6
+
+Clone the project and run the following in the project root:
+
+    composer install
+
+Copy the PHPUnit configuration:
+
+    cp phpunit.xml.dist phpunit.xml
+
+Change the `env` parameters to connect to MySQL and Redis test instances.
+
+Common tasks during development are listed in the `scripts` section of [composer.json](composer.json).
 
 ## Testing
 
@@ -67,6 +100,11 @@ Then, add a short description of your change and close it off with a link to you
 
 ## Code guidelines
 
+### `protected` over `private`
+
+Always use class member visibility `protected` over `private`. We cannot foresee every
+possible use case in advance, extending the code should remain possible. 
+
 ### Laravel feature usage
 
 We strive to be compatible with both Lumen and Laravel.
@@ -97,7 +135,7 @@ If known, add additional type information in the PHPDoc.
 /**
  * We know we get an array of strings here.
  *
- * @param  string[]  $bar
+ * @param  array<string>  $bar
  * @return string
  */
 function foo(array $bar): string
@@ -117,7 +155,7 @@ function foo(): Collection
 ```
 
 Use `self` to annotate that a class returns an instance of itself (or its child).
-Use [PHPDoc type hints](http://docs.phpdoc.org/guides/types.html#keywords) to
+Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to
 differentiate between cases where you return the original object instance and
 other cases where you instantiate a new class.
 
@@ -187,13 +225,29 @@ function bar(){
 We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
 at the Laravel coding style.
 
-Look through some code to get a feel for the naming conventions.
-
 Prefer explicit naming and short, focused functions over excessive comments.
 
-### Ternarys
+### Alignment
 
-Ternary's should be spread out across multiple lines.
+Do not align stuff horizontally, it leads to ugly diffs.
+
+```php
+// Right
+[
+    'foo' => 1,
+    'barbaz' => 2,
+]
+
+// Wrong
+[
+    'foo'    => 1,
+    'barbaz' => 2,
+]
+```
+
+### Multiline Ternary Expressions
+
+Ternary expressions must be spread across multiple lines.
 
 ```php
 $foo = $cond
@@ -230,6 +284,37 @@ You can use the following two case-sensitive regexes to search for violations:
 ```regexp
 @(var|param|return|throws).*\|[A-Z]
 @(var|param|return|throws)\s*[A-Z]
+```
+
+### Test Data Setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$user->post()->save();
+
+// Wrong
+$user = factory(Post::class)->create([
+    'user_id' => $post->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
 ```
 
 ## Benchmarks

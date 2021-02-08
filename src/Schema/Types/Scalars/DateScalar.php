@@ -2,20 +2,20 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
 use Exception;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
+use Illuminate\Support\Carbon;
 
 abstract class DateScalar extends ScalarType
 {
     /**
      * Serialize an internal value, ensuring it is a valid date string.
      *
-     * @param  \Carbon\Carbon|string  $value
+     * @param  \Illuminate\Support\Carbon|string  $value
      */
     public function serialize($value): string
     {
@@ -40,7 +40,7 @@ abstract class DateScalar extends ScalarType
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
      * @param  \GraphQL\Language\AST\Node  $valueNode
-     * @param  mixed[]|null  $variables
+     * @param  array<string, mixed>|null  $variables
      *
      * @throws \GraphQL\Error\Error
      */
@@ -59,7 +59,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
-     * @param  string  $value
+     * @param  mixed  $value  Any value that might be a Date
      * @param  class-string<\Exception>  $exceptionClass
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
@@ -67,6 +67,30 @@ abstract class DateScalar extends ScalarType
     protected function tryParsingDate($value, string $exceptionClass): Carbon
     {
         try {
+            if (
+                is_object($value)
+                // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
+                // @noRector Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector
+                && get_class($value) === \Carbon\Carbon::class
+            ) {
+                /**
+                 * Given we had a valid \Carbon\Carbon before, this can not fail.
+                 *
+                 * @var \Illuminate\Support\Carbon $carbon
+                 */
+                $carbon = Carbon::create(
+                    $value->year,
+                    $value->month,
+                    $value->day,
+                    $value->hour,
+                    $value->minute,
+                    $value->second,
+                    $value->timezone
+                );
+
+                return $carbon;
+            }
+
             return $this->parse($value);
         } catch (Exception $e) {
             throw new $exceptionClass(

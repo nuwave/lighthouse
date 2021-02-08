@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
+use GraphQL\Language\Parser;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Utils;
 
 class SoftDeletesServiceProvider extends ServiceProvider
@@ -37,7 +37,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
             function (ManipulateAST $manipulateAST): void {
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
-                        PartialParser::enumTypeDefinition('
+                        Parser::enumTypeDefinition('
                             "Specify if you want to include or exclude trashed results from a query."
                             enum Trashed {
                                 "Only return trashed results."

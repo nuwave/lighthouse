@@ -292,7 +292,7 @@ Because of this, Lighthouse does **not** validate that the user is authenticated
 
 ## @complexity
 
-Place on fields to perform analysis to calculate a query complexity score before execution. [Read More](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+Place on fields to perform analysis to calculate a query complexity score before execution. [Read More](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ```graphql
 type Query {
@@ -1072,7 +1072,7 @@ type Mutation {
 ## @scalar
 
 Point Lighthouse to your scalar definition class.
-[Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
 
 Lighthouse looks into your default scalar namespace for a class with the same name.
 You do not need to specify the directive in that case.
@@ -1358,7 +1358,7 @@ First, enable the service provider:
 
 It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+    composer require mll-lab/graphql-php-scalars:^3
 
 Finally, add an enum type `Operator` to your schema. Depending on your
 database, you may want to allow different internal values. This default

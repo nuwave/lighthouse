@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
@@ -13,15 +14,14 @@ abstract class DBTestCase extends TestCase
      */
     protected static $migrated = false;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
         if (! static::$migrated) {
-            // We have to use this instead of --realpath as long as Laravel 5.5 is supported
-            $this->app->setBasePath(__DIR__);
             $this->artisan('migrate:fresh', [
-                '--path' => 'database/migrations',
+                '--path' => __DIR__.'/database/migrations',
+                '--realpath' => true,
             ]);
 
             static::$migrated = true;
@@ -29,19 +29,24 @@ abstract class DBTestCase extends TestCase
 
         // Ensure we start from a clean slate each time
         // We cannot use transactions, as they do not reset autoincrement
+        $databaseName = env('LIGHTHOUSE_TEST_DB_DATABASE') ?? 'lighthouse';
+        $columnName = "Tables_in_{$databaseName}";
         foreach (DB::select('SHOW TABLES') as $table) {
-            DB::table($table->Tables_in_test)->truncate();
+            DB::table($table->{$columnName})->truncate();
         }
 
         $this->withFactories(__DIR__.'/database/factories');
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('database.default', 'mysql');
-        $app['config']->set('database.connections.mysql', [
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app->make(ConfigRepository::class);
+
+        $config->set('database.default', 'mysql');
+        $config->set('database.connections.mysql', [
             'driver' => 'mysql',
             'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
             'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),

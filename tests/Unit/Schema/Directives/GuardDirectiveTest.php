@@ -5,6 +5,7 @@ namespace Tests\Unit\Schema\Directives;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
+use Tests\Utils\Queries\Foo;
 
 class GuardDirectiveTest extends TestCase
 {
@@ -23,13 +24,42 @@ class GuardDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => AuthenticationException::UNAUTHENTICATED,
+                    'message' => AuthenticationException::MESSAGE,
                 ],
             ],
         ]);
     }
 
     public function testGuardsWithApi(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Int @guard(with: ["api"])
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => AuthenticationException::MESSAGE,
+                    'extensions' => [
+                        'guards' => [
+                            'api',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @deprecated remove cast in v6
+     */
+    public function testSpecifyGuardAsString(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -44,7 +74,7 @@ class GuardDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => AuthenticationException::UNAUTHENTICATED,
+                    'message' => AuthenticationException::MESSAGE,
                     'extensions' => [
                         'guards' => [
                             'api',
@@ -58,10 +88,11 @@ class GuardDirectiveTest extends TestCase
     public function testPassesOneFieldButThrowsInAnother(): void
     {
         $this->be(new User());
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @guard
-            bar: String @guard(with: "api")
+            bar: String @guard(with: ["api"])
         }
         ';
 
@@ -72,7 +103,7 @@ class GuardDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => \Tests\Utils\Queries\Foo::THE_ANSWER,
+                'foo' => Foo::THE_ANSWER,
                 'bar' => null,
             ],
             'errors' => [
@@ -80,7 +111,7 @@ class GuardDirectiveTest extends TestCase
                     'path' => [
                         'bar',
                     ],
-                    'message' => AuthenticationException::UNAUTHENTICATED,
+                    'message' => AuthenticationException::MESSAGE,
                 ],
             ],
         ]);

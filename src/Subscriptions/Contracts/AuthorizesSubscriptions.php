@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 interface AuthorizesSubscriptions
 {
     /**
-     * Authorize subscription request.
+     * Is the subscription request authorized?
      *
      * @return bool
      */

@@ -10,7 +10,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class ArgumentSetFactory
 {
@@ -25,14 +25,14 @@ class ArgumentSetFactory
     protected $argumentTypeNodeConverter;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
     public function __construct(
         ASTBuilder $astBuilder,
         ArgumentTypeNodeConverter $argumentTypeNodeConverter,
-        DirectiveFactory $directiveFactory
+        DirectiveLocator $directiveFactory
     ) {
         $this->documentAST = $astBuilder->documentAST();
         $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
@@ -52,6 +52,7 @@ class ArgumentSetFactory
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentDefinition */
         $parentDefinition = $this->documentAST->types[$parentName];
+
         /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
         $fieldDefinition = ASTHelper::firstByName($parentDefinition->fields, $fieldName);
 
@@ -62,13 +63,13 @@ class ArgumentSetFactory
      * Wrap client-given args with type information.
      *
      * @param  \GraphQL\Language\AST\FieldDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
-     * @param  mixed[]  $args
+     * @param  array<mixed>  $args
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $this->directiveFactory->createAssociatedDirectives($definition);
+        $argumentSet->directives = $this->directiveFactory->associated($definition);
 
         if ($definition instanceof FieldDefinitionNode) {
             $argDefinitions = $definition->arguments;
@@ -77,6 +78,7 @@ class ArgumentSetFactory
         } else {
             throw new InvalidArgumentException('Got unexpected node of type '.get_class($definition));
         }
+
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
 
         foreach ($argumentDefinitionMap as $name => $definition) {
@@ -118,7 +120,7 @@ class ArgumentSetFactory
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $this->directiveFactory->createAssociatedDirectives($definition);
+        $argument->directives = $this->directiveFactory->associated($definition);
         $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
 
@@ -128,7 +130,7 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a type.
      *
-     * @param  mixed|mixed[]  $valueOrValues
+     * @param  mixed|array<mixed>  $valueOrValues
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
      * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
@@ -136,7 +138,7 @@ class ArgumentSetFactory
     {
         // No need to recurse down further if the value is null
         if ($valueOrValues === null) {
-            return;
+            return null;
         }
 
         // We have to do this conversion as we are resolving a client query

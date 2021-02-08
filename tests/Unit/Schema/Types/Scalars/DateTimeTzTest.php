@@ -12,8 +12,18 @@ class DateTimeTzTest extends DateScalarTest
         return new DateTimeTz();
     }
 
-    protected function validDate(): string
+    public function validDates(): array
     {
-        return '2020-04-20T16:20:04+04:00';
+        return [
+            ['2020-04-20T16:20:04+04:00'],
+            ['2020-04-20T16:20:04Z'],
+        ];
+    }
+
+    public function canonicalizeDates(): array
+    {
+        return [
+            ['2020-4-20T16:20:04+04:0', '2020-04-20T16:20:04+04:00'],
+        ];
     }
 }

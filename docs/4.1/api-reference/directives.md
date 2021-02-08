@@ -451,8 +451,8 @@ directive @can(
   ability: String!
 
   """
-  The name of the argument that is used to find a specific model
-  instance against which the permissions should be checked.
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
   """
   find: String
 
@@ -516,7 +516,7 @@ type Query {
 }
 ```
 
-[Read More about query complexity analysis](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+[Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ### Definition
 
@@ -1457,7 +1457,7 @@ directive @node(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
-) on FIELD_DEFINITION
+) on OBJECT
 ```
 
 ## @notIn
@@ -1813,7 +1813,7 @@ directive @rulesForArray(
 ## @scalar
 
 Reference a class implementing a scalar definition.
-[Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
@@ -2265,7 +2265,7 @@ Add the service provider to your `config/app.php`
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+    composer require mll-lab/graphql-php-scalars:^3
 
 It contains the scalar type `Mixed`, which enables the dynamic query capabilities.
 

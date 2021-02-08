@@ -59,7 +59,7 @@ GRAPHQL;
             ],
         ]);
 
-        $this->assertArrayNotHasKey('id', $result->jsonGet('data.namedThings.1'));
+        $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
     }
 
     public function testCanUseCustomTypeResolver(): void
@@ -133,7 +133,7 @@ GRAPHQL;
         }
         ');
 
-        $interface = (new Collection($result->jsonGet('data.__schema.types')))
+        $interface = (new Collection($result->json('data.__schema.types')))
             ->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);

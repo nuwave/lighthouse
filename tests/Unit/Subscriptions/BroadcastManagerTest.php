@@ -10,18 +10,19 @@ use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Symfony\Component\HttpFoundation\Response;
+use Tests\TestCase;
+use Tests\TestsSubscriptions;
 
-class BroadcastManagerTest extends SubscriptionTestCase
+class BroadcastManagerTest extends TestCase
 {
+    use TestsSubscriptions;
+
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcastManager;
 
-    /**
-     * Set up test environment.
-     */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -57,9 +58,8 @@ class BroadcastManagerTest extends SubscriptionTestCase
                 return new Response();
             }
 
-            public function broadcast(Subscriber $subscriber, array $data)
+            public function broadcast(Subscriber $subscriber, $data)
             {
-                //
             }
         };
 
@@ -73,11 +73,7 @@ class BroadcastManagerTest extends SubscriptionTestCase
         $resolvedBroadcaster = $this->broadcastManager->driver('foo');
 
         $this->assertSame(['driver' => 'foo'], $broadcasterConfig);
-
-        $this->assertSame(
-            $broadcaster,
-            $resolvedBroadcaster
-        );
+        $this->assertSame($broadcaster, $resolvedBroadcaster);
     }
 
     public function testThrowsIfDriverDoesNotImplementInterface(): void

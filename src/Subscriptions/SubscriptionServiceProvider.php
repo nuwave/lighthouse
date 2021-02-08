@@ -15,21 +15,16 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
-use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
-use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionListener;
 use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
+use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
+use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {
     public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void
     {
-        $eventsDispatcher->listen(
-            BroadcastSubscriptionEvent::class,
-            BroadcastSubscriptionListener::class
-        );
-
         $eventsDispatcher->listen(
             StartExecution::class,
             SubscriptionRegistry::class.'@handleStartExecution'
@@ -65,7 +60,16 @@ class SubscriptionServiceProvider extends ServiceProvider
     {
         $this->app->singleton(BroadcastManager::class);
         $this->app->singleton(SubscriptionRegistry::class);
-        $this->app->singleton(StoresSubscriptions::class, StorageManager::class);
+        $this->app->singleton(StoresSubscriptions::class, function () {
+            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
+            $configRepository = $this->app->make(ConfigRepository::class);
+            switch ($configRepository->get('lighthouse.subscriptions.storage')) {
+                case 'redis':
+                    return $this->app->make(RedisStorageManager::class);
+                default:
+                    return $this->app->make(CacheStorageManager::class);
+            }
+        });
 
         $this->app->bind(ContextSerializer::class, Serializer::class);
         $this->app->bind(AuthorizesSubscriptions::class, Authorizer::class);
@@ -81,7 +85,8 @@ class SubscriptionServiceProvider extends ServiceProvider
 
         if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
             [$routesProviderClass, $method] = Str::parseCallback($routesMethod, 'pusher');
-
+            /** @var class-string $routesProviderClass */
+            /** @var string $method */
             $routesProvider = $this->app->make($routesProviderClass);
             $router = $this->app->make('router');
 

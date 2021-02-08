@@ -35,13 +35,92 @@ class CanDirectiveTest extends TestCase
         ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
+    public function testThrowsWithCustomMessageIfNotAuthorized(): void
+    {
+        // TODO remove with Laravel < 6 support
+        if (AppVersion::below(6.0)) {
+            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
+        }
+
+        $this->be(new User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User!
+                @can(ability: "superAdminOnly")
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ');
+        $response->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        $response->assertJson([
+            'errors' => [
+                [
+                    'message' => UserPolicy::SUPER_ADMINS_ONLY_MESSAGE,
+                ],
+            ],
+        ]);
+    }
+
+    public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
+    {
+        // TODO remove with Laravel < 6 support
+        if (AppVersion::below(6.0)) {
+            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
+        }
+
+        $this->be(new User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User!
+                @can(ability: ["superAdminOnly", "adminOnly"])
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ');
+        $response->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        $response->assertJson([
+            'errors' => [
+                [
+                    'message' => UserPolicy::SUPER_ADMINS_ONLY_MESSAGE,
+                ],
+            ],
+        ]);
+    }
+
     public function testPassesAuthIfAuthorized(): void
     {
         $user = new User;
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
@@ -75,7 +154,10 @@ class CanDirectiveTest extends TestCase
             $this->markTestSkipped('Version less than 5.7 do not support guest user.');
         }
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
@@ -109,7 +191,10 @@ class CanDirectiveTest extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User!
@@ -164,7 +249,10 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!
@@ -196,7 +284,10 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $this->mockResolver([$this, 'resolveUser']);
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!

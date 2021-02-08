@@ -14,7 +14,7 @@ class Foo
     /**
      * Return a value for the field.
      */
-    public function resolve(): string
+    public function __invoke(): string
     {
         return self::NOT_THE_ANSWER;
     }

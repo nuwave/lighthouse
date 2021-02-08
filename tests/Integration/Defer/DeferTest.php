@@ -11,14 +11,14 @@ use Tests\TestCase;
 
 class DeferTest extends TestCase
 {
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->setUpDeferStream();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -40,7 +40,7 @@ class DeferTest extends TestCase
 
         $this->assertContains(
             'defer',
-            $introspection->jsonGet('data.__schema.directives.*.name')
+            $introspection->json('data.__schema.directives.*.name')
         );
     }
 

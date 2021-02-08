@@ -2,13 +2,15 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
+use Exception;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Allows clients to filter a query based on the existence of a related model, using
 a dynamically controlled `WHERE` condition that applies to the relationship.
@@ -37,32 +39,37 @@ directive @whereHasConditions(
     """
     columnsEnum: String
 ) on ARGUMENT_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
-     * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Eloquent\Builder  The modified builder.
+     * @param  array<string, mixed>|null  $whereConditions The client given conditions
      */
-    public function handleBuilder($builder, $whereConditions)
+    public function handleBuilder($builder, $whereConditions): object
     {
-        // The value `null` should be allowed but have no effect on the query.
-        if (is_null($whereConditions)) {
+        if (null === $whereConditions) {
             return $builder;
         }
 
-        return $builder->whereHas(
-            $this->getRelationName(),
-            function ($builder) use ($whereConditions): void {
-                // This extra nesting is required for the `OR` condition to work correctly.
-                $builder->whereNested(
-                    function ($builder) use ($whereConditions): void {
-                        $this->handleWhereConditions($builder, $whereConditions);
-                    }
-                );
-            }
+        if (! $builder instanceof EloquentBuilder) {
+            throw new Exception('Can not get model from builder of class: '.get_class($builder));
+        }
+        $model = $builder->getModel();
+
+        $this->handleWhereConditions(
+            $builder,
+            [
+                'HAS' => [
+                    'relation' => $this->getRelationName(),
+                    'amount' => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
+                    'operator' => '>=',
+                    'condition' => $whereConditions,
+                ],
+            ],
+            $model
         );
+
+        return $builder;
     }
 
     /**
@@ -81,5 +88,10 @@ SDL;
         }
 
         return $relationName;
+    }
+
+    protected function generatedInputSuffix(): string
+    {
+        return 'WhereHasConditions';
     }
 }

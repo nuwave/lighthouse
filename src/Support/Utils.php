@@ -42,7 +42,7 @@ class Utils
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param  string  $className This class is resolved through the container.
+     * @param  class-string  $className This class is resolved through the container.
      * @param  string  $methodName The method that gets passed the arguments of the closure.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -53,7 +53,10 @@ class Utils
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
-        return Closure::fromCallable([app($className), $methodName]);
+        return Closure::fromCallable(
+            // @phpstan-ignore-next-line this works
+            [app($className), $methodName]
+        );
     }
 
     /**
@@ -82,16 +85,16 @@ class Utils
     /**
      * Apply a callback to a value or each value in an array.
      *
-     * @param  mixed|mixed[]  $valueOrValues
-     * @return mixed|mixed[]
+     * @param  mixed|array<mixed>  $valueOrValues
+     * @return mixed|array<mixed>
      */
     public static function applyEach(\Closure $callback, $valueOrValues)
     {
-        if (! is_array($valueOrValues)) {
-            return $callback($valueOrValues);
+        if (is_array($valueOrValues)) {
+            return array_map($callback, $valueOrValues);
         }
 
-        return array_map($callback, $valueOrValues);
+        return $callback($valueOrValues);
     }
 
     /**

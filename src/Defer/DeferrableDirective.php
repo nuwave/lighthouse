@@ -12,11 +12,10 @@ use Nuwave\Lighthouse\ClientDirectives\ClientDirective;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class DeferrableDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
+class DeferrableDirective extends BaseDirective implements FieldMiddleware
 {
     public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
     public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
@@ -24,13 +23,13 @@ class DeferrableDirective extends BaseDirective implements DefinedDirective, Fie
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Do not use this directive directly, it is automatically added to the schema
 when using the defer extension.
 """
 directive @deferrable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**
@@ -43,9 +42,6 @@ SDL;
         $this->defer = $defer;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
@@ -105,13 +101,12 @@ SDL;
         }
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
-        foreach ($includes as $include) {
-            if ($include === [Directive::IF_ARGUMENT_NAME => false]) {
-                return false;
-            }
-        }
 
-        return true;
+        return ! in_array(
+            [Directive::IF_ARGUMENT_NAME => false],
+            $includes,
+            true
+        );
     }
 
     /**

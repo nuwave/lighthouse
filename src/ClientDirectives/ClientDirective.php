@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\GraphQL;
  * Provides information about where client directives
  * were placed in the query and what arguments were given to them.
  *
- * TODO implement accessors for other locations http://spec.graphql.org/draft/#ExecutableDirectiveLocation
+ * TODO implement accessors for other locations https://spec.graphql.org/draft/#ExecutableDirectiveLocation
  */
 class ClientDirective
 {
@@ -24,7 +24,7 @@ class ClientDirective
     /**
      * @var \GraphQL\Type\Definition\Directive|null
      */
-    private $definition;
+    protected $definition;
 
     public function __construct(string $name)
     {
@@ -60,7 +60,7 @@ class ClientDirective
      */
     protected function definition(): Directive
     {
-        if ($this->definition) {
+        if ($this->definition !== null) {
             return $this->definition;
         }
 
@@ -68,10 +68,6 @@ class ClientDirective
         $graphQL = app(GraphQL::class);
         $schema = $graphQL->prepSchema();
 
-        /**
-         * TODO remove once graphql-php is accurate.
-         * @var \GraphQL\Type\Definition\Directive|null $definition
-         */
         $definition = $schema->getDirective($this->name);
         if ($definition === null) {
             throw new DefinitionException("Missing a schema definition for the client directive $this->name");

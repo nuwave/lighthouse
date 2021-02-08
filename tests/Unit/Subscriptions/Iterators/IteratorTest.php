@@ -11,10 +11,13 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\Unit\Subscriptions\SubscriptionTestCase;
+use Tests\TestCase;
+use Tests\TestsSubscriptions;
 
-abstract class IteratorTest extends SubscriptionTestCase
+abstract class IteratorTest extends TestCase
 {
+    use TestsSubscriptions;
+
     public function assertIteratesOverItemsWithCallback(SubscriptionIterator $iterator): void
     {
         $count = 2;
@@ -55,7 +58,9 @@ abstract class IteratorTest extends SubscriptionTestCase
      */
     protected function subscribers(int $count): Collection
     {
-        return Collection::times($count, [$this, 'generateSubscriber']);
+        return Collection::times($count, function (): Subscriber {
+            return $this->generateSubscriber();
+        });
     }
 
     public function generateSubscriber(): Subscriber

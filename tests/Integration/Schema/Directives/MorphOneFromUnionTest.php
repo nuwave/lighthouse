@@ -12,48 +12,38 @@ use Tests\Utils\Models\User;
 
 class MorphOneFromUnionTest extends DBTestCase
 {
-    /** @var \Tests\Utils\Models\Employee */
-    protected $employee;
-
-    /** @var \Tests\Utils\Models\Contractor */
-    protected $contractor;
-
-    /** @var \Tests\Utils\Models\Color */
-    protected $color1;
-
-    /** @var \Tests\Utils\Models\Color */
-    protected $color2;
-
-    protected function setUp(): void
+    public function testCanResolveMorphOneRelationshipOnInterface(): void
     {
-        parent::setUp();
+        /** @var \Tests\Utils\Models\Employee $employee */
+        $employee = factory(Employee::class)->create();
+        /** @var \Tests\Utils\Models\Contractor $contractor */
+        $contractor = factory(Contractor::class)->create();
 
         $companyId = factory(Company::class)->create()->getKey();
         $teamId = factory(Team::class)->create()->getKey();
 
-        $user1 = factory(User::class)->create([
+        /** @var \Tests\Utils\Models\User $employeeUser */
+        $employeeUser = factory(User::class)->create([
             'company_id' => $companyId,
             'team_id' => $teamId,
         ]);
-        $user2 = factory(User::class)->create([
+        /** @var \Tests\Utils\Models\User $contractorUser */
+        $contractorUser = factory(User::class)->create([
             'company_id' => $companyId,
             'team_id' => $teamId,
         ]);
 
-        $this->employee = factory(Employee::class)->create();
-        $this->contractor = factory(Contractor::class)->create();
-        $this->employee->user()->save($user1);
-        $this->contractor->user()->save($user2);
+        $employee->user()->save($employeeUser);
+        $contractor->user()->save($contractorUser);
 
-        $this->color1 = factory(Color::class)->create();
-        $this->color2 = factory(Color::class)->create();
+        /** @var \Tests\Utils\Models\Color $employeeColor */
+        $employeeColor = factory(Color::class)->create();
+        /** @var \Tests\Utils\Models\Color $contractorColor */
+        $contractorColor = factory(Color::class)->create();
 
-        $this->employee->colors()->save($this->color1);
-        $this->contractor->colors()->save($this->color2);
-    }
+        $employee->colors()->save($employeeColor);
+        $contractor->colors()->save($contractorColor);
 
-    public function testCanResolveMorphOneRelationshipOnInterface(): void
-    {
         $this->schema = /** @lang GraphQL */ '
         interface Person {
             id: ID!
@@ -113,28 +103,28 @@ class MorphOneFromUnionTest extends DBTestCase
             'data' => [
                 'colors' => [
                     [
-                        'id' => (string) $this->color1->id,
-                        'name' => $this->color1->name,
+                        'id' => (string) $employeeColor->id,
+                        'name' => $employeeColor->name,
                         'creator' => [
                             '__typename' => 'Employee',
-                            'id' => (string) $this->employee->id,
+                            'id' => (string) $employee->id,
                             'user' => [
-                                'id' => (string) $this->employee->user->id,
-                                'name' => $this->employee->user->name,
-                                'email' => $this->employee->user->email,
+                                'id' => (string) $employeeUser->id,
+                                'name' => $employeeUser->name,
+                                'email' => $employeeUser->email,
                             ],
                         ],
                     ],
                     [
-                        'id' => (string) $this->color2->id,
-                        'name' => $this->color2->name,
+                        'id' => (string) $contractorColor->id,
+                        'name' => $contractorColor->name,
                         'creator' => [
                             '__typename' => 'Contractor',
-                            'id' => (string) $this->contractor->id,
+                            'id' => (string) $contractor->id,
                             'user' => [
-                                'id' => (string) $this->contractor->user->id,
-                                'name' => $this->contractor->user->name,
-                                'email' => $this->contractor->user->email,
+                                'id' => (string) $contractorUser->id,
+                                'name' => $contractorUser->name,
+                                'email' => $contractorUser->email,
                             ],
                         ],
                     ],

@@ -2,107 +2,102 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
-class RelationBatchLoader extends BatchLoader
+class RelationBatchLoader
 {
     /**
-     * The name of the Eloquent relation to load.
+     * A map from unique keys to parent model instances.
      *
+     * @var array<string, \Illuminate\Database\Eloquent\Model>
+     */
+    protected $parents = [];
+
+    /**
+     * @var \Nuwave\Lighthouse\Execution\DataLoader\RelationLoader
+     */
+    protected $relationLoader;
+
+    /**
      * @var string
      */
     protected $relationName;
 
     /**
-     * This function is called with the relation query builder and may modify it.
+     * Marks when the actual batch loading happened.
      *
-     * @var \Closure
+     * @var bool
      */
-    protected $decorateBuilder;
+    protected $hasResolved = false;
 
     /**
-     * Optionally, a relation may be paginated.
-     *
-     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs
+     * Check if a loader has been registered.
      */
-    protected $paginationArgs;
-
-    /**
-     * @param  \Closure  $decorateBuilder
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationArgs  $paginationArgs
-     */
-    public function __construct(
-        string $relationName,
-        // Not using a type-hint to avoid resolving those params through the container
-        $decorateBuilder,
-        $paginationArgs = null
-    ) {
-        $this->relationName = $relationName;
-        $this->decorateBuilder = $decorateBuilder;
-        $this->paginationArgs = $paginationArgs;
+    public function hasRelationLoader(): bool
+    {
+        return $this->relationLoader !== null;
     }
 
     /**
-     * Resolve the keys.
+     * Register a relation loader.
      *
-     * @return array<string, mixed>
+     * Check hasRelation() before to avoid re-instantiating and re-registering the same loader.
      */
-    public function resolve(): array
+    public function registerRelationLoader(RelationLoader $relationLoader, string $relationName): void
     {
-        $relation = [$this->relationName => $this->decorateBuilder];
+        $this->relationLoader = $relationLoader;
+        $this->relationName = $relationName;
+    }
 
-        if ($this->paginationArgs !== null) {
-            $modelRelationFetcher = new ModelRelationFetcher(
-                $this->getParentModels(),
-                $relation
-            );
-            $models = $modelRelationFetcher->loadRelationsForPage($this->paginationArgs);
-        } else {
-            $models = $this->getParentModels()->load($relation);
+    /**
+     * Schedule loading a relation off of a concrete parent.
+     *
+     * This returns effectively a promise that will resolve to
+     * the result of loading the relation.
+     *
+     * As a side-effect, the parent will then hold the relation.
+     */
+    public function load(Model $parent): Deferred
+    {
+        $modelKey = ModelKey::build($parent);
+        $this->parents[$modelKey] = $parent;
+
+        return new Deferred(function () use ($modelKey) {
+            if (! $this->hasResolved) {
+                $this->resolve();
+            }
+
+            // When we are deep inside a nested query, we can come across the
+            // same model in two different paths, so this might be another
+            // model instance then $parent.
+            $parent = $this->parents[$modelKey];
+
+            return $this->relationLoader->extract($parent, $this->relationName);
+        });
+    }
+
+    public function resolve(): void
+    {
+        $parentModels = new EloquentCollection($this->parents);
+
+        // Monomorphize the models to simplify eager loading relations onto them
+        $parentsGroupedByClass = $parentModels->groupBy(
+            /**
+             * @return class-string<\Illuminate\Database\Eloquent\Model>
+             */
+            static function (Model $model): string {
+                return get_class($model);
+            },
+            true
+        );
+
+        foreach ($parentsGroupedByClass as $parentsOfSameClass) {
+            $this->relationLoader->load($parentsOfSameClass, $this->relationName);
         }
 
-        return $models
-            ->mapWithKeys(
-                /**
-                 * @return array<string, mixed>
-                 */
-                function (Model $model): array {
-                    return [$this->buildKey($model->getKey()) => $this->extractRelation($model)];
-                }
-            )
-            ->all();
-    }
-
-    /**
-     * Get the parents from the keys that are present on the BatchLoader.
-     */
-    protected function getParentModels(): EloquentCollection
-    {
-        return new EloquentCollection(
-            array_map(
-                function (array $meta) {
-                    return $meta['parent'];
-                },
-                $this->keys
-            )
-        );
-    }
-
-    /**
-     * Extract the relation that was loaded.
-     *
-     * @return mixed The model's relation.
-     */
-    protected function extractRelation(Model $model)
-    {
-        // Dot notation may be used to eager load nested relations
-        $parts = explode('.', $this->relationName);
-
-        // We just return the first level of relations for now. They
-        // hold the nested relations in case they are needed.
-        $firstRelation = $parts[0];
-
-        return $model->getRelation($firstRelation);
+        $this->hasResolved = true;
     }
 }

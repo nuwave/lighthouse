@@ -103,7 +103,7 @@ class PostUpdated extends GraphQLSubscription
      * Resolve the subscription.
      *
      * @param  \App\Post  $root
-     * @param  mixed[]  $args
+     * @param  array<string, mixed>  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed

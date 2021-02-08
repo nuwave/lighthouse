@@ -25,8 +25,6 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     }
 
     /**
-     * Get the default namespace for the class.
-     *
      * @param  string  $rootNamespace
      */
     protected function getDefaultNamespace($rootNamespace): string
@@ -46,7 +44,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      *
      * For example, ['App\\Foo\\A', 'App\\Foo\\B'] would return 'App\\Foo'.
      *
-     * @param  string[]  $namespaces
+     * @param  array<string>  $namespaces
      */
     public static function commonNamespace(array $namespaces): string
     {
@@ -60,13 +58,13 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
             return reset($namespaces);
         }
 
-        // Save the first namespac
+        // Save the first namespace
         $preferredNamespaceFallback = reset($namespaces);
 
         // If the strings are sorted, any prefix common to all strings
         // will be common to the sorted first and last strings.
         // All the strings in the middle can be ignored.
-        sort($namespaces);
+        \Safe\sort($namespaces);
 
         $firstParts = explode('\\', reset($namespaces));
         $lastParts = explode('\\', end($namespaces));

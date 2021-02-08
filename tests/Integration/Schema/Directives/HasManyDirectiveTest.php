@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
@@ -26,14 +27,14 @@ class HasManyDirectiveTest extends DBTestCase
      */
     protected $tasks;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->user = factory(User::class)->create();
-        $this->tasks = factory(Task::class, 3)->create([
-            'user_id' => $this->user->getKey(),
-        ]);
+        $this->tasks = factory(Task::class, 3)->make();
+        $this->user->tasks()->saveMany($this->tasks);
+
         factory(Task::class)->create([
             'user_id' => $this->user->getKey(),
             // This task should be ignored via global scope on the Task model
@@ -78,6 +79,44 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.tasks');
     }
 
+    public function testCanQueryHasManyWithCondition(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks(
+                id: ID @eq
+            ): [Task!]! @hasMany
+        }
+
+        type Task {
+            id: Int
+            foo: String
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        /** @var Task $firstTask */
+        $firstTask = $this->user->tasks->first();
+
+        // Ensure global scopes are respected here
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID){
+                user {
+                    tasks(id: $id) {
+                        id
+                    }
+                }
+            }
+            ', [
+                'id' => $firstTask->id,
+            ])
+            ->assertJsonCount(1, 'data.user.tasks');
+    }
+
     public function testCallsScopeWithResolverArgs(): void
     {
         $this->assertCount(3, $this->user->tasks);
@@ -112,8 +151,8 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator")
-            posts: [Post!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
+            posts: [Post!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -163,7 +202,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [NotTheModelNameTask!]! @hasMany(type: "paginator")
+            tasks: [NotTheModelNameTask!]! @hasMany(type: PAGINATOR)
         }
 
         type NotTheModelNameTask {
@@ -211,7 +250,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator", maxCount: 3)
+            tasks: [Task!]! @hasMany(type: PAGINATOR, maxCount: 3)
         }
 
         type Task {
@@ -237,7 +276,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 5),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -246,7 +285,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID
-            tasks: [Task!] @hasMany(type: "paginator")
+            tasks: [Task!] @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -285,7 +324,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay", maxCount: 3)
+            tasks: [Task!]! @hasMany(type: CONNECTION, maxCount: 3)
         }
 
         type Task {
@@ -313,7 +352,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 5),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -323,7 +362,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -349,7 +388,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -359,7 +398,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay")
+            tasks: [Task!]! @hasMany(type: CONNECTION)
         }
 
         type Task {
@@ -387,7 +426,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -396,7 +435,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany (
-                type: "relay"
+                type: CONNECTION
                 edgeType: "TaskEdge"
             )
         }
@@ -423,10 +462,13 @@ class HasManyDirectiveTest extends DBTestCase
         );
 
         $user = $this->introspectType('User');
+
+        $this->assertNotNull($user);
+        /** @var array<string, mixed> $user */
         $tasks = Arr::first(
             $user['fields'],
-            function (array $user): bool {
-                return $user['name'] === 'tasks';
+            function (array $field): bool {
+                return $field['name'] === 'tasks';
             }
         );
         $this->assertSame(
@@ -439,7 +481,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator", defaultCount: 2)
+            tasks: [Task!]! @hasMany(type: PAGINATOR, defaultCount: 2)
         }
 
         type Task {
@@ -485,7 +527,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay")
+            tasks: [Task!]! @hasMany(type: CONNECTION)
         }
 
         type Task {
@@ -529,7 +571,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay", defaultCount: 2)
+            tasks: [Task!]! @hasMany(type: CONNECTION, defaultCount: 2)
         }
 
         type Task {
@@ -573,7 +615,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: "relay")
+            tasks: [Task!]! @hasMany(type: CONNECTION)
         }
 
         type Task {
@@ -693,11 +735,11 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
+        $this->expectExceptionMessage('Found invalid pagination type: foo');
 
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
-            tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
+            tasks(first: Int! after: Int): [Task!]! @hasMany(type: "foo")
         }
 
         type Task {
@@ -706,6 +748,9 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $type = $schema->getType('User');
+
+        $this->assertInstanceOf(Type::class, $type);
+        /** @var \GraphQL\Type\Definition\Type $type */
         $type->config['fields']();
     }
 
@@ -715,7 +760,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: Int!
-            tasks: [Task!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {
@@ -750,7 +795,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         type User {
             id: Int!
-            tasks: [Task!]! @hasMany(type: "paginator")
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
         }
 
         type Task {

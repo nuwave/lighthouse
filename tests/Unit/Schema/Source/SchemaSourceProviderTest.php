@@ -20,7 +20,7 @@ class SchemaSourceProviderTest extends TestCase
      */
     protected $filesystem;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -43,14 +43,5 @@ class SchemaSourceProviderTest extends TestCase
         $currentDir = new Filesystem(new Local(__DIR__));
 
         $currentDir->deleteDir('schema');
-    }
-
-    public function testCanSetRootPath(): void
-    {
-        $this->filesystem->put('foo', 'bar');
-
-        app(SchemaSourceProvider::class)->setRootPath(__DIR__.'/schema/foo');
-
-        $this->assertSame('bar'.PHP_EOL, app(SchemaSourceProvider::class)->getSchemaString());
     }
 }

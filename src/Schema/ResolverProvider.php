@@ -20,39 +20,15 @@ class ResolverProvider implements ProvidesResolver
     public function provideResolver(FieldValue $fieldValue): Closure
     {
         if ($fieldValue->parentIsRootType()) {
-            // TODO use only __invoke in v5
-            $resolverClass = $this->findResolverClass($fieldValue, 'resolve');
-            if ($resolverClass) {
-                return Closure::fromCallable(
-                    [app($resolverClass), 'resolve']
-                );
-            }
-
             $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
-            if ($resolverClass) {
-                return Closure::fromCallable(
-                    [app($resolverClass), '__invoke']
-                );
+            if ($resolverClass === null) {
+                $this->throwMissingResolver($fieldValue);
             }
 
-            if (! $resolverClass) {
-                // Since we already know we are on the root type, this is either
-                // query, mutation or subscription
-                $parent = lcfirst($fieldValue->getParentName());
-                $fieldName = $fieldValue->getFieldName();
-                $proposedResolverClass = ucfirst($fieldName);
-
-                throw new DefinitionException(<<<MESSAGE
-Could not locate a field resolver for the {$parent}: {$fieldName}.
-
-Either add a resolver directive such as @all, @find or @create or add
-a resolver class through:
-
-php artisan lighthouse:{$parent} {$proposedResolverClass}
-
-MESSAGE
-                );
-            }
+            return Closure::fromCallable(
+                // @phpstan-ignore-next-line this works
+                [app($resolverClass), '__invoke']
+            );
         }
 
         return Closure::fromCallable(
@@ -71,6 +47,29 @@ MESSAGE
             function (string $class) use ($methodName): bool {
                 return method_exists($class, $methodName);
             }
+        );
+    }
+
+    /**
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
+    protected function throwMissingResolver(FieldValue $fieldValue): void
+    {
+        // Since we already know we are on the root type, this is either
+        // query, mutation or subscription
+        $parent = lcfirst($fieldValue->getParentName());
+        $fieldName = $fieldValue->getFieldName();
+        $proposedResolverClass = ucfirst($fieldName);
+
+        throw new DefinitionException(<<<MESSAGE
+Could not locate a field resolver for the {$parent}: {$fieldName}.
+
+Either add a resolver directive such as @all, @find or @create or add
+a resolver class through:
+
+php artisan lighthouse:{$parent} {$proposedResolverClass}
+
+MESSAGE
         );
     }
 }

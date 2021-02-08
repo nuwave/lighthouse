@@ -3,11 +3,15 @@
 namespace Nuwave\Lighthouse\Defer;
 
 use Closure;
+use GraphQL\Language\Parser;
+use GraphQL\Server\Helper;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,17 +29,22 @@ class Defer implements CreatesResponse
     protected $graphQL;
 
     /**
-     * @var mixed[]
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
+     * @var array<string, mixed>
      */
     protected $result = [];
 
     /**
-     * @var mixed[]
+     * @var array<string, \Closure(): mixed>
      */
     protected $deferred = [];
 
     /**
-     * @var mixed[]
+     * @var array<int, mixed>
      */
     protected $resolved = [];
 
@@ -59,10 +68,11 @@ class Defer implements CreatesResponse
      */
     protected $maxNestedFields = 0;
 
-    public function __construct(CanStreamResponse $stream, GraphQL $graphQL)
+    public function __construct(CanStreamResponse $stream, GraphQL $graphQL, Container $container)
     {
         $this->stream = $stream;
         $this->graphQL = $graphQL;
+        $this->container = $container;
         $this->maxNestedFields = config('lighthouse.defer.max_nested_fields', 0);
     }
 
@@ -73,11 +83,11 @@ class Defer implements CreatesResponse
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            PartialParser::directive(/** @lang GraphQL */ '@deferrable')
+            Parser::constDirective(/** @lang GraphQL */ '@deferrable')
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
-            PartialParser::directiveDefinition(/** @lang GraphQL */ '
+            Parser::directiveDefinition(/** @lang GraphQL */ '
 """
 Use this directive on expensive or slow fields to resolve them asynchronously.
 Must not be placed upon:
@@ -97,6 +107,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Register deferred field.
      *
+     * @param  \Closure(): mixed  $resolver
      * @return mixed The data if it is already available.
      */
     public function defer(Closure $resolver, string $path)
@@ -110,9 +121,12 @@ directive @defer(if: Boolean = true) on FIELD
         }
 
         $this->deferred[$path] = $resolver;
+
+        return null;
     }
 
     /**
+     * @param  \Closure(): mixed  $originalResolver
      * @return mixed The loaded data.
      */
     public function findOrResolve(Closure $originalResolver, string $path)
@@ -131,6 +145,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Resolve field with data or resolver.
      *
+     * @param  \Closure(): mixed  $originalResolver
      * @return mixed The result of calling the resolver.
      */
     public function resolve(Closure $originalResolver, string $path)
@@ -162,7 +177,7 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Return either a final response or a stream of responses.
      *
-     * @param  mixed[]  $result
+     * @param  array<mixed>  $result
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function createResponse(array $result): Response
@@ -194,7 +209,7 @@ directive @defer(if: Boolean = true) on FIELD
                 // We've hit the max execution time or max nested levels of deferred fields.
                 // We process remaining deferred fields, but are no longer allowing additional
                 // fields to be deferred.
-                if (count($this->deferred)) {
+                if (count($this->deferred) > 0) {
                     $this->acceptFurtherDeferring = false;
                     $this->executeDeferred();
                 }
@@ -249,8 +264,10 @@ directive @defer(if: Boolean = true) on FIELD
      */
     protected function executeDeferred(): void
     {
-        $this->result = app()->call(
-            [$this->graphQL, 'executeRequest']
+        $this->result = $this->container->call(
+            function (Request $request, RequestParser $requestParser, Helper $graphQLHelper) {
+                return $this->graphQL->executeRequest($request, $requestParser, $graphQLHelper);
+            }
         );
 
         $this->stream->stream(

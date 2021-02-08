@@ -36,7 +36,8 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     {
         $fieldName = $fieldValue->getFieldName();
 
-        if ($directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME)) {
+        $directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME);
+        if ($directive !== null) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
             $className = Str::studly($fieldName);
@@ -87,6 +88,8 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
                 $subscriber,
                 $subscription->encodeTopic($subscriber, $fieldName)
             );
+
+            return null;
         };
     }
 }

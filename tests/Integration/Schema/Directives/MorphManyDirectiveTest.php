@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Exception;
 use GraphQL\Error\Error;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
@@ -43,7 +44,7 @@ class MorphManyDirectiveTest extends DBTestCase
      */
     protected $postImages;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -54,12 +55,18 @@ class MorphManyDirectiveTest extends DBTestCase
         ]);
         $this->taskImages = Collection
             ::times(10)
-            ->map(function () {
-                return $this->task
+            ->map(function (): Image {
+                $image = $this->task
                     ->images()
                     ->save(
                         factory(Image::class)->create()
                     );
+
+                if ($image === false) {
+                    throw new Exception('Failed to save Image');
+                }
+
+                return $image;
             });
 
         $this->post = factory(Post::class)->create([
@@ -70,11 +77,17 @@ class MorphManyDirectiveTest extends DBTestCase
                 $this->faker()->numberBetween(1, 10)
             )
             ->map(function () {
-                return $this->post
+                $image = $this->post
                     ->images()
                     ->save(
                         factory(Image::class)->create()
                     );
+
+                if ($image === false) {
+                    throw new Exception('Failed to save Image');
+                }
+
+                return $image;
             });
     }
 
@@ -161,7 +174,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: PAGINATOR)
         }
 
         type Image {
@@ -214,7 +227,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator", maxCount: 3)
+            images: [Image!] @morphMany(type: PAGINATOR, maxCount: 3)
         }
 
         type Image {
@@ -244,7 +257,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -256,7 +269,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: PAGINATOR)
         }
 
         type Image {
@@ -286,7 +299,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -296,7 +309,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: "paginator")
+            images: [Image!] @morphMany(type: PAGINATOR)
         }
 
         type Image {
@@ -339,7 +352,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "paginator", defaultCount: 3)
+            images: [Image!] @morphMany(type: PAGINATOR, defaultCount: 3)
         }
 
         type Image {
@@ -393,7 +406,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay")
+            images: [Image!] @morphMany(type: CONNECTION)
         }
 
         type Image {
@@ -447,7 +460,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay", maxCount: 3)
+            images: [Image!] @morphMany(type: CONNECTION, maxCount: 3)
         }
 
         type Image {
@@ -479,7 +492,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -491,7 +504,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay")
+            images: [Image!] @morphMany(type: CONNECTION)
         }
 
         type Image {
@@ -523,7 +536,7 @@ class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
-            $result->jsonGet('errors.0.message')
+            $result->json('errors.0.message')
         );
     }
 
@@ -533,7 +546,7 @@ class MorphManyDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
-            images: [Image!] @morphMany(type: "relay", defaultCount: 3)
+            images: [Image!] @morphMany(type: CONNECTION, defaultCount: 3)
         }
 
         type Image {

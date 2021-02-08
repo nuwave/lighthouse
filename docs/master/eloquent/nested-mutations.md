@@ -356,7 +356,7 @@ We will start off by defining a mutation to update a `User`.
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateeUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User @update
 }
 ```
 
@@ -765,7 +765,7 @@ You will get the following response:
 }
 ```
 
-It is also possible to use the `sync` and `syncWithoutDetach` operations.
+It is also possible to use the `sync` and `syncWithoutDetaching` operations.
 
 ## MorphToMany
 

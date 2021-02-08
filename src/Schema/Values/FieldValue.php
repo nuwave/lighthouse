@@ -3,11 +3,14 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
+use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -37,16 +40,11 @@ class FieldValue
     /**
      * The actual field resolver.
      *
-     * @var callable|null
+     * Lazily initialized through setResolver().
+     *
+     * @var callable
      */
     protected $resolver;
-
-    /**
-     * Text describing by this field is deprecated.
-     *
-     * @var string|null
-     */
-    protected $deprecationReason = null;
 
     /**
      * A closure that determines the complexity of executing the field.
@@ -100,23 +98,11 @@ class FieldValue
     }
 
     /**
-     * Set deprecation reason for field.
-     *
-     * @return $this
-     */
-    public function setDeprecationReason(string $deprecationReason): self
-    {
-        $this->deprecationReason = $deprecationReason;
-
-        return $this;
-    }
-
-    /**
      * Get an instance of the return type of the field.
      */
     public function getReturnType(): Type
     {
-        if (! isset($this->returnType)) {
+        if ($this->returnType === null) {
             /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
             $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
             $this->returnType = $typeNodeConverter->convert($this->field->type);
@@ -125,9 +111,6 @@ class FieldValue
         return $this->returnType;
     }
 
-    /**
-     * @return \Nuwave\Lighthouse\Schema\Values\TypeValue
-     */
     public function getParent(): TypeValue
     {
         return $this->parent;
@@ -149,7 +132,7 @@ class FieldValue
     /**
      * Get field resolver.
      */
-    public function getResolver(): ?callable
+    public function getResolver(): callable
     {
         return $this->resolver;
     }
@@ -157,7 +140,7 @@ class FieldValue
     /**
      * Return the namespaces configured for the parent type.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function defaultNamespacesForParent(): array
     {
@@ -191,16 +174,54 @@ class FieldValue
         return $this->field->name->value;
     }
 
-    public function getDeprecationReason(): ?string
-    {
-        return $this->deprecationReason;
-    }
-
     /**
      * Is the parent of this field one of the root types?
      */
     public function parentIsRootType(): bool
     {
         return RootType::isRootType($this->getParentName());
+    }
+
+    /**
+     * Register a function that will receive the final result and resolver arguments.
+     *
+     * For example, the following handler tries to double the result.
+     * This is somewhat non-sensical, but shows the range of what you can do.
+     *
+     * function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+     *     if (is_numeric($result)) {
+     *         // A common use-case is to transform the result
+     *         $result = $result * 2;
+     *     }
+     *
+     *     // You can also filter results conditionally
+     *     if ($result === 42) {
+     *          return null;
+     *     }
+     *
+     *     // You can also run side-effects
+     *     Log::debug("Doubled to {$result}.");
+     *
+     *     // Don't forget to return something
+     *     return $result;
+     * }
+     *
+     * @param callable(mixed $result, array<string, mixed> $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
+     */
+    public function resultHandler(callable $handle): void
+    {
+        $previousResolver = $this->resolver;
+
+        $this->resolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $handle) {
+            $resolved = $previousResolver($root, $args, $context, $resolveInfo);
+
+            if ($resolved instanceof Deferred) {
+                return $resolved->then(static function ($result) use ($handle, $args, $context, $resolveInfo) {
+                    return $handle($result, $args, $context, $resolveInfo);
+                });
+            }
+
+            return $handle($resolved, $args, $context, $resolveInfo);
+        };
     }
 }

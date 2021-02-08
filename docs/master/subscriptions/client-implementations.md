@@ -1,12 +1,12 @@
 # Client Implementations
 
-To get you up and running quickly, the following sections show how to use subcriptions
+To get you up and running quickly, the following sections show how to use subscriptions
 with common GraphQL client libraries.
 
-## Apollo
+## Apollo for Pusher
 
-To use Lighthouse subscriptions with the [Apollo](https://www.apollographql.com/docs/react/)
-client library you will need to create an `apollo-link`
+To use Lighthouse Pusher subscriptions with the [Apollo](https://www.apollographql.com/docs/react/)
+client library you will need to create an `apollo-link`:
 
 ```js
 import { ApolloLink, Observable } from "apollo-link";
@@ -41,7 +41,8 @@ class PusherLink extends ApolloLink {
       forward(operation).subscribe({
         next: (data) => {
           // If the operation has the subscription channel, it's a subscription
-          subscriptionChannel = this.getChannelFromResponse(data, operation);
+          subscriptionChannel =
+            data?.extensions?.lighthouse_subscriptions.channel ?? null;
 
           // No subscription found in the response, pipe data through
           if (!subscriptionChannel) {
@@ -89,16 +90,6 @@ class PusherLink extends ApolloLink {
   unsubscribeFromChannel(subscriptionChannel) {
     this.pusher.unsubscribe(subscriptionChannel);
   }
-
-  getChannelFromResponse(response, operation) {
-    return !!response.extensions &&
-      !!response.extensions.lighthouse_subscriptions &&
-      !!response.extensions.lighthouse_subscriptions.channels
-      ? response.extensions.lighthouse_subscriptions.channels[
-          operation.operationName
-        ]
-      : null;
-  }
 }
 
 // Turn `subscribe` arguments into an observer-like thing, see getObserver
@@ -142,9 +133,14 @@ const pusherLink = new PusherLink({
 const link = ApolloLink.from([pusherLink, httpLink(`${API_LOCATION}/graphql`)]);
 ```
 
+## Apollo for Laravel Echo
+
+If you are using the Laravel Echo subscription driver with Apollo
+you can use [this apollo link](https://github.com/thekonz/apollo-lighthouse-subscription-link).
+
 ## Relay Modern
 
-To use Lighthouse's subscriptions with Relay Modern you will
+To use Lighthouse's Pusher subscriptions with Relay Modern you will
 need to create a custom handler and inject it into Relay's environment.
 
 ```js
@@ -179,13 +175,7 @@ const createHandler = (options) => {
         })
         .then((json) => {
           channelName =
-            !!response.extensions &&
-            !!response.extensions.lighthouse_subscriptions &&
-            !!response.extensions.lighthouse_subscriptions.channels
-              ? response.extensions.lighthouse_subscriptions.channels[
-                  operation.name
-                ]
-              : null;
+            response?.extensions?.lighthouse_subscriptions.channel ?? null;
 
           if (!channelName) {
             return;

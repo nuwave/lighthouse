@@ -4,6 +4,10 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
 
+/**
+ * @deprecated implement your own batch loader instead.
+ * @see \Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry to resolve instances.
+ */
 abstract class BatchLoader
 {
     /**
@@ -91,12 +95,10 @@ abstract class BatchLoader
     /**
      * Schedule a result to be loaded.
      *
-     * @param  array<string>|string  $key
      * @param  array<mixed>  $metaInfo
      */
-    public function load($key, array $metaInfo = []): Deferred
+    public function load(string $key, array $metaInfo = []): Deferred
     {
-        $key = $this->buildKey($key);
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
@@ -114,7 +116,7 @@ abstract class BatchLoader
      *
      * @param  array<mixed>  $keys
      * @param  array<mixed>  $metaInfo
-     * @return \GraphQL\Deferred[]
+     * @return array<\GraphQL\Deferred>
      */
     public function loadMany(array $keys, array $metaInfo = []): array
     {
@@ -134,18 +136,4 @@ abstract class BatchLoader
      * @return array<mixed, mixed>
      */
     abstract public function resolve(): array;
-
-    /**
-     * Build a key out of one or more given keys, supporting composite keys.
-     *
-     * E.g.: $primaryKey = ['key1', 'key2'];.
-     *
-     * @param  array<string>|string  $key
-     */
-    protected function buildKey($key): string
-    {
-        return is_array($key)
-            ? implode('___', $key)
-            : $key;
-    }
 }

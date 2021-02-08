@@ -2,13 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-
-class ScalarDirective extends BaseDirective implements DefinedDirective
+class ScalarDirective extends BaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Reference a class implementing a scalar definition.
 """
@@ -18,6 +16,6 @@ directive @scalar(
   """
   class: String!
 ) on SCALAR
-SDL;
+GRAPHQL;
     }
 }

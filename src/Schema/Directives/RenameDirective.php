@@ -4,16 +4,16 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class RenameDirective extends BaseDirective implements FieldResolver, DefinedDirective
+class RenameDirective extends BaseDirective implements FieldResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Change the internally used name of a field or argument.
+
 This does not change the schema from a client perspective.
 """
 directive @rename(
@@ -22,12 +22,9 @@ directive @rename(
   """
   attribute: String!
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $attribute = $this->attributeArgValue();
@@ -42,7 +39,6 @@ SDL;
     /**
      * Retrieves the attribute argument for the directive.
      *
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function attributeArgValue(): string
@@ -51,7 +47,7 @@ SDL;
 
         if (! $attribute) {
             throw new DefinitionException(
-                "The [{$this->name()}] directive requires an `attribute` argument."
+                "The @{$this->name()} directive requires an `attribute` argument."
             );
         }
 

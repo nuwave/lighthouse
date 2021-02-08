@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Carbon\Carbon;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
+use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Tests\TestCase;
 
@@ -36,10 +36,18 @@ abstract class DateScalarTest extends TestCase
         $this->scalarInstance()->parseValue($value);
     }
 
+    public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
+    {
+        $this->assertInstanceOf(
+            \Illuminate\Support\Carbon::class,
+            $this->scalarInstance()->parseValue(\Carbon\Carbon::now())
+        );
+    }
+
     /**
      * Those values should fail passing as a date.
      *
-     * @return mixed[]
+     * @return array<array<mixed>>
      */
     public function invalidDateValues(): array
     {
@@ -51,18 +59,24 @@ abstract class DateScalarTest extends TestCase
         ];
     }
 
-    public function testParsesValueString(): void
+    /**
+     * @dataProvider validDates
+     */
+    public function testParsesValueString(string $date): void
     {
         $this->assertInstanceOf(
             Carbon::class,
-            $this->scalarInstance()->parseValue($this->validDate())
+            $this->scalarInstance()->parseValue($date)
         );
     }
 
-    public function testParsesLiteral(): void
+    /**
+     * @dataProvider validDates
+     */
+    public function testParsesLiteral(string $date): void
     {
         $dateLiteral = new StringValueNode(
-            ['value' => $this->validDate()]
+            ['value' => $date]
         );
         $parsed = $this->scalarInstance()->parseLiteral($dateLiteral);
 
@@ -80,21 +94,41 @@ abstract class DateScalarTest extends TestCase
 
     public function testSerializesCarbonInstance(): void
     {
-        $now = now();
+        $now = Carbon::now();
         $result = $this->scalarInstance()->serialize($now);
 
-        $this->assertInternalType('string', $result);
+        // TODO use native assertIsString when upgrading PHPUnit
+        $this->assertTrue(is_string($result));
     }
 
-    public function testSerializesValidDateString(): void
+    /**
+     * @dataProvider canonicalizeDates
+     */
+    public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
-        $date = $this->validDate();
         $result = $this->scalarInstance()->serialize($date);
 
-        $this->assertSame($date, $result);
+        $this->assertSame($canonical, $result);
     }
 
+    /**
+     * The specific instance under test.
+     */
     abstract protected function scalarInstance(): DateScalar;
 
-    abstract protected function validDate(): string;
+    /**
+     * Data provider for valid date strings.
+     *
+     * @return array<array<string>>
+     */
+    abstract public function validDates(): array;
+
+    /**
+     * Data provider with pairs of dates:
+     * 1. A valid representation of the date
+     * 1. The canonical representation of the date.
+     *
+     * @return array<array<string>>
+     */
+    abstract public function canonicalizeDates(): array;
 }

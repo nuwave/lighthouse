@@ -5,43 +5,40 @@ namespace Tests\Unit\Schema\Directives;
 use GraphQL\Type\Definition\Directive;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
-use Tests\Utils\Resolvers\Foo;
 
 class DeprecatedDirectiveTest extends TestCase
 {
     public function testCanRemoveDeprecatedFieldsFromIntrospection(): void
     {
         $reason = 'Use `bar` field';
-        $resolver = addslashes(Foo::class).'@bar';
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ "
         type Query {
-            foo: String @field(resolver: \"{$resolver}\")
-                @deprecated(reason: \"{$reason}\") 
-            withDefaultReason: String @field(resolver: \"{$resolver}\")
+            withReason: String @mock
+                @deprecated(reason: \"{$reason}\")
+            withDefaultReason: String @mock
                 @deprecated
-            bar: String @field(resolver: \"{$resolver}\")
+            notDeprecated: String @mock
+        }
+
+        enum Foo {
+            DEPRECATED @deprecated
+            NOT_DEPRECATED
         }
         ";
 
-        $introspectionQuery = '
-        {
+        $introspectionQuery = /** @lang GraphQL */ '
+        query ($includeDeprecated: Boolean!) {
             __schema {
                 queryType {
-                    fields {
+                    fields(includeDeprecated: $includeDeprecated) {
                         name
+                        isDeprecated
+                        deprecationReason
                     }
                 }
-            }
-        }
-        ';
-        $this->graphQL($introspectionQuery)
-            ->assertJsonCount(1, 'data.__schema.queryType.fields');
-
-        $includeDeprecatedIntrospectionQuery = '
-        {
-            __schema {
-                queryType {
-                    fields(includeDeprecated: true) {
+                types {
+                    name
+                    enumValues(includeDeprecated: $includeDeprecated) {
                         name
                         isDeprecated
                         deprecationReason
@@ -50,10 +47,29 @@ class DeprecatedDirectiveTest extends TestCase
             }
         }
         ';
-        $result = $this->graphQL($includeDeprecatedIntrospectionQuery);
+        $withoutDeprecatedIntrospection = $this->graphQL(
+            $introspectionQuery,
+            [
+                'includeDeprecated' => false,
+            ]
+        );
+
+        $withoutDeprecatedIntrospection->assertJsonCount(1, 'data.__schema.queryType.fields');
+        $types = $withoutDeprecatedIntrospection->json('data.__schema.types');
+        $foo = Arr::first($types, static function (array $type): bool {
+            return $type['name'] === 'Foo';
+        });
+        $this->assertCount(1, $foo['enumValues']);
+
+        $includeDeprecatedIntrospection = $this->graphQL(
+            $introspectionQuery,
+            [
+                'includeDeprecated' => true,
+            ]
+        );
 
         $deprecatedFields = Arr::where(
-            $result->jsonGet('data.__schema.queryType.fields'),
+            $includeDeprecatedIntrospection->json('data.__schema.queryType.fields'),
             function (array $field): bool {
                 return $field['isDeprecated'];
             }
@@ -70,14 +86,10 @@ class DeprecatedDirectiveTest extends TestCase
             'Should fallback to the default deprecation reason'
         );
 
-        $this->graphQL('
-        {
-            foo
-        }
-        ')->assertJson([
-            'data' => [
-                'foo' => 'foo.bar',
-            ],
-        ]);
+        $types = $includeDeprecatedIntrospection->json('data.__schema.types');
+        $foo = Arr::first($types, static function (array $type): bool {
+            return $type['name'] === 'Foo';
+        });
+        $this->assertCount(2, $foo['enumValues']);
     }
 }

@@ -5,12 +5,12 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 interface Directive
 {
     /**
-     * Name of the directive as used in the schema.
+     * Formal directive specification in schema definition language (SDL).
      *
-     * @deprecated will be replaced by definition(): string
-     * @see \Nuwave\Lighthouse\Support\Contracts\DefinedDirective
+     * @see https://spec.graphql.org/draft/#sec-Type-System.Directives
      *
-     * @return string
+     * This must contain a single directive definition, but can also contain
+     * auxiliary types, such as enum definitions for directive arguments.
      */
-    public function name();
+    public static function definition(): string;
 }

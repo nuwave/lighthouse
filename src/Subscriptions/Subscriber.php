@@ -3,20 +3,21 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Serializable;
 
 class Subscriber implements Serializable
 {
-    public const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
-
     /**
-     * A unique key for the subscriber.
+     * A unique key for the subscriber's channel.
+     *
+     * This has to be unique for each subscriber, because each of them can send a different
+     * query and must receive a response that is specifically tailored towards that.
      *
      * @var string
      */
@@ -37,11 +38,14 @@ class Subscriber implements Serializable
     public $query;
 
     /**
-     * The name of the queried operation.
+     * The name of the queried field.
+     *
+     * Guaranteed be be unique because of
+     * @see \GraphQL\Validator\Rules\SingleFieldSubscription
      *
      * @var string
      */
-    public $operationName;
+    public $fieldName;
 
     /**
      * The root element of the query.
@@ -53,9 +57,16 @@ class Subscriber implements Serializable
     /**
      * The args passed to the subscription query.
      *
-     * @var mixed[]
+     * @var array<string, mixed>
      */
     public $args;
+
+    /**
+     * The variables passed to the subscription query.
+     *
+     * @var array<string, mixed>
+     */
+    public $variables;
 
     /**
      * The context passed to the query.
@@ -65,31 +76,32 @@ class Subscriber implements Serializable
     public $context;
 
     /**
-     * @param  mixed[]  $args
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
+     * @param  array<string, mixed>  $args
      */
     public function __construct(
         array $args,
         GraphQLContext $context,
         ResolveInfo $resolveInfo
     ) {
-        $operationName = $resolveInfo->operation->name;
-
-        // TODO remove that check and associated tests once graphql-php covers that validation https://github.com/webonyx/graphql-php/pull/644
-        if (! $operationName) { // @phpstan-ignore-line TODO remove when upgrading graphql-php
-            throw new SubscriptionException(self::MISSING_OPERATION_NAME);
-        }
-        $this->operationName = $operationName->value;
-
+        $this->fieldName = $resolveInfo->fieldName;
         $this->channel = self::uniqueChannelName();
         $this->args = $args;
+        $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
 
-        $documentNode = new DocumentNode([]);
-        $documentNode->definitions = $resolveInfo->fragments;
-        $documentNode->definitions[] = $resolveInfo->operation;
-        $this->query = $documentNode;
+        /**
+         * Must be here, since webonyx/graphql-php validated the subscription.
+         *
+         * @var \GraphQL\Language\AST\OperationDefinitionNode $operation
+         */
+        $operation = $resolveInfo->operation;
+
+        $this->query = new DocumentNode([
+            'definitions' => new NodeList(array_merge(
+                $resolveInfo->fragments,
+                [$operation]
+            )),
+        ]);
     }
 
     /**
@@ -99,15 +111,23 @@ class Subscriber implements Serializable
      */
     public function unserialize($subscription): void
     {
-        $data = json_decode($subscription, true);
+        $data = \Safe\json_decode($subscription, true);
 
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
-        $this->query = AST::fromArray( // @phpstan-ignore-line We know this will be exactly a DocumentNode and nothing else
+
+        /**
+         * We know the type since it is set during construction and serialized.
+         *
+         * @var \GraphQL\Language\AST\DocumentNode $documentNode
+         */
+        $documentNode = AST::fromArray(
             unserialize($data['query'])
         );
-        $this->operationName = $data['operation_name'];
+        $this->query = $documentNode;
+        $this->fieldName = $data['field_name'];
         $this->args = $data['args'];
+        $this->variables = $data['variables'];
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
@@ -118,30 +138,24 @@ class Subscriber implements Serializable
      */
     public function serialize(): string
     {
-        $serialized = json_encode([
+        return \Safe\json_encode([
             'channel' => $this->channel,
             'topic' => $this->topic,
             'query' => serialize(
                 AST::toArray($this->query)
             ),
-            'operation_name' => $this->operationName,
+            'field_name' => $this->fieldName,
             'args' => $this->args,
+            'variables' => $this->variables,
             'context' => $this->contextSerializer()->serialize($this->context),
         ]);
-
-        // TODO use \Safe\json_encode
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('Tried to encode invalid JSON while serializing subscriber data: '.json_last_error_msg());
-        }
-        /** @var string $serialized */
-
-        return $serialized;
     }
 
     /**
      * Set root data.
      *
      * @return $this
+     * @deprecated set the attribute directly
      */
     public function setRoot($root): self
     {

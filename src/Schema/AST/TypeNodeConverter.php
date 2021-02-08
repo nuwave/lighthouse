@@ -11,6 +11,7 @@ abstract class TypeNodeConverter
     /**
      * Convert an AST type to an executable type.
      *
+     * @param  \GraphQL\Language\AST\TypeNode&\GraphQL\Language\AST\Node  $node
      * @return mixed The executable type.
      */
     public function convert(TypeNode $node)
@@ -21,7 +22,8 @@ abstract class TypeNodeConverter
     /**
      * Convert an AST type and apply wrapping types.
      *
-     * @param  string[]  $wrappers
+     * @param  \GraphQL\Language\AST\TypeNode&\GraphQL\Language\AST\Node  $node
+     * @param  array<string>  $wrappers
      * @return mixed The wrapped type.
      */
     protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])
@@ -32,7 +34,7 @@ abstract class TypeNodeConverter
             /** @var \GraphQL\Language\AST\NonNullTypeNode|\GraphQL\Language\AST\ListTypeNode $node */
             $wrappers[] = $nodeKind;
 
-            return $this->convertWrappedTypeNode( // @phpstan-ignore-line TODO remove when upgrading graphql-php
+            return $this->convertWrappedTypeNode(
                 $node->type,
                 $wrappers
             );

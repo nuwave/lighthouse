@@ -10,8 +10,6 @@ use PHPUnit\Framework\Assert;
  */
 class TestResponseMixin
 {
-    const EXPECTED_VALIDATION_KEYS = 'Expected the query to return validation errors for specific fields.';
-
     public function assertGraphQLValidationError(): Closure
     {
         return function (string $key, ?string $message) {
@@ -38,15 +36,17 @@ class TestResponseMixin
         return function (array $keys) {
             $validation = TestResponseUtils::extractValidationErrors($this);
 
-            Assert::assertIsArray($validation, self::EXPECTED_VALIDATION_KEYS);
-
+            Assert::assertNotNull($validation, 'Expected the query to return validation errors for specific fields.');
+            /** @var array<string, mixed> $validation */
+            Assert::assertArrayHasKey('extensions', $validation);
             $extensions = $validation['extensions'];
-            Assert::assertIsArray($extensions, self::EXPECTED_VALIDATION_KEYS);
 
+            Assert::assertNotNull($extensions, 'Expected the query to return validation errors for specific fields.');
+            /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
                 array_keys($extensions['validation']),
-                self::EXPECTED_VALIDATION_KEYS
+                'Expected the query to return validation errors for specific fields.'
             );
 
             return $this;
@@ -78,13 +78,6 @@ class TestResponseMixin
             ]);
 
             return $this;
-        };
-    }
-
-    public function jsonGet(): Closure
-    {
-        return function (string $key = null) {
-            return data_get($this->decodeResponseJson(), $key);
         };
     }
 }

@@ -12,13 +12,14 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
+use GraphQL\Language\Parser;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -38,7 +39,7 @@ class ASTBuilder
     /**
      * The directive factory.
      *
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveFactory;
 
@@ -66,12 +67,14 @@ class ASTBuilder
     /**
      * The document AST.
      *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST|null
+     * Initialized lazily, is only set after documentAST() is called.
+     *
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
     public function __construct(
-        DirectiveFactory $directiveFactory,
+        DirectiveLocator $directiveFactory,
         SchemaSourceProvider $schemaSourceProvider,
         EventDispatcher $eventDispatcher,
         ConfigRepository $configRepository
@@ -89,18 +92,17 @@ class ASTBuilder
      */
     public function documentAST(): DocumentAST
     {
-        if (isset($this->documentAST)) {
+        if ($this->documentAST !== null) {
             return $this->documentAST;
         }
 
         $cacheConfig = $this->configRepository->get('lighthouse.cache');
         if ($cacheConfig['enable']) {
             /** @var \Illuminate\Contracts\Cache\Repository $cache */
-            $cache = app('cache');
+            $cache = app('cache')->store($cacheConfig['store'] ?? null);
             $this->documentAST = $cache->remember(
                 $cacheConfig['key'],
-                // TODO remove this fallback in v5
-                $cacheConfig['ttl'] ?? null,
+                $cacheConfig['ttl'],
                 function (): DocumentAST {
                     return $this->build();
                 }
@@ -136,10 +138,6 @@ class ASTBuilder
         $this->applyFieldManipulators();
         $this->applyArgManipulators();
 
-        // TODO separate out into modules
-        $this->addPaginationInfoTypes();
-        $this->addNodeSupport();
-
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
         // that want to programmatically change the schema.
@@ -158,7 +156,7 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
-                $this->directiveFactory->createAssociatedDirectivesOfType($typeDefinition, TypeManipulator::class)
+                $this->directiveFactory->associatedOfType($typeDefinition, TypeManipulator::class)
                 as $typeDefinitionManipulator
             ) {
                 $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -177,7 +175,7 @@ class ASTBuilder
                 // that are defined on type extensions themselves
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
-                    $this->directiveFactory->createAssociatedDirectivesOfType($typeExtension, TypeExtensionManipulator::class)
+                    $this->directiveFactory->associatedOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
@@ -207,19 +205,36 @@ class ASTBuilder
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
         if ($extendedObjectLikeType === null) {
             if (RootType::isRootType($typeName)) {
-                $extendedObjectLikeType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
+                $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
             } else {
-                $this->throwDefinitionDoesNotExist($typeName, $typeExtension);
+                throw new DefinitionException(
+                    $this->missingBaseDefinition($typeName, $typeExtension)
+                );
             }
         }
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);
 
+        // @phpstan-ignore-next-line we know the types of fields will match because we passed assertExtensionMatchesDefinition().
         $extendedObjectLikeType->fields = ASTHelper::mergeUniqueNodeList(
+            // @phpstan-ignore-next-line
             $extendedObjectLikeType->fields,
+            // @phpstan-ignore-next-line
             $typeExtension->fields
         );
+
+        if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
+            /**
+             * We know this because we passed assertExtensionMatchesDefinition().
+             *
+             * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $typeExtension
+             */
+            $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
+                $extendedObjectLikeType->interfaces,
+                $typeExtension->interfaces
+            );
+        }
     }
 
     protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
@@ -227,7 +242,9 @@ class ASTBuilder
         /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName] ?? null;
         if ($extendedEnum === null) {
-            $this->throwDefinitionDoesNotExist($typeName, $typeExtension);
+            throw new DefinitionException(
+                $this->missingBaseDefinition($typeName, $typeExtension)
+            );
         }
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
@@ -240,19 +257,11 @@ class ASTBuilder
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $typeExtension
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    protected function throwDefinitionDoesNotExist(string $typeName, TypeExtensionNode $typeExtension): void
+    protected function missingBaseDefinition(string $typeName, TypeExtensionNode $typeExtension): string
     {
-        throw new DefinitionException(
-            "Could not find a base definition $typeName of kind {$typeExtension->kind} to extend."
-        );
+        return "Could not find a base definition $typeName of kind {$typeExtension->kind} to extend.";
     }
-
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
 
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
@@ -279,7 +288,7 @@ class ASTBuilder
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
-                        $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinition, FieldManipulator::class)
+                        $this->directiveFactory->associatedOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -300,7 +309,7 @@ class ASTBuilder
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
-                            $this->directiveFactory->createAssociatedDirectivesOfType($argumentDefinition, ArgManipulator::class)
+                            $this->directiveFactory->associatedOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
                             $argManipulator->manipulateArgDefinition(
@@ -314,125 +323,5 @@ class ASTBuilder
                 }
             }
         }
-    }
-
-    /**
-     * Add the types required for pagination.
-     */
-    protected function addPaginationInfoTypes(): void
-    {
-        $this->documentAST->setTypeDefinition(
-            PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
-                "Pagination information about the corresponding list of items."
-                type PaginatorInfo {
-                  "Total count of available items in the page."
-                  count: Int!
-
-                  "Current pagination page."
-                  currentPage: Int!
-
-                  "Index of first item in the current page."
-                  firstItem: Int
-
-                  "If collection has more pages."
-                  hasMorePages: Boolean!
-
-                  "Index of last item in the current page."
-                  lastItem: Int
-
-                  "Last page number of the collection."
-                  lastPage: Int!
-
-                  "Number of items per page in the collection."
-                  perPage: Int!
-
-                  "Total items available in the collection."
-                  total: Int!
-                }
-            ')
-        );
-
-        $this->documentAST->setTypeDefinition(
-            PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
-                "Pagination information about the corresponding list of items."
-                type PageInfo {
-                  "When paginating forwards, are there more items?"
-                  hasNextPage: Boolean!
-
-                  "When paginating backwards, are there more items?"
-                  hasPreviousPage: Boolean!
-
-                  "When paginating backwards, the cursor to continue."
-                  startCursor: String
-
-                  "When paginating forwards, the cursor to continue."
-                  endCursor: String
-
-                  "Total number of node in connection."
-                  total: Int
-
-                  "Count of nodes in current request."
-                  count: Int
-
-                  "Current page of request."
-                  currentPage: Int
-
-                  "Last page in connection."
-                  lastPage: Int
-                }
-            ')
-        );
-    }
-
-    /**
-     * Returns whether or not the given interface is used within the defined types.
-     */
-    protected function hasTypeImplementingInterface(string $interfaceName): bool
-    {
-        foreach ($this->documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                if (ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Inject the Node interface and a node field into the Query type.
-     */
-    protected function addNodeSupport(): void
-    {
-        // Only add the node type and node field if a type actually implements them
-        // Otherwise, a validation error is thrown
-        if (! $this->hasTypeImplementingInterface('Node')) {
-            return;
-        }
-
-        $globalId = config('lighthouse.global_id_field');
-        // Double slashes to escape the slashes in the namespace.
-        $this->documentAST->setTypeDefinition(
-            PartialParser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-"Node global interface"
-interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {
-"Global identifier that can be used to resolve any Node implementation."
-$globalId: ID!
-}
-GRAPHQL
-            )
-        );
-
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $this->documentAST->types[RootType::QUERY];
-        $queryType->fields = ASTHelper::mergeNodeList(
-            $queryType->fields,
-            [
-                PartialParser::fieldDefinition(/** @lang GraphQL */ '
-                    node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
-                '),
-            ]
-        );
     }
 }

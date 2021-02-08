@@ -14,13 +14,15 @@ class ForceDeleteDirective extends ModifyModelExistenceDirective
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Permanently remove one or more soft deleted models by their ID.
 The field must have a single non-null argument that may be a list.
 """
 directive @forceDelete(
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -32,29 +34,21 @@ directive @forceDelete(
   """
   model: String
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Find one or more models by id.
-     *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @param  string|int|string[]|int[]  $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
-     */
     protected function find(string $modelClass, $idOrIds)
     {
-        /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $modelClass */
+        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+        // @phpstan-ignore-next-line because it involves mixins
         return $modelClass::withTrashed()->find($idOrIds);
     }
 
-    /**
-     * Bring a model in or out of existence.
-     */
-    protected function modifyExistence(Model $model): void
+    protected function modifyExistence(Model $model): bool
     {
-        /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $model */
-        $model->forceDelete();
+        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+        // @phpstan-ignore-next-line because it involves mixins
+        return (bool) $model->forceDelete();
     }
 
     /**

@@ -5,6 +5,7 @@ namespace DummyNamespace;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DummyClass
 {

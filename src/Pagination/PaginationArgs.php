@@ -22,13 +22,13 @@ class PaginationArgs
     /**
      * Create a new instance from user given args.
      *
-     * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationType|null  $paginationType
+     * @param  array<string, mixed>  $args
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      * @return static
      *
      * @throws \GraphQL\Error\Error
      */
-    public static function extractArgs(array $args, ?PaginationType $paginationType, ?int $paginateMaxCount): self
+    public static function extractArgs(array $args, PaginationType $paginationType, ?int $paginateMaxCount): self
     {
         $instance = new static();
 
@@ -39,7 +39,7 @@ class PaginationArgs
                 Cursor::decode($args)
             );
         } else {
-            $instance->first = $args[config('lighthouse.pagination_amount_argument')];
+            $instance->first = $args['first'];
             $instance->page = Arr::get($args, 'page', 1);
         }
 
@@ -85,14 +85,15 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder
+     * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      */
-    public function applyToBuilder($builder): LengthAwarePaginator
+    public function applyToBuilder(object $builder): LengthAwarePaginator
     {
         if ($builder instanceof ScoutBuilder) {
             return $builder->paginate($this->first, 'page', $this->page);
         }
 
+        // @phpstan-ignore-next-line Relation&Builder mixin not recognized
         return $builder->paginate($this->first, ['*'], 'page', $this->page);
     }
 }

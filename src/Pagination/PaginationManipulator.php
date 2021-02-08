@@ -4,9 +4,10 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class PaginationManipulator
 {
@@ -79,7 +80,7 @@ class PaginationManipulator
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
-        if ($edgeType) {
+        if ($edgeType !== null) {
             $connectionEdgeName = $edgeType->name->value;
             $connectionTypeName = "{$connectionEdgeName}Connection";
         } else {
@@ -89,7 +90,7 @@ class PaginationManipulator
 
         $connectionFieldName = addslashes(ConnectionField::class);
 
-        $connectionType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        $connectionType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName edges."
             type $connectionTypeName {
                 "Pagination information about the list of edges."
@@ -104,7 +105,7 @@ GRAPHQL
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
-            ?? PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            ?? Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
                 "An edge that contains a node of type $fieldTypeName and a cursor."
                 type $connectionEdgeName {
                     "The $fieldTypeName node."
@@ -117,16 +118,17 @@ GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
-        $inputValueDefinitions = [
-            self::countArgument('first', $defaultCount, $maxCount),
-            "\"A cursor after which elements are returned.\"\nafter: String",
-        ];
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
+            self::countArgument($defaultCount, $maxCount)
+        );
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"A cursor after which elements are returned."
+after: String
+GRAPHQL
+        );
 
-        $connectionArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
-
-        $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
-        $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
-        $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
+        $fieldDefinition->type = Parser::namedType($connectionTypeName);
+        $parentType->fields [] = $fieldDefinition;
     }
 
     /**
@@ -139,13 +141,17 @@ GRAPHQL
         // If the type already exists, we use that instead
         if (isset($this->documentAST->types[$objectType->name->value])) {
             $objectType = $this->documentAST->types[$objectType->name->value];
+
+            if (! $objectType instanceof ObjectTypeDefinitionNode) {
+                throw new DefinitionException(
+                    'Expected object type for pagination wrapper '.$objectType->name->value
+                    .', found '.$objectType->kind.' instead.'
+                );
+            }
         }
 
         if ($this->modelClass) {
-            $objectType->directives = ASTHelper::mergeNodeList(
-                $objectType->directives,
-                [PartialParser::directive('@modelClass(class: "'.addslashes($this->modelClass).'")')]
-            );
+            $objectType->directives [] = Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")');
         }
 
         $this->documentAST->setTypeDefinition($objectType);
@@ -164,7 +170,7 @@ GRAPHQL
         $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
-        $paginatorType = PartialParser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "A paginated list of $fieldTypeName items."
             type $paginatorTypeName {
                 "Pagination information about the list of items."
@@ -177,22 +183,19 @@ GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $inputValueDefinitions = [
-            self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
-            "\"The offset from which elements are returned.\"\npage: Int",
-        ];
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
+            self::countArgument($defaultCount, $maxCount)
+        );
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
 
-        $paginationArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
-
-        $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
-        $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
-        $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
+        $fieldDefinition->type = Parser::namedType($paginatorTypeName);
+        $parentType->fields [] = $fieldDefinition;
     }
 
     /**
      * Build the count argument definition string, considering default and max values.
      */
-    protected static function countArgument(string $argumentName, ?int $defaultCount = null, ?int $maxCount = null): string
+    protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
     {
         $description = '"Limits number of fetched elements.';
         if ($maxCount) {
@@ -200,7 +203,7 @@ GRAPHQL
         }
         $description .= "\"\n";
 
-        $definition = $argumentName.': Int'
+        $definition = 'first: Int'
             .($defaultCount
                 ? ' = '.$defaultCount
                 : '!'
