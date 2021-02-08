@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Federation\Schema\Types\Scalars;
+namespace Nuwave\Lighthouse\Federation\Scalars;
 
 use GraphQL\Type\Definition\ScalarType;
 
-class Any extends ScalarType
+class FieldSet extends ScalarType
 {
     public function serialize($value)
     {

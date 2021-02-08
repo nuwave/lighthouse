@@ -14,9 +14,10 @@ class Service
     const FEDERATION_DIRECTIVES = ['key', 'extends', 'external', 'extends', 'requires', 'provides'];
 
     /**
-     * @return array
+     * @param array{} $args
+     * @return array{sdl: string} 
      */
-    public function resolveSdl($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         $schema = $resolveInfo->schema;
 
@@ -53,6 +54,8 @@ class Service
         ]);*/
 
         // TODO the new schema should be printed including the inline (federation) directives required for federation to work. We may need to create our own schema printer for this.
-        return ['sdl' => SchemaPrinter::doPrint($schema)];
+        return [
+            'sdl' => SchemaPrinter::doPrint($schema)
+        ];
     }
 }

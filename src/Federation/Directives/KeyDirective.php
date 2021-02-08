@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Federation\Directives;
 
+use GraphQL\Language\AST\SelectionSetNode;
+use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class KeyDirective extends BaseDirective
@@ -14,25 +17,27 @@ class KeyDirective extends BaseDirective
         return /* @lang GraphQL */
             <<<'SDL'
 """
-The @key directive is used to indicate a combination of fields that can be used to uniquely identify and fetch an object
-or interface. Multiple keys can be defined on a single object type:
-
-    type User @key(fields: "id") @key(fields: "another_field") @extends {
+The @key directive is used to indicate a combination of fields that
+can be used to uniquely identify and fetch an object or interface.
 """
 directive @key(
     """
-    Fields that can be used to uniquely identify and fetch an object or interface
+    Fields that can be used to uniquely identify and fetch an object or interface.
     """
     fields: _FieldSet!
-) on OBJECT | INTERFACE
+) repeatable on OBJECT | INTERFACE
 SDL;
     }
 
-    /**
-     * Directive name.
-     */
-    public function name(): string
+    public function fields(): SelectionSetNode
     {
-        return 'key';
+        $fields = $this->directiveArgValue('fields');
+        if (! is_string($fields)) {
+            throw new DefinitionException('Argument `fields` on the `@key` directive is required.');
+        }
+
+        // Grammatically, a field set is a selection set minus the braces.
+        // https://www.apollographql.com/docs/federation/federation-spec/#scalar-_fieldset
+        return Parser::selectionSet("{ {$fields} }");
     }
 }
