@@ -15,7 +15,7 @@ class Service
 
     /**
      * @param array{} $args
-     * @return array{sdl: string} 
+     * @return array{sdl: string}
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
@@ -55,7 +55,7 @@ class Service
 
         // TODO the new schema should be printed including the inline (federation) directives required for federation to work. We may need to create our own schema printer for this.
         return [
-            'sdl' => SchemaPrinter::doPrint($schema)
+            'sdl' => SchemaPrinter::doPrint($schema),
         ];
     }
 }

@@ -30,11 +30,11 @@ DESCRIPTION;
     public function parseValue($value): array
     {
         if (! is_array($value)) {
-            throw new Error(self::MESSAGE . \Safe\json_encode($value));
+            throw new Error(self::MESSAGE.\Safe\json_encode($value));
         }
 
         if (! isset($value['__typename'])) {
-            throw new Error(self::MESSAGE . \Safe\json_encode($value));
+            throw new Error(self::MESSAGE.\Safe\json_encode($value));
         }
 
         // TODO validate fields match the @external fields of the __typename

@@ -28,7 +28,7 @@ class FederationServiceProvider extends ServiceProvider
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
             static function (): string {
-                return __NAMESPACE__ . '\\Directives';
+                return __NAMESPACE__.'\\Directives';
             }
         );
     }
@@ -42,13 +42,13 @@ class FederationServiceProvider extends ServiceProvider
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $manipulateAST->documentAST->types['Query'];
 
-        $queryType->fields []= Parser::fieldDefinition(/** @lang GraphQL */ '
+        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(
             representations: [_Any!]!
         ): [_Entity]! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Entity")
         ');
 
-        $queryType->fields []= Parser::fieldDefinition(/** @lang GraphQL */ '
+        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _service: _Service! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Service")
         ');
 
@@ -127,7 +127,6 @@ class FederationServiceProvider extends ServiceProvider
         if (count($entities) === 0) {
             throw new FederationException('There must be at least one type defining the @key directive');
         }
-
 
         $entitiesString = implode(' | ', $entities);
         $manipulateAST->documentAST->setTypeDefinition(

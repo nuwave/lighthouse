@@ -6,9 +6,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class ExternalDirective extends BaseDirective
 {
-    /**
-     * 
-     */
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'

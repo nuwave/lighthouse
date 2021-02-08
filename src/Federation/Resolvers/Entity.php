@@ -16,12 +16,12 @@ class Entity
     {
         $results = [];
 
-        foreach($args['representations'] as $representation) {
+        foreach ($args['representations'] as $representation) {
             $typename = $representation['__typename'];
             $resolverClass = Utils::namespaceClassname($typename, config('lighthouse.federation.namespace'), 'class_exists');
             $resolver = Utils::constructResolver($resolverClass, '__invoke');
 
-            $results []= $resolver($representation);
+            $results [] = $resolver($representation);
         }
 
         return $results;
