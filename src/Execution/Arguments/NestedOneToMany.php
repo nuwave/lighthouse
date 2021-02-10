@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Closure;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
@@ -27,6 +28,7 @@ class NestedOneToMany implements ArgResolver
         $relation = $parent->{$this->relationName}();
 
         static::createUpdateUpsert($args, $relation);
+        static::connectDisconnect($args, $relation);
 
         if ($args->has('delete')) {
             $relation->getRelated()::destroy(
@@ -66,5 +68,48 @@ class NestedOneToMany implements ArgResolver
                 $upsertModel($relation->make(), $childArgs);
             }
         }
+    }
+
+    public static function connectDisconnect(ArgumentSet $args, Relation $relation): void
+    {
+        $localKeyName = self::getLocalKeyName($relation);
+        $foreignKeyName = self::getForeignKeyName($relation);
+
+        if ($args->has('connect')) {
+            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+            $children = $relation->make()->whereIn($localKeyName, $args->arguments['connect']->value)->get();
+
+            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+            $relation->saveMany($children);
+        }
+
+        if ($args->has('disconnect')) {
+            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+            $relation->whereIn($localKeyName, $args->arguments['disconnect']->value)->update([$foreignKeyName => null]);
+        }
+    }
+
+    private static function getLocalKeyName(Relation $relation): string
+    {
+        $bindLocalKey = function () {
+            // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
+            return $this->localKey;
+        };
+        $localKeyName = Closure::bind($bindLocalKey, $relation, get_class($relation));
+
+        return $localKeyName();
+    }
+
+    private static function getForeignKeyName(Relation $relation): string
+    {
+        $bindForeignKey = function () {
+            // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
+            $segments = explode('.', $this->foreignKey);
+
+            return end($segments);
+        };
+        $foreignKeyName = Closure::bind($bindForeignKey, $relation, get_class($relation));
+
+        return $foreignKeyName();
     }
 }

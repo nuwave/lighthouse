@@ -512,6 +512,8 @@ input UpdatePostsHasMany {
   update: [UpdatePostInput!]
   upsert: [UpsertPostInput!]
   delete: [ID!]
+  connect: [ID!]
+  disconnect: [ID!]
 }
 
 input CreatePostInput {
@@ -539,6 +541,8 @@ mutation {
         create: [{ title: "A new post" }]
         update: [{ id: 45, title: "This post is updated" }]
         delete: [8]
+        connect: [1, 2, 3]
+        disconnect: [6]
       }
     }
   ) {
