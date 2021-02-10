@@ -23,7 +23,7 @@ class FederationServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             ManipulateAST::class,
-            static function (ManipulateAST &$manipulateAST) {
+            function (ManipulateAST &$manipulateAST) {
                 $this->addFederationAdjustments($manipulateAST->documentAST);
             }
         );

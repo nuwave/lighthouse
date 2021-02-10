@@ -94,7 +94,7 @@ GRAPHQL;
                     $astNode = $f->astNode;
                     $directives = $astNode === null
                         ? ''
-                        : static::printDirectives($f->astNode->directives);
+                        : static::printDirectives($astNode->directives);
 
                     $description = static::printDescription($options, $f, '  ', $firstInBlock)
                         .'  '
@@ -132,7 +132,7 @@ GRAPHQL;
         $description = static::printDescription($options, $type);
 
         $astNode = $type->astNode;
-        $directives = $astNode === ''
+        $directives = $astNode === null
             ? ''
             : static::printDirectives($astNode->directives);
 
