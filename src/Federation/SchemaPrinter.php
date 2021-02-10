@@ -17,12 +17,12 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 {
     protected static function printObject(ObjectType $type, array $options): string
     {
-        $interfaces            = $type->getInterfaces();
+        $interfaces = $type->getInterfaces();
         $implementedInterfaces = count($interfaces) > 0
-            ? ' implements ' . implode(
+            ? ' implements '.implode(
                 ' & ',
                 array_map(
-                    static function (InterfaceType $interface) : string {
+                    static function (InterfaceType $interface): string {
                         return $interface->name;
                     },
                     $interfaces
@@ -53,9 +53,9 @@ GRAPHQL;
         // TODO maybe filter directives here?
 
         return count($directives) > 0
-            ? (' ' . (new Collection($directives))
+            ? (' '.(new Collection($directives))
                     ->map(static function (DirectiveNode $directive): string {
-                        return '@' . $directive->name->value . static::printDirectiveArgs($directive->arguments);
+                        return '@'.$directive->name->value.static::printDirectiveArgs($directive->arguments);
                     })
                     ->implode(' '))
             : '';
@@ -71,13 +71,13 @@ GRAPHQL;
         }
 
         return '('
-            . implode(
+            .implode(
                 ', ',
                 Utils::map($args, static function (ArgumentNode $arg): string {
-                    return $arg->name->value . ': ' . Printer::doPrint($arg->value);
+                    return $arg->name->value.': '.Printer::doPrint($arg->value);
                 })
             )
-            . ')';
+            .')';
     }
 
     /**
@@ -92,13 +92,13 @@ GRAPHQL;
             array_map(
                 static function (FieldDefinition $f) use (&$firstInBlock, $options): string {
                     $description = static::printDescription($options, $f, '  ', $firstInBlock)
-                        . '  '
-                        . $f->name
-                        . static::printArgs($options, $f->args, '  ')
-                        . ': '
-                        . (string) $f->getType()
-                        . static::printDirectives($f->astNode->directives)
-                        . static::printDeprecated($f);
+                        .'  '
+                        .$f->name
+                        .static::printArgs($options, $f->args, '  ')
+                        .': '
+                        .(string) $f->getType()
+                        .static::printDirectives($f->astNode->directives)
+                        .static::printDeprecated($f);
 
                     $firstInBlock = false;
 
@@ -113,7 +113,7 @@ GRAPHQL;
     {
         $interfaces = $type->getInterfaces();
         $implementedInterfaces = count($interfaces) > 0
-            ? ' implements ' . implode(
+            ? ' implements '.implode(
                 ' & ',
                 array_map(
                     static function (InterfaceType $interface): string {
@@ -127,6 +127,7 @@ GRAPHQL;
         $description = static::printDescription($options, $type);
         $directives = static::printDirectives($type->astNode->directives);
         $fields = static::printFields($options, $type);
+
         return <<<GRAPHQL
 {$description}interface {$type->name}{$implementedInterfaces}{$directives} {
 {$fields}

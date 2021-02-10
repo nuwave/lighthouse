@@ -32,7 +32,7 @@ type Query {
 
 GRAPHQL;
 
-        $this->schema = $foo . $query;
+        $this->schema = $foo.$query;
 
         $response = $this->graphQL(/** @lang GraphQL */ '
         {
