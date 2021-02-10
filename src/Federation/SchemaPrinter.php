@@ -46,7 +46,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  NodeList<\GraphQL\Language\AST\DirectiveDefinitionNode>  $directives
+     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode>  $directives
      */
     protected static function printDirectives(NodeList $directives): string
     {
@@ -62,7 +62,7 @@ GRAPHQL;
     }
 
     /**
-     * @param NodeList<ArgumentNode> $args
+     * @param \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\ArgumentNode> $args
      */
     protected static function printDirectiveArgs(NodeList $args): string
     {
@@ -91,13 +91,18 @@ GRAPHQL;
             "\n",
             array_map(
                 static function (FieldDefinition $f) use (&$firstInBlock, $options): string {
+                    $astNode = $f->astNode;
+                    $directives = $astNode === null
+                        ? ''
+                        : static::printDirectives($f->astNode->directives);
+
                     $description = static::printDescription($options, $f, '  ', $firstInBlock)
                         .'  '
                         .$f->name
                         .static::printArgs($options, $f->args, '  ')
                         .': '
                         .(string) $f->getType()
-                        .static::printDirectives($f->astNode->directives)
+                        .$directives
                         .static::printDeprecated($f);
 
                     $firstInBlock = false;
@@ -125,7 +130,12 @@ GRAPHQL;
             : '';
 
         $description = static::printDescription($options, $type);
-        $directives = static::printDirectives($type->astNode->directives);
+
+        $astNode = $type->astNode;
+        $directives = $astNode === ''
+            ? ''
+            : static::printDirectives($astNode->directives);
+
         $fields = static::printFields($options, $type);
 
         return <<<GRAPHQL

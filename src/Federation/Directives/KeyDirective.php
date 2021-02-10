@@ -14,8 +14,7 @@ class KeyDirective extends BaseDirective
      */
     public static function definition(): string
     {
-        return /* @lang GraphQL */
-            <<<'SDL'
+        return /* @lang GraphQL */ <<<'GRAPHQL'
 """
 The @key directive is used to indicate a combination of fields that
 can be used to uniquely identify and fetch an object or interface.
@@ -26,7 +25,7 @@ directive @key(
     """
     fields: _FieldSet!
 ) repeatable on OBJECT | INTERFACE
-SDL;
+GRAPHQL;
     }
 
     public function fields(): SelectionSetNode

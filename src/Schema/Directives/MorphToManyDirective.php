@@ -8,7 +8,7 @@ class MorphToManyDirective extends RelationDirective implements FieldResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.com/docs/eloquent-relationships#many-to-many-polymorphic-relations).
 """
@@ -24,6 +24,6 @@ directive @morphToMany(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }

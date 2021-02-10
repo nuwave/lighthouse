@@ -11,11 +11,10 @@ class RequiresDirective extends BaseDirective
      */
     public static function definition(): string
     {
-        return /* @lang GraphQL */
-            <<<'SDL'
+        return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-The @requires directive is used to annotate the required input fieldset from a base type for a resolver. It is used to 
-develop a query plan where the required fields may not be needed by the client, but the service may need additional 
+The @requires directive is used to annotate the required input fieldset from a base type for a resolver. It is used to
+develop a query plan where the required fields may not be needed by the client, but the service may need additional
 information from other services. For example:
 
     extend type User @key(fields: "id") {
@@ -26,19 +25,11 @@ information from other services. For example:
 """
 directive @requires(
     """
-    It is used to develop a query plan where the required fields may not be needed by the client, but the service may 
+    It is used to develop a query plan where the required fields may not be needed by the client, but the service may
     need additional information from other services.
     """
     fields: _FieldSet!
 ) on FIELD_DEFINITION
-SDL;
-    }
-
-    /**
-     * Name of the directive.
-     */
-    public function name(): string
-    {
-        return 'requires';
+GRAPHQL;
     }
 }

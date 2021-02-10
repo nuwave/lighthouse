@@ -24,12 +24,11 @@ class FederationPrinter
     ];
 
     const FEDERATION_DIRECTIVES = [
-        'key',
         'extends',
         'external',
-        'extends',
-        'requires',
+        'key',
         'provides',
+        'requires',
     ];
 
     public static function print(Schema $schema): string

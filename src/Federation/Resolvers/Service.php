@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class Service
 {
     /**
-     * @param array{} $args
+     * @param  array<string, mixed>  $args  Always empty
      * @return array{sdl: string}
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
