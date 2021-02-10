@@ -12,7 +12,7 @@ class Entity
      * @param array{representations: array<int, mixed>} $args
      * @return array<int, mixed>
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
+    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         $results = [];
 

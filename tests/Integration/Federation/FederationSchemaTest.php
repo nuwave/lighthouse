@@ -7,10 +7,7 @@ use Tests\DBTestCase;
 
 class FederationSchemaTest extends DBTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
@@ -18,33 +15,39 @@ class FederationSchemaTest extends DBTestCase
         );
     }
 
-    public function testServiceQueryShouldReturnValidSdl()
+    public function testServiceQueryShouldReturnValidSdl(): void
     {
-        $this->schema = '
-        type Foo @key(fields: "id") {
-            id: ID! @external
-            foo: String!
-        }
-        type Query {
-            foo: Int!
-        }
-        ';
+        $foo = /** @lang GraphQL */ <<<'GRAPHQL'
+type Foo @key(fields: "id") {
+  id: ID! @external
+  foo: String!
+}
 
-        $this->graphQL('
-            {
-                _service { sdl }
+GRAPHQL;
+
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
+type Query {
+  foo: Int!
+}
+
+GRAPHQL;
+
+        $this->schema = $foo . $query;
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            _service {
+                sdl
             }
-        ')
-            ->assertJson([
-                'data' => [
-                    '_service' => [
-                        'sdl' => $this->schema,
-                    ],
-                ],
-            ]);
+        }
+        ');
+
+        $sdl = $response->json('data._service.sdl');
+        $this->assertStringContainsString($foo, $sdl);
+        $this->assertStringContainsString($query, $sdl);
     }
 
-    public function testFederatedSchemaShouldContainCorrectEntityUnion()
+    public function testFederatedSchemaShouldContainCorrectEntityUnion(): void
     {
         // TODO introspect the schema and validate that the _Entity union contains all the types which we defined in the
         // schema within this test case

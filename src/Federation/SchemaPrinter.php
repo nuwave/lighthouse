@@ -2,12 +2,15 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\Printer;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Utils\SchemaPrinter as GraphQLSchemaPrinter;
+use GraphQL\Utils\Utils;
 use Illuminate\Support\Collection;
 
 class SchemaPrinter extends GraphQLSchemaPrinter
@@ -27,7 +30,11 @@ class SchemaPrinter extends GraphQLSchemaPrinter
             )
             : '';
 
-        $schemaDirectives = static::printDirectives($type->astNode->directives);
+        $astNode = $type->astNode;
+        $schemaDirectives = $astNode === null
+            ? ''
+            : static::printDirectives($astNode->directives);
+
         $fields = static::printFields($options, $type);
         $description = static::printDescription($options, $type);
 
@@ -47,11 +54,30 @@ GRAPHQL;
 
         return count($directives) > 0
             ? (' ' . (new Collection($directives))
-                    ->map(static function (DirectiveDefinitionNode $directive): string {
-                        return '@' . $directive->name->value . static::printArgs([], $directive->arguments);
+                    ->map(static function (DirectiveNode $directive): string {
+                        return '@' . $directive->name->value . static::printDirectiveArgs($directive->arguments);
                     })
                     ->implode(' '))
             : '';
+    }
+
+    /**
+     * @param NodeList<ArgumentNode> $args
+     */
+    protected static function printDirectiveArgs(NodeList $args): string
+    {
+        if (count($args) === 0) {
+            return '';
+        }
+
+        return '('
+            . implode(
+                ', ',
+                Utils::map($args, static function (ArgumentNode $arg): string {
+                    return $arg->name->value . ': ' . Printer::doPrint($arg->value);
+                })
+            )
+            . ')';
     }
 
     /**
@@ -64,13 +90,13 @@ GRAPHQL;
         return implode(
             "\n",
             array_map(
-                static function (FieldDefinition $f, int $i) use (&$firstInBlock, $options): string {
+                static function (FieldDefinition $f) use (&$firstInBlock, $options): string {
                     $description = static::printDescription($options, $f, '  ', $firstInBlock)
                         . '  '
                         . $f->name
                         . static::printArgs($options, $f->args, '  ')
                         . ': '
-                        . $f->getType()->name
+                        . (string) $f->getType()
                         . static::printDirectives($f->astNode->directives)
                         . static::printDeprecated($f);
 

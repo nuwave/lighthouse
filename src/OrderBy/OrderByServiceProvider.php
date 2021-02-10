@@ -20,7 +20,7 @@ class OrderByServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );
@@ -28,27 +28,27 @@ class OrderByServiceProvider extends ServiceProvider
         $dispatcher->listen(
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
-                $manipulateAST->documentAST
-                    ->setTypeDefinition(
-                        Parser::enumTypeDefinition(/** @lang GraphQL */ '
-                            "The available directions for ordering a list of records."
-                            enum SortOrder {
-                                "Sort records in ascending order."
-                                ASC
-
-                                "Sort records in descending order."
-                                DESC
-                            }
-                        '
-                        )
+                $documentAST = $manipulateAST->documentAST;
+                $documentAST->setTypeDefinition(
+                    Parser::enumTypeDefinition(/** @lang GraphQL */ '
+                        "The available directions for ordering a list of records."
+                        enum SortOrder {
+                            "Sort records in ascending order."
+                            ASC
+    
+                            "Sort records in descending order."
+                            DESC
+                        }
+                    '
                     )
-                    ->setTypeDefinition(
-                        static::createOrderByClauseInput(
-                            static::DEFAULT_ORDER_BY_CLAUSE,
-                            'Allows ordering a list of records.',
-                            'String'
-                        )
-                    );
+                );
+                $documentAST->setTypeDefinition(
+                    static::createOrderByClauseInput(
+                        static::DEFAULT_ORDER_BY_CLAUSE,
+                        'Allows ordering a list of records.',
+                        'String'
+                    )
+                );
             }
         );
     }

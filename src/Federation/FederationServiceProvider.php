@@ -14,6 +14,7 @@ use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
 use Nuwave\Lighthouse\Federation\Directives\ProvidesDirective;
 use Nuwave\Lighthouse\Federation\Directives\RequiresDirective;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationServiceProvider extends ServiceProvider
@@ -33,14 +34,15 @@ class FederationServiceProvider extends ServiceProvider
         );
     }
 
-    public function addFederationAdjustments(ManipulateAST $manipulateAST): void
+    public function addFederationAdjustments(ManipulateAST &$manipulateAST): void
     {
-        $this->addDirectives($manipulateAST);
-        $this->addScalars($manipulateAST);
-        $this->addEntityUnion($manipulateAST);
+        $documentAST = $manipulateAST->documentAST;
+        $this->addDirectives($documentAST);
+        $this->addScalars($documentAST);
+        $this->addEntityUnion($documentAST);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $manipulateAST->documentAST->types['Query'];
+        $queryType = $documentAST->types['Query'];
 
         $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(
@@ -52,7 +54,7 @@ class FederationServiceProvider extends ServiceProvider
         _service: _Service! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Service")
         ');
 
-        $manipulateAST->documentAST->setTypeDefinition(
+        $documentAST->setTypeDefinition(
             Parser::objectTypeDefinition(/** @lang GraphQL */ '
             type _Service {
                 sdl: String
@@ -64,30 +66,30 @@ class FederationServiceProvider extends ServiceProvider
     /**
      * Add federation specific directives to the AST.
      */
-    protected function addDirectives(ManipulateAST &$manipulateAST): void
+    protected function addDirectives(DocumentAST &$documentAST): void
     {
-        $manipulateAST->documentAST->setDirectiveDefinition(Parser::directiveDefinition(ExternalDirective::definition()));
-        $manipulateAST->documentAST->setDirectiveDefinition(Parser::directiveDefinition(RequiresDirective::definition()));
-        $manipulateAST->documentAST->setDirectiveDefinition(Parser::directiveDefinition(ProvidesDirective::definition()));
-        $manipulateAST->documentAST->setDirectiveDefinition(Parser::directiveDefinition(KeyDirective::definition()));
-        $manipulateAST->documentAST->setDirectiveDefinition(Parser::directiveDefinition(ExtendsDirective::definition()));
+        $documentAST->setDirectiveDefinition(Parser::directiveDefinition(ExternalDirective::definition()));
+        $documentAST->setDirectiveDefinition(Parser::directiveDefinition(RequiresDirective::definition()));
+        $documentAST->setDirectiveDefinition(Parser::directiveDefinition(ProvidesDirective::definition()));
+        $documentAST->setDirectiveDefinition(Parser::directiveDefinition(KeyDirective::definition()));
+        $documentAST->setDirectiveDefinition(Parser::directiveDefinition(ExtendsDirective::definition()));
     }
 
     /**
      * Add federation specific scalars to the AST.
      */
-    protected function addScalars(ManipulateAST &$manipulateAST): void
+    protected function addScalars(DocumentAST &$documentAST): void
     {
-        $manipulateAST->documentAST->setTypeDefinition(
+        $documentAST->setTypeDefinition(
             Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-            scalar _Any @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Schema\\\Types\\\Scalars\\\Any")
+            scalar _Any @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Scalars\\\Any")
             ')
         );
 
         // TODO check if required or if we could also use `String!` instead of the _FieldSet scalar. Apollo federation demo uses String!
-        $manipulateAST->documentAST->setTypeDefinition(
+        $documentAST->setTypeDefinition(
             Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-            scalar _FieldSet @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Schema\\\Types\\\Scalars\\\FieldSet")
+            scalar _FieldSet @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Scalars\\\FieldSet")
             ')
         );
     }
@@ -98,14 +100,14 @@ class FederationServiceProvider extends ServiceProvider
      *
      * @throws \Nuwave\Lighthouse\Exceptions\FederationException
      */
-    protected function addEntityUnion(ManipulateAST &$manipulateAST): void
+    protected function addEntityUnion(DocumentAST &$documentAST): void
     {
         /** @var array<int, string> $entities */
         $entities = [];
 
         // We just care about object types ... but we don't care about global object types ... and we just want the
         // types which make use of the @key directive
-        foreach ($manipulateAST->documentAST->types as $type) {
+        foreach ($documentAST->types as $type) {
             if (! $type instanceof ObjectTypeDefinitionNode) {
                 continue;
             }
@@ -129,7 +131,7 @@ class FederationServiceProvider extends ServiceProvider
         }
 
         $entitiesString = implode(' | ', $entities);
-        $manipulateAST->documentAST->setTypeDefinition(
+        $documentAST->setTypeDefinition(
             Parser::unionTypeDefinition(/** @lang GraphQL */ "
             union _Entity = {$entitiesString}
             ")
