@@ -25,6 +25,7 @@ class UpsertModel implements ArgResolver
      */
     public function __invoke($model, $args)
     {
+        // TODO consider Laravel native ->upsert(), available from 8.10
         $id = $args->arguments['id']
             ?? $args->arguments[$model->getKeyName()]
             ?? null;
