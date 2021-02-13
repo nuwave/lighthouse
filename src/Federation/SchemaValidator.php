@@ -56,6 +56,7 @@ class SchemaValidator
                             throw new FederationException($i->getMessage(), $i->getCode(), $i);
                         }
 
+                        // https://github.com/apollographql/federation/blob/main/federation-js/src/composition/validate/preComposition/keyFieldsMissingExternal.ts
                         // TODO recurse when field definitions are nested
                     }
                 }
