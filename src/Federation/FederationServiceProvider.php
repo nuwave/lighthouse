@@ -48,7 +48,7 @@ class FederationServiceProvider extends ServiceProvider
         $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(
             representations: [_Any!]!
-        ): [_Entity]! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Entity")
+        ): [_Entity]! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Entities")
         ');
 
         $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
@@ -83,14 +83,14 @@ class FederationServiceProvider extends ServiceProvider
     {
         $documentAST->setTypeDefinition(
             Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-            scalar _Any @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Scalars\\\Any")
+            scalar _Any @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Types\\\Any")
             ')
         );
 
         // TODO check if required or if we could also use `String!` instead of the _FieldSet scalar. Apollo federation demo uses String!
         $documentAST->setTypeDefinition(
             Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-            scalar _FieldSet @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Scalars\\\FieldSet")
+            scalar _FieldSet @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Types\\\FieldSet")
             ')
         );
     }

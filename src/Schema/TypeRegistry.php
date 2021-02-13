@@ -298,7 +298,7 @@ EOL
 
         if (! $className) {
             throw new DefinitionException(
-                "No matching subclass of GraphQL\Type\Definition\ScalarType of found for the scalar {$scalarName}"
+                "No matching subclass of GraphQL\Type\Definition\ScalarType found for the scalar {$scalarName}"
             );
         }
 
@@ -435,7 +435,13 @@ EOL
     protected function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
-            return $this->get(class_basename($rootValue));
+            if (is_array($rootValue) && isset($rootValue['__typename'])) {
+                $name = $rootValue['__typename'];
+            } else {
+                $name = class_basename($rootValue);
+            }
+
+            return $this->get($name);
         };
     }
 

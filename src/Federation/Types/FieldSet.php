@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Federation\Scalars;
+namespace Nuwave\Lighthouse\Federation\Types;
 
 use GraphQL\Type\Definition\ScalarType;
 

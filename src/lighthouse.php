@@ -298,16 +298,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Apollo federation support
+    | Apollo Federation
     |--------------------------------------------------------------------------
     |
-    | Possible types are "service" and "gateway". Defaults to
-    | "service" because you may implement more services than gateways ;)
+    | Lighthouse can act as a federated service: https://www.apollographql.com/docs/federation/federation-spec.  
     |
     */
 
     'federation' => [
-        'type'    => 'service',
+        /*
+         * Location of resolver classes when resolving the `_entities` field.
+         */
+        'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
     ],
 
     /*
@@ -315,7 +317,7 @@ return [
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
-    | Here you can define GraphQL subscription "broadcasters" and "storage" drivers
+    | Here you can define GraphQL subscription broadcaster and storage drivers
     | as well their required configuration options.
     |
     */
