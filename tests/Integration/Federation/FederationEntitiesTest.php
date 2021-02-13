@@ -46,13 +46,13 @@ class FederationEntitiesTest extends TestCase
         ', [
             '_representations' => [
                 $foo,
-            ]
+            ],
         ])->assertJson([
             'data' => [
                 '_entities' => [
                     $foo,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 

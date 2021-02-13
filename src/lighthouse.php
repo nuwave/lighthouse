@@ -301,7 +301,7 @@ return [
     | Apollo Federation
     |--------------------------------------------------------------------------
     |
-    | Lighthouse can act as a federated service: https://www.apollographql.com/docs/federation/federation-spec.  
+    | Lighthouse can act as a federated service: https://www.apollographql.com/docs/federation/federation-spec.
     |
     */
 
