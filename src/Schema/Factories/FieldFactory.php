@@ -63,7 +63,9 @@ class FieldFactory
             $resolver = $fieldValue->useDefaultResolver()->getResolver();
         }
 
-        $fieldValue->setResolver(new OptimizingResolver($resolver, $this->fieldMiddleware($fieldDefinitionNode)));
+        $fieldValue->setResolver(
+            new OptimizingResolver($resolver, $this->fieldMiddleware($fieldDefinitionNode))
+        );
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
@@ -85,17 +87,15 @@ class FieldFactory
      */
     protected function fieldMiddleware(FieldDefinitionNode $fieldDefinitionNode): array
     {
-        // Middleware resolve in reversed order
-
-        $globalFieldMiddleware = array_reverse(
-            config('lighthouse.field_middleware')
-        );
+        $globalFieldMiddleware = config('lighthouse.field_middleware');
 
         $directiveFieldMiddleware = $this->directiveFactory
             ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
-            ->reverse()
             ->all();
 
-        return array_merge($directiveFieldMiddleware, $globalFieldMiddleware);
+        $fieldMiddleware = array_merge($globalFieldMiddleware, $directiveFieldMiddleware);
+
+        // Middleware resolve in reversed order
+        return array_reverse($fieldMiddleware);
     }
 }

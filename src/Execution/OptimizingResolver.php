@@ -12,12 +12,12 @@ class OptimizingResolver
     /**
      * @var callable
      */
-    private $resolver;
+    protected $resolver;
 
     /**
      * @var array<FieldMiddleware>
      */
-    private $fieldMiddleware;
+    protected $fieldMiddleware;
 
     public function __construct(callable $resolver, array $fieldMiddleware)
     {
