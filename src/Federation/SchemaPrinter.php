@@ -96,9 +96,9 @@ GRAPHQL;
     }
 
     /**
-     * @param  iterable<\GraphQL\Language\AST\DirectiveNode>  $directives
+     * @param  array<\GraphQL\Language\AST\DirectiveNode>  $directives
      */
-    public static function printDirectives(iterable $directives): string
+    public static function printDirectives(array $directives): string
     {
         if (count($directives) === 0) {
             return '';
