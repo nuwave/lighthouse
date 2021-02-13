@@ -128,7 +128,7 @@ GRAPHQL
         );
 
         $fieldDefinition->type = Parser::namedType($connectionTypeName);
-        $parentType->fields [] = $fieldDefinition;
+        $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
     }
 
     /**
@@ -189,7 +189,7 @@ GRAPHQL
         $fieldDefinition->arguments [] = Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
 
         $fieldDefinition->type = Parser::namedType($paginatorTypeName);
-        $parentType->fields [] = $fieldDefinition;
+        $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
     }
 
     /**
