@@ -2,11 +2,19 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\EnumValueDefinition;
+use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
+use GraphQL\Type\Definition\InputObjectField;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use GraphQL\Utils\Utils;
 use Illuminate\Support\Arr;
 
 class FederationPrinter
@@ -69,6 +77,46 @@ class FederationPrinter
             }
         ));
 
-        return SchemaPrinter::doPrint(new Schema($config), []);
+        $printDirectives = static function ($definition): string {
+            /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
+            $astNode = $definition->astNode;
+            if ($astNode === null) {
+                return '';
+            }
+
+            if ($astNode instanceof ObjectTypeDefinitionNode) {
+                return SchemaPrinter::printDirectives(
+                    Utils::filter(
+                        $astNode->directives,
+                        static function (DirectiveNode $directive): bool {
+                            $name = $directive->name->value;
+                            return $name === 'key'
+                                || $name === 'extends';
+                        }
+                    )
+                );
+            } elseif ($astNode instanceof FieldDefinitionNode) {
+                return SchemaPrinter::printDirectives(
+                    Utils::filter(
+                        $astNode->directives,
+                        static function (DirectiveNode $directive): bool {
+                            $name = $directive->name->value;
+                            return $name === 'provides'
+                                || $name === 'requires'
+                                || $name === 'external';
+                        }
+                    )
+                );
+            }
+
+            return '';
+        };
+
+        return SchemaPrinter::doPrint(
+            new Schema($config),
+            // @phpstan-ignore-next-line We extended the SchemaPrinter to allow for this option
+            ['printDirectives' => $printDirectives]
+        );
     }
+
 }
