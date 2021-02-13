@@ -46,7 +46,7 @@ class SchemaValidator
 
                     foreach ($fields->selections as $selection) {
                         if (! $selection instanceof FieldNode) {
-                            throw new FederationException('Must only use field selections in the `fields` argument of @key, got: ' . $selection->kind);
+                            throw new FederationException('Must only use field selections in the `fields` argument of @key, got: '.$selection->kind);
                         }
 
                         try {
