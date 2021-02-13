@@ -31,12 +31,6 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        $this->assertInstanceOf(Directive::class, $schema->getDirective('extends'));
-        $this->assertInstanceOf(Directive::class, $schema->getDirective('external'));
-        $this->assertInstanceOf(Directive::class, $schema->getDirective('key'));
-        $this->assertInstanceOf(Directive::class, $schema->getDirective('provides'));
-        $this->assertInstanceOf(Directive::class, $schema->getDirective('requires'));
-
         $this->assertTrue($schema->hasType('_Entity'));
         $this->assertTrue($schema->hasType('_Service'));
 
