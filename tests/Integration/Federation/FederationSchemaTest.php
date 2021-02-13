@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Federation;
 
+use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\DBTestCase;
 
@@ -34,6 +35,41 @@ GRAPHQL;
 
         $this->schema = $foo.$query;
 
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString($foo, $sdl);
+        $this->assertStringContainsString($query, $sdl);
+    }
+
+    public function testFederatedSchemaShouldContainCorrectEntityUnion(): void
+    {
+        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        type Foo @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+
+        type Bar @key(fields: "id") {
+          id: ID! @external
+          bar: String!
+        }
+
+        type Query {
+          foo: Int!
+        }
+        ');
+
+        /** @var \GraphQL\Type\Definition\UnionType|null $_Entity */
+        $_Entity = $schema->getType('_Entity');
+        $this->assertInstanceOf(UnionType::class, $_Entity);
+
+        $types = $_Entity->getTypes();
+        $this->assertSame('Foo', $types[0]->name);
+        $this->assertSame('Bar', $types[1]->name);
+    }
+
+    protected function _serviceSdl(): string
+    {
         $response = $this->graphQL(/** @lang GraphQL */ '
         {
             _service {
@@ -42,14 +78,6 @@ GRAPHQL;
         }
         ');
 
-        $sdl = $response->json('data._service.sdl');
-        $this->assertStringContainsString($foo, $sdl);
-        $this->assertStringContainsString($query, $sdl);
-    }
-
-    public function testFederatedSchemaShouldContainCorrectEntityUnion(): void
-    {
-        // TODO introspect the schema and validate that the _Entity union contains all the types which we defined in the
-        // schema within this test case
+        return $response->json('data._service.sdl');
     }
 }
