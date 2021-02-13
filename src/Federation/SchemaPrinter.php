@@ -105,10 +105,10 @@ GRAPHQL;
         }
 
         return ' '
-            . implode(
+            .implode(
                 ' ',
                 Utils::map($directives, static function (DirectiveNode $directive): string {
-                    return '@' . $directive->name->value . SchemaPrinter::printDirectiveArgs($directive->arguments);
+                    return '@'.$directive->name->value.SchemaPrinter::printDirectiveArgs($directive->arguments);
                 })
             );
     }
@@ -123,12 +123,12 @@ GRAPHQL;
         }
 
         return '('
-            . implode(
+            .implode(
                 ', ',
                 Utils::map($args, static function (ArgumentNode $arg): string {
-                    return $arg->name->value . ': ' . Printer::doPrint($arg->value);
+                    return $arg->name->value.': '.Printer::doPrint($arg->value);
                 })
             )
-            . ')';
+            .')';
     }
 }

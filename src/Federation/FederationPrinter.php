@@ -86,6 +86,7 @@ class FederationPrinter
                         $astNode->directives,
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
+
                             return $name === 'key'
                                 || $name === 'extends';
                         }
@@ -97,6 +98,7 @@ class FederationPrinter
                         $astNode->directives,
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
+
                             return $name === 'provides'
                                 || $name === 'requires'
                                 || $name === 'external';
@@ -114,5 +116,4 @@ class FederationPrinter
             ['printDirectives' => $printDirectives]
         );
     }
-
 }
