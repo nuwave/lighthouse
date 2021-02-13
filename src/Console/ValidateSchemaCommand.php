@@ -6,6 +6,8 @@ use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Nuwave\Lighthouse\Events\ValidateSchema;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
@@ -21,6 +23,7 @@ class ValidateSchemaCommand extends Command
     public function handle(
         CacheRepository $cache,
         ConfigRepository $config,
+        EventsDispatcher $eventsDispatcher,
         GraphQL $graphQL,
         DirectiveLocator $directiveLocator,
         TypeRegistry $typeRegistry
@@ -46,6 +49,11 @@ class ValidateSchemaCommand extends Command
 
         $schema = new Schema($schemaConfig);
         $schema->assertValid();
+
+        // Allow plugins to do their own schema validations
+        $eventsDispatcher->dispatch(
+            new ValidateSchema($schema)
+        );
 
         $this->info('The defined schema is valid.');
     }
