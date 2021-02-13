@@ -41,10 +41,6 @@ class FederationPrinter
 
     public static function print(Schema $schema): string
     {
-        // TODO decide where to filter directives
-//        $directives = (new Collection($directives))->filter(static function ($directive) {
-//            return in_array($directive->name->value, static::FEDERATION_DIRECTIVES);
-//        });
         $config = SchemaConfig::create();
 
         $types = $schema->getTypeMap();
