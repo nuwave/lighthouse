@@ -22,7 +22,7 @@ class SchemaValidator
         $this->directiveLocator = $directiveLocator;
     }
 
-    public function __invoke(ValidateSchema $validateSchema)
+    public function handle(ValidateSchema $validateSchema): void
     {
         $schema = $validateSchema->schema;
 

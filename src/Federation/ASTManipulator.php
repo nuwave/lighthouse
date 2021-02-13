@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\RootType;
 
 class ASTManipulator
 {
-    public function __invoke(ManipulateAST &$manipulateAST)
+    public function handle(ManipulateAST &$manipulateAST): void
     {
         $documentAST = $manipulateAST->documentAST;
 
