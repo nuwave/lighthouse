@@ -54,7 +54,7 @@ class FieldValue
     protected $complexity;
 
     /**
-     * Field middleware that will only happen once. 
+     * Field middleware that will only happen once.
      *
      * @var callable
      */
@@ -249,5 +249,4 @@ class FieldValue
 
         return $this;
     }
-
 }
