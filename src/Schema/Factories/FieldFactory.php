@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\OptimizingResolver;
@@ -11,6 +12,7 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class FieldFactory
 {
@@ -58,14 +60,26 @@ class FieldFactory
         // Directives have the first priority for defining a resolver for a field
         $resolverDirective = $this->directiveFactory->exclusiveOfType($fieldDefinitionNode, FieldResolver::class);
         if ($resolverDirective instanceof FieldResolver) {
-            $resolver = $resolverDirective->resolveField($fieldValue)->getResolver();
+            $resolverDirective->resolveField($fieldValue);
         } else {
-            $resolver = $fieldValue->useDefaultResolver()->getResolver();
+            $fieldValue->useDefaultResolver();
         }
 
-        $fieldValue->setResolver(
-            new OptimizingResolver($resolver, $this->fieldMiddleware($fieldDefinitionNode))
-        );
+        $this->pipeline
+            ->send($fieldValue)
+            ->through($this->fieldMiddleware($fieldDefinitionNode))
+            ->via('handleField')
+            ->then(static function (FieldValue $fieldValue): FieldValue {
+                return $fieldValue;
+            });
+
+        // Do this after applying other field middleware, so before them in terms of execution order
+        $previousOneOffResolver = $fieldValue->getOneOffResolver();
+        $oneOffResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousOneOffResolver) {
+            $resolveInfo->argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+
+            return $previousOneOffResolver($root, $args, $context, $resolveInfo);
+        };
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
@@ -75,7 +89,7 @@ class FieldFactory
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
-            'resolve' => $fieldValue->getResolver(),
+            'resolve' => new OptimizingResolver($oneOffResolver, $fieldValue->getResolver()),
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
@@ -83,7 +97,7 @@ class FieldFactory
     }
 
     /**
-     * @return array<FieldMiddleware>
+     * @return array<\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware>
      */
     protected function fieldMiddleware(FieldDefinitionNode $fieldDefinitionNode): array
     {

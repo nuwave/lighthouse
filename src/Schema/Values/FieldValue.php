@@ -49,26 +49,24 @@ class FieldValue
     /**
      * A closure that determines the complexity of executing the field.
      *
-     * @var \Closure|null
+     * @var callable|null
      */
     protected $complexity;
+
+    /**
+     * Field middleware that will only happen once. 
+     *
+     * @var callable
+     */
+    protected $oneOffResolver;
 
     public function __construct(TypeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
         $this->field = $field;
-    }
-
-    /**
-     * Overwrite the current/default resolver.
-     *
-     * @return $this
-     */
-    public function setResolver(callable $resolver): self
-    {
-        $this->resolver = $resolver;
-
-        return $this;
+        $this->oneOffResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            return [$root, $args, $context, $resolveInfo];
+        };
     }
 
     /**
@@ -85,16 +83,14 @@ class FieldValue
         return $this;
     }
 
-    /**
-     * Define a closure that is used to determine the complexity of the field.
-     *
-     * @return $this
-     */
-    public function setComplexity(Closure $complexity): self
+    public function getParentName(): string
     {
-        $this->complexity = $complexity;
+        return $this->getParent()->getTypeDefinitionName();
+    }
 
-        return $this;
+    public function getParent(): TypeValue
+    {
+        return $this->parent;
     }
 
     /**
@@ -111,16 +107,6 @@ class FieldValue
         return $this->returnType;
     }
 
-    public function getParent(): TypeValue
-    {
-        return $this->parent;
-    }
-
-    public function getParentName(): string
-    {
-        return $this->getParent()->getTypeDefinitionName();
-    }
-
     /**
      * Get the underlying AST definition for the field.
      */
@@ -135,6 +121,18 @@ class FieldValue
     public function getResolver(): callable
     {
         return $this->resolver;
+    }
+
+    /**
+     * Overwrite the current/default resolver.
+     *
+     * @return $this
+     */
+    public function setResolver(callable $resolver): self
+    {
+        $this->resolver = $resolver;
+
+        return $this;
     }
 
     /**
@@ -156,6 +154,9 @@ class FieldValue
         }
     }
 
+    /**
+     * @deprecated
+     */
     public function getDescription(): ?StringValueNode
     {
         return $this->field->description;
@@ -164,9 +165,21 @@ class FieldValue
     /**
      * Get current complexity.
      */
-    public function getComplexity(): ?Closure
+    public function getComplexity(): ?callable
     {
         return $this->complexity;
+    }
+
+    /**
+     * Define a callable that is used to determine the complexity of the field.
+     *
+     * @return $this
+     */
+    public function setComplexity(callable $complexity): self
+    {
+        $this->complexity = $complexity;
+
+        return $this;
     }
 
     public function getFieldName(): string
@@ -224,4 +237,17 @@ class FieldValue
             return $handle($resolved, $args, $context, $resolveInfo);
         };
     }
+
+    public function getOneOffResolver(): callable
+    {
+        return $this->oneOffResolver;
+    }
+
+    public function setOneOffResolver(callable $oneOffResolver): self
+    {
+        $this->oneOffResolver = $oneOffResolver;
+
+        return $this;
+    }
+
 }
