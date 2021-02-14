@@ -108,27 +108,8 @@ GRAPHQL;
             .implode(
                 ' ',
                 Utils::map($directives, static function (DirectiveNode $directive): string {
-                    return '@'.$directive->name->value.SchemaPrinter::printDirectiveArgs($directive->arguments);
+                    return Printer::doPrint($directive);
                 })
             );
-    }
-
-    /**
-     * @param \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\ArgumentNode> $args
-     */
-    protected static function printDirectiveArgs(NodeList $args): string
-    {
-        if (count($args) === 0) {
-            return '';
-        }
-
-        return '('
-            .implode(
-                ', ',
-                Utils::map($args, static function (ArgumentNode $arg): string {
-                    return $arg->name->value.': '.Printer::doPrint($arg->value);
-                })
-            )
-            .')';
     }
 }
