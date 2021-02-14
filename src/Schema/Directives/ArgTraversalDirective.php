@@ -18,22 +18,22 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 {
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $resolver = $fieldValue->getResolver();
+        $resolver = $fieldValue->getOneOffResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
+        $fieldValue->setOneOffResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+                $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
 
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
+                return $resolver(
+                    $root,
+                    $resolveInfo->argumentSet->toArray(),
+                    $context,
+                    $resolveInfo
+                );
+            }
         );
+
+        return $next($fieldValue);
     }
 
     public function transformRecursively(ArgumentSet $argumentSet): ArgumentSet

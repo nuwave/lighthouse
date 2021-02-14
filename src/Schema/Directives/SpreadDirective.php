@@ -23,21 +23,21 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
-        $resolver = $fieldValue->getResolver();
+        $resolver = $fieldValue->getOneOffResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $resolveInfo->argumentSet->spread();
+        $fieldValue->setOneOffResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+                $resolveInfo->argumentSet = $resolveInfo->argumentSet->spread();
 
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
+                return $resolver(
+                    $root,
+                    $resolveInfo->argumentSet->toArray(),
+                    $context,
+                    $resolveInfo
+                );
+            }
         );
+
+        return $next($fieldValue);
     }
 }
