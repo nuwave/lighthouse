@@ -28,6 +28,10 @@ class OptimizingResolver
         $this->resolver = $resolver;
     }
 
+    /**
+     * @param  array<string, mixed>  $args
+     * @return mixed Really anything
+     */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         if (! isset($this->transformedResolveArgs)) {
