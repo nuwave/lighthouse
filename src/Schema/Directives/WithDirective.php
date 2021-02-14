@@ -2,12 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithDirective extends WithRelationDirective implements FieldMiddleware
+class WithDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
 {
     public static function definition(): string
     {
@@ -28,6 +34,13 @@ directive @with(
   scopes: [String!]
 ) repeatable on FIELD_DEFINITION
 GRAPHQL;
+    }
+
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    {
+        if (RootType::isRootType($parentType->name->value)) {
+            throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");
+        }
     }
 
     protected function relationName(): string

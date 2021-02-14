@@ -39,13 +39,15 @@ GRAPHQL;
 
     protected function find(string $modelClass, $idOrIds)
     {
-        /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $modelClass */
+        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+        // @phpstan-ignore-next-line because it involves mixins
         return $modelClass::withTrashed()->find($idOrIds);
     }
 
     protected function modifyExistence(Model $model): bool
     {
-        /** @var \Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\SoftDeletes $model */
+        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+        // @phpstan-ignore-next-line because it involves mixins
         return (bool) $model->forceDelete();
     }
 

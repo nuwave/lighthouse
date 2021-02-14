@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Comment;
@@ -284,5 +285,16 @@ class WithDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testWithDirectiveOnRootFieldThrows(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            foo: Int @with(relation: "tasks")
+        }
+        ');
     }
 }

@@ -11,14 +11,32 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
+- Validate that `@with` and `@withCount` are not used on root fields https://github.com/nuwave/lighthouse/pull/1714
+
+## 5.2.0
+
+### Added
+
 - Allow using the `@builder` directive on fields https://github.com/nuwave/lighthouse/pull/1687
 - Add dedicated `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective` https://github.com/nuwave/lighthouse/pull/1691
 - Allow `@eq` directive on fields https://github.com/nuwave/lighthouse/pull/1681
+- Add `@throttle` directive to set field rate limit using Laravel rate limiting services https://github.com/nuwave/lighthouse/pull/1708
+- Add subscriptions v2 https://github.com/nuwave/lighthouse/pull/1716
 
 ### Changed
 
 - Clarify semantics of combining `@search` with other directives https://github.com/nuwave/lighthouse/pull/1691
 - Move Scout related classes into `\Nuwave\Lighthouse\Scout` https://github.com/nuwave/lighthouse/pull/1698
+- `BaseDirective` loads all arguments and caches them after the first `directiveHasArgument`/`directiveArgValue` call https://github.com/nuwave/lighthouse/pull/1707
+- Use gate response in authorization errors of `@can` directive https://github.com/nuwave/lighthouse/pull/1715
+
+### Fixed
+
+- Fix nested `OR` conditions in `HAS` relations https://github.com/nuwave/lighthouse/pull/1713
+
+### Deprecated
+
+- Specify `@guard(with: "api")` should be changed to `@guard(with: ["api"])`https://github.com/nuwave/lighthouse/pull/1705
 
 ## 5.1.0
 

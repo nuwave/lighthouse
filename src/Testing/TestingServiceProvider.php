@@ -23,7 +23,7 @@ class TestingServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->singleton(MockDirective::class);
+        $this->app->singleton(MockResolverService::class);
 
         if (class_exists('Illuminate\Testing\TestResponse')) {
             \Illuminate\Testing\TestResponse::mixin(new TestResponseMixin());

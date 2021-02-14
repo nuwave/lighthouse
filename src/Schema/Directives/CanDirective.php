@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
@@ -82,22 +83,22 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
+        $ability = $this->directiveArgValue('ability');
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    $gate = $this->gate->forUser($context->user());
-                    $ability = $this->directiveArgValue('ability');
-                    $checkArguments = $this->buildCheckArguments($args);
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($ability, $previousResolver) {
+                $gate = $this->gate->forUser($context->user());
+                $checkArguments = $this->buildCheckArguments($args);
 
-                    foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
-                        $this->authorize($gate, $ability, $model, $checkArguments);
-                    }
-
-                    return $previousResolver($root, $args, $context, $resolveInfo);
+                foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
+                    $this->authorize($gate, $ability, $model, $checkArguments);
                 }
-            )
+
+                return $previousResolver($root, $args, $context, $resolveInfo);
+            }
         );
+
+        return $next($fieldValue);
     }
 
     /**
@@ -120,7 +121,8 @@ GRAPHQL;
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
-                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+                // @phpstan-ignore-next-line because it involves mixins
                 $queryBuilder->withTrashed();
             }
 
@@ -128,7 +130,8 @@ GRAPHQL;
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
-                /** @var \Illuminate\Database\Eloquent\Builder&\Illuminate\Database\Eloquent\SoftDeletes $queryBuilder */
+                /** @see \Illuminate\Database\Eloquent\SoftDeletes */
+                // @phpstan-ignore-next-line because it involves mixins
                 $queryBuilder->onlyTrashed();
             }
 
@@ -166,7 +169,7 @@ GRAPHQL;
     /**
      * @param  string|array<string>  $ability
      * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array<mixed>  $arguments
+     * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -176,17 +179,32 @@ GRAPHQL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        if (! $gate->check($ability, $arguments)) {
-            throw new AuthorizationException(
-                "You are not authorized to access {$this->nodeName()}"
+        // Gate responses were introduced in Laravel 6
+        // TODO remove with Laravel < 6 support
+        if (AppVersion::atLeast(6.0)) {
+            Utils::applyEach(
+                function ($ability) use ($gate, $arguments) {
+                    $response = $gate->inspect($ability, $arguments);
+
+                    if ($response->denied()) {
+                        throw new AuthorizationException($response->message(), $response->code());
+                    }
+                },
+                $ability
             );
+        } else {
+            if (! $gate->check($ability, $arguments)) {
+                throw new AuthorizationException(
+                    "You are not authorized to access {$this->nodeName()}"
+                );
+            }
         }
     }
 
     /**
      * Additional arguments that are passed to `Gate::check`.
      *
-     * @param  array<mixed>  $args
+     * @param  array<string, mixed>  $args
      * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array

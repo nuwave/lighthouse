@@ -356,6 +356,12 @@ return [
                 'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@echoRoutes',
             ],
         ],
+
+        /*
+         * Controls the format of the extensions response.
+         * Allowed values: 1, 2
+         */
+        'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
     ],
 
     /*

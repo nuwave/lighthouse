@@ -62,13 +62,14 @@ GRAPHQL;
         // Ensure we run this after all other field middleware
         $fieldValue = $next($fieldValue);
 
+        $shouldUseTags = $this->shouldUseTags();
         $resolver = $fieldValue->getResolver();
-
         $maxAge = $this->directiveArgValue('maxAge');
         $isPrivate = $this->directiveArgValue('private', false);
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $isPrivate) {
-            $cacheValue = new CacheValue(
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
+                $cacheValue = new CacheValue(
                 $root,
                 $args,
                 $context,
@@ -77,33 +78,33 @@ GRAPHQL;
                 $isPrivate
             );
 
-            $cacheKey = $cacheValue->getKey();
+                $cacheKey = $cacheValue->getKey();
 
-            /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
-            $cache = $this->shouldUseTags()
+                /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
+                $cache = $shouldUseTags
                 ? $this->cacheRepository->tags($cacheValue->getTags())
                 : $this->cacheRepository;
 
-            // We found a matching value in the cache, so we can just return early
-            // without actually running the query
-            if ($value = $cache->get($cacheKey)) {
-                return $value;
-            }
+                // We found a matching value in the cache, so we can just return early
+                // without actually running the query
+                if ($value = $cache->get($cacheKey)) {
+                    return $value;
+                }
 
-            $resolved = $resolver($root, $args, $context, $resolveInfo);
+                $resolved = $resolver($root, $args, $context, $resolveInfo);
 
-            $storeInCache = $maxAge
+                $storeInCache = $maxAge
                 ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
                     $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
                 }
-            : static function ($result) use ($cacheKey, $cache): void {
-                $cache->forever($cacheKey, $result);
-            };
+                : static function ($result) use ($cacheKey, $cache): void {
+                    $cache->forever($cacheKey, $result);
+                };
 
-            Resolved::handle($resolved, $storeInCache);
+                Resolved::handle($resolved, $storeInCache);
 
-            return $resolved;
-        });
+                return $resolved;
+            });
 
         return $fieldValue;
     }

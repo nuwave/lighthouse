@@ -161,8 +161,7 @@ class PaginateDirectiveTest extends TestCase
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */'
         type User {
             id: ID!
             name: String!
@@ -279,15 +278,15 @@ class PaginateDirectiveTest extends TestCase
     public function testDoesNotRequireModelWhenUsingBuilder(): void
     {
         $validationErrors = $this
-            ->buildSchema(/** @lang GraphQL */ '
+            ->buildSchema(/** @lang GraphQL */ "
             type Query {
-                users: [NotAnActualModelName!] @paginate(builder: "'.$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder').'")
+                users: [NotAnActualModelName!] @paginate(builder: \"{$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder')}\")
             }
 
             type NotAnActualModelName {
                 id: ID!
             }
-            ')
+            ")
             ->validate();
 
         $this->assertCount(0, $validationErrors);

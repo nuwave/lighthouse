@@ -151,6 +151,32 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
+    public function testGetsArgumentFromDirective(): void
+    {
+        $directive = $this->constructFieldDirective('foo: ID @dummy(argName:"argValue", argName2:"argValue2")');
+
+        $this->assertSame(
+            'argValue',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('argName')
+        );
+
+        $this->assertSame(
+            'argValue2',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('argName2')
+        );
+    }
+
+    public function testTwoArgumentsWithSameName(): void
+    {
+        $directive = $this->constructFieldDirective('foo: ID @dummy(argName:"argValue", argName:"argValue2")');
+
+        $this->expectException(DefinitionException::class);
+        // @phpstan-ignore-next-line protected method is called via wrapper below
+        $directive->directiveArgValue('argName');
+    }
+
     protected function constructFieldDirective(string $definition): BaseDirective
     {
         $fieldDefinition = Parser::fieldDefinition($definition);

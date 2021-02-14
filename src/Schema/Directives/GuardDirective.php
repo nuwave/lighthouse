@@ -52,18 +52,21 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
-
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    $this->authenticate(
-                        (array) $this->directiveArgValue('with')
-                    );
-
-                    return $previousResolver($root, $args, $context, $resolveInfo);
-                }
-            )
+        // TODO remove cast in v6
+        $with = (array) (
+            $this->directiveArgValue('with')
+            ?? [config('lighthouse.guard')]
         );
+
+        $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($with, $previousResolver) {
+                $this->authenticate($with);
+
+                return $previousResolver($root, $args, $context, $resolveInfo);
+            }
+        );
+
+        return $next($fieldValue);
     }
 
     /**
@@ -75,10 +78,6 @@ GRAPHQL;
      */
     protected function authenticate(array $guards): void
     {
-        if (empty($guards)) {
-            $guards = [config('lighthouse.guard')];
-        }
-
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
                 $this->auth->shouldUse($guard);

@@ -2592,6 +2592,41 @@ type Subscription {
 }
 ```
 
+## @throttle
+
+```graphql
+"""
+Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
+"""
+directive @throttle(
+  """
+  Named preconfigured rate limiter. Requires Larave 8.x or later.
+  """
+  name: String
+
+  """
+  Maximum number of attempts in a specified time interval.
+  """
+  maxAttempts: Int = 60
+
+  """
+  Time in minutes to reset attempts.
+  """
+  decayMinutes: Float = 1.0
+
+  """
+  Prefix to distinguish several field groups.
+  """
+  prefix: String
+) on FIELD_DEFINITION
+```
+
+Allows use Laravel throttling on a per-field basis. See [Laravel doc](https://laravel.com/docs/routing#rate-limiting)
+on how to configure named limiters.
+
+Limiters that return `response` are not supported. Hashes are different from the ones of Laravel, so one can't use
+one named limiter to limit both Laravel route and GraphQL field.
+
 ## @trashed
 
 ```graphql
