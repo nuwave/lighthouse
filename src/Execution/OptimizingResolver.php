@@ -34,6 +34,10 @@ class OptimizingResolver
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
+        // TODO we might have to store this keyed by path in order to not confuse the same field being referenced
+        // multiple times in a query
+        // $resolveInfo->path
+
         if (! isset($this->transformedResolveArgs)) {
             $this->transformedResolveArgs = ($this->oneOffResolver)($root, $args, $context, $resolveInfo);
         }
