@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\Printer;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InterfaceType;
