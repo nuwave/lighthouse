@@ -123,7 +123,9 @@ class DocumentAST implements Serializable
 
         // Utilize the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
+        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
         $this->types = new NodeList($types);
+        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
         $this->directives = new NodeList($directives);
     }
 
