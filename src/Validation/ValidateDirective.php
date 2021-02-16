@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;

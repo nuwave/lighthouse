@@ -45,5 +45,4 @@ abstract class BatchLoaderRegistry
     {
         self::$instances = [];
     }
-
 }

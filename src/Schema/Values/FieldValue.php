@@ -273,7 +273,7 @@ class FieldValue
 
     public function addArgumentSetTransformer(callable $argumentSetTransformer): self
     {
-        $this->argumentSetTransformers []= $argumentSetTransformer;
+        $this->argumentSetTransformers [] = $argumentSetTransformer;
 
         return $this;
     }
