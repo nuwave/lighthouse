@@ -19,7 +19,7 @@ class OptimizingResolver
     protected $resolver;
 
     /**
-     * @var array{0: mixed, 1: array<string, mixed>, 2: GraphQLContext, 3: ResolveInfo}
+     * @var array<string, array{0: array<string, mixed>, 1: ArgumentSet}>
      */
     protected $transformedResolveArgs;
 
