@@ -62,7 +62,7 @@ class FieldValue
     /**
      * Ordered list of callbacks to transform the incoming argument set.
      *
-     * @var array<int, callable(argumentSet: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, resolveInfo: \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @var array<int, (callable(argumentSet: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, resolveInfo: \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet)>
      */
     protected $argumentSetTransformers;
 
