@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Nuwave\Lighthouse\Execution\Utils\FieldPath;
+
 abstract class BatchLoaderRegistry
 {
     /**
@@ -24,7 +26,7 @@ abstract class BatchLoaderRegistry
     public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): object
     {
         // The path to the field serves as the unique key for the instance
-        $instanceKey = static::instanceKey($pathToField);
+        $instanceKey = FieldPath::withoutLists($pathToField);
 
         if (isset(self::$instances[$instanceKey])) {
             return self::$instances[$instanceKey];
@@ -42,25 +44,5 @@ abstract class BatchLoaderRegistry
     public static function forgetInstances(): void
     {
         self::$instances = [];
-    }
-
-    /**
-     * Generate a unique key for the instance, using the path in the query.
-     *
-     * @param  array<int|string>  $path
-     */
-    protected static function instanceKey(array $path): string
-    {
-        $significantPathSegments = array_filter(
-            $path,
-            static function ($segment): bool {
-                // Ignore numeric path entries, as those signify a list of fields.
-                // Combining the queries for those is the very purpose of the
-                // batch loader, so they must not be included.
-                return ! is_numeric($segment);
-            }
-        );
-
-        return implode('.', $significantPathSegments);
     }
 }

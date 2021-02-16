@@ -6,10 +6,11 @@ use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ValidateDirective extends BaseDirective implements FieldMiddleware
 {
@@ -35,31 +36,25 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $resolver = $fieldValue->getResolver();
+        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet, ResolveInfo $resolveInfo): ArgumentSet {
+            $rulesGatherer = new RulesGatherer($argumentSet);
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $argumentSet = $resolveInfo->argumentSet;
-                    $rulesGatherer = new RulesGatherer($argumentSet);
+            $validator = $this->validationFactory->make(
+                $argumentSet->toArray(),
+                $rulesGatherer->rules,
+                $rulesGatherer->messages,
+                $rulesGatherer->attributes
+            );
 
-                    $validator = $this->validationFactory
-                        ->make(
-                            $args,
-                            $rulesGatherer->rules,
-                            $rulesGatherer->messages,
-                            $rulesGatherer->attributes
-                        );
+            if ($validator->fails()) {
+                $path = FieldPath::withoutLists($resolveInfo->path);
 
-                    if ($validator->fails()) {
-                        $path = implode('.', $resolveInfo->path);
+                throw new ValidationException("Validation failed for the field [$path].", $validator);
+            }
 
-                        throw new ValidationException("Validation failed for the field [$path].", $validator);
-                    }
+            return $argumentSet;
+        });
 
-                    return $resolver($root, $args, $context, $resolveInfo);
-                }
-            )
-        );
+        return $next($fieldValue);
     }
 }

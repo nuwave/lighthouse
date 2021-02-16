@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -16,6 +17,11 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldValue
 {
+    /**
+     * @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}>
+     */
+    protected static $transformedResolveArgs = [];
+
     /**
      * An instance of the type that this field returns.
      *
@@ -49,9 +55,16 @@ class FieldValue
     /**
      * A closure that determines the complexity of executing the field.
      *
-     * @var \Closure|null
+     * @var callable|null
      */
     protected $complexity;
+
+    /**
+     * Ordered list of callbacks to transform the incoming argument set.
+     *
+     * @var array<int, callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo $resolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     */
+    protected $argumentSetTransformers;
 
     public function __construct(TypeValue $parent, FieldDefinitionNode $field)
     {
@@ -59,16 +72,34 @@ class FieldValue
         $this->field = $field;
     }
 
-    /**
-     * Overwrite the current/default resolver.
-     *
-     * @return $this
-     */
-    public function setResolver(callable $resolver): self
+    public static function clear(): void
     {
-        $this->resolver = $resolver;
+        self::$transformedResolveArgs = [];
+    }
 
-        return $this;
+    /**
+     * @param  array<string, mixed>  $args
+     * @return mixed Really anything
+     */
+    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        $path = FieldPath::withoutLists($resolveInfo->path);
+
+        if (! isset(self::$transformedResolveArgs[$path])) {
+            $argumentSetFactory = app(ArgumentSetFactory::class);
+            $argumentSet = $argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+
+            foreach ($this->argumentSetTransformers as $transform) {
+                $argumentSet = $transform($argumentSet);
+            }
+
+            self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];
+        }
+
+        [$args, $argumentSet] = self::$transformedResolveArgs[$path];
+        $resolveInfo->argumentSet = $argumentSet;
+
+        return ($this->resolver)($root, $args, $context, $resolveInfo);
     }
 
     /**
@@ -85,16 +116,14 @@ class FieldValue
         return $this;
     }
 
-    /**
-     * Define a closure that is used to determine the complexity of the field.
-     *
-     * @return $this
-     */
-    public function setComplexity(Closure $complexity): self
+    public function getParentName(): string
     {
-        $this->complexity = $complexity;
+        return $this->getParent()->getTypeDefinitionName();
+    }
 
-        return $this;
+    public function getParent(): TypeValue
+    {
+        return $this->parent;
     }
 
     /**
@@ -111,16 +140,6 @@ class FieldValue
         return $this->returnType;
     }
 
-    public function getParent(): TypeValue
-    {
-        return $this->parent;
-    }
-
-    public function getParentName(): string
-    {
-        return $this->getParent()->getTypeDefinitionName();
-    }
-
     /**
      * Get the underlying AST definition for the field.
      */
@@ -135,6 +154,18 @@ class FieldValue
     public function getResolver(): callable
     {
         return $this->resolver;
+    }
+
+    /**
+     * Overwrite the current/default resolver.
+     *
+     * @return $this
+     */
+    public function setResolver(callable $resolver): self
+    {
+        $this->resolver = $resolver;
+
+        return $this;
     }
 
     /**
@@ -156,6 +187,9 @@ class FieldValue
         }
     }
 
+    /**
+     * @deprecated
+     */
     public function getDescription(): ?StringValueNode
     {
         return $this->field->description;
@@ -164,9 +198,21 @@ class FieldValue
     /**
      * Get current complexity.
      */
-    public function getComplexity(): ?Closure
+    public function getComplexity(): ?callable
     {
         return $this->complexity;
+    }
+
+    /**
+     * Define a callable that is used to determine the complexity of the field.
+     *
+     * @return $this
+     */
+    public function setComplexity(callable $complexity): self
+    {
+        $this->complexity = $complexity;
+
+        return $this;
     }
 
     public function getFieldName(): string
@@ -223,5 +269,12 @@ class FieldValue
 
             return $handle($resolved, $args, $context, $resolveInfo);
         };
+    }
+
+    public function addArgumentSetTransformer(callable $argumentSetTransformer): self
+    {
+        $this->argumentSetTransformers [] = $argumentSetTransformer;
+
+        return $this;
     }
 }

@@ -56,7 +56,7 @@ class HashDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(function ($root, array $args) {
+        $this->mockResolver(static function ($root, array $args): array {
             return $args['input'];
         });
 

@@ -23,6 +23,7 @@ use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
@@ -267,6 +268,7 @@ class GraphQL
     protected function cleanUp(): void
     {
         BatchLoaderRegistry::forgetInstances();
+        FieldValue::clear();
         $this->errorPool->clear();
 
         // TODO remove in v6
