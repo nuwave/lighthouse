@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -11,27 +10,15 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddleware
 {
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $resolver = $fieldValue->getOneOffResolver();
-
-        $fieldValue->setOneOffResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
-
-                return $resolver(
-                    $root,
-                    $resolveInfo->argumentSet->toArray(),
-                    $context,
-                    $resolveInfo
-                );
-            }
-        );
+        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet): ArgumentSet {
+            return $this->transformRecursively($argumentSet);
+        });
 
         return $next($fieldValue);
     }

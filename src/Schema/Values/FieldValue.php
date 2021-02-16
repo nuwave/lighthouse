@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -16,6 +17,11 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldValue
 {
+    /**
+     * @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}>
+     */
+    protected static $transformedResolveArgs = [];
+
     /**
      * An instance of the type that this field returns.
      *
@@ -54,19 +60,46 @@ class FieldValue
     protected $complexity;
 
     /**
-     * Field middleware that will only happen once.
+     * Ordered list of callbacks to transform the incoming argument set.
      *
-     * @var callable
+     * @var array<int, callable(argumentSet: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, resolveInfo: \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
      */
-    protected $oneOffResolver;
+    protected $argumentSetTransformers;
 
     public function __construct(TypeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
         $this->field = $field;
-        $this->oneOffResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-            return [$args, $resolveInfo->argumentSet];
-        };
+    }
+
+    public static function clear(): void
+    {
+        self::$transformedResolveArgs = [];
+    }
+
+    /**
+     * @param  array<string, mixed>  $args
+     * @return mixed Really anything
+     */
+    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        $path = FieldPath::withoutLists($resolveInfo->path);
+
+        if (! isset(self::$transformedResolveArgs[$path])) {
+            $argumentSetFactory = app(ArgumentSetFactory::class);
+            $argumentSet = $argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+
+            foreach ($this->argumentSetTransformers as $transform) {
+                $argumentSet = $transform($argumentSet);
+            }
+
+            self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];
+        }
+
+        [$args, $argumentSet] = self::$transformedResolveArgs[$path];
+        $resolveInfo->argumentSet = $argumentSet;
+
+        return ($this->resolver)($root, $args, $context, $resolveInfo);
     }
 
     /**
@@ -238,14 +271,9 @@ class FieldValue
         };
     }
 
-    public function getOneOffResolver(): callable
+    public function addArgumentSetTransformer(callable $argumentSetTransformer): self
     {
-        return $this->oneOffResolver;
-    }
-
-    public function setOneOffResolver(callable $oneOffResolver): self
-    {
-        $this->oneOffResolver = $oneOffResolver;
+        $this->argumentSetTransformers []= $argumentSetTransformer;
 
         return $this;
     }

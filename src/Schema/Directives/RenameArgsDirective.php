@@ -3,10 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class RenameArgsDirective extends BaseDirective implements FieldMiddleware
 {
@@ -22,20 +21,9 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
-        $resolver = $fieldValue->getOneOffResolver();
-
-        $fieldValue->setOneOffResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                $resolveInfo->argumentSet = $resolveInfo->argumentSet->rename();
-
-                return $resolver(
-                    $root,
-                    $resolveInfo->argumentSet->toArray(),
-                    $context,
-                    $resolveInfo
-                );
-            }
-        );
+        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet): ArgumentSet {
+            return $argumentSet->rename();
+        });
 
         return $next($fieldValue);
     }
