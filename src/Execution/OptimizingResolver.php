@@ -19,7 +19,7 @@ class OptimizingResolver
     protected $resolver;
 
     /**
-     * @var array<string, array{0: array<string, mixed>, 1: ArgumentSet}>
+     * @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}>
      */
     protected static $transformedResolveArgs = [];
 
