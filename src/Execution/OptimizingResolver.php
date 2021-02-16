@@ -21,7 +21,7 @@ class OptimizingResolver
     /**
      * @var array<string, array{0: array<string, mixed>, 1: ArgumentSet}>
      */
-    protected $transformedResolveArgs;
+    protected static $transformedResolveArgs = [];
 
     public function __construct(callable $oneOffResolver, callable $resolver)
     {
@@ -37,13 +37,18 @@ class OptimizingResolver
     {
         $instanceKey = BatchLoaderRegistry::instanceKey($resolveInfo->path);
 
-        if (! isset($this->transformedResolveArgs[$instanceKey])) {
-            $this->transformedResolveArgs[$instanceKey] = ($this->oneOffResolver)($root, $args, $context, $resolveInfo);
+        if (! isset(self::$transformedResolveArgs[$instanceKey])) {
+            self::$transformedResolveArgs[$instanceKey] = ($this->oneOffResolver)($root, $args, $context, $resolveInfo);
         }
 
-        [$args, $argumentSet] = $this->transformedResolveArgs[$instanceKey];
+        [$args, $argumentSet] = self::$transformedResolveArgs[$instanceKey];
         $resolveInfo->argumentSet = $argumentSet;
 
         return ($this->resolver)($root, $args, $context, $resolveInfo);
+    }
+
+    public static function clear(): void
+    {
+        self::$transformedResolveArgs = [];
     }
 }

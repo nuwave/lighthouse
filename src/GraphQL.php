@@ -21,6 +21,7 @@ use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\Execution\OptimizingResolver;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -267,6 +268,7 @@ class GraphQL
     protected function cleanUp(): void
     {
         BatchLoaderRegistry::forgetInstances();
+        OptimizingResolver::clear();
         $this->errorPool->clear();
 
         // TODO remove in v6

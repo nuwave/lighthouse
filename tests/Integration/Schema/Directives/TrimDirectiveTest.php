@@ -73,35 +73,6 @@ class TrimDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testTrimsOnNonRootField(): void
-    {
-        factory(Company::class, 3)->create();
-
-        $this->schema .= /** @lang GraphQL */ '
-        type Company {
-            id(foo: String @trim): ID!
-        }
-
-        type Query {
-            companies: [Company!]! @all
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            companies {
-                id(foo: " bar ")
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'companies' => [
-                    'id' => '1',
-                ],
-            ],
-        ]);
-    }
-
     public function testTrimsAllFieldInputs(): void
     {
         $this->mockResolver(static function ($root, array $args): array {
