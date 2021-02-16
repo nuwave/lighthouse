@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Company;
 
 class TrimDirectiveTest extends DBTestCase
 {
