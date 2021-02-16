@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class OptimizingResolver
@@ -34,14 +35,15 @@ class OptimizingResolver
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
-        // TODO we might have to store this keyed by path in order to not confuse the same field being referenced
-        // multiple times in a query
-        // $resolveInfo->path
+        $instanceKey = BatchLoaderRegistry::instanceKey($resolveInfo->path);
 
-        if (! isset($this->transformedResolveArgs)) {
-            $this->transformedResolveArgs = ($this->oneOffResolver)($root, $args, $context, $resolveInfo);
+        if (! isset($this->transformedResolveArgs[$instanceKey])) {
+            $this->transformedResolveArgs[$instanceKey] = ($this->oneOffResolver)($root, $args, $context, $resolveInfo);
         }
 
-        return ($this->resolver)(...$this->transformedResolveArgs);
+        [$args, $argumentSet] = $this->transformedResolveArgs[$instanceKey];
+        $resolveInfo->argumentSet = $argumentSet;
+
+        return ($this->resolver)($root, $args, $context, $resolveInfo);
     }
 }

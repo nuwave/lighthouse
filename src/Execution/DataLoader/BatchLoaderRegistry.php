@@ -49,7 +49,7 @@ abstract class BatchLoaderRegistry
      *
      * @param  array<int|string>  $path
      */
-    protected static function instanceKey(array $path): string
+    public static function instanceKey(array $path): string
     {
         $significantPathSegments = array_filter(
             $path,

@@ -65,7 +65,7 @@ class FieldValue
         $this->parent = $parent;
         $this->field = $field;
         $this->oneOffResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-            return [$root, $args, $context, $resolveInfo];
+            return [$args, $resolveInfo->argumentSet];
         };
     }
 
