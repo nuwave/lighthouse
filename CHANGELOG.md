@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Validate that `@with` and `@withCount` are not used on root fields https://github.com/nuwave/lighthouse/pull/1714
+- For `echo` driver based subscriptions, the event name will be 'lighthouse-subscription'. Echo driver will always broadcast through the `private` channel. If want to broadcast a sync event, it will not be queued anymore. Pusher driver can log entries if defined in the `broadcasting` config file. https://github.com/nuwave/lighthouse/pull/1733
 
 ## 5.2.0
 
