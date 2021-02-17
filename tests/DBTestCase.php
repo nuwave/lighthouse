@@ -50,6 +50,7 @@ abstract class DBTestCase extends TestCase
             'driver' => 'mysql',
             'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
             'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
+            'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
             'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
             'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
         ]);

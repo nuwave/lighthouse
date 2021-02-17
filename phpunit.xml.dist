@@ -29,6 +29,7 @@
     <php>
         <env name="LIGHTHOUSE_TEST_DB_DATABASE" value="test"/>
         <env name="LIGHTHOUSE_TEST_DB_HOST" value="mysql"/>
+        <env name="LIGHTHOUSE_TEST_DB_PORT" value="3306"/>
         <env name="LIGHTHOUSE_TEST_DB_USERNAME" value="root"/>
         <env name="LIGHTHOUSE_TEST_DB_PASSWORD" value=""/>
         <env name="LIGHTHOUSE_TEST_REDIS_HOST" value="redis"/>
