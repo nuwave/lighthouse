@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
