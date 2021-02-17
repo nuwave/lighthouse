@@ -40,6 +40,35 @@ class AuthorizeRequestsTest extends TestCase
             ]);
     }
 
+    public function testEchoClientAuthorizesPresenceChannelForBackwardCompatibility(): void
+    {
+        $response = $this->querySubscription();
+
+        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'presence-' . $channel,
+            ])
+            ->assertSuccessful()
+            ->assertJsonStructure([
+                'channel_data' => [
+                    'user_id', 'user_info',
+                ],
+            ]);
+    }
+
+    public function testEchoClientAuthorizationFailsOtherThanPresenceChannel(): void
+    {
+        $response = $this->querySubscription();
+
+        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'anything-before-' . $channel,
+            ])
+            ->assertForbidden();
+    }
+
     public function testEchoClientAuthorizeFails(): void
     {
         $response = $this->querySubscription();
