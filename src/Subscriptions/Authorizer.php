@@ -44,8 +44,6 @@ class Authorizer implements AuthorizesSubscriptions
                 return false;
             }
 
-            $channel = $this->sanitizeChannelName($channel);
-
             $subscriber = $this->storage->subscriberByChannel($channel);
             if ($subscriber === null) {
                 return false;
@@ -71,19 +69,5 @@ class Authorizer implements AuthorizesSubscriptions
 
             return false;
         }
-    }
-
-    /**
-     * Removes the prefix "presence-" from the channel name.
-     *
-     * Laravel Echo prefixes channel names with "presence-", but we don't.
-     */
-    private function sanitizeChannelName(string $channelName): string
-    {
-        if (Str::startsWith($channelName, 'presence-')) {
-            return Str::substr($channelName, 9);
-        }
-
-        return $channelName;
     }
 }

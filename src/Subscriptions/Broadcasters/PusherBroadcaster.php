@@ -11,8 +11,6 @@ use Pusher\Pusher;
 
 class PusherBroadcaster implements Broadcaster
 {
-    public const EVENT_NAME = 'lighthouse-subscription';
-
     /**
      * @var \Pusher\Pusher
      */
