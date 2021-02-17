@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\DriverManager;
+use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
 use RuntimeException;
 
@@ -53,6 +54,10 @@ class BroadcastManager extends DriverManager
         $options = Arr::get($driverConfig, 'options', []);
 
         $pusher = new Pusher($appKey, $appSecret, $appId, $options);
+
+        if ($driverConfig['log'] ?? false) {
+            $pusher->setLogger($this->app->make(LoggerInterface::class));
+        }
 
         return new PusherBroadcaster($pusher);
     }
