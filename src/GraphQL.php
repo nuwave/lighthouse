@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
+use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Language\Parser;
@@ -130,8 +131,16 @@ class GraphQL
      */
     public function executeOperation(OperationParams $params): array
     {
+        try {
+            $query = Parser::parse($params->query);
+        } catch (SyntaxError $syntaxError) {
+            return $this->applyDebugSettings(
+                new ExecutionResult(null, [$syntaxError])
+            );
+        }
+
         $result = $this->executeQuery(
-            $params->query,
+            $query,
             $this->createsContext->generate(
                 app('request')
             ),
@@ -150,6 +159,33 @@ class GraphQL
      */
     public function applyDebugSettings(ExecutionResult $result): array
     {
+        $result->setErrorsHandler(
+            function (array $errors, callable $formatter): array {
+                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
+                // This allows the user to register multiple handlers and pipe the errors through.
+                $handlers = [];
+                foreach (config('lighthouse.error_handlers', []) as $handlerClass) {
+                    $handlers [] = app($handlerClass);
+                }
+
+                return (new Collection($errors))
+                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
+                        return $this->pipeline
+                            ->send($error)
+                            ->through($handlers)
+                            ->then(function (?Error $error) use ($formatter): ?array {
+                                if ($error === null) {
+                                    return null;
+                                }
+
+                                return $formatter($error);
+                            });
+                    })
+                    ->filter()
+                    ->all();
+            }
+        );
+
         // If debugging is set to false globally, do not add GraphQL specific
         // debugging info either. If it is true, then we fetch the debug
         // level from the Lighthouse configuration.
@@ -182,10 +218,6 @@ class GraphQL
         // This allows tracking the time for batched queries independently.
         $this->prepSchema();
 
-        if (is_string($query)) {
-            $query = Parser::parse($query);
-        }
-
         $this->eventDispatcher->dispatch(
             new StartExecution($query, $variables, $operationName)
         );
@@ -215,33 +247,6 @@ class GraphQL
         foreach ($this->errorPool->errors() as $error) {
             $result->errors [] = $error;
         }
-
-        $result->setErrorsHandler(
-            function (array $errors, callable $formatter): array {
-                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
-                // This allows the user to register multiple handlers and pipe the errors through.
-                $handlers = [];
-                foreach (config('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers [] = app($handlerClass);
-                }
-
-                return (new Collection($errors))
-                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
-                        return $this->pipeline
-                            ->send($error)
-                            ->through($handlers)
-                            ->then(function (?Error $error) use ($formatter): ?array {
-                                if ($error === null) {
-                                    return null;
-                                }
-
-                                return $formatter($error);
-                            });
-                    })
-                    ->filter()
-                    ->all();
-            }
-        );
 
         // Allow listeners to manipulate the result after each resolved query
         $this->eventDispatcher->dispatch(
