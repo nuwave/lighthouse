@@ -31,7 +31,7 @@ class RedisStorageManagerTest extends TestCase
         $response = $this->querySubscription();
 
         // externally, we do not see a redis prefix
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this->assertStringStartsWith('private-lighthouse-', $channel);
 
         // internally when using the redis driver to access the keys there seems to be no prefix
@@ -51,7 +51,7 @@ class RedisStorageManagerTest extends TestCase
         $storage = $this->app->make(RedisStorageManager::class);
 
         $response = $this->querySubscription();
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
 
         // when it's the only subscriber to a topic, the topic gets deleted with the subscriber
         $this->assertRedisHas('graphql.subscriber.'.$channel);
@@ -63,9 +63,9 @@ class RedisStorageManagerTest extends TestCase
 
         // when there are multiple subscribers, the topic stays as long as there are subscribers
         $firstResponse = $this->querySubscription();
-        $firstChannel = $firstResponse->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $firstChannel = $firstResponse->json('extensions.lighthouse_subscriptions.channel');
         $secondResponse = $this->querySubscription();
-        $secondChannel = $secondResponse->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $secondChannel = $secondResponse->json('extensions.lighthouse_subscriptions.channel');
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         $storage->deleteSubscriber($firstChannel);
