@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
+use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
@@ -115,5 +116,30 @@ class GuardDirectiveTest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    public function testGuardHappensBeforeOtherDirectivesIfAddedFromType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query @guard {
+            user: User!
+                @can(ability: "adminOnly")
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    name
+                }
+            }
+            ')
+            ->assertGraphQLErrorCategory(AuthenticationException::CATEGORY);
     }
 }
