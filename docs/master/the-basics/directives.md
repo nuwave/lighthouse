@@ -53,10 +53,10 @@ type Query {
     "Search by title"
     title: String @like(template: "%{}%")
   ): [Post!]!
-    # Resolve as a paginated list
-    @paginate
     # Require authentication
     @guard
+    # Resolve as a paginated list
+    @paginate
 }
 ```
 

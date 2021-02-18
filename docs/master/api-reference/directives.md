@@ -1078,6 +1078,18 @@ on all of them at once.
 extend type Query @guard { ... }
 ```
 
+The `@guard` directive will be prepended to other directives defined on the fields
+and thus executes before them.
+
+```graphql
+extend type Query {
+  user: User!
+    @guard
+    @can(ability: "adminOnly")
+  ...
+}
+```
+
 ## @hash
 
 ```graphql
