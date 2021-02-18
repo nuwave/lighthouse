@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Events\EndExecution;
 use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\ManipulateResult;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Tests\TestCase;
@@ -32,19 +33,28 @@ class LifecycleEventsTest extends TestCase
             }
         });
 
+        $this->mockResolver();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+           foo: Int @mock
+        }
+        ';
+
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo
         }
         ');
 
-        $this->assertInstanceOf(StartRequest::class, $events[0]);
-        $this->assertInstanceOf(BuildSchemaString::class, $events[1]);
-        $this->assertInstanceOf(ManipulateAST::class, $events[2]);
-        $this->assertInstanceOf(StartExecution::class, $events[3]);
-        $this->assertInstanceOf(BuildExtensionsResponse::class, $events[4]);
-        $this->assertInstanceOf(ManipulateResult::class, $events[5]);
-        $this->assertInstanceOf(EndExecution::class, $events[6]);
-        $this->assertInstanceOf(EndRequest::class, $events[7]);
+        $this->assertInstanceOf(StartRequest::class, array_shift($events));
+        $this->assertInstanceOf(BuildSchemaString::class, array_shift($events));
+        $this->assertInstanceOf(RegisterDirectiveNamespaces::class, array_shift($events));
+        $this->assertInstanceOf(ManipulateAST::class, array_shift($events));
+        $this->assertInstanceOf(StartExecution::class, array_shift($events));
+        $this->assertInstanceOf(BuildExtensionsResponse::class, array_shift($events));
+        $this->assertInstanceOf(ManipulateResult::class, array_shift($events));
+        $this->assertInstanceOf(EndExecution::class, array_shift($events));
+        $this->assertInstanceOf(EndRequest::class, array_shift($events));
     }
 }

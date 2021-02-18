@@ -3,8 +3,7 @@
 namespace Nuwave\Lighthouse\Execution;
 
 /**
- * May be returned from listeners of the event:.
- * @see \Nuwave\Lighthouse\Events\BuildExtensionsResponse
+ * May be returned from listeners of @see \Nuwave\Lighthouse\Events\BuildExtensionsResponse
  */
 class ExtensionsResponse
 {

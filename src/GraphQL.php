@@ -131,9 +131,8 @@ class GraphQL
      */
     public function executeOperation(OperationParams $params): array
     {
-
         $result = $this->executeQuery(
-            $query,
+            $params->query,
             $this->createsContext->generate(
                 app('request')
             ),

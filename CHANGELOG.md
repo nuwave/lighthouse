@@ -19,6 +19,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Prepend directives when transferring them from types to fields https://github.com/nuwave/lighthouse/pull/1734
 
+### Fixed
+
+- Apply custom error handlers for syntax or request errors https://github.com/nuwave/lighthouse/pull/1726
+
 ## 5.2.0
 
 ### Added
