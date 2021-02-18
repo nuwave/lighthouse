@@ -68,7 +68,7 @@ Field middleware run in lexical definition order.
 
 ```graphql
 type Query {
-    foo: ID @first @second
+  foo: ID @first @second
 }
 ```
 
