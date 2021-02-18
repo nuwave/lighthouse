@@ -15,7 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Prepend directives when transferring them from types to fields
+- Prepend directives when transferring them from types to fields https://github.com/nuwave/lighthouse/pull/1734
 
 ## 5.2.0
 

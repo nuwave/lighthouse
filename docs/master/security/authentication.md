@@ -71,8 +71,7 @@ to add a CSRF token](https://github.com/mll-lab/laravel-graphql-playground#confi
 
 ## Guard selected fields
 
-If you want to guard only selected fields, you can use the [@guard](../api-reference/directives.md#guard)
-directive to require authentication for accessing them.
+Use the [@guard](../api-reference/directives.md#guard) directive to require authentication for a single field.
 
 ```graphql
 type Query {
@@ -80,13 +79,25 @@ type Query {
 }
 ```
 
-If you need to guard multiple fields, just use [@guard](../api-reference/directives.md#guard)
+If you need to guard multiple fields, use [@guard](../api-reference/directives.md#guard)
 on a `type` or an `extend type` definition. It will be applied to all fields within that type.
 
 ```graphql
-extend type Query @guard
+extend type Query @guard {
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
+}
+```
+
+The `@guard` directive will be prepended to other directives defined on the fields
+and thus executes before them.
+
+```graphql
+extend type Query {
+  user: User!
+    @guard
+    @can(ability: "adminOnly")
+  ...
 }
 ```
 
