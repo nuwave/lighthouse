@@ -12,10 +12,16 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Validate that `@with` and `@withCount` are not used on root fields https://github.com/nuwave/lighthouse/pull/1714
+- Add events to cover the lifecycle of a GraphQL request: `EndExecution`, `EndRequest` https://github.com/nuwave/lighthouse/pull/1726
+- Include the client given query, variables and operation name in the `StartExecution` event https://github.com/nuwave/lighthouse/pull/1726
 
 ### Changed
 
 - Prepend directives when transferring them from types to fields https://github.com/nuwave/lighthouse/pull/1734
+
+### Fixed
+
+- Apply custom error handlers for syntax or request errors https://github.com/nuwave/lighthouse/pull/1726
 
 ## 5.2.0
 

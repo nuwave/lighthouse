@@ -2,36 +2,36 @@
 
 namespace Nuwave\Lighthouse\Events;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Fires right after a request reaches the GraphQLController.
+ * Fires right after building the HTTP response in the GraphQLController.
  *
  * Can be used for logging or for measuring and monitoring
  * the time a request takes to resolve.
  *
  * @see \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController
  */
-class StartRequest
+class EndRequest
 {
     /**
-     * The request sent from the client.
+     * The response that is about to be sent to the client.
      *
-     * @var \Illuminate\Http\Request
+     * @var \Symfony\Component\HttpFoundation\Response
      */
-    public $request;
+    public $response;
 
     /**
-     * The point in time when the request started.
+     * The point in time when the response was ready.
      *
      * @var \Illuminate\Support\Carbon
      */
     public $moment;
 
-    public function __construct(Request $request)
+    public function __construct(Response $response)
     {
-        $this->request = $request;
+        $this->response = $response;
         $this->moment = Carbon::now();
     }
 }
