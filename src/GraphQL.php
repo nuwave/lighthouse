@@ -131,13 +131,6 @@ class GraphQL
      */
     public function executeOperation(OperationParams $params): array
     {
-        try {
-            $query = Parser::parse($params->query);
-        } catch (SyntaxError $syntaxError) {
-            return $this->applyDebugSettings(
-                new ExecutionResult(null, [$syntaxError])
-            );
-        }
 
         $result = $this->executeQuery(
             $query,
@@ -213,6 +206,15 @@ class GraphQL
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
+        // TODO make executeQuery require a DocumentNode and move this parsing out of here
+        if (is_string($query)) {
+            try {
+                $query = Parser::parse($query);
+            } catch (SyntaxError $syntaxError) {
+                return new ExecutionResult(null, [$syntaxError]);
+            }
+        }
+
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
         // This allows tracking the time for batched queries independently.
