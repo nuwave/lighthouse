@@ -27,7 +27,7 @@ class AuthorizeRequestsTest extends TestCase
     {
         $response = $this->querySubscription();
 
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
                 'channel_name' => $channel,
@@ -73,7 +73,7 @@ class AuthorizeRequestsTest extends TestCase
     {
         $response = $this->querySubscription();
 
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
                 'channel_name' => $channel.'plain-wrong',
@@ -85,7 +85,7 @@ class AuthorizeRequestsTest extends TestCase
     {
         $response = $this->querySubscription();
 
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
                 'channel_name' => $channel,

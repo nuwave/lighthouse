@@ -64,6 +64,14 @@ GRAPHQL;
 }
 ```
 
+Field middleware run in lexical definition order.
+
+```graphql
+type Query {
+  foo: ID @first @second
+}
+```
+
 ## FieldBuilderDirective
 
 A [`\Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/FieldBuilderDirective.php)
