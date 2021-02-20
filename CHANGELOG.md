@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Validate that `@with` and `@withCount` are not used on root fields https://github.com/nuwave/lighthouse/pull/1714
+- For `echo` driver based subscriptions, the event name will be 'lighthouse-subscription'. Echo driver will always broadcast through the `private` channel. If want to broadcast a sync event, it will not be queued anymore. Pusher driver can log entries if defined in the `broadcasting` config file. https://github.com/nuwave/lighthouse/pull/1733
 - Add events to cover the lifecycle of a GraphQL request: `EndExecution`, `EndRequest` https://github.com/nuwave/lighthouse/pull/1726
 - Include the client given query, variables and operation name in the `StartExecution` event https://github.com/nuwave/lighthouse/pull/1726
 
