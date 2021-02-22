@@ -36,7 +36,7 @@ class EntityResolverProvider
     /**
      * Maps from __typename to resolver.
      *
-     * @var array<string, \Closure(array<string, mixed> $representations): mixed>
+     * @var array<string, \Closure(array<string, mixed>): mixed>
      */
     protected $resolvers;
 
@@ -142,7 +142,7 @@ class EntityResolverProvider
         }
 
         if ($satisfiedKeyFields === null) {
-            throw new FederationException('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
+            throw new FederationException('Representation does not satisfy any set of uniquely identifying keys: '.\Safe\json_encode($representation));
         }
 
         $this->applySatisfiedSelection($builder, $keyFields, $representation);
@@ -198,6 +198,7 @@ class EntityResolverProvider
             $subSelection = $field->selectionSet;
             if ($subSelection === null) {
                 $builder->where($fieldName, $value);
+
                 return;
             }
 
