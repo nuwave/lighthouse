@@ -25,8 +25,6 @@ RUN pecl install \
 
 RUN echo 'memory_limit=-1' > /usr/local/etc/php/conf.d/lighthouse.ini
 
-RUN echo "alias phpunit='vendor/bin/phpunit'" >> ~/.bashrc
-
 ARG USER
 ARG USER_ID
 ARG GROUP_ID

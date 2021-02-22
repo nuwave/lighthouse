@@ -5,6 +5,7 @@ namespace Tests\Unit\Subscriptions\Broadcasters;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Constraint\Callback;
@@ -21,14 +22,30 @@ class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return $event->broadcastAs() === 'lighthouse.subscription' &&
-                    $event->broadcastOn()->name === 'presence-test-123' &&
-                    $event->data === 'foo';
+                return $event->broadcastAs() === Broadcaster::EVENT_NAME
+                    && $event->broadcastOn()->name === 'test-123'
+                    && $event->data === 'foo';
             }));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
         $subscriber = $this->createMock(Subscriber::class);
         $subscriber->channel = 'test-123';
+
+        $redisBroadcaster->broadcast($subscriber, 'foo');
+    }
+
+    public function testBroadcastChannelNameIsNotModified(): void
+    {
+        $broadcastManager = $this->createMock(BroadcastManager::class);
+        $broadcastManager->expects($this->once())
+            ->method('event')
+            ->with(new Callback(function (EchoSubscriptionEvent $event) {
+                return $event->broadcastOn()->name === 'private-test-123';
+            }));
+
+        $redisBroadcaster = new EchoBroadcaster($broadcastManager);
+        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber->channel = 'private-test-123';
 
         $redisBroadcaster->broadcast($subscriber, 'foo');
     }

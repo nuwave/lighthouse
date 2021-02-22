@@ -7,6 +7,8 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface Broadcaster
 {
+    public const EVENT_NAME = 'lighthouse-subscription';
+
     /**
      * Handle authorized subscription request.
      *

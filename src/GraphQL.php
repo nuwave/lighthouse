@@ -4,8 +4,10 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
+use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Language\Parser;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
@@ -16,6 +18,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\EndExecution;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
@@ -148,6 +151,33 @@ class GraphQL
      */
     public function applyDebugSettings(ExecutionResult $result): array
     {
+        $result->setErrorsHandler(
+            function (array $errors, callable $formatter): array {
+                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
+                // This allows the user to register multiple handlers and pipe the errors through.
+                $handlers = [];
+                foreach (config('lighthouse.error_handlers', []) as $handlerClass) {
+                    $handlers [] = app($handlerClass);
+                }
+
+                return (new Collection($errors))
+                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
+                        return $this->pipeline
+                            ->send($error)
+                            ->through($handlers)
+                            ->then(function (?Error $error) use ($formatter): ?array {
+                                if ($error === null) {
+                                    return null;
+                                }
+
+                                return $formatter($error);
+                            });
+                    })
+                    ->filter()
+                    ->all();
+            }
+        );
+
         // If debugging is set to false globally, do not add GraphQL specific
         // debugging info either. If it is true, then we fetch the debug
         // level from the Lighthouse configuration.
@@ -165,7 +195,7 @@ class GraphQL
      * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
      *
      * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  array<mixed>|null  $variables
+     * @param  array<string, mixed>|null  $variables
      * @param  mixed|null  $rootValue
      */
     public function executeQuery(
@@ -175,13 +205,22 @@ class GraphQL
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
+        // TODO make executeQuery require a DocumentNode and move this parsing out of here
+        if (is_string($query)) {
+            try {
+                $query = Parser::parse($query);
+            } catch (SyntaxError $syntaxError) {
+                return new ExecutionResult(null, [$syntaxError]);
+            }
+        }
+
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
         // This allows tracking the time for batched queries independently.
         $this->prepSchema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution
+            new StartExecution($query, $variables, $operationName)
         );
 
         $result = GraphQLBase::executeQuery(
@@ -210,36 +249,13 @@ class GraphQL
             $result->errors [] = $error;
         }
 
-        $result->setErrorsHandler(
-            function (array $errors, callable $formatter): array {
-                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
-                // This allows the user to register multiple handlers and pipe the errors through.
-                $handlers = [];
-                foreach (config('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers [] = app($handlerClass);
-                }
-
-                return (new Collection($errors))
-                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
-                        return $this->pipeline
-                            ->send($error)
-                            ->through($handlers)
-                            ->then(function (?Error $error) use ($formatter): ?array {
-                                if ($error === null) {
-                                    return null;
-                                }
-
-                                return $formatter($error);
-                            });
-                    })
-                    ->filter()
-                    ->all();
-            }
-        );
-
         // Allow listeners to manipulate the result after each resolved query
         $this->eventDispatcher->dispatch(
             new ManipulateResult($result)
+        );
+
+        $this->eventDispatcher->dispatch(
+            new EndExecution($result)
         );
 
         $this->cleanUp();

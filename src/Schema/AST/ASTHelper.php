@@ -71,6 +71,24 @@ class ASTHelper
         return $merged;
     }
 
+    /**
+     * @template TNode of \GraphQL\Language\AST\Node
+     * @param  \GraphQL\Language\AST\NodeList<TNode>  $nodeList
+     * @param  TNode  $node
+     * @return \GraphQL\Language\AST\NodeList<TNode>
+     */
+    public static function prepend(NodeList $nodeList, Node $node): NodeList
+    {
+        /**
+         * Since we did not modify the passed in lists, the types did not change.
+         *
+         * @var \GraphQL\Language\AST\NodeList<TNode> $merged
+         */
+        $merged = (new NodeList([$node]))->merge($nodeList);
+
+        return $merged;
+    }
+
     public static function duplicateDefinition(string $oldName): string
     {
         return "Duplicate definition {$oldName} found when merging.";
@@ -106,22 +124,6 @@ class ASTHelper
         }
 
         return self::getUnderlyingNamedTypeNode($type);
-    }
-
-    /**
-     * Does the given field have an argument of the given name?
-     */
-    public static function fieldHasArgument(FieldDefinitionNode $fieldDefinition, string $name): bool
-    {
-        return self::firstByName($fieldDefinition->arguments, $name) !== null;
-    }
-
-    /**
-     * Does the given directive have an argument of the given name?
-     */
-    public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
-    {
-        return self::firstByName($directiveDefinition->arguments, $name) !== null;
     }
 
     /**
@@ -237,7 +239,7 @@ class ASTHelper
                 /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
                 $fieldDefinitions = $typeDefinition->fields;
                 foreach ($fieldDefinitions as $fieldDefinition) {
-                    $fieldDefinition->directives [] = $directive;
+                    $fieldDefinition->directives = static::prepend($fieldDefinition->directives, $directive);
                 }
             }
         }
@@ -287,7 +289,7 @@ class ASTHelper
                 continue;
             }
 
-            $fieldDefinition->directives [] = $directiveNode;
+            $fieldDefinition->directives = static::prepend($fieldDefinition->directives, $directiveNode);
         }
     }
 

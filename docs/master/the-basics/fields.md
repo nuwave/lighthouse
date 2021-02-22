@@ -176,7 +176,7 @@ of `App\Model\User`.
 
 Next, the field sub-selection will be resolved - the two requested fields are `id` and `name`.
 Since we already resolved the User in the parent field, we do not want to fetch it again
-to get it's attributes.
+to get its attributes.
 
 Conveniently, the first argument of each resolver is the return value of the parent
 field, in this case a User model.
