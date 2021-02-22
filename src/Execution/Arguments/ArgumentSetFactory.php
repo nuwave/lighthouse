@@ -9,7 +9,6 @@ use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ResolveInfo;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class ArgumentSetFactory
@@ -47,16 +46,7 @@ class ArgumentSetFactory
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
-        $parentName = $resolveInfo->parentType->name;
-        $fieldName = $resolveInfo->fieldName;
-
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentDefinition */
-        $parentDefinition = $this->documentAST->types[$parentName];
-
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
-        $fieldDefinition = ASTHelper::firstByName($parentDefinition->fields, $fieldName);
-
-        return $this->wrapArgs($fieldDefinition, $args);
+        return $this->wrapArgs($resolveInfo->fieldDefinition->astNode, $args);
     }
 
     /**

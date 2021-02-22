@@ -37,6 +37,7 @@ DESCRIPTION;
             throw new Error(self::MESSAGE.\Safe\json_encode($value));
         }
 
+        // TODO couple with EntityResolverProvider and ensure the necessary fields are contained
         // TODO validate fields match the @external fields of the __typename
 
         return $value;

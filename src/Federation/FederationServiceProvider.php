@@ -10,6 +10,11 @@ use Nuwave\Lighthouse\Events\ValidateSchema;
 
 class FederationServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->singleton(EntityResolverProvider::class);
+    }
+
     public function boot(EventsDispatcher $eventsDispatcher): void
     {
         $eventsDispatcher->listen(

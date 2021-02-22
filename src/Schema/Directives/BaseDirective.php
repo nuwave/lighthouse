@@ -148,37 +148,12 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName);
-
-        // Fallback to using information from the schema definition as the model name
-        if (! $model) {
-            if ($this->definitionNode instanceof FieldDefinitionNode) {
-                $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
-
-                /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
-                $documentAST = app(ASTBuilder::class)->documentAST();
-
-                if (! isset($documentAST->types[$returnTypeName])) {
-                    throw new DefinitionException(
-                        "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
-                    );
-                }
-                $type = $documentAST->types[$returnTypeName];
-
-                $modelDirective = ASTHelper::directiveDefinition($type, 'model');
-                if ($modelDirective !== null) {
-                    $model = ASTHelper::directiveArgValue($modelDirective, 'class');
-                } else {
-                    $model = $returnTypeName;
-                }
-            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
-                $model = $this->nodeName();
-            }
-        }
+        $model = $this->directiveArgValue($argumentName)
+            ?? ASTHelper::modelName($this->definitionNode);
 
         if (! $model) {
             throw new DefinitionException(
-                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
+                "A `model` argument must be assigned to the '@{$this->name()}' directive on '{$this->nodeName()}."
             );
         }
 

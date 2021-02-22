@@ -3,9 +3,8 @@
 namespace Nuwave\Lighthouse\Federation\Resolvers;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Exceptions\FederationException;
+use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Utils;
 
 /**
  * Resolver for the _entities field.
@@ -14,6 +13,16 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 class Entities
 {
+    /**
+     * @var \Nuwave\Lighthouse\Federation\EntityResolverProvider
+     */
+    private $entityResolverProvider;
+
+    public function __construct(EntityResolverProvider $entityResolverProvider)
+    {
+        $this->entityResolverProvider = $entityResolverProvider;
+    }
+
     /**
      * @param array{representations: array<int, mixed>} $args
      * @return array<int, mixed>
@@ -24,17 +33,7 @@ class Entities
 
         foreach ($args['representations'] as $representation) {
             $typename = $representation['__typename'];
-
-            $resolverClass = Utils::namespaceClassname(
-                $typename,
-                (array) config('lighthouse.federation.entities_resolver_namespace'),
-                'class_exists'
-            );
-            if ($resolverClass === null) {
-                throw new FederationException("Could not locate entity resolver for typename {$typename}.");
-            }
-
-            $resolver = Utils::constructResolver($resolverClass, '__invoke');
+            $resolver = $this->entityResolverProvider->resolver($typename);
 
             $results [] = $resolver($representation);
         }
