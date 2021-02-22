@@ -2,7 +2,10 @@
 
 namespace Tests\Integration;
 
+use Exception;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
 class ErrorTest extends TestCase
@@ -107,5 +110,38 @@ class ErrorTest extends TestCase
                 ],
             ])
             ->assertStatus(200);
+    }
+
+    public function testRethrowsInternalExceptions(): void
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = app(ConfigRepository::class);
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
+
+        $this->mockResolver()
+            ->willThrowException(new Exception('foo'));
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertJsonCount(1, 'errors');
+
+        $config->set('lighthouse.debug', DebugFlag::RETHROW_INTERNAL_EXCEPTIONS);
+
+        $this->expectException(Exception::class);
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ');
     }
 }
