@@ -46,7 +46,14 @@ class ArgumentSetFactory
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
-        return $this->wrapArgs($resolveInfo->fieldDefinition->astNode, $args);
+        /**
+         * TODO handle programmatic types without an AST gracefully.
+         *
+         * @var \GraphQL\Language\AST\FieldDefinitionNode $definition
+         */
+        $definition = $resolveInfo->fieldDefinition->astNode;
+
+        return $this->wrapArgs($definition, $args);
     }
 
     /**

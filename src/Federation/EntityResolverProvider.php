@@ -9,6 +9,7 @@ use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -128,24 +129,22 @@ class EntityResolverProvider
     }
 
     /**
-     * @param  \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
+     * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
-    protected function constrainKeys(Builder $builder, NodeList $keyFieldsSelections, array $representation): void
+    protected function constrainKeys(Builder $builder, Collection $keyFieldsSelections, array $representation): void
     {
-        $satisfiedKeyFields = null;
-        foreach ($keyFieldsSelections as $keyFields) {
-            if ($this->satisfiesKeyFields($keyFields, $representation)) {
-                $satisfiedKeyFields = $keyFields;
-                break;
+        $satisfiedKeyFields = $keyFieldsSelections->first(
+            function (SelectionSetNode $keyFields) use ($representation): bool {
+                return $this->satisfiesKeyFields($keyFields, $representation);
             }
-        }
+        );
 
         if ($satisfiedKeyFields === null) {
             throw new FederationException('Representation does not satisfy any set of uniquely identifying keys: '.\Safe\json_encode($representation));
         }
 
-        $this->applySatisfiedSelection($builder, $keyFields, $representation);
+        $this->applySatisfiedSelection($builder, $satisfiedKeyFields, $representation);
     }
 
     /**
