@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Federation;
 
 use Closure;
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Builder;
