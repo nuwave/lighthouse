@@ -202,4 +202,60 @@ class ValidatorDirectiveTest extends TestCase
             ')
             ->assertGraphQLValidationError('email', 'The email must be a valid email address.');
     }
+
+    public function testValidateRequiredWithout(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom @validator {
+            foo: String
+            bar: String
+            baz: String
+        }
+        ';
+
+        // Bar is required as foo is not present
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        baz: "::baz::"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when foo is not present.');
+
+
+        // Bar is not required as foo is present
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "::foo::"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        // Bar is required as foo is not present
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        bar: "::bar::"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+    }
+
 }
