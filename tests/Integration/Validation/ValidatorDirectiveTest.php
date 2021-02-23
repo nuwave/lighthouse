@@ -217,19 +217,34 @@ class ValidatorDirectiveTest extends TestCase
         }
         ';
 
-        // Bar is required as foo is not present
+        // Bar is not required as foo is present
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
                 foo(
                     input: {
-                        baz: "::baz::"
+                        foo: "::foo::"
                     }
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when foo is not present.');
+            ->assertGraphQLValidationPasses();
+    }
 
+
+    public function testValidateRequiredWithout_Unexpected(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: WrongCustom): String
+        }
+
+        input WrongCustom @validator {
+            foo: String
+            bar: String
+            baz: String
+        }
+        ';
 
         // Bar is not required as foo is present
         $this
@@ -243,19 +258,5 @@ class ValidatorDirectiveTest extends TestCase
             }
             ')
             ->assertGraphQLValidationPasses();
-
-        // Bar is required as foo is not present
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(
-                    input: {
-                        bar: "::bar::"
-                    }
-                )
-            }
-            ')
-            ->assertGraphQLValidationPasses();
     }
-
 }
