@@ -15,6 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add events to cover the lifecycle of a GraphQL request: `EndExecution`, `EndRequest` https://github.com/nuwave/lighthouse/pull/1726
 - Include the client given query, variables and operation name in the `StartExecution` event https://github.com/nuwave/lighthouse/pull/1726
 - Apply `log` option from the `broadcasting` config to the Pusher subscription driver https://github.com/nuwave/lighthouse/pull/1733
+- Support `pusher/pusher-php-server` version 5 https://github.com/nuwave/lighthouse/pull/1741
 
 ### Changed
 

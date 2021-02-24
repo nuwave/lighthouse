@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
@@ -59,7 +60,7 @@ class BroadcastManager extends DriverManager
             $pusher->setLogger($this->app->make(LoggerInterface::class));
         }
 
-        return new PusherBroadcaster($pusher);
+        return new PusherBroadcaster($pusher, $this->app->make(LaravelExceptionHandler::class));
     }
 
     /**
