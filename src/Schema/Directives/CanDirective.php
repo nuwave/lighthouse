@@ -72,8 +72,13 @@ directive @can(
   You may pass pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
-  args: Mixed
+  args: CanArgs
 ) repeatable on FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar CanArgs
 GRAPHQL;
     }
 

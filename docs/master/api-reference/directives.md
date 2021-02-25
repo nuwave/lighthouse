@@ -293,8 +293,13 @@ directive @builder(
   Pass a value to the method as the second argument after the query builder.
   Only used when the directive is added on a field.
   """
-  value: Mixed
+  value: BuilderValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar BuilderValue
 ```
 
 You must point to a `method` which will receive the builder instance
@@ -437,8 +442,13 @@ directive @can(
   You may pass pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
-  args: Mixed
+  args: CanArgs
 ) repeatable on FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar CanArgs
 ```
 
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
@@ -881,10 +891,14 @@ you will receive the defined value instead of the string key.
 directive @enum(
   """
   The internal value of the enum key.
-  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
   """
-  value: Mixed
+  value: EnumValue
 ) on ENUM_VALUE
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar EnumValue
 ```
 
 ```graphql
@@ -916,8 +930,13 @@ directive @eq(
   Provide a value to compare against.
   Only required when this directive is used on a field.
   """
-  value: Mixed
+  value: EqValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar EqValue
 ```
 
 ```graphql
