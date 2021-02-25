@@ -282,19 +282,24 @@ type Mutation {
 Manipulate the query builder with a method.
 """
 directive @builder(
-  """
-  Reference a method that is passed the query builder.
-  Consists of two parts: a class name and a method name, separated by an `@` symbol.
-  If you pass only a class name, the method name defaults to `__invoke`.
-  """
-  method: String!
+    """
+    Reference a method that is passed the query builder.
+    Consists of two parts: a class name and a method name, separated by an `@` symbol.
+    If you pass only a class name, the method name defaults to `__invoke`.
+    """
+    method: String!
 
-  """
-  Pass a value to the method as the second argument after the query builder.
-  Only used when the directive is added on a field.
-  """
-  value: Mixed
+    """
+    Pass a value to the method as the second argument after the query builder.
+    Only used when the directive is added on a field.
+    """
+    value: BuilderValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar BuilderValue
 ```
 
 You must point to a `method` which will receive the builder instance
@@ -407,38 +412,43 @@ When `injectArgs` and `args` are used together, the client given
 arguments will be passed before the static args.
 """
 directive @can(
-  """
-  The ability to check permissions for.
-  """
-  ability: String!
+    """
+    The ability to check permissions for.
+    """
+    ability: String!
 
-  """
-  If your policy checks against specific model instances, specify
-  the name of the field argument that contains its primary key(s).
+    """
+    If your policy checks against specific model instances, specify
+    the name of the field argument that contains its primary key(s).
 
-  You may pass the string in dot notation to use nested inputs.
-  """
-  find: String
+    You may pass the string in dot notation to use nested inputs.
+    """
+    find: String
 
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model detection does not work.
-  """
-  model: String
+    """
+    Specify the class name of the model to use.
+    This is only needed when the default model detection does not work.
+    """
+    model: String
 
-  """
-  Pass along the client given input data as arguments to `Gate::check`.
-  """
-  injectArgs: Boolean = false
+    """
+    Pass along the client given input data as arguments to `Gate::check`.
+    """
+    injectArgs: Boolean = false
 
-  """
-  Statically defined arguments that are passed to `Gate::check`.
+    """
+    Statically defined arguments that are passed to `Gate::check`.
 
-  You may pass pass arbitrary GraphQL literals,
-  e.g.: [1, 2, 3] or { foo: "bar" }
-  """
-  args: Mixed
+    You may pass pass arbitrary GraphQL literals,
+    e.g.: [1, 2, 3] or { foo: "bar" }
+    """
+    args: CanArgs
 ) repeatable on FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar CanArgs
 ```
 
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
@@ -879,12 +889,16 @@ When dealing with the Enum type in your code,
 you will receive the defined value instead of the string key.
 """
 directive @enum(
-  """
-  The internal value of the enum key.
-  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-  """
-  value: Mixed
+    """
+    The internal value of the enum key.
+    """
+    value: EnumValue
 ) on ENUM_VALUE
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar EnumValue
 ```
 
 ```graphql
@@ -904,20 +918,25 @@ is an identical string. [Read more about enum types](../the-basics/types.md#enum
 Add an equal conditional to a database query.
 """
 directive @eq(
-  """
-  Specify the database column to compare.
-  Required if the directive is:
-  - used on an argument and the database column has a different name
-  - used on a field
-  """
-  key: String
+    """
+    Specify the database column to compare.
+    Required if the directive is:
+    - used on an argument and the database column has a different name
+    - used on a field
+    """
+    key: String
 
-  """
-  Provide a value to compare against.
-  Only required when this directive is used on a field.
-  """
-  value: Mixed
+    """
+    Provide a value to compare against.
+    Only required when this directive is used on a field.
+    """
+    value: EqValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar EqValue
 ```
 
 ```graphql

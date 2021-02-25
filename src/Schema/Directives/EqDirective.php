@@ -33,8 +33,13 @@ directive @eq(
   Provide a value to compare against.
   Only required when this directive is used on a field.
   """
-  value: Mixed
+  value: EqValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar EqValue
 GRAPHQL;
     }
 
