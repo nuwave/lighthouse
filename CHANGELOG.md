@@ -27,6 +27,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply custom error handlers for syntax or request errors https://github.com/nuwave/lighthouse/pull/1726
 - Define scalars instead of `Mixed` type in directive definitions https://github.com/nuwave/lighthouse/pull/1742
+- Fix subscription extension version default value https://github.com/nuwave/lighthouse/pull/1744
 
 ## 5.2.0
 
