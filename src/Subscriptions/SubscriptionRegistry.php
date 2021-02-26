@@ -155,7 +155,7 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
-        $version = config('lighthouse.subscriptions.version');
+        $version = config('lighthouse.subscriptions.version', 1);
         switch ((int) $version) {
             case 1:
                 $content = [
