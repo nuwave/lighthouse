@@ -73,14 +73,13 @@ class NestedOneToMany implements ArgResolver
 
     public static function connectDisconnect(ArgumentSet $args, HasOneOrMany $relation): void
     {
-        $localKeyName = self::getLocalKeyName($relation);
-        $foreignKeyName = $relation->getForeignKeyName();
-
         if ($args->has('connect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $children = $relation
-                ->make()
-                ->whereIn($localKeyName, $args->arguments['connect']->value)
+                ->whereIn(
+                    self::getLocalKeyName($relation),
+                    $args->arguments['connect']->value
+                )
                 ->get();
 
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
@@ -90,8 +89,11 @@ class NestedOneToMany implements ArgResolver
         if ($args->has('disconnect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $relation
-                ->whereIn($localKeyName, $args->arguments['disconnect']->value)
-                ->update([$foreignKeyName => null]);
+                ->whereIn(
+                    self::getLocalKeyName($relation),
+                    $args->arguments['disconnect']->value
+                )
+                ->update([$relation->getForeignKeyName() => null]);
         }
     }
 
