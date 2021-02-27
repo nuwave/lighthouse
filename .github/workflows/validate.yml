@@ -1,0 +1,208 @@
+name: "Validate"
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+env:
+  REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
+  LIGHTHOUSE_TEST_DB_HOST: 127.0.0.1
+  LIGHTHOUSE_TEST_DB_PASSWORD: root
+  LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version:
+          - 7.2
+          - 7.3
+          - 7.4
+          - 8.0
+        laravel-version:
+          - ^6
+          - ^7
+          - ^8
+        exclude:
+          - php-version: 7.2
+            laravel-version: ^8
+          - php-version: 8.0
+            laravel-version: ^6
+          - php-version: 8.0
+            laravel-version: ^7
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          coverage: none
+          extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
+          php-version: ${{ matrix.php-version }}
+
+      - name: "Cache composer dependencies"
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
+
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: composer remove --dev phpbench/phpbench rector/rector --no-update
+
+      - name: "Ensure compatibility with legacy factories"
+        if: matrix.laravel-version != '^8'
+        run: composer remove --dev laravel/legacy-factories --no-update
+
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+
+      - run: vendor/bin/phpstan analyse
+
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version:
+          - 7.2
+          - 7.3
+          - 7.4
+          - 8.0
+        laravel-version:
+          - 5.6.*
+          - 5.7.*
+          - 5.8.*
+          - ^6
+          - ^7
+          - ^8
+        exclude:
+          - php-version: 7.2
+            laravel-version: ^8
+          - php-version: 8.0
+            laravel-version: 5.6.*
+          - php-version: 8.0
+            laravel-version: 5.7.*
+          - php-version: 8.0
+            laravel-version: 5.8.*
+          - php-version: 8.0
+            laravel-version: ^6
+          - php-version: 8.0
+            laravel-version: ^7
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
+          php-version: ${{ matrix.php-version }}
+
+      - name: "Cache composer dependencies"
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
+
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
+
+      - name: "Ensure compatibility with legacy factories"
+        if: matrix.laravel-version != '^8'
+        run: composer remove --dev laravel/legacy-factories --no-update
+
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+
+      - run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
+
+      - run: vendor/bin/phpunit --colors=always --verbose
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version:
+          - 8.0
+        laravel-version:
+          - ^8
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          coverage: pcov
+          extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
+          php-version: ${{ matrix.php-version }}
+
+      - name: "Cache composer dependencies"
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
+
+      - run: composer remove --dev phpbench/phpbench rector/rector --no-update
+
+      - name: "Ensure compatibility with legacy factories"
+        if: matrix.laravel-version != '^8'
+        run: composer remove --dev laravel/legacy-factories --no-update
+
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+
+      - run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
+
+      - run: vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - run: bash <(curl -s https://codecov.io/bash)
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  benchmarks:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version:
+          - 8.0
+        laravel-version:
+          - ^8
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
+          php-version: ${{ matrix.php-version }}
+
+      - name: "Cache composer dependencies"
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
+
+      - name: "Ensure compatibility with legacy factories"
+        if: matrix.laravel-version != '^8'
+        run: composer remove --dev laravel/legacy-factories --no-update
+
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+
+      - run: vendor/bin/phpbench run --progress=none --report=ast
