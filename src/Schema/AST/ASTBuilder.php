@@ -92,23 +92,21 @@ class ASTBuilder
      */
     public function documentAST(): DocumentAST
     {
-        if ($this->documentAST !== null) {
-            return $this->documentAST;
-        }
-
-        $cacheConfig = $this->configRepository->get('lighthouse.cache');
-        if ($cacheConfig['enable']) {
-            /** @var \Illuminate\Contracts\Cache\Repository $cache */
-            $cache = app('cache')->store($cacheConfig['store'] ?? null);
-            $this->documentAST = $cache->remember(
-                $cacheConfig['key'],
-                $cacheConfig['ttl'],
-                function (): DocumentAST {
-                    return $this->build();
-                }
-            );
-        } else {
-            $this->documentAST = $this->build();
+        if (! isset($this->documentAST)) {
+            $cacheConfig = $this->configRepository->get('lighthouse.cache');
+            if ($cacheConfig['enable']) {
+                /** @var \Illuminate\Contracts\Cache\Repository $cache */
+                $cache = app('cache')->store($cacheConfig['store'] ?? null);
+                $this->documentAST = $cache->remember(
+                    $cacheConfig['key'],
+                    $cacheConfig['ttl'],
+                    function (): DocumentAST {
+                        return $this->build();
+                    }
+                );
+            } else {
+                $this->documentAST = $this->build();
+            }
         }
 
         return $this->documentAST;

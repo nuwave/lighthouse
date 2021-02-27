@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Utils;
 
 use InvalidArgumentException;
-use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
@@ -20,9 +20,9 @@ class Subscription
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
-        /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
-        $graphQL = app(GraphQL::class);
-        $graphQL->prepSchema();
+        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
+        $schemaBuilder = app(SchemaBuilder::class);
+        $schemaBuilder->schema();
 
         /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);

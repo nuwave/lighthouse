@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
  *
- * @property-read Task|User $imageable
+ * @property-read Task|User|null $imageable
  */
 class Image extends Model
 {

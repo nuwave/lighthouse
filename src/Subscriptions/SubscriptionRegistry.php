@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
-use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
@@ -29,9 +29,9 @@ class SubscriptionRegistry
     protected $storage;
 
     /**
-     * @var \Nuwave\Lighthouse\GraphQL
+     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
-    protected $graphQL;
+    protected $schemaBuilder;
 
     /**
      * A map from operation names to channel names.
@@ -47,11 +47,11 @@ class SubscriptionRegistry
      */
     protected $subscriptions = [];
 
-    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, GraphQL $graphQL)
+    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, SchemaBuilder $schemaBuilder)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
-        $this->graphQL = $graphQL;
+        $this->schemaBuilder = $schemaBuilder;
     }
 
     /**
@@ -116,7 +116,7 @@ class SubscriptionRegistry
     {
         // A subscription can be fired without a request so we must make
         // sure the schema has been generated.
-        $this->graphQL->prepSchema();
+        $this->schemaBuilder->schema();
 
         return (new Collection($subscriber->query->definitions))
             ->filter(
@@ -155,7 +155,7 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
-        $version = config('lighthouse.subscriptions.version');
+        $version = config('lighthouse.subscriptions.version', 1);
         switch ((int) $version) {
             case 1:
                 $content = [

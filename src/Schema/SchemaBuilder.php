@@ -6,6 +6,7 @@ use GraphQL\GraphQL;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
@@ -16,9 +17,31 @@ class SchemaBuilder
      */
     protected $typeRegistry;
 
-    public function __construct(TypeRegistry $typeRegistry)
+    /**
+     * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
+     */
+    protected $astBuilder;
+
+    /**
+     * @var \GraphQL\Type\Schema
+     */
+    protected $schema;
+
+    public function __construct(TypeRegistry $typeRegistry, ASTBuilder $astBuilder)
     {
         $this->typeRegistry = $typeRegistry;
+        $this->astBuilder = $astBuilder;
+    }
+
+    public function schema(): Schema
+    {
+        if (! isset($this->schema)) {
+            $this->schema = $this->build(
+                $this->astBuilder->documentAST()
+            );
+        }
+
+        return $this->schema;
     }
 
     /**

@@ -58,9 +58,7 @@ GRAPHQL;
                     return $this->defer->defer($wrappedResolver, $path);
                 }
 
-                return $this->defer->isStreaming()
-                    ? $this->defer->findOrResolve($wrappedResolver, $path)
-                    : $previousResolver($root, $args, $context, $resolveInfo);
+                return $this->defer->findOrResolve($wrappedResolver, $path);
             }
         );
 

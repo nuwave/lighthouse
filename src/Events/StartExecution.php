@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Language\AST\DocumentNode;
 use Illuminate\Support\Carbon;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
  * Fires right before resolving an individual query.
@@ -34,6 +35,13 @@ class StartExecution
     public $operationName;
 
     /**
+     * The context for the operation.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
+     */
+    public $context;
+
+    /**
      * The point in time when the query execution started.
      *
      * @var \Illuminate\Support\Carbon
@@ -43,11 +51,12 @@ class StartExecution
     /**
      * @param array<string, mixed>|null $variables
      */
-    public function __construct(DocumentNode $query, ?array $variables, ?string $operationName)
+    public function __construct(DocumentNode $query, ?array $variables, ?string $operationName, GraphQLContext $context)
     {
         $this->query = $query;
         $this->variables = $variables;
         $this->operationName = $operationName;
+        $this->context = $context;
         $this->moment = Carbon::now();
     }
 }
