@@ -1,3 +1,4 @@
+name: "Autoformat"
 on:
   push:
 
@@ -22,7 +23,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - uses: creyD/prettier_action@v2
+      - uses: creyD/prettier_action@v2.2
         with:
           prettier_options: --write --tab-width=2 docs/**/**/*.md
           branch: ${{ github.head_ref }}
