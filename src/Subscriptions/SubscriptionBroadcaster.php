@@ -92,7 +92,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
                 $this->broadcastManager->broadcast(
                     $subscriber,
-                    $data->jsonSerialize()
+                    $this->graphQL->serializable($data)
                 );
             }
         );

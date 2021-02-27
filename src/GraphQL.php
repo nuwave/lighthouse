@@ -12,6 +12,7 @@ use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
@@ -62,13 +63,29 @@ class GraphQL
      */
     protected $graphQLHelper;
 
+    /**
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
+    /**
+     * Lazily initialized.
+     *
+     * @var \Closure(
+     *   array<\GraphQL\Error\Error> $errors,
+     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
+     * ): array<string, mixed>
+     */
+    protected $errorsHandler;
+
     public function __construct(
         SchemaBuilder $schemaBuilder,
         Pipeline $pipeline,
         EventDispatcher $eventDispatcher,
         ErrorPool $errorPool,
         ProvidesValidationRules $providesValidationRules,
-        GraphQLHelper $graphQLHelper
+        GraphQLHelper $graphQLHelper,
+        ConfigRepository $config
     ) {
         $this->schemaBuilder = $schemaBuilder;
         $this->pipeline = $pipeline;
@@ -76,6 +93,7 @@ class GraphQL
         $this->errorPool = $errorPool;
         $this->providesValidationRules = $providesValidationRules;
         $this->graphQLHelper = $graphQLHelper;
+        $this->config = $config;
     }
 
     /**
@@ -109,12 +127,12 @@ class GraphQL
         if (count($errors) > 0) {
             $errors = array_map(
                 static function (RequestError $err): Error {
-                    return Error::createLocatedError($err, null, null);
+                    return Error::createLocatedError($err);
                 },
                 $errors
             );
 
-            return $this->applyDebugSettings(
+            return $this->serializable(
                 new ExecutionResult(null, $errors)
             );
         }
@@ -127,51 +145,7 @@ class GraphQL
             $params->operation
         );
 
-        return $this->applyDebugSettings($result);
-    }
-
-    /**
-     * Apply the debug settings from the config and get the result as an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function applyDebugSettings(ExecutionResult $result): array
-    {
-        $result->setErrorsHandler(
-            function (array $errors, callable $formatter): array {
-                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
-                // This allows the user to register multiple handlers and pipe the errors through.
-                $handlers = [];
-                foreach (config('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers [] = app($handlerClass);
-                }
-
-                return (new Collection($errors))
-                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
-                        return $this->pipeline
-                            ->send($error)
-                            ->through($handlers)
-                            ->then(function (?Error $error) use ($formatter): ?array {
-                                if ($error === null) {
-                                    return null;
-                                }
-
-                                return $formatter($error);
-                            });
-                    })
-                    ->filter()
-                    ->all();
-            }
-        );
-
-        // If debugging is set to false globally, do not add GraphQL specific
-        // debugging info either. If it is true, then we fetch the debug
-        // level from the Lighthouse configuration.
-        return $result->toArray(
-            config('app.debug')
-                ? (int) config('lighthouse.debug')
-                : DebugFlag::NONE
-        );
+        return $this->serializable($result);
     }
 
     /**
@@ -244,9 +218,78 @@ class GraphQL
             new EndExecution($result)
         );
 
-        $this->cleanUp();
+        $this->cleanUpAfterExecution();
 
         return $result;
+    }
+
+    protected function cleanUpAfterExecution(): void
+    {
+        BatchLoaderRegistry::forgetInstances();
+        $this->errorPool->clear();
+
+        // TODO remove in v6
+        BatchLoader::forgetInstances();
+    }
+
+    /**
+     * Convert the result to a serializable array.
+     *
+     * @return array<string, mixed>
+     */
+    public function serializable(ExecutionResult $result): array
+    {
+        $result->setErrorsHandler($this->errorsHandler());
+
+        return $result->toArray($this->debugFlag());
+    }
+
+    /**
+     * @return \Closure(
+     *   array<\GraphQL\Error\Error> $errors,
+     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
+     * ): array<string, mixed>
+     */
+    protected function errorsHandler(): \Closure
+    {
+        if (! isset($this->errorsHandler)) {
+            $this->errorsHandler = function (array $errors, callable $formatter): array {
+                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
+                // This allows the user to register multiple handlers and pipe the errors through.
+                $handlers = [];
+                foreach ($this->config->get('lighthouse.error_handlers', []) as $handlerClass) {
+                    $handlers [] = app($handlerClass);
+                }
+
+                return (new Collection($errors))
+                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
+                        return $this->pipeline
+                            ->send($error)
+                            ->through($handlers)
+                            ->then(function (?Error $error) use ($formatter): ?array {
+                                if ($error === null) {
+                                    return null;
+                                }
+
+                                return $formatter($error);
+                            });
+                    })
+                    ->filter()
+                    ->all();
+            };
+        }
+
+        return $this->errorsHandler;
+    }
+
+    protected function debugFlag(): int
+    {
+        // If debugging is set to false globally, do not add GraphQL specific
+        // debugging info either. If it is true, then we fetch the debug
+        // level from the Lighthouse configuration.
+        return $this->config->get('app.debug')
+            ? (int) $this->config->get('lighthouse.debug')
+            : DebugFlag::NONE;
     }
 
     /**
@@ -258,17 +301,5 @@ class GraphQL
     public function prepSchema(): Schema
     {
         return $this->schemaBuilder->schema();
-    }
-
-    /**
-     * Clean up after executing a query.
-     */
-    protected function cleanUp(): void
-    {
-        BatchLoaderRegistry::forgetInstances();
-        $this->errorPool->clear();
-
-        // TODO remove in v6
-        BatchLoader::forgetInstances();
     }
 }
