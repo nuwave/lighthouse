@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
@@ -40,7 +41,7 @@ class NestedOneToMany implements ArgResolver
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
-    public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
+    public static function createUpdateUpsert(ArgumentSet $args, HasOneOrMany $relation): void
     {
         if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($relation));
@@ -70,14 +71,17 @@ class NestedOneToMany implements ArgResolver
         }
     }
 
-    public static function connectDisconnect(ArgumentSet $args, Relation $relation): void
+    public static function connectDisconnect(ArgumentSet $args, HasOneOrMany $relation): void
     {
-        $localKeyName = self::getLocalKeyName($relation);
-        $foreignKeyName = self::getForeignKeyName($relation);
+        $localKeyName = $relation->getLocalKeyName();
+        $foreignKeyName = $relation->getForeignKeyName()
 
         if ($args->has('connect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-            $children = $relation->make()->whereIn($localKeyName, $args->arguments['connect']->value)->get();
+            $children = $relation
+                ->make()
+                ->whereIn($localKeyName, $args->arguments['connect']->value)
+                ->get();
 
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $relation->saveMany($children);
@@ -85,11 +89,13 @@ class NestedOneToMany implements ArgResolver
 
         if ($args->has('disconnect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-            $relation->whereIn($localKeyName, $args->arguments['disconnect']->value)->update([$foreignKeyName => null]);
+            $relation
+                ->whereIn($localKeyName, $args->arguments['disconnect']->value)
+                ->update([$foreignKeyName => null]);
         }
     }
 
-    private static function getLocalKeyName(Relation $relation): string
+    private static function getLocablKeyName(Relation $relation): string
     {
         $bindLocalKey = function () {
             // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
