@@ -9,7 +9,6 @@ use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 class PrintSchemaCommand extends Command

@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Execution\Utils;
 
 use InvalidArgumentException;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;

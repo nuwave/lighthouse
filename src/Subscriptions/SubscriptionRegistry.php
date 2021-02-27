@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
