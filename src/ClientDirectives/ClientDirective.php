@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 /**
  * Provides information about where client directives
@@ -64,9 +65,9 @@ class ClientDirective
             return $this->definition;
         }
 
-        /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
-        $graphQL = app(GraphQL::class);
-        $schema = $graphQL->prepSchema();
+        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
+        $schemaBuilder = app(SchemaBuilder::class);
+        $schema = $schemaBuilder->schema();
 
         $definition = $schema->getDirective($this->name);
         if ($definition === null) {

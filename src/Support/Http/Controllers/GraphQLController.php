@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use GraphQL\Server\Helper;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
 use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,14 +19,17 @@ class GraphQLController
         GraphQL $graphQL,
         EventsDispatcher $eventsDispatcher,
         RequestParser $requestParser,
-        Helper $graphQLHelper,
-        CreatesResponse $createsResponse
+        CreatesResponse $createsResponse,
+        CreatesContext $createsContext
     ): Response {
         $eventsDispatcher->dispatch(
             new StartRequest($request)
         );
 
-        $result = $graphQL->executeRequest($request, $requestParser, $graphQLHelper);
+        $operationOrOperations = $requestParser->parseRequest($request);
+        $context = $createsContext->generate($request);
+
+        $result = $graphQL->executeOperationOrOperations($operationOrOperations, $context);
 
         $response = $createsResponse->createResponse($result);
 
