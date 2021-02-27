@@ -148,7 +148,7 @@ class Defer implements CreatesResponse
             return $this->getData($path);
         }
 
-        return $originalResolver($path);
+        return $originalResolver();
     }
 
     protected function hasData(string $path): bool
@@ -159,7 +159,7 @@ class Defer implements CreatesResponse
     /**
      * Return either a final response or a stream of responses.
      *
-     * @param  array<string, mixed>|array<int, array<string, mixed>>  $result
+     * @param  array<string, mixed>  $result
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function createResponse(array $result): Response
