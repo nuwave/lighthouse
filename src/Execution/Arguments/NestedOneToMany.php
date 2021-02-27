@@ -73,7 +73,7 @@ class NestedOneToMany implements ArgResolver
 
     public static function connectDisconnect(ArgumentSet $args, HasOneOrMany $relation): void
     {
-        $localKeyName = $relation->getLocalKeyName();
+        $localKeyName = self::getLocalKeyName($relation);
         $foreignKeyName = $relation->getForeignKeyName();
 
         if ($args->has('connect')) {
@@ -95,27 +95,19 @@ class NestedOneToMany implements ArgResolver
         }
     }
 
-    private static function getLocablKeyName(Relation $relation): string
+    /**
+     * TODO remove this horrible hack when we no longer support Laravel 5.6
+     */
+    private static function getLocalKeyName(HasOneOrMany $relation): string
     {
-        $bindLocalKey = function () {
-            // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
-            return $this->localKey;
-        };
-        $localKeyName = Closure::bind($bindLocalKey, $relation, get_class($relation));
+        $getLocalKeyName = Closure::bind(
+            function () {
+                // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
+                return $this->localKey;
+            },
+            $relation
+        );
 
-        return $localKeyName();
-    }
-
-    private static function getForeignKeyName(Relation $relation): string
-    {
-        $bindForeignKey = function () {
-            // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
-            $segments = explode('.', $this->foreignKey);
-
-            return end($segments);
-        };
-        $foreignKeyName = Closure::bind($bindForeignKey, $relation, get_class($relation));
-
-        return $foreignKeyName();
+        return $getLocalKeyName();
     }
 }
