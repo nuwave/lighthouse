@@ -317,4 +317,41 @@ class ValidationTest extends TestCase
             ')
             ->assertGraphQLValidationError('bar', 'The bar may not be greater than 3 characters.');
     }
+
+    public function testArgumentReferencesAreQualified(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom {
+            foo: String
+            bar: String @rules(apply: ["required_without:foo"])
+            baz: String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "whatever"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {}
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is not present.');
+    }
 }

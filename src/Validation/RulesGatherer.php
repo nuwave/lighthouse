@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
@@ -131,9 +132,16 @@ class RulesGatherer
      */
     public function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
+        $qualifiedRulesMap = array_map(
+            function (array $rules) use ($argumentPath): array {
+                return $this->qualifyArgumentReferences($rules, $argumentPath);
+            },
+            $directive->rules()
+        );
+
         $this->rules = array_merge_recursive(
             $this->rules,
-            $this->wrap($directive->rules(), $argumentPath)
+            $this->wrap($qualifiedRulesMap, $argumentPath)
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
@@ -149,9 +157,16 @@ class RulesGatherer
      */
     public function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
     {
+        $qualifiedRules = $this->qualifyArgumentReferences(
+            $directive->rules(),
+            // The last element is the name of the argument the rule is defined upon.
+            // We want the qualified path to start from the parent level.
+            array_slice($argumentPath, 0, -1)
+        );
+
         $this->rules = array_merge_recursive(
             $this->rules,
-            [$this->pathDotNotation($argumentPath) => $directive->rules()]
+            [implode('.', $argumentPath) => $qualifiedRules]
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
@@ -160,7 +175,7 @@ class RulesGatherer
         if (null !== $attribute) {
             $this->attributes = array_merge(
                 $this->attributes,
-                [$this->pathDotNotation($argumentPath) => $attribute]
+                [implode('.', $argumentPath) => $attribute]
             );
         }
     }
@@ -175,20 +190,48 @@ class RulesGatherer
         $withPath = [];
 
         foreach ($rulesOrMessages as $key => $value) {
-            $combinedPath = array_merge($path, [$key]);
-            $pathDotNotation = $this->pathDotNotation($combinedPath);
+            $combinedPath = implode('.', array_merge($path, [$key]));
 
-            $withPath[$pathDotNotation] = $value;
+            $withPath[$combinedPath] = $value;
         }
 
         return $withPath;
     }
 
     /**
-     * @param  array<int|string>  $path
+     * Prepend rule arguments that refer to other arguments with the full path.
+     *
+     * This may be necessary to allow certain rules to be reusable when placed
+     * upon input arguments. For example, `required_with:foo` may be defined
+     * on an input value that is nested within the arguments under `input.0`.
+     * It is thus changed to the full reference `required_with:input.0.foo`.
+     *
+     * @param  array<int, mixed>  $rules
+     * @param  array<int|string>  $argumentPath
      */
-    protected function pathDotNotation(array $path): string
+    protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
-        return implode('.', $path);
+        return array_map(
+            static function ($rule) use ($argumentPath): array {
+                /**
+                 * @var array{
+                 *   0: string|\Illuminate\Contracts\Validation\Rule,
+                 *   1: array<int, mixed>,
+                 * } $parsed 
+                 */
+                $parsed = ValidationRuleParser::parse($rule);
+
+                $name = $parsed[0];
+                if ($name === 'RequiredWithout') {
+                    $args = &$parsed[1];
+
+                    $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
+                }
+
+                // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
+                return array_merge([$name], $parsed[1]);
+            },
+            $rules
+        );
     }
 }
