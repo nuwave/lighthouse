@@ -78,8 +78,15 @@ Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is somet
 
 ## Documentation
 
+### External
+
 The documentation for Lighthouse is located in [`/docs`](/docs).
-You can check out the [Docs README](/docs/.github/README.md) for more information on how to contribute to the docs.
+See [/docs/.github/README.md](/docs/.github/README.md) for more information on how to contribute to the docs.
+
+### Internal
+
+Mark classes or methods that are meant to be used by end-users with the `@api` PHPDoc tag.
+Those elements are guaranteed to not change until the next major release.
 
 ## Changelog
 
