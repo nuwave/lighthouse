@@ -30,6 +30,7 @@ use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
@@ -49,9 +50,6 @@ use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(ConfigRepository $configRepository): void
     {
         $this->publishes([
@@ -65,11 +63,6 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
     }
 
-    /**
-     * Load routes from provided path.
-     *
-     * @param  string  $path
-     */
     protected function loadRoutesFrom($path): void
     {
         if (AppVersion::isLumen()) {
@@ -81,15 +74,13 @@ class LighthouseServiceProvider extends ServiceProvider
         parent::loadRoutesFrom($path);
     }
 
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
         $this->app->singleton(ASTBuilder::class);
+        $this->app->singleton(SchemaBuilder::class);
         $this->app->singleton(DirectiveLocator::class);
         $this->app->singleton(TypeRegistry::class);
         $this->app->singleton(ErrorPool::class);

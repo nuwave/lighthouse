@@ -92,7 +92,7 @@ class ASTBuilder
      */
     public function documentAST(): DocumentAST
     {
-        if ($this->documentAST !== null) {
+        if (isset($this->documentAST)) {
             return $this->documentAST;
         }
 

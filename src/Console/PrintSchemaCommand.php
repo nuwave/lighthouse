@@ -9,7 +9,7 @@ use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 class PrintSchemaCommand extends Command
 {
@@ -24,14 +24,14 @@ SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
 
-    public function handle(CacheRepository $cache, ConfigRepository $config, Filesystem $storage, GraphQL $graphQL): void
+    public function handle(CacheRepository $cache, ConfigRepository $config, Filesystem $storage, SchemaBuilder $schemaBuilder): void
     {
         // Clear the cache so this always gets the current schema
         $cache->forget(
             $config->get('lighthouse.cache.key')
         );
 
-        $schema = $graphQL->prepSchema();
+        $schema = $schemaBuilder->schema();
         if ($this->option('json')) {
             $filename = self::JSON_FILENAME;
             $schemaString = $this->toJson($schema);

@@ -8,15 +8,13 @@ use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Language\Parser;
-use GraphQL\Server\Helper;
+use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
-use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
-use Laragraph\Utils\RequestParser;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\EndExecution;
 use Nuwave\Lighthouse\Events\ManipulateResult;
@@ -24,20 +22,16 @@ use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
+/**
+ * The main entrypoint to start and end GraphQL execution.
+ */
 class GraphQL
 {
-    /**
-     * @var \GraphQL\Type\Schema
-     */
-    protected $executableSchema;
-
     /**
      * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
@@ -54,16 +48,6 @@ class GraphQL
     protected $eventDispatcher;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
-     */
-    protected $astBuilder;
-
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
-     */
-    protected $createsContext;
-
-    /**
      * @var \Nuwave\Lighthouse\Execution\ErrorPool
      */
     protected $errorPool;
@@ -73,54 +57,43 @@ class GraphQL
      */
     protected $providesValidationRules;
 
+    /**
+     * @var \GraphQL\Server\Helper
+     */
+    protected $graphQLHelper;
+
     public function __construct(
         SchemaBuilder $schemaBuilder,
         Pipeline $pipeline,
         EventDispatcher $eventDispatcher,
-        ASTBuilder $astBuilder,
-        CreatesContext $createsContext,
         ErrorPool $errorPool,
-        ProvidesValidationRules $providesValidationRules
+        ProvidesValidationRules $providesValidationRules,
+        GraphQLHelper $graphQLHelper
     ) {
         $this->schemaBuilder = $schemaBuilder;
         $this->pipeline = $pipeline;
         $this->eventDispatcher = $eventDispatcher;
-        $this->astBuilder = $astBuilder;
-        $this->createsContext = $createsContext;
         $this->errorPool = $errorPool;
         $this->providesValidationRules = $providesValidationRules;
+        $this->graphQLHelper = $graphQLHelper;
     }
 
     /**
+     * Run one ore more GraphQL operations against the schema.
+     *
+     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
-    public function executeRequest(Request $request, RequestParser $requestParser, Helper $graphQLHelper): array
+    public function executeOperationOrOperations($operationOrOperations, GraphQLContext $context): array
     {
-        $operationParams = $requestParser->parseRequest($request);
-
         return LighthouseUtils::applyEach(
             /**
              * @return array<string, mixed>
              */
-            function (OperationParams $operationParams) use ($graphQLHelper): array {
-                $errors = $graphQLHelper->validateOperationParams($operationParams);
-
-                if (count($errors) > 0) {
-                    $errors = array_map(
-                        static function (RequestError $err): Error {
-                            return Error::createLocatedError($err, null, null);
-                        },
-                        $errors
-                    );
-
-                    return $this->applyDebugSettings(
-                        new ExecutionResult(null, $errors)
-                    );
-                }
-
-                return $this->executeOperation($operationParams);
+            function (OperationParams $operationParams) use ($context): array {
+                return $this->executeOperation($operationParams, $context);
             },
-            $operationParams
+            $operationOrOperations
         );
     }
 
@@ -129,13 +102,26 @@ class GraphQL
      *
      * @return array<string, mixed>
      */
-    public function executeOperation(OperationParams $params): array
+    public function executeOperation(OperationParams $params, GraphQLContext $context): array
     {
+        $errors = $this->graphQLHelper->validateOperationParams($params);
+
+        if (count($errors) > 0) {
+            $errors = array_map(
+                static function (RequestError $err): Error {
+                    return Error::createLocatedError($err, null, null);
+                },
+                $errors
+            );
+
+            return $this->applyDebugSettings(
+                new ExecutionResult(null, $errors)
+            );
+        }
+
         $result = $this->executeQuery(
             $params->query,
-            $this->createsContext->generate(
-                app('request')
-            ),
+            $context,
             $params->variables,
             null,
             $params->operation
@@ -217,14 +203,14 @@ class GraphQL
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
         // This allows tracking the time for batched queries independently.
-        $this->prepSchema();
+        $schema = $this->schemaBuilder->schema();
 
         $this->eventDispatcher->dispatch(
             new StartExecution($query, $variables, $operationName, $context)
         );
 
         $result = GraphQLBase::executeQuery(
-            $this->executableSchema,
+            $schema,
             $query,
             $rootValue,
             $context,
@@ -265,16 +251,13 @@ class GraphQL
 
     /**
      * Ensure an executable GraphQL schema is present.
+     *
+     * @deprecated
+     * @see \Nuwave\Lighthouse\Schema\SchemaBuilder::schema()
      */
     public function prepSchema(): Schema
     {
-        if ($this->executableSchema === null) {
-            $this->executableSchema = $this->schemaBuilder->build(
-                $this->astBuilder->documentAST()
-            );
-        }
-
-        return $this->executableSchema;
+        return $this->schemaBuilder->schema();
     }
 
     /**
