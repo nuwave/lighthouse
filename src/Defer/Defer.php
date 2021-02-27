@@ -133,7 +133,7 @@ class Defer implements CreatesResponse
     protected function resolve(Closure $resolver, string $path)
     {
         unset($this->deferred[$path]);
-        $this->resolved []= $path;
+        $this->resolved [] = $path;
 
         return $resolver();
     }
@@ -172,7 +172,7 @@ class Defer implements CreatesResponse
         $this->isStreaming = true;
 
         return response()->stream(
-            function () use ($result): void {
+            function (): void {
                 $this->stream();
 
                 $nested = 1;
