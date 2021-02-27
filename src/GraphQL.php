@@ -220,7 +220,7 @@ class GraphQL
         $this->prepSchema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution($query, $variables, $operationName)
+            new StartExecution($query, $variables, $operationName, $context)
         );
 
         $result = GraphQLBase::executeQuery(
