@@ -242,15 +242,15 @@ class Defer implements CreatesResponse
 
     protected function executeDeferred(): void
     {
-        $this->result = $this->graphQL->serializable(
-            $this->graphQL->executeQuery(
-                $this->startExecution->query,
-                $this->startExecution->context,
-                $this->startExecution->variables,
-                null,
-                $this->startExecution->operationName
-            )
+        $executionResult = $this->graphQL->executeQuery(
+            $this->startExecution->query,
+            $this->startExecution->context,
+            $this->startExecution->variables,
+            null,
+            $this->startExecution->operationName
         );
+
+        $this->result = $this->graphQL->serializable($executionResult);
         $this->stream();
 
         $this->resolved = [];
