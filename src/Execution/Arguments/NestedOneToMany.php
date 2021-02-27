@@ -96,7 +96,7 @@ class NestedOneToMany implements ArgResolver
     }
 
     /**
-     * TODO remove this horrible hack when we no longer support Laravel 5.6
+     * TODO remove this horrible hack when we no longer support Laravel 5.6.
      */
     private static function getLocalKeyName(HasOneOrMany $relation): string
     {
