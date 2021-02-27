@@ -125,18 +125,9 @@ class HasManyTest extends DBTestCase
     {
         $task1 = factory(Task::class)->create();
         $task2 = factory(Task::class)->create();
-        $task3 = factory(Task::class)->create();
-        $queryVariables = [
-            'input' => [
-                'name' => 'foo',
-                'tasks' => [
-                    'connect' => [$task1->id, $task2->id, $task3->id],
-                ],
-            ],
-        ];
 
         $this->graphQL(/** @lang GraphQL */ '
-            mutation createUser($input: CreateUserInput!){
+            mutation ($input: CreateUserInput!) {
                 createUser(input: $input) {
                     id
                     name
@@ -146,10 +137,21 @@ class HasManyTest extends DBTestCase
                     }
                 }
             }
-        ', $queryVariables)->assertJson([
+            ',
+            [
+                'input' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        'connect' => [
+                            $task1->id,
+                            $task2->id,
+                        ],
+                    ],
+                ],
+            ]
+        )->assertJson([
             'data' => [
                 'createUser' => [
-                    'id' => '1',
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -159,10 +161,6 @@ class HasManyTest extends DBTestCase
                         [
                             'id' => $task2->id,
                             'name' => $task2->name,
-                        ],
-                        [
-                            'id' => $task3->id,
-                            'name' => $task3->name,
                         ],
                     ],
                 ],
@@ -204,7 +202,7 @@ class HasManyTest extends DBTestCase
 
     public function testCanUpsertWithNewHasMany(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -241,7 +239,7 @@ class HasManyTest extends DBTestCase
 
     public function testUpsertHasManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertUser(input: {
                 name: "foo"
@@ -259,8 +257,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -515,17 +512,8 @@ GRAPHQL
         $user = factory(User::class)->create();
         $task1 = factory(Task::class)->create();
         $task2 = factory(Task::class)->create();
-        $task3 = factory(Task::class)->create();
+
         $actionInputName = ucfirst($action);
-        $queryVariables = [
-            'input' => [
-                'id' => $user->id,
-                'name' => 'foo',
-                'tasks' => [
-                    'connect' => [$task1->id, $task2->id, $task3->id],
-                ],
-            ],
-        ];
 
         $this->graphQL(/** @lang GraphQL */ "
             mutation ${action}User(\$input: {$actionInputName}UserInput!){
@@ -538,7 +526,20 @@ GRAPHQL
                     }
                 }
             }
-        ", $queryVariables)->assertJson([
+            ",
+            [
+                'input' => [
+                    'id' => $user->id,
+                    'name' => 'foo',
+                    'tasks' => [
+                        'connect' => [
+                            $task1->id,
+                            $task2->id,
+                        ],
+                    ],
+                ],
+            ]
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -552,10 +553,6 @@ GRAPHQL
                             'id' => $task2->id,
                             'name' => $task2->name,
                         ],
-                        [
-                            'id' => $task3->id,
-                            'name' => $task3->name,
-                        ],
                     ],
                 ],
             ],
@@ -568,19 +565,18 @@ GRAPHQL
     public function testCanDisconnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
-        $task1 = factory(Task::class)->create();
-        $task2 = factory(Task::class)->create();
-        $task3 = factory(Task::class)->create();
+
+        /** @var \Tests\Utils\Models\Task $taskDisconnect */
+        $taskDisconnect = factory(Task::class)->make();
+        $taskDisconnect->user()->associate($user);
+        $taskDisconnect->save();
+
+        /** @var \Tests\Utils\Models\Task $taskKeep */
+        $taskKeep = factory(Task::class)->make();
+        $taskKeep->user()->associate($user);
+        $taskKeep->save();
+
         $actionInputName = ucfirst($action);
-        $queryVariables = [
-            'input' => [
-                'id' => $user->id,
-                'name' => 'foo',
-                'tasks' => [
-                    'disconnect' => [$task1->id, $task2->id, $task3->id],
-                ],
-            ],
-        ];
 
         $this->graphQL(/** @lang GraphQL */ "
             mutation ${action}User(\$input: {$actionInputName}UserInput!){
@@ -593,19 +589,32 @@ GRAPHQL
                     }
                 }
             }
-        ", $queryVariables)->assertJson([
+        ", [
+            'input' => [
+                'id' => $user->id,
+                'name' => 'foo',
+                'tasks' => [
+                    'disconnect' => [
+                        $taskDisconnect->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
                     'name' => 'foo',
-                    'tasks' => [],
+                    'tasks' => [
+                        [
+                            'id' => $taskKeep->id,
+                            'name' => $taskKeep->name,
+                        ],
+                    ],
                 ],
             ],
         ]);
 
-        foreach (Task::all() as $task) {
-            $this->assertNull($task->user_id);
-        }
+        $this->assertNull($taskDisconnect->refresh()->user);
     }
 
     public function testUpsertAcrossPivotTableOverrideExistingModel(): void

@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add `GraphQLContext` to `StartExecution` event
+- Add `connect` and `disconnect` operations in nested mutations for HasMany and MorphMany relations https://github.com/nuwave/lighthouse/pull/1730
 
 ### Changed
 
