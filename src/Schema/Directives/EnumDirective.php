@@ -15,10 +15,14 @@ you will receive the defined value instead of the string key.
 directive @enum(
   """
   The internal value of the enum key.
-  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
   """
-  value: Mixed
+  value: EnumValue
 ) on ENUM_VALUE
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar EnumValue
 GRAPHQL;
     }
 

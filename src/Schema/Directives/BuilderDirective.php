@@ -25,8 +25,13 @@ directive @builder(
   Pass a value to the method as the second argument after the query builder.
   Only used when the directive is added on a field.
   """
-  value: Mixed
+  value: BuilderValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar BuilderValue
 GRAPHQL;
     }
 

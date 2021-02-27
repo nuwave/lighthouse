@@ -8,10 +8,10 @@ use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\ValidateSchema;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class ValidateSchemaCommand extends Command
@@ -24,7 +24,7 @@ class ValidateSchemaCommand extends Command
         CacheRepository $cache,
         ConfigRepository $config,
         EventsDispatcher $eventsDispatcher,
-        GraphQL $graphQL,
+        SchemaBuilder $schemaBuilder,
         DirectiveLocator $directiveLocator,
         TypeRegistry $typeRegistry
     ): void {
@@ -33,7 +33,7 @@ class ValidateSchemaCommand extends Command
             $config->get('lighthouse.cache.key')
         );
 
-        $originalSchema = $graphQL->prepSchema();
+        $originalSchema = $schemaBuilder->schema();
         $schemaConfig = $originalSchema->getConfig();
 
         // We add schema directive definitions only here, since it is very slow

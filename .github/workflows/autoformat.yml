@@ -1,45 +1,32 @@
 name: "Autoformat"
-
 on:
   push:
 
 jobs:
   composer-normalize:
-    name: "composer-normalize"
-
-    runs-on: "ubuntu-latest"
-
+    runs-on: ubuntu-latest
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+      - uses: actions/checkout@v2
         with:
-          ref: "${{ github.head_ref }}"
+          ref: ${{ github.head_ref }}
 
-      - name: "Run composer normalize"
-        uses: "docker://ergebnis/composer-normalize-action:0.8.0"
+      - uses: docker://ergebnis/composer-normalize-action:0.8.0
 
-      - name: "Commit fixed composer.json"
-        uses: "stefanzweifel/git-auto-commit-action@v4.1.6"
+      - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Normalize composer.json"
-          branch: "${{ github.head_ref }}"
+          commit_message: Normalize composer.json
 
   prettier:
-    name: "Prettify docs"
-
-    runs-on: "ubuntu-latest"
-
+    runs-on: ubuntu-latest
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2.0.0"
+      - uses: actions/checkout@v2
         with:
-          ref: "${{ github.head_ref }}"
+          ref: ${{ github.head_ref }}
 
-      - name: "Prettify docs"
-        uses: "creyD/prettier_action@v2.2"
+      - uses: creyD/prettier_action@v2.2
         with:
-          prettier_options: '--write --tab-width=2 docs/**/**/*.md'
-          branch: "${{ github.head_ref }}"
-          commit_message: "Prettify docs"
+          prettier_options: --write --tab-width=2 docs/**/**/*.md
+          branch: ${{ github.head_ref }}
+          commit_message: Prettify docs
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
