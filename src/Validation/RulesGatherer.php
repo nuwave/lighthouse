@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -208,14 +209,19 @@ class RulesGatherer
      *
      * @param  array<int, mixed>  $rules
      * @param  array<int|string>  $argumentPath
+     * @return array<int, array<int, mixed>|\Illuminate\Contracts\Validation\Rule>
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
         return array_map(
-            static function ($rule) use ($argumentPath): array {
+            static function ($rule) use ($argumentPath) {
+                if ($rule instanceof Rule) {
+                    return $rule;
+                }
+
                 /**
                  * @var array{
-                 *   0: string|\Illuminate\Contracts\Validation\Rule,
+                 *   0: string,
                  *   1: array<int, mixed>,
                  * } $parsed 
                  */
