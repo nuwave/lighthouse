@@ -15,7 +15,7 @@ class ResponseStream extends Stream implements CanStreamResponse
      */
     public const EOL = "\r\n";
 
-    public function stream(array $data, array $paths, bool $final): void
+    public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
         if (! empty($paths)) {
             $chunk = [];
@@ -36,7 +36,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $chunk['errors'] = $errors;
                 }
 
-                $terminating = $final && $i === $lastKey;
+                $terminating = $isFinalChunk && $i === $lastKey;
 
                 $this->emit(
                     $this->chunk($chunk, $terminating)
@@ -44,11 +44,11 @@ class ResponseStream extends Stream implements CanStreamResponse
             }
         } else {
             $this->emit(
-                $this->chunk($data, $final)
+                $this->chunk($data, $isFinalChunk)
             );
         }
 
-        if ($final) {
+        if ($isFinalChunk) {
             $this->emit($this->terminatingBoundary());
         }
     }

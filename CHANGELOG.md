@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `GraphQLContext` to `StartExecution` event
+
+### Changed
+
+- Optimize `@defer` by avoiding parsing the request multiple times
+
 ## 5.3.0
 
 ### Added
