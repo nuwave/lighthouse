@@ -180,7 +180,7 @@ class MorphManyTest extends DBTestCase
                     'name' => 'foo',
                     'images' => [
                         [
-                            'url' => $image1->url
+                            'url' => $image1->url,
                         ],
                     ],
                 ],
@@ -476,7 +476,7 @@ GRAPHQL
                     'name' => 'foo',
                     'images' => [
                         [
-                            'url' => $image->url
+                            'url' => $image->url,
                         ],
                     ],
                 ],

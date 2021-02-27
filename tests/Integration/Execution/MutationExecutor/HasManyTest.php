@@ -608,7 +608,7 @@ GRAPHQL
                         [
                             'id' => $taskKeep->id,
                             'name' => $taskKeep->name,
-                        ]
+                        ],
                     ],
                 ],
             ],
