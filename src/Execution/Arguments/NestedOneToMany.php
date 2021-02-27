@@ -105,7 +105,8 @@ class NestedOneToMany implements ArgResolver
                 // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
                 return $this->localKey;
             },
-            $relation
+            $relation,
+            get_class($relation)
         );
 
         return $getLocalKeyName();
