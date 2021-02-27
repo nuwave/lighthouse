@@ -76,6 +76,7 @@ class NestedOneToMany implements ArgResolver
         if ($args->has('connect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $children = $relation
+                ->make()
                 ->whereIn(
                     self::getLocalKeyName($relation),
                     $args->arguments['connect']->value
@@ -89,6 +90,7 @@ class NestedOneToMany implements ArgResolver
         if ($args->has('disconnect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $relation
+                ->make()
                 ->whereIn(
                     self::getLocalKeyName($relation),
                     $args->arguments['disconnect']->value
