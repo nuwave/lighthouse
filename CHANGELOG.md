@@ -18,11 +18,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Optimize `@defer` by avoiding parsing the request multiple times
 - Move HTTP and Schema handling out of the GraphQL class https://github.com/nuwave/lighthouse/pull/1748
-- Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
 
 ### Fixed
 
 - Apply error handling and debug settings consistently https://github.com/nuwave/lighthouse/pull/1749
+- Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
 
 ## 5.3.0
 
