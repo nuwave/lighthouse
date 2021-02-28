@@ -102,9 +102,23 @@ Run database migrations to create the `users` table:
     php artisan migrate
 
 Seed the database with some fake users:
+- First, invoke _tinker_, a powerful REPL for the Laravel framework:
 
-    php artisan tinker
-    factory('App\User', 10)->create();
+        php artisan tinker
+    
+- And then run the factory function:
+
+    For Larave 7.x or earlier:
+
+        factory('App\User', 10)->create();
+
+    For Laravel 8.x (see [Seeding using model factories](https://laravel.com/docs/8.x/seeding#using-model-factories)):
+ 
+        \App\Models\User::factory(10)->create()
+  
+    or
+  
+        \App\Models\User::factory()->count(10)->make()    
 
 ### Installing Lighthouse
 
