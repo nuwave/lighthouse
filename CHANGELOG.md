@@ -13,6 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add `GraphQLContext` to `StartExecution` event
 - Add `connect` and `disconnect` operations in nested mutations for HasMany and MorphMany relations https://github.com/nuwave/lighthouse/pull/1730
+- Allow constraining allowed relations in `@whereConditions` and `@whereHasConditions`
 
 ### Changed
 
