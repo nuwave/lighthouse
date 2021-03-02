@@ -140,20 +140,21 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
-            $documentAST
-                ->setTypeDefinition(
-                    WhereConditionsServiceProvider::createWhereConditionsInputType(
-                        $restrictedWhereConditionsName,
-                        "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
-                        $allowedColumnsEnumName
-                    )
+            $documentAST->setTypeDefinition(
+                WhereConditionsServiceProvider::createWhereConditionsInputType(
+                    $restrictedWhereConditionsName,
+                    "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                    $allowedColumnsEnumName
                 )
-                ->setTypeDefinition(
-                    WhereConditionsServiceProvider::createHasConditionsInputType(
-                        $restrictedWhereConditionsName,
-                        "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`."
-                    )
-                );
+            );
+
+            $documentAST->setTypeDefinition(
+                WhereConditionsServiceProvider::createHasConditionsInputType(
+                    $restrictedWhereConditionsName,
+                    "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                    $this->directiveArgValue('relations')
+                )
+            );
         } else {
             $argDefinition->type = Parser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
         }

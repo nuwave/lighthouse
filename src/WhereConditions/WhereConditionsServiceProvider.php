@@ -105,8 +105,13 @@ GRAPHQL
         );
     }
 
-    public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
+    /**
+     * @param  array<int, string>  $relations
+     */
+    public static function createHasConditionsInputType(string $name, string $description, array $relations): InputObjectTypeDefinitionNode
     {
+        // TODO turn $relations into scalar, perhaps like
+        // scalar {$name}Relation @scalar(regex: "^{implode('|', $relations)}$")
         $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
