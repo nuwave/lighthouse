@@ -107,7 +107,7 @@ input QueryPeopleWhereWhereConditionsRelation {
   "The relation that is checked."
   relation: String!
 
-  "The comparision operator to test against the amount."
+  "The comparison operator to test against the amount."
   operator: SQLOperator = GTE
 
   "The amount to test."
