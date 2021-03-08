@@ -23,7 +23,7 @@ class ExternalDirectiveTest extends TestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Foo @mock
+            foo: Foo! @mock
         }
 
         type Foo @key(fields: "id") {
@@ -46,6 +46,42 @@ class ExternalDirectiveTest extends TestCase
         ]);
     }
 
+    public function testExternalDirectiveForwardsScalarsWithinIterable(): void
+    {
+        $one = 1;
+        $two = 2;
+        $this->mockResolver([$one, $two]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foos: [Foo!]! @mock
+        }
+
+        type Foo @key(fields: "id") {
+            id: ID! @external
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foos {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'foos' => [
+                    [
+                        'id' => $one,
+                    ],
+                    [
+                        'id' => $two,
+                    ],
+                ]
+            ]
+        ]);
+    }
+
     public function testExternalDirectiveFallbackToDefaultFieldResolver(): void
     {
         $foo = [
@@ -56,12 +92,12 @@ class ExternalDirectiveTest extends TestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Foo @mock
+            foo: Foo! @mock
         }
 
         type Foo @key(fields: "id") {
             id: ID! @external
-            someFieldWeOwn: String
+            someFieldWeOwn: String!
         }
         ';
 
