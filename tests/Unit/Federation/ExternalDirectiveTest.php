@@ -77,8 +77,8 @@ class ExternalDirectiveTest extends TestCase
                     [
                         'id' => $two,
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
