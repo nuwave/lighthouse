@@ -41,8 +41,8 @@ class ExternalDirectiveTest extends TestCase
             'data' => [
                 'foo' => [
                     'id' => $id,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -75,7 +75,7 @@ class ExternalDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'foo' => $foo,
-            ]
+            ],
         ]);
     }
 }
