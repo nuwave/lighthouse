@@ -87,7 +87,7 @@ class EntityResolverProvider
     protected function resolverFromModel(string $typeName): ?Closure
     {
         /**
-         * @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $type
+         * @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|null $type
          */
         $type = $this->documentAST->types[$typeName] ?? null;
         if ($type === null) {
