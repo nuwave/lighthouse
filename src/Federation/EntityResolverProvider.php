@@ -87,11 +87,12 @@ class EntityResolverProvider
     protected function resolverFromModel(string $typeName): ?Closure
     {
         /**
-         * We validated this in _Any.
-         *
          * @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $type
          */
-        $type = $this->documentAST->types[$typeName];
+        $type = $this->documentAST->types[$typeName] ?? null;
+        if ($type === null) {
+            return null;
+        }
 
         $model = ModelDirective::modelClass($type) ?? $typeName;
 
