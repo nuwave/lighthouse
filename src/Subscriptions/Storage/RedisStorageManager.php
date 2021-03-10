@@ -64,6 +64,9 @@ class RedisStorageManager implements StoresSubscriptions
         // Since we store the individual subscribers with a prefix,
         // but not in the set, we have to add the prefix here.
         $subscriberIds = array_map([$this, 'channelKey'], $subscriberIds);
+        if (empty($subscriberIds)) {
+            return new Collection();
+        }
 
         // Using the mget command, we can retrieve multiple values from redis.
         // This is like using multiple get calls (getSubscriber uses the get command).
