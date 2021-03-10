@@ -23,6 +23,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply error handling and debug settings consistently https://github.com/nuwave/lighthouse/pull/1749
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
+- Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
 
 ## 5.3.0
 
