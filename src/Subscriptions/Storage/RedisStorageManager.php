@@ -64,7 +64,7 @@ class RedisStorageManager implements StoresSubscriptions
         // Since we store the individual subscribers with a prefix,
         // but not in the set, we have to add the prefix here.
         $subscriberIds = array_map([$this, 'channelKey'], $subscriberIds);
-        if (empty($subscriberIds)) {
+        if (count($subscriberIds) === 0) {
             return new Collection();
         }
 
