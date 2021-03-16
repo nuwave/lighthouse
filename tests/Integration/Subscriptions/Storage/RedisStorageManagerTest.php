@@ -85,9 +85,11 @@ class RedisStorageManagerTest extends TestCase
         $this->querySubscription();
         $this->querySubscription('taskCreated');
 
+        $unknownSubscribers = $storage->subscribersByTopic('SOMETHING_UNKNOWN');
         $updatedSubscribers = $storage->subscribersByTopic('TASK_UPDATED');
         $createdSubscribers = $storage->subscribersByTopic('TASK_CREATED');
 
+        $this->assertCount(0, $unknownSubscribers);
         $this->assertCount(3, $updatedSubscribers);
         $this->assertCount(1, $createdSubscribers);
 

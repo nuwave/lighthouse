@@ -104,25 +104,24 @@ Run database migrations to create the `users` table:
 Seed the database with some fake users:
 
     php artisan tinker
-    factory('App\User', 10)->create();
+    \App\User::factory(10)->create()
 
 ### Installing Lighthouse
 
-Of course, we will use Lighthouse as the GraphQL Server.
+Of course, we will use Lighthouse as the GraphQL Server:
 
     composer require nuwave/lighthouse
 
-In this tutorial we will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
-as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
-
-    composer require mll-lab/laravel-graphql-playground
-
-Then publish default schema to `graphql/schema.graphql`.
+Publish the default schema to `graphql/schema.graphql`:
 
     php artisan vendor:publish --tag=lighthouse-schema
 
-To make sure everything is working, access Laravel GraphQL Playground on `/graphql-playground`
-and try the following query:
+We will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+to interactively run GraphQL queries:
+
+    composer require mll-lab/laravel-graphql-playground
+
+To make sure everything is working, access `/graphql-playground` and try this query:
 
 ```graphql
 {
@@ -133,8 +132,6 @@ and try the following query:
   }
 }
 ```
-
-Now, let's move on and create a GraphQL API for our blog.
 
 ## The Models
 

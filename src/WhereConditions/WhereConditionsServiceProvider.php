@@ -127,7 +127,7 @@ GRAPHQL
                 "The relation that is checked."
                 relation: String!
 
-                "The comparision operator to test against the amount."
+                "The comparison operator to test against the amount."
                 operator: $operatorName = $operatorDefault
 
                 "The amount to test."

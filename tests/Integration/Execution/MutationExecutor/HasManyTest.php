@@ -35,6 +35,7 @@ class HasManyTest extends DBTestCase
     input CreateTaskRelation {
         create: [CreateTaskInput!]
         upsert: [UpsertTaskInput!]
+        connect: [ID!]
     }
 
     input CreateTaskInput {
@@ -52,6 +53,8 @@ class HasManyTest extends DBTestCase
         update: [UpdateTaskInput!]
         upsert: [UpsertTaskInput!]
         delete: [ID!]
+        connect: [ID!]
+        disconnect: [ID!]
     }
 
     input UpdateTaskInput {
@@ -70,6 +73,8 @@ class HasManyTest extends DBTestCase
         update: [UpdateTaskInput!]
         upsert: [UpsertTaskInput!]
         delete: [ID!]
+        connect: [ID!]
+        disconnect: [ID!]
     }
 
     input UpsertTaskInput {
@@ -116,6 +121,53 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
+    public function testCanCreateWithConnectHasMany(): void
+    {
+        $task1 = factory(Task::class)->create();
+        $task2 = factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation ($input: CreateUserInput!) {
+                createUser(input: $input) {
+                    id
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+            ',
+            [
+                'input' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        'connect' => [
+                            $task1->id,
+                            $task2->id,
+                        ],
+                    ],
+                ],
+            ]
+        )->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => $task1->id,
+                            'name' => $task1->name,
+                        ],
+                        [
+                            'id' => $task2->id,
+                            'name' => $task2->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testAllowsNullOperations(): void
     {
         factory(User::class)->create();
@@ -150,7 +202,7 @@ class HasManyTest extends DBTestCase
 
     public function testCanUpsertWithNewHasMany(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -187,7 +239,7 @@ class HasManyTest extends DBTestCase
 
     public function testUpsertHasManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertUser(input: {
                 name: "foo"
@@ -205,8 +257,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -451,6 +502,119 @@ GRAPHQL
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanConnectHasMany(string $action): void
+    {
+        $user = factory(User::class)->create();
+        $task1 = factory(Task::class)->create();
+        $task2 = factory(Task::class)->create();
+
+        $actionInputName = ucfirst($action);
+
+        $this->graphQL(/** @lang GraphQL */ "
+            mutation ${action}User(\$input: {$actionInputName}UserInput!){
+                ${action}User(input: \$input) {
+                    id
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+            ",
+            [
+                'input' => [
+                    'id' => $user->id,
+                    'name' => 'foo',
+                    'tasks' => [
+                        'connect' => [
+                            $task1->id,
+                            $task2->id,
+                        ],
+                    ],
+                ],
+            ]
+        )->assertJson([
+            'data' => [
+                "${action}User" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => $task1->id,
+                            'name' => $task1->name,
+                        ],
+                        [
+                            'id' => $task2->id,
+                            'name' => $task2->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanDisconnectHasMany(string $action): void
+    {
+        $user = factory(User::class)->create();
+
+        /** @var \Tests\Utils\Models\Task $taskDisconnect */
+        $taskDisconnect = factory(Task::class)->make();
+        $taskDisconnect->user()->associate($user);
+        $taskDisconnect->save();
+
+        /** @var \Tests\Utils\Models\Task $taskKeep */
+        $taskKeep = factory(Task::class)->make();
+        $taskKeep->user()->associate($user);
+        $taskKeep->save();
+
+        $actionInputName = ucfirst($action);
+
+        $this->graphQL(/** @lang GraphQL */ "
+            mutation ${action}User(\$input: {$actionInputName}UserInput!){
+                ${action}User(input: \$input) {
+                    id
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+        ", [
+            'input' => [
+                'id' => $user->id,
+                'name' => 'foo',
+                'tasks' => [
+                    'disconnect' => [
+                        $taskDisconnect->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "${action}User" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => $taskKeep->id,
+                            'name' => $taskKeep->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($taskDisconnect->refresh()->user);
     }
 
     public function testUpsertAcrossPivotTableOverrideExistingModel(): void

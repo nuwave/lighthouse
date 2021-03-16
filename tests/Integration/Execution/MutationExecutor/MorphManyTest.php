@@ -23,7 +23,7 @@ class MorphManyTest extends DBTestCase
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
-        upsertTask(input: UpdateTaskInput! @spread): Task @upsert
+        upsertTask(input: UpsertTaskInput! @spread): Task @upsert
     }
 
     input CreateTaskInput {
@@ -34,6 +34,7 @@ class MorphManyTest extends DBTestCase
     input CreateImageRelation {
         create: [CreateImageInput!]
         upsert: [UpsertImageInput!]
+        connect: [ID!]
     }
 
     input CreateImageInput {
@@ -51,6 +52,8 @@ class MorphManyTest extends DBTestCase
         update: [UpdateImageInput!]
         upsert: [UpsertImageInput!]
         delete: [ID!]
+        connect: [ID!]
+        disconnect: [ID!]
     }
 
     input UpdateImageInput {
@@ -59,7 +62,7 @@ class MorphManyTest extends DBTestCase
     }
 
     input UpsertTaskInput {
-        id: ID!
+        id: ID
         name: String
         images: UpsertImageRelation
     }
@@ -69,6 +72,8 @@ class MorphManyTest extends DBTestCase
         update: [UpdateImageInput!]
         upsert: [UpsertImageInput!]
         delete: [ID!]
+        connect: [ID!]
+        disconnect: [ID!]
     }
 
     input UpsertImageInput {
@@ -139,6 +144,43 @@ class MorphManyTest extends DBTestCase
                     'images' => [
                         [
                             'url' => 'foo',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanCreateWithConnectMorphMany(): void
+    {
+        $image1 = factory(Image::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation createTask($input: CreateTaskInput!){
+                createTask(input: $input) {
+                    id
+                    name
+                    images {
+                        url
+                    }
+                }
+            }
+        ', [
+            'input' => [
+                'name' => 'foo',
+                'images' => [
+                    'connect' => [
+                        $image1->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                'createTask' => [
+                    'name' => 'foo',
+                    'images' => [
+                        [
+                            'url' => $image1->url,
                         ],
                     ],
                 ],
@@ -395,5 +437,97 @@ GRAPHQL
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndConnectMorphMany(string $action): void
+    {
+        $task = factory(Task::class)->create();
+        $image = factory(Image::class)->create();
+
+        $actionInputName = ucfirst($action);
+
+        $this->graphQL(/** @lang GraphQL */ "
+            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
+                ${action}Task(input: \$input) {
+                    id
+                    name
+                    images {
+                        url
+                    }
+                }
+            }
+        ", [
+            'input' => [
+                'id' => $task->id,
+                'name' => 'foo',
+                'images' => [
+                    'connect' => [
+                        $image->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'images' => [
+                        [
+                            'url' => $image->url,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testCanUpdateAndDisconnectMorphMany(string $action): void
+    {
+        /** @var \Tests\Utils\Models\Task $task */
+        $task = factory(Task::class)->create();
+
+        /** @var \Tests\Utils\Models\Image $image */
+        $image = factory(Image::class)->make();
+        $task->images()->save($image);
+
+        $actionInputName = ucfirst($action);
+
+        $this->graphQL(/** @lang GraphQL */ "
+            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
+                ${action}Task(input: \$input) {
+                    id
+                    name
+                    images {
+                        url
+                    }
+                }
+            }
+        ", [
+            'input' => [
+                'id' => $task->id,
+                'name' => 'foo',
+                'images' => [
+                    'disconnect' => [
+                        $image->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'images' => [],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($image->refresh()->imageable);
     }
 }
