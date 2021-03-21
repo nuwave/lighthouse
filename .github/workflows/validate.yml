@@ -120,9 +120,10 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
 
-      - run: |
-          sudo systemctl start mysql.service
-          mysql --user=root --password=root --execute='CREATE DATABASE test;'
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'test'
+          mysql root password: 'root'
 
       - run: vendor/bin/phpunit --colors=always --verbose
 
