@@ -19,7 +19,7 @@ class GlobalIdTest extends TestCase
         $this->globalIdResolver = new GlobalId;
     }
 
-    public function testCanHandleGlobalIds(): void
+    public function testHandleGlobalIds(): void
     {
         $globalId = $this->globalIdResolver->encode('User', 'asdf');
         $idParts = $this->globalIdResolver->decode($globalId);
@@ -27,14 +27,14 @@ class GlobalIdTest extends TestCase
         $this->assertSame(['User', 'asdf'], $idParts);
     }
 
-    public function testCanDecodeJustTheId(): void
+    public function testDecodeJustTheId(): void
     {
         $globalId = $this->globalIdResolver->encode('User', 123);
 
         $this->assertSame('123', $this->globalIdResolver->decodeID($globalId));
     }
 
-    public function testCanDecodeJustTheType(): void
+    public function testDecodeJustTheType(): void
     {
         $globalId = $this->globalIdResolver->encode('User', 123);
 

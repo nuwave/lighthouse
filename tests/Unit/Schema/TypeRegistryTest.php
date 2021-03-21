@@ -69,7 +69,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('EMPLOYEE', $enumValueDefinition->value);
     }
 
-    public function testCanTransformScalars(): void
+    public function testTransformScalars(): void
     {
         $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
         scalar Email
@@ -81,7 +81,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('Email', $scalarType->name);
     }
 
-    public function testCanPointToScalarClassThroughDirective(): void
+    public function testPointToScalarClassThroughDirective(): void
     {
         $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
@@ -93,7 +93,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('DateTime', $scalarType->name);
     }
 
-    public function testCanPointToScalarClassThroughDirectiveWithoutNamespace(): void
+    public function testPointToScalarClassThroughDirectiveWithoutNamespace(): void
     {
         $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
         scalar SomeEmail @scalar(class: "Email")
@@ -105,7 +105,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('SomeEmail', $scalarType->name);
     }
 
-    public function testCanTransformInterfaces(): void
+    public function testTransformInterfaces(): void
     {
         $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ '
         interface Foo {
@@ -148,7 +148,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('Bar', $interfaceType->name);
     }
 
-    public function testCanTransformUnions(): void
+    public function testTransformUnions(): void
     {
         $unionNode = Parser::unionTypeDefinition(/** @lang GraphQL */ '
         union Foo = Bar
@@ -161,7 +161,7 @@ class TypeRegistryTest extends TestCase
         $this->assertInstanceOf(Closure::class, $unionType->config['resolveType']);
     }
 
-    public function testCanTransformObjectTypes(): void
+    public function testTransformObjectTypes(): void
     {
         $objectTypeNode = Parser::objectTypeDefinition(/** @lang GraphQL */ '
         type User {
@@ -176,7 +176,7 @@ class TypeRegistryTest extends TestCase
         $this->assertArrayHasKey('foo', $objectType->getFields());
     }
 
-    public function testCanTransformInputObjectTypes(): void
+    public function testTransformInputObjectTypes(): void
     {
         $inputNode = Parser::inputObjectTypeDefinition(/** @lang GraphQL */ '
         input UserInput {

@@ -12,7 +12,7 @@ use Tests\Utils\Models\User;
 
 class UpdateDirectiveTest extends DBTestCase
 {
-    public function testCanUpdateFromFieldArguments(): void
+    public function testUpdateFromFieldArguments(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
@@ -52,7 +52,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Company::firstOrFail()->name);
     }
 
-    public function testCanUpdateFromInputObject(): void
+    public function testUpdateFromInputObject(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
@@ -123,7 +123,7 @@ class UpdateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateWithCustomPrimaryKey(): void
+    public function testUpdateWithCustomPrimaryKey(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
@@ -163,7 +163,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Category::firstOrFail()->name);
     }
 
-    public function testCanUpdateWithCustomPrimaryKeyAsId(): void
+    public function testUpdateWithCustomPrimaryKeyAsId(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
@@ -389,7 +389,7 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        ')->assertSimilarJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',

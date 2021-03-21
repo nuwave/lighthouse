@@ -35,7 +35,7 @@ class NodeDirectiveDBTest extends DBTestCase
         ],
     ];
 
-    public function testCanResolveNodes(): void
+    public function testResolveNodes(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
@@ -75,7 +75,7 @@ class NodeDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveNodesViaInterface(): void
+    public function testResolveNodesViaInterface(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         interface IUser {
@@ -176,7 +176,7 @@ class NodeDirectiveDBTest extends DBTestCase
     /**
      * @dataProvider modelNodeDirectiveStyles
      */
-    public function testCanResolveModelsNodes(string $directiveDefinition): void
+    public function testResolveModelsNodes(string $directiveDefinition): void
     {
         $this->schema .= /** @lang GraphQL */"
         type User {$directiveDefinition} {

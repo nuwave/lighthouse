@@ -91,7 +91,7 @@ class DirectiveFactoryTest extends TestCase
         $this->directiveFactory->create('bar');
     }
 
-    public function testCanCreateSingleDirective(): void
+    public function testCreateSingleDirective(): void
     {
         $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ '
             foo: [Foo!]! @hasMany
@@ -113,7 +113,7 @@ class DirectiveFactoryTest extends TestCase
         $this->directiveFactory->exclusiveOfType($fieldDefinition, FieldResolver::class);
     }
 
-    public function testCanCreateMultipleDirectives(): void
+    public function testCreateMultipleDirectives(): void
     {
         $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ '
             bar: String @can(if: ["viewBar"]) @event

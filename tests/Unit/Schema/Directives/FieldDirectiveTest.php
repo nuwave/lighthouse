@@ -46,7 +46,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    public function testCanResolveFieldWithMergedArgs(): void
+    public function testResolveFieldWithMergedArgs(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {

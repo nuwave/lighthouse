@@ -8,7 +8,7 @@ use Tests\Utils\Models\Task;
 
 class HasOneDirectiveTest extends DBTestCase
 {
-    public function testCanQueryHasOneRelationship(): void
+    public function testQueryHasOneRelationship(): void
     {
         // Task with id 1, no post
         factory(Task::class)->create();

@@ -28,7 +28,7 @@ class OrderByDirectiveDBTest extends DBTestCase
     }
     ';
 
-    public function testCanOrderByTheGivenColumnAndSortOrderASC(): void
+    public function testOrderByTheGivenColumnAndSortOrderASC(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -60,7 +60,7 @@ class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanOrderByTheGivenFieldAndSortOrderDESC(): void
+    public function testOrderByTheGivenFieldAndSortOrderDESC(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -92,7 +92,7 @@ class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanOrderByMultipleColumns(): void
+    public function testOrderByMultipleColumns(): void
     {
         factory(User::class)->create(['name' => 'B', 'team_id' => 2]);
         factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
@@ -136,7 +136,7 @@ class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanOrderWithRestrictedColumns(): void
+    public function testOrderWithRestrictedColumns(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -168,7 +168,7 @@ class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanUseColumnEnumsArg(): void
+    public function testUseColumnEnumsArg(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -222,7 +222,7 @@ class OrderByDirectiveDBTest extends DBTestCase
         ');
     }
 
-    public function testCanOrderColumnOnField(): void
+    public function testOrderColumnOnField(): void
     {
         $now = Carbon::now();
         factory(User::class)->create(['name' => 'A']);

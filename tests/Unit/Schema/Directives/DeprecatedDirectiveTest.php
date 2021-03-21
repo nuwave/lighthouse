@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class DeprecatedDirectiveTest extends TestCase
 {
-    public function testCanRemoveDeprecatedFieldsFromIntrospection(): void
+    public function testRemoveDeprecatedFieldsFromIntrospection(): void
     {
         $reason = 'Use `bar` field';
         $this->schema = /** @lang GraphQL */ "

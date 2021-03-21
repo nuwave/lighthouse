@@ -47,7 +47,7 @@ class RelationBatchLoaderTest extends DBTestCase
             });
     }
 
-    public function testCanResolveBatchedFieldsFromBatchedRequests(): void
+    public function testResolveBatchedFieldsFromBatchedRequests(): void
     {
         $query = /** @lang GraphQL */ '
         query User($id: ID!) {
@@ -121,7 +121,7 @@ class RelationBatchLoaderTest extends DBTestCase
         ];
     }
 
-    public function testCanResolveFieldsByCustomBatchLoader(): void
+    public function testResolveFieldsByCustomBatchLoader(): void
     {
         $users = factory(User::class, 3)
             ->create()

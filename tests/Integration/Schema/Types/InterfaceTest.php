@@ -12,7 +12,7 @@ use Tests\Utils\Models\User;
 
 class InterfaceTest extends DBTestCase
 {
-    public function testCanResolveInterfaceTypes(): void
+    public function testResolveInterfaceTypes(): void
     {
         // This creates one team with it
         factory(User::class)->create();
@@ -62,7 +62,7 @@ GRAPHQL;
         $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
     }
 
-    public function testCanUseCustomTypeResolver(): void
+    public function testUseCustomTypeResolver(): void
     {
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         interface Nameable @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}"){
@@ -95,7 +95,7 @@ GRAPHQL;
         ]);
     }
 
-    public function testCanListPossibleTypes(): void
+    public function testListPossibleTypes(): void
     {
         // This creates one team with it
         factory(User::class)->create();

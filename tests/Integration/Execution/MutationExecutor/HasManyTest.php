@@ -83,7 +83,7 @@ class HasManyTest extends DBTestCase
     }
     '.self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewHasMany(): void
+    public function testCreateWithNewHasMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -105,7 +105,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ')->assertSimilarJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -121,7 +121,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateWithConnectHasMany(): void
+    public function testCreateWithConnectHasMany(): void
     {
         $task1 = factory(Task::class)->create();
         $task2 = factory(Task::class)->create();
@@ -149,7 +149,7 @@ class HasManyTest extends DBTestCase
                     ],
                 ],
             ]
-        )->assertJson([
+        )->assertSimilarJson([
             'data' => [
                 'createUser' => [
                     'name' => 'foo',
@@ -190,7 +190,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ')->assertSimilarJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -200,7 +200,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertWithNewHasMany(): void
+    public function testUpsertWithNewHasMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -221,7 +221,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ')->assertSimilarJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -257,7 +257,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ')->assertSimilarJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -273,7 +273,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateUsingUpsertWithNewHasMany(): void
+    public function testCreateUsingUpsertWithNewHasMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -295,7 +295,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ')->assertSimilarJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -325,7 +325,7 @@ class HasManyTest extends DBTestCase
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanCreateHasMany(string $action): void
+    public function testCreateHasMany(string $action): void
     {
         factory(User::class)->create();
 
@@ -349,7 +349,7 @@ class HasManyTest extends DBTestCase
             }
         }
 GRAPHQL
-        )->assertJson([
+        )->assertSimilarJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -368,7 +368,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateHasMany(string $action): void
+    public function testUpdateHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -398,7 +398,7 @@ GRAPHQL
             }
         }
 GRAPHQL
-        )->assertJson([
+        )->assertSimilarJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -417,7 +417,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpsertHasMany(string $action): void
+    public function testUpsertHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -447,7 +447,7 @@ GRAPHQL
             }
         }
 GRAPHQL
-        )->assertJson([
+        )->assertSimilarJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -466,7 +466,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanDeleteHasMany(string $action): void
+    public function testDeleteHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -493,7 +493,7 @@ GRAPHQL
             }
         }
 GRAPHQL
-        )->assertJson([
+        )->assertSimilarJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -507,7 +507,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanConnectHasMany(string $action): void
+    public function testConnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
         $task1 = factory(Task::class)->create();
@@ -539,7 +539,7 @@ GRAPHQL
                     ],
                 ],
             ]
-        )->assertJson([
+        )->assertSimilarJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -562,7 +562,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanDisconnectHasMany(string $action): void
+    public function testDisconnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
 
@@ -599,7 +599,7 @@ GRAPHQL
                     ],
                 ],
             ],
-        ])->assertJson([
+        ])->assertSimilarJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -675,7 +675,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        ')->assertSimilarJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -720,7 +720,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        ')->assertSimilarJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',

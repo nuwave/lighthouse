@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class SecurityTest extends TestCase
 {
-    public function testCanSetMaxComplexityThroughConfig(): void
+    public function testSetMaxComplexityThroughConfig(): void
     {
         config(['lighthouse.security.max_query_complexity' => 1]);
 
@@ -26,7 +26,7 @@ class SecurityTest extends TestCase
         $this->assertMaxQueryComplexityIs1();
     }
 
-    public function testCanSetMaxDepthThroughConfig(): void
+    public function testSetMaxDepthThroughConfig(): void
     {
         config(['lighthouse.security.max_query_depth' => 1]);
 
@@ -44,7 +44,7 @@ class SecurityTest extends TestCase
         $this->assertMaxQueryDepthIs1();
     }
 
-    public function testCanDisableIntrospectionThroughConfig(): void
+    public function testDisableIntrospectionThroughConfig(): void
     {
         config(['lighthouse.security.disable_introspection' => true]);
 

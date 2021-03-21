@@ -24,7 +24,7 @@ class ASTBuilderTest extends TestCase
         $this->astBuilder = app(ASTBuilder::class);
     }
 
-    public function testCanMergeTypeExtensionFields(): void
+    public function testMergeTypeExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -92,7 +92,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(1, $subscriptionFields);
     }
 
-    public function testCanMergeInputExtensionFields(): void
+    public function testMergeInputExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         input Inputs {
@@ -118,7 +118,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(3, $fields);
     }
 
-    public function testCanMergeInterfaceExtensionFields(): void
+    public function testMergeInterfaceExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         interface Named {
@@ -144,7 +144,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(3, $fields);
     }
 
-    public function testCanMergeEnumExtensionFields(): void
+    public function testMergeEnumExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         enum MyEnum {
@@ -275,7 +275,7 @@ class ASTBuilderTest extends TestCase
         $this->astBuilder->documentAST();
     }
 
-    public function testCanMergeTypeExtensionInterfaces(): void
+    public function testMergeTypeExtensionInterfaces(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User implements Emailable {

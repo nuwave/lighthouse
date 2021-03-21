@@ -24,7 +24,7 @@ class ContextFactoryTest extends TestCase
         });
     }
 
-    public function testCanGenerateCustomContext(): void
+    public function testGenerateCustomContext(): void
     {
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context): string {

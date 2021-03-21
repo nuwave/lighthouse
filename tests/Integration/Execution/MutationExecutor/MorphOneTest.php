@@ -77,7 +77,7 @@ class MorphOneTest extends DBTestCase
     }
     '.self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewMorphOne(): void
+    public function testCreateWithNewMorphOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -109,7 +109,7 @@ class MorphOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateWithUpsertMorphOne(): void
+    public function testCreateWithUpsertMorphOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -223,7 +223,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateWithNewMorphOne(string $action): void
+    public function testUpdateWithNewMorphOne(string $action): void
     {
         factory(Task::class)->create();
 
@@ -261,7 +261,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateWithUpsertMorphOne(string $action): void
+    public function testUpdateWithUpsertMorphOne(string $action): void
     {
         factory(Task::class)->create();
 
@@ -300,7 +300,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndUpdateMorphOne(string $action): void
+    public function testUpdateAndUpdateMorphOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -344,7 +344,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndDeleteMorphOne(string $action): void
+    public function testUpdateAndDeleteMorphOne(string $action): void
     {
         factory(Task::class)
             ->create()

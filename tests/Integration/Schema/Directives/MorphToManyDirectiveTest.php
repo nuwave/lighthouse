@@ -37,7 +37,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         });
     }
 
-    public function testCanResolveMorphToManyRelationship(): void
+    public function testResolveMorphToManyRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Tag {
@@ -89,7 +89,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveMorphToManyWithCustomName(): void
+    public function testResolveMorphToManyWithCustomName(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Tag {
@@ -141,7 +141,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveMorphToManyUsingInterfaces(): void
+    public function testResolveMorphToManyUsingInterfaces(): void
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();

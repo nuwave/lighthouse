@@ -757,7 +757,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanQueryForNull(): void
+    public function testQueryForNull(): void
     {
         factory(User::class, 3)->create();
 
@@ -866,7 +866,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanUseColumnEnumsArg(): void
+    public function testUseColumnEnumsArg(): void
     {
         factory(User::class)->create();
 
