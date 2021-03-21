@@ -7,7 +7,7 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
-  LIGHTHOUSE_TEST_DB_HOST: 127.0.0.1
+  LIGHTHOUSE_TEST_DB_HOST: /var/run/mysqld/mysqld.sock
   LIGHTHOUSE_TEST_DB_PASSWORD: root
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
 
@@ -63,16 +63,6 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     strategy:
       matrix:
@@ -130,20 +120,15 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
 
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'test'
+          mysql root password: 'root'
+
       - run: vendor/bin/phpunit --colors=always --verbose
 
   coverage:
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     strategy:
       matrix:
@@ -179,6 +164,10 @@ jobs:
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+
+      - run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
