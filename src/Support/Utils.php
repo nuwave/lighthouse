@@ -16,6 +16,7 @@ class Utils
      * Else, the given namespaces are tried in order.
      *
      * @param  array<string>  $namespacesToTry
+     * @param  callable(string $className): bool  $determineMatch
      * @return class-string|null
      */
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string

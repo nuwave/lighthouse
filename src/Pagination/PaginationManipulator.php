@@ -128,7 +128,7 @@ GRAPHQL
         );
 
         $fieldDefinition->type = Parser::namedType($connectionTypeName);
-        $parentType->fields [] = $fieldDefinition;
+        $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
     }
 
     /**
@@ -138,16 +138,18 @@ GRAPHQL
      */
     protected function addPaginationWrapperType(ObjectTypeDefinitionNode $objectType): void
     {
-        // If the type already exists, we use that instead
-        if (isset($this->documentAST->types[$objectType->name->value])) {
-            $objectType = $this->documentAST->types[$objectType->name->value];
+        $typeName = $objectType->name->value;
 
-            if (! $objectType instanceof ObjectTypeDefinitionNode) {
+        // If the type already exists, we use that instead
+        $existingType = $this->documentAST->types[$typeName] ?? null;
+        if ($existingType !== null) {
+            if (! $existingType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException(
-                    'Expected object type for pagination wrapper '.$objectType->name->value
-                    .', found '.$objectType->kind.' instead.'
+                    "Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead."
                 );
             }
+
+            $objectType = $existingType;
         }
 
         if ($this->modelClass) {
@@ -189,7 +191,7 @@ GRAPHQL
         $fieldDefinition->arguments [] = Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
 
         $fieldDefinition->type = Parser::namedType($paginatorTypeName);
-        $parentType->fields [] = $fieldDefinition;
+        $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
     }
 
     /**

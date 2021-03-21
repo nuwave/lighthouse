@@ -271,6 +271,7 @@ EOL
             'name' => $enumDefinition->name->value,
             'description' => data_get($enumDefinition->description, 'value'),
             'values' => $values,
+            'astNode' => $enumDefinition,
         ]);
     }
 
@@ -297,13 +298,14 @@ EOL
 
         if (! $className) {
             throw new DefinitionException(
-                "No matching subclass of GraphQL\Type\Definition\ScalarType of found for the scalar {$scalarName}"
+                "No matching subclass of GraphQL\Type\Definition\ScalarType found for the scalar {$scalarName}"
             );
         }
 
         return new $className([
             'name' => $scalarName,
             'description' => data_get($scalarDefinition->description, 'value'),
+            'astNode' => $scalarDefinition,
         ]);
     }
 
@@ -327,6 +329,7 @@ EOL
 
                     return $interfaces;
                 },
+            'astNode' => $objectDefinition,
         ]);
     }
 
@@ -362,7 +365,6 @@ EOL
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
-            'astNode' => $inputDefinition,
             'fields' =>
                 /**
                  * @return array<string, array<string, mixed>>
@@ -370,6 +372,7 @@ EOL
                 function () use ($inputDefinition): array {
                     return $this->argumentFactory->toTypeMap($inputDefinition->fields);
                 },
+            'astNode' => $inputDefinition,
         ]);
     }
 
@@ -395,6 +398,7 @@ EOL
             'description' => data_get($interfaceDefinition->description, 'value'),
             'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
+            'astNode' => $interfaceDefinition,
         ]);
     }
 
@@ -431,7 +435,13 @@ EOL
     protected function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
-            return $this->get(class_basename($rootValue));
+            if (is_array($rootValue) && isset($rootValue['__typename'])) {
+                $name = $rootValue['__typename'];
+            } else {
+                $name = class_basename($rootValue);
+            }
+
+            return $this->get($name);
         };
     }
 
@@ -469,6 +479,7 @@ EOL
                     return $types;
                 },
             'resolveType' => $typeResolver,
+            'astNode' => $unionDefinition,
         ]);
     }
 }

@@ -105,6 +105,7 @@ class FieldFactory
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
+            'astNode' => $fieldDefinitionNode,
         ];
     }
 }
