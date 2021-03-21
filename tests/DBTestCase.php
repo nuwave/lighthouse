@@ -46,13 +46,29 @@ abstract class DBTestCase extends TestCase
         $config = $app->make(ConfigRepository::class);
 
         $config->set('database.default', 'mysql');
-        $config->set('database.connections.mysql', [
+        $config->set('database.connections.mysql', $this->mysqlOptions());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function mysqlOptions(): array
+    {
+        $mysqlOptions = [
             'driver' => 'mysql',
             'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
-            'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
-            'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
             'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
             'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
-        ]);
+        ];
+
+        $socket = env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET') ?? null;
+        if (is_string($socket)) {
+            $mysqlOptions['unix_socket'] = $socket;
+        } else {
+            $mysqlOptions['host'] = env('LIGHTHOUSE_TEST_DB_HOST', 'mysql');
+            $mysqlOptions['port'] = env('LIGHTHOUSE_TEST_DB_PORT', '3306');
+        }
+
+        return $mysqlOptions;
     }
 }
