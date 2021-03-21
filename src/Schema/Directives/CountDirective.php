@@ -43,7 +43,7 @@ GRAPHQL;
     public function resolveField(FieldValue $value): FieldValue
     {
         $modelArg = $this->directiveArgValue('model');
-        if (! is_null($modelArg)) {
+        if (is_string($modelArg)) {
             return $value->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
                     /** @var \Illuminate\Database\Eloquent\Builder $query */
@@ -60,7 +60,7 @@ GRAPHQL;
 
         // Fetch the count by relation
         $relation = $this->directiveArgValue('relation');
-        if (! is_null($relation)) {
+        if (is_string($relation)) {
             return $value->setResolver(
                 function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                     return $this->loadRelation($parent, $resolveInfo);

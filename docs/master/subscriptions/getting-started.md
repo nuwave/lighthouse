@@ -9,7 +9,7 @@ Much of the credit should be given to the [Ruby implementation](https://github.c
 
 ## Setup
 
-Add the service provider to your `config/app.php`
+Add the service provider to your `config/app.php`:
 
 ```php
 'providers' => [

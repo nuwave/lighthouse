@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 class PaginateDirectiveDBTest extends DBTestCase
 {
-    public function testCanCreateQueryPaginators(): void
+    public function testCreateQueryPaginators(): void
     {
         factory(User::class, 3)->create();
 
@@ -53,7 +53,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         ])->assertJsonCount(2, 'data.users.data');
     }
 
-    public function testCanSpecifyCustomBuilder(): void
+    public function testSpecifyCustomBuilder(): void
     {
         factory(User::class, 2)->create();
 
@@ -147,7 +147,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         return User::orderBy('id', 'DESC');
     }
 
-    public function testCanCreateQueryPaginatorsWithDifferentPages(): void
+    public function testCreateQueryPaginatorsWithDifferentPages(): void
     {
         $users = factory(User::class, 3)->create();
         $posts = factory(Post::class, 3)->create([
@@ -235,7 +235,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateQueryConnections(): void
+    public function testCreateQueryConnections(): void
     {
         factory(User::class, 3)->create();
 
@@ -402,7 +402,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users.data');
     }
 
-    public function testCanHaveADefaultPaginationCount(): void
+    public function testHaveADefaultPaginationCount(): void
     {
         factory(User::class, 3)->create();
 

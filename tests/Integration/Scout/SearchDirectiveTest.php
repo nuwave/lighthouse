@@ -173,7 +173,7 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanSearchWithinCustomIndex(): void
+    public function testSearchWithinCustomIndex(): void
     {
         /** @var \Tests\Utils\Models\Post $postA */
         $postA = factory(Post::class)->create([

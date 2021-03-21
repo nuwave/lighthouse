@@ -71,7 +71,7 @@ class GraphQLTest extends TestCase
         ]);
     }
 
-    public function testCanResolveBatchedQueries(): void
+    public function testResolveBatchedQueries(): void
     {
         $this
             ->postGraphQL([

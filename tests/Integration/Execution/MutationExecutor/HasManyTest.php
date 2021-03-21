@@ -83,7 +83,7 @@ class HasManyTest extends DBTestCase
     }
     '.self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewHasMany(): void
+    public function testCreateWithNewHasMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -121,7 +121,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateWithConnectHasMany(): void
+    public function testCreateWithConnectHasMany(): void
     {
         $task1 = factory(Task::class)->create();
         $task2 = factory(Task::class)->create();
@@ -129,7 +129,6 @@ class HasManyTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: CreateUserInput!) {
                 createUser(input: $input) {
-                    id
                     name
                     tasks {
                         id
@@ -155,11 +154,11 @@ class HasManyTest extends DBTestCase
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => $task1->id,
+                            'id' => (string) $task1->id,
                             'name' => $task1->name,
                         ],
                         [
-                            'id' => $task2->id,
+                            'id' => (string) $task2->id,
                             'name' => $task2->name,
                         ],
                     ],
@@ -200,7 +199,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertWithNewHasMany(): void
+    public function testUpsertWithNewHasMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -273,7 +272,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateUsingUpsertWithNewHasMany(): void
+    public function testCreateUsingUpsertWithNewHasMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -325,7 +324,7 @@ class HasManyTest extends DBTestCase
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanCreateHasMany(string $action): void
+    public function testCreateHasMany(string $action): void
     {
         factory(User::class)->create();
 
@@ -368,7 +367,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateHasMany(string $action): void
+    public function testUpdateHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -417,7 +416,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpsertHasMany(string $action): void
+    public function testUpsertHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -466,7 +465,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanDeleteHasMany(string $action): void
+    public function testDeleteHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -507,7 +506,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanConnectHasMany(string $action): void
+    public function testConnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
         $task1 = factory(Task::class)->create();
@@ -546,11 +545,11 @@ GRAPHQL
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => $task1->id,
+                            'id' => (string) $task1->id,
                             'name' => $task1->name,
                         ],
                         [
-                            'id' => $task2->id,
+                            'id' => (string) $task2->id,
                             'name' => $task2->name,
                         ],
                     ],
@@ -562,7 +561,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanDisconnectHasMany(string $action): void
+    public function testDisconnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
 
@@ -606,7 +605,7 @@ GRAPHQL
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => $taskKeep->id,
+                            'id' => (string) $taskKeep->id,
                             'name' => $taskKeep->name,
                         ],
                     ],

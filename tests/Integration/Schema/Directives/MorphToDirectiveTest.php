@@ -45,7 +45,7 @@ class MorphToDirectiveTest extends DBTestCase
             );
     }
 
-    public function testCanResolveMorphToRelationship(): void
+    public function testResolveMorphToRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {
@@ -90,7 +90,7 @@ class MorphToDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveMorphToWithCustomName(): void
+    public function testResolveMorphToWithCustomName(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {
@@ -135,7 +135,7 @@ class MorphToDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveMorphToUsingInterfaces(): void
+    public function testResolveMorphToUsingInterfaces(): void
     {
         /** @var \Tests\Utils\Models\Post $post */
         $post = factory(Post::class)->create([

@@ -81,7 +81,7 @@ GRAPHQL;
         ]);
     }
 
-    public function testCanBroadcastSubscriptions(): void
+    public function testBroadcastSubscriptions(): void
     {
         $this->subscribe();
         $this->graphQL(/** @lang GraphQL */ '

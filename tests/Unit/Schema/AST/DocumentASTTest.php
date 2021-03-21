@@ -57,7 +57,7 @@ class DocumentASTTest extends TestCase
         );
     }
 
-    public function testCanBeSerialized(): void
+    public function testBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
         type Query {

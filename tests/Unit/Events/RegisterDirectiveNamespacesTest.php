@@ -32,14 +32,14 @@ class RegisterDirectiveNamespacesTest extends TestCase
         parent::getEnvironmentSetUp($app);
     }
 
-    public function testCanAddAdditionalDirectiveBaseNamespacesThroughEvent(): void
+    public function testAddAdditionalDirectiveBaseNamespacesThroughEvent(): void
     {
         $directive = $this->directiveLocator->create('foo');
 
         $this->assertInstanceOf(FooDirective::class, $directive);
     }
 
-    public function testCanOverwriteDefaultDirectiveThroughEvent(): void
+    public function testOverwriteDefaultDirectiveThroughEvent(): void
     {
         $directive = $this->directiveLocator->create('field');
 

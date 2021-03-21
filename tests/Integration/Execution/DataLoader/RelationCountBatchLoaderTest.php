@@ -12,7 +12,7 @@ use Tests\Utils\Models\User;
 
 class RelationCountBatchLoaderTest extends DBTestCase
 {
-    public function testCanResolveBatchedCountsFromBatchedRequests(): void
+    public function testResolveBatchedCountsFromBatchedRequests(): void
     {
         $users = factory(User::class, 2)
             ->create()
@@ -83,7 +83,7 @@ class RelationCountBatchLoaderTest extends DBTestCase
             ]);
     }
 
-    public function testCanResolveFieldsByCustomBatchLoader(): void
+    public function testResolveFieldsByCustomBatchLoader(): void
     {
         $users = factory(User::class, 3)
             ->create()

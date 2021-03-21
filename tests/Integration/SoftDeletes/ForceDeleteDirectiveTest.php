@@ -100,7 +100,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    public function testCanDirectiveIncludesTrashedModelsWhenUsingForceDelete(): void
+    public function testDirectiveIncludesTrashedModelsWhenUsingForceDelete(): void
     {
         $user = new User();
         $user->name = UserPolicy::ADMIN;
@@ -135,7 +135,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    public function testCanDirectiveUsesExplicitTrashedArgument(): void
+    public function testDirectiveUsesExplicitTrashedArgument(): void
     {
         $user = new User();
         $user->name = UserPolicy::ADMIN;

@@ -66,7 +66,7 @@ class UpsertDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        ')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -134,7 +134,7 @@ class UpsertDirectiveTest extends DBTestCase
                     name
                 }
             }
-        }')->assertExactJson([
+        }')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',

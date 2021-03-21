@@ -12,7 +12,7 @@ class UnionTest extends DBTestCase
     /**
      * @dataProvider withAndWithoutCustomTypeResolver
      */
-    public function testCanResolveUnionTypes(string $schema, string $query): void
+    public function testResolveUnionTypes(string $schema, string $query): void
     {
         // This creates a user with it
         factory(Post::class)->create(

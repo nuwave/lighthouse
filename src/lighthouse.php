@@ -301,7 +301,7 @@ return [
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
-    | Here you can define GraphQL subscription "broadcasters" and "storage" drivers
+    | Here you can define GraphQL subscription broadcaster and storage drivers
     | as well their required configuration options.
     |
     */

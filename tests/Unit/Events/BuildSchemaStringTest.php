@@ -19,7 +19,7 @@ class BuildSchemaStringTest extends TestCase
         $this->buildSchema(self::PLACEHOLDER_QUERY);
     }
 
-    public function testCanAddAdditionalSchemaThroughEvent(): void
+    public function testAddAdditionalSchemaThroughEvent(): void
     {
         app('events')->listen(
             BuildSchemaString::class,

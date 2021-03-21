@@ -61,7 +61,7 @@ class SubscriptionTest extends TestCase
         );
     }
 
-    public function testCanSendSubscriptionToBroadcaster(): void
+    public function testSendSubscriptionToBroadcaster(): void
     {
         $root = [
             'post' => [

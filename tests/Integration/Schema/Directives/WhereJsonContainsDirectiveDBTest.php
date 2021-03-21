@@ -17,7 +17,7 @@ class WhereJsonContainsDirectiveDBTest extends DBTestCase
     }
     ';
 
-    public function testCanApplyWhereJsonContainsFilter(): void
+    public function testApplyWhereJsonContainsFilter(): void
     {
         $nestedBar = \Safe\json_encode([
             'nested' => 'bar',

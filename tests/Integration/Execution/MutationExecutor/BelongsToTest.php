@@ -80,7 +80,7 @@ class BelongsToTest extends DBTestCase
     }
     '.self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateAndConnectWithBelongsTo(): void
+    public function testCreateAndConnectWithBelongsTo(): void
     {
         factory(User::class)->create();
 
@@ -138,7 +138,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertUsingCreateAndConnectWithBelongsTo(): void
+    public function testUpsertUsingCreateAndConnectWithBelongsTo(): void
     {
         factory(User::class)->create();
 
@@ -207,7 +207,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateWithNewBelongsTo(): void
+    public function testCreateWithNewBelongsTo(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -239,7 +239,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertWithNewBelongsTo(): void
+    public function testUpsertWithNewBelongsTo(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -305,7 +305,7 @@ GRAPHQL
         ]);
     }
 
-    public function testCanUpsertUsingCreateWithNewBelongsTo(): void
+    public function testUpsertUsingCreateWithNewBelongsTo(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -338,7 +338,7 @@ GRAPHQL
         ]);
     }
 
-    public function testCanUpsertUsingCreateWithNewUpsertBelongsTo(): void
+    public function testUpsertUsingCreateWithNewUpsertBelongsTo(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -372,7 +372,7 @@ GRAPHQL
         ]);
     }
 
-    public function testCanCreateAndUpdateBelongsTo(): void
+    public function testCreateAndUpdateBelongsTo(): void
     {
         factory(User::class)->create([
             'name' => 'foo',
@@ -411,7 +411,7 @@ GRAPHQL
         ]);
     }
 
-    public function testCanUpsertUsingCreateAndUpdateBelongsTo(): void
+    public function testUpsertUsingCreateAndUpdateBelongsTo(): void
     {
         factory(User::class)->create([
             'name' => 'foo',
@@ -451,7 +451,7 @@ GRAPHQL
         ]);
     }
 
-    public function testCanUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
+    public function testUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
     {
         factory(User::class)->create([
             'name' => 'foo',
@@ -505,7 +505,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndDisconnectBelongsTo(string $action): void
+    public function testUpdateAndDisconnectBelongsTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
@@ -548,7 +548,7 @@ GRAPHQL
         $this->assertNull($task->user, 'Must disconnect the parent relationship.');
     }
 
-    public function testCanCreateUsingUpsertAndDisconnectBelongsTo(): void
+    public function testCreateUsingUpsertAndDisconnectBelongsTo(): void
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
@@ -598,7 +598,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndDeleteBelongsTo(string $action): void
+    public function testUpdateAndDeleteBelongsTo(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
@@ -646,7 +646,7 @@ GRAPHQL
         );
     }
 
-    public function testCanCreateUsingUpsertAndDeleteBelongsTo(): void
+    public function testCreateUsingUpsertAndDeleteBelongsTo(): void
     {
         factory(User::class)->create();
 

@@ -13,7 +13,7 @@ use Tests\Utils\Models\User;
 
 class CountDirectiveDBTest extends DBTestCase
 {
-    public function testItRequiresARelationOrModelArgument(): void
+    public function testRequiresARelationOrModelArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -29,7 +29,7 @@ class CountDirectiveDBTest extends DBTestCase
         ');
     }
 
-    public function testItCanCountAModel(): void
+    public function testCountModel(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -50,7 +50,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCanCountAModelWithScopes(): void
+    public function testCountModelWithScopes(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -74,7 +74,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCountsARelationAndEagerLoadsTheCount(): void
+    public function testCountRelationAndEagerLoadsTheCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -123,7 +123,7 @@ class CountDirectiveDBTest extends DBTestCase
         $this->assertEquals(2, $queries);
     }
 
-    public function testItCountsARelationThatIsNotSuffixedWithCount(): void
+    public function testCountRelationThatIsNotSuffixedWithCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -154,7 +154,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCountsARelationshipWithScopesApplied(): void
+    public function testCountRelationWithScopesApplied(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -191,7 +191,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCanCountPolymorphicRelations(): void
+    public function testCountPolymorphicRelation(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -310,7 +310,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveCountByModel(): void
+    public function testResolveCountByModel(): void
     {
         factory(User::class)->times(3)->create();
 
@@ -331,7 +331,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveCountByRelation(): void
+    public function testResolveCountByRelation(): void
     {
         /** @var User $user */
         $user = factory(User::class)->create();
