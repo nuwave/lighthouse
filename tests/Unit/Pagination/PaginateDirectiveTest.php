@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class PaginateDirectiveTest extends TestCase
 {
-    public function testCanAliasRelayToConnection(): void
+    public function testAliasRelayToConnection(): void
     {
         $connection = $this->getConnectionQueryField(PaginationType::CONNECTION);
         $relay = $this->getConnectionQueryField('relay');

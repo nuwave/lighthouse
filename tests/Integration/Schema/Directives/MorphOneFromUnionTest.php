@@ -12,7 +12,7 @@ use Tests\Utils\Models\User;
 
 class MorphOneFromUnionTest extends DBTestCase
 {
-    public function testCanResolveMorphOneRelationshipOnInterface(): void
+    public function testResolveMorphOneRelationshipOnInterface(): void
     {
         /** @var \Tests\Utils\Models\Employee $employee */
         $employee = factory(Employee::class)->create();

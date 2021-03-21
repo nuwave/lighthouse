@@ -15,7 +15,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
     }
     ';
 
-    public function testCanLimitPostByAuthenticatedUser(): void
+    public function testLimitPostByAuthenticatedUser(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -47,7 +47,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanChangeGuard(): void
+    public function testChangeGuard(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {

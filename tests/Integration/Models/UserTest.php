@@ -8,7 +8,7 @@ use Tests\Utils\Models\User;
 
 class UserTest extends DBTestCase
 {
-    public function testCanInsertRecordsIntoTestDB(): void
+    public function testInsertRecordsIntoTestDB(): void
     {
         factory(User::class, 2)->create();
 

@@ -9,7 +9,7 @@ class CustomDefaultResolverTest extends TestCase
 {
     public const CUSTOM_RESOLVER_RESULT = 123;
 
-    public function testCanSpecifyACustomDefaultResolver(): void
+    public function testSpecifyACustomDefaultResolver(): void
     {
         $this->mockResolver([
             'bar' => 'should not be returned',

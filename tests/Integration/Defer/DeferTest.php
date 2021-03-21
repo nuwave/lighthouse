@@ -44,7 +44,7 @@ class DeferTest extends TestCase
         );
     }
 
-    public function testCanDeferFields(): void
+    public function testDeferFields(): void
     {
         $this->mockResolver([
             'name' => 'John Doe',
@@ -97,7 +97,7 @@ class DeferTest extends TestCase
         );
     }
 
-    public function testCanDeferNestedFields(): void
+    public function testDeferNestedFields(): void
     {
         $data = [
             'name' => 'John Doe',
@@ -151,7 +151,7 @@ class DeferTest extends TestCase
         $this->assertSame($data['parent']['parent']['name'], $nestedDeferred['data']['name']);
     }
 
-    public function testCanDeferNestedFieldsOnMutations(): void
+    public function testDeferNestedFieldsOnMutations(): void
     {
         $this->mockResolver([
             'name' => 'John Doe',
@@ -210,7 +210,7 @@ class DeferTest extends TestCase
         );
     }
 
-    public function testCanDeferListFields(): void
+    public function testDeferListFields(): void
     {
         $data = [
             [
@@ -266,7 +266,7 @@ class DeferTest extends TestCase
         $this->assertSame($data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
     }
 
-    public function testCanDeferGroupedListFields(): void
+    public function testDeferGroupedListFields(): void
     {
         $data = [
             [

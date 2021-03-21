@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class ManipulateASTTest extends TestCase
 {
-    public function testCanManipulateTheAST(): void
+    public function testManipulateTheAST(): void
     {
         $this->schema = '
         type Query {

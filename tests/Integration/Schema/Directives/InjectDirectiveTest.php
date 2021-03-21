@@ -7,7 +7,7 @@ use Tests\Utils\Models\User;
 
 class InjectDirectiveTest extends DBTestCase
 {
-    public function testCanCreateFromInputObjectWithDeepInjection(): void
+    public function testCreateFromInputObjectWithDeepInjection(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);

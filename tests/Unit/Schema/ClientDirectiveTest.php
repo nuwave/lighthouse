@@ -17,7 +17,7 @@ class ClientDirectiveTest extends TestCase
         );
     }
 
-    public function testCanDefineACustomClientDirective(): void
+    public function testDefineACustomClientDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         "foo"

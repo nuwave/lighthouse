@@ -91,7 +91,7 @@ class FindDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'errors');
     }
 
-    public function testCanUseScopes(): void
+    public function testUseScopes(): void
     {
         $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
         $companyB = factory(Company::class)->create(['name' => 'CompanyB']);

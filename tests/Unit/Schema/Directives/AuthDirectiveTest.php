@@ -8,7 +8,7 @@ use Tests\Utils\Models\User;
 
 class AuthDirectiveTest extends TestCase
 {
-    public function testCanResolveAuthenticatedUser(): void
+    public function testResolveAuthenticatedUser(): void
     {
         $user = new User();
         $user->name = 'foo';
@@ -39,7 +39,7 @@ class AuthDirectiveTest extends TestCase
         ]);
     }
 
-    public function testCanResolveAuthenticatedUserWithGuardArgument(): void
+    public function testResolveAuthenticatedUserWithGuardArgument(): void
     {
         $user = new User();
         $user->name = 'foo';

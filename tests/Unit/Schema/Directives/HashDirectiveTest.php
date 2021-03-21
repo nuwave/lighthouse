@@ -6,7 +6,7 @@ use Tests\TestCase;
 
 class HashDirectiveTest extends TestCase
 {
-    public function testCanHashAnArgument(): void
+    public function testHashAnArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -36,7 +36,7 @@ class HashDirectiveTest extends TestCase
         $this->assertTrue(password_verify('password', $password));
     }
 
-    public function testCanHashAnArgumentInInputObjectAndArray(): void
+    public function testHashAnArgumentInInputObjectAndArray(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
