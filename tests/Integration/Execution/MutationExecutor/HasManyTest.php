@@ -129,7 +129,6 @@ class HasManyTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: CreateUserInput!) {
                 createUser(input: $input) {
-                    id
                     name
                     tasks {
                         id
@@ -546,11 +545,11 @@ GRAPHQL
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => $task1->id,
+                            'id' => (string) $task1->id,
                             'name' => $task1->name,
                         ],
                         [
-                            'id' => $task2->id,
+                            'id' => (string) $task2->id,
                             'name' => $task2->name,
                         ],
                     ],
@@ -606,7 +605,7 @@ GRAPHQL
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => $taskKeep->id,
+                            'id' => (string) $taskKeep->id,
                             'name' => $taskKeep->name,
                         ],
                     ],

@@ -207,7 +207,7 @@ class RelationBatchLoaderTest extends DBTestCase
                 }
             }
             ')
-            ->assertExactJson([
+            ->assertSimilarJson([
                 'data' => [
                     'user' => [
                         'tasks' => [
@@ -235,7 +235,7 @@ class RelationBatchLoaderTest extends DBTestCase
                 }
             }
             ')
-            ->assertExactJson([
+            ->assertSimilarJson([
                 'data' => [
                     'user' => [
                         'tasks' => [
