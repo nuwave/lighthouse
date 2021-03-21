@@ -7,7 +7,7 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
-  LIGHTHOUSE_TEST_DB_HOST: localhost
+  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
   LIGHTHOUSE_TEST_DB_PASSWORD: root
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
 
@@ -120,10 +120,9 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
 
-      - uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql database: 'test'
-          mysql root password: 'root'
+      - run: |
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE test;'
 
       - run: vendor/bin/phpunit --colors=always --verbose
 
