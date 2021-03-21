@@ -1,11 +1,12 @@
 # Events
 
-This reference lists the events that Lighthouse dispatches during a request in order
-of execution.
-
 All events reside in the namespace `\Nuwave\Lighthouse\Events`.
 
-## StartRequest
+## Lifecycle Events
+
+Lighthouse dispatches the following order of events during a request.
+
+### StartRequest
 
 ```php
 <?php
@@ -47,7 +48,7 @@ class StartRequest
 }
 ```
 
-## BuildSchemaString
+### BuildSchemaString
 
 ```php
 <?php
@@ -78,7 +79,7 @@ class BuildSchemaString
 }
 ```
 
-## RegisterDirectiveNamespaces
+### RegisterDirectiveNamespaces
 
 ```php
 <?php
@@ -99,7 +100,7 @@ class RegisterDirectiveNamespaces
 }
 ```
 
-## ManipulateAST
+### ManipulateAST
 
 ```php
 <?php
@@ -132,7 +133,7 @@ class ManipulateAST
 }
 ```
 
-## StartExecution
+### StartExecution
 
 ```php
 <?php
@@ -199,7 +200,7 @@ class StartExecution
 }
 ```
 
-## BuildExtensionsResponse
+### BuildExtensionsResponse
 
 ```php
 <?php
@@ -267,7 +268,7 @@ class ExtensionsResponse
 }
 ```
 
-## ManipulateResult
+### ManipulateResult
 
 ```php
 <?php
@@ -298,7 +299,7 @@ class ManipulateResult
 }
 ```
 
-## EndExecution
+### EndExecution
 
 ```php
 <?php
@@ -335,7 +336,7 @@ class EndExecution
 }
 ```
 
-## EndRequest
+### EndRequest
 
 ```php
 <?php
@@ -373,6 +374,40 @@ class EndRequest
     {
         $this->response = $response;
         $this->moment = Carbon::now();
+    }
+}
+```
+
+## Non-lifecycle Events
+
+The following events happen outside of the execution lifecycle.
+
+### ValidateSchema
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+use GraphQL\Type\Schema;
+
+/**
+ * Dispatched when php artisan lighthouse:validate-schema is called.
+ *
+ * Listeners should throw a descriptive error if the schema is wrong.
+ */
+class ValidateSchema
+{
+    /**
+     * The final schema to validate.
+     *
+     * @var \GraphQL\Type\Schema
+     */
+    public $schema;
+
+    public function __construct(Schema $schema)
+    {
+        $this->schema = $schema;
     }
 }
 ```
