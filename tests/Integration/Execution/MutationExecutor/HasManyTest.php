@@ -105,7 +105,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -148,7 +148,7 @@ class HasManyTest extends DBTestCase
                     ],
                 ],
             ]
-        )->assertSimilarJson([
+        )->assertJson([
             'data' => [
                 'createUser' => [
                     'name' => 'foo',
@@ -189,7 +189,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -220,7 +220,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -256,7 +256,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -294,7 +294,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -348,7 +348,7 @@ class HasManyTest extends DBTestCase
             }
         }
 GRAPHQL
-        )->assertSimilarJson([
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -397,7 +397,7 @@ GRAPHQL
             }
         }
 GRAPHQL
-        )->assertSimilarJson([
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -446,7 +446,7 @@ GRAPHQL
             }
         }
 GRAPHQL
-        )->assertSimilarJson([
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -492,7 +492,7 @@ GRAPHQL
             }
         }
 GRAPHQL
-        )->assertSimilarJson([
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -538,7 +538,7 @@ GRAPHQL
                     ],
                 ],
             ]
-        )->assertSimilarJson([
+        )->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -598,7 +598,7 @@ GRAPHQL
                     ],
                 ],
             ],
-        ])->assertSimilarJson([
+        ])->assertJson([
             'data' => [
                 "${action}User" => [
                     'id' => '1',
@@ -674,7 +674,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -719,7 +719,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',

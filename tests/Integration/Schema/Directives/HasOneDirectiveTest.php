@@ -37,7 +37,7 @@ class HasOneDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'tasks' => [
                     [

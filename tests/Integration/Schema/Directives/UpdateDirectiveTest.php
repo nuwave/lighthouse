@@ -389,7 +389,7 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',

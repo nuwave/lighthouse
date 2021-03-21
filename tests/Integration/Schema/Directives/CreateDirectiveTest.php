@@ -534,7 +534,7 @@ class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertSimilarJson([
+        ')->assertJson([
             'data' => [
                 'createUser' => [
                     'name' => 'foo',
