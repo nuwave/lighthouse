@@ -13,7 +13,7 @@ env:
 
 jobs:
   static-analysis:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
@@ -62,7 +62,7 @@ jobs:
       - run: vendor/bin/phpstan analyse
 
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
@@ -127,7 +127,7 @@ jobs:
       - run: vendor/bin/phpunit --colors=always --verbose
 
   coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
@@ -175,7 +175,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   benchmarks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:

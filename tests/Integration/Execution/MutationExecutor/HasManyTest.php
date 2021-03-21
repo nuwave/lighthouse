@@ -154,11 +154,11 @@ class HasManyTest extends DBTestCase
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => $task1->id,
+                            'id' => (string) $task1->id,
                             'name' => $task1->name,
                         ],
                         [
-                            'id' => $task2->id,
+                            'id' => (string) $task2->id,
                             'name' => $task2->name,
                         ],
                     ],
