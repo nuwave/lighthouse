@@ -4,6 +4,7 @@ namespace Tests\Unit\Pagination;
 
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
+use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class PaginateDirectiveTest extends TestCase
 {
-    public function testCanAliasRelayToConnection(): void
+    public function testAliasRelayToConnection(): void
     {
         $connection = $this->getConnectionQueryField(PaginationType::CONNECTION);
         $relay = $this->getConnectionQueryField('relay');
@@ -277,8 +278,7 @@ class PaginateDirectiveTest extends TestCase
 
     public function testDoesNotRequireModelWhenUsingBuilder(): void
     {
-        $validationErrors = $this
-            ->buildSchema(/** @lang GraphQL */ "
+        $schema = $this->buildSchema(/** @lang GraphQL */ "
             type Query {
                 users: [NotAnActualModelName!] @paginate(builder: \"{$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder')}\")
             }
@@ -286,10 +286,11 @@ class PaginateDirectiveTest extends TestCase
             type NotAnActualModelName {
                 id: ID!
             }
-            ")
-            ->validate();
+            ");
 
-        $this->assertCount(0, $validationErrors);
+        /** @var \GraphQL\Type\Definition\ObjectType $paginator */
+        $paginator = $schema->getType('NotAnActualModelNamePaginator');
+        $this->assertInstanceOf(ObjectType::class, $paginator);
     }
 
     public function testThrowsIfBuilderIsNotPresent(): void
