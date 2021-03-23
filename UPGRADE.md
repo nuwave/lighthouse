@@ -323,7 +323,8 @@ use Illuminate\Validation\Rule;
     {
         return [
             'id' => ['required'],
-            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
+-            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
++            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->arg('id'), 'id')],
         ];
     }
 }
