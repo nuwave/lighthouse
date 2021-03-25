@@ -74,7 +74,7 @@ class UnionTest extends DBTestCase
             : '';
 
         return [
-            /** @lang GraphQL */ "
+/** @lang GraphQL */ "
             union Stuff {$customResolver} = {$prefix}User | {$prefix}Post
 
             type {$prefix}User {
@@ -89,7 +89,7 @@ class UnionTest extends DBTestCase
                 stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver()}\")
             }
             ",
-            /** @lang GraphQL */ "
+/** @lang GraphQL */ "
             {
                 stuff {
                     ... on {$prefix}User {
