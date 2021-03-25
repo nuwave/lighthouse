@@ -49,31 +49,33 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
         /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionGuard $guard */
         $guard = $this->authFactory->guard(SubscriptionGuard::GUARD_NAME);
 
-        $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {
-            // If there is an authenticated user set in the context, set that user as the authenticated user
-            $user = $item->context->user();
-            if ($user !== null) {
-                $guard->setUser($user);
-            }
-
-            try {
-                $handleSubscriber($item);
-            } catch (Exception $e) {
-                if ($handleError === null) {
-                    throw $e;
+        try {
+            $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {
+                // If there is an authenticated user set in the context, set that user as the authenticated user
+                $user = $item->context->user();
+                if ($user !== null) {
+                    $guard->setUser($user);
                 }
 
-                $handleError($e);
-            } finally {
-                // Unset the authenticated user after each iteration to restore the guard to a unauthenticated state
-                $guard->reset();
-            }
-        });
+                try {
+                    $handleSubscriber($item);
+                } catch (Exception $e) {
+                    if ($handleError === null) {
+                        throw $e;
+                    }
 
-        // Restore the previous default Lighthouse guard name
-        $this->configRepository->set('lighthouse.guard', $defaultLighthouseGuardName);
+                    $handleError($e);
+                } finally {
+                    // Unset the authenticated user after each iteration to restore the guard to a unauthenticated state
+                    $guard->reset();
+                }
+            });
+        } finally {
+            // Restore the previous default Lighthouse guard name
+            $this->configRepository->set('lighthouse.guard', $defaultLighthouseGuardName);
 
-        // Restore the previous default guard name
-        $this->authFactory->shouldUse($previousGuardName);
+            // Restore the previous default guard name
+            $this->authFactory->shouldUse($previousGuardName);
+        }
     }
 }
