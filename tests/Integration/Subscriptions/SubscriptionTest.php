@@ -24,7 +24,7 @@ class SubscriptionTest extends TestCase
                 return $args;
             });
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             title: String!
             body: String @guard(with: "api")
