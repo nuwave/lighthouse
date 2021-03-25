@@ -2,12 +2,14 @@
 
 namespace Tests\Integration\Subscriptions;
 
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
+use Tests\Utils\Models\User;
 
 class SubscriptionTest extends TestCase
 {
@@ -17,9 +19,15 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
+        $this->mockResolverExpects($this->any())
+            ->willReturnCallback(function ($root, array $args): array {
+                return $args;
+            });
+
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
-            body: String
+            title: String!
+            body: String @guard(with: "api")
         }
 
         type Subscription {
@@ -27,8 +35,8 @@ class SubscriptionTest extends TestCase
         }
 
         type Mutation {
-            createPost(post: String!): Post
-                @field(resolver: "{$this->qualifyTestResolver()}")
+            createPost(title: String!, body: String): Post
+                @mock
                 @broadcast(subscription: "onPostCreated")
         }
 
@@ -56,7 +64,7 @@ GRAPHQL;
                 'query' => /** @lang GraphQL */ '
                     subscription OnPostCreated1 {
                         onPostCreated {
-                            body
+                            title
                         }
                     }
                     ',
@@ -65,7 +73,7 @@ GRAPHQL;
                 'query' => /** @lang GraphQL */ '
                     subscription OnPostCreated2 {
                         onPostCreated {
-                            body
+                            title
                         }
                     }
                     ',
@@ -86,8 +94,8 @@ GRAPHQL;
         $this->subscribe();
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
-            createPost(post: "Foobar") {
-                body
+            createPost(title: "Foobar") {
+                title
             }
         }
         ');
@@ -102,7 +110,7 @@ GRAPHQL;
 
         $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
-        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostCreated']);
+        $this->assertSame(['title' => 'Foobar'], $broadcasted['onPostCreated']);
     }
 
     public function testWithFieldAlias(): void
@@ -110,7 +118,7 @@ GRAPHQL;
         $response = $this->graphQL(/** @lang GraphQL */ '
         subscription {
             alias: onPostCreated {
-                body
+                title
             }
         }
         ');
@@ -138,15 +146,43 @@ GRAPHQL;
         ]);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     * @return array<string, string>
-     */
-    public function resolve($root, array $args): array
+    public function testWithGuard(): void
     {
-        return [
-            'body' => $args['post'],
-        ];
+        $this->be(new User());
+        $this->graphQL(/** @lang GraphQL */ '
+            subscription OnPostCreated {
+                onPostCreated {
+                    body
+                }
+            }
+        ');
+
+        /** @var SessionGuard $sessionGuard */
+        $sessionGuard = $this->app['auth']->guard();
+        $sessionGuard->logout();
+//        dd($sessionGuard);
+
+//        $this->be(new User());
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createPost(title: "foo", body: "bar") {
+                body
+            }
+        }
+        ');
+
+        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
+        $log = app(BroadcastManager::class)->driver();
+        $broadcasts = $log->broadcasts();
+
+        $this->assertNotNull($broadcasts);
+        /** @var array<mixed> $broadcasts */
+        $this->assertCount(1, $broadcasts);
+        dd($broadcasts);
+
+        $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);
+        $this->assertArrayHasKey('onPostCreated', $broadcasted);
+        $this->assertSame(['body' => 'bar'], $broadcasted['onPostCreated']);
     }
 
     /**
@@ -157,7 +193,7 @@ GRAPHQL;
         return $this->graphQL(/** @lang GraphQL */ '
             subscription OnPostCreated {
                 onPostCreated {
-                    body
+                    title
                 }
             }
         ');
