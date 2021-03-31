@@ -90,6 +90,7 @@ class RedisStorageManagerTest extends TestCase
                         'channel' => $channel,
                         'topic' => 'some-topic',
                     ]).'}',
+                    'EX',
                     $ttl,
                 ]]
             );
