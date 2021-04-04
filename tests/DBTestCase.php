@@ -61,7 +61,7 @@ abstract class DBTestCase extends TestCase
             'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
             'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
             'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
-            'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null)
+            'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
         ];
     }
 }
