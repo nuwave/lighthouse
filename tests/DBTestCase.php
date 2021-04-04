@@ -63,6 +63,7 @@ abstract class DBTestCase extends TestCase
 
         $socket = env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET') ?? null;
         if (is_string($socket)) {
+            $mysqlOptions['host'] = 'localhost';
             $mysqlOptions['unix_socket'] = $socket;
         } else {
             $mysqlOptions['host'] = env('LIGHTHOUSE_TEST_DB_HOST', 'mysql');
