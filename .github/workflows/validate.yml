@@ -7,8 +7,10 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
-  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
+  LIGHTHOUSE_TEST_DB_USER: root
   LIGHTHOUSE_TEST_DB_PASSWORD: root
+  LIGHTHOUSE_TEST_DB_HOST: localhost
+  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
 
 # Using ubuntu-18.04 because it has MySQL 5.7.
