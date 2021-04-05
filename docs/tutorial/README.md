@@ -104,7 +104,7 @@ Run database migrations to create the `users` table:
 Seed the database with some fake users:
 
     php artisan tinker
-    \App\User::factory(10)->create()
+    \App\Models\User::factory(10)->create()
 
 ### Installing Lighthouse
 

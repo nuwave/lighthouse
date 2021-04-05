@@ -7,15 +7,14 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
-  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
+  LIGHTHOUSE_TEST_DB_USER: root
   LIGHTHOUSE_TEST_DB_PASSWORD: root
+  LIGHTHOUSE_TEST_DB_HOST: localhost
+  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
 
 # Using ubuntu-18.04 because it has MySQL 5.7.
-# MySQL 8.0 requires a new authentication method that is only supported in PHP 7.4+.defaults:
-# Once we drop support for older PHP versions, we can use ubuntu-20.04.
-# Also, default ordering semantics in MySQL 8 seem to have changed, so we will need
-# to change a bunch of assertJson() to assertSimilarJson().
+# TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784
 
 jobs:
   static-analysis:

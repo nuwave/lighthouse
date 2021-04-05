@@ -17,11 +17,11 @@ up: ## Bring up the docker-compose stack
 	docker-compose up -d
 
 .PHONY: stan
-stan: up ## Runs static analysis with phpstan
+stan: up ## Runs static analysis with PHPStan
 	docker-compose exec php composer stan
 
 .PHONY: test
-test: up ## Runs tests with phpunit
+test: up ## Runs tests with PHPUnit
 	docker-compose exec php composer test
 
 .PHONY: bench
@@ -29,7 +29,7 @@ bench: up ## Run benchmarks
 	docker-compose exec php composer bench
 
 .PHONY: rector
-rector: up ## Automatic code fixes with rector
+rector: up ## Automatic code fixes with Rector
 	docker-compose exec php composer rector
 
 vendor: up composer.json ## Install composer dependencies
@@ -38,9 +38,9 @@ vendor: up composer.json ## Install composer dependencies
 	docker-compose exec php composer normalize
 
 .PHONY: php
-php: up ## Open an interactive shell into the php container
+php: up ## Open an interactive shell into the PHP container
 	docker-compose exec php bash
 
 .PHONY: node
-node: up ## Open an interactive shell into the node container
+node: up ## Open an interactive shell into the Node container
 	docker-compose exec node bash
