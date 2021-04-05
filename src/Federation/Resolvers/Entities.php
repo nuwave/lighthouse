@@ -16,7 +16,7 @@ class Entities
     /**
      * @var \Nuwave\Lighthouse\Federation\EntityResolverProvider
      */
-    private $entityResolverProvider;
+    protected $entityResolverProvider;
 
     public function __construct(EntityResolverProvider $entityResolverProvider)
     {

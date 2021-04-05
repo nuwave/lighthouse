@@ -11,7 +11,7 @@ class SimpleRelationLoader implements RelationLoader
     /**
      * @var \Closure
      */
-    private $decorateBuilder;
+    protected $decorateBuilder;
 
     public function __construct(Closure $decorateBuilder)
     {
