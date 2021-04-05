@@ -52,19 +52,16 @@ class EntityResolverProvider
      */
     public function resolver(string $typename): Closure
     {
-        $resolver = $this->resolvers[$typename] ?? null;
+        $resolver = $this->resolvers[$typename]
+            ?? $this->resolverFromClass($typename)
+            ?? $this->resolverFromModel($typename)
+            ?? null;
 
         if ($resolver === null) {
-            $resolver = $this->resolverFromClass($typename)
-                ?? $this->resolverFromModel($typename);
-
-            if ($resolver === null) {
-                throw new FederationException("Could not locate resolver for __typename: {$typename}");
-            }
-            $this->resolvers[$typename] = $resolver;
-
-            return $resolver;
+            throw new FederationException("Could not locate resolver for __typename: {$typename}");
         }
+
+        $this->resolvers[$typename] = $resolver;
 
         return $resolver;
     }

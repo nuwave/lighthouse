@@ -6,6 +6,8 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class RequiresDirective extends BaseDirective
 {
+    const NAME = 'requires';
+
     /**
      * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
      */

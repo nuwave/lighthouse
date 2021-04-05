@@ -16,6 +16,11 @@ use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use GraphQL\Utils\Utils;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
+use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
+use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
+use Nuwave\Lighthouse\Federation\Directives\ProvidesDirective;
+use Nuwave\Lighthouse\Federation\Directives\RequiresDirective;
 
 class FederationPrinter
 {
@@ -32,11 +37,11 @@ class FederationPrinter
     ];
 
     const FEDERATION_DIRECTIVES = [
-        'extends',
-        'external',
-        'key',
-        'provides',
-        'requires',
+        ExtendsDirective::NAME,
+        ExternalDirective::NAME,
+        KeyDirective::NAME,
+        ProvidesDirective::NAME,
+        RequiresDirective::NAME,
     ];
 
     public static function print(Schema $schema): string
@@ -87,8 +92,8 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return $name === 'key'
-                                || $name === 'extends';
+                            return $name === KeyDirective::NAME
+                                || $name === ExtendsDirective::NAME;
                         }
                     )
                 );
@@ -99,9 +104,9 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return $name === 'provides'
-                                || $name === 'requires'
-                                || $name === 'external';
+                            return $name === ProvidesDirective::NAME
+                                || $name === RequiresDirective::NAME
+                                || $name === ExternalDirective::NAME;
                         }
                     )
                 );
