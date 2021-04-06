@@ -46,7 +46,6 @@ GRAPHQL;
         if (is_string($modelArg)) {
             return $value->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
-                    /** @var \Illuminate\Database\Eloquent\Builder $query */
                     $query = $this
                         ->namespaceModelClass($modelArg)
                         ::query();

@@ -103,7 +103,6 @@ class DirectiveLocator
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
-                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
                 $name = self::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
@@ -121,7 +120,7 @@ class DirectiveLocator
     /**
      * Return the parsed definitions for all directive classes.
      *
-     * @return array<int, \GraphQL\Language\AST\DirectiveDefinitionNode>
+     * @return list<\GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public function definitions(): array
     {
@@ -165,7 +164,6 @@ class DirectiveLocator
                 if (! is_a($directiveClass, Directive::class, true)) {
                     throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
-                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass */
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;

@@ -83,7 +83,6 @@ class ASTHelper
         /**
          * Since we did not modify the passed in lists, the types did not change.
          *
-         * @var \GraphQL\Language\AST\NodeList<TNode> $merged
          */
         $merged = (new NodeList([$node]))->merge($nodeList);
 

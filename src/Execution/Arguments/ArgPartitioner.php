@@ -65,7 +65,7 @@ class ArgPartitioner
      * ]
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
      */
     public static function relationMethods(
         ArgumentSet $argumentSet,
@@ -156,7 +156,7 @@ class ArgPartitioner
      * - the second one contains all arguments for which the predicate did not match
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @return  array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
      */
     public static function partition(ArgumentSet $argumentSet, \Closure $predicate): array
     {

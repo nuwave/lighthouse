@@ -68,6 +68,9 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         return $value;
     }
 
+    /**
+     * @return Closure(object): void
+     */
     protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
     {
         return function (object $builder) use ($resolveInfo) {

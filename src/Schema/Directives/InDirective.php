@@ -22,11 +22,11 @@ directive @in(
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $values): object
+    public function handleBuilder($builder, $value): object
     {
         return $builder->whereIn(
             $this->directiveArgValue('key', $this->nodeName()),
-            $values
+            $value
         );
     }
 }

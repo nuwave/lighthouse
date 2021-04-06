@@ -25,7 +25,14 @@ class GlobalId implements GlobalIdContract
 
     public function decode(string $globalID): array
     {
-        return explode(':', \Safe\base64_decode($globalID));
+        $parts = explode(':', \Safe\base64_decode($globalID));
+
+        if (count($parts) !== 2) {
+            throw new GlobalIdException("Unexpectedly found more then 2 segments when decoding global id: {$globalID}.");
+        }
+
+        /** @var array{0: string, 1: string} $parts */
+        return $parts;
     }
 
     public function decodeID(string $globalID): string

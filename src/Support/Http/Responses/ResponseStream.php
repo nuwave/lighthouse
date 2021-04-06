@@ -10,9 +10,6 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
 {
-    /**
-     * @var string
-     */
     public const EOL = "\r\n";
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
