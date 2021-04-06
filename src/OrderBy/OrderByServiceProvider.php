@@ -35,7 +35,7 @@ class OrderByServiceProvider extends ServiceProvider
                         enum SortOrder {
                             "Sort records in ascending order."
                             ASC
-    
+
                             "Sort records in descending order."
                             DESC
                         }

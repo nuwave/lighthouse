@@ -64,7 +64,9 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
 
-      - run: vendor/bin/phpstan analyse
+      - run: vendor/bin/phpstan
+
+      - run: vendor/bin/psalm
 
   tests:
     runs-on: ubuntu-18.04

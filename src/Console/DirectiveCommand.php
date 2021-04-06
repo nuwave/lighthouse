@@ -215,7 +215,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @return array<array<mixed>>
+     * @return array<int, array<int, mixed>>
      */
     protected function getOptions(): array
     {

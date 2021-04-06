@@ -63,6 +63,9 @@ GRAPHQL;
         return $relation;
     }
 
+    /**
+     * @return RelationCountLoader
+     */
     protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
     {
         return new RelationCountLoader(

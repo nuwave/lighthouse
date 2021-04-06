@@ -78,7 +78,6 @@ GRAPHQL;
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
-                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
                 $name = DirectiveLocator::directiveName($class);
 
                 // The directive was already found, so we do not add it twice

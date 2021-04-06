@@ -56,7 +56,8 @@
         "predis/predis": "^1.1",
         "pusher/pusher-php-server": "^4 || ^5",
         "rector/rector": "^0.9",
-        "thecodingmachine/phpstan-safe-rule": "^1.0"
+        "thecodingmachine/phpstan-safe-rule": "^1.0",
+        "vimeo/psalm": "^4.7"
     },
     "suggest": {
         "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",

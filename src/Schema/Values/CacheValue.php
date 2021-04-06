@@ -99,7 +99,7 @@ class CacheValue
     /**
      * Get cache tags.
      *
-     * @return array<string>
+     * @return array{0: string, 1: string}
      */
     public function getTags(): array
     {

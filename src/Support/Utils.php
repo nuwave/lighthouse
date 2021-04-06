@@ -113,6 +113,8 @@ class Utils
 
     /**
      * Construct a callback that checks if its input is a given class.
+     *
+     * @return Closure(mixed): bool
      */
     public static function instanceofMatcher(string $classLike): Closure
     {

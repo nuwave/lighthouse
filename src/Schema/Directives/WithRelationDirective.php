@@ -62,6 +62,8 @@ abstract class WithRelationDirective extends BaseDirective
 
     /**
      * Decorate the builder used to fetch the models.
+     *
+     * @return Closure(object): void
      */
     protected function decorateBuilder(ResolveInfo $resolveInfo): Closure
     {
