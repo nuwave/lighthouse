@@ -14,7 +14,11 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
-        if (! empty($paths)) {
+        if (empty($paths)) {
+            $this->emit(
+                $this->chunk($data, $isFinalChunk)
+            );
+        } else {
             $chunk = [];
             $lastKey = count($paths) - 1;
 
@@ -23,13 +27,13 @@ class ResponseStream extends Stream implements CanStreamResponse
                 $chunk['path'] = (new Collection(explode('.', $path)))
                     ->map(function ($partial) {
                         return is_numeric($partial)
-                            ? (int) $partial
+                            ? (int)$partial
                             : $partial;
                     })
                     ->all();
 
                 $errors = $this->chunkError($path, $data);
-                if (! empty($errors)) {
+                if (!empty($errors)) {
                     $chunk['errors'] = $errors;
                 }
 
@@ -39,10 +43,6 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $this->chunk($chunk, $terminating)
                 );
             }
-        } else {
-            $this->emit(
-                $this->chunk($data, $isFinalChunk)
-            );
         }
 
         if ($isFinalChunk) {

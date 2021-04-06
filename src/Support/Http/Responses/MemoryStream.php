@@ -14,19 +14,21 @@ class MemoryStream extends Stream implements CanStreamResponse
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
-        if (! empty($paths)) {
+        if (empty($paths)) {
+            $this->chunks[] = $data;
+        } else {
+            $chunk = [];
             foreach ($paths as $path) {
                 $response = ['data' => Arr::get($data, "data.{$path}", [])];
 
                 $errors = $this->chunkError($path, $data);
-                if (! empty($errors)) {
+                if (!empty($errors)) {
                     $response['errors'] = $errors;
                 }
 
-                $data[$path] = $response;
+                $chunk[$path] = $response;
             }
+            $this->chunks[] = $chunk;
         }
-
-        $this->chunks[] = $data;
     }
 }
