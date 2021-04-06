@@ -6,6 +6,7 @@ use Closure;
 use PHPUnit\Framework\Assert;
 
 /**
+ * @psalm-suppress UndefinedDocblockClass
  * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin

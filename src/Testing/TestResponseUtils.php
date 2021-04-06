@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Exceptions\ValidationException;
 class TestResponseUtils
 {
     /**
+     * @psalm-suppress UndefinedDocblockClass
      * @param  \Illuminate\Testing\TestResponse  $response
      */
     public static function extractValidationErrors($response): ?array

@@ -47,7 +47,7 @@ Sets rate limit to access the field. Does the same as ThrottleRequests Laravel M
 """
 directive @throttle(
     """
-    Named preconfigured rate limiter. Requires Larave 8.x or later.
+    Named preconfigured rate limiter. Requires Laravel 8.x or later.
     """
     name: String
 
@@ -80,6 +80,9 @@ GRAPHQL;
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
+            /**
+             * @psalm-suppress UndefinedClass
+             */
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             if ($limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);

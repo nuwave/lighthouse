@@ -80,12 +80,7 @@ class ASTHelper
      */
     public static function prepend(NodeList $nodeList, Node $node): NodeList
     {
-        /**
-         * Since we did not modify the passed in lists, the types did not change.
-         */
-        $merged = (new NodeList([$node]))->merge($nodeList);
-
-        return $merged;
+        return (new NodeList([$node]))->merge($nodeList);
     }
 
     public static function duplicateDefinition(string $oldName): string
