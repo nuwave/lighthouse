@@ -27,13 +27,13 @@ class ResponseStream extends Stream implements CanStreamResponse
                 $chunk['path'] = (new Collection(explode('.', $path)))
                     ->map(function ($partial) {
                         return is_numeric($partial)
-                            ? (int)$partial
+                            ? (int) $partial
                             : $partial;
                     })
                     ->all();
 
                 $errors = $this->chunkError($path, $data);
-                if (!empty($errors)) {
+                if (! empty($errors)) {
                     $chunk['errors'] = $errors;
                 }
 
