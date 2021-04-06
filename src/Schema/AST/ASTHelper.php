@@ -82,7 +82,6 @@ class ASTHelper
     {
         /**
          * Since we did not modify the passed in lists, the types did not change.
-         *
          */
         $merged = (new NodeList([$node]))->merge($nodeList);
 

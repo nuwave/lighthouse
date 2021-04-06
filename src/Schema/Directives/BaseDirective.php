@@ -229,7 +229,6 @@ abstract class BaseDirective implements Directive
             );
         }
         /** @var array{0: string, 1?: string} $argumentParts */
-
         if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
