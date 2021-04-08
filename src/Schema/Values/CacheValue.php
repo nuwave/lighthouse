@@ -81,17 +81,17 @@ class CacheValue
 
         $user = $this->context->user();
         if ($this->isPrivate && $user !== null) {
-            $parts []= 'auth';
-            $parts []= $user->getAuthIdentifier();
+            $parts [] = 'auth';
+            $parts [] = $user->getAuthIdentifier();
         }
 
-        $parts []= strtolower($this->resolveInfo->parentType->name);
-        $parts []= $this->fieldKey;
-        $parts []= strtolower($this->resolveInfo->fieldName);
+        $parts [] = strtolower($this->resolveInfo->parentType->name);
+        $parts [] = $this->fieldKey;
+        $parts [] = strtolower($this->resolveInfo->fieldName);
 
         $argKeys = $this->argKeys();
         if ($argKeys->isNotEmpty()) {
-            $parts []= $argKeys->implode(':');
+            $parts [] = $argKeys->implode(':');
         }
 
         return $this->implode($parts);
