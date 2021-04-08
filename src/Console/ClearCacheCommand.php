@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class ClearCacheCommand extends Command
