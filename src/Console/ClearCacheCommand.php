@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class ClearCacheCommand extends Command
@@ -11,9 +12,9 @@ class ClearCacheCommand extends Command
 
     protected $description = 'Clear the GraphQL schema cache.';
 
-    public function handle(ConfigRepository $config): void
+    public function handle(CacheFactory $cacheFactory, ConfigRepository $config): void
     {
-        app('cache')
+        $cacheFactory
             ->store($config->get('lighthouse.cache.store'))
             ->forget($config->get('lighthouse.cache.key'));
 
