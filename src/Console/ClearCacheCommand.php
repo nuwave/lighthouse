@@ -12,11 +12,11 @@ class ClearCacheCommand extends Command
 
     protected $description = 'Clear the GraphQL schema cache.';
 
-    public function handle(CacheRepository $cache, ConfigRepository $config): void
+    public function handle(ConfigRepository $config): void
     {
-        $cache->forget(
-            $config->get('lighthouse.cache.key')
-        );
+        app('cache')
+            ->store($config->get('lighthouse.cache.store'))
+            ->forget($config->get('lighthouse.cache.key'));
 
         $this->info('GraphQL AST schema cache deleted.');
     }
