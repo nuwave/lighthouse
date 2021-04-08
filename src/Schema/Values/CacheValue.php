@@ -77,23 +77,24 @@ class CacheValue
      */
     public function getKey(): string
     {
-        $argKeys = $this->argKeys();
-        $user = app('auth')->user();
+        $parts = [];
 
-        return $this->implode([
-            $this->isPrivate && $user
-                ? 'auth'
-                : null,
-            $this->isPrivate && $user
-                ? $user->getKey()
-                : null,
-            strtolower($this->resolveInfo->parentType->name),
-            $this->fieldKey,
-            strtolower($this->resolveInfo->fieldName),
-            $argKeys->isNotEmpty()
-                ? $argKeys->implode(':')
-                : null,
-        ]);
+        $user = $this->context->user();
+        if ($this->isPrivate && $user !== null) {
+            $parts [] = 'auth';
+            $parts [] = $user->getAuthIdentifier();
+        }
+
+        $parts [] = strtolower($this->resolveInfo->parentType->name);
+        $parts [] = $this->fieldKey;
+        $parts [] = strtolower($this->resolveInfo->fieldName);
+
+        $argKeys = $this->argKeys();
+        if ($argKeys->isNotEmpty()) {
+            $parts [] = $argKeys->implode(':');
+        }
+
+        return $this->implode($parts);
     }
 
     /**
