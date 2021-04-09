@@ -84,4 +84,6 @@ class FederationEntitiesTest extends TestCase
         }
         ');
     }
+
+    // TODO test validation for faulty representations properly
 }

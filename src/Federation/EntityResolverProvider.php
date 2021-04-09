@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Federation;
 
 use Closure;
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,17 +12,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Utils;
 
 class EntityResolverProvider
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @var \GraphQL\Type\Schema
      */
-    protected $documentAST;
+    protected $schema;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
@@ -34,15 +35,22 @@ class EntityResolverProvider
     protected $configRepository;
 
     /**
+     * Maps from __typename to definitions.
+     *
+     * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
+     */
+    protected $definitions;
+
+    /**
      * Maps from __typename to resolver.
      *
      * @var array<string, \Closure(array<string, mixed>): mixed>
      */
     protected $resolvers;
 
-    public function __construct(ASTBuilder $astBuilder, DirectiveLocator $directiveLocator, ConfigRepository $configRepository)
+    public function __construct(SchemaBuilder $schemaBuilder, DirectiveLocator $directiveLocator, ConfigRepository $configRepository)
     {
-        $this->documentAST = $astBuilder->documentAST();
+        $this->schema = $schemaBuilder->schema();
         $this->directiveLocator = $directiveLocator;
         $this->configRepository = $configRepository;
     }
@@ -52,18 +60,51 @@ class EntityResolverProvider
      */
     public function resolver(string $typename): Closure
     {
-        $resolver = $this->resolvers[$typename]
-            ?? $this->resolverFromClass($typename)
+        if (isset($this->resolvers[$typename])) {
+            return $this->resolvers[$typename];
+        }
+
+        $resolver = $this->resolverFromClass($typename)
             ?? $this->resolverFromModel($typename)
             ?? null;
 
         if ($resolver === null) {
-            throw new FederationException("Could not locate resolver for __typename: {$typename}");
+            throw new Error("Could not locate a resolver for __typename `{$typename}`.");
         }
 
         $this->resolvers[$typename] = $resolver;
 
         return $resolver;
+    }
+
+    public function typeDefinition(string $typename): ObjectTypeDefinitionNode
+    {
+        if (isset($this->definitions[$typename])) {
+            return $this->definitions[$typename];
+        }
+
+        $type = $this->schema->getType($typename);
+        if ($type === null) {
+            throw new Error("Unknown __typename `{$typename}`.");
+        }
+
+        /**
+         * TODO remove when upgrading graphql-php
+         *
+         * @var (\GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode)|null $definition
+         */
+        $definition = $type->astNode;
+        if ($definition === null) {
+            throw new FederationException("Must provide AST definition for type `{$typename}`.");
+        }
+
+        if (! $definition instanceof ObjectTypeDefinitionNode) {
+            throw new Error("Expected __typename `{$typename}` to be ObjectTypeDefinition, got {$definition->kind}.");
+        }
+
+        $this->definitions[$typename] = $definition;
+
+        return $definition;
     }
 
     protected function resolverFromClass(string $typename): ?Closure
@@ -83,15 +124,9 @@ class EntityResolverProvider
 
     protected function resolverFromModel(string $typeName): ?Closure
     {
-        /**
-         * @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|null $type
-         */
-        $type = $this->documentAST->types[$typeName] ?? null;
-        if ($type === null) {
-            return null;
-        }
+        $definition = $this->typeDefinition($typeName);
 
-        $model = ModelDirective::modelClass($type) ?? $typeName;
+        $model = ModelDirective::modelClass($definition) ?? $typeName;
 
         /** @var class-string<\Illuminate\Database\Eloquent\Model>|null $modelClass */
         $modelClass = Utils::namespaceClassname(
@@ -105,11 +140,7 @@ class EntityResolverProvider
             return null;
         }
 
-        $keyFieldsSelections = $this->directiveLocator
-            ->associatedOfType($type, KeyDirective::class)
-            ->map(static function (KeyDirective $keyDirective): SelectionSetNode {
-                return $keyDirective->fields();
-            });
+        $keyFieldsSelections = $this->keyFieldsSelections($definition);
 
         return function (array $representation) use ($keyFieldsSelections, $modelClass): ?Model {
             /** @var \Illuminate\Database\Eloquent\Builder $builder */
@@ -131,17 +162,11 @@ class EntityResolverProvider
      */
     protected function constrainKeys(Builder $builder, Collection $keyFieldsSelections, array $representation): void
     {
-        $satisfiedKeyFields = $keyFieldsSelections->first(
-            function (SelectionSetNode $keyFields) use ($representation): bool {
-                return $this->satisfiesKeyFields($keyFields, $representation);
-            }
+        $this->applySatisfiedSelection(
+            $builder,
+            $this->firstSatisfiedKeyFields($keyFieldsSelections, $representation),
+            $representation
         );
-
-        if ($satisfiedKeyFields === null) {
-            throw new FederationException('Representation does not satisfy any set of uniquely identifying keys: '.\Safe\json_encode($representation));
-        }
-
-        $this->applySatisfiedSelection($builder, $satisfiedKeyFields, $representation);
     }
 
     /**
@@ -151,6 +176,7 @@ class EntityResolverProvider
     {
         /**
          * Fragments or spreads are not allowed in key fields.
+         * @see \Nuwave\Lighthouse\Federation\SchemaValidator
          *
          * @var \GraphQL\Language\AST\FieldNode $field
          */
@@ -200,5 +226,36 @@ class EntityResolverProvider
 
             $this->applySatisfiedSelection($builder, $subSelection, $representation);
         }
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>
+     */
+    public function keyFieldsSelections(ObjectTypeDefinitionNode $definition): Collection
+    {
+        return $this->directiveLocator
+            ->associatedOfType($definition, KeyDirective::class)
+            ->map(static function (KeyDirective $keyDirective): SelectionSetNode {
+                return $keyDirective->fields();
+            });
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode> $keyFieldsSelections
+     * @param array<string, mixed> $representation
+     */
+    public function firstSatisfiedKeyFields(Collection $keyFieldsSelections, array $representation): SelectionSetNode
+    {
+        $satisfiedKeyFields = $keyFieldsSelections->first(
+            function (SelectionSetNode $keyFields) use ($representation): bool {
+                return $this->satisfiesKeyFields($keyFields, $representation);
+            }
+        );
+
+        if ($satisfiedKeyFields === null) {
+            throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
+        }
+
+        return $satisfiedKeyFields;
     }
 }
