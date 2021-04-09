@@ -22,10 +22,10 @@ class SchemaValidatorTest extends TestCase
     public function testHooksIntoValidateSchemaCommand(): void
     {
         $this->schema = /** @lang GraphQL */ '
-        type Query @key(fields: "not_defined_on_the_object_type") {
-          id: ID! @external
+        type Foo @key(fields: "not_defined_on_the_object_type") {
+          id: ID!
         }
-        ';
+        ' . self::PLACEHOLDER_QUERY;
         $tester = $this->commandTester(new ValidateSchemaCommand());
 
         $this->expectException(FederationException::class);
@@ -34,9 +34,9 @@ class SchemaValidatorTest extends TestCase
 
     public function testValidatesSuccessfully(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
-        type Query @key(fields: "id") {
-          id: ID! @external
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type Foo @key(fields: "id") {
+          id: ID!
         }
         ');
 
@@ -49,9 +49,9 @@ class SchemaValidatorTest extends TestCase
 
     public function testValidatesUsesFieldNodes(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
-        type Query @key(fields: "...{ id }") {
-          id: ID! @external
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type Foo @key(fields: "...{ id }") {
+          id: ID!
         }
         ');
 
@@ -64,8 +64,8 @@ class SchemaValidatorTest extends TestCase
 
     public function testValidatesMissingExternalDirective(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
-        type Query @key(fields: "id") {
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type Foo @key(fields: "id") @extends {
           id: ID! @mock
         }
         ');
@@ -79,14 +79,14 @@ class SchemaValidatorTest extends TestCase
 
     public function testValidatesNestedSuccessfully(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
-        type Query @key(fields: "id foo { id }") {
-          id: ID! @external
-          foo: Foo! @external
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type Foo @key(fields: "id bar { id }") {
+          id: ID!
+          bar: Bar!
         }
 
-        type Foo {
-          id: ID! @external
+        type Bar {
+          id: ID!
         }
         ');
 
@@ -99,13 +99,13 @@ class SchemaValidatorTest extends TestCase
 
     public function testValidatesNestedMissingExternal(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
-        type Query @key(fields: "id foo { id }") {
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type Foo @key(fields: "id foo { id }") @extends {
           id: ID! @external
-          foo: Foo! @external
+          bar: Bar! @external
         }
 
-        type Foo {
+        type Bar {
           id: ID!
         }
         ');

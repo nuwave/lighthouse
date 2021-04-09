@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\WrappingType;
 use Nuwave\Lighthouse\Events\ValidateSchema;
 use Nuwave\Lighthouse\Exceptions\FederationException;
+use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -69,8 +70,11 @@ class SchemaValidator
                 throw new FederationException($i->getMessage(), $i->getCode(), $i);
             }
 
-            if (! ASTHelper::hasDirective($field->astNode, ExternalDirective::NAME)) {
-                throw new FederationException("A @key directive specifies the `{$field->name}` field which has no @external directive.");
+            if (
+                ASTHelper::hasDirective($type->astNode, ExtendsDirective::NAME)
+                && ! ASTHelper::hasDirective($field->astNode, ExternalDirective::NAME)
+            ) {
+                throw new FederationException("A @key directive on `{$type->name}` specifies the `{$field->name}` field which has no @external directive.");
             }
 
             $nestedSelection = $selection->selectionSet;
