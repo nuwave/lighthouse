@@ -89,7 +89,7 @@ class EntityResolverProvider
         }
 
         /**
-         * TODO remove when upgrading graphql-php
+         * TODO remove when upgrading graphql-php.
          *
          * @var (\GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode)|null $definition
          */
@@ -253,7 +253,7 @@ class EntityResolverProvider
         );
 
         if ($satisfiedKeyFields === null) {
-            throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
+            throw new Error('Representation does not satisfy any set of uniquely identifying keys: '.\Safe\json_encode($representation));
         }
 
         return $satisfiedKeyFields;
