@@ -49,6 +49,9 @@ GRAPHQL;
             ?? $this->nodeName();
     }
 
+    /**
+     * @return \Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader
+     */
     protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
     {
         return new SimpleRelationLoader(

@@ -9,7 +9,8 @@ you can listen for the [`BuildSchemaString`](../api-reference/events.md#buildsch
 event and return additional schema definitions as a string:
 
 ```php
-app('events')->listen(
+$dispatcher = app(\Illuminate\Contracts\Events\Dispatcher::class);
+$dispatcher->listen(
     \Nuwave\Lighthouse\Events\BuildSchemaString::class,
     function(): string {
         // You can get your schema from anywhere you want, e.g. a database, hardcoded

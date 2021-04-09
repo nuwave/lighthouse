@@ -163,9 +163,11 @@ abstract class BaseDirective implements Directive
      * Find a class name in a set of given namespaces.
      *
      * @param  array<string>  $namespacesToTry
-     * @return class-string
+     * @param  callable(string $className): bool $determineMatch
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return class-string
      */
     protected function namespaceClassName(
         string $classCandidate,
@@ -207,9 +209,9 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @return array<string> Contains two entries: [string $className, string $methodName]
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {
@@ -226,10 +228,11 @@ abstract class BaseDirective implements Directive
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
             );
         }
-
+        /** @var array{0: string, 1?: string} $argumentParts */
         if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
+        /** @var array{0: string, 1: string} $argumentParts */
 
         return $argumentParts;
     }

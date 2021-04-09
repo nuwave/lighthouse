@@ -3,6 +3,7 @@
 namespace Tests\Unit\GlobalId;
 
 use Nuwave\Lighthouse\GlobalId\GlobalId;
+use Nuwave\Lighthouse\GlobalId\GlobalIdException;
 use Tests\TestCase;
 
 class GlobalIdTest extends TestCase
@@ -39,5 +40,27 @@ class GlobalIdTest extends TestCase
         $globalId = $this->globalIdResolver->encode('User', 123);
 
         $this->assertSame('User', $this->globalIdResolver->decodeType($globalId));
+    }
+
+    /**
+     * @dataProvider provideInvalidGlobalIds
+     */
+    public function testThrowsOnInvalidGlobalIds(string $invalidGlobalId): void
+    {
+        $this->expectException(GlobalIdException::class);
+        $this->globalIdResolver->decode($invalidGlobalId);
+    }
+
+    /**
+     * @return array<int, array{0: string}>
+     */
+    public function provideInvalidGlobalIds(): array
+    {
+        return [
+            ['foo'],
+            ['foo:bar:baz'],
+            ['foo::baz'],
+            [':::'],
+        ];
     }
 }

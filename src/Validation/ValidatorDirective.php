@@ -135,14 +135,22 @@ GRAPHQL;
         }
     }
 
+    /**
+     * @return class-string<\Nuwave\Lighthouse\Validation\Validator>
+     */
     protected function namespaceValidatorClass(string $classCandidate): string
     {
-        return $this->namespaceClassName(
+        /**
+         * @var class-string<\Nuwave\Lighthouse\Validation\Validator> $validatorClassName We know this because of the callback
+         */
+        $validatorClassName = $this->namespaceClassName(
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
             function (string $classCandidate): bool {
                 return is_subclass_of($classCandidate, Validator::class);
             }
         );
+
+        return $validatorClassName;
     }
 }

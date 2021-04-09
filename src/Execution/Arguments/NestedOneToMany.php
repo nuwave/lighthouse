@@ -106,7 +106,8 @@ class NestedOneToMany implements ArgResolver
     {
         $getLocalKeyName = Closure::bind(
             function () {
-                // @phpstan-ignore-next-line $this variable not recognized despite it's exists in the bind class
+                /** @psalm-suppress InvalidScope */
+                // @phpstan-ignore-next-line This is a dirty hack
                 return $this->localKey;
             },
             $relation,

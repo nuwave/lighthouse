@@ -165,7 +165,6 @@ EOL
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
         // ever used through its association to an interface
-        /** @var \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition */
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
@@ -317,7 +316,7 @@ EOL
             'fields' => $this->makeFieldsLoader($objectDefinition),
             'interfaces' =>
                 /**
-                 * @return array<\GraphQL\Type\Definition\Type>
+                 * @return list<\GraphQL\Type\Definition\Type>
                  */
                 function () use ($objectDefinition): array {
                     $interfaces = [];
@@ -337,12 +336,14 @@ EOL
      * Returns a closure that lazy loads the fields for a constructed type.
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
+     *
+     * @return \Closure(): array<string, array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): Closure
     {
         return
             /**
-             * @return array<string, array>
+             * @return array<string, array<string, mixed>>
              */
             function () use ($typeDefinition): array {
                 $typeValue = new TypeValue($typeDefinition);
@@ -431,14 +432,16 @@ EOL
      * We just assume that the rootValue that shall be returned from the
      * field is a class that is named just like the concrete Object Type
      * that is supposed to be returned.
+     *
+     * @return Closure(mixed): Type
      */
     protected function typeResolverFallback(): Closure
     {
-        return function ($rootValue): Type {
-            if (is_array($rootValue) && isset($rootValue['__typename'])) {
-                $name = $rootValue['__typename'];
+        return function ($root): Type {
+            if (is_array($root) && isset($root['__typename'])) {
+                $name = $root['__typename'];
             } else {
-                $name = class_basename($rootValue);
+                $name = class_basename($root);
             }
 
             return $this->get($name);
@@ -467,7 +470,7 @@ EOL
             'description' => data_get($unionDefinition->description, 'value'),
             'types' =>
                 /**
-                 * @return array<\GraphQL\Type\Definition\Type>
+                 * @return list<\GraphQL\Type\Definition\Type>
                  */
                 function () use ($unionDefinition): array {
                     $types = [];

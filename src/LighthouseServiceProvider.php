@@ -89,14 +89,14 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
-        $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
+        $this->app->singleton(SchemaSourceProvider::class, static function (): SchemaStitcher {
             return new SchemaStitcher(
                 config('lighthouse.schema.register', '')
             );
         });
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
-        $this->app->bind(ProvidesSubscriptionResolver::class, function (): ProvidesSubscriptionResolver {
+        $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
             return new class implements ProvidesSubscriptionResolver {
                 public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
                 {
@@ -109,7 +109,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
 
-        $this->app->singleton(MiddlewareAdapter::class, function (Container $app): MiddlewareAdapter {
+        $this->app->singleton(MiddlewareAdapter::class, static function (Container $app): MiddlewareAdapter {
             // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
             if ($app instanceof LaravelApplication) {
                 return new LaravelMiddlewareAdapter(

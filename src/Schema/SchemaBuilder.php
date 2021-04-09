@@ -85,6 +85,9 @@ class SchemaBuilder
         // This is just used for introspection, it is required
         // to be able to retrieve all the types in the schema
         $config->setTypes(
+            /**
+             * @return array<string, \GraphQL\Type\Definition\Type>
+             */
             function (): array {
                 return $this->typeRegistry->possibleTypes();
             }

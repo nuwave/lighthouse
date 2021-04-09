@@ -8,9 +8,6 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class TestingServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(

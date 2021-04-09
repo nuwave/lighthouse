@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Events;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\TestCase;
 
@@ -9,7 +10,9 @@ class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {
-        app('events')->listen(
+        /** @var \Illuminate\Contracts\Events\Dispatcher $dispatcher */
+        $dispatcher = app(Dispatcher::class);
+        $dispatcher->listen(
             BuildSchemaString::class,
             function (BuildSchemaString $buildSchemaString): void {
                 $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
@@ -21,10 +24,12 @@ class BuildSchemaStringTest extends TestCase
 
     public function testAddAdditionalSchemaThroughEvent(): void
     {
-        app('events')->listen(
+        /** @var \Illuminate\Contracts\Events\Dispatcher $dispatcher */
+        $dispatcher = app(Dispatcher::class);
+        $dispatcher->listen(
             BuildSchemaString::class,
-            function (BuildSchemaString $buildSchemaString): string {
-                return "
+            function (): string {
+                return /** @lang GraphQL */ "
                 extend type Query {
                     sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
                 }
@@ -32,13 +37,13 @@ class BuildSchemaStringTest extends TestCase
             }
         );
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */"
         type Query {
             foo: String @field(resolver: \"{$this->qualifyTestResolver('resolveFoo')}\")
         }
         ";
 
-        $queryForBaseSchema = '
+        $queryForBaseSchema = /** @lang GraphQL */'
         {
             foo
         }
@@ -49,7 +54,7 @@ class BuildSchemaStringTest extends TestCase
             ],
         ]);
 
-        $queryForAdditionalSchema = '
+        $queryForAdditionalSchema = /** @lang GraphQL */'
         {
             sayHello
         }

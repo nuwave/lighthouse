@@ -25,11 +25,11 @@ directive @whereNotBetween(
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $values): object
+    public function handleBuilder($builder, $value): object
     {
         return $builder->whereNotBetween(
             $this->directiveArgValue('key', $this->nodeName()),
-            $values
+            $value
         );
     }
 }

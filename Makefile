@@ -17,8 +17,9 @@ up: ## Bring up the docker-compose stack
 	docker-compose up -d
 
 .PHONY: stan
-stan: up ## Runs static analysis with PHPStan
-	docker-compose exec php composer stan
+stan: up ## Runs static analysis
+	docker-compose exec php vendor/bin/phpstan
+	docker-compose exec php vendor/bin/psalm
 
 .PHONY: test
 test: up ## Runs tests with PHPUnit
