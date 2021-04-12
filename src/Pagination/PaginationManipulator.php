@@ -188,7 +188,11 @@ GRAPHQL
         $fieldDefinition->arguments [] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments [] = Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"The offset from which elements are returned."
+page: Int
+GRAPHQL
+);
 
         $fieldDefinition->type = Parser::namedType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
