@@ -2068,7 +2068,7 @@ The final schema will be transformed to this:
 
 ```graphql
 type Query {
-  posts(first: Int!, page: Int): PostConnection
+  posts(first: Int!, after: String): PostConnection
 }
 
 "A paginated list of Post edges."

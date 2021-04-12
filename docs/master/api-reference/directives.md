@@ -2074,7 +2074,13 @@ The schema definition is automatically transformed to this:
 
 ```graphql
 type Query {
-  posts(first: Int!, page: Int): PostPaginator
+  posts(
+    "Limits number of fetched elements."
+    first: Int!
+
+    "The offset from which elements are returned."
+    page: Int
+  ): PostPaginator
 }
 
 "A paginated list of Post items."
@@ -2087,7 +2093,7 @@ type PostPaginator {
 }
 ```
 
-And can be queried like this:
+It can be queried like this:
 
 ```graphql
 {
@@ -2122,7 +2128,13 @@ The final schema will be transformed to this:
 
 ```graphql
 type Query {
-  posts(first: Int!, after: String): PostConnection
+  posts(
+    "Limits number of fetched elements."
+    first: Int!
+
+    "A cursor after which elements are returned."
+    after: String
+  ): PostConnection
 }
 
 "A paginated list of Post edges."
