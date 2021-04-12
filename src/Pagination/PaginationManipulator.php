@@ -188,7 +188,7 @@ GRAPHQL
         $fieldDefinition->arguments [] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 "The offset from which elements are returned."
 page: Int
 GRAPHQL
