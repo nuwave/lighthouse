@@ -5,6 +5,7 @@ namespace Tests\Integration\WhereConditions;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
+use Tests\Utils\Models\Location;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -42,6 +43,12 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         name: String!
     }
 
+    type Location {
+        id: ID!
+        parent: Location @belongsTo
+        children: [Location!] @hasMany
+    }
+
     type Query {
         posts(
             hasUser: _ @whereHasConditions(relation: "user")
@@ -65,6 +72,11 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         withoutRelation(
             hasCompany: _ @whereHasConditions
         ): [User!]! @all
+
+        locations(
+            hasParent: _ @whereHasConditions(columns: ["id"]),
+            hasChildren: _ @whereHasConditions(columns: ["id"])
+        ): [Location!]! @all
     }
     ';
 
@@ -309,6 +321,80 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
                     ],
                     [
                         'id' => (string) $post5->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasBelongsToSameTableRelationship(): void
+    {
+        $parent = factory(Location::class)->create();
+        $child = factory(Location::class)->create([
+            'parent_id' => $parent->id,
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($hasParent: QueryLocationsHasParentWhereHasConditions) {
+            locations(hasParent: $hasParent) {
+                id
+                parent {
+                    id
+                }
+                children {
+                    id
+                }
+            }
+        }
+        ', [
+            'hasParent' => ['column' => 'ID', 'value' => $parent->id],
+        ])->assertExactJson([
+            'data' => [
+                'locations' => [
+                    [
+                        'id' => (string) $child->id,
+                        'parent' => [
+                            'id' => (string) $parent->id,
+                        ],
+                        'children' => [],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasHasManySameTableRelationship(): void
+    {
+        $parent = factory(Location::class)->create();
+        $child = factory(Location::class)->create([
+            'parent_id' => $parent->id,
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($hasChildren: QueryLocationsHasChildrenWhereHasConditions) {
+            locations(hasChildren: $hasChildren) {
+                id
+                parent {
+                    id
+                }
+                children {
+                    id
+                }
+            }
+        }
+        ', [
+            'hasChildren' => ['column' => 'ID', 'value' => $child->id],
+        ])->assertExactJson([
+            'data' => [
+                'locations' => [
+                    [
+                        'id' => (string) $parent->id,
+                        'parent' => null,
+                        'children' => [
+                            [
+                                'id' => (string) $child->id,
+                            ],
+                        ],
                     ],
                 ],
             ],
