@@ -28,35 +28,10 @@ If you want to use the Laravel Echo driver, you need to set the env `LIGHTHOUSE_
 Lighthouse returns the subscription channel as part of the response under `extensions`.
 You can configure which format is used with `subscriptions.version` in `lighthouse.php`.
 
-For new applications, version 3 is recommended.
+For new applications, version 2 is recommended. When upgrading, make sure
+your clients no longer depend on the redundant `channels` key from version 1.
 
-**Version 3 (Recommended)**
-
-This is the same as version 2 (below), but a response with no new channel will exclude the subscription extension response as an optimization. When upgrading from version 2, make sure your client implementation expects the "lighthouse_subscription" extension will oftentimes be excluded.
-
-With a channel response included:
-```json
-{
-  "data": {...},
-  "extensions": {
-    "lighthouse_subscriptions": {
-      "version": 3,
-      "channel": "channel-name"
-    }
-  }
-}
-```
-
-When no channel is included:
-```json
-{
-  "data": {...},
-}
-```
-
-**Version 2**
-
-When upgrading from version 2, make sure your client implementation no longer depends on the redundant `channels` key from version 1.
+**Version 2 (Recommended)**
 
 ```json
 {

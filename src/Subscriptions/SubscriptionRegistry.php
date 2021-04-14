@@ -155,29 +155,23 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
-        $version = (int) config('lighthouse.subscriptions.version', 1);
-
-        if ($channel === null && $version === 3) {
-            return null;
-        }
-
-        switch ($version) {
+        $version = config('lighthouse.subscriptions.version', 1);
+        switch ((int) $version) {
             case 1:
                 $content = [
-                    'version' => $version,
+                    'version' => 1,
                     'channel' => $channel,
                     'channels' => $this->subscribers,
                 ];
                 break;
             case 2:
-            case 3:
                 $content = [
-                    'version' => $version,
+                    'version' => 2,
                     'channel' => $channel,
                 ];
                 break;
             default:
-                throw new DefinitionException("Expected lighthouse.subscriptions.version to be 1, 2 or 3, got: {$version}");
+                throw new DefinitionException("Expected lighthouse.subscriptions.version to be 1 or 2, got: {$version}");
         }
 
         return new ExtensionsResponse('lighthouse_subscriptions', $content);

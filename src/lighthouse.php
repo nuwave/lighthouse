@@ -359,14 +359,7 @@ return [
 
         /*
          * Controls the format of the extensions response.
-         * Allowed values: 1, 2, 3
-         *
-         * Version 1: Channel returned in "channels" array, or empty array when none.
-         *
-         * Version 2: Channel returned as string "channel", or null when none.
-         *
-         * Version 3: Same as version 2, but entire extension response will be excluded when no channel is provided.
-         *
+         * Allowed values: 1, 2
          */
         'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
     ],
