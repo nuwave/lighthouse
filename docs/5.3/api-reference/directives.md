@@ -323,7 +323,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MyClass
 {
-    public function limit(Builder $builder, int $minimumHighscore): Builder
+    public function minimumHighscore(Builder $builder, int $minimumHighscore): Builder
     {
         return $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
             $builder->where('score', '>', $minimumHighscore);
