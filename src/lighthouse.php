@@ -362,6 +362,13 @@ return [
          * Allowed values: 1, 2
          */
         'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
+
+        /*
+         * When true, an API response without a subscription channel will exclude the subscription extension response as
+         * a performance optimization.
+         *
+         */
+        'exclude_empty' => env('LIGHTHOUSE_SUBSCRIPTION_EXCLUDE_EMPTY', false),
     ],
 
     /*
