@@ -19,6 +19,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Optimize `@defer` by avoiding parsing the request multiple times
 - Move HTTP and Schema handling out of the GraphQL class https://github.com/nuwave/lighthouse/pull/1748
+- Move subscription related classes into Subscription namespace https://github.com/nuwave/lighthouse/pull/1803
 
 ### Fixed
 
