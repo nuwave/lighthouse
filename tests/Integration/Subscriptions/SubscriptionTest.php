@@ -142,8 +142,8 @@ GRAPHQL;
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app->make('config');
-        $config->set('subscriptions.exclude_empty', false);
-        $config->set('subscriptions.version', 2);
+        $config->set('lighthouse.subscriptions.exclude_empty', false);
+        $config->set('lighthouse.subscriptions.version', 2);
 
         $this->subscribe();
 
@@ -170,8 +170,8 @@ GRAPHQL;
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app->make('config');
-        $config->set('subscriptions.exclude_empty', true);
-        $config->set('subscriptions.version', 2);
+        $config->set('lighthouse.subscriptions.exclude_empty', true);
+        $config->set('lighthouse.subscriptions.version', 2);
 
         $this->subscribe();
 
