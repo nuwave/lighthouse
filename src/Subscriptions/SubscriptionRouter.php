@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Nuwave\Lighthouse\Subscriptions\SubscriptionController;
-
 class SubscriptionRouter
 {
     /**
