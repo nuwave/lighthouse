@@ -20,6 +20,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Optimize `@defer` by avoiding parsing the request multiple times
 - Move HTTP and Schema handling out of the GraphQL class https://github.com/nuwave/lighthouse/pull/1748
 - Move subscription related classes into Subscription namespace https://github.com/nuwave/lighthouse/pull/1803
+- Consolidate GlobalId namespace https://github.com/nuwave/lighthouse/pull/1804
 
 ### Fixed
 
@@ -27,6 +28,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
 - Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
+
+### Deprecated
+
+- Deprecate the `globalId` argument on the `@upsert` directive https://github.com/nuwave/lighthouse/pull/1804
 
 ## 5.3.0
 

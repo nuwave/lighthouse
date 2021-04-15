@@ -2690,7 +2690,7 @@ directive @upsert(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Lighthouse will try to to fetch the model by its primary key, just like [@update](#update).
+Lighthouse will try to fetch the model by its primary key, just like [@update](#update).
 If the model doesn't exist, it will be newly created with a given `id`.
 In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
