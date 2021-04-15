@@ -155,7 +155,7 @@ GRAPHQL;
 
         $response->assertExactJson([
             'data' => [
-                'foo' => null,
+                'foo' => '42',
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
@@ -183,7 +183,7 @@ GRAPHQL;
 
         $response->assertExactJson([
             'data' => [
-                'foo' => null,
+                'foo' => '42',
             ],
         ]);
     }
