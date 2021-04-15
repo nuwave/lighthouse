@@ -26,6 +26,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
 - Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
+- Fix problem with table name on HAS condition with relationship on same table https://github.com/nuwave/lighthouse/pull/1795
 
 ## 5.3.0
 
@@ -379,7 +380,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
 - Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290
 - Replace usage of `resolve()` helper with Lumen-compatible `app()` https://github.com/nuwave/lighthouse/pull/1305
-- Fix using `@create` and `@update` on nested input object fields that accept an array of input types  
+- Fix using `@create` and `@update` on nested input object fields that accept an array of input types
   https://github.com/nuwave/lighthouse/pull/1316
 
 ### Changed
