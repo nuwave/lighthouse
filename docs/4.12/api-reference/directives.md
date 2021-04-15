@@ -741,7 +741,7 @@ directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
   suggestion for how to access supported similar data. Formatted
-  in [Markdown](https://daringfireball.net/projects/markdown/).
+  in [Markdown](https://daringfireball.net/projects/markdown).
   """
   reason: String = "No longer supported"
 ) on FIELD_DEFINITION
@@ -2358,7 +2358,7 @@ Read more in the [validation docs](../security/validation.md#validating-arrays).
 ## @scalar
 
 Reference a class implementing a scalar definition.
-[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalars)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
