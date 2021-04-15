@@ -1,9 +1,8 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Http\Controllers;
+namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Symfony\Component\HttpFoundation\Response;
 
