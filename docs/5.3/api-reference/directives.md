@@ -2411,7 +2411,7 @@ directive @scalar(
 If you follow the namespace convention, you do not need this directive.
 Lighthouse looks into your configured scalar namespace for a class with the same name.
 
-[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalar-types/)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
