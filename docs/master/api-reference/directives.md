@@ -2862,26 +2862,26 @@ This directive can also be used as a [nested arg resolver](../concepts/arg-resol
 Create or update an Eloquent model with the input values of the field.
 """
 directive @upsert(
-    """
-    Specify the class name of the model to use.
-    This is only needed when the default model detection does not work.
-    """
-    model: String
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
-    """
-    DEPRECATED use @globalId, will be removed in v6
+  """
+  DEPRECATED use @globalId, will be removed in v6
 
-    Set to `true` to use global ids for finding the model.
-    If set to `false`, regular non-global ids are used.
-    """
-    globalId: Boolean = false
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
 
-    """
-    Specify the name of the relation on the parent model.
-    This is only needed when using this directive as a nested arg
-    resolver and if the name of the relation is not the arg name.
-    """
-    relation: String
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
