@@ -178,7 +178,7 @@ class NodeDirectiveDBTest extends DBTestCase
      */
     public function testResolveModelsNodes(string $directiveDefinition): void
     {
-        $this->GlobalId .= /** @lang GraphQL */"
+        $this->schema .= /** @lang GraphQL */"
         type User {$directiveDefinition} {
             name: String!
         }
