@@ -105,16 +105,14 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             ->whereHas(
                 $relation,
                 $condition
-                    ? function ($builder) use ($relation, $model, $condition): void {
-                        $relatedModel = $this->nestedRelatedModel($model, $relation);
-
+                    ? function ($builder) use ($condition): void {
                         $this->handleWhereConditions(
                             $builder,
                             $this->prefixConditionWithTableName(
                                 $condition,
-                                $relatedModel
+                                $builder->getModel()
                             ),
-                            $relatedModel
+                            $builder->getModel()
                         );
                     }
                     : null,
@@ -176,18 +174,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                 self::invalidColumnName($column)
             );
         }
-    }
-
-    protected function nestedRelatedModel(Model $model, string $nestedRelationPath): Model
-    {
-        $relations = explode('.', $nestedRelationPath);
-        $relatedModel = $model->newInstance();
-
-        foreach ($relations as $relation) {
-            $relatedModel = $relatedModel->{$relation}()->getRelated();
-        }
-
-        return $relatedModel;
     }
 
     /**
