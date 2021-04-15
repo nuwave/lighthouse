@@ -31,7 +31,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- - Deprecate the `globalId` argument on the `@upsert` directive https://github.com/nuwave/lighthouse/pull/1804
+- Deprecate the `globalId` argument on the `@upsert` directive https://github.com/nuwave/lighthouse/pull/1804
 
 ## 5.3.0
 
