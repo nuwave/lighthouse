@@ -2,7 +2,7 @@
 
 A GraphQL schema is made out of types. This section describes the different set of types
 and how they can be defined to work with Lighthouse. For a more in-depth reference about types,
-look into the [GraphQL documentation](https://graphql.org/learn/schema/)
+look into the [GraphQL documentation](https://graphql.org/learn/schema)
 
 ## Object Type
 
@@ -52,7 +52,7 @@ Use the [@scalar](../api-reference/directives.md#scalar) directive to point to a
 scalar Email @scalar(class: "MLL\\GraphQLScalars\\Email")
 ```
 
-[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalars)
 
 ## Enum
 
@@ -134,7 +134,7 @@ The PHP internal value of the field `ADMIN` will be `string('ADMIN')`.
 If you want to reuse enum definitions or constants from PHP, you can also
 register a native PHP enum type [through the TypeRegistry](../digging-deeper/adding-types-programmatically.md#native-php-types).
 
-Just define a [EnumType](https://webonyx.github.io/graphql-php/type-definitions/enums/) and
+Just define a [EnumType](https://webonyx.github.io/graphql-php/type-definitions/enums) and
 register it:
 
 ```php
@@ -291,7 +291,7 @@ You can also provide a custom type resolver. Run `php artisan lighthouse:interfa
 a custom interface class. It is automatically put in the default namespace where Lighthouse can discover it by itself.
 
 Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#interfaces) and the
-[docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/interfaces/)
+[docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/interfaces)
 
 ## Union
 
@@ -317,4 +317,4 @@ own using `php artisan lighthouse:union <Union name>`.
 It is automatically put in the default namespace where Lighthouse can discover it by itself.
 
 Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#union-types) and the
-[docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/unions/)
+[docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/unions)

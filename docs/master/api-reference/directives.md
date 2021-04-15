@@ -704,7 +704,7 @@ directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
   suggestion for how to access supported similar data. Formatted
-  in [Markdown](https://daringfireball.net/projects/markdown/).
+  in [Markdown](https://daringfireball.net/projects/markdown).
   """
   reason: String = "No longer supported"
 ) on FIELD_DEFINITION
@@ -2423,7 +2423,7 @@ directive @scalar(
 If you follow the namespace convention, you do not need this directive.
 Lighthouse looks into your configured scalar namespace for a class with the same name.
 
-[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalars)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")

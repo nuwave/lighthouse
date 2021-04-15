@@ -5,7 +5,7 @@ with common GraphQL client libraries.
 
 ## Apollo for Pusher
 
-To use Lighthouse Pusher subscriptions with the [Apollo](https://www.apollographql.com/docs/react/)
+To use Lighthouse Pusher subscriptions with the [Apollo](https://www.apollographql.com/docs/react)
 client library you will need to create an `apollo-link`:
 
 ```js

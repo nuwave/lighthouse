@@ -237,7 +237,7 @@ with common GraphQL client libraries.
 
 ### Apollo
 
-To use Lighthouse subscriptions with the [Apollo](https://www.apollographql.com/docs/react/)
+To use Lighthouse subscriptions with the [Apollo](https://www.apollographql.com/docs/react)
 client library you will need to create an `apollo-link`
 
 ```js
