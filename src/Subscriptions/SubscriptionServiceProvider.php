@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -35,6 +36,13 @@ class SubscriptionServiceProvider extends ServiceProvider
             SubscriptionRegistry::class.'@handleBuildExtensionsResponse'
         );
 
+        $eventsDispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            static function (): string {
+                return __NAMESPACE__ . '\\Directives';
+            }
+        );
+
         $this->registerBroadcasterRoutes($configRepository);
 
         // If authentication is used, we can log in subscribers when broadcasting an update
@@ -53,9 +61,6 @@ class SubscriptionServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register subscription services.
-     */
     public function register(): void
     {
         $this->app->singleton(BroadcastManager::class);
