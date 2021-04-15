@@ -33,7 +33,7 @@ class GlobalIdServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );

@@ -2593,7 +2593,7 @@ directive @upsert(
 
 ### Examples
 
-Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
+Lighthouse will try to fetch the model by its primary key, just like [`@update`](#update).
 If the model doesn't exist, it will be created using the given `id`.
 
 ```graphql

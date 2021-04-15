@@ -22,6 +22,8 @@ directive @upsert(
   model: String
 
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """

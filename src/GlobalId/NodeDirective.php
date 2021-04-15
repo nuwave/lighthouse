@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\GlobalId;
 
 use Closure;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -9,8 +9,8 @@ use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\GlobalId\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
@@ -79,8 +79,8 @@ GRAPHQL;
     }
 
     /**
-     * @param TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
-     * @throws DefinitionException
+     * @param \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
