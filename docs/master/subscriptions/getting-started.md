@@ -62,10 +62,12 @@ your clients no longer depend on the redundant `channels` key from version 1.
 }
 ```
 
-### Empty response optimization
+### Empty Response Optimization
 
 Lighthouse returns the subscription channel as part of the response under `extensions`.
-If  `subscriptions.exclude_empty` in `lighthouse.php` is set to `true`, then API responses which exclude a subscription channel will exclude the subscriptions extension entirely as a performance optimization. Client implementations must anticipate this appropriately.
+If `subscriptions.exclude_empty` in `lighthouse.php` is set to `true`,
+API responses without a subscription channel will not contain `lighthouse_subscriptions` in `extensions`.
+This optimizes performance by sending less data, but clients must anticipate this appropriately.
 
 ## Expiring Subscriptions
 

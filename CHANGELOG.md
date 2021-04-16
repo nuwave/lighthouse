@@ -14,7 +14,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add `GraphQLContext` to `StartExecution` event
 - Add `connect` and `disconnect` operations in nested mutations for HasMany and MorphMany relations https://github.com/nuwave/lighthouse/pull/1730
 - Add `ValidateSchema` event https://github.com/nuwave/lighthouse/pull/1764
-- Add config option `subscriptions.exclude_empty` (default false). When true, the subscriptions extension response will be excluded when a channel is not to be included.
+- Add config option `subscriptions.exclude_empty` https://github.com/nuwave/lighthouse/pull/1799
 
 ### Changed
 
