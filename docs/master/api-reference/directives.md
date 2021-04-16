@@ -402,6 +402,64 @@ type GithubProfile {
 }
 ```
 
+## @cacheSet
+
+```graphql
+"""
+Saves the result of a cache with your desired name.
+"""
+directive @cacheSet(
+  """
+  Set the key cache -> The default is your query name
+  """
+  key: String
+  """
+  Set the duration it takes for the cache to expire in seconds.
+  If not given, the result will be stored forever.
+  """
+  maxAge: Int
+) on FIELD_DEFINITION
+```
+
+The cache is created on the first request and is cached forever by default.
+Use this for values that seldom change and take long to fetch/compute.
+
+```graphql
+type Query {
+  """
+  If empty, your query name will be saved
+  """
+  highestKnownPrimeNumber: Int! @cacheSet
+}
+```
+
+You can save the cache with the desired key.
+
+```graphql
+type Query {
+  highestKnownPrimeNumber: Int! @cacheSet(key: "cache-one")
+}
+```
+
+You can set an expiration time in seconds
+if you want to invalidate the cache after a while.
+
+```graphql
+type Query {
+  temperature: Int! @cacheSet(maxAge: 300)
+}
+```
+
+## @deleteCache
+
+Remove cache by key
+
+```graphql
+extend type Mutation {
+    createCategory(input: CategoryInput! @spread): Category! @trim @create @deleteCache(key: "categories")
+}
+```
+
 ## @can
 
 ```graphql
@@ -2727,6 +2785,35 @@ global field middleware in `lighthouse.php`:
         \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
         ...
     ],
+```
+
+## @cleanInput
+
+```graphql
+"""
+Clears user input of malicious items
+
+This can be used on:
+- a single argument or input field to sanitize that subtree
+- a field to cleanInput all strings
+"""
+directive @cleanInput on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+```
+
+Whitespace around the passed in string will be removed.
+
+```graphql
+type Mutation {
+  createUser(name: String @cleanInput): User
+}
+```
+
+Usage on a field applies `trim` recursively to all inputs.
+
+```graphql
+type Mutation {
+  createUser(input: CreateUserInput): User @trimcleanInput
+}
 ```
 
 ## @union

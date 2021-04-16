@@ -367,4 +367,75 @@ class CacheDirectiveTest extends DBTestCase
             $cachedResponse->json()
         );
     }
+
+
+    public function testStoreResolverResultInCacheSet(): void
+    {
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String @cacheSet
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('name'));
+    }
+
+    public function testStoreResolverResultInCacheSetByKey(): void
+    {
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String @cacheSet(key: "name")
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('name'));
+    }
 }
