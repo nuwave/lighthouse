@@ -18,6 +18,16 @@ type Mutation {
 }
 ```
 
+## Clear user input
+
+Using ٬cleanInput you can clear user inputs from malicious items
+
+```graphql
+type Mutation {
+    createPost(title: String @cleanInput): Post
+}
+```
+
 ## Complex arguments
 
 When you need to look at multiple input fields in order to run sanitization, you can use
