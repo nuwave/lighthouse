@@ -364,9 +364,9 @@ return [
         'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
 
         /*
-         * When true, an API response without a subscription channel will exclude the subscription extension response as
-         * a performance optimization.
-         *
+         * Should the subscriptions extension be excluded when the response has no subscription channel?
+         * This optimizes performance by sending less data, but clients must anticipate this appropriately.
+         * Will default to true in v6 and be removed in v7.
          */
         'exclude_empty' => env('LIGHTHOUSE_SUBSCRIPTION_EXCLUDE_EMPTY', false),
     ],
