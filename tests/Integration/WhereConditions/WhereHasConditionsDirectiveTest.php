@@ -327,6 +327,89 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testWhereConditionsHasNestedTables(): void {
+        $category1 = factory(Category::class)->create();
+
+        $category2 = factory(Category::class)->create();
+        $category2->parent()->associate($category1);
+        $category2->save();
+
+        $category3 = factory(Category::class)->create();
+        $category3->parent()->associate($category2);
+        $category3->save();
+
+        $category4 = factory(Category::class)->create();
+        $category4->parent()->associate($category3);
+        $category4->save();
+
+        $post = factory(Post::class)->create();
+        $post->categories()->attach($category4);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($hasCategories: WhereConditions) {
+            posts(hasCategories: $hasCategories) {
+                id
+                title
+                body
+                categories {
+                    category_id
+                    name
+                    parent {
+                        category_id
+                        name
+                        parent {
+                            category_id
+                            name
+                            parent {
+                                category_id
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ', [
+            'hasCategories' => [
+                'HAS' => [
+                   'relation' => 'parent.parent.parent',
+                   'condition' => [
+                       'column' => 'category_id',
+                       'value' => $category1->category_id,
+                   ],
+                ],
+            ],
+        ])->assertExactJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => (string) $post->id,
+                        'title' => $post->title,
+                        'body' => $post->body,
+                        'categories' => [
+                            [
+                                'category_id' => (string) $category4->category_id,
+                                'name' => $category4->name,
+                                'parent' => [
+                                    'category_id' => (string) $category3->category_id,
+                                    'name' => $category3->name,
+                                    'parent' => [
+                                        'category_id' => (string) $category2->category_id,
+                                        'name' => $category2->name,
+                                        'parent' => [
+                                            'category_id' => (string) $category1->category_id,
+                                            'name' => $category1->name,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testWhereHasBelongsToSameTableRelationship(): void
     {
         $parent = factory(Location::class)->create();
