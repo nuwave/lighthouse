@@ -74,7 +74,7 @@ GRAPHQL;
         return $argumentSet;
     }
 
-    protected function transformLeaf($value)
+    protected function transformLeaf($value): string
     {
         if (is_string($value)) {
             $search = [
