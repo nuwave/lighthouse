@@ -155,6 +155,10 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
+        if ($channel === null && config('lighthouse.subscriptions.exclude_empty', false)) {
+            return null;
+        }
+
         $version = config('lighthouse.subscriptions.version', 1);
         switch ((int) $version) {
             case 1:
