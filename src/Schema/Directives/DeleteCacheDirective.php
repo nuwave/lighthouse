@@ -34,11 +34,6 @@ directive @deleteCache(
 GRAPHQL;
     }
 
-    /**
-     * @param FieldValue $fieldValue
-     * @param Closure $next
-     * @return FieldValue
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         // Ensure we run this after all other field middleware

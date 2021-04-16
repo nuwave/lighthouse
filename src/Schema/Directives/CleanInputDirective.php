@@ -45,11 +45,6 @@ GRAPHQL;
         );
     }
 
-    /**
-     * @param FieldValue $fieldValue
-     * @param Closure $next
-     * @return FieldValue
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
@@ -70,10 +65,6 @@ GRAPHQL;
         );
     }
 
-    /**
-     * @param ArgumentSet $argumentSet
-     * @return ArgumentSet
-     */
     protected function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $argument) {
@@ -83,19 +74,15 @@ GRAPHQL;
         return $argumentSet;
     }
 
-    /**
-     * @param  mixed  $value The client given value
-     * @return mixed The transformed value
-     */
     protected function transformLeaf($value)
     {
         if (is_string($value)) {
-            $search = array(
+            $search = [
                 '@<script[^>]*?>.*?</script>@si',   // Strip out javascript
                 '@<[\/\!]*?[^<>]*?>@si',            // Strip out HTML tags
                 '@<style[^>]*?>.*?</style>@siU',    // Strip style tags properly
-                '@<![\s\S]*?--[ \t\n\r]*>@'         // Strip multi-line comments
-            );
+                '@<![\s\S]*?--[ \t\n\r]*>@',        // Strip multi-line comments
+            ];
 
             return preg_replace($search, '', $value);
         }

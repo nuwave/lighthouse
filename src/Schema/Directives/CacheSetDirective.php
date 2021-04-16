@@ -43,11 +43,6 @@ directive @cacheSet(
 GRAPHQL;
     }
 
-    /**
-     * @param FieldValue $fieldValue
-     * @param Closure $next
-     * @return FieldValue
-     */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
 
@@ -60,7 +55,6 @@ GRAPHQL;
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $key, $maxAge) {
-
                 $cache = $this->cacheRepository;
 
                 // We found a matching value in the cache, so we can just return early
@@ -75,9 +69,9 @@ GRAPHQL;
                     ? static function ($result) use ($key, $maxAge, $cache): void {
                         $cache->put($key, $result, Carbon::now()->addSeconds($maxAge));
                     }
-                    : static function ($result) use ($key, $cache): void {
-                        $cache->forever($key, $result);
-                    };
+                : static function ($result) use ($key, $cache): void {
+                    $cache->forever($key, $result);
+                };
 
                 Resolved::handle($resolved, $storeInCache);
 
