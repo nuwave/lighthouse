@@ -73,7 +73,7 @@ GRAPHQL;
         return $argumentSet;
     }
 
-    protected function transformLeaf($value): string
+    protected function transformLeaf($value): mixed
     {
         if (is_string($value)) {
             $search = [
