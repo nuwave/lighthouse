@@ -11,7 +11,6 @@ use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
-
 use function Safe\preg_replace;
 
 class CleanInputDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective, FieldMiddleware
