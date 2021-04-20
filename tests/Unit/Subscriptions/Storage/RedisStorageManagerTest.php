@@ -97,6 +97,7 @@ class RedisStorageManagerTest extends TestCase
         $manager = new RedisStorageManager($config, $redisFactory);
         $manager->storeSubscriber($subscriber, 'some-topic');
     }
+
     public function testStoreSubscriberWithoutTtl(): void
     {
         $config = $this->createMock(ConfigRepository::class);
