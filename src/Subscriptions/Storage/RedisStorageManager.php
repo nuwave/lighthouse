@@ -104,7 +104,7 @@ class RedisStorageManager implements StoresSubscriptions
         ];
         if ($this->ttl !== null) {
             $setCommand = 'setex';
-            array_splice($setArguments, 1, 0, $this->ttl);
+            array_splice($setArguments, 1, 0, [$this->ttl]);
         }
         $this->connection->command($setCommand, $setArguments);
     }
