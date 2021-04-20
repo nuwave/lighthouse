@@ -208,8 +208,8 @@ class HasManyDirectiveTest extends DBTestCase
                     'posts' => [
                         'paginatorInfo' => [
                             'count' => 3,
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
             ],
         ])->assertJsonCount(2, 'data.user.tasks.data');

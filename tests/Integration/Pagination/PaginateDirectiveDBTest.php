@@ -554,9 +554,9 @@ class PaginateDirectiveDBTest extends DBTestCase
                         'firstItem' => 1,
                         'lastItem' => 3,
                         'perPage' => 10,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }
