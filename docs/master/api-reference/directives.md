@@ -2188,7 +2188,7 @@ If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
 > Please note that the `SIMPLE` paginator does not have the attributes
 > `hasMorePages`, `lastPage` and `total`.
-> 
+>
 > If you need those fields, you should use the default `PAGINATOR`.
 
 ```graphql
