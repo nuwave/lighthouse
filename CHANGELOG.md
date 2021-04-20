@@ -29,6 +29,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
 - Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
+- Fix subscription storage in redis for predis users https://github.com/nuwave/lighthouse/pull/1814
 
 ### Deprecated
 
