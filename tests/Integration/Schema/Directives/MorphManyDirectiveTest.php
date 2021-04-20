@@ -175,6 +175,7 @@ class MorphManyDirectiveTest extends DBTestCase
             id: ID!
             title: String!
             images: [Image!] @morphMany(type: PAGINATOR)
+            images2: [Image!] @morphMany(type: SIMPLE, relation: "images")
         }
 
         type Image {
@@ -198,6 +199,11 @@ class MorphManyDirectiveTest extends DBTestCase
                         id
                     }
                 }
+                images2(first: 5) {
+                    paginatorInfo {
+                        count
+                    }
+                }
             }
         }
         ")->assertJson([
@@ -213,6 +219,11 @@ class MorphManyDirectiveTest extends DBTestCase
                                 ];
                             })
                             ->toArray(),
+                    ],
+                    'images2' => [
+                        'paginatorInfo' => [
+                            'count' => 5,
+                        ],
                     ],
                 ],
             ],

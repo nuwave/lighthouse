@@ -52,12 +52,18 @@ class PaginateDirectiveTest extends TestCase
             users: [User!]! @paginate
             users2: [User!]! @paginate(type: CONNECTION)
             users3: [User!]! @paginate(type: "relay")
+            users4: [User!]! @paginate(type: "simple")
         }
         ');
         $typeMap = $schema->getTypeMap();
 
         $this->assertArrayHasKey(
             'UserPaginator',
+            $typeMap
+        );
+
+        $this->assertArrayHasKey(
+            'UserSimplePaginator',
             $typeMap
         );
 
@@ -103,8 +109,10 @@ class PaginateDirectiveTest extends TestCase
             type Query {
                 defaultPaginated: [User!]! @paginate
                 defaultRelay: [User!]! @paginate(type: CONNECTION)
+                defaultSimple: [User!]! @paginate(type: SIMPLE)
                 customPaginated:  [User!]! @paginate(maxCount: 10)
                 customRelay:  [User!]! @paginate(maxCount: 10, type: CONNECTION)
+                customSimple:  [User!]! @paginate(maxCount: 10, type: SIMPLE)
             }
 
             type User {
@@ -135,6 +143,17 @@ class PaginateDirectiveTest extends TestCase
             $defaultRelayFirstArg->description
         );
 
+        $defaultSimpleFirstArg = $queryType
+            ->getField('defaultSimple')
+            ->getArg('first');
+
+        $this->assertInstanceOf(FieldArgument::class, $defaultSimpleFirstArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $defaultSimpleFirstArg */
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 5.',
+            $defaultSimpleFirstArg->description
+        );
+
         $customPaginatedAmountArg = $queryType
             ->getField('customPaginated')
             ->getArg('first');
@@ -155,6 +174,17 @@ class PaginateDirectiveTest extends TestCase
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
             $customRelayFirstArg->description
+        );
+
+        $customSimpleFirstArg = $queryType
+            ->getField('customSimple')
+            ->getArg('first');
+
+        $this->assertInstanceOf(FieldArgument::class, $customSimpleFirstArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $customSimpleFirstArg */
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 10.',
+            $customSimpleFirstArg->description
         );
     }
 
@@ -204,6 +234,7 @@ class PaginateDirectiveTest extends TestCase
         type Query {
             users1: [User!]! @paginate
             users2: [User!]! @paginate(type: CONNECTION)
+            users3: [User!]! @paginate(type: SIMPLE)
         }
         ';
 
@@ -239,6 +270,22 @@ class PaginateDirectiveTest extends TestCase
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
             $resultFromRelayPagination->json('errors.0.message')
+        );
+
+        $resultFromSimplePagination = $this->graphQL(/** @lang GraphQL */ '
+        {
+            users3(first: 10) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            PaginationArgs::requestedTooManyItems(5, 10),
+            $resultFromSimplePagination->json('errors.0.message')
         );
     }
 

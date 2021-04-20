@@ -103,6 +103,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: PAGINATOR)
+            roles2: [Role!]! @belongsToMany(type: SIMPLE, relation: "roles")
         }
 
         type Role {
@@ -128,6 +129,14 @@ class BelongsToManyDirectiveTest extends DBTestCase
                         id
                     }
                 }
+                roles2(first: 3) {
+                    paginatorInfo {
+                        count
+                    }
+                    data {
+                        id
+                    }
+                }
             }
         }
         ')->assertJson([
@@ -140,9 +149,16 @@ class BelongsToManyDirectiveTest extends DBTestCase
                             'total' => $this->rolesCount,
                         ],
                     ],
+
+                    'roles2' => [
+                        'paginatorInfo' => [
+                            'count' => 3,
+                        ],
+                    ],
                 ],
             ],
-        ])->assertJsonCount(2, 'data.user.roles.data');
+        ])->assertJsonCount(2, 'data.user.roles.data')
+            ->assertJsonCount(3, 'data.user.roles2.data');;
     }
 
     public function testQueryBelongsToManyRelayConnection(): void

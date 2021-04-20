@@ -149,10 +149,14 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testQueryHasManyPaginator(): void
     {
+        $this->user->posts()->saveMany(
+            factory(Post::class, 3)->make()
+        );
+
         $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany(type: PAGINATOR)
-            posts: [Post!]! @hasMany(type: PAGINATOR)
+            posts: [Post!]! @hasMany(type: SIMPLE)
         }
 
         type Task {
@@ -181,6 +185,14 @@ class HasManyDirectiveTest extends DBTestCase
                         id
                     }
                 }
+                posts(first: 5) {
+                    paginatorInfo {
+                        count
+                    }
+                    data {
+                        id
+                    }
+                }
             }
         }
         ')->assertJson([
@@ -193,6 +205,11 @@ class HasManyDirectiveTest extends DBTestCase
                             'total' => 3,
                         ],
                     ],
+                    'posts' => [
+                        'paginatorInfo' => [
+                            'count' => 3,
+                        ]
+                    ]
                 ],
             ],
         ])->assertJsonCount(2, 'data.user.tasks.data');

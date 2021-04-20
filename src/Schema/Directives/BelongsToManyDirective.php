@@ -59,6 +59,11 @@ enum BelongsToManyType {
     PAGINATOR
 
     """
+    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+    """
+    SIMPLE
+
+    """
     Cursor-based pagination, compatible with the Relay specification.
     """
     CONNECTION
