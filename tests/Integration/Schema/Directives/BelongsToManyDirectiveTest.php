@@ -158,7 +158,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 ],
             ],
         ])->assertJsonCount(2, 'data.user.roles.data')
-            ->assertJsonCount(3, 'data.user.roles2.data');;
+            ->assertJsonCount(3, 'data.user.roles2.data');
     }
 
     public function testQueryBelongsToManyRelayConnection(): void
