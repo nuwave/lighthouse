@@ -174,6 +174,11 @@ enum BelongsToManyType {
   PAGINATOR
 
   """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
   Cursor-based pagination, compatible with the Relay specification.
   """
   CONNECTION
@@ -1183,6 +1188,11 @@ enum HasManyType {
   PAGINATOR
 
   """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
   Cursor-based pagination, compatible with the Relay specification.
   """
   CONNECTION
@@ -1200,6 +1210,7 @@ You can return the related models paginated by setting the `type`.
 ```graphql
 type User {
   postsPaginated: [Post!]! @hasMany(type: PAGINATOR)
+  postsSimplePaginated: [Post!]! @hasMany(type: SIMPLE)
   postsRelayConnection: [Post!]! @hasMany(type: CONNECTION)
 }
 ```
@@ -1608,6 +1619,11 @@ enum MorphManyType {
   Offset-based pagination, similar to the Laravel default.
   """
   PAGINATOR
+
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
 
   """
   Cursor-based pagination, compatible with the Relay specification.
@@ -2051,6 +2067,11 @@ enum PaginateType {
   PAGINATOR
 
   """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
   Cursor-based pagination, compatible with the Relay specification.
   """
   CONNECTION
@@ -2112,8 +2133,9 @@ It can be queried like this:
 
 ### Pagination type
 
-The `type` of pagination defaults to `PAGINATOR`, but may also be set to a Relay
-compliant `CONNECTION`.
+The `type` of pagination defaults to `PAGINATOR`, but may also be set to
+`SIMPLE` (see [Simple Pagination](#simple-pagination)) or a Relay compliant
+`CONNECTION`.
 
 > Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
 > Under the hood, the "cursor" is decoded into a page offset.
@@ -2153,6 +2175,64 @@ type PostEdge {
 
   "A unique cursor that can be used for pagination."
   cursor: String!
+}
+```
+
+### Simple Pagination
+
+The default `PAGINATOR` uses the query builder method `paginate` which will
+fire an additional query every time to count the total number of items. This
+is usually very helpful to generate pagination elements in the frontend.
+
+If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
+
+> Please note that the `SIMPLE` paginator does not have the attributes
+> `hasMorePages`, `lastPage` and `total`.
+> 
+> If you need those fields, you should use the default `PAGINATOR`.
+
+```graphql
+type Query {
+  posts: [Post!]! @paginate(type: SIMPLE)
+}
+```
+
+The schema definition is automatically transformed to this:
+
+```graphql
+type Query {
+  posts(
+    "Limits number of fetched elements."
+    first: Int!
+
+    "The offset from which elements are returned."
+    page: Int
+  ): PostSimplePaginator
+}
+
+"A paginated list of Post items."
+type PostSimplePaginator {
+  "A list of Post items."
+  data: [Post!]!
+
+  "Pagination information about the list of items."
+  paginatorInfo: SimplePaginatorInfo!
+}
+```
+
+It can be queried like this:
+
+```graphql
+{
+  posts(first: 10) {
+    data {
+      id
+      title
+    }
+    paginatorInfo {
+      currentPage
+    }
+  }
 }
 ```
 
