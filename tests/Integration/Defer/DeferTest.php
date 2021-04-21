@@ -483,13 +483,7 @@ class DeferTest extends TestCase
                 }
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
     }
 
     public function testDoesNotDeferWithIncludeAndSkipDirectives(): void
@@ -647,13 +641,7 @@ class DeferTest extends TestCase
                 name
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
     }
 
     public function testDoesNotDeferFieldsIfFalse(): void

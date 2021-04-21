@@ -316,12 +316,6 @@ class DeleteDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => ModifyModelExistenceDirective::couldNotModify($user),
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(ModifyModelExistenceDirective::couldNotModify($user));
     }
 }

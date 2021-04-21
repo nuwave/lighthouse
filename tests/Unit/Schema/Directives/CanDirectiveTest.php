@@ -56,21 +56,16 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                name
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    name
+                }
             }
-        }
-        ');
-        $response->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
-        $response->assertJson([
-            'errors' => [
-                [
-                    'message' => UserPolicy::SUPER_ADMINS_ONLY_MESSAGE,
-                ],
-            ],
-        ]);
+            ')
+            ->assertGraphQLErrorCategory(AuthorizationException::CATEGORY)
+            ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
@@ -94,21 +89,16 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                name
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    name
+                }
             }
-        }
-        ');
-        $response->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
-        $response->assertJson([
-            'errors' => [
-                [
-                    'message' => UserPolicy::SUPER_ADMINS_ONLY_MESSAGE,
-                ],
-            ],
-        ]);
+            ')
+            ->assertGraphQLErrorCategory(AuthorizationException::CATEGORY)
+            ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testPassesAuthIfAuthorized(): void
