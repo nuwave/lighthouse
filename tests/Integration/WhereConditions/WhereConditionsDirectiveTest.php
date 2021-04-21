@@ -720,9 +720,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonFragment([
-            'message' => WhereConditionsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
-        ]);
+        ')->assertGraphQLErrorMessage(WhereConditionsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"));
     }
 
     public function testQueriesEmptyStrings(): void
@@ -801,9 +799,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonFragment([
-            'message' => SQLOperator::missingValueForColumn('no_value'),
-        ]);
+        ')->assertGraphQLErrorMessage(SQLOperator::missingValueForColumn('no_value'));
     }
 
     public function testOnlyAllowsWhitelistedColumns(): void

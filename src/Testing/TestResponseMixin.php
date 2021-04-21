@@ -64,6 +64,21 @@ class TestResponseMixin
         };
     }
 
+    public function assertGraphQLErrorMessage(): Closure
+    {
+        return function (string $message) {
+            $this->assertJson([
+                'errors' => [
+                    [
+                        'message' => $message,
+                    ],
+                ],
+            ]);
+
+            return $this;
+        };
+    }
+
     public function assertGraphQLErrorCategory(): Closure
     {
         return function (string $category) {
