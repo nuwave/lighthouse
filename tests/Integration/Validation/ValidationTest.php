@@ -323,7 +323,7 @@ class ValidationTest extends TestCase
             ->assertGraphQLValidationError('bar', $message);
     }
 
-    public function testArgumentReferencesAreQualified(): void
+    public function testSingleFieldReferencesAreQualified(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -332,7 +332,45 @@ class ValidationTest extends TestCase
 
         input Custom {
             foo: String
-            bar: String @rules(apply: ["required_without:foo"])
+            bar: String @rules(apply: ["required_if:foo,baz"])
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "whatever"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "baz"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is baz.');
+    }
+
+    public function testMultipleFieldReferencesAreQualified(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom {
+            foo: String
+            bar: String @rules(apply: ["required_without_all:foo,baz"])
             baz: String
         }
         ';
@@ -357,6 +395,6 @@ class ValidationTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is not present.');
+            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when none of input.foo / input.baz are present.');
     }
 }

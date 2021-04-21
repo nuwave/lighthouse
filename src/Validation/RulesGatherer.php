@@ -234,14 +234,43 @@ class RulesGatherer
                 $parsed = ValidationRuleParser::parse($rule);
 
                 $name = $parsed[0];
-                if ($name === 'RequiredWithout') {
-                    $args = &$parsed[1];
+                $args = $parsed[1];
 
+                // Those rule lists are a subset of https://github.com/illuminate/validation/blob/8079fd53dee983e7c52d1819ae3b98c71a64fbc0/Validator.php#L206-L236
+                // using the docs to know which ones reference other fields: https://laravel.com/docs/8.x/validation#available-validation-rules
+                // We do not handle the Exclude* rules, those mutate the input and are not supported.
+
+                // Rules where the first argument is a field reference
+                if (in_array($name, [
+                    'Different',
+                    'Gt',
+                    'Gte',
+                    'Lt',
+                    'Lte',
+                    'RequiredIf',
+                    'RequiredUnless',
+                    'Same',
+                ])) {
                     $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                 }
 
+                // Rules where all arguments are field references
+                if (in_array($name, [
+                    'RequiredWith',
+                    'RequiredWithAll',
+                    'RequiredWithout',
+                    'RequiredWithoutAll',
+                ])) {
+                    $args = array_map(
+                        static function (string $field) use ($argumentPath): string {
+                            return implode('.', array_merge($argumentPath, [$field]));
+                        },
+                        $args
+                    );
+                }
+
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
-                return array_merge([$name], $parsed[1]);
+                return array_merge([$name], $args);
             },
             $rules
         );
