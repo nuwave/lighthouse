@@ -10,6 +10,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -56,6 +57,24 @@ class EntityResolverProvider
     }
 
     /**
+     * @param string $typename
+     * @return string
+     */
+    public static function missingResolver(string $typename): string
+    {
+        return "Could not locate a resolver for __typename `{$typename}`.";
+    }
+
+    /**
+     * @param string $typename
+     * @return string
+     */
+    public static function unknownTypename(string $typename): string
+    {
+        return "Unknown __typename `{$typename}`.";
+    }
+
+    /**
      * @return \Closure(array<string, mixed> $representations): mixed
      */
     public function resolver(string $typename): Closure
@@ -69,7 +88,7 @@ class EntityResolverProvider
             ?? null;
 
         if ($resolver === null) {
-            throw new Error("Could not locate a resolver for __typename `{$typename}`.");
+            throw new Error(self::missingResolver($typename));
         }
 
         $this->resolvers[$typename] = $resolver;
@@ -83,9 +102,14 @@ class EntityResolverProvider
             return $this->definitions[$typename];
         }
 
-        $type = $this->schema->getType($typename);
+        $type = null;
+        try {
+            $type = $this->schema->getType($typename);
+        } catch (DefinitionException $definitionException) {
+            // Signalizes the type is unknown, handled by the null check below
+        }
         if ($type === null) {
-            throw new Error("Unknown __typename `{$typename}`.");
+            throw new Error(self::unknownTypename($typename));
         }
 
         /**

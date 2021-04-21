@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\Federation;
 
-use Nuwave\Lighthouse\Exceptions\FederationException;
+use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
@@ -56,21 +56,16 @@ class FederationEntitiesTest extends TestCase
         ]);
     }
 
-    public function testThrowsWhenNoEntityResolverIsFound(): void
+    public function testThrowsWhenTypeIsUnknown(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
         }
+        ' . self::PLACEHOLDER_QUERY;
 
-        type Query {
-          foo: Int!
-        }
-        ';
-
-        $this->expectException(FederationException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ '
         {
             _entities(
                 representations: [
@@ -83,7 +78,71 @@ class FederationEntitiesTest extends TestCase
             }
         }
         ');
+
+        $this->assertStringContainsString(
+            EntityResolverProvider::unknownTypename('Unknown'),
+            $response->json('errors.0.message')
+        );
     }
 
-    // TODO test validation for faulty representations properly
+    public function testThrowsWhenNoKeySelectionIsSatisfied(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Foo @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+        ' . self::PLACEHOLDER_QUERY;
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            _entities(
+                representations: [
+                    { __typename: "Foo" }
+                ]
+            ) {
+                ... on Foo {
+                    id
+                }
+            }
+        }
+        ');
+
+        $this->assertStringContainsString(
+            'Representation does not satisfy any set of uniquely identifying keys',
+            $response->json('errors.0.message')
+        );
+    }
+
+    public function testThrowsWhenMissingResolver(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type MissingResolver @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+        ' . self::PLACEHOLDER_QUERY;
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            _entities(
+                representations: [
+                    {
+                        __typename: "MissingResolver"
+                        id: 1
+                    }
+                ]
+            ) {
+                ... on MissingResolver {
+                    id
+                }
+            }
+        }
+        ');
+
+        $this->assertStringContainsString(
+            EntityResolverProvider::missingResolver('MissingResolver'),
+            $response->json('errors.0.message')
+        );
+    }
 }
