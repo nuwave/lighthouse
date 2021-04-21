@@ -65,6 +65,7 @@ class PaginatedRelationLoader implements RelationLoader
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
 
+                    // @phpstan-ignore-next-line Builder mixin is not understood
                     $relation->addSelect($select);
                 }
 

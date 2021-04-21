@@ -772,7 +772,7 @@ You can customize the error message for a particular argument.
 ## @scalar
 
 Point Lighthouse to your scalar definition class.
-[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalars)
 
 Lighthouse looks into your default scalar namespace for a class with the same name.
 You do not need to specify the directive in that case.

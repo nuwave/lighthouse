@@ -138,6 +138,56 @@ GRAPHQL;
         ]);
     }
 
+    public function testWithoutExcludeEmpty(): void
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $this->app->make('config');
+        $config->set('lighthouse.subscriptions.exclude_empty', false);
+        $config->set('lighthouse.subscriptions.version', 2);
+
+        $this->subscribe();
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        query foo {
+            foo
+        }
+        ');
+
+        $response->assertExactJson([
+            'data' => [
+                'foo' => '42',
+            ],
+            'extensions' => [
+                'lighthouse_subscriptions' => [
+                    'version' => 2,
+                    'channel' => null,
+                ],
+            ],
+        ]);
+    }
+
+    public function testWithExcludeEmpty(): void
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $this->app->make('config');
+        $config->set('lighthouse.subscriptions.exclude_empty', true);
+        $config->set('lighthouse.subscriptions.version', 2);
+
+        $this->subscribe();
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        query foo {
+            foo
+        }
+        ');
+
+        $response->assertExactJson([
+            'data' => [
+                'foo' => '42',
+            ],
+        ]);
+    }
+
     /**
      * @param  array<string, mixed>  $args
      * @return array<string, string>

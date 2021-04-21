@@ -741,7 +741,7 @@ directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
   suggestion for how to access supported similar data. Formatted
-  in [Markdown](https://daringfireball.net/projects/markdown/).
+  in [Markdown](https://daringfireball.net/projects/markdown).
   """
   reason: String = "No longer supported"
 ) on FIELD_DEFINITION
@@ -2356,7 +2356,7 @@ directive @rulesForArray(
 ## @scalar
 
 Reference a class implementing a scalar definition.
-[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalars)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
@@ -2808,7 +2808,7 @@ directive @upsert(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Lighthouse will try to to fetch the model by its primary key, just like [`@update`](#update).
+Lighthouse will try to fetch the model by its primary key, just like [`@update`](#update).
 If the model doesn't exist, it will be newly created with a given `id`.
 In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
