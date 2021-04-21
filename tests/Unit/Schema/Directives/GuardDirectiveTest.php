@@ -21,13 +21,7 @@ class GuardDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => AuthenticationException::MESSAGE,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
     }
 
     public function testGuardsWithApi(): void
@@ -108,10 +102,10 @@ class GuardDirectiveTest extends TestCase
             ],
             'errors' => [
                 [
+                    'message' => AuthenticationException::MESSAGE,
                     'path' => [
                         'bar',
                     ],
-                    'message' => AuthenticationException::MESSAGE,
                 ],
             ],
         ]);

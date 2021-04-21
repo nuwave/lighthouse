@@ -13,16 +13,8 @@ class ErrorTest extends TestCase
     public function testMissingQuery(): void
     {
         $this->postGraphQL([])
-            ->assertJson([
-                'errors' => [
-                    [
-                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
-                        'extensions' => [
-                            'category' => 'request',
-                        ],
-                    ],
-                ],
-            ]);
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
+            ->assertGraphQLErrorCategory('request');
     }
 
     public function testRejectsInvalidQuery(): void
@@ -53,32 +45,16 @@ class ErrorTest extends TestCase
     {
         $this->postGraphQL([])
             ->assertStatus(200)
-            ->assertJson([
-                'errors' => [
-                    [
-                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
-                        'extensions' => [
-                            'category' => 'request',
-                        ],
-                    ],
-                ],
-            ]);
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
+            ->assertGraphQLErrorCategory('request');
     }
 
     public function testRejectsEmptyQuery(): void
     {
         $this->graphQL('')
             ->assertStatus(200)
-            ->assertJson([
-                'errors' => [
-                    [
-                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
-                        'extensions' => [
-                            'category' => 'request',
-                        ],
-                    ],
-                ],
-            ]);
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
+            ->assertGraphQLErrorCategory('request');
     }
 
     public function testHandlesErrorInResolver(): void

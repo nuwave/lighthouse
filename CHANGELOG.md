@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add method `assertGraphQLErrorMessage()` to `TestResponse` mixin
+
 ## 5.4.0
 
 ### Added
