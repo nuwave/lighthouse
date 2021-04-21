@@ -121,7 +121,7 @@ type Mutation {
 ```
 
 You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
-both the size and the contents of an argument array.
+both size and contents of an argument array.
 For example, you might require a list of at least 3 valid emails to be passed.
 
 ```graphql
@@ -139,7 +139,7 @@ complex validation. For example, accessing existing data in the database or vali
 values cannot be achieved with the examples above. This is where validator classes come into play.
 
 Validator classes can be reused on field definitions or input types within your schema.
-Use the [`@validator`](../api-reference/directives.md#validator) directive:
+Use the [@validator](../api-reference/directives.md#validator) directive:
 
 ```graphql
 input UpdateUserInput @validator {
