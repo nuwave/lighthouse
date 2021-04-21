@@ -17,7 +17,6 @@ use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Utils\AST;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
@@ -148,37 +147,12 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName);
-
-        // Fallback to using information from the schema definition as the model name
-        if (! $model) {
-            if ($this->definitionNode instanceof FieldDefinitionNode) {
-                $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
-
-                /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
-                $documentAST = app(ASTBuilder::class)->documentAST();
-
-                if (! isset($documentAST->types[$returnTypeName])) {
-                    throw new DefinitionException(
-                        "Type '$returnTypeName' on '{$this->nodeName()}' can not be found in the schema.'"
-                    );
-                }
-                $type = $documentAST->types[$returnTypeName];
-
-                $modelDirective = ASTHelper::directiveDefinition($type, 'model');
-                if ($modelDirective !== null) {
-                    $model = ASTHelper::directiveArgValue($modelDirective, 'class');
-                } else {
-                    $model = $returnTypeName;
-                }
-            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
-                $model = $this->nodeName();
-            }
-        }
+        $model = $this->directiveArgValue($argumentName)
+            ?? ASTHelper::modelName($this->definitionNode);
 
         if (! $model) {
             throw new DefinitionException(
-                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->nodeName()}"
+                "A `model` argument must be assigned to the '@{$this->name()}' directive on '{$this->nodeName()}."
             );
         }
 
@@ -189,9 +163,11 @@ abstract class BaseDirective implements Directive
      * Find a class name in a set of given namespaces.
      *
      * @param  array<string>  $namespacesToTry
-     * @return class-string
+     * @param  callable(string $className): bool $determineMatch
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return class-string
      */
     protected function namespaceClassName(
         string $classCandidate,
@@ -233,9 +209,9 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @return array<string> Contains two entries: [string $className, string $methodName]
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {
@@ -252,10 +228,11 @@ abstract class BaseDirective implements Directive
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
             );
         }
-
+        /** @var array{0: string, 1?: string} $argumentParts */
         if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
+        /** @var array{0: string, 1: string} $argumentParts */
 
         return $argumentParts;
     }

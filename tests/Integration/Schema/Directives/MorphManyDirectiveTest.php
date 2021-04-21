@@ -91,7 +91,7 @@ class MorphManyDirectiveTest extends DBTestCase
             });
     }
 
-    public function testCanQueryMorphManyRelationship(): void
+    public function testQueryMorphManyRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Post {
@@ -168,7 +168,7 @@ class MorphManyDirectiveTest extends DBTestCase
             ->assertJsonCount($this->taskImages->count(), 'data.task.images');
     }
 
-    public function testCanQueryMorphManyPaginator(): void
+    public function testQueryMorphManyPaginator(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Post {
@@ -346,7 +346,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
-    public function testCanQueryMorphManyPaginatorWithADefaultCount(): void
+    public function testQueryMorphManyPaginatorWithADefaultCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {
@@ -400,7 +400,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(3, 'data.task.images.data');
     }
 
-    public function testCanQueryMorphManyRelayConnection(): void
+    public function testQueryMorphManyRelayConnection(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {
@@ -540,7 +540,7 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanQueryMorphManyRelayConnectionWithADefaultCount(): void
+    public function testQueryMorphManyRelayConnectionWithADefaultCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {

@@ -44,6 +44,9 @@ directive @like(
 GRAPHQL;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     */
     public function handleBuilder($builder, $value): object
     {
         if ($value === null) {

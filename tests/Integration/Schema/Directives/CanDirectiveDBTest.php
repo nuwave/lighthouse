@@ -209,7 +209,7 @@ class CanDirectiveDBTest extends DBTestCase
         ")->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
-    public function testCanHandleMultipleModels(): void
+    public function testHandleMultipleModels(): void
     {
         $user = new User();
         $user->name = UserPolicy::ADMIN;

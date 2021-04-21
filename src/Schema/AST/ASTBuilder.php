@@ -13,6 +13,7 @@ use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
@@ -95,8 +96,10 @@ class ASTBuilder
         if (! isset($this->documentAST)) {
             $cacheConfig = $this->configRepository->get('lighthouse.cache');
             if ($cacheConfig['enable']) {
-                /** @var \Illuminate\Contracts\Cache\Repository $cache */
-                $cache = app('cache')->store($cacheConfig['store'] ?? null);
+                /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
+                $cacheFactory = app(CacheFactory::class);
+                $cache = $cacheFactory->store($cacheConfig['store'] ?? null);
+
                 $this->documentAST = $cache->remember(
                     $cacheConfig['key'],
                     $cacheConfig['ttl'],

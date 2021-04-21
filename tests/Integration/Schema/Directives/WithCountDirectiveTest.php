@@ -61,7 +61,7 @@ class WithCountDirectiveTest extends DBTestCase
         $this->assertSame(2, $queries);
     }
 
-    public function testItFailsToEagerLoadRelationCountWithoutRelation(): void
+    public function testFailsToEagerLoadRelationCountWithoutRelation(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {

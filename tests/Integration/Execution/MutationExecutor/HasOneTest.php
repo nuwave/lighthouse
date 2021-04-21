@@ -78,7 +78,7 @@ class HasOneTest extends DBTestCase
     }
     '.self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewHasOne(): void
+    public function testCreateWithNewHasOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -112,7 +112,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertWithNewHasOne(): void
+    public function testUpsertWithNewHasOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -147,7 +147,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateUsingUpsertWithNewHasOne(): void
+    public function testCreateUsingUpsertWithNewHasOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -264,7 +264,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateWithNewHasOne(string $action): void
+    public function testUpdateWithNewHasOne(string $action): void
     {
         factory(Task::class)->create();
 
@@ -305,7 +305,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndUpdateHasOne(string $action): void
+    public function testUpdateAndUpdateHasOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -352,7 +352,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndUpsertHasOne(string $action): void
+    public function testUpdateAndUpsertHasOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -399,7 +399,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndDeleteHasOne(string $action): void
+    public function testUpdateAndDeleteHasOne(string $action): void
     {
         factory(Task::class)
             ->create()

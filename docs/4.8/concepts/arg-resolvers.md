@@ -1,7 +1,7 @@
 # Arg Resolvers
 
 To understand the concept behind arg resolvers, you should familiarize yourself with
-[how field resolvers are composed](https://graphql.org/learn/execution/).
+[how field resolvers are composed](https://graphql.org/learn/execution).
 
 ## Motivation
 

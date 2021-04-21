@@ -119,7 +119,7 @@ class PaginatedRelationLoaderTest extends DBTestCase
         $this->assertTrue($firstUser->relationLoaded('posts'));
     }
 
-    public function testCanHandleSoftDeletes(): void
+    public function testHandleSoftDeletes(): void
     {
         /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();

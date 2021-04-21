@@ -24,6 +24,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
 class ASTHelper
@@ -79,14 +80,7 @@ class ASTHelper
      */
     public static function prepend(NodeList $nodeList, Node $node): NodeList
     {
-        /**
-         * Since we did not modify the passed in lists, the types did not change.
-         *
-         * @var \GraphQL\Language\AST\NodeList<TNode> $merged
-         */
-        $merged = (new NodeList([$node]))->merge($nodeList);
-
-        return $merged;
+        return (new NodeList([$node]))->merge($nodeList);
     }
 
     public static function duplicateDefinition(string $oldName): string
@@ -364,5 +358,43 @@ class ASTHelper
         }
 
         return $directive;
+    }
+
+    /**
+     * @return \GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode
+     */
+    public static function underlyingType(FieldDefinitionNode $field): Node
+    {
+        $typeName = static::getUnderlyingTypeName($field);
+
+        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
+        $astBuilder = app(ASTBuilder::class);
+        $documentAST = $astBuilder->documentAST();
+
+        $type = $documentAST->types[$typeName] ?? null;
+        if ($type === null) {
+            throw new DefinitionException(
+                "Type '$typeName' on '{$field->name->value}' can not be found in the schema.'"
+            );
+        }
+
+        return $type;
+    }
+
+    /**
+     * Take a guess at the name of the model associated with the given node.
+     */
+    public static function modelName(Node $definitionNode): ?string
+    {
+        if ($definitionNode instanceof FieldDefinitionNode) {
+            $definitionNode = static::underlyingType($definitionNode);
+        }
+
+        if ($definitionNode instanceof ObjectTypeDefinitionNode) {
+            return ModelDirective::modelClass($definitionNode)
+                ?? $definitionNode->name->value;
+        }
+
+        return null;
     }
 }

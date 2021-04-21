@@ -24,7 +24,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->cache = $app->make('cache');
     }
 
-    public function testCanStoreResolverResultInCache(): void
+    public function testStoreResolverResultInCache(): void
     {
         $this->mockResolver([
             'id' => 1,
@@ -59,7 +59,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    public function testCanPlaceCacheKeyOnAnyField(): void
+    public function testPlaceCacheKeyOnAnyField(): void
     {
         $this->mockResolver([
             'id' => 1,
@@ -96,7 +96,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:foo@bar.com:name'));
     }
 
-    public function testCanStoreResolverResultInPrivateCache(): void
+    public function testStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
@@ -135,7 +135,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get($cacheKey));
     }
 
-    public function testCanStoreResolverResultInCacheWhenUsingNodeDirective(): void
+    public function testStoreResolverResultInCacheWhenUsingNodeDirective(): void
     {
         $this->mockResolver([
             'id' => 1,
@@ -209,7 +209,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    public function testCanStorePaginateResolverInCache(): void
+    public function testStorePaginateResolverInCache(): void
     {
         factory(User::class, 5)->create();
 
@@ -241,7 +241,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertCount(5, $result);
     }
 
-    public function testCanCacheHasManyResolver(): void
+    public function testCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
 
@@ -302,7 +302,7 @@ class CacheDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanAttachTagsToCache(): void
+    public function testAttachTagsToCache(): void
     {
         config(['lighthouse.cache.tags' => true]);
 

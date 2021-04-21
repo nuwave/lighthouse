@@ -9,7 +9,8 @@ you can listen for the [`BuildSchemaString`](../api-reference/events.md#buildsch
 event and return additional schema definitions as a string:
 
 ```php
-app('events')->listen(
+$dispatcher = app(\Illuminate\Contracts\Events\Dispatcher::class);
+$dispatcher->listen(
     \Nuwave\Lighthouse\Events\BuildSchemaString::class,
     function(): string {
         // You can get your schema from anywhere you want, e.g. a database, hardcoded
@@ -29,7 +30,7 @@ return $stitcher->getSchemaString();
 
 While Lighthouse is an SDL-first GraphQL server, you can also use native PHP type definitions.
 
-Check out the [webonyx/graphql-php documentation](https://webonyx.github.io/graphql-php/type-system/)
+Check out the [webonyx/graphql-php documentation](https://webonyx.github.io/graphql-php/type-definitions)
 on how to define types.
 
 Note that you will not have access to a large portion of Lighthouse functionality
@@ -39,9 +40,9 @@ Because of this, we do not recommend you use native PHP types for complex object
 
 However, it can be advantageous to use native types for two use cases:
 
-- [Enum types](https://webonyx.github.io/graphql-php/type-system/enum-types/):
+- [Enum types](https://webonyx.github.io/graphql-php/type-definitions/enums):
   Allows you to reuse existing constants in your code
-- [Custom Scalar types](https://webonyx.github.io/graphql-php/type-system/scalar-types/#writing-custom-scalar-types).
+- [Custom Scalar types](https://webonyx.github.io/graphql-php/type-definitions/scalars/#writing-custom-scalar-types).
   They will have to be implemented in PHP anyway
 
 ## Using the TypeRegistry

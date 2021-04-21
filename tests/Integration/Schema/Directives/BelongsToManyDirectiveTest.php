@@ -42,7 +42,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->be($this->user);
     }
 
-    public function testCanQueryBelongsToManyRelationship(): void
+    public function testQueryBelongsToManyRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -70,7 +70,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJsonCount($this->rolesCount, 'data.user.roles');
     }
 
-    public function testCanNameRelationExplicitly(): void
+    public function testNameRelationExplicitly(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -98,7 +98,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJsonCount($this->rolesCount, 'data.user.foo');
     }
 
-    public function testCanQueryBelongsToManyPaginator(): void
+    public function testQueryBelongsToManyPaginator(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -145,7 +145,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.data');
     }
 
-    public function testCanQueryBelongsToManyRelayConnection(): void
+    public function testQueryBelongsToManyRelayConnection(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -190,7 +190,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    public function testCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
+    public function testQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -276,7 +276,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ');
     }
 
-    public function testCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
+    public function testQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -330,7 +330,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    public function testCanQueryBelongsToManyNestedRelationships(): void
+    public function testQueryBelongsToManyNestedRelationships(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {

@@ -9,7 +9,7 @@ Much of the credit should be given to the [Ruby implementation](https://github.c
 
 ## Setup
 
-Add the service provider to your `config/app.php`
+Add the service provider to your `config/app.php`:
 
 ```php
 'providers' => [
@@ -61,6 +61,13 @@ your clients no longer depend on the redundant `channels` key from version 1.
   }
 }
 ```
+
+### Empty Response Optimization
+
+Lighthouse returns the subscription channel as part of the response under `extensions`.
+If `subscriptions.exclude_empty` in `lighthouse.php` is set to `true`,
+API responses without a subscription channel will not contain `lighthouse_subscriptions` in `extensions`.
+This optimizes performance by sending less data, but clients must anticipate this appropriately.
 
 ## Expiring Subscriptions
 

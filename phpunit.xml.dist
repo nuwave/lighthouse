@@ -12,20 +12,24 @@
 >
     <testsuites>
         <testsuite name="Unit">
-            <directory>./tests/Unit/</directory>
+            <directory>tests/Unit</directory>
         </testsuite>
+
         <testsuite name="Integration">
-            <directory>./tests/Integration/</directory>
+            <directory>tests/Integration</directory>
         </testsuite>
+
         <testsuite name="Console">
-            <directory>./tests/Console/</directory>
+            <directory>tests/Console</directory>
         </testsuite>
     </testsuites>
+
     <filter>
         <whitelist>
-            <directory suffix=".php">src/</directory>
+            <directory suffix=".php">src</directory>
         </whitelist>
     </filter>
+
     <php>
         <env name="LIGHTHOUSE_TEST_DB_DATABASE" value="test"/>
         <env name="LIGHTHOUSE_TEST_DB_HOST" value="mysql"/>

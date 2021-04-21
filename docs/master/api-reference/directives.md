@@ -323,7 +323,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MyClass
 {
-    public function limit(Builder $builder, int $minimumHighscore): Builder
+    public function minimumHighscore(Builder $builder, int $minimumHighscore): Builder
     {
         return $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
             $builder->where('score', '>', $minimumHighscore);
@@ -704,7 +704,7 @@ directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
   suggestion for how to access supported similar data. Formatted
-  in [Markdown](https://daringfireball.net/projects/markdown/).
+  in [Markdown](https://daringfireball.net/projects/markdown).
   """
   reason: String = "No longer supported"
 ) on FIELD_DEFINITION
@@ -2074,7 +2074,13 @@ The schema definition is automatically transformed to this:
 
 ```graphql
 type Query {
-  posts(first: Int!, page: Int): PostPaginator
+  posts(
+    "Limits number of fetched elements."
+    first: Int!
+
+    "The offset from which elements are returned."
+    page: Int
+  ): PostPaginator
 }
 
 "A paginated list of Post items."
@@ -2087,7 +2093,7 @@ type PostPaginator {
 }
 ```
 
-And can be queried like this:
+It can be queried like this:
 
 ```graphql
 {
@@ -2122,7 +2128,13 @@ The final schema will be transformed to this:
 
 ```graphql
 type Query {
-  posts(first: Int!, page: Int): PostConnection
+  posts(
+    "Limits number of fetched elements."
+    first: Int!
+
+    "A cursor after which elements are returned."
+    after: String
+  ): PostConnection
 }
 
 "A paginated list of Post edges."
@@ -2411,7 +2423,7 @@ directive @scalar(
 If you follow the namespace convention, you do not need this directive.
 Lighthouse looks into your configured scalar namespace for a class with the same name.
 
-[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-system/scalar-types/)
+[Learn how to implement your own scalar.](https://webonyx.github.io/graphql-php/type-definitions/scalars)
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
@@ -2631,7 +2643,7 @@ Sets rate limit to access the field. Does the same as ThrottleRequests Laravel M
 """
 directive @throttle(
   """
-  Named preconfigured rate limiter. Requires Larave 8.x or later.
+  Named preconfigured rate limiter. Requires Laravel 8.x or later.
   """
   name: String
 
@@ -2857,6 +2869,8 @@ directive @upsert(
   model: String
 
   """
+  DEPRECATED use @globalId, will be removed in v6
+
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
   """
@@ -2871,7 +2885,7 @@ directive @upsert(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Lighthouse will try to to fetch the model by its primary key, just like [@update](#update).
+Lighthouse will try to fetch the model by its primary key, just like [@update](#update).
 If the model doesn't exist, it will be newly created with a given `id`.
 In case no `id` is specified, an auto-generated fresh ID will be used instead.
 

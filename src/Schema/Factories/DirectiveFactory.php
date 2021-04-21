@@ -26,7 +26,6 @@ class DirectiveFactory
     public function handle(DirectiveDefinitionNode $directive): Directive
     {
         $arguments = [];
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
             /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->typeNodeConverter->convert($argument->type);

@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 class CreateDirectiveTest extends DBTestCase
 {
-    public function testCanCreateFromFieldArguments(): void
+    public function testCreateFromFieldArguments(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Company {
@@ -40,7 +40,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateFromInputObject(): void
+    public function testCreateFromInputObject(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Company {
@@ -412,7 +412,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateTwice(): void
+    public function testCreateTwice(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Task {
@@ -487,7 +487,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateTwiceWithCreateDirective(): void
+    public function testCreateTwiceWithCreateDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Task {

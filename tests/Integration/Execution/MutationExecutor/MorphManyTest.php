@@ -82,7 +82,7 @@ class MorphManyTest extends DBTestCase
     }
     '.self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewMorphMany(): void
+    public function testCreateWithNewMorphMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -116,7 +116,7 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateWithUpsertMorphMany(): void
+    public function testCreateWithUpsertMorphMany(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -151,7 +151,7 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateWithConnectMorphMany(): void
+    public function testCreateWithConnectMorphMany(): void
     {
         $image1 = factory(Image::class)->create();
 
@@ -271,7 +271,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateWithNewMorphMany(string $action): void
+    public function testUpdateWithNewMorphMany(string $action): void
     {
         factory(Task::class)->create();
 
@@ -311,7 +311,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndUpdateMorphMany(string $action): void
+    public function testUpdateAndUpdateMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -357,7 +357,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndUpsertMorphMany(string $action): void
+    public function testUpdateAndUpsertMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -403,7 +403,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndDeleteMorphMany(string $action): void
+    public function testUpdateAndDeleteMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -442,7 +442,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndConnectMorphMany(string $action): void
+    public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
         $image = factory(Image::class)->create();
@@ -487,7 +487,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndDisconnectMorphMany(string $action): void
+    public function testUpdateAndDisconnectMorphMany(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();

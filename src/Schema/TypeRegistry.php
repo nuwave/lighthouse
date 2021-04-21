@@ -165,7 +165,6 @@ EOL
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
         // ever used through its association to an interface
-        /** @var \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition */
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
@@ -271,6 +270,7 @@ EOL
             'name' => $enumDefinition->name->value,
             'description' => data_get($enumDefinition->description, 'value'),
             'values' => $values,
+            'astNode' => $enumDefinition,
         ]);
     }
 
@@ -297,13 +297,14 @@ EOL
 
         if (! $className) {
             throw new DefinitionException(
-                "No matching subclass of GraphQL\Type\Definition\ScalarType of found for the scalar {$scalarName}"
+                "No matching subclass of GraphQL\Type\Definition\ScalarType found for the scalar {$scalarName}"
             );
         }
 
         return new $className([
             'name' => $scalarName,
             'description' => data_get($scalarDefinition->description, 'value'),
+            'astNode' => $scalarDefinition,
         ]);
     }
 
@@ -315,7 +316,7 @@ EOL
             'fields' => $this->makeFieldsLoader($objectDefinition),
             'interfaces' =>
                 /**
-                 * @return array<\GraphQL\Type\Definition\Type>
+                 * @return list<\GraphQL\Type\Definition\Type>
                  */
                 function () use ($objectDefinition): array {
                     $interfaces = [];
@@ -327,6 +328,7 @@ EOL
 
                     return $interfaces;
                 },
+            'astNode' => $objectDefinition,
         ]);
     }
 
@@ -334,12 +336,14 @@ EOL
      * Returns a closure that lazy loads the fields for a constructed type.
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
+     *
+     * @return \Closure(): array<string, array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): Closure
     {
         return
             /**
-             * @return array<string, array>
+             * @return array<string, array<string, mixed>>
              */
             function () use ($typeDefinition): array {
                 $typeValue = new TypeValue($typeDefinition);
@@ -362,7 +366,6 @@ EOL
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
-            'astNode' => $inputDefinition,
             'fields' =>
                 /**
                  * @return array<string, array<string, mixed>>
@@ -370,6 +373,7 @@ EOL
                 function () use ($inputDefinition): array {
                     return $this->argumentFactory->toTypeMap($inputDefinition->fields);
                 },
+            'astNode' => $inputDefinition,
         ]);
     }
 
@@ -395,6 +399,7 @@ EOL
             'description' => data_get($interfaceDefinition->description, 'value'),
             'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
+            'astNode' => $interfaceDefinition,
         ]);
     }
 
@@ -427,11 +432,19 @@ EOL
      * We just assume that the rootValue that shall be returned from the
      * field is a class that is named just like the concrete Object Type
      * that is supposed to be returned.
+     *
+     * @return Closure(mixed): Type
      */
     protected function typeResolverFallback(): Closure
     {
-        return function ($rootValue): Type {
-            return $this->get(class_basename($rootValue));
+        return function ($root): Type {
+            if (is_array($root) && isset($root['__typename'])) {
+                $name = $root['__typename'];
+            } else {
+                $name = class_basename($root);
+            }
+
+            return $this->get($name);
         };
     }
 
@@ -457,7 +470,7 @@ EOL
             'description' => data_get($unionDefinition->description, 'value'),
             'types' =>
                 /**
-                 * @return array<\GraphQL\Type\Definition\Type>
+                 * @return list<\GraphQL\Type\Definition\Type>
                  */
                 function () use ($unionDefinition): array {
                     $types = [];
@@ -469,6 +482,7 @@ EOL
                     return $types;
                 },
             'resolveType' => $typeResolver,
+            'astNode' => $unionDefinition,
         ]);
     }
 }

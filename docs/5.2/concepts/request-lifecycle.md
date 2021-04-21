@@ -15,7 +15,7 @@ We are still dealing with HTTP requests, so Laravel middleware applies as usual.
 ## Request Parsing
 
 The incoming request is parsed into the elements that make a GraphQL request.
-Lighthouse aims to handle requests following [the informal specification at graphql.org](https://graphql.org/learn/serving-over-http/).
+Lighthouse aims to handle requests following [the informal specification at graphql.org](https://graphql.org/learn/serving-over-http).
 
 ## Schema Construction
 
@@ -40,7 +40,7 @@ fine-grained validation, and more. Finally, the field resolver is called to prod
 If the field contains a subselection, the same process happens for the nested fields, until
 we either abort with an error or traversed the entire query tree.
 
-[Learn more about GraphQL execution](https://graphql.org/learn/execution/).
+[Learn more about GraphQL execution](https://graphql.org/learn/execution).
 
 ## Error Handling
 

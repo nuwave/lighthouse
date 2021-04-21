@@ -6,7 +6,7 @@ sidebar: auto
 
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
-with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
+with [GraphQL](https://graphql.org) and [Laravel](https://laravel.com) first.
 
 The source code of the finished project is available at [nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial).
 
@@ -23,12 +23,12 @@ makes it easier to evolve APIs over time, and enables powerful developer tools.
   <small>GraphQL Playground</small>
 </div>
 
-GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql/).
+GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql).
 This means that GraphQL is in fact not more than a long document that describes in detail
 the behaviour of a GraphQL server.
 
 GraphQL has its own type system that’s used to define the schema of an API.
-The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51/) or short **SDL**.
+The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) or short **SDL**.
 
 Here is an example how we can use the SDL to define a type called `User` and its
 relation to another type `Post`.
@@ -104,25 +104,24 @@ Run database migrations to create the `users` table:
 Seed the database with some fake users:
 
     php artisan tinker
-    factory('App\User', 10)->create();
+    \App\Models\User::factory(10)->create()
 
 ### Installing Lighthouse
 
-Of course, we will use Lighthouse as the GraphQL Server.
+Of course, we will use Lighthouse as the GraphQL Server:
 
     composer require nuwave/lighthouse
 
-In this tutorial we will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
-as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
-
-    composer require mll-lab/laravel-graphql-playground
-
-Then publish default schema to `graphql/schema.graphql`.
+Publish the default schema to `graphql/schema.graphql`:
 
     php artisan vendor:publish --tag=lighthouse-schema
 
-To make sure everything is working, access Laravel GraphQL Playground on `/graphql-playground`
-and try the following query:
+We will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+to interactively run GraphQL queries:
+
+    composer require mll-lab/laravel-graphql-playground
+
+To make sure everything is working, access `/graphql-playground` and try this query:
 
 ```graphql
 {
@@ -133,8 +132,6 @@ and try the following query:
   }
 }
 ```
-
-Now, let's move on and create a GraphQL API for our blog.
 
 ## The Models
 

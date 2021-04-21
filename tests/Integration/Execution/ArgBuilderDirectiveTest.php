@@ -15,7 +15,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
     }
     ';
 
-    public function testCanAttachNeqFilterToQuery(): void
+    public function testAttachNeqFilterToQuery(): void
     {
         $users = factory(User::class, 3)->create();
 
@@ -42,7 +42,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ->assertJsonCount(2, 'data.users');
     }
 
-    public function testCanAttachInFilterToQuery(): void
+    public function testAttachInFilterToQuery(): void
     {
         $user1 = factory(User::class)->create();
         factory(User::class, 3)->create();
@@ -74,7 +74,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ->assertJsonCount(2, 'data.users');
     }
 
-    public function testCanAttachNotInFilterToQuery(): void
+    public function testAttachNotInFilterToQuery(): void
     {
         $user1 = factory(User::class)->create();
         factory(User::class, 3)->create();
@@ -106,7 +106,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ->assertJsonCount(3, 'data.users');
     }
 
-    public function testCanAttachWhereFilterToQuery(): void
+    public function testAttachWhereFilterToQuery(): void
     {
         $users = factory(User::class, 3)->create();
 
@@ -133,7 +133,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             ->assertJsonCount(2, 'data.users');
     }
 
-    public function testCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
+    public function testAttachTwoWhereFilterWithTheSameKeyToQuery(): void
     {
         factory(User::class, 5)->create();
 
@@ -162,7 +162,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.users');
     }
 
-    public function testCanAttachWhereBetweenFilterToQuery(): void
+    public function testAttachWhereBetweenFilterToQuery(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -195,7 +195,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    public function testCanUseInputObjectsForWhereBetweenFilter(): void
+    public function testUseInputObjectsForWhereBetweenFilter(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -232,7 +232,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    public function testCanAttachWhereNotBetweenFilterToQuery(): void
+    public function testAttachWhereNotBetweenFilterToQuery(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -261,7 +261,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    public function testCanAttachWhereClauseFilterToQuery(): void
+    public function testAttachWhereClauseFilterToQuery(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {

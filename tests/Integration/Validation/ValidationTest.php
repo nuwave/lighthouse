@@ -3,6 +3,7 @@
 namespace Tests\Integration\Validation;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
 /**
@@ -309,13 +310,17 @@ class ValidationTest extends TestCase
             ')
             ->assertGraphQLValidationError('bar', 'The bar must be at least 2 characters.');
 
+        $message = AppVersion::atLeast(8.32)
+            ? 'The bar must not be greater than 3 characters.'
+            : 'The bar may not be greater than 3 characters.';
+
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
                 foo(bar: "fasdf")
             }
             ')
-            ->assertGraphQLValidationError('bar', 'The bar may not be greater than 3 characters.');
+            ->assertGraphQLValidationError('bar', $message);
     }
 
     public function testArgumentReferencesAreQualified(): void

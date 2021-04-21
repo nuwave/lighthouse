@@ -62,7 +62,7 @@ class ASTHelperTest extends TestCase
         $this->assertCount(1, $firstNameField->directives);
     }
 
-    public function testCanExtractStringArguments(): void
+    public function testExtractStringArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: "baz")');
         $this->assertSame(
@@ -71,7 +71,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    public function testCanExtractBooleanArguments(): void
+    public function testExtractBooleanArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: true)');
         $this->assertTrue(
@@ -79,7 +79,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    public function testCanExtractArrayArguments(): void
+    public function testExtractArrayArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: ["one", "two"])');
         $this->assertSame(
@@ -88,7 +88,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    public function testCanExtractObjectArguments(): void
+    public function testExtractObjectArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: { baz: "foobar" })');
         $this->assertSame(

@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class CacheCommandTest extends TestCase
 {
-    public function testItCachesGraphQLAST(): void
+    public function testCachesGraphQLAST(): void
     {
         $config = app(ConfigRepository::class);
         $config->set('lighthouse.cache.ttl', 60);

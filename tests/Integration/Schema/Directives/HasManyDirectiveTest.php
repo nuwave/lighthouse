@@ -44,7 +44,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->be($this->user);
     }
 
-    public function testCanQueryHasManyRelationship(): void
+    public function testQueryHasManyRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -79,7 +79,7 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.tasks');
     }
 
-    public function testCanQueryHasManyWithCondition(): void
+    public function testQueryHasManyWithCondition(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -147,7 +147,7 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.user.tasks');
     }
 
-    public function testCanQueryHasManyPaginator(): void
+    public function testQueryHasManyPaginator(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -477,7 +477,7 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanQueryHasManyPaginatorWithADefaultCount(): void
+    public function testQueryHasManyPaginatorWithADefaultCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -523,7 +523,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
-    public function testCanQueryHasManyRelayConnection(): void
+    public function testQueryHasManyRelayConnection(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -567,7 +567,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
-    public function testCanQueryHasManyRelayConnectionWithADefaultCount(): void
+    public function testQueryHasManyRelayConnectionWithADefaultCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -611,7 +611,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
-    public function testCanQueryHasManyNestedRelationships(): void
+    public function testQueryHasManyNestedRelationships(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -666,7 +666,7 @@ class HasManyDirectiveTest extends DBTestCase
         ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
     }
 
-    public function testCanQueryHasManySelfReferencingRelationships(): void
+    public function testQueryHasManySelfReferencingRelationships(): void
     {
         $post1 = factory(Post::class)->create([
             'id' => 1,
@@ -754,7 +754,7 @@ class HasManyDirectiveTest extends DBTestCase
         $type->config['fields']();
     }
 
-    public function testCanQueryHasManyPaginatorBeforeQuery(): void
+    public function testQueryHasManyPaginatorBeforeQuery(): void
     {
         // BeforeQuery
         $this->schema = /** @lang GraphQL */ '
@@ -784,7 +784,7 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.tasks.data');
     }
 
-    public function testCanQueryHasManyPaginatorAfterQuery(): void
+    public function testQueryHasManyPaginatorAfterQuery(): void
     {
         // AfterQuery
         $this->schema = /** @lang GraphQL */ '
@@ -814,7 +814,7 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.tasks.data');
     }
 
-    public function testCanQueryHasManyNoTypePaginator(): void
+    public function testQueryHasManyNoTypePaginator(): void
     {
         // AfterQuery
         $this->schema = /** @lang GraphQL */ '

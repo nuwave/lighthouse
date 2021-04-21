@@ -59,7 +59,7 @@ class MorphToManyTest extends DBTestCase
     }
     '.self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateATaskWithExistingTagsByUsingConnect(): void
+    public function testCreateATaskWithExistingTagsByUsingConnect(): void
     {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
@@ -118,7 +118,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertATaskWithExistingTagsByUsingConnect(): void
+    public function testUpsertATaskWithExistingTagsByUsingConnect(): void
     {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
@@ -149,7 +149,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateATaskWithExistingTagsByUsingSync(): void
+    public function testCreateATaskWithExistingTagsByUsingSync(): void
     {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
@@ -179,7 +179,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertATaskWithExistingTagsByUsingSync(): void
+    public function testUpsertATaskWithExistingTagsByUsingSync(): void
     {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
@@ -210,7 +210,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateANewTagRelationByUsingCreate(): void
+    public function testCreateANewTagRelationByUsingCreate(): void
     {
         $this->graphQL('
         mutation {
@@ -244,7 +244,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertANewTagRelationByUsingCreate(): void
+    public function testUpsertANewTagRelationByUsingCreate(): void
     {
         $this->graphQL('
         mutation {
@@ -279,7 +279,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertANewTagRelationByUsingUpsert(): void
+    public function testUpsertANewTagRelationByUsingUpsert(): void
     {
         $this->graphQL('
         mutation {

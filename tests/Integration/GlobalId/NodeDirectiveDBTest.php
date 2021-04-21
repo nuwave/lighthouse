@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema;
+namespace Tests\Integration\GlobalId;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
@@ -35,10 +35,10 @@ class NodeDirectiveDBTest extends DBTestCase
         ],
     ];
 
-    public function testCanResolveNodes(): void
+    public function testResolveNodes(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\GlobalId\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
@@ -75,13 +75,13 @@ class NodeDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveNodesViaInterface(): void
+    public function testResolveNodesViaInterface(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         interface IUser {
             name: String!
         }
-        type User implements IUser @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
+        type User implements IUser @node(resolver: "Tests\\\Integration\\\GlobalId\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
@@ -110,7 +110,7 @@ class NodeDirectiveDBTest extends DBTestCase
     public function testUnknownNodeType(): void
     {
         $this->schema .= /** @lang GraphQL */ '
-        type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeDirectiveDBTest@resolveNode") {
+        type User @node(resolver: "Tests\\\Integration\\\GlobalId\\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
         ';
@@ -176,7 +176,7 @@ class NodeDirectiveDBTest extends DBTestCase
     /**
      * @dataProvider modelNodeDirectiveStyles
      */
-    public function testCanResolveModelsNodes(string $directiveDefinition): void
+    public function testResolveModelsNodes(string $directiveDefinition): void
     {
         $this->schema .= /** @lang GraphQL */"
         type User {$directiveDefinition} {

@@ -1,7 +1,7 @@
 # Lighthouse Website
 
 The Lighthouse docs website uses [Vue Press](https://vuepress.vuejs.org),
-a minimalistic [Vue](https://vuejs.org/) powered static site generator.
+a minimalistic [Vue](https://vuejs.org) powered static site generator.
 
 ## Directory structure
 

@@ -43,11 +43,11 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>|null  $whereConditions The client given conditions
+     * @param  array<string, mixed>|null  $value The client given conditions
      */
-    public function handleBuilder($builder, $whereConditions): object
+    public function handleBuilder($builder, $value): object
     {
-        if (null === $whereConditions) {
+        if (null === $value) {
             return $builder;
         }
 
@@ -63,7 +63,7 @@ GRAPHQL;
                     'relation' => $this->getRelationName(),
                     'amount' => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
                     'operator' => '>=',
-                    'condition' => $whereConditions,
+                    'condition' => $value,
                 ],
             ],
             $model

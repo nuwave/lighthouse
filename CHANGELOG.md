@@ -13,16 +13,28 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add `GraphQLContext` to `StartExecution` event
 - Add `connect` and `disconnect` operations in nested mutations for HasMany and MorphMany relations https://github.com/nuwave/lighthouse/pull/1730
+- Add `ValidateSchema` event https://github.com/nuwave/lighthouse/pull/1764
+- Add config option `subscriptions.exclude_empty` https://github.com/nuwave/lighthouse/pull/1799
 
 ### Changed
 
 - Optimize `@defer` by avoiding parsing the request multiple times
 - Move HTTP and Schema handling out of the GraphQL class https://github.com/nuwave/lighthouse/pull/1748
+- Move subscription related classes into Subscription namespace https://github.com/nuwave/lighthouse/pull/1803
+- Consolidate GlobalId namespace https://github.com/nuwave/lighthouse/pull/1804
 
 ### Fixed
 
 - Apply error handling and debug settings consistently https://github.com/nuwave/lighthouse/pull/1749
+- Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
+- Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
+- Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
+- Fix subscription storage in redis for predis users https://github.com/nuwave/lighthouse/pull/1814
 - Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
+
+### Deprecated
+
+- Deprecate the `globalId` argument on the `@upsert` directive https://github.com/nuwave/lighthouse/pull/1804
 
 ## 5.3.0
 

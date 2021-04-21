@@ -29,15 +29,15 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>|null  $whereConditions
+     * @param  array<string, mixed>|null  $value
      */
-    public function handleBuilder($builder, $whereConditions): object
+    public function handleBuilder($builder, $value): object
     {
-        if (null === $whereConditions) {
+        if (null === $value) {
             return $builder;
         }
 
-        return $this->handleWhereConditions($builder, $whereConditions);
+        return $this->handleWhereConditions($builder, $value);
     }
 
     protected function generatedInputSuffix(): string
