@@ -11,18 +11,11 @@ namespace configured in `lighthouse.federation.entities_resolver_namespace`.
 
 ```graphql
 {
-    _entities(
-        representations: [
-            {
-                __typename: "Foo"
-                id: 1
-            }
-        ]
-    ) {
-        ... on Foo {
-            id
-        }
+  _entities(representations: [{ __typename: "Foo", id: 1 }]) {
+    ... on Foo {
+      id
     }
+  }
 }
 ```
 
@@ -52,19 +45,11 @@ matches the type `__typename`, using the namespaces configured in `lighthouse.na
 
 ```graphql
 {
-    _entities(
-        representations: [
-            {
-                __typename: "Foo"
-                bar: "asdf"
-                baz: 42
-            }
-        ]
-    ) {
-        ... on Foo {
-            id
-        }
+  _entities(representations: [{ __typename: "Foo", bar: "asdf", baz: 42 }]) {
+    ... on Foo {
+      id
     }
+  }
 }
 ```
 
