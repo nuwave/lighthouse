@@ -56,19 +56,11 @@ class EntityResolverProvider
         $this->configRepository = $configRepository;
     }
 
-    /**
-     * @param string $typename
-     * @return string
-     */
     public static function missingResolver(string $typename): string
     {
         return "Could not locate a resolver for __typename `{$typename}`.";
     }
 
-    /**
-     * @param string $typename
-     * @return string
-     */
     public static function unknownTypename(string $typename): string
     {
         return "Unknown __typename `{$typename}`.";
