@@ -48,6 +48,7 @@ module.exports = [
         title: 'Federation',
         children: [
             ['federation/getting-started', 'Getting Started'],
+            'federation/entities'
         ]
     },
     {
