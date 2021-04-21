@@ -249,6 +249,8 @@ class RulesGatherer
                     'Lte',
                     'RequiredIf',
                     'RequiredUnless',
+                    'ProhibitedIf',
+                    'ProhibitedUnless',
                     'Same',
                 ])) {
                     $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
