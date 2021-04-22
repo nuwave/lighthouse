@@ -26,7 +26,7 @@ directive @skip(
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 ```
 
-In this example experimentalField will only be queried if the variable \$someTest has the value `false`.
+In this example, `experimentalField` will only be queried if the variable `$someTest` has the value `false`.
 
 ```graphql
 query myQuery($someTest: Boolean) {
@@ -52,7 +52,7 @@ directive @include(
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 ```
 
-In this example experimentalField will only be queried if the variable \$someTest has the value true
+In this example, `experimentalField` will only be queried if the variable `$someTest` has the value `true`.
 
 ```graphql
 query myQuery($someTest: Boolean) {

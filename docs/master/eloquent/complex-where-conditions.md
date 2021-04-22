@@ -1,5 +1,7 @@
 # Complex Where Conditions
 
+**Experimental: not enabled by default, not guaranteed to be stable.**
+
 Adding query conditions ad-hoc can be cumbersome and limiting when you require
 manifold ways to filter query results.
 Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients
@@ -7,9 +9,7 @@ and allow them to apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
-**This is an experimental feature and not included in Lighthouse by default.**
-
-Add the service provider to your `config/app.php`
+Add the service provider to your `config/app.php`:
 
 ```php
 'providers' => [

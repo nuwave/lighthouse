@@ -168,7 +168,7 @@ class RedisStorageManagerTest extends TestCase
      * @param \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Redis\Connections\Connection $redisConnection
      * @return \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Redis\Factory
      */
-    private function getRedisFactory(MockObject $redisConnection): MockObject
+    protected function getRedisFactory(MockObject $redisConnection): MockObject
     {
         $redisFactory = $this->createMock(RedisFactory::class);
         $redisFactory->expects($this->once())
