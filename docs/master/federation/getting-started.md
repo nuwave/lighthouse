@@ -1,5 +1,7 @@
 # Federation: Getting Started
 
+**Experimental: not enabled by default, not guaranteed to be stable.**
+
 Federation enables you to combine GraphQL services into a single unified data graph.
 Read more about the core concepts and motivation in the [Apollo Federation docs](https://www.apollographql.com/docs/federation).
 

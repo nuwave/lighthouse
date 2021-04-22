@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.6.0
+
+### Added
+
+- Support for Apollo Federation https://github.com/nuwave/lighthouse/pull/1728
+
 ## 5.5.1
 
 ### Fixed
