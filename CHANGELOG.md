@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Allow `@limit` on `FIELD_DEFINITION` to fix validation errors
+- Allow `@limit` on `FIELD_DEFINITION` to fix validation errors https://github.com/nuwave/lighthouse/pull/1821
 
 ### Added
 
