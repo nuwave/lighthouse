@@ -152,6 +152,10 @@ GRAPHQL;
 
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
+
+        $config->set('lighthouse.federation', [
+            'entities_resolver_namespace' => 'Tests\\Utils\\Entities',
+        ]);
     }
 
     /**

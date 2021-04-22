@@ -1384,7 +1384,7 @@ type Post {
 """
 Allow clients to specify the maximum number of results to return.
 """
-directive @limit on ARGUMENT_DEFINITION
+directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
 ```
 
 Place this on any argument to a field that returns a list of results.

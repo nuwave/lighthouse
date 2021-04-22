@@ -1,5 +1,7 @@
 # Deferred Fields
 
+**Experimental: not enabled by default, not guaranteed to be stable.**
+
 ::: warning
 Currently the `@defer` directive requires Apollo Client in alpha.
 Track the state of the PR here: https://github.com/apollographql/apollo-client/pull/3686#issuecomment-555534519

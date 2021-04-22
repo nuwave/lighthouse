@@ -9,6 +9,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.6.0
+
+### Added
+
+- Support for Apollo Federation https://github.com/nuwave/lighthouse/pull/1728
+
+## 5.5.1
+
+### Fixed
+
+- Add placeholder type `_` to `schema-directives.graphql` https://github.com/nuwave/lighthouse/pull/1823
+
+## 5.5.0
+
+### Fixed
+
+- Allow `@limit` on `FIELD_DEFINITION` to fix validation errors https://github.com/nuwave/lighthouse/pull/1821
+
 ### Added
 
 - Add method `assertGraphQLErrorMessage()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/1819
