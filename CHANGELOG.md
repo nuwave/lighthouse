@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix overly eager validation of repeatable directive usage by requiring `webonyx/graphql-php:^14.6.1` https://github.com/nuwave/lighthouse/pull/1824
+- Fix overly eager validation of repeatable directive usage by requiring `webonyx/graphql-php:^14.6.2` https://github.com/nuwave/lighthouse/pull/1824
 
 ## 5.6.0
 
