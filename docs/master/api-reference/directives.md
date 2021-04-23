@@ -14,6 +14,12 @@ directive @all(
   model: String
 
   """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
