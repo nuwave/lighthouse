@@ -108,7 +108,7 @@ class AuthorizeRequestsTest extends TestCase
     /**
      * @return \Illuminate\Testing\TestResponse
      */
-    private function querySubscription()
+    protected function querySubscription()
     {
         return $this->graphQL(/** @lang GraphQL */ '
         subscription {

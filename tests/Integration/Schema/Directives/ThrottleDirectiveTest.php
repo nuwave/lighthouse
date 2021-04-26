@@ -97,13 +97,7 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => RateLimitException::MESSAGE,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
     }
 
     public function testInlineLimiter(): void
@@ -128,12 +122,6 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => RateLimitException::MESSAGE,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
     }
 }

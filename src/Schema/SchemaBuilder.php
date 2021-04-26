@@ -45,9 +45,9 @@ class SchemaBuilder
     }
 
     /**
-     * Build an executable schema from AST.
+     * Build an executable schema from an AST.
      */
-    public function build(DocumentAST $documentAST): Schema
+    protected function build(DocumentAST $documentAST): Schema
     {
         $config = SchemaConfig::create();
 

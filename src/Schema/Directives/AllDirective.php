@@ -24,6 +24,12 @@ directive @all(
   model: String
 
   """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
@@ -35,10 +41,18 @@ GRAPHQL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
+                if ($this->directiveHasArgument('builder')) {
+                    $builderResolver = $this->getResolverFromArgument('builder');
+
+                    $query = $builderResolver($root, $args, $context, $resolveInfo);
+                } else {
+                    $query = $this->getModelClass()::query();
+                }
+
                 return $resolveInfo
                     ->argumentSet
                     ->enhanceBuilder(
-                        $this->getModelClass()::query(),
+                        $query,
                         $this->directiveArgValue('scopes', [])
                     )
                     ->get();

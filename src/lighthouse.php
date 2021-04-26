@@ -362,6 +362,13 @@ return [
          * Allowed values: 1, 2
          */
         'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
+
+        /*
+         * Should the subscriptions extension be excluded when the response has no subscription channel?
+         * This optimizes performance by sending less data, but clients must anticipate this appropriately.
+         * Will default to true in v6 and be removed in v7.
+         */
+        'exclude_empty' => env('LIGHTHOUSE_SUBSCRIPTION_EXCLUDE_EMPTY', false),
     ],
 
     /*
@@ -387,6 +394,22 @@ return [
          * 0 means unlimited.
          */
         'max_execution_ms' => 0,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Apollo Federation
+    |--------------------------------------------------------------------------
+    |
+    | Lighthouse can act as a federated service: https://www.apollographql.com/docs/federation/federation-spec.
+    |
+    */
+
+    'federation' => [
+        /*
+         * Location of resolver classes when resolving the `_entities` field.
+         */
+        'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
     ],
 
 ];

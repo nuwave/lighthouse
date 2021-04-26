@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -34,6 +35,11 @@ class SubscriptionRegistry
     protected $schemaBuilder;
 
     /**
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $configRepository;
+
+    /**
      * A map from operation names to channel names.
      *
      * @var array<string, string>
@@ -47,11 +53,12 @@ class SubscriptionRegistry
      */
     protected $subscriptions = [];
 
-    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, SchemaBuilder $schemaBuilder)
+    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, SchemaBuilder $schemaBuilder, ConfigRepository $configRepository)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
         $this->schemaBuilder = $schemaBuilder;
+        $this->configRepository = $configRepository;
     }
 
     /**
@@ -151,11 +158,17 @@ class SubscriptionRegistry
 
     public function handleBuildExtensionsResponse(): ?ExtensionsResponse
     {
+        $subscriptionsConfig = $this->configRepository->get('lighthouse.subscriptions');
+
         $channel = count($this->subscribers) > 0
             ? reset($this->subscribers)
             : null;
 
-        $version = config('lighthouse.subscriptions.version', 1);
+        if ($channel === null && ($subscriptionsConfig['exclude_empty'] ?? false)) {
+            return null;
+        }
+
+        $version = $subscriptionsConfig['version'] ?? 1;
         switch ((int) $version) {
             case 1:
                 $content = [

@@ -26,7 +26,7 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgManipulat
 """
 Allow clients to specify the maximum number of results to return.
 """
-directive @limit on ARGUMENT_DEFINITION
+directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
 GRAPHQL;
     }
 
