@@ -390,7 +390,8 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testWhereConditionsHasNestedTables(): void {
+    public function testWhereConditionsHasNestedTables(): void
+    {
         $category1 = factory(Category::class)->create();
 
         $category2 = factory(Category::class)->create();
@@ -435,11 +436,11 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         ', [
             'hasCategories' => [
                 'HAS' => [
-                   'relation' => 'parent.parent.parent',
-                   'condition' => [
-                       'column' => 'category_id',
-                       'value' => $category1->category_id,
-                   ],
+                    'relation' => 'parent.parent.parent',
+                    'condition' => [
+                        'column' => 'category_id',
+                        'value' => $category1->category_id,
+                    ],
                 ],
             ],
         ])->assertExactJson([
