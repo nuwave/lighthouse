@@ -67,13 +67,10 @@ class TestResponseMixin
     public function assertGraphQLErrorMessage(): Closure
     {
         return function (string $message) {
-            $this->assertJson([
-                'errors' => [
-                    [
-                        'message' => $message,
-                    ],
-                ],
-            ]);
+            Assert::assertContains(
+                $message,
+                $this->json('errors.*.message')
+            );
 
             return $this;
         };
