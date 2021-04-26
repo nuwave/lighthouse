@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `builder` option to `@all` directive https://github.com/nuwave/lighthouse/pull/1826
+
 ## 5.6.2
 
 ### Changed
