@@ -13,7 +13,7 @@
     "scripts": {
         "start": "vuepress dev .",
         "build": "vuepress build .",
-        "prettify": "prettier --write --tab-width=2 **/**/*.md **/*.js",
-        "bump": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'"
+        "prettify": "prettier --write --tab-width=2 **/**/*.md **/*.js .vuepress/*.js",
+        "release": "rm -rf 5 && cp -r master 5"
     }
 }

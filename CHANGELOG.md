@@ -9,7 +9,15 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Add `builder` option to `@all` directive
+### Added
+
+- Add `builder` option to `@all` directive https://github.com/nuwave/lighthouse/pull/1826
+
+## 5.6.2
+
+### Changed
+
+- Update behavior of `TestReponse::assertGraphQLErrorMessage` to work when multiple errors are present https://github.com/nuwave/lighthouse/pull/1827
 
 ## 5.6.1
 

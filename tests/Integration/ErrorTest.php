@@ -120,4 +120,27 @@ class ErrorTest extends TestCase
         }
         ');
     }
+
+    public function testReturnsMultipleErrors(): void
+    {
+        $this->schema = /** @lang GraphQL */'
+        input TestInput {
+            string: String!
+            integer: Int!
+        }
+
+        type Query {
+            foo(input: TestInput): ID
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(input: {})
+            }
+            ')
+            ->assertGraphQLErrorMessage('Field TestInput.string of required type String! was not provided.')
+            ->assertGraphQLErrorMessage('Field TestInput.integer of required type Int! was not provided.');
+    }
 }
