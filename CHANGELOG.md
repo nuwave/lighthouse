@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Fix problem with table name on HAS condition with relationship on same table https://github.com/nuwave/lighthouse/pull/1795
 
+## 5.7.1
+
+### Fixed
+
+- Fix usage of closures in validation https://github.com/nuwave/lighthouse/pull/1831
+
 ## 5.7.0
 
 ### Added
