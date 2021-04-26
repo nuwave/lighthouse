@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.7.1
+
+### Fixed
+
 - Fix usage of closures in validation
 
 ## 5.7.0

@@ -5,6 +5,7 @@ namespace Tests\Integration\Validation;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
+use Tests\Utils\Validators\FooClosureValidator;
 
 /**
  * Covers fundamentals of the validation process.
@@ -432,6 +433,6 @@ class ValidationTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.foo', 'The input.foo field must have a value of "foo".');
+            ->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
     }
 }
