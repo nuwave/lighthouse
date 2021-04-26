@@ -114,13 +114,7 @@ class UpdateDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE);
     }
 
     public function testUpdateWithCustomPrimaryKey(): void

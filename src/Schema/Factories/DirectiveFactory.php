@@ -56,6 +56,7 @@ class DirectiveFactory
             'description' => data_get($directive->description, 'value'),
             'locations' => $locations,
             'args' => $arguments,
+            'isRepeatable' => $directive->repeatable,
             'astNode' => $directive,
         ]);
     }

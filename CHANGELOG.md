@@ -9,16 +9,66 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Fix problem with table name on HAS condition with relationship on same table https://github.com/nuwave/lighthouse/pull/1795
+
+## 5.7.0
+
+### Added
+
+- Add `builder` option to `@all` directive https://github.com/nuwave/lighthouse/pull/1826
+
+## 5.6.2
+
+### Changed
+
+- Update behavior of `TestReponse::assertGraphQLErrorMessage` to work when multiple errors are present https://github.com/nuwave/lighthouse/pull/1827
+
+## 5.6.1
+
+### Fixed
+
+- Fix overly eager validation of repeatable directive usage by requiring `webonyx/graphql-php:^14.6.2` https://github.com/nuwave/lighthouse/pull/1824
+- Fix conversion of `repeatable` directive nodes into executable definitions https://github.com/nuwave/lighthouse/pull/1824
+
+## 5.6.0
+
+### Added
+
+- Support for Apollo Federation https://github.com/nuwave/lighthouse/pull/1728
+
+## 5.5.1
+
+### Fixed
+
+- Add placeholder type `_` to `schema-directives.graphql` https://github.com/nuwave/lighthouse/pull/1823
+
+## 5.5.0
+
+### Fixed
+
+- Allow `@limit` on `FIELD_DEFINITION` to fix validation errors https://github.com/nuwave/lighthouse/pull/1821
+
+### Added
+
+- Add method `assertGraphQLErrorMessage()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/1819
+
+## 5.4.0
+
 ### Added
 
 - Add `GraphQLContext` to `StartExecution` event
 - Add `connect` and `disconnect` operations in nested mutations for HasMany and MorphMany relations https://github.com/nuwave/lighthouse/pull/1730
 - Add `ValidateSchema` event https://github.com/nuwave/lighthouse/pull/1764
+- Add config option `subscriptions.exclude_empty` https://github.com/nuwave/lighthouse/pull/1799
 
 ### Changed
 
 - Optimize `@defer` by avoiding parsing the request multiple times
 - Move HTTP and Schema handling out of the GraphQL class https://github.com/nuwave/lighthouse/pull/1748
+- Move subscription related classes into Subscription namespace https://github.com/nuwave/lighthouse/pull/1803
+- Consolidate GlobalId namespace https://github.com/nuwave/lighthouse/pull/1804
 
 ### Fixed
 
@@ -26,7 +76,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
 - Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
-- Fix problem with table name on HAS condition with relationship on same table https://github.com/nuwave/lighthouse/pull/1795
+- Fix subscription storage in redis for predis users https://github.com/nuwave/lighthouse/pull/1814
+- Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
+
+### Deprecated
+
+- Deprecate the `globalId` argument on the `@upsert` directive https://github.com/nuwave/lighthouse/pull/1804
 
 ## 5.3.0
 

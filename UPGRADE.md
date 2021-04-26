@@ -32,7 +32,7 @@ within the directive definition and leads to static validation errors.
 
 ### Use `@globalId` over `@delete(globalId: true)`
 
-The `@delete`, `@forceDelete` and `@restore` directives no longer offer the
+The `@delete`, `@forceDelete`, `@restore` and `@upsert` directives no longer offer the
 `globalId` argument. Use `@globalId` on the argument instead.
 
 ```diff

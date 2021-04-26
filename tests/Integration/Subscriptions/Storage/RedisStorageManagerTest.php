@@ -100,7 +100,7 @@ class RedisStorageManagerTest extends TestCase
     /**
      * @return \Illuminate\Testing\TestResponse
      */
-    private function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)')
+    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)')
     {
         return $this->graphQL(/** @lang GraphQL */ "
         subscription {

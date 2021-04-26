@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 /**
  * Encode and decode globally unique IDs.
+ *
+ * TODO move to GlobalId namespace in v6
  */
 interface GlobalId
 {

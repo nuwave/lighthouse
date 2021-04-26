@@ -53,7 +53,18 @@ namespace Illuminate\Testing {
     class TestResponse
     {
         /**
-         * Asserts that the response contains an error from a given category.
+         * Assert the response contains an error with the given message.
+         *
+         * @param  string  $message  The expected error message.
+         * @return $this
+         */
+        public function assertGraphQLErrorMessage(string $message): self
+        {
+            return $this;
+        }
+
+        /**
+         * Assert the response contains an error from the given category.
          *
          * @param  string  $category  The name of the expected error category.
          * @return $this
@@ -64,7 +75,7 @@ namespace Illuminate\Testing {
         }
 
         /**
-         * Assert that the returned result contains exactly the given validation keys.
+         * Assert the returned result contains exactly the given validation keys.
          *
          * @param  array  $keys  The validation keys the result should have.
          * @return $this
@@ -75,7 +86,7 @@ namespace Illuminate\Testing {
         }
 
         /**
-         * Assert that a given validation error is present in the response.
+         * Assert a given validation error is present in the response.
          *
          * @param  string  $key  The validation key that should be present.
          * @param  string  $message  The expected validation message.
@@ -87,7 +98,7 @@ namespace Illuminate\Testing {
         }
 
         /**
-         * Assert that no validation errors are present in the response.
+         * Assert no validation errors are present in the response.
          *
          * @return $this
          */

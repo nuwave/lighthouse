@@ -1,19 +1,19 @@
 {
     "license": "MIT",
     "dependencies": {
-        "@vuepress/plugin-back-to-top": "1.5.4",
-        "@vuepress/plugin-medium-zoom": "1.5.4",
-        "fs-extra": "9.0.1",
-        "vuepress": "1.5.4",
+        "@vuepress/plugin-back-to-top": "1.8.2",
+        "@vuepress/plugin-medium-zoom": "1.8.2",
+        "fs-extra": "9.1.0",
+        "vuepress": "1.8.2",
         "vuepress-theme-default-prefers-color-scheme": "1.0.9"
     },
     "devDependencies": {
-        "prettier": "2.1.2"
+        "prettier": "2.2.1"
     },
     "scripts": {
         "start": "vuepress dev .",
         "build": "vuepress build .",
-        "prettify": "prettier --write --tab-width=2 **/**/*.md",
-        "bump": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'"
+        "prettify": "prettier --write --tab-width=2 **/**/*.md **/*.js .vuepress/*.js",
+        "release": "rm -rf 5 && cp -r master 5"
     }
 }
