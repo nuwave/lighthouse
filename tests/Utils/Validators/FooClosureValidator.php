@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Tests\Utils\Validators;
 
 use Closure;
