@@ -71,7 +71,7 @@ class TestResponseMixin
             Assert::assertContains(
                 $message,
                 $messages,
-                "Expected the GraphQL response to contain error message `{$message}`, got: " . json_encode($messages)
+                "Expected the GraphQL response to contain error message `{$message}`, got: ".json_encode($messages)
             );
 
             return $this;
