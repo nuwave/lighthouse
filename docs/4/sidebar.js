@@ -49,6 +49,7 @@ module.exports = [
       "digging-deeper/error-handling",
       "digging-deeper/adding-types-programmatically",
       "digging-deeper/file-uploads",
+      "digging-deeper/client-directives",
       "digging-deeper/extending-lighthouse",
     ],
   },
@@ -83,7 +84,7 @@ module.exports = [
   },
   {
     title: "Concepts",
-    children: ["concepts/arg-resolvers"],
+    children: ["concepts/arg-resolvers", "concepts/request-lifecycle"],
   },
   {
     title: "API Reference",
