@@ -476,10 +476,13 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasBelongsToSameTableRelationship(): void
     {
+        /** @var \Tests\Utils\Models\Location $parent */
         $parent = factory(Location::class)->create();
-        $child = factory(Location::class)->create([
-            'parent_id' => $parent->id,
-        ]);
+
+        /** @var \Tests\Utils\Models\Location $child */
+        $child = factory(Location::class)->make();
+        $child->parent()->associate($parent);
+        $child->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($hasParent: QueryLocationsHasParentWhereHasConditions) {
@@ -494,7 +497,10 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'hasParent' => ['column' => 'ID', 'value' => $parent->id],
+            'hasParent' => [
+                'column' => 'ID',
+                'value' => $parent->id,
+            ],
         ])->assertExactJson([
             'data' => [
                 'locations' => [
@@ -512,10 +518,13 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasHasManySameTableRelationship(): void
     {
+        /** @var \Tests\Utils\Models\Location $parent */
         $parent = factory(Location::class)->create();
-        $child = factory(Location::class)->create([
-            'parent_id' => $parent->id,
-        ]);
+
+        /** @var \Tests\Utils\Models\Location $child */
+        $child = factory(Location::class)->make();
+        $child->parent()->associate($parent);
+        $child->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($hasChildren: QueryLocationsHasChildrenWhereHasConditions) {
@@ -530,7 +539,10 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'hasChildren' => ['column' => 'ID', 'value' => $child->id],
+            'hasChildren' => [
+                'column' => 'ID',
+                'value' => $child->id,
+            ],
         ])->assertExactJson([
             'data' => [
                 'locations' => [
