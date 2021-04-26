@@ -67,9 +67,11 @@ class TestResponseMixin
     public function assertGraphQLErrorMessage(): Closure
     {
         return function (string $message) {
+            $messages = $this->json('errors.*.message');
             Assert::assertContains(
                 $message,
-                $this->json('errors.*.message')
+                $messages,
+                "Expected the GraphQL response to contain error message `{$message}`, got: " . json_encode($messages)
             );
 
             return $this;
