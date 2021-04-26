@@ -239,6 +239,69 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasBelongsToManyOrNestedConditions(): void
     {
+        $parentWithoutPosts = factory(Category::class)->create();
+
+        $categoryWithParentWithoutPosts = factory(Category::class)->create();
+        $categoryWithParentWithoutPosts->parent()->associate($parentWithoutPosts);
+        $categoryWithParentWithoutPosts->save();
+
+        $postWithCategoryWithParentWithoutPosts = factory(Post::class)->create();
+        $postWithCategoryWithParentWithoutPosts->categories()->attach($categoryWithParentWithoutPosts);
+
+        $parentWithPosts = factory(Category::class)->create();
+        $postWithParent = factory(Post::class)->create();
+        $postWithParent->categories()->attach($parentWithoutPosts);
+
+        $categoryWithParentWithPosts = factory(Category::class)->create();
+        $categoryWithParentWithPosts->parent()->associate($parentWithPosts);
+        $categoryWithParentWithPosts->save();
+
+        $postWithCategoryWithParentWithPosts = factory(Post::class)->create();
+        $postWithCategoryWithParentWithPosts->categories()->attach($categoryWithParentWithPosts);
+
+        $parentWithFooPosts = factory(Category::class)->create();
+        /** @var Post $fooPost */
+        $fooPost = factory(Post::class)->make();
+        $fooPost->title = 'foo';
+        $fooPost->save();
+        $fooPost->categories()->attach($parentWithFooPosts);
+
+        $categoryWithParentWithFooPosts = factory(Category::class)->create();
+        $categoryWithParentWithFooPosts->parent()->associate($parentWithFooPosts);
+        $categoryWithParentWithFooPosts->save();
+
+        $postWithCategoryWithParentWithFooPosts = factory(Post::class)->create();
+        $postWithCategoryWithParentWithFooPosts->categories()->attach($categoryWithParentWithFooPosts);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts(
+                hasCategories: {
+                    HAS: {
+                        relation: "parent.posts"
+                        condition: {
+                            column: "title"
+                            value: "foo"
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => (string) $postWithCategoryWithParentWithFooPosts->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasNestedRelationWithDotNotation(): void
+    {
         $category1 = factory(Category::class)->create();
 
         $category2 = factory(Category::class)->create();
