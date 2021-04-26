@@ -397,4 +397,41 @@ class ValidationTest extends TestCase
             ')
             ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when none of input.foo / input.baz are present.');
     }
+
+    public function testClosureRulesAreUsed(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom @validator(class: "Tests\\\\Utils\\\\Validators\\\\FooClosureValidator") {
+            foo: String!
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "foo"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "bar"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.foo', 'The input.foo field must have a value of "foo".');
+    }
 }
