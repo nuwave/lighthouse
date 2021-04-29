@@ -19,6 +19,7 @@ abstract class WithRelationDirective extends BaseDirective
      * The name of the relation to be loaded.
      */
     abstract protected function relationName(): string;
+
     /**
      * The name of the column to be loaded.
      */

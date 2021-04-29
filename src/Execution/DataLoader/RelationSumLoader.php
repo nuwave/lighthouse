@@ -22,12 +22,12 @@ class RelationSumLoader implements RelationLoader
 
     public function load(EloquentCollection $parents, string $relationName, ?string $column): void
     {
-        self::loadSum($parents, [$relationName => $this->decorateBuilder],$column);
+        self::loadSum($parents, [$relationName => $this->decorateBuilder], $column);
     }
 
     public function extract(Model $model, string $relationName, ?string $column)
     {
-        return self::extractSum($model, $relationName,$column);
+        return self::extractSum($model, $relationName, $column);
     }
 
     public static function extractSum(Model $model, string $relationName, ?string $column): int

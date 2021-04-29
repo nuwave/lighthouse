@@ -75,6 +75,6 @@ GRAPHQL;
 
     protected function relationColumn(): ?string
     {
-       return null;
+        return null;
     }
 }
