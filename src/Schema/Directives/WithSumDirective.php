@@ -43,6 +43,7 @@ directive @withSum(
 ) repeatable on FIELD_DEFINITION
 GRAPHQL;
     }
+
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
         if (RootType::isRootType($parentType->name->value)) {
