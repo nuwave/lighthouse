@@ -49,6 +49,7 @@ GRAPHQL;
         if (RootType::isRootType($parentType->name->value)) {
             throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");
         }
+
         $relation = $this->directiveArgValue('relation');
         if (! is_string($relation)) {
             throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
