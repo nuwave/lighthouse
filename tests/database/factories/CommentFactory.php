@@ -15,6 +15,6 @@ $factory->define(Comment::class, function (Faker $faker): array {
         'post_id' => function () {
             return factory(Post::class)->create()->getKey();
         },
-        'votes'=>$faker->randomNumber()
+        'votes'=>$faker->randomNumber(),
     ];
 });

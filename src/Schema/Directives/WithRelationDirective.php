@@ -60,7 +60,7 @@ abstract class WithRelationDirective extends BaseDirective
         $relationBatchLoader = BatchLoaderRegistry::instance(RelationBatchLoader::class, $uniquePath);
 
         if (! $relationBatchLoader->hasRelationLoader()) {
-            $relationBatchLoader->registerRelationLoader($this->relationLoader($resolveInfo), $relationName,$relationColumn);
+            $relationBatchLoader->registerRelationLoader($this->relationLoader($resolveInfo), $relationName, $relationColumn);
         }
 
         return $relationBatchLoader->load($parent);

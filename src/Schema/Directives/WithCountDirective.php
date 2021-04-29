@@ -73,7 +73,7 @@ GRAPHQL;
         );
     }
 
-    protected function relationColumn() : ?string
+    protected function relationColumn(): ?string
     {
        return null;
     }

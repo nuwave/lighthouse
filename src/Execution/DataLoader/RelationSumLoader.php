@@ -20,17 +20,17 @@ class RelationSumLoader implements RelationLoader
         $this->decorateBuilder = $decorateBuilder;
     }
 
-    public function load(EloquentCollection $parents, string $relationName,?string $column): void
+    public function load(EloquentCollection $parents, string $relationName, ?string $column): void
     {
         self::loadSum($parents, [$relationName => $this->decorateBuilder],$column);
     }
 
-    public function extract(Model $model, string $relationName,?string $column)
+    public function extract(Model $model, string $relationName, ?string $column)
     {
         return self::extractSum($model, $relationName,$column);
     }
 
-    public static function extractSum(Model $model, string $relationName,?string $column): int
+    public static function extractSum(Model $model, string $relationName, ?string $column): int
     {
         /**
          * This is the name that Eloquent gives to the attribute that contains the sum.
@@ -54,7 +54,7 @@ class RelationSumLoader implements RelationLoader
      *
      * @param  array<string, \Closure> $relations
      */
-    public static function loadSum(EloquentCollection $parents, array $relations,?string $column): void
+    public static function loadSum(EloquentCollection $parents, array $relations, ?string $column): void
     {
         if ($parents->isEmpty()) {
             return;
@@ -63,7 +63,7 @@ class RelationSumLoader implements RelationLoader
         $models = $parents->first()->newModelQuery()
             ->whereKey($parents->modelKeys())
             ->select($parents->first()->getKeyName())
-            ->withSum($relations,$column)
+            ->withSum($relations, $column)
             ->get()
             ->keyBy($parents->first()->getKeyName());
 

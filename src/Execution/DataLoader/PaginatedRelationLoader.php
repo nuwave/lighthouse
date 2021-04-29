@@ -32,7 +32,7 @@ class PaginatedRelationLoader implements RelationLoader
         $this->paginationArgs = $paginationArgs;
     }
 
-    public function load(EloquentCollection $parents, string $relationName,?string $column=null): void
+    public function load(EloquentCollection $parents, string $relationName, ?string $column = null): void
     {
         RelationCountLoader::loadCount($parents, [$relationName => $this->decorateBuilder]);
 
@@ -44,7 +44,7 @@ class PaginatedRelationLoader implements RelationLoader
         $this->convertRelationToPaginator($parents, $relationName);
     }
 
-    public function extract(Model $model, string $relationName,?string $column)
+    public function extract(Model $model, string $relationName, ?string $column)
     {
         return $model->getRelation($relationName);
     }

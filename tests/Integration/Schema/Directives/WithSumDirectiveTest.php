@@ -5,8 +5,8 @@ namespace Tests\Integration\Schema\Directives;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Post;
 
 class WithSumDirectiveTest extends DBTestCase
 {
@@ -28,7 +28,7 @@ class WithSumDirectiveTest extends DBTestCase
                factory(Comment::class)
                    ->create([
                        'post_id' => $post->getKey(),
-                       'votes' => (3 - $index)
+                       'votes' => (3 - $index),
                    ]);
            });
 
@@ -37,7 +37,7 @@ class WithSumDirectiveTest extends DBTestCase
             $queries++;
         });
 
-      $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts {
                 comments_sum_votes
