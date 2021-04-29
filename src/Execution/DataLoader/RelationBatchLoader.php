@@ -6,6 +6,7 @@ use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
+use function dd;
 
 class RelationBatchLoader
 {
@@ -27,6 +28,11 @@ class RelationBatchLoader
     protected $relationName;
 
     /**
+     * @var string|null
+     */
+    protected $relationColumn;
+
+    /**
      * Marks when the actual batch loading happened.
      *
      * @var bool
@@ -46,10 +52,11 @@ class RelationBatchLoader
      *
      * Check hasRelation() before to avoid re-instantiating and re-registering the same loader.
      */
-    public function registerRelationLoader(RelationLoader $relationLoader, string $relationName): void
+    public function registerRelationLoader(RelationLoader $relationLoader, string $relationName,?string $relationColumn=null): void
     {
         $this->relationLoader = $relationLoader;
         $this->relationName = $relationName;
+        $this->relationColumn = $relationColumn;
     }
 
     /**
@@ -75,7 +82,7 @@ class RelationBatchLoader
             // model instance then $parent.
             $parent = $this->parents[$modelKey];
 
-            return $this->relationLoader->extract($parent, $this->relationName);
+            return $this->relationLoader->extract($parent, $this->relationName,$this->relationColumn);
         });
     }
 
@@ -95,7 +102,7 @@ class RelationBatchLoader
         );
 
         foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-            $this->relationLoader->load($parentsOfSameClass, $this->relationName);
+            $this->relationLoader->load($parentsOfSameClass, $this->relationName,$this->relationColumn);
         }
 
         $this->hasResolved = true;

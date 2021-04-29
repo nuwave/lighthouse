@@ -18,7 +18,7 @@ class SimpleRelationLoader implements RelationLoader
         $this->decorateBuilder = $decorateBuilder;
     }
 
-    public function load(EloquentCollection $parents, string $relationName): void
+    public function load(EloquentCollection $parents, string $relationName,?string $column): void
     {
         $parents->load([$relationName => $this->decorateBuilder]);
     }
@@ -28,7 +28,7 @@ class SimpleRelationLoader implements RelationLoader
      *
      * @return mixed The model's relation.
      */
-    public function extract(Model $model, string $relationName)
+    public function extract(Model $model, string $relationName,?string $column)
     {
         // Dot notation may be used to eager load nested relations
         $parts = explode('.', $relationName);

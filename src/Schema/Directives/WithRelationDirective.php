@@ -19,6 +19,10 @@ abstract class WithRelationDirective extends BaseDirective
      * The name of the relation to be loaded.
      */
     abstract protected function relationName(): string;
+    /**
+     * The name of the column to be loaded.
+     */
+    abstract protected function relationColumn(): ?string;
 
     abstract protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader;
 
@@ -45,16 +49,18 @@ abstract class WithRelationDirective extends BaseDirective
     protected function loadRelation(Model $parent, ResolveInfo $resolveInfo): Deferred
     {
         $relationName = $this->relationName();
+        $relationColumn = $this->relationColumn();
 
         // There might be multiple directives on the same field, so we differentiate by relation too
         $uniquePath = $resolveInfo->path;
         $uniquePath [] = $relationName;
+//        $uniquePath [] = $relationColumn;
 
         /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
         $relationBatchLoader = BatchLoaderRegistry::instance(RelationBatchLoader::class, $uniquePath);
 
         if (! $relationBatchLoader->hasRelationLoader()) {
-            $relationBatchLoader->registerRelationLoader($this->relationLoader($resolveInfo), $relationName);
+            $relationBatchLoader->registerRelationLoader($this->relationLoader($resolveInfo), $relationName,$relationColumn);
         }
 
         return $relationBatchLoader->load($parent);

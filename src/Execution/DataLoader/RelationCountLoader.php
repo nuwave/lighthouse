@@ -20,12 +20,12 @@ class RelationCountLoader implements RelationLoader
         $this->decorateBuilder = $decorateBuilder;
     }
 
-    public function load(EloquentCollection $parents, string $relationName): void
+    public function load(EloquentCollection $parents, string $relationName,?string $column): void
     {
         self::loadCount($parents, [$relationName => $this->decorateBuilder]);
     }
 
-    public function extract(Model $model, string $relationName)
+    public function extract(Model $model, string $relationName,?string $column)
     {
         return self::extractCount($model, $relationName);
     }
