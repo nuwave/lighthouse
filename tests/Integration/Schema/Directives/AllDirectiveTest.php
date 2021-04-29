@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -114,5 +115,46 @@ class AllDirectiveTest extends DBTestCase
             }
         }
         ")->assertJsonCount(2, 'data.users');
+    }
+
+    public function testSpecifyCustomBuilder(): void
+    {
+        factory(User::class, 2)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!]! @all(builder: "'.$this->qualifyTestResolver('builder').'")
+        }
+        ';
+
+        // The custom builder is supposed to change the sort order
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function builder(): Builder
+    {
+        return User::orderBy('id', 'DESC');
     }
 }

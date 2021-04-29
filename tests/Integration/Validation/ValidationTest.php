@@ -5,6 +5,7 @@ namespace Tests\Integration\Validation;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
+use Tests\Utils\Validators\FooClosureValidator;
 
 /**
  * Covers fundamentals of the validation process.
@@ -396,5 +397,42 @@ class ValidationTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when none of input.foo / input.baz are present.');
+    }
+
+    public function testClosureRulesAreUsed(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom @validator(class: "Tests\\\\Utils\\\\Validators\\\\FooClosureValidator") {
+            foo: String!
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "foo"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "bar"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
     }
 }

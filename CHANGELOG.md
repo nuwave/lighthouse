@@ -9,6 +9,30 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.7.2
+
+### Fixed
+
+- Fix problem with table name on HAS condition with relationship on same table https://github.com/nuwave/lighthouse/pull/1795
+
+## 5.7.1
+
+### Fixed
+
+- Fix usage of closures in validation https://github.com/nuwave/lighthouse/pull/1831
+
+## 5.7.0
+
+### Added
+
+- Add `builder` option to `@all` directive https://github.com/nuwave/lighthouse/pull/1826
+
+## 5.6.2
+
+### Changed
+
+- Update behavior of `TestReponse::assertGraphQLErrorMessage` to work when multiple errors are present https://github.com/nuwave/lighthouse/pull/1827
+
 ## 5.6.1
 
 ### Fixed
@@ -419,7 +443,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
 - Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290
 - Replace usage of `resolve()` helper with Lumen-compatible `app()` https://github.com/nuwave/lighthouse/pull/1305
-- Fix using `@create` and `@update` on nested input object fields that accept an array of input types  
+- Fix using `@create` and `@update` on nested input object fields that accept an array of input types
   https://github.com/nuwave/lighthouse/pull/1316
 
 ### Changed

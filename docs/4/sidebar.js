@@ -42,13 +42,6 @@ module.exports = [
     ],
   },
   {
-    title: "Federation",
-    children: [
-      ["federation/getting-started", "Getting Started"],
-      "federation/entities",
-    ],
-  },
-  {
     title: "Digging Deeper",
     children: [
       "digging-deeper/schema-organisation",
@@ -76,7 +69,7 @@ module.exports = [
       "security/authorization",
       "security/validation",
       "security/sanitization",
-      "security/resource-exhaustion",
+      ["security/resource-exhaustion", "Resource Exhaustion"],
     ],
   },
   {
