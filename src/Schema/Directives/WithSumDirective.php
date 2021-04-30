@@ -6,14 +6,14 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationSumLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationAggregateLoader;
 
-class WithSumDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
+class WithSumDirective extends WithRelationAggregateDirective implements FieldMiddleware, FieldManipulator
 {
     public static function definition(): string
     {
@@ -71,8 +71,6 @@ GRAPHQL;
     protected function relationColumn(): string
     {
         /**
-         * We validated the argument during schema manipulation.
-         *
          * @var string $column
          */
         $column = $this->directiveArgValue('column');
@@ -83,7 +81,7 @@ GRAPHQL;
     /**
      * @return RelationSumLoader
      */
-    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
+    protected function relationAggregateLoader(ResolveInfo $resolveInfo): RelationAggregateLoader
     {
         return new RelationSumLoader(
             $this->decorateBuilder($resolveInfo)

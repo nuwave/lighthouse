@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Facades\DB;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
@@ -60,31 +59,5 @@ class WithSumDirectiveTest extends DBTestCase
         ]);
 
         $this->assertSame(2, $queries);
-    }
-
-    public function _testFailsToEagerLoadRelationSumWithoutRelation(): void
-    {
-        $this->withExceptionHandling();
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            posts: [Post!] @all
-        }
-
-        type Post {
-            comments_sum_votes: Int!
-                @withSum(relation: "comments", column: "votes")
-        }
-        ';
-
-        factory(Post::class)->create();
-
-        $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            posts {
-                title
-            }
-        }
-        ');
     }
 }

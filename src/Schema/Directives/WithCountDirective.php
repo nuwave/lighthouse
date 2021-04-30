@@ -72,9 +72,4 @@ GRAPHQL;
             $this->decorateBuilder($resolveInfo)
         );
     }
-
-    protected function relationColumn(): ?string
-    {
-        return null;
-    }
 }
