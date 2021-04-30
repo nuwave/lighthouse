@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Tests\Utils\Models\Book;
 use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Comment;
-use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Author;
 
 class WithSumDirectiveTest extends DBTestCase
 {
@@ -13,24 +13,35 @@ class WithSumDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            posts: [Post!] @all
+            authors: [Author!] @all
         }
 
-        type Post {
-            comments_sum_votes: Int!
-                @withSum(relation: "comments", column: "votes")
+        type Book {
+            title: String!
+            price: Int!
+        }
+
+        type Author {
+            name: String!
+            books:[Book!]! @belongsToMany
+            books_sum_price: Int!
+                @withSum(relation: "books", column: "price")
         }
         ';
 
-        factory(Post::class, 3)->create()
-           ->each(function (Post $post, int $index): void {
-               factory(Comment::class)
-                   ->create([
-                       'post_id' => $post->getKey(),
-                       'votes' => (3 - $index),
-                   ]);
-           });
-
+        [$author1,$author2,$author3]=factory(Author::class, 3)->create();
+        $book1= factory(Book::class)->create(["price"=>10]);
+        $book2= factory(Book::class)->create(["price"=>20]);
+        $book3= factory(Book::class)->create(["price"=>30]);
+        $author1->books()->attach([
+           $book1->id, $book2->id,
+        ]);
+        $author2->books()->attach([
+            $book2->id, $book3->id,
+        ]);
+        $author3->books()->attach([
+            $book1->id, $book2->id, $book3->id,
+        ]);
         $queries = 0;
         DB::listen(function ($q) use (&$queries): void {
             $queries++;
@@ -38,21 +49,21 @@ class WithSumDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            posts {
-                comments_sum_votes
+            authors {
+                books_sum_price
             }
         }
         ')->assertExactJson([
             'data' => [
-                'posts' => [
+                'authors' => [
                     [
-                        'comments_sum_votes' => 3,
+                        'books_sum_price' => 30,
                     ],
                     [
-                        'comments_sum_votes' => 2,
+                        'books_sum_price' => 50,
                     ],
                     [
-                        'comments_sum_votes' => 1,
+                        'books_sum_price' => 60,
                     ],
                 ],
             ],
