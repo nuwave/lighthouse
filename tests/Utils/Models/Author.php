@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
- *
  */
 class Author extends Model
 {

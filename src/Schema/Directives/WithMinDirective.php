@@ -6,12 +6,12 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationAggregateLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationMinLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationAggregateLoader;
 
 class WithMinDirective extends WithRelationAggregateDirective implements FieldMiddleware, FieldManipulator
 {

@@ -2,10 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\Utils\Models\Book;
+use function factory;
 use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Author;
+use Tests\Utils\Models\Book;
 
 class WithSumDirectiveTest extends DBTestCase
 {
@@ -29,12 +30,12 @@ class WithSumDirectiveTest extends DBTestCase
         }
         ';
 
-        [$author1,$author2,$author3]=factory(Author::class, 3)->create();
-        $book1= factory(Book::class)->create(["price"=>10]);
-        $book2= factory(Book::class)->create(["price"=>20]);
-        $book3= factory(Book::class)->create(["price"=>30]);
+        [$author1,$author2,$author3] =factory(Author::class, 3)->create();
+        $book1 = factory(Book::class)->create(["price"=>10]);
+        $book2 = factory(Book::class)->create(["price"=>20]);
+        $book3 = factory(Book::class)->create(["price"=>30]);
         $author1->books()->attach([
-           $book1->id, $book2->id,
+            $book1->id, $book2->id,
         ]);
         $author2->books()->attach([
             $book2->id, $book3->id,
