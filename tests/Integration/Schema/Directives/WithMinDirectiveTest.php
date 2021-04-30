@@ -31,9 +31,9 @@ class WithMinDirectiveTest extends DBTestCase
         ';
 
         [$author1,$author2,$author3] = factory(Author::class, 3)->create();
-        $book1 = factory(Book::class)->create(["price"=>10]);
-        $book2 = factory(Book::class)->create(["price"=>20]);
-        $book3 = factory(Book::class)->create(["price"=>30]);
+        $book1 = factory(Book::class)->create(['price'=>10]);
+        $book2 = factory(Book::class)->create(['price'=>20]);
+        $book3 = factory(Book::class)->create(['price'=>30]);
         $author1->books()->attach([
             $book1->id, $book2->id,
         ]);
