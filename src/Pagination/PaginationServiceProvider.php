@@ -36,7 +36,7 @@ class PaginationServiceProvider extends ServiceProvider
         return Parser::objectTypeDefinition(/** @lang GraphQL */ '
             "Pagination information about the corresponding list of items."
             type PaginatorInfo {
-              "Total count of available items in the page."
+              "Count of available items in the page."
               count: Int!
 
               "Current pagination page."
@@ -68,7 +68,7 @@ class PaginationServiceProvider extends ServiceProvider
         return Parser::objectTypeDefinition(/** @lang GraphQL */ '
             "Pagination information about the corresponding list of items."
             type SimplePaginatorInfo {
-              "Total count of available items in the page."
+              "Count of available items in the page."
               count: Int!
 
               "Current pagination page."
