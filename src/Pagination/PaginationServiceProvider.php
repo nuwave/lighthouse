@@ -77,9 +77,6 @@ class PaginationServiceProvider extends ServiceProvider
               "Index of first item in the current page."
               firstItem: Int
 
-              "If collection has more pages."
-              hasMorePages: Boolean!
-
               "Index of last item in the current page."
               lastItem: Int
 

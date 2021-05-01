@@ -2089,6 +2089,33 @@ type PostPaginator {
   "Pagination information about the list of items."
   paginatorInfo: PaginatorInfo!
 }
+
+"Pagination information about the corresponding list of items."
+type PaginatorInfo {
+  "Total count of available items in the page."
+  count: Int!
+
+  "Current pagination page."
+  currentPage: Int!
+
+  "Index of first item in the current page."
+  firstItem: Int
+
+  "If collection has more pages."
+  hasMorePages: Boolean!
+
+  "Index of last item in the current page."
+  lastItem: Int
+
+  "Last page number of the collection."
+  lastPage: Int!
+
+  "Number of items per page in the collection."
+  perPage: Int!
+
+  "Total items available in the collection."
+  total: Int!
+}
 ```
 
 It can be queried like this:
@@ -2157,9 +2184,9 @@ type PostEdge {
 
 ### Simple Pagination
 
-The default `PAGINATOR` uses the query builder method `paginate` which will
-fire an additional query every time to count the total number of items. This
-is usually very helpful to generate pagination elements in the frontend.
+In contrast to other pagination types, `SIMPLE` pagination only fires a single database
+query on every request. This improves performance, but means that the response does not
+hold information about the total number of items.
 
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
@@ -2194,6 +2221,24 @@ type PostSimplePaginator {
 
   "Pagination information about the list of items."
   paginatorInfo: SimplePaginatorInfo!
+}
+
+"Pagination information about the corresponding list of items."
+type SimplePaginatorInfo {
+  "Total count of available items in the page."
+  count: Int!
+
+  "Current pagination page."
+  currentPage: Int!
+
+  "Index of first item in the current page."
+  firstItem: Int
+
+  "Index of last item in the current page."
+  lastItem: Int
+
+  "Number of items per page in the collection."
+  perPage: Int!
 }
 ```
 
