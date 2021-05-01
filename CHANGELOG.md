@@ -9,6 +9,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+- Add `SIMPLE` pagination type https://github.com/nuwave/lighthouse/pull/1816
+
 ## 5.7.2
 
 ### Fixed
@@ -70,7 +73,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add `connect` and `disconnect` operations in nested mutations for HasMany and MorphMany relations https://github.com/nuwave/lighthouse/pull/1730
 - Add `ValidateSchema` event https://github.com/nuwave/lighthouse/pull/1764
 - Add config option `subscriptions.exclude_empty` https://github.com/nuwave/lighthouse/pull/1799
-- Add `SIMPLE` pagination type https://github.com/nuwave/lighthouse/pull/1816
 
 ### Changed
 
