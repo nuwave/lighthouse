@@ -43,9 +43,10 @@ class PaginateDirectiveTest extends TestCase
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             name: String
-            users: [User!]! @paginate
-            users2: [User!]! @paginate(type: CONNECTION)
-            users3: [User!]! @paginate(type: "relay")
+            usersPaginated: [User!]! @paginate
+            usersConnection: [User!]! @paginate(type: CONNECTION)
+            usersRelay: [User!]! @paginate(type: "relay")
+            usersSimplePaginated: [User!]! @paginate(type: "simple")
         }
 
         type Query {
