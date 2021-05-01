@@ -97,7 +97,9 @@ class PaginationArgs
      */
     public function applyToBuilder(object $builder): Paginator
     {
-        $methodName = $this->type->isSimple() ? 'simplePaginate' : 'paginate';
+        $methodName = $this->type->isSimple()
+            ? 'simplePaginate'
+            : 'paginate';
 
         if ($builder instanceof ScoutBuilder) {
             return $builder->{$methodName}($this->first, 'page', $this->page);
