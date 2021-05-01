@@ -199,9 +199,9 @@ class MorphManyDirectiveTest extends DBTestCase
                         id
                     }
                 }
-                imagesSimplePaginated(first: 5) {
-                    paginatorInfo {
-                        count
+                imagesSimplePaginated(first: 10) {
+                    data {
+                        id
                     }
                 }
             }
@@ -223,7 +223,7 @@ class MorphManyDirectiveTest extends DBTestCase
                 ],
             ],
         ])->assertJsonCount($this->postImages->count(), 'data.post.imagesPaginated.data')
-            ->assertJsonPath('data.post.imagesSimplePaginated.paginatorInfo.count', $this->postImages->count());
+            ->assertJsonCount($this->postImages->count(), 'data.post.imagesSimplePaginated.data');
     }
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
