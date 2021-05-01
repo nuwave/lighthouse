@@ -3,6 +3,7 @@
 namespace Tests\Integration\Pagination;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
@@ -469,5 +470,93 @@ class PaginateDirectiveDBTest extends DBTestCase
             }
         }
         ')->assertJsonCount($defaultCount, 'data.users.data');
+    }
+
+    public function testQueriesSimplePagination(): void
+    {
+        config(['lighthouse.pagination.default_count' => 10]);
+        factory(User::class, 3)->create();
+
+        DB::enableQueryLog();
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            usersPaginated: [User!] @paginate(type: PAGINATOR)
+            usersSimplePaginated: [User!] @paginate(type: SIMPLE)
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            usersPaginated {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(3, 'data.usersPaginated.data');
+        // "paginate" fires 2 queries: One for data, one for counting.
+        $this->assertCount(2, DB::getQueryLog());
+        DB::flushQueryLog();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            usersSimplePaginated {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(3, 'data.usersSimplePaginated.data');
+        // "simplePaginate" only fires one query.
+        $this->assertCount(1, DB::getQueryLog());
+        DB::disableQueryLog();
+    }
+
+    public function testGetSimplePaginationAttributes(): void
+    {
+        config(['lighthouse.pagination.default_count' => 10]);
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate(type: SIMPLE)
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                paginatorInfo {
+                    count
+                    currentPage
+                    firstItem
+                    lastItem
+                    perPage
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 3,
+                        'currentPage' => 1,
+                        'firstItem' => 1,
+                        'lastItem' => 3,
+                        'perPage' => 10,
+                    ],
+                ],
+            ],
+        ]);
     }
 }

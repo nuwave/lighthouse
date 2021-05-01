@@ -43,21 +43,28 @@ class PaginateDirectiveTest extends TestCase
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             name: String
-            users: [User!]! @paginate
-            users2: [User!]! @paginate(type: CONNECTION)
-            users3: [User!]! @paginate(type: "relay")
+            usersPaginated: [User!]! @paginate
+            usersConnection: [User!]! @paginate(type: CONNECTION)
+            usersRelay: [User!]! @paginate(type: "relay")
+            usersSimplePaginated: [User!]! @paginate(type: "simple")
         }
 
         type Query {
-            users: [User!]! @paginate
-            users2: [User!]! @paginate(type: CONNECTION)
-            users3: [User!]! @paginate(type: "relay")
+            usersPaginated: [User!]! @paginate
+            usersConnection: [User!]! @paginate(type: CONNECTION)
+            usersRelay: [User!]! @paginate(type: "relay")
+            usersSimplePaginated: [User!]! @paginate(type: "simple")
         }
         ');
         $typeMap = $schema->getTypeMap();
 
         $this->assertArrayHasKey(
             'UserPaginator',
+            $typeMap
+        );
+
+        $this->assertArrayHasKey(
+            'UserSimplePaginator',
             $typeMap
         );
 
@@ -103,8 +110,10 @@ class PaginateDirectiveTest extends TestCase
             type Query {
                 defaultPaginated: [User!]! @paginate
                 defaultRelay: [User!]! @paginate(type: CONNECTION)
+                defaultSimple: [User!]! @paginate(type: SIMPLE)
                 customPaginated:  [User!]! @paginate(maxCount: 10)
                 customRelay:  [User!]! @paginate(maxCount: 10, type: CONNECTION)
+                customSimple:  [User!]! @paginate(maxCount: 10, type: SIMPLE)
             }
 
             type User {
@@ -135,6 +144,17 @@ class PaginateDirectiveTest extends TestCase
             $defaultRelayFirstArg->description
         );
 
+        $defaultSimpleFirstArg = $queryType
+            ->getField('defaultSimple')
+            ->getArg('first');
+
+        $this->assertInstanceOf(FieldArgument::class, $defaultSimpleFirstArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $defaultSimpleFirstArg */
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 5.',
+            $defaultSimpleFirstArg->description
+        );
+
         $customPaginatedAmountArg = $queryType
             ->getField('customPaginated')
             ->getArg('first');
@@ -155,6 +175,17 @@ class PaginateDirectiveTest extends TestCase
         $this->assertSame(
             'Limits number of fetched elements. Maximum allowed value: 10.',
             $customRelayFirstArg->description
+        );
+
+        $customSimpleFirstArg = $queryType
+            ->getField('customSimple')
+            ->getArg('first');
+
+        $this->assertInstanceOf(FieldArgument::class, $customSimpleFirstArg);
+        /** @var \GraphQL\Type\Definition\FieldArgument $customSimpleFirstArg */
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 10.',
+            $customSimpleFirstArg->description
         );
     }
 
@@ -202,14 +233,15 @@ class PaginateDirectiveTest extends TestCase
         }
 
         type Query {
-            users1: [User!]! @paginate
-            users2: [User!]! @paginate(type: CONNECTION)
+            usersPaginated: [User!]! @paginate
+            usersConnection: [User!]! @paginate(type: CONNECTION)
+            usersSimplePaginated: [User!]! @paginate(type: SIMPLE)
         }
         ';
 
         $resultFromDefaultPagination = $this->graphQL(/** @lang GraphQL */ '
         {
-            users1(first: 10) {
+            usersPaginated(first: 10) {
                 data {
                     id
                     name
@@ -225,7 +257,7 @@ class PaginateDirectiveTest extends TestCase
 
         $resultFromRelayPagination = $this->graphQL(/** @lang GraphQL */ '
         {
-            users2(first: 10) {
+            usersConnection(first: 10) {
                 edges {
                     node {
                         id
@@ -239,6 +271,22 @@ class PaginateDirectiveTest extends TestCase
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
             $resultFromRelayPagination->json('errors.0.message')
+        );
+
+        $resultFromSimplePagination = $this->graphQL(/** @lang GraphQL */ '
+        {
+            usersSimplePaginated(first: 10) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            PaginationArgs::requestedTooManyItems(5, 10),
+            $resultFromSimplePagination->json('errors.0.message')
         );
     }
 

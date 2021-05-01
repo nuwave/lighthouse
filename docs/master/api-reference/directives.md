@@ -180,6 +180,11 @@ enum BelongsToManyType {
   PAGINATOR
 
   """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
   Cursor-based pagination, compatible with the Relay specification.
   """
   CONNECTION
@@ -1189,6 +1194,11 @@ enum HasManyType {
   PAGINATOR
 
   """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
   Cursor-based pagination, compatible with the Relay specification.
   """
   CONNECTION
@@ -1206,6 +1216,7 @@ You can return the related models paginated by setting the `type`.
 ```graphql
 type User {
   postsPaginated: [Post!]! @hasMany(type: PAGINATOR)
+  postsSimplePaginated: [Post!]! @hasMany(type: SIMPLE)
   postsRelayConnection: [Post!]! @hasMany(type: CONNECTION)
 }
 ```
@@ -1585,6 +1596,11 @@ enum MorphManyType {
   Offset-based pagination, similar to the Laravel default.
   """
   PAGINATOR
+
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
 
   """
   Cursor-based pagination, compatible with the Relay specification.
@@ -2028,6 +2044,11 @@ enum PaginateType {
   PAGINATOR
 
   """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
   Cursor-based pagination, compatible with the Relay specification.
   """
   CONNECTION
@@ -2068,6 +2089,33 @@ type PostPaginator {
   "Pagination information about the list of items."
   paginatorInfo: PaginatorInfo!
 }
+
+"Pagination information about the corresponding list of items."
+type PaginatorInfo {
+  "Total count of available items in the page."
+  count: Int!
+
+  "Current pagination page."
+  currentPage: Int!
+
+  "Index of first item in the current page."
+  firstItem: Int
+
+  "If collection has more pages."
+  hasMorePages: Boolean!
+
+  "Index of last item in the current page."
+  lastItem: Int
+
+  "Last page number of the collection."
+  lastPage: Int!
+
+  "Number of items per page in the collection."
+  perPage: Int!
+
+  "Total items available in the collection."
+  total: Int!
+}
 ```
 
 It can be queried like this:
@@ -2089,8 +2137,9 @@ It can be queried like this:
 
 ### Pagination type
 
-The `type` of pagination defaults to `PAGINATOR`, but may also be set to a Relay
-compliant `CONNECTION`.
+The `type` of pagination defaults to `PAGINATOR`, but may also be set to
+`SIMPLE` (see [Simple Pagination](#simple-pagination)) or a Relay compliant
+`CONNECTION`.
 
 > Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
 > Under the hood, the "cursor" is decoded into a page offset.
@@ -2130,6 +2179,82 @@ type PostEdge {
 
   "A unique cursor that can be used for pagination."
   cursor: String!
+}
+```
+
+### Simple Pagination
+
+In contrast to other pagination types, `SIMPLE` pagination only fires a single database
+query on every request. This improves performance, but means that the response does not
+hold information about the total number of items.
+
+If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
+
+> Please note that the `SIMPLE` paginator does not have the attributes
+> `hasMorePages`, `lastPage` and `total`.
+>
+> If you need those fields, you should use the default `PAGINATOR`.
+
+```graphql
+type Query {
+  posts: [Post!]! @paginate(type: SIMPLE)
+}
+```
+
+The schema definition is automatically transformed to this:
+
+```graphql
+type Query {
+  posts(
+    "Limits number of fetched elements."
+    first: Int!
+
+    "The offset from which elements are returned."
+    page: Int
+  ): PostSimplePaginator
+}
+
+"A paginated list of Post items."
+type PostSimplePaginator {
+  "A list of Post items."
+  data: [Post!]!
+
+  "Pagination information about the list of items."
+  paginatorInfo: SimplePaginatorInfo!
+}
+
+"Pagination information about the corresponding list of items."
+type SimplePaginatorInfo {
+  "Total count of available items in the page."
+  count: Int!
+
+  "Current pagination page."
+  currentPage: Int!
+
+  "Index of first item in the current page."
+  firstItem: Int
+
+  "Index of last item in the current page."
+  lastItem: Int
+
+  "Number of items per page in the collection."
+  perPage: Int!
+}
+```
+
+It can be queried like this:
+
+```graphql
+{
+  posts(first: 10) {
+    data {
+      id
+      title
+    }
+    paginatorInfo {
+      currentPage
+    }
+  }
 }
 ```
 

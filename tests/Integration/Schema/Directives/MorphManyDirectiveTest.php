@@ -174,7 +174,8 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: PAGINATOR)
+            imagesPaginated: [Image!] @morphMany(type: PAGINATOR, relation: "images")
+            imagesSimplePaginated: [Image!] @morphMany(type: SIMPLE, relation: "images")
         }
 
         type Image {
@@ -193,7 +194,12 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                images(first: 10) {
+                imagesPaginated(first: 10) {
+                    data {
+                        id
+                    }
+                }
+                imagesSimplePaginated(first: 10) {
                     data {
                         id
                     }
@@ -205,7 +211,7 @@ class MorphManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'title' => $this->post->title,
-                    'images' => [
+                    'imagesPaginated' => [
                         'data' => $this->postImages
                             ->map(function (Image $image) {
                                 return [
@@ -216,7 +222,8 @@ class MorphManyDirectiveTest extends DBTestCase
                     ],
                 ],
             ],
-        ])->assertJsonCount($this->postImages->count(), 'data.post.images.data');
+        ])->assertJsonCount($this->postImages->count(), 'data.post.imagesPaginated.data')
+            ->assertJsonCount($this->postImages->count(), 'data.post.imagesSimplePaginated.data');
     }
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void

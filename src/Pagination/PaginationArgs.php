@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Error\Error;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 
@@ -20,6 +20,11 @@ class PaginationArgs
     public $first;
 
     /**
+     * @var \Nuwave\Lighthouse\Pagination\PaginationType
+     */
+    public $type;
+
+    /**
      * Create a new instance from user given args.
      *
      * @param  array<string, mixed>  $args
@@ -32,6 +37,8 @@ class PaginationArgs
     {
         $instance = new static();
 
+        $instance->type = $paginationType;
+
         if ($paginationType->isConnection()) {
             $instance->first = $args['first'];
             $instance->page = self::calculateCurrentPage(
@@ -39,6 +46,7 @@ class PaginationArgs
                 Cursor::decode($args)
             );
         } else {
+            // Handles cases "paginate" and "simple", which both take the same args.
             $instance->first = $args['first'];
             $instance->page = Arr::get($args, 'page', 1);
         }
@@ -87,13 +95,17 @@ class PaginationArgs
      *
      * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      */
-    public function applyToBuilder(object $builder): LengthAwarePaginator
+    public function applyToBuilder(object $builder): Paginator
     {
+        $methodName = $this->type->isSimple()
+            ? 'simplePaginate'
+            : 'paginate';
+
         if ($builder instanceof ScoutBuilder) {
-            return $builder->paginate($this->first, 'page', $this->page);
+            return $builder->{$methodName}($this->first, 'page', $this->page);
         }
 
         // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-        return $builder->paginate($this->first, ['*'], 'page', $this->page);
+        return $builder->{$methodName}($this->first, ['*'], 'page', $this->page);
     }
 }
