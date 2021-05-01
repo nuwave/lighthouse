@@ -86,7 +86,7 @@ class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
     /**
      * @var int
      */
-    private $id;
+    protected $id;
 
     public function __construct(int $id)
     {

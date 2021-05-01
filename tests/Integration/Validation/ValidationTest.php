@@ -5,6 +5,7 @@ namespace Tests\Integration\Validation;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
+use Tests\Utils\Validators\FooClosureValidator;
 
 /**
  * Covers fundamentals of the validation process.
@@ -321,5 +322,117 @@ class ValidationTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('bar', $message);
+    }
+
+    public function testSingleFieldReferencesAreQualified(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom {
+            foo: String
+            bar: String @rules(apply: ["required_if:foo,baz"])
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "whatever"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "baz"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is baz.');
+    }
+
+    public function testMultipleFieldReferencesAreQualified(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom {
+            foo: String
+            bar: String @rules(apply: ["required_without_all:foo,baz"])
+            baz: String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "whatever"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {}
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when none of input.foo / input.baz are present.');
+    }
+
+    public function testClosureRulesAreUsed(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom @validator(class: "Tests\\\\Utils\\\\Validators\\\\FooClosureValidator") {
+            foo: String!
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "foo"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "bar"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
     }
 }

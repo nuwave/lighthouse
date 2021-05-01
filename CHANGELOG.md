@@ -9,6 +9,61 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.7.2
+
+### Fixed
+
+- Fix problem with table name on HAS condition with relationship on same table https://github.com/nuwave/lighthouse/pull/1795
+
+## 5.7.1
+
+### Fixed
+
+- Fix usage of closures in validation https://github.com/nuwave/lighthouse/pull/1831
+
+## 5.7.0
+
+### Added
+
+- Add `builder` option to `@all` directive https://github.com/nuwave/lighthouse/pull/1826
+
+## 5.6.2
+
+### Changed
+
+- Update behavior of `TestReponse::assertGraphQLErrorMessage` to work when multiple errors are present https://github.com/nuwave/lighthouse/pull/1827
+
+## 5.6.1
+
+### Fixed
+
+- Fix overly eager validation of repeatable directive usage by requiring `webonyx/graphql-php:^14.6.2` https://github.com/nuwave/lighthouse/pull/1824
+- Fix conversion of `repeatable` directive nodes into executable definitions https://github.com/nuwave/lighthouse/pull/1824
+
+## 5.6.0
+
+### Added
+
+- Support for Apollo Federation https://github.com/nuwave/lighthouse/pull/1728
+
+## 5.5.1
+
+### Fixed
+
+- Add placeholder type `_` to `schema-directives.graphql` https://github.com/nuwave/lighthouse/pull/1823
+
+## 5.5.0
+
+### Fixed
+
+- Allow `@limit` on `FIELD_DEFINITION` to fix validation errors https://github.com/nuwave/lighthouse/pull/1821
+
+### Added
+
+- Add method `assertGraphQLErrorMessage()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/1819
+
+## 5.4.0
+
 ### Added
 
 - Add `GraphQLContext` to `StartExecution` event
@@ -31,6 +86,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
 - Fix subscription storage in redis for predis users https://github.com/nuwave/lighthouse/pull/1814
+- Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
 
 ### Deprecated
 
@@ -388,7 +444,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix nested mutations with multiple `belongsTo` relations at the same level https://github.com/nuwave/lighthouse/pull/1285
 - Avoid race condition that occurs when using `Cache::has()` https://github.com/nuwave/lighthouse/pull/1290
 - Replace usage of `resolve()` helper with Lumen-compatible `app()` https://github.com/nuwave/lighthouse/pull/1305
-- Fix using `@create` and `@update` on nested input object fields that accept an array of input types  
+- Fix using `@create` and `@update` on nested input object fields that accept an array of input types
   https://github.com/nuwave/lighthouse/pull/1316
 
 ### Changed

@@ -15,7 +15,7 @@ use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -38,37 +38,27 @@ class ASTBuilder
     ];
 
     /**
-     * The directive factory.
-     *
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     /**
-     * The schema source provider.
-     *
      * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
      */
     protected $schemaSourceProvider;
 
     /**
-     * The event dispatcher.
-     *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $eventDispatcher;
+    protected $eventsDispatcher;
 
     /**
-     * The config repository.
-     *
-     * @var ConfigRepository
+     * @var \Illuminate\Contracts\Config\Repository
      */
     protected $configRepository;
 
     /**
-     * The document AST.
-     *
-     * Initialized lazily, is only set after documentAST() is called.
+     * Initialized lazily in $this->documentAST().
      *
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
@@ -77,20 +67,15 @@ class ASTBuilder
     public function __construct(
         DirectiveLocator $directiveFactory,
         SchemaSourceProvider $schemaSourceProvider,
-        EventDispatcher $eventDispatcher,
+        EventsDispatcher $eventsDispatcher,
         ConfigRepository $configRepository
     ) {
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveLocator = $directiveFactory;
         $this->schemaSourceProvider = $schemaSourceProvider;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventsDispatcher = $eventsDispatcher;
         $this->configRepository = $configRepository;
     }
 
-    /**
-     * Get the schema string and build an AST out of it.
-     *
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
     public function documentAST(): DocumentAST
     {
         if (! isset($this->documentAST)) {
@@ -122,7 +107,7 @@ class ASTBuilder
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = (array) $this->eventDispatcher->dispatch(
+        $additionalSchemas = (array) $this->eventsDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );
 
@@ -142,7 +127,7 @@ class ASTBuilder
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
         // that want to programmatically change the schema.
-        $this->eventDispatcher->dispatch(
+        $this->eventsDispatcher->dispatch(
             new ManipulateAST($this->documentAST)
         );
 
@@ -157,7 +142,7 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
-                $this->directiveFactory->associatedOfType($typeDefinition, TypeManipulator::class)
+                $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
                 as $typeDefinitionManipulator
             ) {
                 $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -176,7 +161,7 @@ class ASTBuilder
                 // that are defined on type extensions themselves
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
-                    $this->directiveFactory->associatedOfType($typeExtension, TypeExtensionManipulator::class)
+                    $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
@@ -261,7 +246,7 @@ class ASTBuilder
      */
     protected function missingBaseDefinition(string $typeName, TypeExtensionNode $typeExtension): string
     {
-        return "Could not find a base definition $typeName of kind {$typeExtension->kind} to extend.";
+        return "Could not find a base definition {$typeName} of kind {$typeExtension->kind} to extend.";
     }
 
     /**
@@ -289,7 +274,7 @@ class ASTBuilder
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
-                        $this->directiveFactory->associatedOfType($fieldDefinition, FieldManipulator::class)
+                        $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -310,7 +295,7 @@ class ASTBuilder
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
-                            $this->directiveFactory->associatedOfType($argumentDefinition, ArgManipulator::class)
+                            $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
                             $argManipulator->manipulateArgDefinition(

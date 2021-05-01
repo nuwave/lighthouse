@@ -32,13 +32,17 @@ and offer flexibility when you need it.
 
 The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
 
+The site includes the latest docs for each major version of Lighthouse.
+You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
+at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
+
 A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn/) and is maintained
 over at https://github.com/haxibiao/lighthouse.
 
 ## Get involved
 
 - Have a question? [Use the laravel-lighthouse tag on Stack Overflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
-- Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
+- Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Have an idea? [Propose a feature](https://github.com/nuwave/lighthouse/issues/new?template=feature_proposal.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/CONTRIBUTING.md)

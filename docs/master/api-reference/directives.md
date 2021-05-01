@@ -14,6 +14,12 @@ directive @all(
   model: String
 
   """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
@@ -1280,35 +1286,6 @@ type Query {
 }
 ```
 
-## @include
-
-This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
-and it should be noted this directive is a client side and should not be included in your schema.
-
-Only includes a field in response if the value passed into this directive is true. This directive is one of the core
-directives in the GraphQL spec.
-
-```graphql
-directive @include(
-  """
-  If the "if" value is true the field this is connected with will be included in the query response.
-  Otherwise it will not.
-  """
-  if: Boolean
-) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-```
-
-The [@include](#include) directive may be provided for fields, fragment spreads, and inline fragments,
-and allows for conditional inclusion during execution as described by the `if` argument.
-
-In this example experimentalField will only be queried if the variable \$someTest has the value true
-
-```graphql
-query myQuery($someTest: Boolean) {
-  experimentalField @include(if: $someTest)
-}
-```
-
 ## @inject
 
 ```graphql
@@ -1453,7 +1430,7 @@ type Post {
 """
 Allow clients to specify the maximum number of results to return.
 """
-directive @limit on ARGUMENT_DEFINITION
+directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
 ```
 
 Place this on any argument to a field that returns a list of results.
@@ -2575,32 +2552,6 @@ However, in some situation a custom index might be needed, this can be achieved 
 ```graphql
 type Query {
   posts(search: String @search(within: "my.index")): [Post!]! @paginate
-}
-```
-
-## @skip
-
-```graphql
-directive @skip(
-  """
-  If the value passed into the if field is true the field this
-  is decorating will not be included in the query response.
-  """
-  if: Boolean!
-) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-```
-
-This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include).
-**It is a meant to be used by clients and should not be included in your schema.**
-
-The [@skip](#skip) directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
-exclusion during execution as described by the if argument.
-
-In this example, `experimentalField` will only be queried if the variable `$someTest` has the value `false`.
-
-```graphql
-query myQuery($someTest: Boolean) {
-  experimentalField @skip(if: $someTest)
 }
 ```
 
