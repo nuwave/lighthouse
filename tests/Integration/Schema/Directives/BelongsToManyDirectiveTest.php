@@ -102,8 +102,8 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: PAGINATOR)
-            roles2: [Role!]! @belongsToMany(type: SIMPLE, relation: "roles")
+            rolesPaginated: [Role!]! @belongsToMany(type: PAGINATOR, relation: "roles")
+            rolesSimplePaginated: [Role!]! @belongsToMany(type: SIMPLE, relation: "roles")
         }
 
         type Role {
@@ -119,7 +119,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                roles(first: 2) {
+                rolesPaginated(first: 2) {
                     paginatorInfo {
                         count
                         hasMorePages
@@ -129,7 +129,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                         id
                     }
                 }
-                roles2(first: 3) {
+                rolesSimplePaginated(first: 3) {
                     paginatorInfo {
                         count
                     }
@@ -142,7 +142,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'roles' => [
+                    'rolesPaginated' => [
                         'paginatorInfo' => [
                             'count' => 2,
                             'hasMorePages' => true,
@@ -150,15 +150,15 @@ class BelongsToManyDirectiveTest extends DBTestCase
                         ],
                     ],
 
-                    'roles2' => [
+                    'rolesSimplePaginated' => [
                         'paginatorInfo' => [
                             'count' => 3,
                         ],
                     ],
                 ],
             ],
-        ])->assertJsonCount(2, 'data.user.roles.data')
-            ->assertJsonCount(3, 'data.user.roles2.data');
+        ])->assertJsonCount(2, 'data.user.rolesPaginated.data')
+            ->assertJsonCount(3, 'data.user.rolesSimplePaginated.data');
     }
 
     public function testQueryBelongsToManyRelayConnection(): void

@@ -49,10 +49,10 @@ class PaginateDirectiveTest extends TestCase
         }
 
         type Query {
-            users: [User!]! @paginate
-            users2: [User!]! @paginate(type: CONNECTION)
-            users3: [User!]! @paginate(type: "relay")
-            users4: [User!]! @paginate(type: "simple")
+            usersPaginated: [User!]! @paginate
+            usersConnection: [User!]! @paginate(type: CONNECTION)
+            usersRelay: [User!]! @paginate(type: "relay")
+            usersSimplePaginated: [User!]! @paginate(type: "simple")
         }
         ');
         $typeMap = $schema->getTypeMap();
@@ -232,15 +232,15 @@ class PaginateDirectiveTest extends TestCase
         }
 
         type Query {
-            users1: [User!]! @paginate
-            users2: [User!]! @paginate(type: CONNECTION)
-            users3: [User!]! @paginate(type: SIMPLE)
+            usersPaginated: [User!]! @paginate
+            usersConnection: [User!]! @paginate(type: CONNECTION)
+            usersSimplePaginated: [User!]! @paginate(type: SIMPLE)
         }
         ';
 
         $resultFromDefaultPagination = $this->graphQL(/** @lang GraphQL */ '
         {
-            users1(first: 10) {
+            usersPaginated(first: 10) {
                 data {
                     id
                     name
@@ -256,7 +256,7 @@ class PaginateDirectiveTest extends TestCase
 
         $resultFromRelayPagination = $this->graphQL(/** @lang GraphQL */ '
         {
-            users2(first: 10) {
+            usersConnection(first: 10) {
                 edges {
                     node {
                         id
@@ -274,7 +274,7 @@ class PaginateDirectiveTest extends TestCase
 
         $resultFromSimplePagination = $this->graphQL(/** @lang GraphQL */ '
         {
-            users3(first: 10) {
+            usersSimplePaginated(first: 10) {
                 data {
                     id
                     name

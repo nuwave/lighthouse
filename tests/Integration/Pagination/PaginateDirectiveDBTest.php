@@ -485,33 +485,33 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
 
         type Query {
-            users: [User!] @paginate(type: PAGINATOR)
-            users2: [User!] @paginate(type: SIMPLE)
+            usersPaginated: [User!] @paginate(type: PAGINATOR)
+            usersSimplePaginated: [User!] @paginate(type: SIMPLE)
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users {
+            usersPaginated {
                 data {
                     id
                 }
             }
         }
-        ')->assertJsonCount(3, 'data.users.data');
+        ')->assertJsonCount(3, 'data.usersPaginated.data');
         // "paginate" fires 2 queries: One for data, one for counting.
         $this->assertCount(2, DB::getQueryLog());
         DB::flushQueryLog();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users2 {
+            usersSimplePaginated {
                 data {
                     id
                 }
             }
         }
-        ')->assertJsonCount(3, 'data.users2.data');
+        ')->assertJsonCount(3, 'data.usersSimplePaginated.data');
         // "simplePaginate" only fires one query.
         $this->assertCount(1, DB::getQueryLog());
         DB::disableQueryLog();

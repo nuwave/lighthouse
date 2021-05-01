@@ -174,8 +174,8 @@ class MorphManyDirectiveTest extends DBTestCase
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: PAGINATOR)
-            images2: [Image!] @morphMany(type: SIMPLE, relation: "images")
+            imagesPaginated: [Image!] @morphMany(type: PAGINATOR, relation: "images")
+            imagesSimplePaginated: [Image!] @morphMany(type: SIMPLE, relation: "images")
         }
 
         type Image {
@@ -194,12 +194,12 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                images(first: 10) {
+                imagesPaginated(first: 10) {
                     data {
                         id
                     }
                 }
-                images2(first: 5) {
+                imagesSimplePaginated(first: 5) {
                     paginatorInfo {
                         count
                     }
@@ -211,7 +211,7 @@ class MorphManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'title' => $this->post->title,
-                    'images' => [
+                    'imagesPaginated' => [
                         'data' => $this->postImages
                             ->map(function (Image $image) {
                                 return [
@@ -220,14 +220,10 @@ class MorphManyDirectiveTest extends DBTestCase
                             })
                             ->toArray(),
                     ],
-                    'images2' => [
-                        'paginatorInfo' => [
-                            'count' => 5,
-                        ],
-                    ],
                 ],
             ],
-        ])->assertJsonCount($this->postImages->count(), 'data.post.images.data');
+        ])->assertJsonCount($this->postImages->count(), 'data.post.imagesPaginated.data')
+            ->assertJsonPath('data.post.imagesSimplePaginated.paginatorInfo.count', $this->postImages->count());
     }
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
