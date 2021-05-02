@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CacheSetDirective extends BaseDirective implements FieldMiddleware
+class SetCacheDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * @var \Illuminate\Contracts\Cache\Repository
@@ -29,7 +29,7 @@ class CacheSetDirective extends BaseDirective implements FieldMiddleware
 """
 Cache the result of a resolver.
 """
-directive @cacheSet(
+directive @setCache(
   """
   Set the key cache
   """

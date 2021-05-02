@@ -402,13 +402,13 @@ type GithubProfile {
 }
 ```
 
-## @cacheSet
+## @setCache
 
 ```graphql
 """
 Saves the result of a cache with your desired name.
 """
-directive @cacheSet(
+directive @setCache(
   """
   Set the key cache -> The default is your query name
   """
@@ -429,7 +429,7 @@ type Query {
   """
   If empty, your query name will be saved
   """
-  highestKnownPrimeNumber: Int! @cacheSet
+  highestKnownPrimeNumber: Int! @setCache
 }
 ```
 
@@ -437,7 +437,7 @@ You can save the cache with the desired key.
 
 ```graphql
 type Query {
-  highestKnownPrimeNumber: Int! @cacheSet(key: "cache-one")
+  highestKnownPrimeNumber: Int! @setCache(key: "cache-one")
 }
 ```
 
@@ -446,7 +446,7 @@ if you want to invalidate the cache after a while.
 
 ```graphql
 type Query {
-  temperature: Int! @cacheSet(maxAge: 300)
+  temperature: Int! @setCache(maxAge: 300)
 }
 ```
 
