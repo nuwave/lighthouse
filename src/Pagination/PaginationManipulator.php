@@ -8,6 +8,7 @@ use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 
 class PaginationManipulator
 {
@@ -154,7 +155,10 @@ GRAPHQL
             $objectType = $existingType;
         }
 
-        if ($this->modelClass) {
+        if (
+            $this->modelClass
+            && ! ASTHelper::hasDirective($objectType, ModelDirective::NAME)
+        ) {
             $objectType->directives [] = Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")');
         }
 

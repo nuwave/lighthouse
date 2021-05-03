@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.8.1
+
+### Fixed
+
+- Avoid setting multiple `@model` directives on generated paginator types https://github.com/nuwave/lighthouse/pull/1837
+
 ## 5.8.0
 
 ### Added

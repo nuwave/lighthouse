@@ -15,7 +15,8 @@ trait TestsSerialization
 {
     protected function fakeContextSerializer(Container $app): void
     {
-        $contextSerializer = new class implements ContextSerializer {
+        $contextSerializer = new class implements ContextSerializer
+        {
             public function serialize(GraphQLContext $context)
             {
                 return 'foo';
@@ -23,7 +24,8 @@ trait TestsSerialization
 
             public function unserialize(string $context)
             {
-                return new class implements GraphQLContext {
+                return new class implements GraphQLContext
+                {
                     public function user()
                     {
                         return new User();

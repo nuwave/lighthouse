@@ -142,7 +142,7 @@ GRAPHQL;
 
         // First priority: Look for a field with the @cacheKey directive
         foreach ($fieldDefinitions as $field) {
-            if (ASTHelper::hasDirective($field, 'cacheKey')) {
+            if (ASTHelper::hasDirective($field, CacheKeyDirective::NAME)) {
                 $typeValue->setCacheKey($field->name->value);
 
                 return;

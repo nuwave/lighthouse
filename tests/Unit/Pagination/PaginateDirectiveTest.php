@@ -352,4 +352,26 @@ class PaginateDirectiveTest extends TestCase
         }
         ');
     }
+
+    public function testAllowsMultiplePaginatedFieldsOfTheSameModel(): void
+    {
+        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            users: [User!] @paginate
+            users2: [User!] @paginate
+        }
+
+        type User {
+            id: ID
+        }
+        ');
+
+        /** @var \GraphQL\Type\Definition\ObjectType $userPaginator */
+        $userPaginator = $schema->getType('UserPaginator');
+
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $ast */
+        $ast = $userPaginator->astNode;
+
+        $this->assertCount(1, $ast->directives);
+    }
 }
