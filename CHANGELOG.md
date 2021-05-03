@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.8.1
+
+### Fixed
+
+- Avoid setting multiple `@model` directives on generated paginator types 
+
 ## 5.8.0
 
 ### Added

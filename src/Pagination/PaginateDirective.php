@@ -92,14 +92,13 @@ GRAPHQL;
             );
         }
 
-        $paginationManipulator
-            ->transformToPaginatedField(
-                $this->paginationType(),
-                $fieldDefinition,
-                $parentType,
-                $this->defaultCount(),
-                $this->paginateMaxCount()
-            );
+        $paginationManipulator->transformToPaginatedField(
+            $this->paginationType(),
+            $fieldDefinition,
+            $parentType,
+            $this->defaultCount(),
+            $this->paginateMaxCount()
+        );
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue

@@ -7,6 +7,8 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 class ModelDirective extends BaseDirective
 {
+    const NAME = 'model';
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -29,7 +31,7 @@ GRAPHQL;
      */
     public static function modelClass(ObjectTypeDefinitionNode $node): ?string
     {
-        $modelDirective = ASTHelper::directiveDefinition($node, 'model');
+        $modelDirective = ASTHelper::directiveDefinition($node, self::NAME);
         if ($modelDirective !== null) {
             return ASTHelper::directiveArgValue($modelDirective, 'class');
         }

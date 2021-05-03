@@ -6,6 +6,8 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class CacheKeyDirective extends BaseDirective implements Directive
 {
+    public const NAME = 'cacheKey';
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
