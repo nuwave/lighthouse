@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Pagination;
 
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
