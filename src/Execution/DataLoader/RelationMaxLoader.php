@@ -33,7 +33,7 @@ class RelationMaxLoader implements RelationAggregateLoader
     public static function extractMax(Model $model, string $relationName, string $column): int
     {
         /**
-         * This is the name that Eloquent gives to the attribute that contains the min.
+         * This is the name that Eloquent gives to the attribute that contains the max.
          *
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withMax()
          */
