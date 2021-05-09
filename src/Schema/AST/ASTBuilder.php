@@ -81,7 +81,7 @@ class ASTBuilder
         if (! isset($this->documentAST)) {
             $cacheConfig = $this->configRepository->get('lighthouse.cache');
             if ($cacheConfig['enable']) {
-                $path = $cacheConfig['path'];
+                $path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
                 if (! File::exists($path)) {
                     File::put($path, '<?php return '.var_export($this->build()->toArray(), true).';');
                 }

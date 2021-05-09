@@ -14,7 +14,7 @@ class ClearCacheCommand extends Command
 
     public function handle(ConfigRepository $config): void
     {
-        $path = $config->get('lighthouse.cache.path');
+        $path = $config->get('lighthouse.cache.path') ?? base_path('bootstrap/cache/lighthouse-schema.php');
         File::delete($path);
 
         $this->info('GraphQL AST schema cache deleted.');
