@@ -157,6 +157,8 @@ GRAPHQL;
         $config->set('lighthouse.federation', [
             'entities_resolver_namespace' => 'Tests\\Utils\\Entities',
         ]);
+
+        $config->set('lighthouse.cache.enable', false);
     }
 
     /**

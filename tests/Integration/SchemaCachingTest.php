@@ -7,10 +7,16 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
+use function Safe\unlink;
 
 class SchemaCachingTest extends TestCase
 {
     use TestsSerialization;
+
+    /**
+     * @var string
+     */
+    private $cachePath;
 
     protected function getEnvironmentSetUp($app): void
     {
@@ -19,9 +25,19 @@ class SchemaCachingTest extends TestCase
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.cache.enable', true);
+        $this->cachePath = __DIR__ . '/../storage/' . __METHOD__ . '.php';
+        $config->set('lighthouse.cache.path', $this->cachePath);
 
         $this->useSerializingArrayStore($app);
     }
+
+    protected function tearDown(): void
+    {
+        unlink($this->cachePath);
+
+        parent::tearDown();
+    }
+
 
     public function testSchemaCachingWithUnionType(): void
     {

@@ -2,29 +2,38 @@
 
 namespace Tests\Console;
 
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Tests\TestCase;
+use function Safe\unlink;
 
 class CacheCommandTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    private $cachePath;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $config = app(ConfigRepository::class);
+        $config->set('lighthouse.cache.enable', true);
+        $this->cachePath = __DIR__ . '/../storage/' . __METHOD__ . '.php';
+        $config->set('lighthouse.cache.path', $this->cachePath);
+    }
+
+    protected function tearDown(): void
+    {
+        unlink($this->cachePath);
+        parent::tearDown();
+    }
+
     public function testCachesGraphQLAST(): void
     {
-        $config = app(ConfigRepository::class);
-        $config->set('lighthouse.cache.ttl', 60);
-
-        $key = $config->get('lighthouse.cache.key');
-
-        $cache = app(CacheRepository::class);
-        $this->assertFalse(
-            $cache->has($key)
-        );
-
+        $this->assertFileDoesNotExist($this->cachePath);
         $this->commandTester(new CacheCommand)->execute([]);
-
-        $this->assertTrue(
-            $cache->has($key)
-        );
+        $this->assertFileExists($this->cachePath);
     }
 }
