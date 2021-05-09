@@ -32,8 +32,8 @@ class CacheCommandTest extends TestCase
 
     public function testCachesGraphQLAST(): void
     {
-        $this->assertFileDoesNotExist($this->cachePath);
+        $this->assertNotTrue(file_exists($this->cachePath));
         $this->commandTester(new CacheCommand)->execute([]);
-        $this->assertFileExists($this->cachePath);
+        $this->assertTrue(file_exists($this->cachePath));
     }
 }
