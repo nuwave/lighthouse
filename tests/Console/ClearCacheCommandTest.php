@@ -5,6 +5,7 @@ namespace Tests\Console;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Tests\TestCase;
+use function Safe\file_put_contents;
 
 class ClearCacheCommandTest extends TestCase
 {
