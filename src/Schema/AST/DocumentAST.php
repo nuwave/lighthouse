@@ -139,7 +139,6 @@ class DocumentAST
 
     /**
      * @param array<string, array> $ast
-     * @return DocumentAST
      */
     public static function fromArray(array $ast): DocumentAST
     {

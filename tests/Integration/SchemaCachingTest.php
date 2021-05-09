@@ -4,10 +4,10 @@ namespace Tests\Integration;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use function Safe\unlink;
 use Tests\TestCase;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
-use function Safe\unlink;
 
 class SchemaCachingTest extends TestCase
 {
@@ -25,7 +25,7 @@ class SchemaCachingTest extends TestCase
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.cache.enable', true);
-        $this->cachePath = __DIR__ . '/../storage/' . __METHOD__ . '.php';
+        $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
         $config->set('lighthouse.cache.path', $this->cachePath);
 
         $this->useSerializingArrayStore($app);
@@ -37,7 +37,6 @@ class SchemaCachingTest extends TestCase
 
         parent::tearDown();
     }
-
 
     public function testSchemaCachingWithUnionType(): void
     {

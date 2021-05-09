@@ -4,8 +4,8 @@ namespace Tests\Console;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Console\CacheCommand;
-use Tests\TestCase;
 use function Safe\unlink;
+use Tests\TestCase;
 
 class CacheCommandTest extends TestCase
 {
@@ -20,7 +20,7 @@ class CacheCommandTest extends TestCase
 
         $config = app(ConfigRepository::class);
         $config->set('lighthouse.cache.enable', true);
-        $this->cachePath = __DIR__ . '/../storage/' . __METHOD__ . '.php';
+        $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
         $config->set('lighthouse.cache.path', $this->cachePath);
     }
 
