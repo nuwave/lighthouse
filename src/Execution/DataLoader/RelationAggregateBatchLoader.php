@@ -47,7 +47,6 @@ class RelationAggregateBatchLoader
     }
 
     /**
-     * Register a relation loader.
      *
      * Check hasRelation() before to avoid re-instantiating and re-registering the same loader.
      */
