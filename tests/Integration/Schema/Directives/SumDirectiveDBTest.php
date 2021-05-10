@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\Utils\Models\Book;
+use function factory;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
-use function factory;
+use Tests\Utils\Models\Book;
 
 class SumDirectiveDBTest extends DBTestCase
 {
