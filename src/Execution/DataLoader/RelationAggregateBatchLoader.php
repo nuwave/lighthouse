@@ -30,6 +30,7 @@ class RelationAggregateBatchLoader
      * @var string
      */
     protected $relationColumn;
+
     /**
      * Marks when the actual batch loading happened.
      *
