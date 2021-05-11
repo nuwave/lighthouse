@@ -36,7 +36,10 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                     /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
                     $relationBatchLoader = BatchLoaderRegistry::instance(
                         RelationBatchLoader::class,
-                        $resolveInfo->path
+                        $relationName,
+                        $resolveInfo->path,
+                        $this->directiveArgValue('scopes', []),
+                        $resolveInfo->argumentSet->arguments
                     );
 
                     if (! $relationBatchLoader->hasRelationLoader()) {

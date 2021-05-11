@@ -46,12 +46,15 @@ abstract class WithRelationDirective extends BaseDirective
     {
         $relationName = $this->relationName();
 
-        // There might be multiple directives on the same field, so we differentiate by relation too
-        $uniquePath = $resolveInfo->path;
-        $uniquePath [] = $relationName;
-
         /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
-        $relationBatchLoader = BatchLoaderRegistry::instance(RelationBatchLoader::class, $uniquePath);
+        $relationBatchLoader = BatchLoaderRegistry::instance(
+            RelationBatchLoader::class, 
+            $relationName, 
+            $resolveInfo->path,
+            $this->directiveArgValue('scopes', []), 
+            $resolveInfo->argumentSet->arguments, 
+            []
+        );
 
         if (! $relationBatchLoader->hasRelationLoader()) {
             $relationBatchLoader->registerRelationLoader($this->relationLoader($resolveInfo), $relationName);

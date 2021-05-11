@@ -21,10 +21,15 @@ abstract class BatchLoaderRegistry
      *
      * @throws \Exception
      */
-    public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): object
+    public static function instance(string $loaderClass, string $relationName, array $pathToField, array $relationScopes = [], array $fieldArguments, array $constructorArgs = []): object
     {
-        // The path to the field serves as the unique key for the instance
-        $instanceKey = static::instanceKey($pathToField);
+        // serves as the unique key for the instance
+        $instanceKey = self::instanceKey(
+            $relationName, 
+            $pathToField, 
+            $relationScopes, 
+            !empty($fieldArguments) // we want to batch load per field if any field args exist.
+        );
 
         if (isset(self::$instances[$instanceKey])) {
             return self::$instances[$instanceKey];
@@ -45,11 +50,39 @@ abstract class BatchLoaderRegistry
     }
 
     /**
-     * Generate a unique key for the instance, using the path in the query.
+     * Generate a unique key for the instance
+     *
+     * @param  string  $relationName
+     * @param  array<int|string>  $pathToField
+     * @param  array<string>  $relationScopes
+     * @param  bool  $batchPerField
+     */
+    protected static function instanceKey(string $relationName, array $pathToField, array $relationScopes = [], bool $batchPerField = false): string
+    {
+        if($batchPerField){
+            // Create separate batch loader per field
+            // There might be multiple directives on the same field, so we differentiate by relation too
+            return self::keyPartFromPath($pathToField)
+                ."|relation__".$relationName;
+        }else{
+
+            // Remove field from path array
+            $pathWithoutField = $pathToField;
+            array_pop($pathWithoutField);
+
+             // Since we aren't batching per field we need to unique it by scopes as well
+            return self::keyPartFromPath($pathWithoutField)
+                ."|relation__".$relationName
+                ."|scopes__".implode(',',$relationScopes);
+        }
+    }
+
+    /**
+     * Generate a key part for the instance, using the path in the query.
      *
      * @param  array<int|string>  $path
      */
-    protected static function instanceKey(array $path): string
+    protected static function keyPartFromPath(array $path): string
     {
         $significantPathSegments = array_filter(
             $path,
@@ -63,4 +96,5 @@ abstract class BatchLoaderRegistry
 
         return implode('.', $significantPathSegments);
     }
+
 }
