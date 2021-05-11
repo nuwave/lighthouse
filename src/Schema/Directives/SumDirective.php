@@ -33,8 +33,16 @@ GRAPHQL;
 
     public function resolveField(FieldValue $value): FieldValue
     {
-        $model = $this->directiveArgValue('model');
         $column = $this->directiveArgValue('column');
+        if (is_string($column)) {
+            return $value->setResolver(
+                function (Model $parent) use ($column): int {
+                    return $parent->sum($column);
+                }
+            );
+        }
+
+        $model = $this->directiveArgValue('model');
         if (is_string($model) && is_string($column)) {
             return $value->setResolver(
                 function () use ($column, $model): int {
@@ -43,14 +51,6 @@ GRAPHQL;
                         ::query();
 
                     return $query->sum($column);
-                }
-            );
-        }
-
-        if (is_string($column)) {
-            return $value->setResolver(
-                function (Model $parent) use ($column): int {
-                    return $parent->sum($column);
                 }
             );
         }

@@ -9,7 +9,7 @@ use Tests\Utils\Models\Book;
 
 class SumDirectiveDBTest extends DBTestCase
 {
-    public function testRequiresAModelOrRelationArgument(): void
+    public function testRequiresAModelArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -65,6 +65,35 @@ class SumDirectiveDBTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'books_sum_price' => 10,
+            ],
+        ]);
+    }
+
+    public function testResolveSumByColumn(): void
+    {
+        factory(Book::class)->create(['price'=>10]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            books: [Book!] @all
+        }
+
+        type Book {
+            sum_price: Int! @sum(column: "price")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            books {
+               sum_price
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'books'=> [
+                    ['sum_price' => 10]
+                ],
             ],
         ]);
     }
