@@ -92,7 +92,7 @@ class SumDirectiveDBTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'books'=> [
-                    ['sum_price' => 10]
+                    ['sum_price' => 10],
                 ],
             ],
         ]);
