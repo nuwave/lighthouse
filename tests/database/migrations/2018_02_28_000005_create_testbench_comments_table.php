@@ -15,8 +15,6 @@ class CreateTestbenchCommentsTable extends Migration
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('post_id');
 
-            $table->integer('votes')->default(0);
-
             $table->timestamps();
         });
     }
