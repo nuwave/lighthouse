@@ -1,7 +1,7 @@
 # Validation
 
-Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your
-queries and mutations.
+Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation)
+for your queries and mutations.
 
 ## Single Arguments
 
@@ -203,6 +203,70 @@ type Mutation {
 
 In that case, Lighthouse will look for a validator class in a sub-namespace matching the parent type, in this case
 that would be `Mutation`, so the default FQCN would be `App\GraphQL\Validators\Mutation\UpdateUserValidator`.
+
+## Caveats
+
+### No Mutations
+
+Validation rules that mutate the given input are *not* supported:
+- `exclude_if`
+- `exclude_unless`
+
+### Field References
+
+References are resolved relative to the argument or input field that rules are defined upon:
+
+```graphql
+type Mutation {
+    foo(bar: Int, input: FooInput): ID
+}
+
+input FooInput {
+    bar: Int
+    notBar: Int @rules(apply: ["different:bar"])
+}
+```
+
+The following mutation would pass validation, because `notBar` references the `bar` field of `FooInput`
+and thus its value `1` is compared to the value `2` - which is different:
+
+```graphql
+mutation {
+    foo(
+        bar: 1
+        input: {
+            bar: 2
+            notBar: 1
+        }
+    )
+}
+```
+
+### Comparisons
+
+If you need to validate the size of an integer, you need to add the
+`integer` validation rule before:
+
+```graphql
+type Mutation {
+    drinkCoffee(
+        cups: Int! @rules(apply: ["integer", "max:3"])
+    ): Energy
+}
+```
+
+Rules that reference other fields work strictly function as such.
+For example, it is not possible to use `gt` to compare against a literal value,
+use `min` instead:
+
+```graphql
+type Mutation {
+    bakePizza(
+        dough: Int @rules(apply: ["integer", "gt:water"])
+        water: Int @rules(apply: ["integer", "min:2"])
+    ): User
+}
+```
 
 ## Customize Query Validation Rules
 
