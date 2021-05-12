@@ -8,14 +8,11 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class ValidationServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );
