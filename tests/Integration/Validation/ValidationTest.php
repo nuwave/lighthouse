@@ -141,6 +141,30 @@ class ValidationTest extends TestCase
             ]);
     }
 
+    public function testCombinedRulesChangeTheirSemantics(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: Int @rules(apply: ["min:42"])
+                baz: Int @rules(apply: ["int", "min:42"])
+            ): ID
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    bar: 21
+                    baz: 21
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('bar', 'The bar must be at least 42 characters.')
+            ->assertGraphQLValidationError('baz', 'The baz must be at least 42.');
+    }
+
     public function testValidatesDifferentPathsIndividually(): void
     {
         $this->schema = /** @lang GraphQL */ '
