@@ -48,11 +48,11 @@ abstract class WithRelationDirective extends BaseDirective
 
         /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
         $relationBatchLoader = BatchLoaderRegistry::instance(
-            RelationBatchLoader::class, 
-            $relationName, 
+            RelationBatchLoader::class,
+            $relationName,
             $resolveInfo->path,
-            $this->directiveArgValue('scopes', []), 
-            $resolveInfo->argumentSet->arguments, 
+            $this->directiveArgValue('scopes', []),
+            $resolveInfo->argumentSet->arguments,
             []
         );
 
