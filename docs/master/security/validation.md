@@ -208,7 +208,8 @@ that would be `Mutation`, so the default FQCN would be `App\GraphQL\Validators\M
 
 ### No Mutations
 
-Validation rules that mutate the given input are *not* supported:
+Validation rules that mutate the given input are _not_ supported:
+
 - `exclude_if`
 - `exclude_unless`
 
@@ -218,12 +219,12 @@ References are resolved relative to the argument or input field that rules are d
 
 ```graphql
 type Mutation {
-    foo(bar: Int, input: FooInput): ID
+  foo(bar: Int, input: FooInput): ID
 }
 
 input FooInput {
-    bar: Int
-    notBar: Int @rules(apply: ["different:bar"])
+  bar: Int
+  notBar: Int @rules(apply: ["different:bar"])
 }
 ```
 
@@ -232,13 +233,7 @@ and thus its value `1` is compared to the value `2` - which is different:
 
 ```graphql
 mutation {
-    foo(
-        bar: 1
-        input: {
-            bar: 2
-            notBar: 1
-        }
-    )
+  foo(bar: 1, input: { bar: 2, notBar: 1 })
 }
 ```
 
@@ -249,9 +244,7 @@ If you need to validate the size of an integer, you need to add the
 
 ```graphql
 type Mutation {
-    drinkCoffee(
-        cups: Int! @rules(apply: ["integer", "max:3"])
-    ): Energy
+  drinkCoffee(cups: Int! @rules(apply: ["integer", "max:3"])): Energy
 }
 ```
 
@@ -261,10 +254,10 @@ use `min` instead:
 
 ```graphql
 type Mutation {
-    bakePizza(
-        dough: Int @rules(apply: ["integer", "gt:water"])
-        water: Int @rules(apply: ["integer", "min:2"])
-    ): User
+  bakePizza(
+    dough: Int @rules(apply: ["integer", "gt:water"])
+    water: Int @rules(apply: ["integer", "min:2"])
+  ): User
 }
 ```
 
