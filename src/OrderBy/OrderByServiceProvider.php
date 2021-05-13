@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\OrderBy;
 
-use GraphQL\Language\Parser;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Events\Dispatcher;
-use Nuwave\Lighthouse\Events\ManipulateAST;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class OrderByServiceProvider extends ServiceProvider

@@ -2,20 +2,20 @@
 
 namespace Nuwave\Lighthouse\OrderBy;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
 
 class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, FieldBuilderDirective
 {
@@ -140,7 +140,7 @@ GRAPHQL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        if (!$this->hasAllowedColumns() && !$this->directiveHasArgument('relations')) {
+        if (! $this->hasAllowedColumns() && ! $this->directiveHasArgument('relations')) {
             $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
             return;
         }
@@ -157,7 +157,7 @@ GRAPHQL;
 
             foreach ($this->directiveArgValue('relations', []) as $relation) {
                 $restrictedOrderByNameRelation = $restrictedOrderByPrefix
-                    . Str::ucfirst($relation['relation']);
+                    .Str::ucfirst($relation['relation']);
 
                 $relationsInputs[] = [
                     'input' => $restrictedOrderByNameRelation,
@@ -168,8 +168,8 @@ GRAPHQL;
 
                 if (count($columns) > 0) {
                     $allowedColumnsEnumNameRelation = $restrictedOrderByPrefix
-                        . Str::ucfirst($relation['relation'])
-                        . 'Column';
+                        .Str::ucfirst($relation['relation'])
+                        .'Column';
 
                     $documentAST
                         ->setTypeDefinition(
@@ -201,7 +201,7 @@ GRAPHQL;
                 }
             }
 
-            $restrictedRelationOrderByName = $restrictedOrderByPrefix."OrderByClause";
+            $restrictedRelationOrderByName = $restrictedOrderByPrefix.'OrderByClause';
             $nullableAllowedColumnsEnumName = Str::endsWith($allowedColumnsEnumName, '!')
                 ? Str::replaceLast('!', '', $allowedColumnsEnumName)
                 : $allowedColumnsEnumName;
@@ -252,7 +252,6 @@ GRAPHQL;
      * Get relation method using array key if exists.
      *
      * @param array<mixed> $orderByClause
-     * @return string|null
      */
     protected function retrieveRelationNameIfExists(array $orderByClause): ?string
     {
