@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class AggregateModelsLoader implements ModelsLoader
@@ -38,37 +37,9 @@ class AggregateModelsLoader implements ModelsLoader
         $this->decorateBuilder = $decorateBuilder;
     }
 
-    /**
-     * TODO use built-in function once switching to Laravel 8+ only.
-     * @see EloquentCollection::loadAggregate()
-     */
     public function load(EloquentCollection $parents): void
     {
-        if ($parents->isEmpty()) {
-            return;
-        }
-
-        $models = $parents->first()->newModelQuery()
-            ->whereKey($parents->modelKeys())
-            ->select($parents->first()->getKeyName())
-            ->withAggregate([$this->relation => $this->decorateBuilder], $this->column, $this->function)
-            ->get()
-            ->keyBy($parents->first()->getKeyName());
-
-        $attributes = Arr::except(
-            array_keys($models->first()->getAttributes()),
-            $models->first()->getKeyName()
-        );
-
-        foreach ($parents as $model) {
-            $extraAttributes = Arr::only($models->get($model->getKey())->getAttributes(), $attributes);
-
-            $model->forceFill($extraAttributes);
-
-            foreach ($attributes as $attribute) {
-                $model->syncOriginalAttribute($attribute);
-            }
-        }
+        $parents->loadAggregate([$this->relation => $this->decorateBuilder], $this->column, $this->function);
     }
 
     public function extract(Model $model)
