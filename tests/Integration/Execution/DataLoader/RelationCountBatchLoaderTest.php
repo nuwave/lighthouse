@@ -3,7 +3,7 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
@@ -95,7 +95,9 @@ class RelationCountBatchLoaderTest extends DBTestCase
 
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoaderRegistry::instance(UserLoader::class, $info->path);
+                $loader = BatchLoaderRegistry::instance($info->path, function (): UserLoader {
+                    return new UserLoader();
+                });
 
                 return $loader->load($args['id']);
             },
@@ -103,7 +105,9 @@ class RelationCountBatchLoaderTest extends DBTestCase
         );
         $this->mockResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoaderRegistry::instance(UserLoader::class, $info->path);
+                $loader = BatchLoaderRegistry::instance($info->path, function (): UserLoader {
+                    return new UserLoader();
+                });
 
                 return $loader->loadMany($args['ids']);
             },

@@ -7,9 +7,9 @@ use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
+use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -18,9 +18,9 @@ abstract class WithRelationDirective extends BaseDirective
     /**
      * The name of the relation to be loaded.
      */
-    abstract protected function relationName(): string;
+    abstract protected function relation(): string;
 
-    abstract protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader;
+    abstract protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader;
 
     /**
      * Eager load a relation on the parent instance.
@@ -32,7 +32,7 @@ abstract class WithRelationDirective extends BaseDirective
         $fieldValue->setResolver(
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
                 return $this
-                    ->loadRelation($parent, $resolveInfo)
+                    ->loadRelation($parent, $args, $resolveInfo)
                     ->then(function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
                         return $previousResolver($parent, $args, $context, $resolveInfo);
                     });
@@ -42,30 +42,36 @@ abstract class WithRelationDirective extends BaseDirective
         return $next($fieldValue);
     }
 
-    protected function loadRelation(Model $parent, ResolveInfo $resolveInfo): Deferred
+    /**
+     * @param array<string, mixed> $args
+     */
+    protected function loadRelation(Model $parent, array $args, ResolveInfo $resolveInfo): Deferred
     {
-        $relationName = $this->relationName();
+        // Includes the field we are loading the relation for
+        $path = $resolveInfo->path;
 
-        // There might be multiple directives on the same field, so we differentiate by relation too
-        $uniquePath = $resolveInfo->path;
-        $uniquePath [] = $relationName;
-
-        /** @var \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader $relationBatchLoader */
-        $relationBatchLoader = BatchLoaderRegistry::instance(RelationBatchLoader::class, $uniquePath);
-
-        if (! $relationBatchLoader->hasRelationLoader()) {
-            $relationBatchLoader->registerRelationLoader($this->relationLoader($resolveInfo), $relationName);
+        // In case we have no args, we can combine eager loads that are the same
+        if ($args === []) {
+            array_pop($path);
         }
+
+        $path = $this->qualifyPath($path);
+
+        /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
+        $relationBatchLoader = BatchLoaderRegistry::instance(
+            $path,
+            function () use ($resolveInfo): RelationBatchLoader {
+                return new RelationBatchLoader($this->relationLoader($resolveInfo));
+            }
+        );
 
         return $relationBatchLoader->load($parent);
     }
 
     /**
-     * Decorate the builder used to fetch the models.
-     *
-     * @return Closure(object): void
+     * @return \Closure(object): void
      */
-    protected function decorateBuilder(ResolveInfo $resolveInfo): Closure
+    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
     {
         return function (object $builder) use ($resolveInfo): void {
             if ($builder instanceof Relation) {
@@ -74,8 +80,29 @@ abstract class WithRelationDirective extends BaseDirective
 
             $resolveInfo->argumentSet->enhanceBuilder(
                 $builder,
-                $this->directiveArgValue('scopes', [])
+                $this->scopes()
             );
         };
+    }
+
+    /**
+     * @return mixed|null
+     */
+    protected function scopes()
+    {
+        return $this->directiveArgValue('scopes', []);
+    }
+
+    /**
+     * @param array<int, int|string> $path
+     * @return array<int, int|string>
+     */
+    protected function qualifyPath(array $path): array
+    {
+        // Each relation must be loaded separately
+        $path [] = $this->relation();
+
+        // Scopes influence the result of the query
+        return array_merge($path, $this->scopes());
     }
 }

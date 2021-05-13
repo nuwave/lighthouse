@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution\DataLoader;
+namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
 use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -8,26 +8,32 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-class RelationCountLoader implements RelationLoader
+class CountModelsLoader implements ModelsLoader
 {
+    /**
+     * @var string
+     */
+    protected $relation;
+
     /**
      * @var \Closure
      */
     protected $decorateBuilder;
 
-    public function __construct(Closure $decorateBuilder)
+    public function __construct(string $relation, Closure $decorateBuilder)
     {
+        $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
     }
 
-    public function load(EloquentCollection $parents, string $relationName): void
+    public function load(EloquentCollection $parents): void
     {
-        self::loadCount($parents, [$relationName => $this->decorateBuilder]);
+        self::loadCount($parents, [$this->relation => $this->decorateBuilder]);
     }
 
-    public function extract(Model $model, string $relationName)
+    public function extract(Model $model): int
     {
-        return self::extractCount($model, $relationName);
+        return self::extractCount($model, $this->relation);
     }
 
     public static function extractCount(Model $model, string $relationName): int

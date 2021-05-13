@@ -5,29 +5,39 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\AggregateModelsLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CountDirective extends WithRelationDirective implements FieldResolver
+class AggregateDirective extends WithRelationDirective implements FieldResolver
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Returns the count of a given relationship or model.
+Returns an aggregate of a column in a given relationship or model.
 """
-directive @count(
+directive @aggregate(
   """
-  The relationship to count.
+  The column to aggregate.
+  """
+  column: String!
+
+  """
+  The aggregate function to compute.
+  """
+  function: AggregateFunction!
+
+  """
+  The relationship with the column to aggregate.
   Mutually exclusive with the `model` argument.
   """
   relation: String
 
   """
-  The model to count.
+  The model with the column to aggregate.
   Mutually exclusive with the `relation` argument.
   """
   model: String
@@ -37,6 +47,21 @@ directive @count(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
+
+"""
+Options for the `function` argument of `@aggregate`.
+"""
+enum AggregateFunction {
+    """
+    Return the average value.
+    """
+    AVG
+
+    """
+    Return the sum.
+    """
+    SUM
+}
 GRAPHQL;
     }
 
@@ -45,14 +70,14 @@ GRAPHQL;
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
             return $value->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                     $query = $this
                         ->namespaceModelClass($modelArg)
                         ::query();
 
                     $this->makeBuilderDecorator($resolveInfo)($query);
 
-                    return $query->count();
+                    return $query->aggregate($this->function(), [$this->column()]);
                 }
             );
         }
@@ -85,9 +110,31 @@ GRAPHQL;
 
     protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader
     {
-        return new CountModelsLoader(
+        return new AggregateModelsLoader(
             $this->relation(),
+            $this->column(),
+            $this->function(),
             $this->makeBuilderDecorator($resolveInfo)
+        );
+    }
+
+    protected function function(): string
+    {
+        return strtolower(
+            $this->directiveArgValue('function')
+        );
+    }
+
+    protected function column(): string
+    {
+        return $this->directiveArgValue('column');
+    }
+
+    protected function qualifyPath(array $path): array
+    {
+        return array_merge(
+            parent::qualifyPath($path),
+            [$this->column()]
         );
     }
 }
