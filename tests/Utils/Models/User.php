@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
- * Primary key
+ * Primary key.
  * @property int $id
  *
  * Attributes

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
 
 /**
- * Primary key
+ * Primary key.
  * @property int $id
  *
  * Attributes

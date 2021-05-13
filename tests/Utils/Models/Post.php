@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 
 /**
- * Primary key
+ * Primary key.
  * @property int $id
  *
  * Attributes

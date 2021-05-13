@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * Primary key
+ * Primary key.
  * @property int $id
  *
  * Attributes

@@ -5,7 +5,7 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Primary key
+ * Primary key.
  * @property int $id
  *
  * Attributes

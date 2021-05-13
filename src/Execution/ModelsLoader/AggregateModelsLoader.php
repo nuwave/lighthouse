@@ -39,7 +39,7 @@ class AggregateModelsLoader implements ModelsLoader
     }
 
     /**
-     * TODO use built-in function once switching to Laravel 8+ only
+     * TODO use built-in function once switching to Laravel 8+ only.
      * @see EloquentCollection::loadAggregate()
      */
     public function load(EloquentCollection $parents): void
