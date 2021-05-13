@@ -5,6 +5,7 @@ namespace Tests\Integration\OrderBy;
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class OrderByDirectiveDBTest extends DBTestCase
@@ -15,6 +16,7 @@ class OrderByDirectiveDBTest extends DBTestCase
             orderBy: _ @orderBy
             orderByRestricted: _ @orderBy(columns: ["name"])
             orderByRestrictedEnum: _ @orderBy(columnsEnum: "UserColumn")
+            orderByRelation: _ @orderBy(relations: [{ relation: "tasks" }])
         ): [User!]! @all
     }
 
@@ -256,6 +258,42 @@ class OrderByDirectiveDBTest extends DBTestCase
                     ],
                     [
                         'name' => 'A',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOrderWithRelation(): void
+    {
+        $userB = factory(User::class)->create(['name' => 'B']);
+        $userA = factory(User::class)->create(['name' => 'A']);
+
+        factory(Task::class)->create(['user_id' => $userA->id]);
+        factory(Task::class)->create(['user_id' => $userA->id]);
+        factory(Task::class)->create(['user_id' => $userB->id]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderByRelation: [
+                    {
+                        tasks: { aggregate: COUNT }
+                        order: DESC
+                    }
+                ]
+            ) {
+                name
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'name' => 'A',
+                    ],
+                    [
+                        'name' => 'B',
                     ],
                 ],
             ],

@@ -26,4 +26,30 @@ class OrderByDirectiveTest extends TestCase
         );
         $this->assertInstanceOf(InputObjectType::class, $input);
     }
+
+    public function testGeneratesInputWithFullyQualifiedNameUsingRelations(): void
+    {
+        $schemaString = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                orderBy: _ @orderBy(
+                    columns: ["bar"],
+                    relations: [
+                        { relation: "foo" },
+                        { relation: "baz", columns: ["foz"] },
+                    ]
+                )
+            ): ID @mock
+        }
+        ';
+
+        $schema = $this->buildSchema($schemaString);
+        $input = $schema->getType(
+            'Query' // Parent
+            .'Foo' // Field
+            .'OrderBy' // Arg
+            .'RelationOrderByClause' // Suffix with relation
+        );
+        $this->assertInstanceOf(InputObjectType::class, $input);
+    }
 }
