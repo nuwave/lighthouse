@@ -39,6 +39,7 @@ class AggregateModelsLoader implements ModelsLoader
 
     public function load(EloquentCollection $parents): void
     {
+        // @phpstan-ignore-next-line Only present in Laravel 8+
         $parents->loadAggregate([$this->relation => $this->decorateBuilder], $this->column, $this->function);
     }
 
@@ -52,6 +53,7 @@ class AggregateModelsLoader implements ModelsLoader
         $attribute = Str::snake(
             \Safe\preg_replace('/[^[:alnum:][:space:]_]/u', '', "$this->relation $this->function $this->column")
         );
+
 
         return $model->getAttribute($attribute);
     }

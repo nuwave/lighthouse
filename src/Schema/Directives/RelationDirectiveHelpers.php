@@ -37,12 +37,10 @@ trait RelationDirectiveHelpers
                 $builder = $builder->getQuery();
             }
 
-            $resolveInfo
-                ->argumentSet
-                ->enhanceBuilder(
-                    $builder,
-                    $this->directiveArgValue('scopes', [])
-                );
+            $resolveInfo->argumentSet->enhanceBuilder(
+                $builder,
+                $this->scopes()
+            );
         };
     }
 
