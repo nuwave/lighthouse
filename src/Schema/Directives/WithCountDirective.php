@@ -11,9 +11,8 @@ use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithCountDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
+class WithCountDirective extends WithRelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
@@ -49,18 +48,6 @@ GRAPHQL;
         if (! is_string($relation)) {
             throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
         }
-    }
-
-    protected function relation(): string
-    {
-        /**
-         * We validated the argument during schema manipulation.
-         *
-         * @var string $relation
-         */
-        $relation = $this->directiveArgValue('relation');
-
-        return $relation;
     }
 
     /**

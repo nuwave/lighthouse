@@ -23,9 +23,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 abstract class RelationDirective extends BaseDirective implements FieldResolver
 {
-    public function resolveField(FieldValue $value): FieldValue
+    use RelationDirectiveHelpers;
+
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $value->setResolver(
+        $fieldValue->setResolver(
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationName = $this->relation();
 
@@ -35,7 +37,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 if (config('lighthouse.batchload_relations')) {
                     /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                     $relationBatchLoader = BatchLoaderRegistry::instance(
-                        $resolveInfo->path,
+                        $this->qualifyPath($args, $resolveInfo),
                         function () use ($relationName, $decorateBuilder, $paginationArgs): RelationBatchLoader {
                             $modelsLoader = $paginationArgs !== null
                                 ? new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
@@ -59,32 +61,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             }
         );
 
-        return $value;
-    }
-
-    protected function relation(): string
-    {
-        return $this->directiveArgValue('relation')
-            ?? $this->nodeName();
-    }
-
-    /**
-     * @return \Closure(object): void
-     */
-    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
-    {
-        return function (object $builder) use ($resolveInfo) {
-            if ($builder instanceof Relation) {
-                $builder = $builder->getQuery();
-            }
-
-            $resolveInfo
-                ->argumentSet
-                ->enhanceBuilder(
-                    $builder,
-                    $this->directiveArgValue('scopes', [])
-                );
-        };
+        return $fieldValue;
     }
 
     public function manipulateFieldDefinition(

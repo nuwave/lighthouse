@@ -11,9 +11,8 @@ use Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
+class WithDirective extends WithRelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
@@ -41,12 +40,6 @@ GRAPHQL;
         if (RootType::isRootType($parentType->name->value)) {
             throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");
         }
-    }
-
-    protected function relation(): string
-    {
-        return $this->directiveArgValue('relation')
-            ?? $this->nodeName();
     }
 
     /**
