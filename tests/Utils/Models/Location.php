@@ -7,10 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
+ * Primary key
  * @property int $id
- * @property int|null $parent_id
+ *
+ * Timestamps
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
+ *
+ * Foreign keys
+ * @property int|null $parent_id
+ *
+ * Relations
+ * @property-read \Tests\Utils\Models\Location $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Location> $children
  */
 class Location extends Model
 {
