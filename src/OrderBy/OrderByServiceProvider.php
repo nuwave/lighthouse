@@ -45,8 +45,8 @@ class OrderByServiceProvider extends ServiceProvider
                 $documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/* @lang GraphQL */ '
                         "TODO: description"
-                        enum AggregateFunctionOrderWithoutColumn {
-                            "Count function."
+                        enum AggregateFunctionOrder {
+                            "TODO: description"
                             COUNT
                         }
                     '
@@ -55,20 +55,20 @@ class OrderByServiceProvider extends ServiceProvider
                 $documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/* @lang GraphQL */ '
                         "TODO: description"
-                        enum AggregateFunctionOrder {
-                            "avg function."
+                        enum AggregateFunctionOrderForColumn {
+                            "TODO: description"
                             AVG
 
-                            "min function."
+                            "TODO: description"
                             MIN
 
-                            "max function."
+                            "TODO: description"
                             MAX
 
-                            "sum function."
+                            "TODO: description"
                             SUM
 
-                            "count function."
+                            "TODO: description"
                             COUNT
 
                         }
@@ -101,7 +101,7 @@ GRAPHQL
         );
     }
 
-    public static function createOrderByRelationInput(string $name, string $description, string $relation, string $configurationType): InputObjectTypeDefinitionNode
+    public static function createOrderByRelationClauseInput(string $name, string $description, string $relation, string $configurationType): InputObjectTypeDefinitionNode
     {
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
             "$description"
@@ -116,25 +116,25 @@ GRAPHQL
         );
     }
 
-    public static function createRelationConfigurationWithoutColumnsInput(string $name, string $description): InputObjectTypeDefinitionNode
-    {
-        return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
-                "TODO: description"
-                aggregate: AggregateFunctionOrderWithoutColumn!
-            }
-GRAPHQL
-        );
-    }
-
-    public static function createRelationConfigurationWithColumnsInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
+    public static function createRelationAggregateFunctionInput(string $name, string $description): InputObjectTypeDefinitionNode
     {
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
                 "TODO: description"
                 aggregate: AggregateFunctionOrder!
+            }
+GRAPHQL
+        );
+    }
+
+    public static function createRelationAggregateFunctionForColumnInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
+    {
+        return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
+            "$description"
+            input $name {
+                "TODO: description"
+                aggregate: AggregateFunctionOrderForColumn!
 
                 "TODO: description"
                 column: $columnType

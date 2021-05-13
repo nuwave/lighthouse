@@ -96,14 +96,14 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<array{column: string, order: string}>  $value
+     * @param  array<mixed>  $value
      */
     public function handleBuilder($builder, $value): object
     {
         foreach ($value as $orderByClause) {
-            $relationInfo = Arr::except($orderByClause, ['order', 'column']);
+            $relationMethod = $this->retrieveRelationNameIfExists($orderByClause);
 
-            if (! $relationMethod = array_keys($relationInfo)[0] ?? null) {
+            if (! $relationMethod || $builder instanceof \Illuminate\Database\Query\Builder) {
                 $builder->orderBy(
                     $orderByClause['column'],
                     $orderByClause['order']
@@ -112,17 +112,17 @@ GRAPHQL;
                 continue;
             }
 
-            $aggregate = Str::lower(Arr::get($relationInfo, "{$relationMethod}.aggregate"));
-            $column = Arr::get($relationInfo, "{$relationMethod}.column");
+            $aggregate = Str::lower(Arr::get($orderByClause, "{$relationMethod}.aggregate"));
+            $column = Arr::get($orderByClause, "{$relationMethod}.column");
 
             if ($aggregate === 'count') {
                 $builder->withCount($relationMethod);
-                $orderColumn = Str::snake($relationMethod.' count');
+                $orderColumn = Str::snake("{$relationMethod}_count");
             } else {
-                $operator = Str::camel('with '.$aggregate);
+                $operator = Str::camel("with {$aggregate}");
                 $builder->{$operator}($relationMethod, $column);
 
-                $orderColumn = Str::snake("{$relationMethod} {$aggregate} {$column}");
+                $orderColumn = Str::snake("{$relationMethod}_{$aggregate}_{$column}");
             }
 
             $builder->orderBy(
@@ -140,29 +140,37 @@ GRAPHQL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        $orderByClauseName = OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE;
+        if (!$this->hasAllowedColumns() && !$this->directiveHasArgument('relations')) {
+            $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
+            return;
+        }
 
         $allowedColumnsEnumName = 'String!';
+        $restrictedOrderByPrefix = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType);
 
         if ($this->hasAllowedColumns()) {
-            $restrictedOrderByName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).'OrderByClause';
-            $orderByClauseName = $restrictedOrderByName;
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
         }
 
         if ($this->directiveHasArgument('relations')) {
             $relationsInputs = [];
 
-            foreach ($this->directiveArgValue('relations') as $relation) {
-                $restrictedOrderByNameRelation = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).'OrderBy'.ucfirst($relation['relation']).'Relation';
+            foreach ($this->directiveArgValue('relations', []) as $relation) {
+                $restrictedOrderByNameRelation = $restrictedOrderByPrefix
+                    . Str::ucfirst($relation['relation']);
+
                 $relationsInputs[] = [
                     'input' => $restrictedOrderByNameRelation,
-                    'relation' => $relation['relation'],
+                    'relation' => Arr::get($relation, 'relation'),
                 ];
-                $columns = $relation['columns'] ?? [];
+
+                $columns = Arr::get($relation, 'columns', []);
 
                 if (count($columns) > 0) {
-                    $allowedColumnsEnumNameRelation = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).ucfirst($relation['relation']).'Column';
+                    $allowedColumnsEnumNameRelation = $restrictedOrderByPrefix
+                        . Str::ucfirst($relation['relation'])
+                        . 'Column';
+
                     $documentAST
                         ->setTypeDefinition(
                             $this->createAllowedColumnsEnum(
@@ -176,7 +184,7 @@ GRAPHQL;
 
                     $documentAST
                         ->setTypeDefinition(
-                            OrderByServiceProvider::createRelationConfigurationWithColumnsInput(
+                            OrderByServiceProvider::createRelationAggregateFunctionForColumnInput(
                                 $restrictedOrderByNameRelation,
                                 'TODO: description',
                                 $allowedColumnsEnumNameRelation
@@ -185,7 +193,7 @@ GRAPHQL;
                 } else {
                     $documentAST
                         ->setTypeDefinition(
-                            OrderByServiceProvider::createRelationConfigurationWithoutColumnsInput(
+                            OrderByServiceProvider::createRelationAggregateFunctionInput(
                                 $restrictedOrderByNameRelation,
                                 'TODO: description'
                             )
@@ -193,26 +201,34 @@ GRAPHQL;
                 }
             }
 
-            $orderByClauseName = "{$orderByClauseName}WithRelation";
+            $restrictedRelationOrderByName = $restrictedOrderByPrefix."OrderByClause";
+            $nullableAllowedColumnsEnumName = Str::endsWith($allowedColumnsEnumName, '!')
+                ? Str::replaceLast('!', '', $allowedColumnsEnumName)
+                : $allowedColumnsEnumName;
 
             $inputMerged = "
                 \"TODO: description\"
-                input {$orderByClauseName} {
+                input {$restrictedRelationOrderByName} {
                     \"The column that is used for ordering.\"
-                    column: $allowedColumnsEnumName
+                    column: $nullableAllowedColumnsEnumName
 
                     \"The direction that is used for ordering.\"
                     order: SortOrder!";
 
-            collect($relationsInputs)->each(function ($relation) use (&$inputMerged) {
+            foreach ($relationsInputs as $key => $relation) {
                 $inputMerged .= "
                     \"TODO: description\"
                     {$relation['relation']}: {$relation['input']}
                 ";
-            });
+            }
+
+            $argDefinition->type = Parser::typeReference('['.$restrictedRelationOrderByName.'!]');
 
             $documentAST->setTypeDefinition(Parser::inputObjectTypeDefinition($inputMerged.'}'));
         } else {
+            $restrictedOrderByName = $restrictedOrderByPrefix.'OrderByClause';
+            $argDefinition->type = Parser::typeReference('['.$restrictedOrderByName.'!]');
+
             $documentAST
                 ->setTypeDefinition(
                     OrderByServiceProvider::createOrderByClauseInput(
@@ -222,8 +238,6 @@ GRAPHQL;
                     )
                 );
         }
-
-        $argDefinition->type = Parser::typeReference('['.$orderByClauseName.'!]');
     }
 
     public function handleFieldBuilder(object $builder): object
@@ -232,5 +246,18 @@ GRAPHQL;
             $this->directiveArgValue('column'),
             $this->directiveArgValue('direction', 'ASC')
         );
+    }
+
+    /**
+     * Get relation method using array key if exists.
+     *
+     * @param array<mixed> $orderByClause
+     * @return string|null
+     */
+    protected function retrieveRelationNameIfExists(array $orderByClause): ?string
+    {
+        $relationInfo = Arr::except($orderByClause, ['order', 'column']);
+
+        return Arr::first(array_keys($relationInfo));
     }
 }
