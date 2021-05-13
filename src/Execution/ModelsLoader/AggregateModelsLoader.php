@@ -54,7 +54,6 @@ class AggregateModelsLoader implements ModelsLoader
             \Safe\preg_replace('/[^[:alnum:][:space:]_]/u', '', "$this->relation $this->function $this->column")
         );
 
-
         return $model->getAttribute($attribute);
     }
 }
