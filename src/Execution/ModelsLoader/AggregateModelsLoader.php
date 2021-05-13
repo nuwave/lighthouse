@@ -38,11 +38,9 @@ class AggregateModelsLoader implements ModelsLoader
 
     public function load(EloquentCollection $parents): void
     {
-
     }
 
     public function extract(Model $model)
     {
-
     }
 }
