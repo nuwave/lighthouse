@@ -142,6 +142,7 @@ GRAPHQL;
     ): void {
         if (! $this->hasAllowedColumns() && ! $this->directiveHasArgument('relations')) {
             $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
+
             return;
         }
 
