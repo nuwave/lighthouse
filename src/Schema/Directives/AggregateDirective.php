@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ModelsLoader\AggregateModelsLoader;
@@ -61,6 +62,16 @@ enum AggregateFunction {
     Return the sum.
     """
     SUM
+
+    """
+    Return the minimum.
+    """
+    MIN
+
+    """
+    Return the maximum.
+    """
+    MAX
 }
 GRAPHQL;
     }
@@ -71,13 +82,14 @@ GRAPHQL;
         if (is_string($modelArg)) {
             return $value->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+                    /** @var Builder $query */
                     $query = $this
                         ->namespaceModelClass($modelArg)
                         ::query();
 
                     $this->makeBuilderDecorator($resolveInfo)($query);
 
-                    return $query->aggregate($this->function(), [$this->column()]);
+                    return $query->{$this->function()}($this->column());
                 }
             );
         }
