@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.8.2
+
+### Fixed
+
+- Allow `@builder` in combination with `@search`
+
 ## 5.8.1
 
 ### Fixed
