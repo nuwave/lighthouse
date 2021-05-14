@@ -112,8 +112,7 @@ GRAPHQL;
                 continue;
             }
 
-            $aggregate = Str::lower(Arr::get($orderByClause, "{$relationMethod}.aggregate"));
-            $column = Arr::get($orderByClause, "{$relationMethod}.column");
+            [$aggregate, $column] = $this->retrieveAggregateAndColumnParams($orderByClause, $relationMethod);
 
             if ($aggregate === 'count') {
                 $builder->withCount($relationMethod);
@@ -202,7 +201,7 @@ GRAPHQL;
                 }
             }
 
-            $restrictedRelationOrderByName = $restrictedOrderByPrefix.'OrderByClause';
+            $restrictedRelationOrderByName = $restrictedOrderByPrefix.'RelationOrderByClause';
             $nullableAllowedColumnsEnumName = Str::endsWith($allowedColumnsEnumName, '!')
                 ? Str::replaceLast('!', '', $allowedColumnsEnumName)
                 : $allowedColumnsEnumName;
@@ -259,5 +258,23 @@ GRAPHQL;
         $relationInfo = Arr::except($orderByClause, ['order', 'column']);
 
         return Arr::first(array_keys($relationInfo));
+    }
+
+    /**
+     * Get aggregate and column params from relation input
+     *
+     * @param array<mixed> $orderByClause
+     * @param string $relationMethod
+     * @return array{mixed, mixed}
+     */
+    protected function retrieveAggregateAndColumnParams(array $orderByClause, string $relationMethod): array
+    {
+        $aggregate = Arr::get($orderByClause, "{$relationMethod}.aggregate");
+        $column = Arr::get($orderByClause, "{$relationMethod}.column");
+
+        return [
+            Str::lower($aggregate),
+            $column
+        ];
     }
 }
