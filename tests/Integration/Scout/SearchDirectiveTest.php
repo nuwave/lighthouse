@@ -177,7 +177,7 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function customBuilderMethod(ScoutBuilder $builder, $value): ScoutBuilder
+    public function customBuilderMethod(ScoutBuilder $builder, int $value): ScoutBuilder
     {
         return $builder->where('from_custom_builder', $value);
     }
