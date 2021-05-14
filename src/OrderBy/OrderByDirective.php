@@ -261,10 +261,9 @@ GRAPHQL;
     }
 
     /**
-     * Get aggregate and column params from relation input
+     * Get aggregate and column params from relation input.
      *
      * @param array<mixed> $orderByClause
-     * @param string $relationMethod
      * @return array{mixed, mixed}
      */
     protected function retrieveAggregateAndColumnParams(array $orderByClause, string $relationMethod): array
@@ -274,7 +273,7 @@ GRAPHQL;
 
         return [
             Str::lower($aggregate),
-            $column
+            $column,
         ];
     }
 }
