@@ -145,7 +145,7 @@ GRAPHQL;
             return;
         }
 
-        $allowedColumnsEnumName = 'String!';
+        $allowedColumnsEnumName = 'String';
         $restrictedOrderByPrefix = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType);
 
         if ($this->hasAllowedColumns()) {
@@ -202,15 +202,12 @@ GRAPHQL;
             }
 
             $restrictedRelationOrderByName = $restrictedOrderByPrefix.'RelationOrderByClause';
-            $nullableAllowedColumnsEnumName = Str::endsWith($allowedColumnsEnumName, '!')
-                ? Str::replaceLast('!', '', $allowedColumnsEnumName)
-                : $allowedColumnsEnumName;
 
             $inputMerged = "
                 \"TODO: description\"
                 input {$restrictedRelationOrderByName} {
                     \"The column that is used for ordering.\"
-                    column: $nullableAllowedColumnsEnumName
+                    column: $allowedColumnsEnumName
 
                     \"The direction that is used for ordering.\"
                     order: SortOrder!";

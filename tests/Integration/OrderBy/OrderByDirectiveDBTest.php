@@ -17,6 +17,14 @@ class OrderByDirectiveDBTest extends DBTestCase
             orderByRestricted: _ @orderBy(columns: ["name"])
             orderByRestrictedEnum: _ @orderBy(columnsEnum: "UserColumn")
             orderByRelation: _ @orderBy(relations: [{ relation: "tasks" }])
+            orderByRelationRestricted: _ @orderBy(
+                columns: ["name"],
+                relations: [{ relation: "tasks" }]
+            )
+            orderByRelationRestrictedEnum: _ @orderBy(
+                columnsEnum: "UserColumn",
+                relations: [{ relation: "tasks" }]
+            )
         ): [User!]! @all
     }
 
