@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Allow `@builder` in combination with `@search`
+- Allow `@builder` in combination with `@search` https://github.com/nuwave/lighthouse/pull/1850
 
 ## 5.8.1
 
