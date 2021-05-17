@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution\DataLoader;
+namespace Nuwave\Lighthouse\Execution\BatchLoader;
 
 abstract class BatchLoaderRegistry
 {
@@ -14,14 +14,13 @@ abstract class BatchLoaderRegistry
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
-     * @param  class-string  $loaderClass  The class name of the concrete BatchLoader to instantiate
      * @param  array<int|string>  $pathToField  Path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param  array<mixed>  $constructorArgs  Those arguments are passed to the constructor of the new BatchLoader instance
-     * @return object An instance of the passed in class
+     * @param  callable(): object  $makeInstance  Function to instantiate the instance once
+     * @return object The result of calling makeInstance
      *
      * @throws \Exception
      */
-    public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): object
+    public static function instance(array $pathToField, callable $makeInstance): object
     {
         // The path to the field serves as the unique key for the instance
         $instanceKey = static::instanceKey($pathToField);
@@ -30,7 +29,7 @@ abstract class BatchLoaderRegistry
             return self::$instances[$instanceKey];
         }
 
-        return self::$instances[$instanceKey] = app()->makeWith($loaderClass, $constructorArgs);
+        return self::$instances[$instanceKey] = $makeInstance();
     }
 
     /**

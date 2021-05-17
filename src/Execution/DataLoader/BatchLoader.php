@@ -6,7 +6,7 @@ use GraphQL\Deferred;
 
 /**
  * @deprecated implement your own batch loader instead.
- * @see \Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry to resolve instances.
+ * @see \Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry to resolve instances.
  */
 abstract class BatchLoader
 {

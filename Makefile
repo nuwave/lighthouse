@@ -45,3 +45,7 @@ php: up ## Open an interactive shell into the PHP container
 .PHONY: node
 node: up ## Open an interactive shell into the Node container
 	docker-compose exec node bash
+
+.PHONY: release
+release: up ## Prepare the docs for a new release
+	docker-compose exec node yarn run release

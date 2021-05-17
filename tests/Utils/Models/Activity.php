@@ -7,11 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
+ * Primary key.
  * @property int $id
- * @property int $activity_id
- * @property string $activity_type
+ *
+ * Timestamps
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
+ *
+ * Foreign keys
+ * @property int $activity_id
+ * @property string $activity_type
+ * @property int $user_id
  *
  * Relations
  * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content

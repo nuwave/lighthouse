@@ -6,16 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * Primary key.
  * @property int $id
+ *
+ * Attributes
+ * @property string|null $meta
+ *
+ * Foreign keys
  * @property int $user_id
  * @property int $role_id
- * @property string|null $meta
+ *
+ * Relations
+ * @property-read \Tests\Utils\Models\Role $role
+ * @property-read \Tests\Utils\Models\User $user
  */
 class RoleUserPivot extends Model
 {
     public $table = 'role_user';
 
-    /** @var bool */
     public $timestamps = false;
 
     public function role(): BelongsTo

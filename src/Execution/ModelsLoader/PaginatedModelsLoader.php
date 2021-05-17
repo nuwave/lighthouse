@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution\DataLoader;
+namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -14,8 +14,13 @@ use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use ReflectionClass;
 use ReflectionMethod;
 
-class PaginatedRelationLoader implements RelationLoader
+class PaginatedModelsLoader implements ModelsLoader
 {
+    /**
+     * @var string
+     */
+    protected $relation;
+
     /**
      * @var \Closure
      */
@@ -26,35 +31,36 @@ class PaginatedRelationLoader implements RelationLoader
      */
     protected $paginationArgs;
 
-    public function __construct(Closure $decorateBuilder, PaginationArgs $paginationArgs)
+    public function __construct(string $relation, Closure $decorateBuilder, PaginationArgs $paginationArgs)
     {
+        $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
         $this->paginationArgs = $paginationArgs;
     }
 
-    public function load(EloquentCollection $parents, string $relationName): void
+    public function load(EloquentCollection $parents): void
     {
-        RelationCountLoader::loadCount($parents, [$relationName => $this->decorateBuilder]);
+        CountModelsLoader::loadCount($parents, [$this->relation => $this->decorateBuilder]);
 
-        $relatedModels = $this->loadRelatedModels($parents, $relationName);
+        $relatedModels = $this->loadRelatedModels($parents);
 
-        $this->hydratePivotRelation($parents, $relationName, $relatedModels);
+        $this->hydratePivotRelation($parents, $relatedModels);
         $this->loadDefaultWith($relatedModels);
-        $this->associateRelationModels($parents, $relationName, $relatedModels);
-        $this->convertRelationToPaginator($parents, $relationName);
+        $this->associateRelationModels($parents, $relatedModels);
+        $this->convertRelationToPaginator($parents);
     }
 
-    public function extract(Model $model, string $relationName)
+    public function extract(Model $model)
     {
-        return $model->getRelation($relationName);
+        return $model->getRelation($this->relation);
     }
 
-    protected function loadRelatedModels(EloquentCollection $parents, string $relationName): EloquentCollection
+    protected function loadRelatedModels(EloquentCollection $parents): EloquentCollection
     {
         $relations = $parents
             ->toBase()
-            ->map(function (Model $model) use ($parents, $relationName): Relation {
-                $relation = $this->relationInstance($parents, $relationName);
+            ->map(function (Model $model) use ($parents): Relation {
+                $relation = $this->relationInstance($parents);
 
                 $relation->addEagerConstraints([$model]);
 
@@ -69,7 +75,7 @@ class PaginatedRelationLoader implements RelationLoader
                     $relation->addSelect($select);
                 }
 
-                $relation->initRelation([$model], $relationName);
+                $relation->initRelation([$model], $this->relation);
 
                 // @phpstan-ignore-next-line Builder mixin is not understood
                 return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
@@ -105,11 +111,11 @@ class PaginatedRelationLoader implements RelationLoader
     /**
      * Use the underlying model to instantiate a relation by name.
      */
-    protected function relationInstance(EloquentCollection $parents, string $relationName): Relation
+    protected function relationInstance(EloquentCollection $parents): Relation
     {
         return $this
             ->newModelQuery($parents)
-            ->getRelation($relationName);
+            ->getRelation($this->relation);
     }
 
     /**
@@ -131,9 +137,9 @@ class PaginatedRelationLoader implements RelationLoader
      *
      * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relatedModels
      */
-    protected function hydratePivotRelation(EloquentCollection $parents, string $relationName, EloquentCollection $relatedModels): void
+    protected function hydratePivotRelation(EloquentCollection $parents, EloquentCollection $relatedModels): void
     {
-        $relation = $this->relationInstance($parents, $relationName);
+        $relation = $this->relationInstance($parents);
 
         if ($relatedModels->isNotEmpty() && method_exists($relation, 'hydratePivotRelation')) {
             $hydrationMethod = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
@@ -169,26 +175,26 @@ class PaginatedRelationLoader implements RelationLoader
     /**
      * Associate the collection of all fetched relationModels back with their parents.
      */
-    protected function associateRelationModels(EloquentCollection $parents, string $relationName, EloquentCollection $relatedModels): void
+    protected function associateRelationModels(EloquentCollection $parents, EloquentCollection $relatedModels): void
     {
         $this
-            ->relationInstance($parents, $relationName)
+            ->relationInstance($parents)
             ->match(
                 $parents->all(),
                 $relatedModels,
-                $relationName
+                $this->relation
             );
     }
 
-    protected function convertRelationToPaginator(EloquentCollection $parents, string $relationName): void
+    protected function convertRelationToPaginator(EloquentCollection $parents): void
     {
         foreach ($parents as $model) {
-            $total = RelationCountLoader::extractCount($model, $relationName);
+            $total = CountModelsLoader::extractCount($model, $this->relation);
 
             $paginator = app()->makeWith(
                 LengthAwarePaginator::class,
                 [
-                    'items' => $model->getRelation($relationName),
+                    'items' => $model->getRelation($this->relation),
                     'total' => $total,
                     'perPage' => $this->paginationArgs->first,
                     'currentPage' => $this->paginationArgs->page,
@@ -196,7 +202,7 @@ class PaginatedRelationLoader implements RelationLoader
                 ]
             );
 
-            $model->setRelation($relationName, $paginator);
+            $model->setRelation($this->relation, $paginator);
         }
     }
 }

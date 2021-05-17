@@ -62,7 +62,7 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpstan
 
@@ -125,7 +125,7 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: |
           sudo systemctl start mysql.service
@@ -169,7 +169,7 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: |
           sudo systemctl start mysql.service
@@ -210,6 +210,6 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpbench run --progress=none --report=ast

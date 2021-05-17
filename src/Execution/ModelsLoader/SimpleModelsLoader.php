@@ -1,26 +1,32 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution\DataLoader;
+namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
 use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 
-class SimpleRelationLoader implements RelationLoader
+class SimpleModelsLoader implements ModelsLoader
 {
+    /**
+     * @var string
+     */
+    protected $relation;
+
     /**
      * @var \Closure
      */
     protected $decorateBuilder;
 
-    public function __construct(Closure $decorateBuilder)
+    public function __construct(string $relation, Closure $decorateBuilder)
     {
+        $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
     }
 
-    public function load(EloquentCollection $parents, string $relationName): void
+    public function load(EloquentCollection $parents): void
     {
-        $parents->load([$relationName => $this->decorateBuilder]);
+        $parents->load([$this->relation => $this->decorateBuilder]);
     }
 
     /**
@@ -28,10 +34,10 @@ class SimpleRelationLoader implements RelationLoader
      *
      * @return mixed The model's relation.
      */
-    public function extract(Model $model, string $relationName)
+    public function extract(Model $model)
     {
         // Dot notation may be used to eager load nested relations
-        $parts = explode('.', $relationName);
+        $parts = explode('.', $this->relation);
 
         // We just return the first level of relations for now. They
         // hold the nested relations in case they are needed.

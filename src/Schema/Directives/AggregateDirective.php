@@ -3,34 +3,49 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\AggregateModelsLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CountDirective extends BaseDirective implements FieldResolver
+class AggregateDirective extends BaseDirective implements FieldResolver
 {
-    use RelationDirectiveHelpers;
+    use RelationDirectiveHelpers {
+        qualifyPath as baseQualifyPath;
+    }
 
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Returns the count of a given relationship or model.
+Returns an aggregate of a column in a given relationship or model.
+
+Requires Laravel 8+.
 """
-directive @count(
+directive @aggregate(
   """
-  The relationship to count.
+  The column to aggregate.
+  """
+  column: String!
+
+  """
+  The aggregate function to compute.
+  """
+  function: AggregateFunction!
+
+  """
+  The relationship with the column to aggregate.
   Mutually exclusive with the `model` argument.
   """
   relation: String
 
   """
-  The model to count.
+  The model with the column to aggregate.
   Mutually exclusive with the `relation` argument.
   """
   model: String
@@ -40,6 +55,31 @@ directive @count(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
+
+"""
+Options for the `function` argument of `@aggregate`.
+"""
+enum AggregateFunction {
+    """
+    Return the average value.
+    """
+    AVG
+
+    """
+    Return the sum.
+    """
+    SUM
+
+    """
+    Return the minimum.
+    """
+    MIN
+
+    """
+    Return the maximum.
+    """
+    MAX
+}
 GRAPHQL;
     }
 
@@ -47,19 +87,18 @@ GRAPHQL;
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
+            return $fieldValue->setResolver(
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+                    /** @var Builder $query */
                     $query = $this
                         ->namespaceModelClass($modelArg)
                         ::query();
 
                     $this->makeBuilderDecorator($resolveInfo)($query);
 
-                    return $query->count();
+                    return $query->{$this->function()}($this->column());
                 }
             );
-
-            return $fieldValue;
         }
 
         $relation = $this->directiveArgValue('relation');
@@ -71,7 +110,12 @@ GRAPHQL;
                         $this->qualifyPath($args, $resolveInfo),
                         function () use ($resolveInfo): RelationBatchLoader {
                             return new RelationBatchLoader(
-                                new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($resolveInfo))
+                                new AggregateModelsLoader(
+                                    $this->relation(),
+                                    $this->column(),
+                                    $this->function(),
+                                    $this->makeBuilderDecorator($resolveInfo)
+                                )
                             );
                         }
                     );
@@ -85,6 +129,30 @@ GRAPHQL;
 
         throw new DefinitionException(
             "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'."
+        );
+    }
+
+    protected function function(): string
+    {
+        return strtolower(
+            $this->directiveArgValue('function')
+        );
+    }
+
+    protected function column(): string
+    {
+        return $this->directiveArgValue('column');
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     * @return array<int, int|string>
+     */
+    protected function qualifyPath(array $args, ResolveInfo $resolveInfo): array
+    {
+        return array_merge(
+            $this->baseQualifyPath($args, $resolveInfo),
+            [$this->function(), $this->column()]
         );
     }
 }
