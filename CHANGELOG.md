@@ -9,6 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Make use of [`graphql-php` lazy field definitions](https://github.com/webonyx/graphql-php/pull/861) to resolve fields only when and if they are used https://github.com/nuwave/lighthouse/pull/1851 
+- No longer eager-load all subscription fields when building the schema, only load them if and when they are used https://github.com/nuwave/lighthouse/pull/1851
+
 ## 5.8.2
 
 ### Fixed
