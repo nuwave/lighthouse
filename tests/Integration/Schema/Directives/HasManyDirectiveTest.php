@@ -871,7 +871,7 @@ class HasManyDirectiveTest extends DBTestCase
     }
 
     /**
-     * @return array{0: bool}
+     * @return array<int, array{0: bool}>
      */
     public function batchloadRelations(): array
     {
