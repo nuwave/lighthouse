@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -63,7 +64,6 @@ class SubscriptionRegistry
         $this->storage = $storage;
         $this->schemaBuilder = $schemaBuilder;
         $this->configRepository = $configRepository;
-        $this->subscriptionType = $schemaBuilder->schema()->getSubscriptionType();
     }
 
     /**
@@ -87,20 +87,19 @@ class SubscriptionRegistry
             return true;
         }
 
-        return $this->subscriptionType !== null
-            && $this->subscriptionType->hasField($key);
+        return $this->subscriptionType()->hasField($key);
     }
 
     /**
      * Get subscription keys.
      *
      * @return array<string>
+     *
+     * @deprecated Use the `GraphQL\Type\Schema::subscriptionType()->getFieldNames()` method directly.
      */
     public function keys(): array
     {
-        return $this->subscriptionType === null
-            ? []
-            : $this->subscriptionType->getFieldNames();
+        return $this->subscriptionType()->getFieldNames();
     }
 
     /**
@@ -112,9 +111,7 @@ class SubscriptionRegistry
             return $this->subscriptions[$key];
         }
 
-        if ($this->subscriptionType !== null) {
-            $this->subscriptionType->getField($key);
-        }
+        $this->subscriptionType()->getField($key);
 
         return $this->subscriptions[$key];
     }
@@ -156,11 +153,11 @@ class SubscriptionRegistry
                     ->all();
             })
             ->map(function ($subscriptionField): GraphQLSubscription {
-                if (! $this->has($subscriptionField)) {
-                    return new NotFoundSubscription;
+                if ($this->has($subscriptionField)) {
+                    return $this->subscription($subscriptionField);
                 }
 
-                return $this->subscription($subscriptionField);
+                return new NotFoundSubscription;
             });
     }
 
@@ -204,5 +201,16 @@ class SubscriptionRegistry
         }
 
         return new ExtensionsResponse('lighthouse_subscriptions', $content);
+    }
+
+    private function subscriptionType(): ObjectType
+    {
+        $subscriptions = $this->schemaBuilder->schema()->getSubscriptionType();
+
+        if ($subscriptions === null) {
+            throw new DefinitionException('Schema is missing subscription root type.');
+        }
+
+        return $subscriptions;
     }
 }

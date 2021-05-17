@@ -44,6 +44,9 @@ class SubscriptionTest extends TestCase
         type Query {
             subscription: String @mock
         }
+        type Subscription {
+            subscription: String @mock
+        }
         ';
 
         $this->subscriptionRegistry = app(SubscriptionRegistry::class);
