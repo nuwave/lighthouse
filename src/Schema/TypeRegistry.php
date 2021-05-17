@@ -337,13 +337,13 @@ EOL
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
      *
-     * @return \Closure(): array<string, array<string, mixed>>
+     * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): Closure
     {
         return
             /**
-             * @return array<string, array<string, mixed>>
+             * @return array<string, Closure(): array<string, mixed>>
              */
             static function () use ($typeDefinition): array {
                 $typeValue = new TypeValue($typeDefinition);
