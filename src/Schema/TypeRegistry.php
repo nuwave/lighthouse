@@ -494,7 +494,7 @@ EOL
 
     private function getFieldFactory(): FieldFactory
     {
-        if (!isset($this->fieldFactory)) {
+        if (! isset($this->fieldFactory)) {
             $this->fieldFactory = app(FieldFactory::class);
         }
 
