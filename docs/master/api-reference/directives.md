@@ -41,25 +41,25 @@ directive @aggregate(
 Options for the `function` argument of `@aggregate`.
 """
 enum AggregateFunction {
-    """
-    Return the average value.
-    """
-    AVG
+  """
+  Return the average value.
+  """
+  AVG
 
-    """
-    Return the sum.
-    """
-    SUM
+  """
+  Return the sum.
+  """
+  SUM
 
-    """
-    Return the minimum.
-    """
-    MIN
+  """
+  Return the minimum.
+  """
+  MIN
 
-    """
-    Return the maximum.
-    """
-    MAX
+  """
+  Return the maximum.
+  """
+  MAX
 }
 ```
 
@@ -69,7 +69,8 @@ To retrieve the aggregate of a column on a root field, reference a `model`:
 
 ```graphql
 type Query {
-  totalDownloads: Int! @aggregate(model: "Song", column: "downloads", function: SUM)
+  totalDownloads: Int!
+    @aggregate(model: "Song", column: "downloads", function: SUM)
 }
 ```
 
@@ -85,7 +86,13 @@ You may combine filters and scopes:
 
 ```graphql
 type Query {
-    mostListened(genre: String @eq): Int! @aggregate(model: "Song", column: "listen_count", function: MAX, scope: ["published"])
+  mostListened(genre: String @eq): Int!
+    @aggregate(
+      model: "Song"
+      column: "listen_count"
+      function: MAX
+      scope: ["published"]
+    )
 }
 ```
 
@@ -621,22 +628,22 @@ class ComplexityAnalyzer {
 Returns the count of a given relationship or model.
 """
 directive @count(
-    """
-    The relationship to count.
-    Mutually exclusive with the `model` argument.
-    """
-    relation: String
+  """
+  The relationship to count.
+  Mutually exclusive with the `model` argument.
+  """
+  relation: String
 
-    """
-    The model to count.
-    Mutually exclusive with the `relation` argument.
-    """
-    model: String
+  """
+  The model to count.
+  Mutually exclusive with the `relation` argument.
+  """
+  model: String
 
-    """
-    Apply scopes to the underlying query.
-    """
-    scopes: [String!]
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 ```
 
