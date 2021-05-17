@@ -58,6 +58,11 @@ class TypeRegistry
     protected $argumentFactory;
 
     /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory
+     */
+    protected $fieldFactory;
+
+    /**
      * Lazily initialized.
      *
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
@@ -345,15 +350,13 @@ EOL
             /**
              * @return array<string, Closure(): array<string, mixed>>
              */
-            static function () use ($typeDefinition): array {
+            function () use ($typeDefinition): array {
+                $fieldFactory = $this->getFieldFactory();
                 $typeValue = new TypeValue($typeDefinition);
                 $fields = [];
 
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    $fields[$fieldDefinition->name->value] = static function () use ($typeValue, $fieldDefinition): array {
-                        /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
-                        $fieldFactory = app(FieldFactory::class);
-
+                    $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
                         return $fieldFactory->handle(
                             new FieldValue($typeValue, $fieldDefinition)
                         );
@@ -487,5 +490,14 @@ EOL
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);
+    }
+
+    private function getFieldFactory(): FieldFactory
+    {
+        if (!isset($this->fieldFactory)) {
+            $this->fieldFactory = app(FieldFactory::class);
+        }
+
+        return $this->fieldFactory;
     }
 }
