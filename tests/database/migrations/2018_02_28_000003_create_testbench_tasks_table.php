@@ -14,6 +14,7 @@ class CreateTestbenchTasksTable extends Migration
             $table->string('guard')
                 ->nullable()
                 ->comment('The purpose of this property is to collide with a native model method name');
+            $table->unsignedInteger('difficulty')->nullable();
 
             $table->unsignedInteger('user_id')->nullable();
 

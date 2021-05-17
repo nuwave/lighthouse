@@ -1,14 +1,20 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution\DataLoader;
+namespace Nuwave\Lighthouse\Execution\BatchLoader;
 
 use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
 class RelationBatchLoader
 {
+    /**
+     * @var \Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader
+     */
+    protected $relationLoader;
+
     /**
      * A map from unique keys to parent model instances.
      *
@@ -17,39 +23,15 @@ class RelationBatchLoader
     protected $parents = [];
 
     /**
-     * @var \Nuwave\Lighthouse\Execution\DataLoader\RelationLoader
-     */
-    protected $relationLoader;
-
-    /**
-     * @var string
-     */
-    protected $relationName;
-
-    /**
      * Marks when the actual batch loading happened.
      *
      * @var bool
      */
     protected $hasResolved = false;
 
-    /**
-     * Check if a loader has been registered.
-     */
-    public function hasRelationLoader(): bool
-    {
-        return $this->relationLoader !== null;
-    }
-
-    /**
-     * Register a relation loader.
-     *
-     * Check hasRelation() before to avoid re-instantiating and re-registering the same loader.
-     */
-    public function registerRelationLoader(RelationLoader $relationLoader, string $relationName): void
+    public function __construct(ModelsLoader $relationLoader)
     {
         $this->relationLoader = $relationLoader;
-        $this->relationName = $relationName;
     }
 
     /**
@@ -75,7 +57,7 @@ class RelationBatchLoader
             // model instance then $parent.
             $parent = $this->parents[$modelKey];
 
-            return $this->relationLoader->extract($parent, $this->relationName);
+            return $this->relationLoader->extract($parent);
         });
     }
 
@@ -95,7 +77,7 @@ class RelationBatchLoader
         );
 
         foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-            $this->relationLoader->load($parentsOfSameClass, $this->relationName);
+            $this->relationLoader->load($parentsOfSameClass);
         }
 
         $this->hasResolved = true;
