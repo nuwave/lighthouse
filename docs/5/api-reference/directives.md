@@ -1,5 +1,101 @@
 # Directives
 
+## @aggregate
+
+```graphql
+"""
+Returns an aggregate of a column in a given relationship or model.
+
+Requires Laravel 8+.
+"""
+directive @aggregate(
+  """
+  The column to aggregate.
+  """
+  column: String!
+
+  """
+  The aggregate function to compute.
+  """
+  function: AggregateFunction!
+
+  """
+  The relationship with the column to aggregate.
+  Mutually exclusive with the `model` argument.
+  """
+  relation: String
+
+  """
+  The model with the column to aggregate.
+  Mutually exclusive with the `relation` argument.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+
+"""
+Options for the `function` argument of `@aggregate`.
+"""
+enum AggregateFunction {
+  """
+  Return the average value.
+  """
+  AVG
+
+  """
+  Return the sum.
+  """
+  SUM
+
+  """
+  Return the minimum.
+  """
+  MIN
+
+  """
+  Return the maximum.
+  """
+  MAX
+}
+```
+
+If all you need is counting, use [@count](#count).
+
+To retrieve the aggregate of a column on a root field, reference a `model`:
+
+```graphql
+type Query {
+  totalDownloads: Int!
+    @aggregate(model: "Song", column: "downloads", function: SUM)
+}
+```
+
+To retrieve the aggregate of a column in related models, reference the `relation`:
+
+```graphql
+type Album {
+  rating: Float! @aggregate(relation: "songs", column: "rating", function: AVG)
+}
+```
+
+You may combine filters and scopes:
+
+```graphql
+type Query {
+  mostListened(genre: String @eq): Int!
+    @aggregate(
+      model: "Song"
+      column: "listen_count"
+      function: MAX
+      scope: ["published"]
+    )
+}
+```
+
 ## @all
 
 ```graphql
@@ -533,18 +629,25 @@ Returns the count of a given relationship or model.
 """
 directive @count(
   """
-  The relationship which you want to run the count on.
+  The relationship to count.
+  Mutually exclusive with the `model` argument.
   """
   relation: String
 
   """
-  The model to run the count on.
+  The model to count.
+  Mutually exclusive with the `relation` argument.
   """
   model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 ```
 
-Specify the name of the model to count when using this directive on a root query.
+Specify the name of the model to count when using this directive on a root query:
 
 ```graphql
 type Query {
@@ -552,7 +655,7 @@ type Query {
 }
 ```
 
-You can also count relations.
+You can also count relations:
 
 ```graphql
 type User {
