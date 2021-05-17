@@ -345,16 +345,19 @@ EOL
             /**
              * @return array<string, array<string, mixed>>
              */
-            function () use ($typeDefinition): array {
+            static function () use ($typeDefinition): array {
                 $typeValue = new TypeValue($typeDefinition);
                 $fields = [];
 
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
-                    $fieldFactory = app(FieldFactory::class);
-                    $fieldValue = new FieldValue($typeValue, $fieldDefinition);
+                    $fields[$fieldDefinition->name->value] = static function () use ($typeValue, $fieldDefinition): array {
+                        /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
+                        $fieldFactory = app(FieldFactory::class);
 
-                    $fields[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
+                        return $fieldFactory->handle(
+                            new FieldValue($typeValue, $fieldDefinition)
+                        );
+                    };
                 }
 
                 return $fields;

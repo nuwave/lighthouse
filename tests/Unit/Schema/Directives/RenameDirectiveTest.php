@@ -44,7 +44,7 @@ class RenameDirectiveTest extends TestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: String! @rename
+            fooBar: String! @rename
         }
         ';
 
