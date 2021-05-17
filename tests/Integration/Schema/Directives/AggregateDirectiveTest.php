@@ -3,12 +3,13 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Facades\DB;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class AggregateDirectiveDBTest extends DBTestCase
+class AggregateDirectiveTest extends DBTestCase
 {
     public function setUp(): void
     {
@@ -17,6 +18,22 @@ class AggregateDirectiveDBTest extends DBTestCase
         if (AppVersion::below(8.0)) {
             $this->markTestSkipped('Eager aggregate loading is only available in Laravel 8+.');
         }
+    }
+
+    public function testRequiresARelationOrModelArgument(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @aggregate
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ');
     }
 
     public function testAggregateModel(): void

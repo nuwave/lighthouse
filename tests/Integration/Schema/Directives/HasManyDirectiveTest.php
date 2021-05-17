@@ -147,8 +147,13 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.user.tasks');
     }
 
-    public function testQueryHasManyPaginator(): void
+    /**
+     * @dataProvider batchloadRelations
+     */
+    public function testQueryHasManyPaginator(bool $batchloadRelations): void
     {
+        config(['lighthouse.batchload_relations' => $batchloadRelations]);
+
         $this->user->posts()->saveMany(
             factory(Post::class, 3)->make()
         );
@@ -172,47 +177,51 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                tasks(first: 2) {
-                    paginatorInfo {
-                        count
-                        hasMorePages
-                        total
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    tasks(first: 2) {
+                        paginatorInfo {
+                            count
+                            hasMorePages
+                            total
+                        }
+                        data {
+                            id
+                        }
                     }
-                    data {
-                        id
-                    }
-                }
-                posts(first: 5) {
-                    paginatorInfo {
-                        count
-                    }
-                    data {
-                        id
+                    posts(first: 5) {
+                        paginatorInfo {
+                            count
+                        }
+                        data {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ')->assertJson([
-            'data' => [
-                'user' => [
-                    'tasks' => [
-                        'paginatorInfo' => [
-                            'count' => 2,
-                            'hasMorePages' => true,
-                            'total' => 3,
+            ')
+            ->assertJson([
+                'data' => [
+                    'user' => [
+                        'tasks' => [
+                            'paginatorInfo' => [
+                                'count' => 2,
+                                'hasMorePages' => true,
+                                'total' => 3,
+                            ],
                         ],
-                    ],
-                    'posts' => [
-                        'paginatorInfo' => [
-                            'count' => 3,
+                        'posts' => [
+                            'paginatorInfo' => [
+                                'count' => 3,
+                            ],
                         ],
                     ],
                 ],
-            ],
-        ])->assertJsonCount(2, 'data.user.tasks.data');
+            ])
+            ->assertJsonCount(2, 'data.user.tasks.data')
+            ->assertJsonCount(3, 'data.user.posts.data');
     }
 
     public function testDoesNotRequireModelClassForPaginatedHasMany(): void
@@ -859,5 +868,16 @@ class HasManyDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(2, 'data.tasks.data');
+    }
+
+    /**
+     * @return array{0: bool}
+     */
+    public function batchloadRelations(): array
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 }

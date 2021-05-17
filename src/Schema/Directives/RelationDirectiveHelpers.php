@@ -45,7 +45,7 @@ trait RelationDirectiveHelpers
     }
 
     /**
-     * @param array<string, mixed> $args
+     * @param  array<string, mixed>  $args
      * @return array<int, int|string>
      */
     protected function qualifyPath(array $args, ResolveInfo $resolveInfo): array
