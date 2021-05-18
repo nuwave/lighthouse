@@ -7,6 +7,7 @@ use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
@@ -152,7 +153,7 @@ class SubscriptionRegistry
                     })
                     ->all();
             })
-            ->map(function ($subscriptionField): GraphQLSubscription {
+            ->map(function (string $subscriptionField): GraphQLSubscription {
                 if ($this->has($subscriptionField)) {
                     return $this->subscription($subscriptionField);
                 }
@@ -169,7 +170,7 @@ class SubscriptionRegistry
         $this->subscribers = [];
     }
 
-    public function handleBuildExtensionsResponse(): ?ExtensionsResponse
+    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ?ExtensionsResponse
     {
         $subscriptionsConfig = $this->configRepository->get('lighthouse.subscriptions');
 
