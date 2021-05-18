@@ -8,16 +8,6 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class TestingServiceProvider extends ServiceProvider
 {
-    public function boot(Dispatcher $dispatcher): void
-    {
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static function (): string {
-                return __NAMESPACE__;
-            }
-        );
-    }
-
     public function register(): void
     {
         $this->app->singleton(MockResolverService::class);
@@ -27,5 +17,15 @@ class TestingServiceProvider extends ServiceProvider
         } elseif (class_exists('Illuminate\Foundation\Testing\TestResponse')) {
             \Illuminate\Foundation\Testing\TestResponse::mixin(new TestResponseMixin());
         }
+    }
+
+    public function boot(Dispatcher $dispatcher): void
+    {
+        $dispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            static function (): string {
+                return __NAMESPACE__;
+            }
+        );
     }
 }

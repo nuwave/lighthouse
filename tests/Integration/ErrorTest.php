@@ -91,7 +91,7 @@ class ErrorTest extends TestCase
     public function testRethrowsInternalExceptions(): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $this->mockResolver()

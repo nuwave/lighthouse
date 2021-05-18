@@ -12,6 +12,7 @@ parameters:
   - benchmarks
   - src
   - tests
+  checkOctaneCompatibility: true
   excludePaths:
   - tests/database/migrations/*
 
