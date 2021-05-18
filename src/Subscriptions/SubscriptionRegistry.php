@@ -103,6 +103,13 @@ class SubscriptionRegistry
     public function subscription(string $key): GraphQLSubscription
     {
         if (! isset($this->subscriptions[$key])) {
+            /**
+             * Loading the field has the side effect of triggering a call to
+             * @see \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver::provideSubscriptionResolver()
+             * which is then expected to call @see register().
+             *
+             * TODO make this more explicit and safe
+             */
             $this->subscriptionType()->getField($key);
         }
 
