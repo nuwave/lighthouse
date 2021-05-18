@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Source;
 
+use Illuminate\Container\Container;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
@@ -24,7 +25,7 @@ class SchemaSourceProviderTest extends TestCase
     {
         parent::setUp();
 
-        app()->singleton(SchemaSourceProvider::class, function () {
+        $this->app->singleton(SchemaSourceProvider::class, function () {
             return new SchemaStitcher(config('lighthouse.schema.register', ''));
         });
 

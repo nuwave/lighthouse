@@ -971,7 +971,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Instantiate the `ErrorBuffer` directly, its dependencies
   can not be resolved through the container https://github.com/nuwave/lighthouse/pull/756
-- Refresh GraphQLRequest singleton between multiple requests to prevent
+- Refresh `GraphQLRequest` singleton between multiple requests to prevent
   a common error in test execution https://github.com/nuwave/lighthouse/pull/761
 
 ## 3.4.0
