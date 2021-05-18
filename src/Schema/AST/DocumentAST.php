@@ -11,9 +11,8 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
-use Serializable;
 
-class DocumentAST implements Serializable
+class DocumentAST
 {
     /**
      * The types within the schema.
@@ -90,46 +89,6 @@ class DocumentAST implements Serializable
     }
 
     /**
-     * Serialize the final AST.
-     *
-     * We exclude the type extensions stored in $typeExtensions,
-     * as they are merged with the actual types at this point.
-     */
-    public function serialize(): string
-    {
-        $nodeToArray = function (Node $node): array {
-            return $node->toArray(true);
-        };
-
-        return serialize([
-            // @phpstan-ignore-next-line Before serialization, those are arrays
-            'types' => array_map($nodeToArray, $this->types),
-            // @phpstan-ignore-next-line Before serialization, those are arrays
-            'directives' => array_map($nodeToArray, $this->directives),
-        ]);
-    }
-
-    /**
-     * Unserialize the AST.
-     *
-     * @param string $serialized
-     */
-    public function unserialize($serialized): void
-    {
-        [
-            'types' => $types,
-            'directives' => $directives,
-        ] = unserialize($serialized);
-
-        // Utilize the NodeList for lazy unserialization for performance gains.
-        // Until they are accessed by name, they are kept in their array form.
-        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
-        $this->types = new NodeList($types);
-        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
-        $this->directives = new NodeList($directives);
-    }
-
-    /**
      * Set a type definition in the AST.
      *
      * This operation will overwrite existing definitions with the same name.
@@ -159,5 +118,44 @@ class DocumentAST implements Serializable
         $this->directives[$directive->name->value] = $directive;
 
         return $this;
+    }
+
+    /**
+     * @return array<string, array>
+     */
+    public function toArray(): array
+    {
+        $nodeToArray = function (Node $node): array {
+            return $node->toArray(true);
+        };
+
+        return [
+            // @phpstan-ignore-next-line Before serialization, those are arrays
+            'types' => array_map($nodeToArray, $this->types),
+            // @phpstan-ignore-next-line Before serialization, those are arrays
+            'directives' => array_map($nodeToArray, $this->directives),
+        ];
+    }
+
+    /**
+     * @param array<string, array> $ast
+     */
+    public static function fromArray(array $ast): DocumentAST
+    {
+        [
+            'types' => $types,
+            'directives' => $directives,
+        ] = $ast;
+
+        $documentAST = new static();
+
+        // Utilize the NodeList for lazy unserialization for performance gains.
+        // Until they are accessed by name, they are kept in their array form.
+        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
+        $documentAST->types = new NodeList($types);
+        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
+        $documentAST->directives = new NodeList($directives);
+
+        return $documentAST;
     }
 }

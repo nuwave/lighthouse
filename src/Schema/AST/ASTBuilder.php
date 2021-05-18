@@ -13,10 +13,10 @@ use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -81,17 +81,12 @@ class ASTBuilder
         if (! isset($this->documentAST)) {
             $cacheConfig = $this->configRepository->get('lighthouse.cache');
             if ($cacheConfig['enable']) {
-                /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-                $cacheFactory = app(CacheFactory::class);
-                $cache = $cacheFactory->store($cacheConfig['store'] ?? null);
+                $path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
+                if (! File::exists($path)) {
+                    File::put($path, '<?php return '.var_export($this->build()->toArray(), true).';');
+                }
 
-                $this->documentAST = $cache->remember(
-                    $cacheConfig['key'],
-                    $cacheConfig['ttl'],
-                    function (): DocumentAST {
-                        return $this->build();
-                    }
-                );
+                $this->documentAST = DocumentAST::fromArray(require $path);
             } else {
                 $this->documentAST = $this->build();
             }

@@ -91,19 +91,9 @@ return [
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
 
         /*
-         * The name of the cache item for the schema cache.
+         * File path to store the lighthouse schema.
          */
-        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
-
-        /*
-         * Allows using a specific cache store, uses the app's default if set to null.
-         */
-        'store' => env('LIGHTHOUSE_CACHE_STORE', null),
-
-        /*
-         * Duration in seconds the schema should remain cached, null means forever.
-         */
-        'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
+        'path' => base_path('bootstrap/cache/lighthouse-schema.php'),
     ],
 
     /*

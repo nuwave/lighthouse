@@ -3,11 +3,11 @@
 namespace Tests\Console;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Console\CacheCommand;
-use function Safe\unlink;
+use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use function Safe\file_put_contents;
 use Tests\TestCase;
 
-class CacheCommandTest extends TestCase
+class ClearCacheCommandTest extends TestCase
 {
     /**
      * @var string
@@ -19,21 +19,16 @@ class CacheCommandTest extends TestCase
         parent::setUp();
 
         $config = app(ConfigRepository::class);
-        $config->set('lighthouse.cache.enable', true);
         $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
         $config->set('lighthouse.cache.path', $this->cachePath);
-    }
 
-    protected function tearDown(): void
-    {
-        unlink($this->cachePath);
-        parent::tearDown();
+        file_put_contents($this->cachePath, '<?php return [\'directives\' => []];');
     }
 
     public function testCachesGraphQLAST(): void
     {
-        $this->assertNotTrue(file_exists($this->cachePath));
-        $this->commandTester(new CacheCommand)->execute([]);
         $this->assertTrue(file_exists($this->cachePath));
+        $this->commandTester(new ClearCacheCommand())->execute([]);
+        $this->assertNotTrue(file_exists($this->cachePath));
     }
 }
