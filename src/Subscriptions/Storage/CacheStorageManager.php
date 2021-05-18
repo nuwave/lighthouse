@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Exception;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -40,13 +40,13 @@ class CacheStorageManager implements StoresSubscriptions
      */
     protected $ttl;
 
-    public function __construct(CacheManager $cacheManager, ConfigRepository $config)
+    public function __construct(CacheFactory $cacheFactory, ConfigRepository $config)
     {
         $storage = $config->get('lighthouse.subscriptions.storage') ?? 'file';
         if (! is_string($storage)) {
             throw new Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: '.\Safe\json_encode($storage));
         }
-        $this->cache = $cacheManager->store($storage);
+        $this->cache = $cacheFactory->store($storage);
 
         $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
         if (! is_null($ttl) && ! is_int($ttl)) {

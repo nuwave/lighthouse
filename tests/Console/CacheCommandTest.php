@@ -11,12 +11,12 @@ class CacheCommandTest extends TestCase
 {
     public function testCachesGraphQLAST(): void
     {
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.cache.ttl', 60);
 
         $key = $config->get('lighthouse.cache.key');
 
-        $cache = app(CacheRepository::class);
+        $cache = $this->app->make(CacheRepository::class);
         $this->assertFalse(
             $cache->has($key)
         );

@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Support Laravel Octane https://github.com/nuwave/lighthouse/pull/1854
+
 ### Changed
 
 - Improve performance through [`graphql-php` lazy field definitions](https://github.com/webonyx/graphql-php/pull/861) https://github.com/nuwave/lighthouse/pull/1851 
