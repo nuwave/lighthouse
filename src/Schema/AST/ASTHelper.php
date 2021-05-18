@@ -20,6 +20,7 @@ use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\AST;
+use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -266,7 +267,7 @@ class ASTHelper
         }
 
         /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator $directiveLocator */
-        $directiveLocator = app(DirectiveLocator::class);
+        $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
         $directive = $directiveLocator->resolve($name);
         $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
 

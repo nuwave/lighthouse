@@ -26,16 +26,16 @@ class ArgumentSetFactory
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     public function __construct(
         ASTBuilder $astBuilder,
         ArgumentTypeNodeConverter $argumentTypeNodeConverter,
-        DirectiveLocator $directiveFactory
+        DirectiveLocator $directiveLocator
     ) {
         $this->documentAST = $astBuilder->documentAST();
         $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveLocator = $directiveLocator;
     }
 
     /**
@@ -66,7 +66,7 @@ class ArgumentSetFactory
     public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $this->directiveFactory->associated($definition);
+        $argumentSet->directives = $this->directiveLocator->associated($definition);
 
         if ($definition instanceof FieldDefinitionNode) {
             $argDefinitions = $definition->arguments;
@@ -117,7 +117,7 @@ class ArgumentSetFactory
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $this->directiveFactory->associated($definition);
+        $argument->directives = $this->directiveLocator->associated($definition);
         $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
 

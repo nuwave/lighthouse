@@ -18,20 +18,20 @@ class DirectiveLocatorTest extends TestCase
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->directiveFactory = app(DirectiveLocator::class);
+        $this->directiveLocator = $this->app->make(DirectiveLocator::class);
     }
 
     public function testRegistersLighthouseDirectives(): void
     {
         $this->assertInstanceOf(
             FieldDirective::class,
-            $this->directiveFactory->create('field')
+            $this->directiveLocator->create('field')
         );
     }
 
@@ -43,7 +43,7 @@ class DirectiveLocatorTest extends TestCase
 
         /** @var \Nuwave\Lighthouse\Schema\Directives\FieldDirective $fieldDirective */
         $fieldDirective = $this
-            ->directiveFactory
+            ->directiveLocator
             ->associated($fieldDefinition)
             ->first();
 
@@ -75,10 +75,10 @@ class DirectiveLocatorTest extends TestCase
             }
         };
 
-        $this->directiveFactory->setResolved('foo', get_class($directive));
+        $this->directiveLocator->setResolved('foo', get_class($directive));
 
         $directive = $this
-            ->directiveFactory
+            ->directiveLocator
             ->associated($fieldDefinition)
             ->first();
 
@@ -89,7 +89,7 @@ class DirectiveLocatorTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->directiveFactory->create('bar');
+        $this->directiveLocator->create('bar');
     }
 
     public function testCreateSingleDirective(): void
@@ -98,7 +98,7 @@ class DirectiveLocatorTest extends TestCase
             foo: [Foo!]! @hasMany
         ');
 
-        $resolver = $this->directiveFactory->exclusiveOfType($fieldDefinition, FieldResolver::class);
+        $resolver = $this->directiveLocator->exclusiveOfType($fieldDefinition, FieldResolver::class);
         $this->assertInstanceOf(FieldResolver::class, $resolver);
     }
 
@@ -111,7 +111,7 @@ class DirectiveLocatorTest extends TestCase
             bar: [Bar!]! @hasMany @belongsTo
         ');
 
-        $this->directiveFactory->exclusiveOfType($fieldDefinition, FieldResolver::class);
+        $this->directiveLocator->exclusiveOfType($fieldDefinition, FieldResolver::class);
     }
 
     public function testCreateMultipleDirectives(): void
@@ -120,7 +120,7 @@ class DirectiveLocatorTest extends TestCase
             bar: String @can(if: ["viewBar"]) @event
         ');
 
-        $middleware = $this->directiveFactory->associatedOfType($fieldDefinition, FieldMiddleware::class);
+        $middleware = $this->directiveLocator->associatedOfType($fieldDefinition, FieldMiddleware::class);
         $this->assertCount(2, $middleware);
     }
 }
