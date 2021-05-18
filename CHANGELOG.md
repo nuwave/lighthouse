@@ -15,6 +15,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Load individual subscription fields lazily instead of loading them all eagerly https://github.com/nuwave/lighthouse/pull/1851
 - Require `webonyx/graphql-php:^14.7` https://github.com/nuwave/lighthouse/pull/1851
 
+## 5.9.1
+
+### Fixed
+
+- Pass plain values to `ScoutBuilderDirective::handleScoutBuilder()` https://github.com/nuwave/lighthouse/pull/1853
+
 ## 5.9.0
 
 ### Added
