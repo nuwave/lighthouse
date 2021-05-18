@@ -53,11 +53,6 @@ class SubscriptionRegistry
      */
     protected $subscriptions = [];
 
-    /**
-     * @var \GraphQL\Type\Definition\ObjectType|null
-     */
-    protected $subscriptionType;
-
     public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, SchemaBuilder $schemaBuilder, ConfigRepository $configRepository)
     {
         $this->serializer = $serializer;
@@ -107,11 +102,9 @@ class SubscriptionRegistry
      */
     public function subscription(string $key): GraphQLSubscription
     {
-        if (isset($this->subscriptions[$key])) {
-            return $this->subscriptions[$key];
+        if (! isset($this->subscriptions[$key])) {
+            $this->subscriptionType()->getField($key);
         }
-
-        $this->subscriptionType()->getField($key);
 
         return $this->subscriptions[$key];
     }
@@ -203,14 +196,14 @@ class SubscriptionRegistry
         return new ExtensionsResponse('lighthouse_subscriptions', $content);
     }
 
-    private function subscriptionType(): ObjectType
+    protected function subscriptionType(): ObjectType
     {
-        $subscriptions = $this->schemaBuilder->schema()->getSubscriptionType();
+        $subscriptionType = $this->schemaBuilder->schema()->getSubscriptionType();
 
-        if ($subscriptions === null) {
+        if ($subscriptionType === null) {
             throw new DefinitionException('Schema is missing subscription root type.');
         }
 
-        return $subscriptions;
+        return $subscriptionType;
     }
 }
