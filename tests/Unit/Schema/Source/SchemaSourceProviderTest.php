@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema\Source;
 
-use Illuminate\Container\Container;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;

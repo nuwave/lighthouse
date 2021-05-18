@@ -3,7 +3,6 @@
 namespace Tests\Integration;
 
 use GraphQL\Error\Error;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Tests\TestCase;
 
