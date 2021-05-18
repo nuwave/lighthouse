@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Pass plain values to `ScoutBuilderDirective::handleScoutBuilder()`
+
 ## 5.9.0
 
 ### Added

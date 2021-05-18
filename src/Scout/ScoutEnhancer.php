@@ -84,7 +84,7 @@ class ScoutEnhancer
          * @psalm-suppress UndefinedDocblockClass
          * @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $model
          */
-        $scoutBuilder = $model::search($searchArgument->value);
+        $scoutBuilder = $model::search($searchArgument->toPlain());
 
         /**
          * We know this argument has this directive, because that is how we found it.
@@ -103,7 +103,7 @@ class ScoutEnhancer
                 ->directives
                 ->first(Utils::instanceofMatcher(ScoutBuilderDirective::class));
 
-            $scoutBuilderDirective->handleScoutBuilder($scoutBuilder, $argument->value);
+            $scoutBuilderDirective->handleScoutBuilder($scoutBuilder, $argument->toPlain());
         }
 
         return $scoutBuilder;
