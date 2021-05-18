@@ -154,17 +154,21 @@ class SearchDirectiveTest extends DBTestCase
             id: Int!
         }
 
+        input PostsInput {
+            id: Int!
+        }
+
         type Query {
             posts(
-                id: Int @builder(method: "'.$this->qualifyTestResolver('customBuilderMethod').'")
-                search: String @search
+                input: PostsInput! @builder(method: "'.$this->qualifyTestResolver('customBuilderMethod').'")
+                search: String! @search
             ): [Post!]! @all
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($id: Int) {
-            posts(id: $id, search: "greatness") {
+        query ($id: Int!) {
+            posts(input: { id: $id }, search: "greatness") {
                 id
             }
         }
@@ -177,9 +181,12 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function customBuilderMethod(ScoutBuilder $builder, int $value): ScoutBuilder
+    /**
+     * @param  array{id: int}  $value
+     */
+    public function customBuilderMethod(ScoutBuilder $builder, array $value): ScoutBuilder
     {
-        return $builder->where('from_custom_builder', $value);
+        return $builder->where('from_custom_builder', $value['id']);
     }
 
     public function testSearchWithTrashed(): void

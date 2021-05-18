@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Pass plain values to `ScoutBuilderDirective::handleScoutBuilder()` https://github.com/nuwave/lighthouse/pull/1853
+
 ## 5.9.0
 
 ### Added
