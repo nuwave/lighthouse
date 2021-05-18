@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## 5.10.0
+
 ### Added
 
 - Support Laravel Octane https://github.com/nuwave/lighthouse/pull/1854
