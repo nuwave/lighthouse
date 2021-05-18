@@ -50,7 +50,7 @@ class RenameDirectiveTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            fooBar
+            foo
         }
         ');
     }

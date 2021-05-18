@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Improve performance through [`graphql-php` lazy field definitions](https://github.com/webonyx/graphql-php/pull/861) https://github.com/nuwave/lighthouse/pull/1851 
+- Load individual subscription fields lazily instead of loading them all eagerly https://github.com/nuwave/lighthouse/pull/1851
+- Require `webonyx/graphql-php:^14.7` https://github.com/nuwave/lighthouse/pull/1851
+
 ## 5.9.1
 
 ### Fixed
