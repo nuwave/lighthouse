@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add lifecycle events `StartOperationOrOperations` and `EndOperationOrOperations`
+- Add lifecycle events `StartOperationOrOperations` and `EndOperationOrOperations` https://github.com/nuwave/lighthouse/pull/1856
 
 ## 5.10.0
 
