@@ -48,6 +48,35 @@ class StartRequest
 }
 ```
 
+### StartOperationOrOperations
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+/**
+ * Fires after receiving the parsed operation (single query) or operations (batched query).
+ */
+class StartOperationOrOperations
+{
+    /**
+     * One or multiple parsed GraphQL operations.
+     *
+     * @var \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams> $operationOrOperations
+     */
+    public $operationOrOperations;
+
+    /**
+     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
+     */
+    public function __construct($operationOrOperations)
+    {
+        $this->operationOrOperations = $operationOrOperations;
+    }
+}
+```
+
 ### BuildSchemaString
 
 ```php
@@ -145,9 +174,9 @@ use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
- * Fires right before resolving an individual query.
+ * Fires right before resolving a single operation.
  *
- * Might happen multiple times in a single request if query batching is used.
+ * Might happen multiple times in a single request if batching is used.
  */
 class StartExecution
 {
@@ -310,12 +339,12 @@ use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Carbon;
 
 /**
- * Fires after resolving each individual query.
+ * Fires after resolving a single operation.
  */
 class EndExecution
 {
     /**
-     * The result of resolving an individual query.
+     * The result of resolving a single operation.
      *
      * @var \GraphQL\Executor\ExecutionResult
      */
@@ -332,6 +361,35 @@ class EndExecution
     {
         $this->result = $result;
         $this->moment = Carbon::now();
+    }
+}
+```
+
+### EndOperationOrOperations
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+/**
+ * Fires after resolving a single or multiple operations.
+ */
+class EndOperationOrOperations
+{
+    /**
+     * Single or multiple operation results.
+     *
+     * @var array<string, mixed>|array<int, array<string, mixed>>
+     */
+    public $results;
+
+    /**
+     * @param  array<string, mixed>|array<int, array<string, mixed>>  $results
+     */
+    public function __construct(array $results)
+    {
+        $this->results = $results;
     }
 }
 ```

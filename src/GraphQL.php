@@ -18,8 +18,10 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\EndExecution;
+use Nuwave\Lighthouse\Events\EndOperationOrOperations;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\ErrorPool;
@@ -104,7 +106,11 @@ class GraphQL
      */
     public function executeOperationOrOperations($operationOrOperations, GraphQLContext $context): array
     {
-        return LighthouseUtils::applyEach(
+        $this->eventDispatcher->dispatch(
+            new StartOperationOrOperations($operationOrOperations)
+        );
+
+        $resultOrResults = LighthouseUtils::applyEach(
             /**
              * @return array<string, mixed>
              */
@@ -113,6 +119,12 @@ class GraphQL
             },
             $operationOrOperations
         );
+
+        $this->eventDispatcher->dispatch(
+            new EndOperationOrOperations($resultOrResults)
+        );
+
+        return $resultOrResults;
     }
 
     /**
