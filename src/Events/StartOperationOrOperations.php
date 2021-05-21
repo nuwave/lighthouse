@@ -10,7 +10,7 @@ class StartOperationOrOperations
     /**
      * One or multiple parsed GraphQL operations.
      *
-     * @var \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams> $operationOrOperations
+     * @var \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
     public $operationOrOperations;
 
