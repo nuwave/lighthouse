@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
@@ -372,6 +373,7 @@ class CountDirectiveDBTest extends DBTestCase
         /** @var User $user */
         $user = factory(User::class)->create();
 
+        /** @var Collection<Task> $tasks */
         $tasks = $user->tasks()->saveMany(
             factory(Task::class)->times(2)->make()
         );
