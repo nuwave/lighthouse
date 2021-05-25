@@ -15,9 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class AggregateDirective extends BaseDirective implements FieldResolver
 {
-    use RelationDirectiveHelpers {
-        qualifyPath as baseQualifyPath;
-    }
+    use RelationDirectiveHelpers;
 
     public static function definition(): string
     {
@@ -107,7 +105,10 @@ GRAPHQL;
                 function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                     /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                     $relationBatchLoader = BatchLoaderRegistry::instance(
-                        $this->qualifyPath($args, $resolveInfo),
+                        array_merge(
+                            $this->qualifyPath($args, $resolveInfo),
+                            [$this->function(), $this->column()]
+                        ),
                         function () use ($resolveInfo): RelationBatchLoader {
                             return new RelationBatchLoader(
                                 new AggregateModelsLoader(
@@ -142,17 +143,5 @@ GRAPHQL;
     protected function column(): string
     {
         return $this->directiveArgValue('column');
-    }
-
-    /**
-     * @param array<string, mixed> $args
-     * @return array<int, int|string>
-     */
-    protected function qualifyPath(array $args, ResolveInfo $resolveInfo): array
-    {
-        return array_merge(
-            $this->baseQualifyPath($args, $resolveInfo),
-            [$this->function(), $this->column()]
-        );
     }
 }
