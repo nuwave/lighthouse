@@ -11,8 +11,12 @@ class ValidationExceptionTest extends TestCase
     {
         $this->expectException(ValidationException::class);
 
-        throw ValidationException::withMessage([
+        $exception = ValidationException::withMessage([
             'email' => 'The email or password does not match',
         ]);
+
+        $this->assertArrayHasKey('email', $exception->extensionsContent()['validation']);
+
+        throw $exception;
     }
 }
