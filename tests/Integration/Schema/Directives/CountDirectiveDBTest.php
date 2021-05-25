@@ -337,7 +337,7 @@ class CountDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $user->tasks()->saveMany(
-            factory(Task::class)->times(4)->create()
+            factory(Task::class)->times(4)->make()
         );
 
         $this->be($user);
@@ -362,6 +362,58 @@ class CountDirectiveDBTest extends DBTestCase
             'data' => [
                 'user' => [
                     'taskCount' => 4,
+                ],
+            ],
+        ]);
+    }
+
+    public function testResolveRelationItemsAndCount(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $tasks = $user->tasks()->saveMany(
+            factory(Task::class)->times(2)->make()
+        );
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks: [Task!]! @hasMany
+            taskCount: Int! @count(relation: "tasks")
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                tasks {
+                    id
+                }
+                taskCount
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        [
+                            'id' => $tasks[0]->id,
+                        ],
+                        [
+                            'id' => $tasks[1]->id,
+                        ],
+                    ],
+                    'taskCount' => 2,
                 ],
             ],
         ]);
