@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Exceptions;
 
 use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
 class ValidationException extends Exception implements RendersErrorsExtensions
 {
@@ -23,6 +24,27 @@ class ValidationException extends Exception implements RendersErrorsExtensions
         $this->validator = $validator;
     }
 
+    /**
+     * Instantiate from a plain array of messages.
+     *
+     * @see \Illuminate\Validation\ValidationException::withMessages()
+     *
+     * @param  array<string, string|array<string>>  $messages
+     */
+    public static function withMessages(array $messages): ValidationException
+    {
+        /** @var \Illuminate\Contracts\Validation\Factory $validatorFactory */
+        $validatorFactory = Container::getInstance()->make(ValidatorFactory::class);
+        $validator = $validatorFactory->make([], []);
+        foreach ($messages as $key => $value) {
+            foreach (Arr::wrap($value) as $message) {
+                $validator->errors()->add($key, $message);
+            }
+        }
+
+        return new static('Validation failed.', $validator);
+    }
+
     public function isClientSafe(): bool
     {
         return true;
@@ -33,28 +55,10 @@ class ValidationException extends Exception implements RendersErrorsExtensions
         return self::CATEGORY;
     }
 
-    /**
-     * Handle with message.
-     *
-     * @param array<string, string> $messages
-     */
-    public static function withMessage(array $messages): ValidationException
-    {
-        $validator = tap(ValidatorFacade::make([], []), function ($validator) use ($messages) {
-            foreach ($messages as $key => $value) {
-                foreach (Arr::wrap($value) as $message) {
-                    $validator->errors()->add($key, $message);
-                }
-            }
-        });
-
-        return new static('Validation Failed', $validator);
-    }
-
     public function extensionsContent(): array
     {
         return [
-            'validation' => $this->validator->errors()->messages(),
+            self::CATEGORY => $this->validator->errors()->messages(),
         ];
     }
 }

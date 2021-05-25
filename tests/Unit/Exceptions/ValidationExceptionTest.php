@@ -7,16 +7,13 @@ use Tests\TestCase;
 
 class ValidationExceptionTest extends TestCase
 {
-    public function testWithMessage(): void
+    public function testWithMessages(): void
     {
-        $this->expectException(ValidationException::class);
+        $rule = 'email';
+        $message = 'The email or password does not match';
+        $exception = ValidationException::withMessages([$rule => $message]);
 
-        $exception = ValidationException::withMessage([
-            'email' => 'The email or password does not match',
-        ]);
-
-        $this->assertArrayHasKey('email', $exception->extensionsContent()['validation']);
-
-        throw $exception;
+        $validation = $exception->extensionsContent()[ValidationException::CATEGORY];
+        $this->assertSame([$message], $validation[$rule]);
     }
 }

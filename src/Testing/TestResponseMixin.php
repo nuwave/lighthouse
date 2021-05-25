@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -45,7 +46,7 @@ class TestResponseMixin
             /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
-                array_keys($extensions['validation']),
+                array_keys($extensions[ValidationException::CATEGORY]),
                 'Expected the query to return validation errors for specific fields.'
             );
 
