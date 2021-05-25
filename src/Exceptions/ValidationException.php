@@ -32,8 +32,13 @@ class ValidationException extends Exception implements RendersErrorsExtensions
     {
         return self::CATEGORY;
     }
-    
-    public static function withMessage(array $messages)
+
+    /**
+     * Handle with message
+     *
+     * @param array<string, string> $messages
+     */
+    public static function withMessage(array $messages): ValidationException
     {
         $validator = tap(ValidatorFacade::make([], []), function($validator) use ($messages) {
             foreach ($messages as $key => $value) {

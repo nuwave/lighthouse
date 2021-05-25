@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class ValidationExceptionTest extends TestCase
 {
-    public function testWithMessage()
+    public function testWithMessage(): void
     {
         $this->expectException(ValidationException::class);
 
