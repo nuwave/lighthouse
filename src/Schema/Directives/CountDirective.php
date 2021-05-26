@@ -68,7 +68,10 @@ GRAPHQL;
                 function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                     /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                     $relationBatchLoader = BatchLoaderRegistry::instance(
-                        $this->qualifyPath($args, $resolveInfo),
+                        array_merge(
+                            $this->qualifyPath($args, $resolveInfo),
+                            ['count']
+                        ),
                         function () use ($resolveInfo): RelationBatchLoader {
                             return new RelationBatchLoader(
                                 new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($resolveInfo))

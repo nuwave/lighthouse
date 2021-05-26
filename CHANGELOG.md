@@ -9,6 +9,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.12.1
+
+### Fixed
+
+- Fix resolving relation items and count in one query https://github.com/nuwave/lighthouse/pull/1859
+
+## v5.12.0
+
+### Added
+
+- Add `ValidationException::withMessages()` https://github.com/nuwave/lighthouse/pull/1857
+
 ## v5.11.0
 
 ### Added

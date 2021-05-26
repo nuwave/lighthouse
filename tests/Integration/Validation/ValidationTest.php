@@ -3,6 +3,7 @@
 namespace Tests\Integration\Validation;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Validators\FooClosureValidator;
@@ -67,8 +68,8 @@ class ValidationTest extends TestCase
                     [
                         'message' => 'Validation failed for the field [foo].',
                         'extensions' => [
-                            'category' => 'validation',
-                            'validation' => [
+                            'category' => ValidationException::CATEGORY,
+                            ValidationException::CATEGORY => [
                                 'bar' => [
                                     'The bar field is required.',
                                 ],
@@ -130,7 +131,7 @@ class ValidationTest extends TestCase
                         'path' => ['foo'],
                         'message' => 'Validation failed for the field [foo.baz].',
                         'extensions' => [
-                            'validation' => [
+                            ValidationException::CATEGORY => [
                                 'required' => [
                                     'The required field is required.',
                                 ],
