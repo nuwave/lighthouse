@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Handle `null` when encoding or decoding with `@globalId` https://github.com/nuwave/lighthouse/pull/1862
+
 ## v5.12.1
 
 ### Fixed
