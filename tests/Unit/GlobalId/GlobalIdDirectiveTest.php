@@ -40,6 +40,60 @@ class GlobalIdDirectiveTest extends TestCase
         ]);
     }
 
+    public function testNullableArgument(): void
+    {
+        $this->mockResolver(function ($root, array $args): ?string {
+            return $args['bar'] ?? null;
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: String @globalId): String @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => null,
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: null)
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => null,
+            ],
+        ]);
+    }
+
+    public function testNullableResult(): void
+    {
+        $this->mockResolver();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: String @mock @globalId
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => null,
+            ],
+        ]);
+    }
+
     public function testDecodesGlobalIdOnInput(): void
     {
         $this->mockResolver(
