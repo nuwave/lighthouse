@@ -134,7 +134,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).$this->generatedInputSuffix();
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
             $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
@@ -168,7 +168,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         // - must not start with a digit, dot or hyphen
         // - must contain only alphanumerics, digits, underscores, dots or hyphens
         // Dots are allowed to reference a column in a table: my_table.my_column.
-        $match = \Safe\preg_match('/^(?![0-9.-])[A-Za-z0-9_.-]*$/', $column);
+        $match = \Safe\preg_match('/^(?![0-9.-])([A-Za-z0-9_.-]|->)*$/', $column);
         if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
@@ -188,7 +188,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
         if ($column = $condition['column'] ?? null) {
-            $condition['column'] = $model->getTable().'.'.$column;
+            $condition['column'] = $model->getTable() . '.' . $column;
         }
 
         return $condition;
