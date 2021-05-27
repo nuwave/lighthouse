@@ -67,6 +67,10 @@ GRAPHQL;
         $type = $fieldValue->getParentName();
 
         $fieldValue->resultHandler(function ($result) use ($type) {
+            if (null === $result) {
+                return null;
+            }
+
             return $this->globalId->encode($type, $result);
         });
 
@@ -76,12 +80,17 @@ GRAPHQL;
     /**
      * Decodes a global id given as an argument.
      *
-     * @param  string  $argumentValue
-     * @return string|array<string>
+     * @param  string|null  $argumentValue
+     * @return string|array{0: string, 1: string}|null
      */
     public function sanitize($argumentValue)
     {
-        if ($decode = $this->directiveArgValue('decode')) {
+        if (null === $argumentValue) {
+            return null;
+        }
+
+        $decode = $this->directiveArgValue('decode');
+        if (null !== $decode) {
             switch ($decode) {
                 case 'TYPE':
                     return $this->globalId->decodeType($argumentValue);
