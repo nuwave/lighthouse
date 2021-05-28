@@ -134,7 +134,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).$this->generatedInputSuffix();
             $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
@@ -188,7 +188,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
         if ($column = $condition['column'] ?? null) {
-            $condition['column'] = $model->getTable() . '.' . $column;
+            $condition['column'] = $model->getTable().'.'.$column;
         }
 
         return $condition;
