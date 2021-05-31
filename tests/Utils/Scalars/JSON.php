@@ -12,7 +12,7 @@ use GraphQL\Type\Definition\ScalarType;
 
 /**
  * Read more about scalars here: http://webonyx.github.io/graphql-php/type-system/scalar-types/
- * Code is from an example here: https://github.com/webonyx/graphql-php/issues/129
+ * Code is from an example here: https://github.com/webonyx/graphql-php/issues/129.
  */
 class JSON extends ScalarType
 {
@@ -22,9 +22,6 @@ class JSON extends ScalarType
 
     /**
      * Serializes an internal value to include in a response.
-     *
-     * @param mixed $value
-     * @return mixed
      */
     public function serialize($value)
     {
@@ -33,10 +30,7 @@ class JSON extends ScalarType
     }
 
     /**
-     * Parses an externally provided value (query variable) to use as an input
-     *
-     * @param mixed $value
-     * @return mixed
+     * Parses an externally provided value (query variable) to use as an input.
      */
     public function parseValue($value)
     {
@@ -53,26 +47,23 @@ class JSON extends ScalarType
      *
      * @param \GraphQL\Language\AST\Node $valueNode
      * @param mixed[]|null $variables
-     * @return mixed
      */
     public function parseLiteral($valueNode, ?array $variables = null)
     {
         switch ($valueNode) {
-            case ($valueNode instanceof StringValueNode):
-            case ($valueNode instanceof BooleanValueNode):
+            case $valueNode instanceof StringValueNode:
+            case $valueNode instanceof BooleanValueNode:
                 return $valueNode->value;
-            case ($valueNode instanceof IntValueNode):
-            case ($valueNode instanceof FloatValueNode):
+            case $valueNode instanceof IntValueNode:
+            case $valueNode instanceof FloatValueNode:
                 return (float)$valueNode->value;
-            case ($valueNode instanceof ObjectValueNode):
-            {
+            case $valueNode instanceof ObjectValueNode:
                 $value = [];
                 foreach ($valueNode->fields as $field) {
                     $value[$field->name->value] = $this->parseLiteral($field->value);
                 }
                 return $value;
-            }
-            case ($valueNode instanceof ListValueNode):
+            case $valueNode instanceof ListValueNode:
                 return array_map([$this, 'parseLiteral'], (array)$valueNode->values);
             default:
                 return null;
