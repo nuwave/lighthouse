@@ -56,7 +56,7 @@ class JSON extends ScalarType
                 return $valueNode->value;
             case $valueNode instanceof IntValueNode:
             case $valueNode instanceof FloatValueNode:
-                return (float)$valueNode->value;
+                return (float) $valueNode->value;
             case $valueNode instanceof ObjectValueNode:
                 $value = [];
                 foreach ($valueNode->fields as $field) {
@@ -64,7 +64,7 @@ class JSON extends ScalarType
                 }
                 return $value;
             case $valueNode instanceof ListValueNode:
-                return array_map([$this, 'parseLiteral'], (array)$valueNode->values);
+                return array_map([$this, 'parseLiteral'], (array) $valueNode->values);
             default:
                 return null;
         }
