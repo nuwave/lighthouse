@@ -1,6 +1,6 @@
 <?php
 
-namespace App\GraphQL\Scalars;
+namespace Tests\Utils\Scalars;
 
 use GraphQL\Language\AST\BooleanValueNode;
 use GraphQL\Language\AST\FloatValueNode;
@@ -73,7 +73,7 @@ class JSON extends ScalarType
                 return $value;
             }
             case ($valueNode instanceof ListValueNode):
-                return array_map([$this, 'parseLiteral'], $valueNode->values);
+                return array_map([$this, 'parseLiteral'], (array)$valueNode->values);
             default:
                 return null;
         }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * Primary key.
  * @property int $id
+ * @property array $extra
  *
  * Timestamps
  * @property \lluminate\Support\Carbon $created_at
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Location extends Model
 {
+    /** @var array<string, string> */
     protected $casts = ['extra' => 'array'];
     protected $fillable = ['extra'];
 
