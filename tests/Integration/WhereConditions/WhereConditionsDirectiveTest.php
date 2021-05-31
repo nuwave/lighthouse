@@ -932,6 +932,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'value' => 'exampleValue',
             ],
         ]);
+        factory(Location::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
