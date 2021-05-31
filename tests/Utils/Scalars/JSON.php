@@ -71,4 +71,3 @@ class JSON extends ScalarType
         }
     }
 }
-
