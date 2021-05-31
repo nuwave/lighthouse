@@ -15,6 +15,8 @@ use Tests\Utils\Models\User;
 class WhereConditionsDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
+    scalar JSON @scalar(class: "Tests\\\\Utils\\\\Scalars\\\\JSON")
+
     type User {
         id: ID!
         name: String
