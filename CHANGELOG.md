@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Allow JSON notation `->` in column references for complex where conditions https://github.com/nuwave/lighthouse/pull/1864
+
 ## v5.12.2
 
 ### Fixed

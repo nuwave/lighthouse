@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\WhereConditions\WhereConditionsDirective;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Location;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -905,6 +906,49 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 'users' => [
                     [
                         'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereConditionOnJSONColumn(): void
+    {
+        $this->schema = /** @lang GraphQL */'
+        type Location {
+            id: Int!
+        }
+
+        type Query {
+            locations(where: _ @whereConditions): [Location!]! @all
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\Location $location */
+        $location = factory(Location::class)->make();
+        $location->extra = [
+            'value' => 'exampleValue',
+        ];
+        $location->save();
+
+        factory(Location::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            locations(
+                where: {
+                    column: "extra->value",
+                    value: "exampleValue"
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'locations' => [
+                    [
+                        'id' => $location->id,
                     ],
                 ],
             ],
