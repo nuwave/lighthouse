@@ -26,6 +26,7 @@ class Location extends Model
 {
     /** @var array<string, string> */
     protected $casts = ['extra' => 'array'];
+    /** @var array<string> */
     protected $fillable = ['extra'];
 
     public function parent(): BelongsTo
