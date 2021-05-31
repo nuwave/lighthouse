@@ -12,6 +12,7 @@ class CreateTestbenchLocationsTable extends Migration
             $table->increments('id');
 
             $table->unsignedInteger('parent_id')->nullable();
+            $table->json('extra')->nullable();
 
             $table->timestamps();
         });

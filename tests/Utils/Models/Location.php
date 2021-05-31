@@ -23,6 +23,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Location extends Model
 {
+    protected $casts = ['extra' => 'array'];
+    protected $fillable = ['extra'];
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(__CLASS__, 'parent_id');

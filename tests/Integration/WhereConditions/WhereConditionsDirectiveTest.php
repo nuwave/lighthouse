@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\WhereConditions\WhereConditionsDirective;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Location;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -27,7 +28,13 @@ class WhereConditionsDirectiveTest extends DBTestCase
         parent: Post @belongsTo
     }
 
+    type Location {
+        id: ID!
+        extra: JSON
+    }
+
     type Query {
+        locations(where: _ @whereConditions(columnsEnum: "LocationColumn")): [Location!]! @all
         posts(where: _ @whereConditions): [Post!]! @all
         users(where: _ @whereConditions): [User!]! @all
         whitelistedColumns(
@@ -41,6 +48,11 @@ class WhereConditionsDirectiveTest extends DBTestCase
     enum UserColumn {
         ID @enum(value: "id")
         NAME @enum(value: "name")
+    }
+
+    enum LocationColumn {
+        ID @enum(value: "id")
+        EXTRA_VALUE @enum(value: "extra->value")
     }
     ';
 
@@ -903,6 +915,36 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereConditionOnJSONColumn(): void
+    {
+        factory(Location::class)->create([
+            'extra' => [
+                'value' => 'exampleValue',
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            locations(
+                where: {
+                    column: EXTRA_VALUE,
+                    value: "exampleValue"
+                } 
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'locations' => [
                     [
                         'id' => '1',
                     ],
