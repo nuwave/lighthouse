@@ -62,6 +62,7 @@ class JSON extends ScalarType
                 foreach ($valueNode->fields as $field) {
                     $value[$field->name->value] = $this->parseLiteral($field->value);
                 }
+
                 return $value;
             case $valueNode instanceof ListValueNode:
                 return array_map([$this, 'parseLiteral'], (array) $valueNode->values);
