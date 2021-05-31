@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * Primary key.
  * @property int $id
- * @property array $extra
+ *
+ * Attributes
+ * @property array<string, mixed> $extra
  *
  * Timestamps
  * @property \lluminate\Support\Carbon $created_at
@@ -25,9 +27,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Location extends Model
 {
     /** @var array<string, string> */
-    protected $casts = ['extra' => 'array'];
-    /** @var array<string> */
-    protected $fillable = ['extra'];
+    protected $casts = [
+        'extra' => 'array',
+    ];
 
     public function parent(): BelongsTo
     {

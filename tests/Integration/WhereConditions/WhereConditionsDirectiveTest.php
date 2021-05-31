@@ -15,8 +15,6 @@ use Tests\Utils\Models\User;
 class WhereConditionsDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
-    scalar JSON @scalar(class: "Tests\\\\Utils\\\\Scalars\\\\JSON")
-
     type User {
         id: ID!
         name: String
@@ -50,11 +48,6 @@ class WhereConditionsDirectiveTest extends DBTestCase
     enum UserColumn {
         ID @enum(value: "id")
         NAME @enum(value: "name")
-    }
-
-    enum LocationColumn {
-        ID @enum(value: "id")
-        EXTRA_VALUE @enum(value: "extra->value")
     }
     ';
 
@@ -927,20 +920,32 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testWhereConditionOnJSONColumn(): void
     {
-        factory(Location::class)->create([
-            'extra' => [
-                'value' => 'exampleValue',
-            ],
-        ]);
+        $this->schema = /** @lang GraphQL */'
+        type Location {
+            id: Int!
+        }
+
+        type Query {
+            locations(where: _ @whereConditions): [Location!]! @all
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\Location $location */
+        $location = factory(Location::class)->make();
+        $location->extra = [
+            'value' => 'exampleValue',
+        ];
+        $location->save();
+
         factory(Location::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             locations(
                 where: {
-                    column: EXTRA_VALUE,
+                    column: "extra->value",
                     value: "exampleValue"
-                } 
+                }
             ) {
                 id
             }
@@ -949,7 +954,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'locations' => [
                     [
-                        'id' => '1',
+                        'id' => $location->id,
                     ],
                 ],
             ],
