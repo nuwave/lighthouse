@@ -28,13 +28,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         parent: Post @belongsTo
     }
 
-    type Location {
-        id: ID!
-        extra: JSON
-    }
-
     type Query {
-        locations(where: _ @whereConditions(columnsEnum: "LocationColumn")): [Location!]! @all
         posts(where: _ @whereConditions): [Post!]! @all
         users(where: _ @whereConditions): [User!]! @all
         whitelistedColumns(
