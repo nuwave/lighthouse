@@ -87,7 +87,8 @@ GRAPHQL;
 
                 // We found a matching value in the cache, so we can just return early
                 // without actually running the query
-                if ($value = $cache->get($cacheKey)) {
+                $value = $cache->get($cacheKey);
+                if ($value !== null) {
                     return $value;
                 }
 
