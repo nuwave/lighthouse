@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Allow integer zero, empty string and false as valid cached values with `@cache` https://github.com/nuwave/lighthouse/pull/1869
 
+## v5.12.4
+
+### Fixed
+
+- Fix combining `@lazyLoad` with paginated relations https://github.com/nuwave/lighthouse/pull/1867
+
 ## v5.12.3
 
 ### Fixed
