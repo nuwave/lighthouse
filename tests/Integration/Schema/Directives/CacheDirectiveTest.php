@@ -390,11 +390,13 @@ class CacheDirectiveTest extends DBTestCase
         }
         ';
 
+        // TTL is required for laravel 5.7 and prior
+        // @see https://laravel.com/docs/5.8/upgrade#psr-16-conformity
         $this->cache->setMultiple([
             'user:1:field_boolean' => false,
             'user:1:field_string' => '',
             'user:1:field_integer' => 0,
-        ]);
+        ], 1);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
