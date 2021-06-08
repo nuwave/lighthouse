@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.12.5
+
 ### Fixed
 
 - Allow integer zero, empty string and false as valid cached values with `@cache` https://github.com/nuwave/lighthouse/pull/1869
