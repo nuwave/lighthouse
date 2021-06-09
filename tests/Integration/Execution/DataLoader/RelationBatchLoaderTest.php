@@ -347,7 +347,7 @@ class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount(3, 'data.user.tasks');
     }
 
-    public function testTwoBatchloadedQueriesWithDifferentResults(): void
+    public function testTwoBatchLoadedQueriesWithDifferentResults(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {
@@ -437,7 +437,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         type Task {
             post: Post! @hasOne
-            postOwnerKey: String! @method @with(relation: "post.user")
+            name: String! @with(relation: "post.user")
         }
 
         type Post {
@@ -451,25 +451,51 @@ class RelationBatchLoaderTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        $task = factory(Task::class)->create([
-            'user_id' => $user->getKey(),
-        ]);
-        $post = factory(Post::class)->create([
-            'task_id' => $task->getKey(),
-            'user_id' => $user->getKey()
-        ]);
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            task(id: {$task->getKey()}) {
-                postOwnerKey
-                post {
-                    user {
-                        id
+        /** @var \Tests\Utils\Models\Task $task */
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+
+        /** @var \Tests\Utils\Models\Post $post */
+        $post = factory(Post::class)->make();
+        $post->task()->associate($task);
+        $post->user()->associate($user);
+        $post->save();
+
+        $queries = 0;
+        DB::listen(static function () use (&$queries): void {
+            $queries++;
+        });
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: Int!) {
+                task(id: $id) {
+                    name
+                    post {
+                        user {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ")->dump();
+            ', [
+                'id' => $task->id,
+            ])
+            ->assertJson([
+                'data' => [
+                    'task' => [
+                        'name' => $task->name,
+                        'post' => [
+                            'user' => [
+                                'id' => (string) $user->id,
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->assertSame(3, $queries);
     }
 }

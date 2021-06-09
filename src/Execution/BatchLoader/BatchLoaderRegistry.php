@@ -60,6 +60,7 @@ abstract class BatchLoaderRegistry
             }
         );
 
+        // Using . as the separator would combine nested relations
         return implode('|', $significantPathSegments);
     }
 }
