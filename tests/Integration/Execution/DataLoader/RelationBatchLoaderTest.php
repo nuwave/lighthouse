@@ -490,10 +490,10 @@ class RelationBatchLoaderTest extends DBTestCase
                         'post' => [
                             'user' => [
                                 'id' => (string) $user->id,
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ]);
 
         // TODO optimize this
