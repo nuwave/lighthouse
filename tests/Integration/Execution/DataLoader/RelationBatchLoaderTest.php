@@ -498,6 +498,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         // TODO optimize this
         $this->markTestIncomplete('The intermediary relation of dot notation is not batched with equivalent relations of fields.');
+        // @phpstan-ignore-next-line Of course this terminates...
         $this->assertSame(3, $queries);
     }
 }
