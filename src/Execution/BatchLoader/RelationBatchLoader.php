@@ -35,17 +35,17 @@ class RelationBatchLoader
     }
 
     /**
-     * Schedule loading a relation off of a concrete parent.
+     * Schedule loading a relation off of a concrete model.
      *
      * This returns effectively a promise that will resolve to
      * the result of loading the relation.
      *
-     * As a side-effect, the parent will then hold the relation.
+     * As a side-effect, the model will then hold the relation.
      */
-    public function load(Model $parent): Deferred
+    public function load(Model $model): Deferred
     {
-        $modelKey = ModelKey::build($parent);
-        $this->parents[$modelKey] = $parent;
+        $modelKey = ModelKey::build($model);
+        $this->parents[$modelKey] = $model;
 
         return new Deferred(function () use ($modelKey) {
             if (! $this->hasResolved) {
@@ -54,7 +54,7 @@ class RelationBatchLoader
 
             // When we are deep inside a nested query, we can come across the
             // same model in two different paths, so this might be another
-            // model instance then $parent.
+            // model instance then $model.
             $parent = $this->parents[$modelKey];
 
             return $this->relationLoader->extract($parent);
