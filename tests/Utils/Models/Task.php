@@ -102,4 +102,9 @@ class Task extends Model
             $query->whereIn('name', $tags);
         });
     }
+
+    public function postOwnerKey()
+    {
+        return $this->post->user->getKey();
+    }
 }

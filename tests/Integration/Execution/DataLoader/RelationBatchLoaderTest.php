@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -425,5 +426,50 @@ class RelationBatchLoaderTest extends DBTestCase
                     ],
                 ],
             ]);
+    }
+
+    public function testCombineEagerLoadsThatAreTheSameRecursively(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            task(id: Int! @eq): Task @find
+        }
+
+        type Task {
+            post: Post! @hasOne
+            postOwnerKey: String! @method @with(relation: "post.user")
+        }
+
+        type Post {
+            user: User! @belongsTo
+        }
+
+        type User {
+            id: ID!
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->create([
+            'user_id' => $user->getKey(),
+        ]);
+        $post = factory(Post::class)->create([
+            'task_id' => $task->getKey(),
+            'user_id' => $user->getKey()
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            task(id: {$task->getKey()}) {
+                postOwnerKey
+                post {
+                    user {
+                        id
+                    }
+                }
+            }
+        }
+        ")->dump();
     }
 }
