@@ -60,6 +60,6 @@ abstract class BatchLoaderRegistry
             }
         );
 
-        return implode('.', $significantPathSegments);
+        return implode('|', $significantPathSegments);
     }
 }
