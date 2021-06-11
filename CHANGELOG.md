@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.12.7
+
+### Fixed
+
+- Fix incorrect config key for subscriptions redis storage connection https://github.com/nuwave/lighthouse/pull/1874
+
 ## v5.12.6
 
 ### Fixed
