@@ -367,4 +367,53 @@ class CacheDirectiveTest extends DBTestCase
             $cachedResponse->json()
         );
     }
+
+    public function testUseFalsyResultsInCache(): void
+    {
+        $this->mockResolver([
+            'id' => 1,
+            'field_boolean' => true,
+            'field_string' => 'value',
+            'field_integer' => 1,
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            field_boolean: Boolean @cache
+            field_string: String @cache
+            field_integer: Int @cache
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        // TTL is required for laravel 5.7 and prior
+        // @see https://laravel.com/docs/5.8/upgrade#psr-16-conformity
+        $this->cache->setMultiple([
+            'user:1:field_boolean' => false,
+            'user:1:field_string' => '',
+            'user:1:field_integer' => 0,
+        ], 1);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                field_boolean
+                field_string
+                field_integer
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'field_boolean' => false,
+                    'field_string' => '',
+                    'field_integer' => 0,
+                ],
+            ],
+        ]);
+    }
 }

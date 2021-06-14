@@ -9,6 +9,30 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.12.7
+
+### Fixed
+
+- Fix incorrect config key for subscriptions redis storage connection https://github.com/nuwave/lighthouse/pull/1874
+
+## v5.12.6
+
+### Fixed
+
+- Avoid conflicting relation batch loader overlaps when using dot notation in `@with` https://github.com/nuwave/lighthouse/pull/1871
+
+## v5.12.5
+
+### Fixed
+
+- Allow integer zero, empty string and false as valid cached values with `@cache` https://github.com/nuwave/lighthouse/pull/1869
+
+## v5.12.4
+
+### Fixed
+
+- Fix combining `@lazyLoad` with paginated relations https://github.com/nuwave/lighthouse/pull/1867
+
 ## v5.12.3
 
 ### Fixed

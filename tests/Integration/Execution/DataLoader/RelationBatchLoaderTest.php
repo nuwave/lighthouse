@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -346,7 +347,7 @@ class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount(3, 'data.user.tasks');
     }
 
-    public function testTwoBatchloadedQueriesWithDifferentResults(): void
+    public function testTwoBatchLoadedQueriesWithDifferentResults(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {
@@ -425,5 +426,79 @@ class RelationBatchLoaderTest extends DBTestCase
                     ],
                 ],
             ]);
+    }
+
+    public function testCombineEagerLoadsThatAreTheSameRecursively(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            task(id: Int! @eq): Task @find
+        }
+
+        type Task {
+            post: Post! @hasOne
+            name: String! @with(relation: "post.user")
+        }
+
+        type Post {
+            user: User! @belongsTo
+        }
+
+        type User {
+            id: ID!
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        /** @var \Tests\Utils\Models\Task $task */
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+
+        /** @var \Tests\Utils\Models\Post $post */
+        $post = factory(Post::class)->make();
+        $post->task()->associate($task);
+        $post->user()->associate($user);
+        $post->save();
+
+        $queries = 0;
+        DB::listen(static function () use (&$queries): void {
+            $queries++;
+        });
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: Int!) {
+                task(id: $id) {
+                    name
+                    post {
+                        user {
+                            id
+                        }
+                    }
+                }
+            }
+            ', [
+                'id' => $task->id,
+            ])
+            ->assertJson([
+                'data' => [
+                    'task' => [
+                        'name' => $task->name,
+                        'post' => [
+                            'user' => [
+                                'id' => (string) $user->id,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+
+        // TODO optimize this
+        $this->markTestIncomplete('The intermediary relation of dot notation is not batched with equivalent relations of fields.');
+        // @phpstan-ignore-next-line Of course this terminates...
+        $this->assertSame(3, $queries);
     }
 }

@@ -2089,7 +2089,7 @@ To predefine a default order for your field, use this directive on a field:
 
 ```graphql
 type Query {
-  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: "DESC")
+  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: DESC)
 }
 ```
 

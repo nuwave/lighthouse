@@ -60,6 +60,10 @@ abstract class BatchLoaderRegistry
             }
         );
 
-        return implode('.', $significantPathSegments);
+        // Using . as the separator would combine relations in nested fields with
+        // higher up relations using dot notation, matching the field path.
+        // We might optimize this in the future to enable batching them anyways,
+        // but employ this solution for now, as it preserves correctness.
+        return implode('|', $significantPathSegments);
     }
 }
