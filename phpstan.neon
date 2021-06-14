@@ -59,3 +59,6 @@ parameters:
 
   # PHPStan and PHPUnit disagree with themselves
   - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
+
+  # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
+  - '#Property .* in isset\(\) is not nullable\.#'
