@@ -180,7 +180,7 @@ GRAPHQL;
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
      */
-    protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
+    protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
     {
         return $this->buildSchema(
             $schema.self::PLACEHOLDER_QUERY

@@ -288,22 +288,19 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                tasks(first: 5) {
-                    data {
-                        id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    tasks(first: 5) {
+                        data {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ');
-
-        $this->assertSame(
-            PaginationArgs::requestedTooManyItems(3, 5),
-            $result->json('errors.0.message')
-        );
+            ')
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedTooManyItems(3, 5));
     }
 
     public function testHandlesPaginationWithCountZero(): void
@@ -323,25 +320,20 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                id
-                tasks(first: 0) {
-                    data {
-                        id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    id
+                    tasks(first: 0) {
+                        data {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ')->assertJson([
-            'data' => [
-                'user' => [
-                    'id' => $this->user->id,
-                    'tasks' => null,
-                ],
-            ],
-        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
+            ')
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
@@ -488,8 +480,8 @@ class HasManyDirectiveTest extends DBTestCase
         );
 
         $user = $this->introspectType('User');
-
         $this->assertNotNull($user);
+
         /** @var array<string, mixed> $user */
         $tasks = Arr::first(
             $user['fields'],
@@ -499,7 +491,7 @@ class HasManyDirectiveTest extends DBTestCase
         );
         $this->assertSame(
             $expectedConnectionName,
-            $tasks['type']['name']
+            $tasks['type']['ofType']['name']
         );
     }
 

@@ -330,27 +330,21 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            post(id: {$this->post->id}) {
-                id
-                title
-                images(first: 0) {
-                    data {
-                        id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID!) {
+                post(id: $id) {
+                    images(first: 0) {
+                        data {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ")->assertJson([
-            'data' => [
-                'post' => [
-                    'id' => $this->post->id,
-                    'title' => $this->post->title,
-                    'images' => null,
-                ],
-            ],
-        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
+            ', [
+                'id' => $this->post->id,
+            ])
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
     }
 
     public function testQueryMorphManyPaginatorWithADefaultCount(): void

@@ -17,7 +17,7 @@ class SchemaBuilderTest extends TestCase
 {
     public function testGeneratesValidSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '');
+        $schema = $this->buildSchemaWithPlaceholderQuery();
 
         $this->assertInstanceOf(Schema::class, $schema);
         // This would throw if the schema were invalid
@@ -174,7 +174,7 @@ class SchemaBuilderTest extends TestCase
 
     public function testResolveQueries(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '');
+        $schema = $this->buildSchemaWithPlaceholderQuery();
 
         /** @var \GraphQL\Type\Definition\ObjectType $queryObjectType */
         $queryObjectType = $schema->getType(RootType::QUERY);

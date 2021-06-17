@@ -9,6 +9,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.13.0
+
+### Changed
+
+- Mark appropriate generated pagination types as non-nullable
+- Improve descriptions of generated pagination types
+
 ## v5.12.7
 
 ### Fixed
