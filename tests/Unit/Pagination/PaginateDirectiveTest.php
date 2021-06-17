@@ -103,8 +103,13 @@ GRAPHQL,
         );
     }
 
-    public function testManipulatesPaginator(): void
+    /**
+     * @dataProvider nonNullPaginationResults
+     */
+    public function testManipulatesPaginator(bool $nonNullPaginationResults): void
     {
+        config(['lighthouse.non_null_pagination_results' => $nonNullPaginationResults]);
+
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
@@ -116,7 +121,10 @@ GRAPHQL,
         ');
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $nonNull = $nonNullPaginationResults
+            ? '!'
+            : '';
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
     """Limits number of fetched items."""
@@ -124,7 +132,7 @@ type Query {
 
     """The offset from which items are returned."""
     page: Int
-  ): UserPaginator!
+  ): UserPaginator{$nonNull}
 }
 GRAPHQL,
             $schemaString
@@ -144,8 +152,13 @@ GRAPHQL,
         );
     }
 
-    public function testManipulatesSimplePaginator(): void
+    /**
+     * @dataProvider nonNullPaginationResults
+     */
+    public function testManipulatesSimplePaginator(bool $nonNullPaginationResults): void
     {
+        config(['lighthouse.non_null_pagination_results' => $nonNullPaginationResults]);
+
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
@@ -157,7 +170,10 @@ GRAPHQL,
         ');
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $nonNull = $nonNullPaginationResults
+            ? '!'
+            : '';
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
     """Limits number of fetched items."""
@@ -165,7 +181,7 @@ type Query {
 
     """The offset from which items are returned."""
     page: Int
-  ): UserSimplePaginator!
+  ): UserSimplePaginator{$nonNull}
 }
 GRAPHQL,
             $schemaString
@@ -185,8 +201,13 @@ GRAPHQL,
         );
     }
 
-    public function testManipulatesConnection(): void
+    /**
+     * @dataProvider nonNullPaginationResults
+     */
+    public function testManipulatesConnection(bool $nonNullPaginationResults): void
     {
+        config(['lighthouse.non_null_pagination_results' => $nonNullPaginationResults]);
+
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
@@ -198,7 +219,10 @@ GRAPHQL,
         ');
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $nonNull = $nonNullPaginationResults
+            ? '!'
+            : '';
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
     """Limits number of fetched items."""
@@ -206,7 +230,7 @@ type Query {
 
     """A cursor after which elements are returned."""
     after: String
-  ): UserConnection!
+  ): UserConnection{$nonNull}
 }
 GRAPHQL,
             $schemaString
@@ -517,7 +541,10 @@ GRAPHQL,
         );
     }
 
-    public function testThrowsWhenPaginationWithCountZeroIsRequested(): void
+    /**
+     * @dataProvider nonNullPaginationResults
+     */
+    public function testThrowsWhenPaginationWithCountZeroIsRequested(bool $nonNullPaginationResults): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -530,7 +557,7 @@ GRAPHQL,
         }
         ';
 
-        $this
+        $result = $this
             ->graphQL(/** @lang GraphQL */ '
             {
                 users(first: 0) {
@@ -541,6 +568,25 @@ GRAPHQL,
             }
             ')
             ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+
+        if (! $nonNullPaginationResults) {
+            $result->assertJson([
+                'data' => [
+                    'users' => null,
+                ],
+            ]);
+        }
+    }
+
+    /**
+     * @return array<int, array{bool}>
+     */
+    public function nonNullPaginationResults(): array
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 
     public function testDoesNotRequireModelWhenUsingBuilder(): void

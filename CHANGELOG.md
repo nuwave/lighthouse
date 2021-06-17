@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Mark appropriate generated pagination types as non-nullable
+- Add config setting `non_null_pagination_results` to mark the generated result type of paginated lists as non-nullable
 - Improve descriptions of generated pagination types
 
 ## v5.12.7
