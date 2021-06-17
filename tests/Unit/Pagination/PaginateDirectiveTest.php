@@ -45,7 +45,8 @@ type PageInfo {
   """Index of the last available page."""
   lastPage: Int!
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
 
@@ -76,7 +77,8 @@ type PaginatorInfo {
   """Number of total available items."""
   total: Int!
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
 
@@ -98,7 +100,8 @@ type SimplePaginatorInfo {
   """Number of items per page."""
   perPage: Int!
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
     }
@@ -134,7 +137,8 @@ type Query {
     page: Int
   ): UserPaginator{$nonNull}
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
 
@@ -147,7 +151,8 @@ type UserPaginator {
   """A list of User items."""
   data: [User!]!
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
     }
@@ -183,7 +188,8 @@ type Query {
     page: Int
   ): UserSimplePaginator{$nonNull}
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
 
@@ -196,7 +202,8 @@ type UserSimplePaginator {
   """A list of User items."""
   data: [User!]!
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
     }
@@ -232,7 +239,8 @@ type Query {
     after: String
   ): UserConnection{$nonNull}
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
 
@@ -245,7 +253,8 @@ type UserConnection {
   """A list of User edges."""
   edges: [UserEdge!]!
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
 
@@ -258,7 +267,8 @@ type UserEdge {
   """A unique cursor that can be used for pagination."""
   cursor: String!
 }
-GRAPHQL,
+GRAPHQL
+            ,
             $schemaString
         );
     }
