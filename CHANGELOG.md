@@ -9,6 +9,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.13.0
+
+### Changed
+
+- Add config setting `non_null_pagination_results` to mark the generated result type of paginated lists as non-nullable https://github.com/nuwave/lighthouse/pull/1878
+- Improve descriptions of generated pagination types https://github.com/nuwave/lighthouse/pull/1878
+
 ## v5.12.7
 
 ### Fixed

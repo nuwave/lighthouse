@@ -2176,10 +2176,10 @@ The schema definition is automatically transformed to this:
 ```graphql
 type Query {
   posts(
-    "Limits number of fetched elements."
+    "Limits number of fetched items."
     first: Int!
 
-    "The offset from which elements are returned."
+    "The offset from which items are returned."
     page: Int
   ): PostPaginator
 }
@@ -2193,30 +2193,30 @@ type PostPaginator {
   paginatorInfo: PaginatorInfo!
 }
 
-"Pagination information about the corresponding list of items."
+"Information about pagination using a fully featured paginator."
 type PaginatorInfo {
-  "Count of available items in the page."
+  "Number of items in the current page."
   count: Int!
 
-  "Current pagination page."
+  "Index of the current page."
   currentPage: Int!
 
-  "Index of first item in the current page."
+  "Index of the first item in the current page."
   firstItem: Int
 
-  "If collection has more pages."
+  "Are there more pages after this one?"
   hasMorePages: Boolean!
 
-  "Index of last item in the current page."
+  "Index of the last item in the current page."
   lastItem: Int
 
-  "Last page number of the collection."
+  "Index of the last available page."
   lastPage: Int!
 
-  "Number of items per page in the collection."
+  "Number of items per page."
   perPage: Int!
 
-  "Total items available in the collection."
+  "Number of total available items."
   total: Int!
 }
 ```
@@ -2258,7 +2258,7 @@ The final schema will be transformed to this:
 ```graphql
 type Query {
   posts(
-    "Limits number of fetched elements."
+    "Limits number of fetched items."
     first: Int!
 
     "A cursor after which elements are returned."
@@ -2309,10 +2309,10 @@ The schema definition is automatically transformed to this:
 ```graphql
 type Query {
   posts(
-    "Limits number of fetched elements."
+    "Limits number of fetched items."
     first: Int!
 
-    "The offset from which elements are returned."
+    "The offset from which items are returned."
     page: Int
   ): PostSimplePaginator
 }
@@ -2326,21 +2326,21 @@ type PostSimplePaginator {
   paginatorInfo: SimplePaginatorInfo!
 }
 
-"Pagination information about the corresponding list of items."
+"Information about pagination using a simple paginator."
 type SimplePaginatorInfo {
-  "Count of available items in the page."
+  "Number of items in the current page."
   count: Int!
 
-  "Current pagination page."
+  "Index of the current page."
   currentPage: Int!
 
-  "Index of first item in the current page."
+  "Index of the first item in the current page."
   firstItem: Int
 
-  "Index of last item in the current page."
+  "Index of the last item in the current page."
   lastItem: Int
 
-  "Number of items per page in the collection."
+  "Number of items per page."
   perPage: Int!
 }
 ```

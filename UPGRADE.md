@@ -77,6 +77,14 @@ The previous version 1 contained a redundant key `channels` and is no longer sup
 It is recommended to switch to version 2 before upgrading Lighthouse to give clients
 a smooth transition period.
 
+### Nullability of pagination results
+
+Generated result types of paginated lists are now always marked as non-nullable.
+The setting `non_null_pagination_results` was removed and is now always `true`.
+
+This is generally more convenient for clients, but will
+cause validation errors to bubble further up in the result.
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit

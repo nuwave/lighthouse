@@ -54,6 +54,6 @@ class SchemaBuilderTest extends TestCase
     {
         $this->expectException(FederationException::class);
 
-        $this->buildSchemaWithPlaceholderQuery('');
+        $this->buildSchemaWithPlaceholderQuery();
     }
 }

@@ -298,6 +298,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Non-Null Pagination Results
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, the generated result type of paginated lists will be marked
+    | as non-nullable. This is generally more convenient for clients, but will
+    | cause validation errors to bubble further up in the result.
+    |
+    | This setting will be removed and always true in v6.
+    |
+    */
+
+    'non_null_pagination_results' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
