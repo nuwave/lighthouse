@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;

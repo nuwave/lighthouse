@@ -16,9 +16,9 @@ class PaginateDirectiveTest extends TestCase
     public function testIncludesPaginationInfoObjectsInSchema(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery();
-        $schemaString= SchemaPrinter::doPrint($schema);
+        $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 """Information about pagination using a Relay style cursor connection."""
 type PageInfo {
   """When paginating forwards, are there more items?"""
@@ -49,7 +49,7 @@ GRAPHQL,
             $schemaString
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 """Information about pagination using a fully featured paginator."""
 type PaginatorInfo {
   """Number of items in the current page."""
@@ -80,7 +80,7 @@ GRAPHQL,
             $schemaString
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 """Information about pagination using a simple paginator."""
 type SimplePaginatorInfo {
   """Number of items in the current page."""
@@ -114,9 +114,9 @@ GRAPHQL,
             users: [User!]! @paginate
         }
         ');
-        $schemaString= SchemaPrinter::doPrint($schema);
+        $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   users(
     """Limits number of fetched items."""
@@ -130,7 +130,7 @@ GRAPHQL,
             $schemaString
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 """A paginated list of User items."""
 type UserPaginator {
   """Pagination information about the list of items."""
@@ -155,9 +155,9 @@ GRAPHQL,
             users: [User!]! @paginate(type: SIMPLE)
         }
         ');
-        $schemaString= SchemaPrinter::doPrint($schema);
+        $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   users(
     """Limits number of fetched items."""
@@ -171,7 +171,7 @@ GRAPHQL,
             $schemaString
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 """A paginated list of User items."""
 type UserSimplePaginator {
   """Pagination information about the list of items."""
@@ -196,9 +196,9 @@ GRAPHQL,
             users: [User!]! @paginate(type: CONNECTION)
         }
         ');
-        $schemaString= SchemaPrinter::doPrint($schema);
+        $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   users(
     """Limits number of fetched items."""
@@ -212,7 +212,7 @@ GRAPHQL,
             $schemaString
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 """A paginated list of User edges."""
 type UserConnection {
   """Pagination information about the list of edges."""
@@ -225,7 +225,7 @@ GRAPHQL,
             $schemaString
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
 """An edge that contains a node of type User and a cursor."""
 type UserEdge {
   """The User node."""
