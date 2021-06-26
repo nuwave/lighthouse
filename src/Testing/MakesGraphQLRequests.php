@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
+use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
@@ -202,7 +203,7 @@ trait MakesGraphQLRequests
     {
         $this->deferStream = new MemoryStream;
 
-        app()->singleton(CanStreamResponse::class, function (): MemoryStream {
+        Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;
         });
     }

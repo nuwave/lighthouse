@@ -13,6 +13,12 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 
 class DeferServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->singleton(Defer::class);
+        $this->app->singleton(CreatesResponse::class, Defer::class);
+    }
+
     public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
@@ -56,11 +62,5 @@ Must not be placed upon:
 directive @defer(if: Boolean = true) on FIELD
 ')
         );
-    }
-
-    public function register(): void
-    {
-        $this->app->singleton(Defer::class);
-        $this->app->singleton(CreatesResponse::class, Defer::class);
     }
 }

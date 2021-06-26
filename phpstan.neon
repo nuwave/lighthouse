@@ -2,6 +2,7 @@ includes:
 - vendor/bensampo/laravel-enum/extension.neon
 - vendor/nesbot/carbon/extension.neon
 - vendor/nunomaduro/larastan/extension.neon
+- vendor/phpstan/phpstan/conf/bleedingEdge.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 - vendor/phpstan/phpstan-phpunit/extension.neon
 - vendor/phpstan/phpstan-phpunit/rules.neon
@@ -12,6 +13,7 @@ parameters:
   - benchmarks
   - src
   - tests
+  checkOctaneCompatibility: true
   excludePaths:
   - tests/database/migrations/*
 
@@ -57,3 +59,6 @@ parameters:
 
   # PHPStan and PHPUnit disagree with themselves
   - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
+
+  # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
+  - '#Property .* in isset\(\) is not nullable\.#'

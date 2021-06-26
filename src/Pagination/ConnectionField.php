@@ -22,10 +22,6 @@ class ConnectionField
         $lastItem = $paginator->lastItem();
 
         return [
-            'total' => $paginator->total(),
-            'count' => $paginator->count(),
-            'currentPage' => $paginator->currentPage(),
-            'lastPage' => $paginator->lastPage(),
             'hasNextPage' => $paginator->hasMorePages(),
             'hasPreviousPage' => $paginator->currentPage() > 1,
             'startCursor' => $firstItem !== null
@@ -34,6 +30,10 @@ class ConnectionField
             'endCursor' => $lastItem !== null
                 ? Cursor::encode($lastItem)
                 : null,
+            'total' => $paginator->total(),
+            'count' => $paginator->count(),
+            'currentPage' => $paginator->currentPage(),
+            'lastPage' => $paginator->lastPage(),
         ];
     }
 
@@ -45,13 +45,12 @@ class ConnectionField
      */
     public function edgeResolver(LengthAwarePaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
-        // We know this must be a list, as it is constructed this way during schema manipulation
-        /** @var \GraphQL\Type\Definition\ListOfType $listOfType */
-        $listOfType = $resolveInfo->returnType;
-
-        // We also know this is one of those two return types
+        // We know those types because we manipulated them during PaginationManipulator
+        /** @var \GraphQL\Type\Definition\NonNull $nonNullList */
+        $nonNullList = $resolveInfo->returnType;
         /** @var \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $objectLikeType */
-        $objectLikeType = $listOfType->ofType;
+        $objectLikeType = $nonNullList->getWrappedType(true);
+
         $returnTypeFields = $objectLikeType->getFields();
 
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */

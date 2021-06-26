@@ -137,6 +137,58 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testSearchWithBuilder(): void
+    {
+        $id = 1;
+
+        $this->engine
+            ->shouldReceive('map')
+            ->withArgs(function (ScoutBuilder $builder) use ($id): bool {
+                return $builder->wheres === ['from_custom_builder' => $id];
+            })
+            ->andReturn(new EloquentCollection())
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: Int!
+        }
+
+        input PostsInput {
+            id: Int!
+        }
+
+        type Query {
+            posts(
+                input: PostsInput! @builder(method: "'.$this->qualifyTestResolver('customBuilderMethod').'")
+                search: String! @search
+            ): [Post!]! @all
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: Int!) {
+            posts(input: { id: $id }, search: "greatness") {
+                id
+            }
+        }
+        ', [
+            'id' => $id,
+        ])->assertJson([
+            'data' => [
+                'posts' => [],
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array{id: int}  $value
+     */
+    public function customBuilderMethod(ScoutBuilder $builder, array $value): ScoutBuilder
+    {
+        return $builder->where('from_custom_builder', $value['id']);
+    }
+
     public function testSearchWithTrashed(): void
     {
         $this->engine

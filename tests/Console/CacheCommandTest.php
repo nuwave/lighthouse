@@ -18,7 +18,7 @@ class CacheCommandTest extends TestCase
     {
         parent::setUp();
 
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.cache.enable', true);
         $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
         $config->set('lighthouse.cache.path', $this->cachePath);

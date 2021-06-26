@@ -5,14 +5,17 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
+use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CountDirective extends WithRelationDirective implements FieldResolver
+class CountDirective extends BaseDirective implements FieldResolver
 {
+    use RelationDirectiveHelpers;
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -21,13 +24,13 @@ Returns the count of a given relationship or model.
 """
 directive @count(
   """
-  The relationship which you want to run the count on.
+  The relationship to count.
   Mutually exclusive with the `model` argument.
   """
   relation: String
 
   """
-  The model to run the count on.
+  The model to count.
   Mutually exclusive with the `relation` argument.
   """
   model: String
@@ -40,54 +43,51 @@ directive @count(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $value): FieldValue
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return $value->setResolver(
+            $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
                     $query = $this
                         ->namespaceModelClass($modelArg)
                         ::query();
 
-                    $this->decorateBuilder($resolveInfo)($query);
+                    $this->makeBuilderDecorator($resolveInfo)($query);
 
                     return $query->count();
                 }
             );
+
+            return $fieldValue;
         }
 
-        // Fetch the count by relation
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            return $value->setResolver(
+            $fieldValue->setResolver(
                 function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                    return $this->loadRelation($parent, $resolveInfo);
+                    /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
+                    $relationBatchLoader = BatchLoaderRegistry::instance(
+                        array_merge(
+                            $this->qualifyPath($args, $resolveInfo),
+                            ['count']
+                        ),
+                        function () use ($resolveInfo): RelationBatchLoader {
+                            return new RelationBatchLoader(
+                                new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($resolveInfo))
+                            );
+                        }
+                    );
+
+                    return $relationBatchLoader->load($parent);
                 }
             );
+
+            return $fieldValue;
         }
 
         throw new DefinitionException(
             "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'."
-        );
-    }
-
-    protected function relationName(): string
-    {
-        /**
-         * We only got to this point because we already know this argument is set.
-         *
-         * @var string $relation
-         */
-        $relation = $this->directiveArgValue('relation');
-
-        return $relation;
-    }
-
-    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
-    {
-        return new RelationCountLoader(
-            $this->decorateBuilder($resolveInfo)
         );
     }
 }

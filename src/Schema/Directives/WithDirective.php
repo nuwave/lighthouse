@@ -6,14 +6,13 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
+class WithDirective extends WithRelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
@@ -43,19 +42,14 @@ GRAPHQL;
         }
     }
 
-    protected function relationName(): string
-    {
-        return $this->directiveArgValue('relation')
-            ?? $this->nodeName();
-    }
-
     /**
-     * @return \Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader
+     * @return \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader
      */
-    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
+    protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader
     {
-        return new SimpleRelationLoader(
-            $this->decorateBuilder($resolveInfo)
+        return new SimpleModelsLoader(
+            $this->relation(),
+            $this->makeBuilderDecorator($resolveInfo)
         );
     }
 }

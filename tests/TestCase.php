@@ -10,7 +10,6 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
@@ -183,7 +182,7 @@ GRAPHQL;
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
      */
-    protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
+    protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
     {
         return $this->buildSchema(
             $schema.self::PLACEHOLDER_QUERY

@@ -1,5 +1,101 @@
 # Directives
 
+## @aggregate
+
+```graphql
+"""
+Returns an aggregate of a column in a given relationship or model.
+
+Requires Laravel 8+.
+"""
+directive @aggregate(
+  """
+  The column to aggregate.
+  """
+  column: String!
+
+  """
+  The aggregate function to compute.
+  """
+  function: AggregateFunction!
+
+  """
+  The relationship with the column to aggregate.
+  Mutually exclusive with the `model` argument.
+  """
+  relation: String
+
+  """
+  The model with the column to aggregate.
+  Mutually exclusive with the `relation` argument.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+
+"""
+Options for the `function` argument of `@aggregate`.
+"""
+enum AggregateFunction {
+  """
+  Return the average value.
+  """
+  AVG
+
+  """
+  Return the sum.
+  """
+  SUM
+
+  """
+  Return the minimum.
+  """
+  MIN
+
+  """
+  Return the maximum.
+  """
+  MAX
+}
+```
+
+If all you need is counting, use [@count](#count).
+
+To retrieve the aggregate of a column on a root field, reference a `model`:
+
+```graphql
+type Query {
+  totalDownloads: Int!
+    @aggregate(model: "Song", column: "downloads", function: SUM)
+}
+```
+
+To retrieve the aggregate of a column in related models, reference the `relation`:
+
+```graphql
+type Album {
+  rating: Float! @aggregate(relation: "songs", column: "rating", function: AVG)
+}
+```
+
+You may combine filters and scopes:
+
+```graphql
+type Query {
+  mostListened(genre: String @eq): Int!
+    @aggregate(
+      model: "Song"
+      column: "listen_count"
+      function: MAX
+      scope: ["published"]
+    )
+}
+```
+
 ## @all
 
 ```graphql
@@ -533,18 +629,25 @@ Returns the count of a given relationship or model.
 """
 directive @count(
   """
-  The relationship which you want to run the count on.
+  The relationship to count.
+  Mutually exclusive with the `model` argument.
   """
   relation: String
 
   """
-  The model to run the count on.
+  The model to count.
+  Mutually exclusive with the `relation` argument.
   """
   model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 ```
 
-Specify the name of the model to count when using this directive on a root query.
+Specify the name of the model to count when using this directive on a root query:
 
 ```graphql
 type Query {
@@ -552,7 +655,7 @@ type Query {
 }
 ```
 
-You can also count relations.
+You can also count relations:
 
 ```graphql
 type User {
@@ -1986,7 +2089,7 @@ To predefine a default order for your field, use this directive on a field:
 
 ```graphql
 type Query {
-  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: "DESC")
+  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: DESC)
 }
 ```
 
@@ -2073,10 +2176,10 @@ The schema definition is automatically transformed to this:
 ```graphql
 type Query {
   posts(
-    "Limits number of fetched elements."
+    "Limits number of fetched items."
     first: Int!
 
-    "The offset from which elements are returned."
+    "The offset from which items are returned."
     page: Int
   ): PostPaginator
 }
@@ -2090,30 +2193,30 @@ type PostPaginator {
   paginatorInfo: PaginatorInfo!
 }
 
-"Pagination information about the corresponding list of items."
+"Information about pagination using a fully featured paginator."
 type PaginatorInfo {
-  "Count of available items in the page."
+  "Number of items in the current page."
   count: Int!
 
-  "Current pagination page."
+  "Index of the current page."
   currentPage: Int!
 
-  "Index of first item in the current page."
+  "Index of the first item in the current page."
   firstItem: Int
 
-  "If collection has more pages."
+  "Are there more pages after this one?"
   hasMorePages: Boolean!
 
-  "Index of last item in the current page."
+  "Index of the last item in the current page."
   lastItem: Int
 
-  "Last page number of the collection."
+  "Index of the last available page."
   lastPage: Int!
 
-  "Number of items per page in the collection."
+  "Number of items per page."
   perPage: Int!
 
-  "Total items available in the collection."
+  "Number of total available items."
   total: Int!
 }
 ```
@@ -2155,7 +2258,7 @@ The final schema will be transformed to this:
 ```graphql
 type Query {
   posts(
-    "Limits number of fetched elements."
+    "Limits number of fetched items."
     first: Int!
 
     "A cursor after which elements are returned."
@@ -2206,10 +2309,10 @@ The schema definition is automatically transformed to this:
 ```graphql
 type Query {
   posts(
-    "Limits number of fetched elements."
+    "Limits number of fetched items."
     first: Int!
 
-    "The offset from which elements are returned."
+    "The offset from which items are returned."
     page: Int
   ): PostSimplePaginator
 }
@@ -2223,21 +2326,21 @@ type PostSimplePaginator {
   paginatorInfo: SimplePaginatorInfo!
 }
 
-"Pagination information about the corresponding list of items."
+"Information about pagination using a simple paginator."
 type SimplePaginatorInfo {
-  "Count of available items in the page."
+  "Number of items in the current page."
   count: Int!
 
-  "Current pagination page."
+  "Index of the current page."
   currentPage: Int!
 
-  "Index of first item in the current page."
+  "Index of the first item in the current page."
   firstItem: Int
 
-  "Index of last item in the current page."
+  "Index of the last item in the current page."
   lastItem: Int
 
-  "Number of items per page in the collection."
+  "Number of items per page."
   perPage: Int!
 }
 ```

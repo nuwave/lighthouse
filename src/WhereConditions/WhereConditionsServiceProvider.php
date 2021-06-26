@@ -26,7 +26,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $_): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );

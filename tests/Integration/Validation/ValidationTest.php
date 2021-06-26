@@ -3,6 +3,7 @@
 namespace Tests\Integration\Validation;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Validators\FooClosureValidator;
@@ -67,8 +68,8 @@ class ValidationTest extends TestCase
                     [
                         'message' => 'Validation failed for the field [foo].',
                         'extensions' => [
-                            'category' => 'validation',
-                            'validation' => [
+                            'category' => ValidationException::CATEGORY,
+                            ValidationException::CATEGORY => [
                                 'bar' => [
                                     'The bar field is required.',
                                 ],
@@ -130,7 +131,7 @@ class ValidationTest extends TestCase
                         'path' => ['foo'],
                         'message' => 'Validation failed for the field [foo.baz].',
                         'extensions' => [
-                            'validation' => [
+                            ValidationException::CATEGORY => [
                                 'required' => [
                                     'The required field is required.',
                                 ],
@@ -139,6 +140,30 @@ class ValidationTest extends TestCase
                     ],
                 ],
             ]);
+    }
+
+    public function testCombinedRulesChangeTheirSemantics(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: Int @rules(apply: ["min:42"])
+                baz: Int @rules(apply: ["int", "min:42"])
+            ): ID
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    bar: 21
+                    baz: 21
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('bar', 'The bar must be at least 42 characters.')
+            ->assertGraphQLValidationError('baz', 'The baz must be at least 42.');
     }
 
     public function testValidatesDifferentPathsIndividually(): void

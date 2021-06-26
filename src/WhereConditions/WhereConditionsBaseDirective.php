@@ -166,9 +166,8 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     {
         // A valid column reference:
         // - must not start with a digit, dot or hyphen
-        // - must contain only alphanumerics, digits, underscores, dots or hyphens
-        // Dots are allowed to reference a column in a table: my_table.my_column.
-        $match = \Safe\preg_match('/^(?![0-9.-])[A-Za-z0-9_.-]*$/', $column);
+        // - must contain only alphanumerics, digits, underscores, dots, hyphens or JSON references
+        $match = \Safe\preg_match('/^(?![0-9.-])([A-Za-z0-9_.-]|->)*$/', $column);
         if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)

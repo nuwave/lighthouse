@@ -6,14 +6,13 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class WithCountDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
+class WithCountDirective extends WithRelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
@@ -51,25 +50,14 @@ GRAPHQL;
         }
     }
 
-    protected function relationName(): string
-    {
-        /**
-         * We validated the argument during schema manipulation.
-         *
-         * @var string $relation
-         */
-        $relation = $this->directiveArgValue('relation');
-
-        return $relation;
-    }
-
     /**
-     * @return RelationCountLoader
+     * @return CountModelsLoader
      */
-    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
+    protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader
     {
-        return new RelationCountLoader(
-            $this->decorateBuilder($resolveInfo)
+        return new CountModelsLoader(
+            $this->relation(),
+            $this->makeBuilderDecorator($resolveInfo)
         );
     }
 }

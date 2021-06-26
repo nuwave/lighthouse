@@ -50,30 +50,6 @@ use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
-    public function boot(ConfigRepository $configRepository): void
-    {
-        $this->publishes([
-            __DIR__.'/lighthouse.php' => $this->app->configPath().'/lighthouse.php',
-        ], 'lighthouse-config');
-
-        $this->publishes([
-            __DIR__.'/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
-        ], 'lighthouse-schema');
-
-        $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
-    }
-
-    protected function loadRoutesFrom($path): void
-    {
-        if (AppVersion::isLumen()) {
-            require \Safe\realpath($path);
-
-            return;
-        }
-
-        parent::loadRoutesFrom($path);
-    }
-
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
@@ -119,7 +95,7 @@ class LighthouseServiceProvider extends ServiceProvider
             }
 
             if ($app instanceof LumenApplication) {
-                return new LumenMiddlewareAdapter($app);
+                return new LumenMiddlewareAdapter();
             }
 
             throw new Exception(
@@ -148,5 +124,29 @@ class LighthouseServiceProvider extends ServiceProvider
         if ($this->app->runningUnitTests()) {
             $this->app->register(TestingServiceProvider::class);
         }
+    }
+
+    public function boot(ConfigRepository $configRepository): void
+    {
+        $this->publishes([
+            __DIR__.'/lighthouse.php' => $this->app->configPath().'/lighthouse.php',
+        ], 'lighthouse-config');
+
+        $this->publishes([
+            __DIR__.'/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
+        ], 'lighthouse-schema');
+
+        $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
+    }
+
+    protected function loadRoutesFrom($path): void
+    {
+        if (AppVersion::isLumen()) {
+            require \Safe\realpath($path);
+
+            return;
+        }
+
+        parent::loadRoutesFrom($path);
     }
 }

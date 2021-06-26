@@ -24,7 +24,7 @@ class SchemaSourceProviderTest extends TestCase
     {
         parent::setUp();
 
-        app()->singleton(SchemaSourceProvider::class, function () {
+        $this->app->singleton(SchemaSourceProvider::class, function () {
             return new SchemaStitcher(config('lighthouse.schema.register', ''));
         });
 

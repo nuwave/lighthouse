@@ -34,30 +34,30 @@ class PaginationServiceProvider extends ServiceProvider
     protected static function paginatorInfo(): ObjectTypeDefinitionNode
     {
         return Parser::objectTypeDefinition(/** @lang GraphQL */ '
-            "Pagination information about the corresponding list of items."
+            "Information about pagination using a fully featured paginator."
             type PaginatorInfo {
-              "Count of available items in the page."
+              "Number of items in the current page."
               count: Int!
 
-              "Current pagination page."
+              "Index of the current page."
               currentPage: Int!
 
-              "Index of first item in the current page."
+              "Index of the first item in the current page."
               firstItem: Int
 
-              "If collection has more pages."
+              "Are there more pages after this one?"
               hasMorePages: Boolean!
 
-              "Index of last item in the current page."
+              "Index of the last item in the current page."
               lastItem: Int
 
-              "Last page number of the collection."
+              "Index of the last available page."
               lastPage: Int!
 
-              "Number of items per page in the collection."
+              "Number of items per page."
               perPage: Int!
 
-              "Total items available in the collection."
+              "Number of total available items."
               total: Int!
             }
         ');
@@ -66,21 +66,21 @@ class PaginationServiceProvider extends ServiceProvider
     protected static function simplePaginatorInfo(): ObjectTypeDefinitionNode
     {
         return Parser::objectTypeDefinition(/** @lang GraphQL */ '
-            "Pagination information about the corresponding list of items."
+            "Information about pagination using a simple paginator."
             type SimplePaginatorInfo {
-              "Count of available items in the page."
+              "Number of items in the current page."
               count: Int!
 
-              "Current pagination page."
+              "Index of the current page."
               currentPage: Int!
 
-              "Index of first item in the current page."
+              "Index of the first item in the current page."
               firstItem: Int
 
-              "Index of last item in the current page."
+              "Index of the last item in the current page."
               lastItem: Int
 
-              "Number of items per page in the collection."
+              "Number of items per page."
               perPage: Int!
             }
         ');
@@ -89,7 +89,7 @@ class PaginationServiceProvider extends ServiceProvider
     protected static function pageInfo(): ObjectTypeDefinitionNode
     {
         return Parser::objectTypeDefinition(/** @lang GraphQL */ '
-            "Pagination information about the corresponding list of items."
+            "Information about pagination using a Relay style cursor connection."
             type PageInfo {
               "When paginating forwards, are there more items?"
               hasNextPage: Boolean!
@@ -97,23 +97,23 @@ class PaginationServiceProvider extends ServiceProvider
               "When paginating backwards, are there more items?"
               hasPreviousPage: Boolean!
 
-              "When paginating backwards, the cursor to continue."
+              "The cursor to continue paginating backwards."
               startCursor: String
 
-              "When paginating forwards, the cursor to continue."
+              "The cursor to continue paginating forwards."
               endCursor: String
 
-              "Total number of node in connection."
-              total: Int
+              "Total number of nodes in the paginated connection."
+              total: Int!
 
-              "Count of nodes in current request."
-              count: Int
+              "Number of nodes in the current page."
+              count: Int!
 
-              "Current page of request."
-              currentPage: Int
+              "Index of the current page."
+              currentPage: Int!
 
-              "Last page in connection."
-              lastPage: Int
+              "Index of the last available page."
+              lastPage: Int!
             }
         ');
     }

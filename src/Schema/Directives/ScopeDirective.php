@@ -34,6 +34,7 @@ GRAPHQL;
 
         try {
             return $builder->{$scope}($value);
+            // @phpstan-ignore-next-line PHPStan thinks this exception does not occur - but it does. Magic.
         } catch (BadMethodCallException $exception) {
             throw new DefinitionException(
                 $exception->getMessage()." in @{$this->name()} directive on {$this->nodeName()} argument.",

@@ -36,13 +36,6 @@ use Nuwave\Lighthouse\Support\Utils;
 class TypeRegistry
 {
     /**
-     * Resolved types.
-     *
-     * @var array<string, \GraphQL\Type\Definition\Type>
-     */
-    protected $types = [];
-
-    /**
      * @var \Illuminate\Pipeline\Pipeline
      */
     protected $pipeline;
@@ -50,7 +43,7 @@ class TypeRegistry
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
@@ -60,17 +53,31 @@ class TypeRegistry
     /**
      * Lazily initialized.
      *
+     * @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory
+     */
+    protected $fieldFactory;
+
+    /**
+     * Lazily initialized.
+     *
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
+    /**
+     * Map from type names to resolved types.
+     *
+     * @var array<string, \GraphQL\Type\Definition\Type>
+     */
+    protected $types = [];
+
     public function __construct(
         Pipeline $pipeline,
-        DirectiveLocator $directiveFactory,
+        DirectiveLocator $directiveLocator,
         ArgumentFactory $argumentFactory
     ) {
         $this->pipeline = $pipeline;
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveLocator = $directiveLocator;
         $this->argumentFactory = $argumentFactory;
     }
 
@@ -201,13 +208,13 @@ EOL
                 new TypeValue($definition)
             )
             ->through(
-                $this->directiveFactory
+                $this->directiveLocator
                     ->associatedOfType($definition, TypeMiddleware::class)
                     ->all()
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                $typeResolver = $this->directiveFactory->exclusiveOfType($definition, TypeResolver::class);
+                $typeResolver = $this->directiveLocator->exclusiveOfType($definition, TypeResolver::class);
                 if ($typeResolver !== null) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
                     return $typeResolver->resolveNode($value);
@@ -254,7 +261,7 @@ EOL
 
         foreach ($enumDefinition->values as $enumValue) {
             /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
-            $enumDirective = $this->directiveFactory->exclusiveOfType($enumValue, EnumDirective::class);
+            $enumDirective = $this->directiveLocator->exclusiveOfType($enumValue, EnumDirective::class);
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value
@@ -337,24 +344,25 @@ EOL
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
      *
-     * @return \Closure(): array<string, array<string, mixed>>
+     * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): Closure
     {
         return
             /**
-             * @return array<string, array<string, mixed>>
+             * @return array<string, Closure(): array<string, mixed>>
              */
             function () use ($typeDefinition): array {
+                $fieldFactory = $this->fieldFactory();
                 $typeValue = new TypeValue($typeDefinition);
                 $fields = [];
 
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
-                    $fieldFactory = app(FieldFactory::class);
-                    $fieldValue = new FieldValue($typeValue, $fieldDefinition);
-
-                    $fields[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
+                    $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
+                        return $fieldFactory->handle(
+                            new FieldValue($typeValue, $fieldDefinition)
+                        );
+                    };
                 }
 
                 return $fields;
@@ -484,5 +492,14 @@ EOL
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);
+    }
+
+    protected function fieldFactory(): FieldFactory
+    {
+        if (! isset($this->fieldFactory)) {
+            $this->fieldFactory = app(FieldFactory::class);
+        }
+
+        return $this->fieldFactory;
     }
 }

@@ -17,7 +17,7 @@ class FieldFactory
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
@@ -40,7 +40,7 @@ class FieldFactory
         Pipeline $pipeline,
         ArgumentSetFactory $argumentSetFactory
     ) {
-        $this->directiveFactory = $directiveLocator;
+        $this->directiveLocator = $directiveLocator;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
         $this->argumentSetFactory = $argumentSetFactory;
@@ -56,7 +56,7 @@ class FieldFactory
         $fieldDefinitionNode = $fieldValue->getField();
 
         // Directives have the first priority for defining a resolver for a field
-        $resolverDirective = $this->directiveFactory->exclusiveOfType($fieldDefinitionNode, FieldResolver::class);
+        $resolverDirective = $this->directiveLocator->exclusiveOfType($fieldDefinitionNode, FieldResolver::class);
         if ($resolverDirective instanceof FieldResolver) {
             $fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
@@ -69,7 +69,7 @@ class FieldFactory
             config('lighthouse.field_middleware')
         );
 
-        $fieldMiddleware = $this->directiveFactory
+        $fieldMiddleware = $this->directiveLocator
             ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
             ->reverse()
             ->all();

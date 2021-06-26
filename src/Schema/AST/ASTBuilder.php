@@ -65,12 +65,12 @@ class ASTBuilder
     protected $documentAST;
 
     public function __construct(
-        DirectiveLocator $directiveFactory,
+        DirectiveLocator $directiveLocator,
         SchemaSourceProvider $schemaSourceProvider,
         EventsDispatcher $eventsDispatcher,
         ConfigRepository $configRepository
     ) {
-        $this->directiveLocator = $directiveFactory;
+        $this->directiveLocator = $directiveLocator;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->eventsDispatcher = $eventsDispatcher;
         $this->configRepository = $configRepository;
