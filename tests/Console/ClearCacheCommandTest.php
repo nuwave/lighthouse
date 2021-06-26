@@ -24,7 +24,7 @@ class ClearCacheCommandTest extends TestCase
         $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
         $config->set('lighthouse.cache.path', $this->cachePath);
 
-        file_put_contents($this->cachePath, '<?php return [\'directives\' => []];');
+        file_put_contents($this->cachePath, /** @lang PHP */ "<?php return ['directives' => []];");
     }
 
     protected function tearDown(): void
