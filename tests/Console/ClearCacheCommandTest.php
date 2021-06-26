@@ -54,8 +54,8 @@ class ClearCacheCommandTest extends TestCase
 
         $this->commandTester(new ClearCacheCommand())->execute([]);
 
-        $this->assertTrue(
-            $cache->missing($key)
+        $this->assertFalse(
+            $cache->has($key)
         );
     }
 
