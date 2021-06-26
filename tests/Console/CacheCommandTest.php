@@ -2,7 +2,6 @@
 
 namespace Tests\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use InvalidArgumentException;

@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\File;
+use InvalidArgumentException;
 
 class ClearCacheCommand extends Command
 {

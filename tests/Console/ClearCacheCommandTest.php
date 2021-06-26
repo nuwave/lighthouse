@@ -21,7 +21,7 @@ class ClearCacheCommandTest extends TestCase
         parent::setUp();
 
         $config = $this->app->make(ConfigRepository::class);
-        $this->cachePath = __DIR__ . '/../storage/' . __METHOD__ . '.php';
+        $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
         $config->set('lighthouse.cache.path', $this->cachePath);
 
         file_put_contents($this->cachePath, '<?php return [\'directives\' => []];');
