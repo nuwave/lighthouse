@@ -303,7 +303,10 @@ class ASTBuilder
         }
     }
 
-    protected function cacheAst(array $cacheConfig)
+    /**
+     * @param array<string, mixed> $cacheConfig
+     */
+    protected function cacheAst(array $cacheConfig): void
     {
         $version = $cacheConfig['version'] ?? 1;
         if ($version === 1) {

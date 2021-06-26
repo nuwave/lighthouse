@@ -7,6 +7,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use function Safe\file_put_contents;
+use function Safe\unlink;
 use Tests\TestCase;
 
 class ClearCacheCommandTest extends TestCase

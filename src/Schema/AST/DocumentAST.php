@@ -121,7 +121,7 @@ class DocumentAST
     }
 
     /**
-     * @return array<string, array>
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -138,7 +138,7 @@ class DocumentAST
     }
 
     /**
-     * @param array<string, array> $ast
+     * @param array<string, mixed> $ast
      */
     public static function fromArray(array $ast): DocumentAST
     {
