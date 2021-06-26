@@ -27,6 +27,7 @@ class SchemaCachingTest extends TestCase
         $config->set('lighthouse.cache.enable', true);
         $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
         $config->set('lighthouse.cache.path', $this->cachePath);
+        $config->set('lighthouse.cache.version', 2);
 
         $this->useSerializingArrayStore($app);
     }
