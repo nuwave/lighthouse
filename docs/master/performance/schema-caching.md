@@ -35,6 +35,6 @@ This will store the compiled schema as a file on your disk, allowing opcache to 
 ```php
     'cache' => [
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', true),
-        'version' => env('LIGHTHOUSE_CACHE_VERSION', 2), 
+        'version' => env('LIGHTHOUSE_CACHE_VERSION', 2),
     ],
 ```
