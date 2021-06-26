@@ -47,7 +47,7 @@ class ClearCacheCommandTest extends TestCase
 
         /** @var CacheRepository $cache */
         $cache = $this->app->make(CacheRepository::class);
-        $cache->put($key, serialize(['directives' => []]));
+        $cache->put($key, serialize(['directives' => []]), 60);
         $this->assertTrue(
             $cache->has($key)
         );
