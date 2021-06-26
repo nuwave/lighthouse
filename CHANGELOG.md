@@ -9,9 +9,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-### Changed
+### Added
 
-- Changed schema cache to be a file that can be cached by opcache https://github.com/nuwave/lighthouse/pull/1842
+- Added a config to allow the schema cache to be a file that can be cached by opcache https://github.com/nuwave/lighthouse/pull/1842
 
 ## v5.13.0
 

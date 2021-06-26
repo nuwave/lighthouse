@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use InvalidArgumentException;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\File;
 
@@ -12,10 +14,19 @@ class ClearCacheCommand extends Command
 
     protected $description = 'Clear the GraphQL schema cache.';
 
-    public function handle(ConfigRepository $config): void
+    public function handle(CacheFactory $cacheFactory, ConfigRepository $config): void
     {
-        $path = $config->get('lighthouse.cache.path') ?? base_path('bootstrap/cache/lighthouse-schema.php');
-        File::delete($path);
+        $version = $config->get('lighthouse.cache.version', 1);
+        if ($version === 1) {
+            $cacheFactory
+                ->store($config->get('lighthouse.cache.store'))
+                ->forget($config->get('lighthouse.cache.key'));
+        } elseif ($version === 2) {
+            $path = $config->get('lighthouse.cache.path') ?? base_path('bootstrap/cache/lighthouse-schema.php');
+            File::delete($path);
+        } else {
+            throw new InvalidArgumentException('Unknown cache version.');
+        }
 
         $this->info('GraphQL AST schema cache deleted.');
     }

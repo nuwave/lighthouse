@@ -16,7 +16,7 @@ class SchemaCachingTest extends TestCase
     /**
      * @var string
      */
-    private $cachePath;
+    protected $cachePath;
 
     protected function getEnvironmentSetUp($app): void
     {

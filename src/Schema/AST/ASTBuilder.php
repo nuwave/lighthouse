@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use InvalidArgumentException;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumTypeExtensionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -13,6 +14,7 @@ use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Arr;
@@ -81,12 +83,7 @@ class ASTBuilder
         if (! isset($this->documentAST)) {
             $cacheConfig = $this->configRepository->get('lighthouse.cache');
             if ($cacheConfig['enable']) {
-                $path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
-                if (! File::exists($path)) {
-                    File::put($path, '<?php return '.var_export($this->build()->toArray(), true).';');
-                }
-
-                $this->documentAST = DocumentAST::fromArray(require $path);
+                $this->cacheAst($cacheConfig);
             } else {
                 $this->documentAST = $this->build();
             }
@@ -303,6 +300,33 @@ class ASTBuilder
                     }
                 }
             }
+        }
+    }
+
+    protected function cacheAst(array $cacheConfig)
+    {
+        $version = $cacheConfig['version'] ?? 1;
+        if ($version === 1) {
+            /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
+            $cacheFactory = app(CacheFactory::class);
+            $cache = $cacheFactory->store($cacheConfig['store'] ?? null);
+
+            $this->documentAST = $cache->remember(
+                $cacheConfig['key'],
+                $cacheConfig['ttl'],
+                function (): DocumentAST {
+                    return $this->build();
+                }
+            );
+        } elseif ($version === 2) {
+            $path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
+            if (! File::exists($path)) {
+                File::put($path, '<?php return '.var_export($this->build()->toArray(), true).';');
+            }
+
+            $this->documentAST = DocumentAST::fromArray(require $path);
+        } else {
+            throw new InvalidArgumentException('Unknown cache version.');
         }
     }
 }

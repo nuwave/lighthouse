@@ -26,3 +26,15 @@ Make sure to enable schema caching when shipping Lighthouse to production.
 You may clear your schema cache using the [clear-cache](../api-reference/commands.md#clear-cache) artisan command:
 
     php artisan lighthouse:clear-cache
+
+## Opcache your schema
+
+If you use opcache in your production environment, you may set the cache version to `2`.
+This will store the compiled schema as a file on your disk, allowing opcache to pick it up.
+
+```php
+    'cache' => [
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', true),
+        'version' => env('LIGHTHOUSE_CACHE_VERSION', 2), 
+    ],
+```
