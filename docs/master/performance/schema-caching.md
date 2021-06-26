@@ -29,7 +29,7 @@ You may clear your schema cache using the [clear-cache](../api-reference/command
 
 ## Opcache your schema
 
-If you use opcache in your production environment, you may set the cache version to `2`.
+If you use opcache in your production environment, you might want to set the cache version to `2`.
 This will store the compiled schema as a file on your disk, allowing opcache to pick it up.
 
 ```php
