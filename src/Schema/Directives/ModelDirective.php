@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 class ModelDirective extends BaseDirective
@@ -29,7 +29,7 @@ GRAPHQL;
     /**
      * Attempt to get the model class name from this directive.
      */
-    public static function modelClass(ObjectTypeDefinitionNode $node): ?string
+    public static function modelClass(Node $node): ?string
     {
         $modelDirective = ASTHelper::directiveDefinition($node, self::NAME);
         if ($modelDirective !== null) {
