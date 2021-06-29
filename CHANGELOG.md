@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.13.1
+
+### Fixed
+
+- Fix model name determination when using interfaces https://github.com/nuwave/lighthouse/pull/1882
+
 ## v5.13.0
 
 ### Added
