@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.14.0
+
 ### Added
 
 - Add config setting `cache.version` to use a PHP file for the schema cache and leverage OPcache https://github.com/nuwave/lighthouse/pull/1842
