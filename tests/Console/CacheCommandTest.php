@@ -4,13 +4,22 @@ namespace Tests\Console;
 
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use InvalidArgumentException;
+use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\CacheCommand;
-use function Safe\unlink;
+use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Tests\TestsSerialization;
 use Tests\TestCase;
 
 class CacheCommandTest extends TestCase
 {
+    use TestsSerialization;
+
+    /**
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
     /**
      * @var string
      */
@@ -20,57 +29,62 @@ class CacheCommandTest extends TestCase
     {
         parent::setUp();
 
-        $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.cache.enable', true);
+        $this->config = $this->app->make(ConfigRepository::class);
+
+        $this->config->set('lighthouse.cache.enable', true);
+
         $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
-        $config->set('lighthouse.cache.path', $this->cachePath);
+        $this->config->set('lighthouse.cache.path', $this->cachePath);
+
+        $this->useSerializingArrayStore($this->app);
     }
 
     protected function tearDown(): void
     {
-        if (file_exists($this->cachePath)) {
-            unlink($this->cachePath);
-        }
+        /** @var \Illuminate\Filesystem\Filesystem $filesystem */
+        $filesystem = $this->app->make(Filesystem::class);
+        $filesystem->delete($this->cachePath);
 
         parent::tearDown();
     }
 
-    public function testCachesGraphQLASTV1(): void
+    public function testCacheVersion1(): void
     {
-        $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.cache.version', 1);
-        $config->set('lighthouse.cache.ttl', 60);
+        $this->config->set('lighthouse.cache.version', 1);
+        $this->config->set('lighthouse.cache.ttl', 60);
+        $this->config->set('lighthouse.cache.store', 'array');
 
-        $key = $config->get('lighthouse.cache.key');
+        $key = $this->config->get('lighthouse.cache.key');
 
+        /** @var \Illuminate\Contracts\Cache\Repository $cache */
         $cache = $this->app->make(CacheRepository::class);
-        $this->assertFalse(
-            $cache->has($key)
-        );
+        $this->assertFalse($cache->has($key));
 
         $this->commandTester(new CacheCommand)->execute([]);
 
-        $this->assertTrue(
-            $cache->has($key)
-        );
+        $this->assertTrue($cache->has($key));
+        $this->assertInstanceOf(DocumentAST::class, $cache->get($key));
     }
 
-    public function testCachesGraphQLASTV2(): void
+    public function testCacheVersion2(): void
     {
-        $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.cache.version', 2);
+        $this->config->set('lighthouse.cache.version', 2);
 
-        $this->assertNotTrue(file_exists($this->cachePath));
+        /** @var \Illuminate\Filesystem\Filesystem $filesystem */
+        $filesystem = $this->app->make(Filesystem::class);
+        $this->assertFalse($filesystem->exists($this->cachePath));
+
         $this->commandTester(new CacheCommand)->execute([]);
-        $this->assertTrue(file_exists($this->cachePath));
+
+        $this->assertTrue($filesystem->exists($this->cachePath));
+        $this->assertInstanceOf(DocumentAST::class, DocumentAST::fromArray(require $this->cachePath));
     }
 
-    public function testInvalidVersion(): void
+    public function testCacheVersionUnknown(): void
     {
-        $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.cache.version', 3);
+        $this->config->set('lighthouse.cache.version', 3);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnknownCacheVersionException::class);
         $this->commandTester(new CacheCommand)->execute([]);
     }
 }

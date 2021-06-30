@@ -91,29 +91,33 @@ return [
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
 
         /*
-         * Allowed values: 1, 2
-         * - 1 uses the store, key and ttl config values to store the schema as a string in the given cache store.
-         * - 2 uses the path config value to store the schema in a php file allowing the schema to be op-cached.
+         * Allowed values:
+         * - 1: uses the store, key and ttl config values to store the schema as a string in the given cache store.
+         * - 2: uses the path config value to store the schema in a PHP file allowing OPcache to pick it up.
          */
         'version' => env('LIGHTHOUSE_CACHE_VERSION', 1),
 
         /*
          * The name of the cache item for the schema cache.
+         * Only relevant if version is set to 1.
          */
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
 
         /*
          * Allows using a specific cache store, uses the app's default if set to null.
+         * Only relevant if version is set to 1.
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
 
         /*
          * Duration in seconds the schema should remain cached, null means forever.
+         * Only relevant if version is set to 1.
          */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
 
         /*
          * File path to store the lighthouse schema.
+         * Only relevant if version is set to 2.
          */
         'path' => env('LIGHTHOUSE_CACHE_PATH', base_path('bootstrap/cache/lighthouse-schema.php')),
     ],

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\AST;
+namespace Tests\Unit\Schema\Source;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use League\Flysystem\Adapter\Local;
@@ -39,11 +39,10 @@ class SchemaStitcherTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $currentDir = new Filesystem(new Local(__DIR__));
-
         $currentDir->deleteDir('schema');
+
+        parent::tearDown();
     }
 
     protected function assertSchemaResultIsSame(string $expected): void

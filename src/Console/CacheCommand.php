@@ -15,6 +15,6 @@ class CacheCommand extends Command
     {
         $builder->documentAST();
 
-        $this->info('GraphQL AST schema cache created.');
+        $this->info('GraphQL schema cache created.');
     }
 }

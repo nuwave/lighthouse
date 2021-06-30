@@ -10,9 +10,18 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Contracts\Support\Arrayable;
 use Nuwave\Lighthouse\Exceptions\ParseException;
+use Serializable;
 
-class DocumentAST
+/**
+ * Represents the AST of the entire GraphQL schema document.
+ *
+ * Explicitly implementing Serializable provides performance gains by:
+ * - stripping unnecessary data
+ * - leveraging lazy instantiation of schema types
+ */
+class DocumentAST implements Serializable, Arrayable
 {
     /**
      * The types within the schema.
@@ -121,6 +130,11 @@ class DocumentAST
     }
 
     /**
+     * Convert to a serializable array.
+     *
+     * We exclude the type extensions stored in $typeExtensions,
+     * as they are merged with the actual types at this point.
+     *
      * @return array<string, mixed>
      */
     public function toArray(): array
@@ -138,24 +152,43 @@ class DocumentAST
     }
 
     /**
+     * Instantiate from a serialized array.
+     *
      * @param array<string, mixed> $ast
      */
     public static function fromArray(array $ast): DocumentAST
+    {
+        $documentAST = new static();
+        $documentAST->hydrateFromArray($ast);
+
+        return $documentAST;
+    }
+
+    public function serialize(): string
+    {
+        return serialize($this->toArray());
+    }
+
+    public function unserialize($data): void
+    {
+        $this->hydrateFromArray(unserialize($data));
+    }
+
+    /**
+     * @param array<string, mixed> $ast
+     */
+    protected function hydrateFromArray(array $ast): void
     {
         [
             'types' => $types,
             'directives' => $directives,
         ] = $ast;
 
-        $documentAST = new static();
-
         // Utilize the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
         // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
-        $documentAST->types = new NodeList($types);
+        $this->types = new NodeList($types);
         // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
-        $documentAST->directives = new NodeList($directives);
-
-        return $documentAST;
+        $this->directives = new NodeList($directives);
     }
 }

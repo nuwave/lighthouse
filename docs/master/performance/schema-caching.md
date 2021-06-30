@@ -27,10 +27,10 @@ You may clear your schema cache using the [clear-cache](../api-reference/command
 
     php artisan lighthouse:clear-cache
 
-## Opcache your schema
+## Leverage OPcache
 
-If you use opcache in your production environment, you might want to set the cache version to `2`.
-This will store the compiled schema as a file on your disk, allowing opcache to pick it up.
+If you use [OPcache](https://www.php.net/manual/en/book.opcache.php) in your production environment, you might want to set the cache version to `2`.
+This will store the compiled schema as a PHP file on your disk, allowing OPcache to pick it up.
 
 ```php
     'cache' => [

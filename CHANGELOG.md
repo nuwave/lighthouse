@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Added a config to allow the schema cache to be a file that can be cached by opcache https://github.com/nuwave/lighthouse/pull/1842
+- Add config setting `cache.version` to use a PHP file for the schema cache and leverage OPcache https://github.com/nuwave/lighthouse/pull/1842
 
 ## v5.13.1
 
