@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Testing;
 
+use GraphQL\Error\Error;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
@@ -22,5 +23,34 @@ class MakesGraphQLRequestsTest extends TestCase
             'http://localhost/prefix/graphql',
             $this->graphQLEndpointUrl()
         );
+    }
+
+    public function testRethrowGraphQLErrors(): void
+    {
+        $error = new Error('Would not be rethrown by graphql-php with any combination of flags');
+        $this->mockResolver(static function () use ($error): void {
+            throw $error;
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertGraphQLErrorMessage($error->getMessage());
+
+        $this->rethrowGraphQLErrors();
+
+        $this->expectExceptionObject($error);
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ');
     }
 }
