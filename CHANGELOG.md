@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add method `rethrowGraphQLErrors()` to testing helper to leverage PHPUnit exception testing
+- Add method `rethrowGraphQLErrors()` to testing helper to leverage PHPUnit exception testing https://github.com/nuwave/lighthouse/pull/1885
 
 ## v5.14.0
 
