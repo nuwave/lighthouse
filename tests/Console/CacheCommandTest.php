@@ -8,22 +8,19 @@ use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Tests\TestCase;
+use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
+use Tests\TestCase;
 
 class CacheCommandTest extends TestCase
 {
     use TestsSerialization;
+    use TestsSchemaCache;
 
     /**
      * @var \Illuminate\Contracts\Config\Repository
      */
     protected $config;
-
-    /**
-     * @var string
-     */
-    protected $cachePath;
 
     public function setUp(): void
     {
@@ -31,19 +28,13 @@ class CacheCommandTest extends TestCase
 
         $this->config = $this->app->make(ConfigRepository::class);
 
-        $this->config->set('lighthouse.cache.enable', true);
-
-        $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
-        $this->config->set('lighthouse.cache.path', $this->cachePath);
-
+        $this->setUpSchemaCache();
         $this->useSerializingArrayStore($this->app);
     }
 
     protected function tearDown(): void
     {
-        /** @var \Illuminate\Filesystem\Filesystem $filesystem */
-        $filesystem = $this->app->make(Filesystem::class);
-        $filesystem->delete($this->cachePath);
+        $this->tearDownSchemaCache();
 
         parent::tearDown();
     }
@@ -72,12 +63,13 @@ class CacheCommandTest extends TestCase
 
         /** @var \Illuminate\Filesystem\Filesystem $filesystem */
         $filesystem = $this->app->make(Filesystem::class);
-        $this->assertFalse($filesystem->exists($this->cachePath));
+        $path = $this->schemaCachePath();
+        $this->assertFalse($filesystem->exists($path));
 
         $this->commandTester(new CacheCommand)->execute([]);
 
-        $this->assertTrue($filesystem->exists($this->cachePath));
-        $this->assertInstanceOf(DocumentAST::class, DocumentAST::fromArray(require $this->cachePath));
+        $this->assertTrue($filesystem->exists($path));
+        $this->assertInstanceOf(DocumentAST::class, DocumentAST::fromArray(require $path));
     }
 
     public function testCacheVersionUnknown(): void

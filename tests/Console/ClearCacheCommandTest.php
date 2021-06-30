@@ -8,33 +8,28 @@ use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 use Tests\TestCase;
+use Tests\TestsSchemaCache;
 
 class ClearCacheCommandTest extends TestCase
 {
+    use TestsSchemaCache;
+
     /**
      * @var \Illuminate\Contracts\Config\Repository
      */
     protected $config;
-
-    /**
-     * @var string
-     */
-    protected $cachePath;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->config = $this->app->make(ConfigRepository::class);
-        $this->cachePath = __DIR__.'/../storage/'.__METHOD__.'.php';
-        $this->config->set('lighthouse.cache.path', $this->cachePath);
+        $this->setUpSchemaCache();
     }
 
     protected function tearDown(): void
     {
-        /** @var \Illuminate\Filesystem\Filesystem $filesystem */
-        $filesystem = $this->app->make(Filesystem::class);
-        $filesystem->delete($this->cachePath);
+        $this->tearDownSchemaCache();
 
         parent::tearDown();
     }
@@ -61,11 +56,13 @@ class ClearCacheCommandTest extends TestCase
 
         /** @var \Illuminate\Filesystem\Filesystem $filesystem */
         $filesystem = $this->app->make(Filesystem::class);
-        $filesystem->put($this->cachePath, 'foo');
-        $this->assertTrue($filesystem->exists($this->cachePath));
+
+        $path = $this->schemaCachePath();
+        $filesystem->put($path, 'foo');
+        $this->assertTrue($filesystem->exists($path));
 
         $this->commandTester(new ClearCacheCommand())->execute([]);
-        $this->assertFalse($filesystem->exists($this->cachePath));
+        $this->assertFalse($filesystem->exists($path));
     }
 
     public function testCacheVersionUnknown(): void
