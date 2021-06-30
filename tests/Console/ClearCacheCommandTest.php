@@ -2,19 +2,16 @@
 
 namespace Tests\Console;
 
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Console\CacheCommand;
+use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
-use Tests\TestsSerialization;
 
-class CacheCommandTest extends TestCase
+class ClearCacheCommandTest extends TestCase
 {
-    use TestsSerialization;
     use TestsSchemaCache;
 
     /**
@@ -27,9 +24,7 @@ class CacheCommandTest extends TestCase
         parent::setUp();
 
         $this->config = $this->app->make(ConfigRepository::class);
-
         $this->setUpSchemaCache();
-        $this->useSerializingArrayStore($this->app);
     }
 
     protected function tearDown(): void
@@ -39,37 +34,35 @@ class CacheCommandTest extends TestCase
         parent::tearDown();
     }
 
-    public function testCacheVersion1(): void
+    public function testClearsCacheVersion1(): void
     {
         $this->config->set('lighthouse.cache.version', 1);
         $this->config->set('lighthouse.cache.ttl', 60);
-        $this->config->set('lighthouse.cache.store', 'array');
 
         $key = $this->config->get('lighthouse.cache.key');
 
-        /** @var \Illuminate\Contracts\Cache\Repository $cache */
+        /** @var \Illuminate\Cache\Repository $cache */
         $cache = $this->app->make(CacheRepository::class);
-        $this->assertFalse($cache->has($key));
-
-        $this->commandTester(new CacheCommand)->execute([]);
-
+        $cache->put($key, 'foo', 60);
         $this->assertTrue($cache->has($key));
-        $this->assertInstanceOf(DocumentAST::class, $cache->get($key));
+
+        $this->commandTester(new ClearCacheCommand())->execute([]);
+        $this->assertFalse($cache->has($key));
     }
 
-    public function testCacheVersion2(): void
+    public function testClearsCacheVersion2(): void
     {
         $this->config->set('lighthouse.cache.version', 2);
 
         /** @var \Illuminate\Filesystem\Filesystem $filesystem */
         $filesystem = $this->app->make(Filesystem::class);
+
         $path = $this->schemaCachePath();
-        $this->assertFalse($filesystem->exists($path));
-
-        $this->commandTester(new CacheCommand)->execute([]);
-
+        $filesystem->put($path, 'foo');
         $this->assertTrue($filesystem->exists($path));
-        $this->assertInstanceOf(DocumentAST::class, DocumentAST::fromArray(require $path));
+
+        $this->commandTester(new ClearCacheCommand())->execute([]);
+        $this->assertFalse($filesystem->exists($path));
     }
 
     public function testCacheVersionUnknown(): void
@@ -77,6 +70,6 @@ class CacheCommandTest extends TestCase
         $this->config->set('lighthouse.cache.version', 3);
 
         $this->expectException(UnknownCacheVersionException::class);
-        $this->commandTester(new CacheCommand)->execute([]);
+        $this->commandTester(new ClearCacheCommand())->execute([]);
     }
 }
