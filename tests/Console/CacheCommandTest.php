@@ -8,8 +8,8 @@ use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Tests\TestsSerialization;
 use Tests\TestCase;
+use Tests\TestsSerialization;
 
 class CacheCommandTest extends TestCase
 {
