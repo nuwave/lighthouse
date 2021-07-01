@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add method `rethrowGraphQLErrors()` to testing helper to leverage PHPUnit exception testing https://github.com/nuwave/lighthouse/pull/1885
+
 ## v5.14.0
 
 ### Added

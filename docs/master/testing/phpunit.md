@@ -147,6 +147,39 @@ $this
     ->assertGraphQLValidationKeys(['email']);
 ```
 
+## Testing Errors
+
+Depending on your debug and error handling configuration, Lighthouse catches most if
+not all errors produced within queries and includes them within the result.
+
+One way to test for errors is to examine the `TestResponse`, either by looking
+at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins)
+such as `assertGraphQLErrorMessage()`:
+
+```php
+$this
+    ->graphQL(/** @lang GraphQL */ '
+    mutation {
+        shouldTriggerSomeError
+    }
+    ')
+    ->assertGraphQLErrorMessage($expectedMessage);
+```
+
+Another way is to leverage PHPUnit's built-in methods such as `expectException()`.
+You must disable Lighthouse's error handling with `rethrowGraphQLErrors()` to ensure errors reach your test:
+
+```php
+$this->rethrowGraphQLErrors();
+
+$this->expectException(SomethingWentWrongException::class);
+$this->graphQL(/** @lang GraphQL */ '
+{
+    oops
+}
+');
+```
+
 ## Simulating File Uploads
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
