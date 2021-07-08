@@ -62,3 +62,6 @@ parameters:
 
   # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
   - '#Property .* in isset\(\) is not nullable\.#'
+
+  # TODO remove when https://github.com/FakerPHP/Faker/pull/345 is merged
+  - '#.* undefined .* Faker\\UniqueGenerator::.*#'
