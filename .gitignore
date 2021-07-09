@@ -7,3 +7,4 @@ vendor
 phpunit.xml
 .DS_Store
 .phpunit.result.cache
+.vscode/

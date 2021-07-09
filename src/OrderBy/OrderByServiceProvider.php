@@ -30,7 +30,7 @@ class OrderByServiceProvider extends ServiceProvider
             function (ManipulateAST $manipulateAST): void {
                 $documentAST = $manipulateAST->documentAST;
                 $documentAST->setTypeDefinition(
-                    Parser::enumTypeDefinition(/** @lang GraphQL */ '
+                    Parser::enumTypeDefinition(/* @lang GraphQL */ '
                         "The available directions for ordering a list of records."
                         enum SortOrder {
                             "Sort records in ascending order."
@@ -38,6 +38,39 @@ class OrderByServiceProvider extends ServiceProvider
 
                             "Sort records in descending order."
                             DESC
+                        }
+                    '
+                    )
+                );
+                $documentAST->setTypeDefinition(
+                    Parser::enumTypeDefinition(/* @lang GraphQL */ '
+                        "TODO: description"
+                        enum AggregateFunctionOrder {
+                            "TODO: description"
+                            COUNT
+                        }
+                    '
+                    )
+                );
+                $documentAST->setTypeDefinition(
+                    Parser::enumTypeDefinition(/* @lang GraphQL */ '
+                        "TODO: description"
+                        enum AggregateFunctionOrderForColumn {
+                            "TODO: description"
+                            AVG
+
+                            "TODO: description"
+                            MIN
+
+                            "TODO: description"
+                            MAX
+
+                            "TODO: description"
+                            SUM
+
+                            "TODO: description"
+                            COUNT
+
                         }
                     '
                     )
@@ -55,7 +88,7 @@ class OrderByServiceProvider extends ServiceProvider
 
     public static function createOrderByClauseInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
-        return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
                 "The column that is used for ordering."
@@ -63,6 +96,48 @@ class OrderByServiceProvider extends ServiceProvider
 
                 "The direction that is used for ordering."
                 order: SortOrder!
+            }
+GRAPHQL
+        );
+    }
+
+    public static function createOrderByRelationClauseInput(string $name, string $description, string $relation, string $configurationType): InputObjectTypeDefinitionNode
+    {
+        return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
+            "$description"
+            input $name {
+                "TODO: description"
+                $relation: $configurationType!
+
+                "The direction that is used for ordering."
+                order: SortOrder!
+            }
+GRAPHQL
+        );
+    }
+
+    public static function createRelationAggregateFunctionInput(string $name, string $description): InputObjectTypeDefinitionNode
+    {
+        return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
+            "$description"
+            input $name {
+                "TODO: description"
+                aggregate: AggregateFunctionOrder!
+            }
+GRAPHQL
+        );
+    }
+
+    public static function createRelationAggregateFunctionForColumnInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
+    {
+        return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
+            "$description"
+            input $name {
+                "TODO: description"
+                aggregate: AggregateFunctionOrderForColumn!
+
+                "TODO: description"
+                column: $columnType
             }
 GRAPHQL
         );
