@@ -32,6 +32,19 @@ class DocumentASTTest extends TestCase
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Syntax Error: Unexpected Name "foo"');
 
+        DocumentAST::fromSource(/** @lang GraphQL */ '
+        type Mutation {
+            bar: Int
+        }
+
+        type Query {
+            foo: In!!
+        }
+
+        type Foo {
+            bar: ID
+        }
+        ');
         DocumentAST::fromSource('foo');
     }
 
