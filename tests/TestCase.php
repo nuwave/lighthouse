@@ -217,9 +217,13 @@ GRAPHQL;
     protected function commandTester(Command $command): CommandTester
     {
         $command->setLaravel($this->app);
-        $command->setApplication($this->app->make(ConsoleApplication::class, [
+
+        /** @var \Illuminate\Console\Application $console */
+        $console = $this->app->make(ConsoleApplication::class, [
             'version' => $this->app->version(),
-        ]));
+        ]);
+        $console->resolveCommands(LighthouseServiceProvider::COMMANDS);
+        $command->setApplication($console);
 
         return new CommandTester($command);
     }
