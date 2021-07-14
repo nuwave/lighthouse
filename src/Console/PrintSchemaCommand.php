@@ -5,9 +5,7 @@ namespace Nuwave\Lighthouse\Console;
 use GraphQL\Type\Introspection;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
-use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
@@ -24,12 +22,10 @@ SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
 
-    public function handle(CacheRepository $cache, ConfigRepository $config, Filesystem $storage, SchemaBuilder $schemaBuilder): void
+    public function handle(Filesystem $storage, SchemaBuilder $schemaBuilder): void
     {
         // Clear the cache so this always gets the current schema
-        $cache->forget(
-            $config->get('lighthouse.cache.key')
-        );
+        $this->callSilent(ClearCacheCommand::NAME);
 
         $schema = $schemaBuilder->schema();
         if ($this->option('json')) {

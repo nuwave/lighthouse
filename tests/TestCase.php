@@ -4,6 +4,7 @@ namespace Tests;
 
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
+use Illuminate\Console\Application as ConsoleApplication;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -216,6 +217,9 @@ GRAPHQL;
     protected function commandTester(Command $command): CommandTester
     {
         $command->setLaravel($this->app);
+        $command->setApplication($this->app->make(ConsoleApplication::class, [
+            'version' => $this->app->version(),
+        ]));
 
         return new CommandTester($command);
     }
