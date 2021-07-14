@@ -25,7 +25,7 @@ SIGNATURE;
     public function handle(Filesystem $storage, SchemaBuilder $schemaBuilder): void
     {
         // Clear the cache so this always gets the current schema
-        $this->callSilent(ClearCacheCommand::class);
+        $this->callSilent(ClearCacheCommand::NAME);
 
         $schema = $schemaBuilder->schema();
         if ($this->option('json')) {

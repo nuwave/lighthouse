@@ -25,7 +25,7 @@ class ValidateSchemaCommand extends Command
         TypeRegistry $typeRegistry
     ): void {
         // Clear the cache so this always validates the current schema
-        $this->call(ClearCacheCommand::class);
+        $this->call(ClearCacheCommand::NAME);
 
         $originalSchema = $schemaBuilder->schema();
         $schemaConfig = $originalSchema->getConfig();
