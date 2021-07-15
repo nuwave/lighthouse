@@ -216,17 +216,13 @@ class RulesGatherer
      *
      * @param  array<int, mixed>  $rules
      * @param  array<int|string>  $argumentPath
-     * @return array<int, array<int, mixed>|\Illuminate\Contracts\Validation\Rule|Closure>
+     * @return array<int, array<int, mixed>|object>
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
         return array_map(
             static function ($rule) use ($argumentPath) {
-                if ($rule instanceof Rule) {
-                    return $rule;
-                }
-
-                if ($rule instanceof Closure) {
+                if (is_object($rule)) {
                     return $rule;
                 }
 

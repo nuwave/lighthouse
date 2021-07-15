@@ -2,149 +2,71 @@
 
 namespace Tests\Integration\Validation;
 
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Illuminate\Testing\TestResponse;
 use Tests\DBTestCase;
-use Tests\TestCase;
 use Tests\Utils\Models\User;
-use Tests\Utils\Validators\EmailCustomAttributeValidator;
-use Tests\Utils\Validators\EmailCustomMessageValidator;
 
 class ExistsRuleTest extends DBTestCase
 {
     public function testExistsRule(): void
     {
-        $userValid = factory(User::class)->create([
-            'name' => 'Admin',
-            'created_at' => null
-        ]);
-        $userInvalid = factory(User::class)->create([
-            'name' => 'Tester',
-            'created_at' => '2021-01-01 00:00:00'
-        ]);
+        /** @var \Tests\Utils\Models\User $userValid */
+        $userValid = factory(User::class)->make();
+        $userValid->name = 'Admin';
+        $userValid->save();
+
+        /** @var \Tests\Utils\Models\User $userInvalid */
+        $userInvalid = factory(User::class)->make();
+        $userInvalid->name = 'Tester';
+        $userInvalid->save();
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            getFaultyUser(input: GetFaultyUser): User @find
-            getWorkingUser(input: GetWorkingUser): User @find
+            callbackUser(id: ID! @eq): User @validator @find
+            macroUser(id: ID! @eq): User @validator @find
         }
 
         type User {
             id: ID!
         }
-
-        input GetFaultyUser @validator {
-            user_id: ID! @eq(key: "id")
-        }
-        input GetWorkingUser @validator {
-            user_id: ID! @eq(key: "id")
-        }
         ';
 
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                getWorkingUser(
-                    input: {
-                        user_id: '.$userValid->id.'
-                    }
-                ) {
-                    id
-                }
-            }
-            ')->assertGraphQLValidationPasses();
+        $this->macroUser($userValid)
+            ->assertGraphQLValidationPasses();
 
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                getFaultyUser(
-                    input: {
-                        user_id: '.$userValid->id.'
-                    }
-                ) {
-                    id
-                }
-            }
-            ')->assertGraphQLValidationPasses();
+        $this->callbackUser($userValid)
+            ->assertGraphQLValidationPasses();
 
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                getWorkingUser(
-                    input: {
-                        user_id: '.$userInvalid->id.'
-                    }
-                ) {
-                    id
-                }
-            }
-            ')->assertGraphQLValidationError('input.user_id', 'The selected input.user id is invalid.');
+        $this->macroUser($userInvalid)
+            ->assertGraphQLValidationError('id', 'The selected id is invalid.');
 
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                getFaultyUser(
-                    input: {
-                        user_id: '.$userInvalid->id.'
-                    }
-                ) {
-                    id
-                }
-            }
-            ')->assertGraphQLValidationError('input.user_id', 'The selected input.user id is invalid.');
+        $this->callbackUser($userInvalid)
+            ->assertGraphQLValidationError('id', 'The selected id is invalid.');
     }
 
-    public function testLaravelValidator(): void
+    protected function macroUser(User $user): TestResponse
     {
-        $userValid = factory(User::class)->create([
-            'name' => 'Admin',
-            'created_at' => null
+        return $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            macroUser(id: $id) {
+                id
+            }
+        }
+        ', [
+            'id' => $user->id,
         ]);
-        $userInvalid = factory(User::class)->create([
-            'name' => 'Tester',
-            'created_at' => '2021-01-01 00:00:00'
+    }
+
+    protected function callbackUser(User $user): TestResponse
+    {
+        return $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            callbackUser(id: $id) {
+                id
+            }
+        }
+        ', [
+            'id' => $user->id,
         ]);
-
-        $errors = Validator::make([
-            'user_id' => $userValid->id
-        ], [
-            'user_id' => ['required', Rule::exists('users', 'id')
-                ->where('name', 'Admin')
-                ->whereNull('created_at'),
-            ]
-        ])->errors();
-        $this->assertTrue($errors->isEmpty());
-
-        $errors = Validator::make([
-            'user_id' => $userValid->id
-        ], [
-            'user_id' => ['required', Rule::exists('users', 'id')->where(function ($query) {
-                return $query->where('name', '=', 'Admin')
-                    ->whereNull('created_at');
-            })]
-        ])->errors();
-        $this->assertTrue($errors->isEmpty());
-
-        $errors = Validator::make([
-            'user_id' => $userInvalid->id
-        ], [
-            'user_id' => ['required', Rule::exists('users', 'id')
-                ->where('name', 'Admin')
-                ->whereNull('created_at'),
-            ]
-        ])->errors();
-        $this->assertEquals('The selected user id is invalid.', $errors->first());
-
-        $errors = Validator::make([
-            'user_id' => $userInvalid->id
-        ], [
-            'user_id' => ['required', Rule::exists('users', 'id')->where(function ($query) {
-                return $query->where('name', '=', 'Admin')
-                    ->whereNull('created_at');
-            })]
-        ])->errors();
-        $this->assertEquals('The selected user id is invalid.', $errors->first());
-
     }
 }
