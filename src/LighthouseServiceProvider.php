@@ -50,6 +50,25 @@ use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
+    /**
+     * @var array<int, class-string<\Illuminate\Console\Command>
+     */
+    const COMMANDS = [
+        CacheCommand::class,
+        ClearCacheCommand::class,
+        DirectiveCommand::class,
+        IdeHelperCommand::class,
+        InterfaceCommand::class,
+        MutationCommand::class,
+        PrintSchemaCommand::class,
+        QueryCommand::class,
+        ScalarCommand::class,
+        SubscriptionCommand::class,
+        UnionCommand::class,
+        ValidateSchemaCommand::class,
+        ValidatorCommand::class,
+    ];
+
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
@@ -104,21 +123,7 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
-            $this->commands([
-                CacheCommand::class,
-                ClearCacheCommand::class,
-                DirectiveCommand::class,
-                IdeHelperCommand::class,
-                InterfaceCommand::class,
-                MutationCommand::class,
-                PrintSchemaCommand::class,
-                QueryCommand::class,
-                ScalarCommand::class,
-                SubscriptionCommand::class,
-                UnionCommand::class,
-                ValidateSchemaCommand::class,
-                ValidatorCommand::class,
-            ]);
+            $this->commands(self::COMMANDS);
         }
 
         if ($this->app->runningUnitTests()) {
