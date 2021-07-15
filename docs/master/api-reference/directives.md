@@ -1111,6 +1111,47 @@ class PlacedOrder
 }
 ```
 
+## @extends
+
+```graphql
+"""
+This allows types to extends other Types
+
+it inherits properties from the parent type. 
+It overides same attributes present in the parent type.
+'""
+"""
+directive @extends(
+    """
+    The parent Type
+    """
+    parent: String!
+) on OBJECT
+```
+
+```graphql
+type Human {
+    name: String
+}
+
+type Developer @extends(parent: Human){
+    company: String
+}
+
+type Query {
+    developers: [Developer]
+}
+```
+
+```gql
+query GetDevs {
+    developers {
+        name
+        company
+    }
+}
+```
+
 ## @globalId
 
 ```graphql
