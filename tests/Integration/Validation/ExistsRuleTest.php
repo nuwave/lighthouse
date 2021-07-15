@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Validation;
 
-use Illuminate\Testing\TestResponse;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
