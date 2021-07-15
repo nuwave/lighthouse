@@ -1126,7 +1126,7 @@ directive @extends(
     The parent Type
     """
     parent: String!
-) on OBJECT
+) on OBJECT | INPUT_OBJECT | ENUM | INTERFACE | UNION
 ```
 
 ```graphql
