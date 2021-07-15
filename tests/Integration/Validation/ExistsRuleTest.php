@@ -44,7 +44,10 @@ class ExistsRuleTest extends DBTestCase
             ->assertGraphQLValidationError('id', 'The selected id is invalid.');
     }
 
-    protected function macroUser(User $user): TestResponse
+    /**
+     * @return \Illuminate\Testing\TestResponse
+     */
+    protected function macroUser(User $user)
     {
         return $this->graphQL(/** @lang GraphQL */ '
         query ($id: ID!) {
@@ -57,7 +60,10 @@ class ExistsRuleTest extends DBTestCase
         ]);
     }
 
-    protected function callbackUser(User $user): TestResponse
+    /**
+     * @return \Illuminate\Testing\TestResponse
+     */
+    protected function callbackUser(User $user)
     {
         return $this->graphQL(/** @lang GraphQL */ '
         query ($id: ID!) {
