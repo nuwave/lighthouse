@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.15.2
+
+### Fixed
+
+- Fix usage of validation rules with chained query builders with `@validator` https://github.com/nuwave/lighthouse/pull/1890
+
 ## v5.15.1
 
 ### Fixed

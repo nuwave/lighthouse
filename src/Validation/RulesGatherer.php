@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
-use Closure;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationRuleParser;

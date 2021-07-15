@@ -14,7 +14,7 @@ class MacroUserValidator extends Validator
                 'required',
                 Rule::exists('users', 'id')
                     ->where('name', 'Admin'),
-            ]
+            ],
         ];
     }
 }

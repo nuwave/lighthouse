@@ -16,7 +16,7 @@ class CallbackUserValidator extends Validator
                 Rule::exists('users', 'id')
                     ->where(function (Builder $query): void {
                         $query->where('name', 'Admin');
-                    })
+                    }),
             ],
         ];
     }
