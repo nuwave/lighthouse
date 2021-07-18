@@ -18,7 +18,7 @@ This allows types to inherits fields from another type.
 """
 directive @inherits(
     """
-    The parent Type
+    The parent type.
     """
     parent: String!
 ) on OBJECT
@@ -33,27 +33,14 @@ GRAPHQL;
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        $parent_name = $this->getMethodArgumentParts('parent')[0];
+        $parentType = $documentAST->types[$this->directiveArgValue('parent')];
 
-        $parent = $documentAST->types[$parent_name];
-
-        if ($typeDefinition->kind !== $parent->kind) {
+        if ($typeDefinition->kind !== $parentType->kind) {
             throw new DefinitionException(
-                "The {$typeDefinition->name->value} ({$typeDefinition->kind} Found!) kind must the same as {$parent->name->value} ({$parent->kind} Found!)."
+                "The {$typeDefinition->name->value} ({$typeDefinition->kind} found) kind must be the same as {$parentType->name->value} ({$parentType->kind} found)."
             );
         }
 
-        foreach (get_object_vars($parent) as $type => $value) {
-            if ($type == 'name') {
-                continue;
-            }
-            if ($value instanceof NodeList) {
-                $typeDefinition->{$type} = $parent->{$type}->merge($typeDefinition->{$type});
-            } else {
-                $typeDefinition->{$type} = $typeDefinition->{$type} ?? $parent->{$type};
-            }
-        }
-
-        $documentAST->setTypeDefinition($typeDefinition);
+        $typeDefinition->fields = $parentType->fields->merge($typeDefinition->fields);
     }
 }
