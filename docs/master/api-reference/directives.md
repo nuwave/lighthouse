@@ -1398,9 +1398,9 @@ This allows types to inherits fields from another type.
 """
 directive @inherits(
     """
-    The parent Type
+    The type from where it will inherit.
     """
-    parent: String!
+    from: String!
 ) on OBJECT | INPUT_OBJECT | ENUM | INTERFACE | UNION
 ```
 
