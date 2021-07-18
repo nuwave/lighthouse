@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\TypeDefinitionNode;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
@@ -26,7 +27,11 @@ GRAPHQL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        $parentType = $documentAST->types[$this->directiveArgValue('from')];
+        $parentType = Arr::get($documentAST->types, $this->directiveArgValue('from'));
+
+        if (!$parentType) {
+            throw new DefinitionException("The type {$this->directiveArgValue('from')} was not found in your schama.");
+        }
 
         if ($typeDefinition->kind !== $parentType->kind) {
             throw new DefinitionException(

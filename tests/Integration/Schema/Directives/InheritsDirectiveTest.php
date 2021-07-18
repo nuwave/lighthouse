@@ -152,4 +152,30 @@ class InheritsDirectiveTest extends TestCase
             }'
         );
     }
+
+    public function testExceptionWhenTypeDoesntExist()
+    {
+        $this->rethrowGraphQLErrors();
+
+        $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
+
+        $this->mockResolverExpects($this->never());
+
+        $this->schema = /*  @lang GraphQL */ '
+            type ChildType @inherits(from: UndefinedType) {
+                attribute_1: String
+            }
+            type Query {
+                childTypeQuery: ChildType @mock
+            }
+        ';
+
+        $this->graphQL(
+            '{
+                childTypeQuery {
+                    attribute_1
+                }
+            }'
+        );
+    }
 }
