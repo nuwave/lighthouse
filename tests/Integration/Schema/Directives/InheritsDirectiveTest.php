@@ -19,7 +19,7 @@ class InheritsDirectiveTest extends TestCase
             type ParentType {
                 attribute_1: String
             }
-            type ChildType @inherits(parent: ParentType) {
+            type ChildType @inherits(from: ParentType) {
                 attribute_2: String
             }
 
@@ -61,7 +61,7 @@ class InheritsDirectiveTest extends TestCase
                 attribute_1: String
                 attribute_2: Int
             }
-            type ChildType @inherits(parent: ParentType) {
+            type ChildType @inherits(from: ParentType) {
                 attribute_1: Int
                 attribute_2: String
             }
@@ -101,7 +101,7 @@ class InheritsDirectiveTest extends TestCase
                 attribute_1: String
                 another_attribute: String
             }
-            type ChildType @inherits(parent: ParentType) {
+            type ChildType @inherits(from: ParentType) {
                 new_attribute: String
             }
 
@@ -135,7 +135,7 @@ class InheritsDirectiveTest extends TestCase
             input ParentType {
                 attribute_1: String
             }
-            type ChildType @inherits(parent: ParentType) {
+            type ChildType @inherits(from: ParentType) {
                 attribute_2: String
             }
             type Query {

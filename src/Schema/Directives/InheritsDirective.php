@@ -17,9 +17,9 @@ This allows types to inherits fields from another type.
 """
 directive @inherits(
     """
-    The parent type.
+    The type from where it will inherit.
     """
-    parent: String!
+    from: String!
 ) on OBJECT
 GRAPHQL;
     }
@@ -32,7 +32,7 @@ GRAPHQL;
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        $parentType = $documentAST->types[$this->directiveArgValue('parent')];
+        $parentType = $documentAST->types[$this->directiveArgValue('from')];
 
         if ($typeDefinition->kind !== $parentType->kind) {
             throw new DefinitionException(
