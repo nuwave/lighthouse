@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;

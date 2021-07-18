@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class InheritsDirectiveTest extends TestCase
@@ -80,16 +79,14 @@ class InheritsDirectiveTest extends TestCase
             }'
         );
 
-        $response->assertJson(
-            fn (AssertableJson $json) => $json->has(
-                'data.childtypeQuery',
-                fn ($json) => $json->whereAllType([
-                    'attribute_1' => 'integer',
-                    'attribute_2' => 'string',
-                ])
-                    ->etc()
-            )
-        );
+        $response->assertExactJson([
+            'data' => [
+                'childtypeQuery' => [
+                    'attribute_1' => 100,
+                    'attribute_2' => '100',
+                ],
+            ],
+        ]);
     }
 
     public function testChildAttributesShouldNotBeAddedParent()
