@@ -9,11 +9,23 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v5.15.1
+## v5.15.3
 
 ### Changed
 
 - Provide context for syntax errors thrown during schema parsing https://github.com/nuwave/lighthouse/pull/1892
+
+## v5.15.2
+
+### Fixed
+
+- Fix usage of validation rules with chained query builders with `@validator` https://github.com/nuwave/lighthouse/pull/1890
+
+## v5.15.1
+
+### Fixed
+
+- Call `lighthouse:clear-cache` in other commands to handle schema cache version 2 https://github.com/nuwave/lighthouse/pull/1894
 
 ## v5.15.0
 
