@@ -5,9 +5,9 @@ namespace Tests\Integration\Schema\Directives;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
-class ExtendsDirectiveTest extends TestCase
+class InheritsDirectiveTest extends TestCase
 {
-    public function testCanExtendTypes()
+    public function testCanInheritsTypes()
     {
         $this->mockResolver(function ($root, array $args): array {
             return [
@@ -20,10 +20,10 @@ class ExtendsDirectiveTest extends TestCase
             type ParentType {
                 attribute_1: String
             }
-            type ChildType @extends(parent: ParentType) {
+            type ChildType @inherits(parent: ParentType) {
                 attribute_2: String
             }
-            
+
             type Query {
                 childtypeQuery: ChildType @mock
             }';
@@ -46,7 +46,7 @@ class ExtendsDirectiveTest extends TestCase
         ]);
     }
 
-    public function testChildOverwritesParentAttributes()
+    public function testChildOverridesFields()
     {
         $this->mockResolver(function ($root, array $args): array {
             return [
@@ -62,11 +62,11 @@ class ExtendsDirectiveTest extends TestCase
                 attribute_1: String
                 attribute_2: Int
             }
-            type ChildType @extends(parent: ParentType) {
+            type ChildType @inherits(parent: ParentType) {
                 attribute_1: Int
                 attribute_2: String
             }
-            
+
             type Query {
                 childtypeQuery: ChildType @mock
             }';
@@ -104,10 +104,10 @@ class ExtendsDirectiveTest extends TestCase
                 attribute_1: String
                 another_attribute: String
             }
-            type ChildType @extends(parent: ParentType) {
+            type ChildType @inherits(parent: ParentType) {
                 new_attribute: String
             }
-            
+
             type Query {
                 parentypeQuery: ParentType @mock
                 childtypeQuery: ChildType @mock
@@ -127,7 +127,7 @@ class ExtendsDirectiveTest extends TestCase
         );
     }
 
-    public function testCanNotExtendOtherTypes()
+    public function testCanNotInheritsOtherTypes()
     {
         $this->rethrowGraphQLErrors();
 
@@ -138,8 +138,8 @@ class ExtendsDirectiveTest extends TestCase
             input ParentType {
                 attribute_1: String
             }
-            type ChildType @extends(parent: ParentType) {
-                attribute_2: String 
+            type ChildType @inherits(parent: ParentType) {
+                attribute_2: String
             }
             type Query {
                 childtypeQuery: ChildType @mock

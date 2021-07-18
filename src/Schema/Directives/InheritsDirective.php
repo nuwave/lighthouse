@@ -8,18 +8,15 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-class ExtendsDirective extends BaseDirective implements TypeManipulator
+class InheritsDirective extends BaseDirective implements TypeManipulator
 {
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-This allows types to extends other Types
-
-it inherits properties from the parent type. 
-It overides same attributes present in the parent type.
+This allows types to inherits fields from another type.
 """
-directive @extends(
+directive @inherits(
     """
     The parent Type
     """
