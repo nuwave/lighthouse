@@ -30,9 +30,21 @@ class DocumentASTTest extends TestCase
     public function testThrowsOnInvalidSchema(): void
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Syntax Error: Unexpected Name "foo"');
+        $this->expectExceptionMessage('Syntax Error: Expected Name, found !, near: ');
 
-        DocumentAST::fromSource('foo');
+        DocumentAST::fromSource(/** @lang GraphQL */ '
+        type Mutation {
+            bar: Int
+        }
+
+        type Query {
+            foo: Int!!
+        }
+
+        type Foo {
+            bar: ID
+        }
+        ');
     }
 
     public function testOverwritesDefinitionWithSameName(): void
