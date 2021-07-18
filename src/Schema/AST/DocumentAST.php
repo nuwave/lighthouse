@@ -10,10 +10,18 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Contracts\Support\Arrayable;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Serializable;
 
-class DocumentAST implements Serializable
+/**
+ * Represents the AST of the entire GraphQL schema document.
+ *
+ * Explicitly implementing Serializable provides performance gains by:
+ * - stripping unnecessary data
+ * - leveraging lazy instantiation of schema types
+ */
+class DocumentAST implements Serializable, Arrayable
 {
     /**
      * The types within the schema.
@@ -61,11 +69,7 @@ class DocumentAST implements Serializable
         } catch (SyntaxError $syntaxError) {
             // Throw our own error class instead, since otherwise a schema definition
             // error would get rendered to the Client.
-            throw new ParseException(
-                $syntaxError->getMessage(),
-                $syntaxError->getCode(),
-                $syntaxError
-            );
+            throw new ParseException($syntaxError);
         }
 
         $instance = new static;
@@ -87,46 +91,6 @@ class DocumentAST implements Serializable
         }
 
         return $instance;
-    }
-
-    /**
-     * Serialize the final AST.
-     *
-     * We exclude the type extensions stored in $typeExtensions,
-     * as they are merged with the actual types at this point.
-     */
-    public function serialize(): string
-    {
-        $nodeToArray = function (Node $node): array {
-            return $node->toArray(true);
-        };
-
-        return serialize([
-            // @phpstan-ignore-next-line Before serialization, those are arrays
-            'types' => array_map($nodeToArray, $this->types),
-            // @phpstan-ignore-next-line Before serialization, those are arrays
-            'directives' => array_map($nodeToArray, $this->directives),
-        ]);
-    }
-
-    /**
-     * Unserialize the AST.
-     *
-     * @param string $serialized
-     */
-    public function unserialize($serialized): void
-    {
-        [
-            'types' => $types,
-            'directives' => $directives,
-        ] = unserialize($serialized);
-
-        // Utilize the NodeList for lazy unserialization for performance gains.
-        // Until they are accessed by name, they are kept in their array form.
-        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
-        $this->types = new NodeList($types);
-        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
-        $this->directives = new NodeList($directives);
     }
 
     /**
@@ -159,5 +123,68 @@ class DocumentAST implements Serializable
         $this->directives[$directive->name->value] = $directive;
 
         return $this;
+    }
+
+    /**
+     * Convert to a serializable array.
+     *
+     * We exclude the type extensions stored in $typeExtensions,
+     * as they are merged with the actual types at this point.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        $nodeToArray = function (Node $node): array {
+            return $node->toArray(true);
+        };
+
+        return [
+            // @phpstan-ignore-next-line Before serialization, those are arrays
+            'types' => array_map($nodeToArray, $this->types),
+            // @phpstan-ignore-next-line Before serialization, those are arrays
+            'directives' => array_map($nodeToArray, $this->directives),
+        ];
+    }
+
+    /**
+     * Instantiate from a serialized array.
+     *
+     * @param array<string, mixed> $ast
+     */
+    public static function fromArray(array $ast): DocumentAST
+    {
+        $documentAST = new static();
+        $documentAST->hydrateFromArray($ast);
+
+        return $documentAST;
+    }
+
+    public function serialize(): string
+    {
+        return serialize($this->toArray());
+    }
+
+    public function unserialize($data): void
+    {
+        $this->hydrateFromArray(unserialize($data));
+    }
+
+    /**
+     * @param array<string, mixed> $ast
+     */
+    protected function hydrateFromArray(array $ast): void
+    {
+        [
+            'types' => $types,
+            'directives' => $directives,
+        ] = $ast;
+
+        // Utilize the NodeList for lazy unserialization for performance gains.
+        // Until they are accessed by name, they are kept in their array form.
+        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
+        $this->types = new NodeList($types);
+        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
+        $this->directives = new NodeList($directives);
     }
 }

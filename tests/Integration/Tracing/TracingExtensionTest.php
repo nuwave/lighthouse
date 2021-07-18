@@ -21,7 +21,7 @@ SCHEMA;
         );
     }
 
-    public function testCanAddTracingExtensionMetaToResult(): void
+    public function testAddTracingExtensionMetaToResult(): void
     {
         $this->graphQL('
         {
@@ -38,7 +38,7 @@ SCHEMA;
         ]);
     }
 
-    public function testCanAddTracingExtensionMetaToBatchedResults(): void
+    public function testAddTracingExtensionMetaToBatchedResults(): void
     {
         $postData = [
             'query' => '

@@ -181,7 +181,8 @@ class BaseDirectiveTest extends TestCase
     {
         $fieldDefinition = Parser::fieldDefinition($definition);
 
-        $directive = new class extends BaseDirective {
+        $directive = new class extends BaseDirective
+        {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'directive @baseTest on FIELD_DEFINITION';

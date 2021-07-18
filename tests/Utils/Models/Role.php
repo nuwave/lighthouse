@@ -7,13 +7,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
+ * Primary key.
  * @property int $id
- * @property int|null $acl_id
+ *
+ * Attributes
  * @property string $name
+ *
+ * Foreign keys
+ * @property int|null $acl_id
+ *
+ * Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
+ * @property-read \Tests\Utils\Models\ACL $acl
  */
 class Role extends Model
 {
-    /** @var bool */
     public $timestamps = false;
 
     public function users(): BelongsToMany

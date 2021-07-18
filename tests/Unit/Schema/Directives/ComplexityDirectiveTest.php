@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class ComplexityDirectiveTest extends TestCase
 {
-    public function testCanSetDefaultComplexityOnField(): void
+    public function testSetDefaultComplexityOnField(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
@@ -28,7 +28,7 @@ class ComplexityDirectiveTest extends TestCase
         $this->assertSame(100, $complexityFn(10, ['first' => 10]));
     }
 
-    public function testCanSetCustomComplexityResolver(): void
+    public function testSetCustomComplexityResolver(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<GRAPHQL
         type User {

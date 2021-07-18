@@ -26,7 +26,6 @@ class DirectiveFactory
     public function handle(DirectiveDefinitionNode $directive): Directive
     {
         $arguments = [];
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
             /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->typeNodeConverter->convert($argument->type);
@@ -57,6 +56,7 @@ class DirectiveFactory
             'description' => data_get($directive->description, 'value'),
             'locations' => $locations,
             'args' => $arguments,
+            'isRepeatable' => $directive->repeatable,
             'astNode' => $directive,
         ]);
     }

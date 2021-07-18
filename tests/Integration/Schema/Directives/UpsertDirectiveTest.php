@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -66,7 +68,7 @@ class UpsertDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        ')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -134,7 +136,7 @@ class UpsertDirectiveTest extends DBTestCase
                     name
                 }
             }
-        }')->assertExactJson([
+        }')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -149,5 +151,54 @@ class UpsertDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testUpsertUsingInterface(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
+        type Mutation {
+            upsertUser(input: UpsertUserInput! @spread): IUser @upsert
+        }
+
+        interface IUser
+        @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}")
+        @model(class: "Tests\\\\Utils\\\\Models\\\\User") {
+            name: String
+        }
+
+        type Admin implements IUser {
+            id: ID!
+            name: String
+        }
+
+        input UpsertUserInput {
+            name: String
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertUser(input: {
+                name: "foo"
+            }) {
+                ... on Admin {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'id' => 1,
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    public function resolveType(): Type
+    {
+        return app(TypeRegistry::class)->get('Admin');
     }
 }

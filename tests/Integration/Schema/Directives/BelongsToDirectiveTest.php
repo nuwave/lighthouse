@@ -44,7 +44,7 @@ class BelongsToDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveBelongsToRelationship(): void
+    public function testResolveBelongsToRelationship(): void
     {
         $this->be($this->user);
 
@@ -81,7 +81,7 @@ class BelongsToDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveBelongsToWithCustomName(): void
+    public function testResolveBelongsToWithCustomName(): void
     {
         $this->be($this->user);
 
@@ -118,7 +118,7 @@ class BelongsToDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveBelongsToRelationshipWithTwoRelation(): void
+    public function testResolveBelongsToRelationshipWithTwoRelation(): void
     {
         $this->be($this->user);
 
@@ -166,7 +166,7 @@ class BelongsToDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveBelongsToRelationshipWhenMainModelHasCompositePrimaryKey(): void
+    public function testResolveBelongsToRelationshipWhenMainModelHasCompositePrimaryKey(): void
     {
         $this->be($this->user);
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
@@ -13,7 +14,7 @@ use Tests\Utils\Models\User;
 
 class CountDirectiveDBTest extends DBTestCase
 {
-    public function testItRequiresARelationOrModelArgument(): void
+    public function testRequiresARelationOrModelArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -29,7 +30,7 @@ class CountDirectiveDBTest extends DBTestCase
         ');
     }
 
-    public function testItCanCountAModel(): void
+    public function testCountModel(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -50,7 +51,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCanCountAModelWithScopes(): void
+    public function testCountModelWithScopes(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -74,7 +75,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCountsARelationAndEagerLoadsTheCount(): void
+    public function testCountRelationAndEagerLoadsTheCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -94,7 +95,7 @@ class CountDirectiveDBTest extends DBTestCase
             });
 
         $queries = 0;
-        DB::listen(function ($q) use (&$queries): void {
+        DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
@@ -123,7 +124,7 @@ class CountDirectiveDBTest extends DBTestCase
         $this->assertEquals(2, $queries);
     }
 
-    public function testItCountsARelationThatIsNotSuffixedWithCount(): void
+    public function testCountRelationThatIsNotSuffixedWithCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -154,7 +155,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCountsARelationshipWithScopesApplied(): void
+    public function testCountRelationWithScopesApplied(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -191,7 +192,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testItCanCountPolymorphicRelations(): void
+    public function testCountPolymorphicRelation(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -310,7 +311,7 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveCountByModel(): void
+    public function testResolveCountByModel(): void
     {
         factory(User::class)->times(3)->create();
 
@@ -331,13 +332,13 @@ class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveCountByRelation(): void
+    public function testResolveCountByRelation(): void
     {
         /** @var User $user */
         $user = factory(User::class)->create();
 
         $user->tasks()->saveMany(
-            factory(Task::class)->times(4)->create()
+            factory(Task::class)->times(4)->make()
         );
 
         $this->be($user);
@@ -362,6 +363,59 @@ class CountDirectiveDBTest extends DBTestCase
             'data' => [
                 'user' => [
                     'taskCount' => 4,
+                ],
+            ],
+        ]);
+    }
+
+    public function testResolveRelationItemsAndCount(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        /** @var Collection<Task> $tasks */
+        $tasks = $user->tasks()->saveMany(
+            factory(Task::class)->times(2)->make()
+        );
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks: [Task!]! @hasMany
+            taskCount: Int! @count(relation: "tasks")
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                tasks {
+                    id
+                }
+                taskCount
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        [
+                            'id' => $tasks[0]->id,
+                        ],
+                        [
+                            'id' => $tasks[1]->id,
+                        ],
+                    ],
+                    'taskCount' => 2,
                 ],
             ],
         ]);

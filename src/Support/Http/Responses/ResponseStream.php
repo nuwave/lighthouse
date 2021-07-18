@@ -10,14 +10,15 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
 {
-    /**
-     * @var string
-     */
     public const EOL = "\r\n";
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
-        if (! empty($paths)) {
+        if (empty($paths)) {
+            $this->emit(
+                $this->chunk($data, $isFinalChunk)
+            );
+        } else {
             $chunk = [];
             $lastKey = count($paths) - 1;
 
@@ -42,10 +43,6 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $this->chunk($chunk, $terminating)
                 );
             }
-        } else {
-            $this->emit(
-                $this->chunk($data, $isFinalChunk)
-            );
         }
 
         if ($isFinalChunk) {

@@ -39,7 +39,7 @@ GRAPHQL;
 
         return $builder->{$clause}(
             $this->directiveArgValue('key', $this->nodeName()),
-            $operator = $this->directiveArgValue('operator', '='),
+            $this->directiveArgValue('operator', '='),
             $value
         );
     }

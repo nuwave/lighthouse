@@ -12,18 +12,29 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
+ * Primary key.
  * @property int $id
- * @property int|null $user_id
+ *
+ * Attributes
  * @property string $name
+ * @property int|null $difficulty
  * @property string|null $guard
  * @property \lluminate\Support\Carbon $completed_at
+ *
+ * Timestamps
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
  *
- * @property-read \Tests\Utils\Models\User|null $user
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * Foreign keys
+ * @property int|null $user_id
+ *
+ * Relations
  * @property-read \Tests\Utils\Models\Activity $activity
+ * @property-read \Tests\Utils\Models\Image $image
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * @property-read \Tests\Utils\Models\Post|null $post
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ * @property-read \Tests\Utils\Models\User|null $user
  */
 class Task extends Model
 {
@@ -44,9 +55,14 @@ class Task extends Model
         return $this->morphMany(Activity::class, 'content');
     }
 
-    public function user(): BelongsTo
+    public function image(): MorphOne
     {
-        return $this->belongsTo(User::class);
+        return $this->morphOne(Image::class, 'imageable');
+    }
+
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable');
     }
 
     public function post(): HasOne
@@ -57,6 +73,11 @@ class Task extends Model
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function scopeCompleted(Builder $query): Builder
@@ -70,16 +91,6 @@ class Task extends Model
     public function scopeFoo(Builder $query, array $args): Builder
     {
         return $query->limit($args['foo']);
-    }
-
-    public function images(): MorphMany
-    {
-        return $this->morphMany(Image::class, 'imageable');
-    }
-
-    public function image(): MorphOne
-    {
-        return $this->morphOne(Image::class, 'imageable');
     }
 
     /**

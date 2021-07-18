@@ -45,7 +45,7 @@ class MorphOneDirectiveTest extends DBTestCase
             );
     }
 
-    public function testCanResolveMorphOneRelationship(): void
+    public function testResolveMorphOneRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {
@@ -90,7 +90,7 @@ class MorphOneDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveMorphOneWithCustomName(): void
+    public function testResolveMorphOneWithCustomName(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {

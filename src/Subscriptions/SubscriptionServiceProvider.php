@@ -3,11 +3,13 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Auth\AuthManager;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -23,6 +25,29 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->singleton(BroadcastManager::class);
+        $this->app->singleton(SubscriptionRegistry::class);
+        $this->app->singleton(StoresSubscriptions::class, static function (Container $app): StoresSubscriptions {
+            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
+            $configRepository = $app->make(ConfigRepository::class);
+            switch ($configRepository->get('lighthouse.subscriptions.storage')) {
+                case 'redis':
+                    return $app->make(RedisStorageManager::class);
+                default:
+                    return $app->make(CacheStorageManager::class);
+            }
+        });
+
+        $this->app->bind(ContextSerializer::class, Serializer::class);
+        $this->app->bind(AuthorizesSubscriptions::class, Authorizer::class);
+        $this->app->bind(SubscriptionIterator::class, SyncIterator::class);
+        $this->app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
+        $this->app->bind(BroadcastsSubscriptions::class, SubscriptionBroadcaster::class);
+        $this->app->bind(ProvidesSubscriptionResolver::class, SubscriptionResolverProvider::class);
+    }
+
     public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void
     {
         $eventsDispatcher->listen(
@@ -33,6 +58,13 @@ class SubscriptionServiceProvider extends ServiceProvider
         $eventsDispatcher->listen(
             BuildExtensionsResponse::class,
             SubscriptionRegistry::class.'@handleBuildExtensionsResponse'
+        );
+
+        $eventsDispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            static function (): string {
+                return __NAMESPACE__.'\\Directives';
+            }
         );
 
         $this->registerBroadcasterRoutes($configRepository);
@@ -51,32 +83,6 @@ class SubscriptionServiceProvider extends ServiceProvider
                 return new SubscriptionGuard;
             });
         }
-    }
-
-    /**
-     * Register subscription services.
-     */
-    public function register(): void
-    {
-        $this->app->singleton(BroadcastManager::class);
-        $this->app->singleton(SubscriptionRegistry::class);
-        $this->app->singleton(StoresSubscriptions::class, function () {
-            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
-            $configRepository = $this->app->make(ConfigRepository::class);
-            switch ($configRepository->get('lighthouse.subscriptions.storage')) {
-                case 'redis':
-                    return $this->app->make(RedisStorageManager::class);
-                default:
-                    return $this->app->make(CacheStorageManager::class);
-            }
-        });
-
-        $this->app->bind(ContextSerializer::class, Serializer::class);
-        $this->app->bind(AuthorizesSubscriptions::class, Authorizer::class);
-        $this->app->bind(SubscriptionIterator::class, SyncIterator::class);
-        $this->app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
-        $this->app->bind(BroadcastsSubscriptions::class, SubscriptionBroadcaster::class);
-        $this->app->bind(ProvidesSubscriptionResolver::class, SubscriptionResolverProvider::class);
     }
 
     protected function registerBroadcasterRoutes(ConfigRepository $configRepository): void

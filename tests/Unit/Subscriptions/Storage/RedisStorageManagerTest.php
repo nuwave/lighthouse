@@ -84,13 +84,46 @@ class RedisStorageManagerTest extends TestCase
                     $topicKey,
                     $ttl,
                 ]],
+                ['setex', [
+                    'graphql.subscriber.private-lighthouse-foo',
+                    $ttl,
+                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
+                        'channel' => $channel,
+                        'topic' => 'some-topic',
+                    ]).'}',
+                ]]
+            );
+
+        $manager = new RedisStorageManager($config, $redisFactory);
+        $manager->storeSubscriber($subscriber, 'some-topic');
+    }
+
+    public function testStoreSubscriberWithoutTtl(): void
+    {
+        $config = $this->createMock(ConfigRepository::class);
+        $redisConnection = $this->createMock(RedisConnection::class);
+        $redisFactory = $this->getRedisFactory($redisConnection);
+
+        $ttl = null;
+        $config->method('get')->willReturn($ttl);
+
+        $channel = 'private-lighthouse-foo';
+        $subscriber = new DummySubscriber($channel, 'dummy-topic');
+
+        $topicKey = 'graphql.topic.some-topic';
+        $redisConnection->expects($this->exactly(2))
+            ->method('command')
+            ->withConsecutive(
+                ['sadd', [
+                    $topicKey,
+                    $channel,
+                ]],
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
                     'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
                         'channel' => $channel,
                         'topic' => 'some-topic',
                     ]).'}',
-                    $ttl,
                 ]]
             );
 
@@ -135,7 +168,7 @@ class RedisStorageManagerTest extends TestCase
      * @param \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Redis\Connections\Connection $redisConnection
      * @return \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Redis\Factory
      */
-    private function getRedisFactory(MockObject $redisConnection): MockObject
+    protected function getRedisFactory(MockObject $redisConnection): MockObject
     {
         $redisFactory = $this->createMock(RedisFactory::class);
         $redisFactory->expects($this->once())

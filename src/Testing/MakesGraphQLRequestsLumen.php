@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Type\Introspection;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
@@ -178,7 +180,10 @@ trait MakesGraphQLRequestsLumen
      */
     protected function graphQLEndpointUrl(): string
     {
-        return route(config('lighthouse.route.name'));
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = app(ConfigRepository::class);
+
+        return route($config->get('lighthouse.route.name'));
     }
 
     /**
@@ -213,8 +218,15 @@ trait MakesGraphQLRequestsLumen
     {
         $this->deferStream = new MemoryStream;
 
-        app()->singleton(CanStreamResponse::class, function (): MemoryStream {
+        Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;
         });
+    }
+
+    protected function rethrowGraphQLErrors(): void
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = app(ConfigRepository::class);
+        $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 }

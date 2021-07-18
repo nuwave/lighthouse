@@ -9,7 +9,6 @@ use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ResolveInfo;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class ArgumentSetFactory
@@ -27,16 +26,16 @@ class ArgumentSetFactory
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     public function __construct(
         ASTBuilder $astBuilder,
         ArgumentTypeNodeConverter $argumentTypeNodeConverter,
-        DirectiveLocator $directiveFactory
+        DirectiveLocator $directiveLocator
     ) {
         $this->documentAST = $astBuilder->documentAST();
         $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveLocator = $directiveLocator;
     }
 
     /**
@@ -47,16 +46,14 @@ class ArgumentSetFactory
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
-        $parentName = $resolveInfo->parentType->name;
-        $fieldName = $resolveInfo->fieldName;
+        /**
+         * TODO handle programmatic types without an AST gracefully.
+         *
+         * @var \GraphQL\Language\AST\FieldDefinitionNode $definition
+         */
+        $definition = $resolveInfo->fieldDefinition->astNode;
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentDefinition */
-        $parentDefinition = $this->documentAST->types[$parentName];
-
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
-        $fieldDefinition = ASTHelper::firstByName($parentDefinition->fields, $fieldName);
-
-        return $this->wrapArgs($fieldDefinition, $args);
+        return $this->wrapArgs($definition, $args);
     }
 
     /**
@@ -69,7 +66,7 @@ class ArgumentSetFactory
     public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $this->directiveFactory->associated($definition);
+        $argumentSet->directives = $this->directiveLocator->associated($definition);
 
         if ($definition instanceof FieldDefinitionNode) {
             $argDefinitions = $definition->arguments;
@@ -120,7 +117,7 @@ class ArgumentSetFactory
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $this->directiveFactory->associated($definition);
+        $argument->directives = $this->directiveLocator->associated($definition);
         $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
 

@@ -40,7 +40,7 @@ class RedisStorageManager implements StoresSubscriptions
     public function __construct(ConfigRepository $config, RedisFactory $redis)
     {
         $this->connection = $redis->connection(
-            $config->get('lighthouse.broadcasters.echo.connection') ?? 'default'
+            $config->get('lighthouse.subscriptions.broadcasters.echo.connection') ?? 'default'
         );
         $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl');
     }
@@ -60,6 +60,9 @@ class RedisStorageManager implements StoresSubscriptions
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.
         // We can retrieve all members of a set using the command smembers.
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
+        if (count($subscriberIds) === 0) {
+            return new Collection();
+        }
 
         // Since we store the individual subscribers with a prefix,
         // but not in the set, we have to add the prefix here.
@@ -94,14 +97,16 @@ class RedisStorageManager implements StoresSubscriptions
         }
 
         // Lastly, we store the subscriber as a serialized string...
+        $setCommand = 'set';
         $setArguments = [
             $this->channelKey($subscriber->channel),
             $this->serialize($subscriber),
         ];
         if ($this->ttl !== null) {
-            $setArguments [] = $this->ttl;
+            $setCommand = 'setex';
+            array_splice($setArguments, 1, 0, [$this->ttl]);
         }
-        $this->connection->command('set', $setArguments);
+        $this->connection->command($setCommand, $setArguments);
     }
 
     public function deleteSubscriber(string $channel): ?Subscriber

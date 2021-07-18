@@ -50,6 +50,87 @@ use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
+    /**
+     * @var array<int, class-string<\Illuminate\Console\Command>
+     */
+    const COMMANDS = [
+        CacheCommand::class,
+        ClearCacheCommand::class,
+        DirectiveCommand::class,
+        IdeHelperCommand::class,
+        InterfaceCommand::class,
+        MutationCommand::class,
+        PrintSchemaCommand::class,
+        QueryCommand::class,
+        ScalarCommand::class,
+        SubscriptionCommand::class,
+        UnionCommand::class,
+        ValidateSchemaCommand::class,
+        ValidatorCommand::class,
+    ];
+
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
+
+        $this->app->singleton(GraphQL::class);
+        $this->app->singleton(ASTBuilder::class);
+        $this->app->singleton(SchemaBuilder::class);
+        $this->app->singleton(DirectiveLocator::class);
+        $this->app->singleton(TypeRegistry::class);
+        $this->app->singleton(ErrorPool::class);
+        $this->app->singleton(CreatesContext::class, ContextFactory::class);
+        $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
+
+        $this->app->bind(CreatesResponse::class, SingleResponse::class);
+
+        $this->app->singleton(SchemaSourceProvider::class, static function (): SchemaStitcher {
+            return new SchemaStitcher(
+                config('lighthouse.schema.register', '')
+            );
+        });
+
+        $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
+        $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
+            return new class implements ProvidesSubscriptionResolver
+            {
+                public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+                {
+                    throw new Exception(
+                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
+                    );
+                }
+            };
+        });
+
+        $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
+
+        $this->app->singleton(MiddlewareAdapter::class, static function (Container $app): MiddlewareAdapter {
+            // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
+            if ($app instanceof LaravelApplication) {
+                return new LaravelMiddlewareAdapter(
+                    $app->get(Router::class)
+                );
+            }
+
+            if ($app instanceof LumenApplication) {
+                return new LumenMiddlewareAdapter();
+            }
+
+            throw new Exception(
+                'Could not correctly determine Laravel framework flavor, got '.get_class($app).'.'
+            );
+        });
+
+        if ($this->app->runningInConsole()) {
+            $this->commands(self::COMMANDS);
+        }
+
+        if ($this->app->runningUnitTests()) {
+            $this->app->register(TestingServiceProvider::class);
+        }
+    }
+
     public function boot(ConfigRepository $configRepository): void
     {
         $this->publishes([
@@ -72,80 +153,5 @@ class LighthouseServiceProvider extends ServiceProvider
         }
 
         parent::loadRoutesFrom($path);
-    }
-
-    public function register(): void
-    {
-        $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
-
-        $this->app->singleton(GraphQL::class);
-        $this->app->singleton(ASTBuilder::class);
-        $this->app->singleton(SchemaBuilder::class);
-        $this->app->singleton(DirectiveLocator::class);
-        $this->app->singleton(TypeRegistry::class);
-        $this->app->singleton(ErrorPool::class);
-        $this->app->singleton(CreatesContext::class, ContextFactory::class);
-        $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
-
-        $this->app->bind(CreatesResponse::class, SingleResponse::class);
-
-        $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
-            return new SchemaStitcher(
-                config('lighthouse.schema.register', '')
-            );
-        });
-
-        $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
-        $this->app->bind(ProvidesSubscriptionResolver::class, function (): ProvidesSubscriptionResolver {
-            return new class implements ProvidesSubscriptionResolver {
-                public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
-                {
-                    throw new Exception(
-                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
-                    );
-                }
-            };
-        });
-
-        $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
-
-        $this->app->singleton(MiddlewareAdapter::class, function (Container $app): MiddlewareAdapter {
-            // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
-            if ($app instanceof LaravelApplication) {
-                return new LaravelMiddlewareAdapter(
-                    $app->get(Router::class)
-                );
-            }
-
-            if ($app instanceof LumenApplication) {
-                return new LumenMiddlewareAdapter($app);
-            }
-
-            throw new Exception(
-                'Could not correctly determine Laravel framework flavor, got '.get_class($app).'.'
-            );
-        });
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                CacheCommand::class,
-                ClearCacheCommand::class,
-                DirectiveCommand::class,
-                IdeHelperCommand::class,
-                InterfaceCommand::class,
-                MutationCommand::class,
-                PrintSchemaCommand::class,
-                QueryCommand::class,
-                ScalarCommand::class,
-                SubscriptionCommand::class,
-                UnionCommand::class,
-                ValidateSchemaCommand::class,
-                ValidatorCommand::class,
-            ]);
-        }
-
-        if ($this->app->runningUnitTests()) {
-            $this->app->register(TestingServiceProvider::class);
-        }
     }
 }

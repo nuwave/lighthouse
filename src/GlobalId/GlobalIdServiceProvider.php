@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 
 class GlobalIdServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
         $this->app->bind(GlobalIdContract::class, GlobalId::class);
         $this->app->singleton(NodeRegistry::class);
@@ -33,7 +33,7 @@ class GlobalIdServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );

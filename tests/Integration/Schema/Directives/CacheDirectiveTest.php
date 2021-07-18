@@ -24,7 +24,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->cache = $app->make('cache');
     }
 
-    public function testCanStoreResolverResultInCache(): void
+    public function testStoreResolverResultInCache(): void
     {
         $this->mockResolver([
             'id' => 1,
@@ -59,7 +59,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    public function testCanPlaceCacheKeyOnAnyField(): void
+    public function testPlaceCacheKeyOnAnyField(): void
     {
         $this->mockResolver([
             'id' => 1,
@@ -96,7 +96,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:foo@bar.com:name'));
     }
 
-    public function testCanStoreResolverResultInPrivateCache(): void
+    public function testStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
@@ -135,7 +135,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get($cacheKey));
     }
 
-    public function testCanStoreResolverResultInCacheWhenUsingNodeDirective(): void
+    public function testStoreResolverResultInCacheWhenUsingNodeDirective(): void
     {
         $this->mockResolver([
             'id' => 1,
@@ -209,7 +209,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    public function testCanStorePaginateResolverInCache(): void
+    public function testStorePaginateResolverInCache(): void
     {
         factory(User::class, 5)->create();
 
@@ -241,7 +241,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertCount(5, $result);
     }
 
-    public function testCanCacheHasManyResolver(): void
+    public function testCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
 
@@ -302,7 +302,7 @@ class CacheDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanAttachTagsToCache(): void
+    public function testAttachTagsToCache(): void
     {
         config(['lighthouse.cache.tags' => true]);
 
@@ -366,5 +366,54 @@ class CacheDirectiveTest extends DBTestCase
             $firstResponse->json(),
             $cachedResponse->json()
         );
+    }
+
+    public function testUseFalsyResultsInCache(): void
+    {
+        $this->mockResolver([
+            'id' => 1,
+            'field_boolean' => true,
+            'field_string' => 'value',
+            'field_integer' => 1,
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            field_boolean: Boolean @cache
+            field_string: String @cache
+            field_integer: Int @cache
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        // TTL is required for laravel 5.7 and prior
+        // @see https://laravel.com/docs/5.8/upgrade#psr-16-conformity
+        $this->cache->setMultiple([
+            'user:1:field_boolean' => false,
+            'user:1:field_string' => '',
+            'user:1:field_integer' => 0,
+        ], 1);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                field_boolean
+                field_string
+                field_integer
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'field_boolean' => false,
+                    'field_string' => '',
+                    'field_integer' => 0,
+                ],
+            ],
+        ]);
     }
 }

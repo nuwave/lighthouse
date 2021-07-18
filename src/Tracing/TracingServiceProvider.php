@@ -9,18 +9,19 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class TracingServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(DirectiveLocator $directiveFactory, EventsDispatcher $eventsDispatcher): void
+    public function register(): void
+    {
+        $this->app->singleton(Tracing::class);
+    }
+
+    public function boot(EventsDispatcher $eventsDispatcher): void
     {
         $eventsDispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );
@@ -44,13 +45,5 @@ class TracingServiceProvider extends ServiceProvider
             BuildExtensionsResponse::class,
             Tracing::class.'@handleBuildExtensionsResponse'
         );
-    }
-
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        $this->app->singleton(Tracing::class);
     }
 }

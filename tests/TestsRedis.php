@@ -11,6 +11,7 @@ trait TestsRedis
     protected function tearDown(): void
     {
         Redis::flushall();
+
         parent::tearDown();
     }
 

@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Exception;
-use GraphQL\Error\Error;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -91,7 +90,7 @@ class MorphManyDirectiveTest extends DBTestCase
             });
     }
 
-    public function testCanQueryMorphManyRelationship(): void
+    public function testQueryMorphManyRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Post {
@@ -168,13 +167,14 @@ class MorphManyDirectiveTest extends DBTestCase
             ->assertJsonCount($this->taskImages->count(), 'data.task.images');
     }
 
-    public function testCanQueryMorphManyPaginator(): void
+    public function testQueryMorphManyPaginator(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
             title: String!
-            images: [Image!] @morphMany(type: PAGINATOR)
+            imagesPaginated: [Image!] @morphMany(type: PAGINATOR, relation: "images")
+            imagesSimplePaginated: [Image!] @morphMany(type: SIMPLE, relation: "images")
         }
 
         type Image {
@@ -193,7 +193,12 @@ class MorphManyDirectiveTest extends DBTestCase
             post(id: {$this->post->id}) {
                 id
                 title
-                images(first: 10) {
+                imagesPaginated(first: 10) {
+                    data {
+                        id
+                    }
+                }
+                imagesSimplePaginated(first: 10) {
                     data {
                         id
                     }
@@ -205,7 +210,7 @@ class MorphManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'title' => $this->post->title,
-                    'images' => [
+                    'imagesPaginated' => [
                         'data' => $this->postImages
                             ->map(function (Image $image) {
                                 return [
@@ -216,7 +221,8 @@ class MorphManyDirectiveTest extends DBTestCase
                     ],
                 ],
             ],
-        ])->assertJsonCount($this->postImages->count(), 'data.post.images.data');
+        ])->assertJsonCount($this->postImages->count(), 'data.post.imagesPaginated.data')
+            ->assertJsonCount($this->postImages->count(), 'data.post.imagesSimplePaginated.data');
     }
 
     public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
@@ -323,30 +329,24 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            post(id: {$this->post->id}) {
-                id
-                title
-                images(first: 0) {
-                    data {
-                        id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID!) {
+                post(id: $id) {
+                    images(first: 0) {
+                        data {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ")->assertJson([
-            'data' => [
-                'post' => [
-                    'id' => $this->post->id,
-                    'title' => $this->post->title,
-                    'images' => null,
-                ],
-            ],
-        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
+            ', [
+                'id' => $this->post->id,
+            ])
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
     }
 
-    public function testCanQueryMorphManyPaginatorWithADefaultCount(): void
+    public function testQueryMorphManyPaginatorWithADefaultCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {
@@ -400,7 +400,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(3, 'data.task.images.data');
     }
 
-    public function testCanQueryMorphManyRelayConnection(): void
+    public function testQueryMorphManyRelayConnection(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {
@@ -540,7 +540,7 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanQueryMorphManyRelayConnectionWithADefaultCount(): void
+    public function testQueryMorphManyRelayConnectionWithADefaultCount(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Task {

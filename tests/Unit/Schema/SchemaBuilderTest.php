@@ -17,7 +17,7 @@ class SchemaBuilderTest extends TestCase
 {
     public function testGeneratesValidSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '');
+        $schema = $this->buildSchemaWithPlaceholderQuery();
 
         $this->assertInstanceOf(Schema::class, $schema);
         // This would throw if the schema were invalid
@@ -58,7 +58,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('foo', $foo->name);
     }
 
-    public function testCanResolveEnumTypes(): void
+    public function testResolveEnumTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         "Role description"
@@ -85,7 +85,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('Company administrator.', $enumValueDefinition->description);
     }
 
-    public function testCanResolveInterfaceTypes(): void
+    public function testResolveInterfaceTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         """
@@ -105,7 +105,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('bar is baz', $interfaceType->getField('bar')->description);
     }
 
-    public function testCanResolveObjectTypes(): void
+    public function testResolveObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         "asdf"
@@ -136,7 +136,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertFalse($baz->defaultValue);
     }
 
-    public function testCanResolveInputObjectTypes(): void
+    public function testResolveInputObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         "bla"
@@ -157,7 +157,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame(123, $inputObjectType->getField('bar')->defaultValue);
     }
 
-    public function testCanResolveMutations(): void
+    public function testResolveMutations(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type Mutation {
@@ -172,9 +172,9 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('foo', $foo->name);
     }
 
-    public function testCanResolveQueries(): void
+    public function testResolveQueries(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '');
+        $schema = $this->buildSchemaWithPlaceholderQuery();
 
         /** @var \GraphQL\Type\Definition\ObjectType $queryObjectType */
         $queryObjectType = $schema->getType(RootType::QUERY);
@@ -183,7 +183,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('foo', $field->name);
     }
 
-    public function testCanExtendObjectTypes(): void
+    public function testExtendObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type Foo {
@@ -202,7 +202,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertArrayHasKey('baz', $fields);
     }
 
-    public function testCanExtendTypes(): void
+    public function testExtendTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type Foo {

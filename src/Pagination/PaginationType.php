@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 class PaginationType
 {
     public const PAGINATOR = 'PAGINATOR';
+    public const SIMPLE = 'SIMPLE';
     public const CONNECTION = 'CONNECTION';
 
     /**
@@ -32,6 +33,9 @@ class PaginationType
             case 'relay':
                 $this->type = self::CONNECTION;
                 break;
+            case 'simple':
+                $this->type = self::SIMPLE;
+                break;
             default:
                 throw new DefinitionException(
                     "Found invalid pagination type: {$paginationType}"
@@ -47,5 +51,10 @@ class PaginationType
     public function isConnection(): bool
     {
         return $this->type === self::CONNECTION;
+    }
+
+    public function isSimple(): bool
+    {
+        return $this->type === self::SIMPLE;
     }
 }

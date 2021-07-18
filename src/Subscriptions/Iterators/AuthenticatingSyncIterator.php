@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Subscriptions\Iterators;
 
 use Closure;
 use Exception;
-use Illuminate\Contracts\Auth\Factory;
-use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -26,10 +26,10 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
      */
     protected $authFactory;
 
-    public function __construct(Repository $configRepository, Factory $authFactory)
+    public function __construct(ConfigRepository $configRepository, AuthFactory $authFactory)
     {
-        $this->authFactory = $authFactory;
         $this->configRepository = $configRepository;
+        $this->authFactory = $authFactory;
     }
 
     public function process(Collection $subscribers, Closure $handleSubscriber, Closure $handleError = null): void

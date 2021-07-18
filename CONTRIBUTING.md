@@ -4,11 +4,17 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 ## The process
 
+If this is your first time contributing to any project on GitHub, try [First Contributions](https://github.com/firstcontributions/first-contributions/blob/master/README.md).
+For this project specifically, follow these steps:
+
 1. Fork the project
-1. Create a new branch
-1. Code
+1. Clone the repository
+1. [Setup the project](#setup)
+1. Create a branch
+1. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
+1. [Test your changes](#testing)
 1. Commit and push
-1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
+1. Open a pull request, following the [template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ## Setup
 

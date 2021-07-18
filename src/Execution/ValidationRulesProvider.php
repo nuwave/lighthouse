@@ -14,19 +14,19 @@ class ValidationRulesProvider implements ProvidesValidationRules
     /**
      * @var \Illuminate\Contracts\Config\Repository
      */
-    protected $config;
+    protected $configRepository;
 
-    public function __construct(ConfigRepository $config)
+    public function __construct(ConfigRepository $configRepository)
     {
-        $this->config = $config;
+        $this->configRepository = $configRepository;
     }
 
     public function validationRules(): ?array
     {
         return [
-            QueryComplexity::class => new QueryComplexity($this->config->get('lighthouse.security.max_query_complexity', 0)),
-            QueryDepth::class => new QueryDepth($this->config->get('lighthouse.security.max_query_depth', 0)),
-            DisableIntrospection::class => new DisableIntrospection($this->config->get('lighthouse.security.disable_introspection', false)),
+            QueryComplexity::class => new QueryComplexity($this->configRepository->get('lighthouse.security.max_query_complexity', 0)),
+            QueryDepth::class => new QueryDepth($this->configRepository->get('lighthouse.security.max_query_depth', 0)),
+            DisableIntrospection::class => new DisableIntrospection($this->configRepository->get('lighthouse.security.disable_introspection', false)),
         ] + DocumentValidator::defaultRules();
     }
 }

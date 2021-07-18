@@ -45,9 +45,9 @@ class SchemaBuilder
     }
 
     /**
-     * Build an executable schema from AST.
+     * Build an executable schema from an AST.
      */
-    public function build(DocumentAST $documentAST): Schema
+    protected function build(DocumentAST $documentAST): Schema
     {
         $config = SchemaConfig::create();
 
@@ -69,9 +69,6 @@ class SchemaBuilder
         if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
             /** @var \GraphQL\Type\Definition\ObjectType $subscription */
             $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
-            // Eager-load the subscription fields to ensure they are registered
-            $subscription->getFields();
-
             $config->setSubscription($subscription);
         }
 
@@ -85,6 +82,9 @@ class SchemaBuilder
         // This is just used for introspection, it is required
         // to be able to retrieve all the types in the schema
         $config->setTypes(
+            /**
+             * @return array<string, \GraphQL\Type\Definition\Type>
+             */
             function (): array {
                 return $this->typeRegistry->possibleTypes();
             }

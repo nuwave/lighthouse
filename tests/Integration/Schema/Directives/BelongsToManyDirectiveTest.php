@@ -42,7 +42,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->be($this->user);
     }
 
-    public function testCanQueryBelongsToManyRelationship(): void
+    public function testQueryBelongsToManyRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -70,7 +70,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJsonCount($this->rolesCount, 'data.user.roles');
     }
 
-    public function testCanNameRelationExplicitly(): void
+    public function testNameRelationExplicitly(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -98,11 +98,12 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJsonCount($this->rolesCount, 'data.user.foo');
     }
 
-    public function testCanQueryBelongsToManyPaginator(): void
+    public function testQueryBelongsToManyPaginator(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: PAGINATOR)
+            rolesPaginated: [Role!]! @belongsToMany(type: PAGINATOR, relation: "roles")
+            rolesSimplePaginated: [Role!]! @belongsToMany(type: SIMPLE, relation: "roles")
         }
 
         type Role {
@@ -118,11 +119,19 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                roles(first: 2) {
+                rolesPaginated(first: 2) {
                     paginatorInfo {
                         count
                         hasMorePages
                         total
+                    }
+                    data {
+                        id
+                    }
+                }
+                rolesSimplePaginated(first: 3) {
+                    paginatorInfo {
+                        count
                     }
                     data {
                         id
@@ -133,19 +142,26 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'roles' => [
+                    'rolesPaginated' => [
                         'paginatorInfo' => [
                             'count' => 2,
                             'hasMorePages' => true,
                             'total' => $this->rolesCount,
                         ],
                     ],
+
+                    'rolesSimplePaginated' => [
+                        'paginatorInfo' => [
+                            'count' => 3,
+                        ],
+                    ],
                 ],
             ],
-        ])->assertJsonCount(2, 'data.user.roles.data');
+        ])->assertJsonCount(2, 'data.user.rolesPaginated.data')
+            ->assertJsonCount(3, 'data.user.rolesSimplePaginated.data');
     }
 
-    public function testCanQueryBelongsToManyRelayConnection(): void
+    public function testQueryBelongsToManyRelayConnection(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -190,7 +206,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    public function testCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
+    public function testQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -276,7 +292,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ');
     }
 
-    public function testCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
+    public function testQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -330,7 +346,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    public function testCanQueryBelongsToManyNestedRelationships(): void
+    public function testQueryBelongsToManyNestedRelationships(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {

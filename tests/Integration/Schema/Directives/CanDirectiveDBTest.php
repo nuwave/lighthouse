@@ -80,13 +80,13 @@ class CanDirectiveDBTest extends DBTestCase
             }
         }
         ')->assertJson([
+            'data' => [
+                'user' => null,
+            ],
             'errors' => [
                 [
                     'message' => 'No query results for model [Tests\Utils\Models\User] not-present',
                 ],
-            ],
-            'data' => [
-                'user' => null,
             ],
         ]);
     }
@@ -116,13 +116,7 @@ class CanDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => CanDirective::missingKeyToFindModel('some.path'),
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(CanDirective::missingKeyToFindModel('some.path'));
     }
 
     public function testFindUsingNestedInputWithDotNotation(): void
@@ -209,7 +203,7 @@ class CanDirectiveDBTest extends DBTestCase
         ")->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
-    public function testCanHandleMultipleModels(): void
+    public function testHandleMultipleModels(): void
     {
         $user = new User();
         $user->name = UserPolicy::ADMIN;

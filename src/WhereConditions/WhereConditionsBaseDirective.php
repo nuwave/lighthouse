@@ -105,16 +105,14 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             ->whereHas(
                 $relation,
                 $condition
-                    ? function ($builder) use ($relation, $model, $condition): void {
-                        $relatedModel = $this->nestedRelatedModel($model, $relation);
-
+                    ? function ($builder) use ($condition): void {
                         $this->handleWhereConditions(
                             $builder,
                             $this->prefixConditionWithTableName(
                                 $condition,
-                                $relatedModel
+                                $builder->getModel()
                             ),
-                            $relatedModel
+                            $builder->getModel()
                         );
                     }
                     : null,
@@ -169,26 +167,13 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     {
         // A valid column reference:
         // - must not start with a digit, dot or hyphen
-        // - must contain only alphanumerics, digits, underscores, dots or hyphens
-        // Dots are allowed to reference a column in a table: my_table.my_column.
-        $match = \Safe\preg_match('/^(?![0-9.-])[A-Za-z0-9_.-]*$/', $column);
+        // - must contain only alphanumerics, digits, underscores, dots, hyphens or JSON references
+        $match = \Safe\preg_match('/^(?![0-9.-])([A-Za-z0-9_.-]|->)*$/', $column);
         if ($match === 0) {
             throw new Error(
                 self::invalidColumnName($column)
             );
         }
-    }
-
-    protected function nestedRelatedModel(Model $model, string $nestedRelationPath): Model
-    {
-        $relations = explode('.', $nestedRelationPath);
-        $relatedModel = $model->newInstance();
-
-        foreach ($relations as $relation) {
-            $relatedModel = $relatedModel->{$relation}()->getRelated();
-        }
-
-        return $relatedModel;
     }
 
     /**

@@ -13,16 +13,8 @@ class ErrorTest extends TestCase
     public function testMissingQuery(): void
     {
         $this->postGraphQL([])
-            ->assertJson([
-                'errors' => [
-                    [
-                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
-                        'extensions' => [
-                            'category' => 'request',
-                        ],
-                    ],
-                ],
-            ]);
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
+            ->assertGraphQLErrorCategory('request');
     }
 
     public function testRejectsInvalidQuery(): void
@@ -53,32 +45,16 @@ class ErrorTest extends TestCase
     {
         $this->postGraphQL([])
             ->assertStatus(200)
-            ->assertJson([
-                'errors' => [
-                    [
-                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
-                        'extensions' => [
-                            'category' => 'request',
-                        ],
-                    ],
-                ],
-            ]);
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
+            ->assertGraphQLErrorCategory('request');
     }
 
     public function testRejectsEmptyQuery(): void
     {
         $this->graphQL('')
             ->assertStatus(200)
-            ->assertJson([
-                'errors' => [
-                    [
-                        'message' => 'GraphQL Request must include at least one of those two parameters: "query" or "queryId"',
-                        'extensions' => [
-                            'category' => 'request',
-                        ],
-                    ],
-                ],
-            ]);
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
+            ->assertGraphQLErrorCategory('request');
     }
 
     public function testHandlesErrorInResolver(): void
@@ -115,7 +91,7 @@ class ErrorTest extends TestCase
     public function testRethrowsInternalExceptions(): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $this->mockResolver()
@@ -143,5 +119,28 @@ class ErrorTest extends TestCase
             foo
         }
         ');
+    }
+
+    public function testReturnsMultipleErrors(): void
+    {
+        $this->schema = /** @lang GraphQL */'
+        input TestInput {
+            string: String!
+            integer: Int!
+        }
+
+        type Query {
+            foo(input: TestInput): ID
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(input: {})
+            }
+            ')
+            ->assertGraphQLErrorMessage('Field TestInput.string of required type String! was not provided.')
+            ->assertGraphQLErrorMessage('Field TestInput.integer of required type Int! was not provided.');
     }
 }

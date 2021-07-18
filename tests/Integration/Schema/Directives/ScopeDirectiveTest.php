@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 class ScopeDirectiveTest extends DBTestCase
 {
-    public function testCanApplyDirective(): void
+    public function testApplyDirective(): void
     {
         /** @var User $user */
         $user = factory(User::class)->create();
@@ -70,7 +70,7 @@ class ScopeDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanThrowExceptionOnInvalidScope(): void
+    public function testThrowExceptionOnInvalidScope(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {

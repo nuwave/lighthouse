@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -45,7 +46,7 @@ class TestResponseMixin
             /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
-                array_keys($extensions['validation']),
+                array_keys($extensions[ValidationException::CATEGORY]),
                 'Expected the query to return validation errors for specific fields.'
             );
 
@@ -59,6 +60,20 @@ class TestResponseMixin
             $validation = TestResponseUtils::extractValidationErrors($this);
 
             Assert::assertNull($validation, 'Expected the query to have no validation errors.');
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLErrorMessage(): Closure
+    {
+        return function (string $message) {
+            $messages = $this->json('errors.*.message');
+            Assert::assertContains(
+                $message,
+                $messages,
+                "Expected the GraphQL response to contain error message `{$message}`, got: ".\Safe\json_encode($messages)
+            );
 
             return $this;
         };
