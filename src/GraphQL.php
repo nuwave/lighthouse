@@ -136,6 +136,13 @@ class GraphQL
     {
         $errors = $this->graphQLHelper->validateOperationParams($params);
 
+        $query = $params->query;
+        if (! is_string($query) || $query === '') {
+            $errors[] = new RequestError(
+                'GraphQL Request parameter "query" is required and must not be empty.'
+            );
+        }
+
         if (count($errors) > 0) {
             $errors = array_map(
                 static function (RequestError $err): Error {
@@ -148,9 +155,9 @@ class GraphQL
                 new ExecutionResult(null, $errors)
             );
         }
-
+        /** @var string $query Otherwise we would have bailed with an error */
         $result = $this->executeQuery(
-            $params->query,
+            $query,
             $context,
             $params->variables,
             null,
