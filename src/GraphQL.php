@@ -156,7 +156,6 @@ class GraphQL
             );
         }
         /** @var string $query Otherwise we would have bailed with an error */
-
         $result = $this->executeQuery(
             $query,
             $context,
