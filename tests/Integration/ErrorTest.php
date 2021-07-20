@@ -17,6 +17,13 @@ class ErrorTest extends TestCase
             ->assertGraphQLErrorCategory('request');
     }
 
+    public function testEmptyQuery(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '')
+            ->assertGraphQLErrorMessage('GraphQL Request parameter "query" is required and must not be empty.')
+            ->assertGraphQLErrorCategory('request');
+    }
+
     public function testRejectsInvalidQuery(): void
     {
         $result = $this->graphQL(/** @lang GraphQL */ '
