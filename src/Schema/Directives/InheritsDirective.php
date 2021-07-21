@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
@@ -29,7 +31,7 @@ GRAPHQL;
     {
         $parentType = Arr::get($documentAST->types, $this->directiveArgValue('from'));
 
-        if (!$parentType) {
+        if (! $parentType) {
             throw new DefinitionException("The type {$this->directiveArgValue('from')} was not found in your schama.");
         }
 
@@ -39,6 +41,14 @@ GRAPHQL;
             );
         }
 
-        $typeDefinition->fields = $parentType->fields->merge($typeDefinition->fields);
+        foreach (get_object_vars($parentType) as $type => $value) {
+            if ($value instanceof NodeList) {
+                $typeDefinition->{$type} = ASTHelper::mergeUniqueNodeList($parentType->{$type}, $typeDefinition->{$type}, true);
+            } else {
+                $typeDefinition->{$type} = $typeDefinition->{$type} ?? $parentType->{$type};
+            }
+        }
+
+        $documentAST->setTypeDefinition($typeDefinition);
     }
 }

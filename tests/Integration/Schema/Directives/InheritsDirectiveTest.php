@@ -8,14 +8,7 @@ class InheritsDirectiveTest extends TestCase
 {
     public function testCanInheritsTypes()
     {
-        $this->mockResolver(function ($root, array $args): array {
-            return [
-                'attribute_1' => 'Attribute 1',
-                'attribute_2' => 'Attribute 2',
-            ];
-        });
-
-        $this->schema = /* @lang GraphQL */ '
+        $schema = $this->buildSchema(/**@lang GraphQL */ '
             type ParentType {
                 attribute_1: String
             }
@@ -24,38 +17,17 @@ class InheritsDirectiveTest extends TestCase
             }
 
             type Query {
-                childtypeQuery: ChildType @mock
-            }';
+                childtypeQuery: ChildType
+            }');
 
-        $response = $this->graphQL(
-            'query TestChildType{
-               childtypeQuery {
-                   attribute_1
-                   attribute_2
-               }
-            }'
-        );
-        $response->assertExactJson([
-            'data' => [
-                'childtypeQuery' => [
-                    'attribute_1' => 'Attribute 1',
-                    'attribute_2' => 'Attribute 2',
-                ],
-            ],
-        ]);
+        $childType = $schema->getType('ChildType');
+
+        $this->assertNotNull($childType->getField('attribute_1'));
     }
 
     public function testChildOverridesFields()
     {
-        $this->mockResolver(function ($root, array $args): array {
-            return [
-                'attribute_1' => '100',
-                'attribute_2' => 100,
-            ];
-        });
-
-        $this->schema =
-            /* @lang GraphQL */
+        $schema = $this->buildSchema(/* @lang GraphQL */
             '
             type ParentType {
                 attribute_1: String
@@ -67,36 +39,23 @@ class InheritsDirectiveTest extends TestCase
             }
 
             type Query {
-                childtypeQuery: ChildType @mock
-            }';
+                childtypeQuery: ChildType
+            }');
 
-        $response = $this->graphQL(
-            'query TestChildType{
-               childtypeQuery {
-                   attribute_1
-                   attribute_2
-               }
-            }'
-        );
+        $childType = $schema->getType('ChildType');
 
-        $response->assertExactJson([
-            'data' => [
-                'childtypeQuery' => [
-                    'attribute_1' => 100,
-                    'attribute_2' => '100',
-                ],
-            ],
-        ]);
+        $stringType = $schema->getType('String');
+        $intType = $schema->getType('Int');
+
+        $this->assertSame($intType, $childType->getField('attribute_1')->getType());
+        $this->assertSame($stringType, $childType->getField('attribute_2')->getType());
     }
 
     public function testChildAttributesShouldNotBeAddedParent()
     {
-        $this->rethrowGraphQLErrors();
+        $this->expectException(\GraphQL\Error\InvariantViolation::class);
 
-        $this->expectException(\GraphQL\Error\Error::class);
-
-        $this->mockResolverExpects($this->never());
-        $this->schema = /* @lang GraphQL */ '
+        $schema = $this->buildSchema(/* @lang GraphQL */ '
             type ParentType {
                 attribute_1: String
                 another_attribute: String
@@ -106,32 +65,19 @@ class InheritsDirectiveTest extends TestCase
             }
 
             type Query {
-                parentypeQuery: ParentType @mock
-                childtypeQuery: ChildType @mock
-            }';
+                parentypeQuery: ParentType
+                childtypeQuery: ChildType
+            }');
 
-        $this->graphQL(
-            'query TestChildType{
-               childtypeQuery {
-                   attribute_1
-                   new_attribute
-               }
-                parentypeQuery {
-                   attribute_1
-                   new_attribute
-               }
-            }'
-        );
+        $parentType = $schema->getType('ParentType');
+        $parentType->getField('new_attribute');
     }
 
     public function testCanNotInheritsOtherTypes()
     {
-        $this->rethrowGraphQLErrors();
-
         $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
 
-        $this->mockResolverExpects($this->never());
-        $this->schema = /*  @lang GraphQL */ '
+        $this->buildSchema(/*  @lang GraphQL */ '
             input ParentType {
                 attribute_1: String
             }
@@ -141,41 +87,20 @@ class InheritsDirectiveTest extends TestCase
             type Query {
                 childtypeQuery: ChildType @mock
             }
-        ';
-
-        $this->graphQL(
-            'query testquery {
-                childtypeQuery {
-                    attribute_2
-                    attribute_1
-                }
-            }'
-        );
+        ');
     }
 
     public function testExceptionWhenTypeDoesntExist()
     {
-        $this->rethrowGraphQLErrors();
-
         $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
 
-        $this->mockResolverExpects($this->never());
-
-        $this->schema = /*  @lang GraphQL */ '
+        $this->buildSchema(/*  @lang GraphQL */ '
             type ChildType @inherits(from: UndefinedType) {
                 attribute_1: String
             }
             type Query {
                 childTypeQuery: ChildType @mock
             }
-        ';
-
-        $this->graphQL(
-            '{
-                childTypeQuery {
-                    attribute_1
-                }
-            }'
-        );
+        ');
     }
 }
