@@ -23,6 +23,7 @@ class ValidationErrorHandlerTest extends TestCase
         };
 
         $handler($original, $next);
+        $this->assertInstanceOf(Error::class, $error);
         $this->assertInstanceOf(ValidationException::class, $error->getPrevious());
     }
 }
