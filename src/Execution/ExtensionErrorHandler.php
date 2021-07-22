@@ -20,10 +20,9 @@ class ExtensionErrorHandler implements ErrorHandler
         }
 
         $underlyingException = $error->getPrevious();
-
         if ($underlyingException instanceof RendersErrorsExtensions) {
             // Reconstruct the error, passing in the extensions of the underlying exception
-            $error = new Error(
+            return $next(new Error(
                 $error->getMessage(),
                 // @phpstan-ignore-next-line graphql-php and phpstan disagree with themselves
                 $error->getNodes(),
@@ -32,7 +31,7 @@ class ExtensionErrorHandler implements ErrorHandler
                 $error->getPath(),
                 $underlyingException,
                 $underlyingException->extensionsContent()
-            );
+            ));
         }
 
         return $next($error);
