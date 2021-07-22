@@ -20,7 +20,15 @@ class ValidationErrorHandler implements ErrorHandler
 
         $underlyingException = $error->getPrevious();
         if ($underlyingException instanceof LaravelValidationException) {
-            return $next(ValidationException::fromLaravel($underlyingException));
+            return $next(new Error(
+                $error->getMessage(),
+                // @phpstan-ignore-next-line graphql-php and phpstan disagree with themselves
+                $error->getNodes(),
+                $error->getSource(),
+                $error->getPositions(),
+                $error->getPath(),
+                ValidationException::fromLaravel($underlyingException)
+            ));
         }
 
         return $next($error);

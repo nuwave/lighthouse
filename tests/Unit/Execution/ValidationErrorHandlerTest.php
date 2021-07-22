@@ -15,14 +15,14 @@ class ValidationErrorHandlerTest extends TestCase
         $handler = new ValidationErrorHandler();
 
         $validationException = LaravelValidationException::withMessages([]);
-        $error = new Error('foo', null, null, [], null, $validationException);
+        $original = new Error('foo', null, null, [], null, $validationException);
 
-        $exception = null;
-        $next = function (ValidationException $e) use (&$exception) {
-            $exception = $e;
+        $error = null;
+        $next = function (Error $e) use (&$error) {
+            $error = $e;
         };
 
-        $handler($error, $next);
-        $this->assertInstanceOf(ValidationException::class, $exception);
+        $handler($original, $next);
+        $this->assertInstanceOf(ValidationException::class, $error->getPrevious());
     }
 }
