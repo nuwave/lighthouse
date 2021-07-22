@@ -4,14 +4,13 @@ namespace Nuwave\Lighthouse\Execution;
 
 use Closure;
 use GraphQL\Error\Error;
-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
+use Illuminate\Validation\ValidationException as LaravelValidationException;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 
 /**
- * Handle Exceptions that implement Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions
- * and add extra content from them to the 'extensions' key of the Error that is rendered
- * to the User.
+ * Wrap native Laravel validation exceptions, adding structured data to extensions.
  */
-class ExtensionErrorHandler implements ErrorHandler
+class ValidationErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {
@@ -20,8 +19,7 @@ class ExtensionErrorHandler implements ErrorHandler
         }
 
         $underlyingException = $error->getPrevious();
-        if ($underlyingException instanceof RendersErrorsExtensions) {
-            // Reconstruct the error, passing in the extensions of the underlying exception
+        if ($underlyingException instanceof LaravelValidationException) {
             return $next(new Error(
                 $error->getMessage(),
                 // @phpstan-ignore-next-line graphql-php and phpstan disagree with themselves
@@ -29,8 +27,7 @@ class ExtensionErrorHandler implements ErrorHandler
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),
-                $underlyingException,
-                $underlyingException->extensionsContent()
+                ValidationException::fromLaravel($underlyingException)
             ));
         }
 

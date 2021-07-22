@@ -3,10 +3,8 @@
 namespace Nuwave\Lighthouse\Exceptions;
 
 use Exception;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationException as LaravelValidationException;
 
 class ValidationException extends Exception implements RendersErrorsExtensions
 {
@@ -24,6 +22,14 @@ class ValidationException extends Exception implements RendersErrorsExtensions
         $this->validator = $validator;
     }
 
+    public static function fromLaravel(LaravelValidationException $laravelException): self
+    {
+        return new static(
+            $laravelException->getMessage(),
+            $laravelException->validator
+        );
+    }
+
     /**
      * Instantiate from a plain array of messages.
      *
@@ -31,18 +37,11 @@ class ValidationException extends Exception implements RendersErrorsExtensions
      *
      * @param  array<string, string|array<string>>  $messages
      */
-    public static function withMessages(array $messages): ValidationException
+    public static function withMessages(array $messages): self
     {
-        /** @var \Illuminate\Contracts\Validation\Factory $validatorFactory */
-        $validatorFactory = Container::getInstance()->make(ValidatorFactory::class);
-        $validator = $validatorFactory->make([], []);
-        foreach ($messages as $key => $value) {
-            foreach (Arr::wrap($value) as $message) {
-                $validator->errors()->add($key, $message);
-            }
-        }
-
-        return new static('Validation failed.', $validator);
+        return static::fromLaravel(
+            LaravelValidationException::withMessages($messages)
+        );
     }
 
     public function isClientSafe(): bool
