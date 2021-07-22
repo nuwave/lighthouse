@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## v5.16.0
 
-- Add `ValidationException::fromLaravel()` and `ValidationErrorHandler` to include validation messages in extensions
+- Add `ValidationException::fromLaravel()` and `ValidationErrorHandler` to include validation messages in extensions https://github.com/nuwave/lighthouse/pull/1899
 
 ## v5.15.3
 
