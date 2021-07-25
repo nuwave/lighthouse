@@ -1393,12 +1393,11 @@ type Query {
 
 ```graphql
 """
-This allows types to inherits fields from another type.
-'""
+All fields & properties of the parent type will be inherited by the child type.
 """
 directive @inherits(
     """
-    The type from where it will inherit.
+    Specify the parent type to inherit from.
     """
     from: String!
 ) on OBJECT | INPUT_OBJECT | ENUM | INTERFACE | UNION
