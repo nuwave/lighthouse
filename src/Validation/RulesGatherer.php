@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Date;
+use Illuminate\Support\DateFactory;
 use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
@@ -280,7 +280,7 @@ class RulesGatherer
                     'BeforeOrEqual',
                 ])) {
                     try {
-                        Date::parse($args[0]);
+                        (new DateFactory())->parse($args[0]);
                     } catch (\Exception $e) {
                         $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                     }
