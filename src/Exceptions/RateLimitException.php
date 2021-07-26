@@ -11,7 +11,6 @@ use RuntimeException;
 class RateLimitException extends RuntimeException implements ClientAware
 {
     public const MESSAGE = 'Rate limit exceeded. Please try later.';
-    public const CATEGORY = 'rate-limit';
 
     public function __construct()
     {
@@ -21,10 +20,5 @@ class RateLimitException extends RuntimeException implements ClientAware
     public function isClientSafe(): bool
     {
         return true;
-    }
-
-    public function getCategory(): string
-    {
-        return self::CATEGORY;
     }
 }

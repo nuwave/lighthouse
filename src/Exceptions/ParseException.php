@@ -28,9 +28,4 @@ class ParseException extends Exception implements ClientAware
     {
         return false;
     }
-
-    public function getCategory(): string
-    {
-        return 'schema';
-    }
 }

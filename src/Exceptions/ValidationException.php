@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException as LaravelValidationException;
 
 class ValidationException extends Exception implements RendersErrorsExtensions
 {
-    const CATEGORY = 'validation';
+    const KEY = 'validation';
 
     /**
      * @var \Illuminate\Contracts\Validation\Validator
@@ -49,15 +49,10 @@ class ValidationException extends Exception implements RendersErrorsExtensions
         return true;
     }
 
-    public function getCategory(): string
-    {
-        return self::CATEGORY;
-    }
-
     public function extensionsContent(): array
     {
         return [
-            self::CATEGORY => $this->validator->errors()->messages(),
+            self::KEY => $this->validator->errors()->messages(),
         ];
     }
 }

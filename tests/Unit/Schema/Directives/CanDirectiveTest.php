@@ -32,7 +32,7 @@ class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
@@ -64,7 +64,6 @@ class CanDirectiveTest extends TestCase
                 }
             }
             ')
-            ->assertGraphQLErrorCategory(AuthorizationException::CATEGORY)
             ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
@@ -97,7 +96,6 @@ class CanDirectiveTest extends TestCase
                 }
             }
             ')
-            ->assertGraphQLErrorCategory(AuthorizationException::CATEGORY)
             ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
@@ -232,7 +230,7 @@ class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void

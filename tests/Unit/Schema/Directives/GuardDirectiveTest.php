@@ -133,6 +133,6 @@ class GuardDirectiveTest extends TestCase
                 }
             }
             ')
-            ->assertGraphQLErrorCategory(AuthenticationException::CATEGORY);
+            ->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
     }
 }

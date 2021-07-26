@@ -56,19 +56,6 @@ class CustomException extends Exception implements RendersErrorsExtensions
     }
 
     /**
-     * Returns string describing a category of the error.
-     *
-     * Value "graphql" is reserved for errors produced by query parsing or validation, do not use it.
-     *
-     * @api
-     * @return string
-     */
-    public function getCategory(): string
-    {
-        return 'custom';
-    }
-
-    /**
      * Return the content that is put in the "extensions" part
      * of the returned error.
      *
@@ -121,7 +108,6 @@ A query that produces an error will render like this:
     {
       "message": "This is the error message",
       "extensions": {
-        "category": "custom",
         "some": "additional information",
         "reason": "The reason why this error was thrown, is rendered in the extension output."
       }

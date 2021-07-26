@@ -46,7 +46,7 @@ class SecurityTest extends TestCase
 
     public function testDisableIntrospectionThroughConfig(): void
     {
-        config(['lighthouse.security.disable_introspection' => DisableIntrospection::DISABLED]);
+        config(['lighthouse.security.disable_introspection' => DisableIntrospection::ENABLED]);
 
         $this->assertIntrospectionIsDisabled();
     }

@@ -13,15 +13,13 @@ class ErrorTest extends TestCase
     public function testMissingQuery(): void
     {
         $this->postGraphQL([])
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testEmptyQuery(): void
     {
         $this->graphQL(/** @lang GraphQL */ '')
-            ->assertGraphQLErrorMessage('GraphQL Request parameter "query" is required and must not be empty.')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request parameter "query" is required and must not be empty.');
     }
 
     public function testRejectsInvalidQuery(): void
@@ -52,16 +50,14 @@ class ErrorTest extends TestCase
     {
         $this->postGraphQL([])
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testRejectsEmptyQuery(): void
     {
         $this->graphQL('')
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testHandlesErrorInResolver(): void

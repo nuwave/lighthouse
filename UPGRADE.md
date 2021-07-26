@@ -85,6 +85,10 @@ The setting `non_null_pagination_results` was removed and is now always `true`.
 This is generally more convenient for clients, but will
 cause validation errors to bubble further up in the result.
 
+### Removed error extension field `category`
+
+See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit

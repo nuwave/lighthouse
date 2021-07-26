@@ -4,17 +4,6 @@ namespace Illuminate\Foundation\Testing {
     class TestResponse
     {
         /**
-         * Asserts that the response contains an error from a given category.
-         *
-         * @param  string  $category  The name of the expected error category.
-         * @return $this
-         */
-        public function assertGraphQLErrorCategory(string $category): self
-        {
-            return $this;
-        }
-
-        /**
          * Assert that the returned result contains exactly the given validation keys.
          *
          * @param  array  $keys  The validation keys the result should have.
@@ -59,17 +48,6 @@ namespace Illuminate\Testing {
          * @return $this
          */
         public function assertGraphQLErrorMessage(string $message): self
-        {
-            return $this;
-        }
-
-        /**
-         * Assert the response contains an error from the given category.
-         *
-         * @param  string  $category  The name of the expected error category.
-         * @return $this
-         */
-        public function assertGraphQLErrorCategory(string $category): self
         {
             return $this;
         }

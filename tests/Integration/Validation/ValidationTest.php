@@ -68,8 +68,7 @@ class ValidationTest extends TestCase
                     [
                         'message' => 'Validation failed for the field [foo].',
                         'extensions' => [
-                            'category' => ValidationException::CATEGORY,
-                            ValidationException::CATEGORY => [
+                            ValidationException::KEY => [
                                 'bar' => [
                                     'The bar field is required.',
                                 ],
@@ -131,7 +130,7 @@ class ValidationTest extends TestCase
                         'path' => ['foo'],
                         'message' => 'Validation failed for the field [foo.baz].',
                         'extensions' => [
-                            ValidationException::CATEGORY => [
+                            ValidationException::KEY => [
                                 'required' => [
                                     'The required field is required.',
                                 ],

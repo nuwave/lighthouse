@@ -7,15 +7,10 @@ use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthorizationExce
 
 class AuthorizationException extends IlluminateAuthorizationException implements ClientAware
 {
-    public const CATEGORY = 'authorization';
+    public const MESSAGE = 'This action is unauthorized.';
 
     public function isClientSafe(): bool
     {
         return true;
-    }
-
-    public function getCategory(): string
-    {
-        return self::CATEGORY;
     }
 }

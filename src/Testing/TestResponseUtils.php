@@ -22,7 +22,7 @@ class TestResponseUtils
         return Arr::first(
             $errors,
             function (array $error): bool {
-                return Arr::get($error, 'extensions.category') === ValidationException::CATEGORY;
+                return isset($error['extensions'][ValidationException::KEY]);
             }
         );
     }

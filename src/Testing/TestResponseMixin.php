@@ -46,7 +46,7 @@ class TestResponseMixin
             /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
-                array_keys($extensions[ValidationException::CATEGORY]),
+                array_keys($extensions[ValidationException::KEY]),
                 'Expected the query to return validation errors for specific fields.'
             );
 
@@ -74,23 +74,6 @@ class TestResponseMixin
                 $messages,
                 "Expected the GraphQL response to contain error message `{$message}`, got: ".\Safe\json_encode($messages)
             );
-
-            return $this;
-        };
-    }
-
-    public function assertGraphQLErrorCategory(): Closure
-    {
-        return function (string $category) {
-            $this->assertJson([
-                'errors' => [
-                    [
-                        'extensions' => [
-                            'category' => $category,
-                        ],
-                    ],
-                ],
-            ]);
 
             return $this;
         };

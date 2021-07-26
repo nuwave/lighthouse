@@ -55,6 +55,6 @@ class FieldMiddlewareTest extends TestCase
                 name
             }
         }
-        ')->assertGraphQLErrorCategory(AuthenticationException::CATEGORY);
+        ')->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
     }
 }
