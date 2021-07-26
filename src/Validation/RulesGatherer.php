@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
@@ -269,6 +270,20 @@ class RulesGatherer
                         },
                         $args
                     );
+                }
+
+                // Rules where the first argument is a date or a field reference
+                if (is_string($args[0] ?? null) && in_array($name, [
+                    'After',
+                    'AfterOrEqual',
+                    'Before',
+                    'BeforeOrEqual',
+                ])) {
+                    try {
+                        Date::parse($args[0]);
+                    } catch (\Exception $e) {
+                        $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
+                    }
                 }
 
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...

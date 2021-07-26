@@ -387,6 +387,47 @@ class ValidationTest extends TestCase
             ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is baz.');
     }
 
+    public function testOptionalFieldReferencesAreQualified(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom {
+            foo: String @rules(apply: ["after:2018-01-01"])
+            bar: String @rules(apply: ["after:foo"])
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "2019-01-01"
+                        bar: "2020-01-01"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "2017-01-01"
+                        bar: "2016-01-01"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.foo', 'The input.foo must be a date after 2018-01-01.')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar must be a date after input.foo.');
+    }
+
     public function testMultipleFieldReferencesAreQualified(): void
     {
         $this->schema = /** @lang GraphQL */ '
