@@ -89,6 +89,24 @@ cause validation errors to bubble further up in the result.
 
 See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category
 
+### Use native interface for errors with extensions
+
+Use `GraphQL\Error\ProvidesExtensions::getExtensions()` over `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions::extensionsContent()`
+to return extra information from exceptions:
+
+```diff
+use Exception;
+-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
++use GraphQL\Error\ClientAware;
++use GraphQL\Error\ProvidesExtensions;
+
+-class CustomException extends Exception implements RendersErrorsExtensions
++class CustomException extends Exception implements ClientAware, ProvidesExtensions
+{
+-   public function extensionsContent(): array
++   public function getExtensions(): array
+```
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit

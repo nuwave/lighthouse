@@ -3,10 +3,12 @@
 namespace Nuwave\Lighthouse\Exceptions;
 
 use Exception;
+use GraphQL\Error\ClientAware;
+use GraphQL\Error\ProvidesExtensions;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException as LaravelValidationException;
 
-class ValidationException extends Exception implements RendersErrorsExtensions
+class ValidationException extends Exception implements ClientAware, ProvidesExtensions
 {
     const KEY = 'validation';
 
@@ -49,7 +51,7 @@ class ValidationException extends Exception implements RendersErrorsExtensions
         return true;
     }
 
-    public function extensionsContent(): array
+    public function getExtensions(): array
     {
         return [
             self::KEY => $this->validator->errors()->messages(),

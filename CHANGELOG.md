@@ -13,7 +13,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Remove mixin `TestResponse::assertGraphQLErrorCategory()`
 - Remove class `Nuwave\Lighthouse\Exceptions\GenericException`
-- Removed error extension field `category`
+- Remove error extension field `category`
+- Remove interface `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`
+- Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
 
 ## v5.16.1
 

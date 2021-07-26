@@ -16,11 +16,10 @@ Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/erro
 
 ## Additional Error Information
 
-The interface [`\Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`](https://github.com/nuwave/lighthouse/blob/master/src/Exceptions/RendersErrorsExtensions.php)
-may be extended to add more information than just an error message to the rendered error output.
+The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php)
+may be implemented to add more information than just an error message to the rendered error output.
 
-Let's say you want to have a custom exception type that contains information about
-the reason the exception was thrown.
+This custom exception contains information about the reason the exception was thrown:
 
 ```php
 <?php
@@ -28,13 +27,14 @@ the reason the exception was thrown.
 namespace App\Exceptions;
 
 use Exception;
-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
+use GraphQL\Error\ClientAware;
+use GraphQL\Error\ProvidesExtensions;
 
-class CustomException extends Exception implements RendersErrorsExtensions
+class CustomException extends Exception implements ClientAware, ProvidesExtensions
 {
     /**
-    * @var @string
-    */
+     * @var @string
+     */
     protected $reason;
 
     public function __construct(string $message, string $reason)
@@ -46,9 +46,6 @@ class CustomException extends Exception implements RendersErrorsExtensions
 
     /**
      * Returns true when exception message is safe to be displayed to a client.
-     *
-     * @api
-     * @return bool
      */
     public function isClientSafe(): bool
     {
@@ -56,12 +53,11 @@ class CustomException extends Exception implements RendersErrorsExtensions
     }
 
     /**
-     * Return the content that is put in the "extensions" part
-     * of the returned error.
+     * Data to include within the "extensions" key of the formatted error.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function extensionsContent(): array
+    public function getExtensions(): array
     {
         return [
             'some' => 'additional information',
@@ -125,8 +121,9 @@ Add them to your `lighthouse.php` config file, for example:
 
 ```php
 'error_handlers' => [
-    \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
-    \App\GraphQL\MyErrorHandler::class,
+    \App\GraphQL\CountErrorHandler::class,
+    \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
+    \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
 ],
 ```
 
@@ -141,7 +138,7 @@ use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
-class ExtensionErrorHandler implements ErrorHandler
+class CountErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {
