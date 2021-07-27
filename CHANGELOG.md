@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.16.2
+
+### Fixed
+
+- Allow using date validation rules that reference other arguments
+
 ## v5.16.1
 
 ### Fixed

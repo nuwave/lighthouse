@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Validation;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -13,6 +14,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation;
 use Nuwave\Lighthouse\Support\Contracts\ArgumentValidation;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentValue;
 use Nuwave\Lighthouse\Support\Utils;
+use Throwable;
 
 class RulesGatherer
 {
@@ -269,6 +271,20 @@ class RulesGatherer
                         },
                         $args
                     );
+                }
+
+                // Rules where the first argument is a date or a field reference
+                if (is_string($args[0] ?? null) && in_array($name, [
+                    'After',
+                    'AfterOrEqual',
+                    'Before',
+                    'BeforeOrEqual',
+                ])) {
+                    try {
+                        Carbon::parse($args[0]);
+                    } catch (Throwable $argumentIsNotADate) {
+                        $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
+                    }
                 }
 
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
