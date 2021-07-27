@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix using date validation with other fields as comparison
+- Allow using date validation rules that reference other arguments
 
 ## v5.16.1
 
