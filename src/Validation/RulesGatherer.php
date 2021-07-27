@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Validation;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\DateFactory;
 use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
