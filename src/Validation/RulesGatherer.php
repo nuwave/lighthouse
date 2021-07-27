@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
+use Throwable;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\DateFactory;
@@ -281,7 +282,7 @@ class RulesGatherer
                 ])) {
                     try {
                         (new DateFactory())->parse($args[0]);
-                    } catch (\Exception $e) {
+                    } catch (Throwable $argumentIsNotADate) {
                         $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                     }
                 }
