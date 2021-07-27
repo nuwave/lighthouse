@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
-use Throwable;
+use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\DateFactory;
@@ -281,7 +281,7 @@ class RulesGatherer
                     'BeforeOrEqual',
                 ])) {
                     try {
-                        (new DateFactory())->parse($args[0]);
+                        Carbon::parse($args[0]);
                     } catch (Throwable $argumentIsNotADate) {
                         $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                     }
