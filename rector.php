@@ -21,6 +21,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         // Does not fit autoloading standards
         __DIR__.'/tests/database/migrations',
 
+        // References PreLaravel7ExceptionHandler which is not compatible with newer Laravel
+        __DIR__.'/tests/TestCase.php',
+        __DIR__.'/tests/PreLaravel7ExceptionHandler.php',
+
         // Gets stuck on WhereConditionsBaseDirective for some reason
         __DIR__.'/src/WhereConditions',
 
