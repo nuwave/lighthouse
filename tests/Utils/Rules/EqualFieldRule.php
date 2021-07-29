@@ -39,8 +39,8 @@ class EqualFieldRule implements Rule, WithReferenceRule
         return "The $this->attribute must be equal to $this->field.";
     }
 
-    public function setArgumentPath(string $argumentPath): void
+    public function setArgumentPath(array $argumentPath): void
     {
-        $this->field = $argumentPath.'.'.$this->field;
+        $this->field = implode('.', array_merge($argumentPath, [$this->field]));
     }
 }

@@ -226,7 +226,7 @@ class RulesGatherer
             static function ($rule) use ($argumentPath) {
                 if (is_object($rule)) {
                     if ($rule instanceof WithReferenceRule) {
-                        $rule->setArgumentPath(implode('.', $argumentPath));
+                        $rule->setArgumentPath($argumentPath);
                     }
 
                     return $rule;
@@ -247,6 +247,7 @@ class RulesGatherer
                     $indexes = explode('_', $args[1]);
                     array_splice($args, 1, 1);
                     foreach ($indexes as $index) {
+                        // Skipping over the first index, which is the name
                         $index = (int) $index + 1;
                         $args[$index] = implode('.', array_merge($argumentPath, [$args[$index]]));
                     }
