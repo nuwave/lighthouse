@@ -511,7 +511,7 @@ class ValidationTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.bar', 'The input.bar must be equal to input.foo.');
+            ->assertGraphQLValidationError('input.bar', 'input');
     }
 
     public function testMultipleFieldReferencesAreQualified(): void
