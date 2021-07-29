@@ -3,7 +3,6 @@
 namespace Tests\Utils\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\WithReferenceRule;
 
 class EqualFieldRule implements Rule, WithReferenceRule
