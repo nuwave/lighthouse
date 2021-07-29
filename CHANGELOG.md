@@ -9,7 +9,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v5.16.3
+## v5.17.0
 
 ### Added
 
