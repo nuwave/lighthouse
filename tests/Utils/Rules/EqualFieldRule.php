@@ -47,6 +47,7 @@ class EqualFieldRule implements Rule, DataAwareRule, WithReferenceRule
     public function setData($data): EqualFieldRule
     {
         $this->reference = Arr::get($data, $this->field);
+        
         return $this;
     }
 
