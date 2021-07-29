@@ -242,12 +242,12 @@ mutation {
 ### Custom Rules With References
 
 When creating custom validation rules with references, you need to tell Lighthouse
-which parameters are references, so it can add the full argument path:  
+which parameters are references, so it can add the full argument path:
 
 ```graphql
 input FooInput {
-    foo: Int
-    bar: Int @rules(apply: ["with_reference:equal_field,0,foo"])
+  foo: Int
+  bar: Int @rules(apply: ["with_reference:equal_field,0,foo"])
 }
 ```
 
@@ -255,6 +255,7 @@ In this example, `equal_field` is a custom rule that checks if the argument
 is the same as the one referenced by the parameter.
 
 The parameters to `with_reference` are:
+
 1. Name of the custom rule
 2. Indexes of the custom rule parameter that should be treated as a reference.
    Specify multiple indexes separated by `_`.
