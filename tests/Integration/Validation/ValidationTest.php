@@ -506,19 +506,6 @@ class ValidationTest extends TestCase
                 foo(
                     input: {
                         foo: 5
-                        bar: 5
-                    }
-                )
-            }
-            ')
-            ->assertGraphQLValidationPasses();
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(
-                    input: {
-                        foo: 5
                         bar: 6
                     }
                 )

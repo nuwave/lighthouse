@@ -2,12 +2,11 @@
 
 namespace Tests\Utils\Rules;
 
-use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\WithReferenceRule;
 
-class EqualFieldRule implements Rule, DataAwareRule, WithReferenceRule
+class EqualFieldRule implements Rule, WithReferenceRule
 {
     /**
      * @var string
@@ -33,22 +32,12 @@ class EqualFieldRule implements Rule, DataAwareRule, WithReferenceRule
     {
         $this->attribute = $attribute;
 
-        return $this->reference === $value;
+        return false;
     }
 
     public function message(): string
     {
         return "The $this->attribute must be equal to $this->field.";
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    public function setData($data): EqualFieldRule
-    {
-        $this->reference = Arr::get($data, $this->field);
-
-        return $this;
     }
 
     public function setArgumentPath(string $argumentPath): void
