@@ -263,6 +263,31 @@ type Mutation {
 }
 ```
 
+### Custom rules with reference
+
+When creating custom validation rules that need to reference other fields in the
+request you need to tell Lighthouse which parameters are references, so it can
+add the full argument path.  
+You can do this using the `with_reference` wrapper rule:
+
+```graphql
+input FooInput {
+    foo: Int
+    bar: Int @rules(apply: ["with_reference:equal_field,0,foo"])
+}
+```
+
+Where `equal_field` is a custom rule that checks if the field under validation
+is the same as the one referenced by the parameter.  
+The first argument of `with_reference` is the custom rule, and the second
+argument is the index of the parameter that should be treated as a reference.
+You can use a list of indexes separated by `_` to specify multiple parameters.
+
+Alternatively, if you are using custom rule classes you can implement the
+`WithReferenceRule` and define the `setArgumentPath` method. Lighthouse will
+call this method with the prefix which you can use to update the value in the
+rule.
+
 ## Customize Query Validation Rules
 
 By default, Lighthouse enables all default query validation rules from `webonyx/graphql-php`.
