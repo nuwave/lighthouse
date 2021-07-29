@@ -29,7 +29,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
         $ownedPosts = factory(Post::class, 3)->create([
             'user_id' => $user->getKey(),
         ]);
-        $nonOwnedPosts = factory(Post::class, 3)->create();
+        factory(Post::class, 3)->create();
 
         $this->be($user);
 
@@ -63,7 +63,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
         $ownedPosts = factory(Post::class, 3)->create([
             'user_id' => $user->getKey(),
         ]);
-        $nonOwnedPosts = factory(Post::class, 3)->create();
+        factory(Post::class, 3)->create();
 
         $authFactory = $this->app->make(AuthFactory::class);
         $authFactory->guard('api')->setUser($user);

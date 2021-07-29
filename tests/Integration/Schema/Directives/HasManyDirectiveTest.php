@@ -694,7 +694,7 @@ class HasManyDirectiveTest extends DBTestCase
             'parent_id' => $post1->getKey(),
         ]);
 
-        $post3 = factory(Post::class)->create([
+        factory(Post::class)->create([
             'id' => 3,
             'parent_id' => $post2->getKey(),
         ]);

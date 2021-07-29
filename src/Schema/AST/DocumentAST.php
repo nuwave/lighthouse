@@ -54,8 +54,6 @@ class DocumentAST implements Serializable, Arrayable
     /**
      * Create a new DocumentAST instance from a schema.
      *
-     * @return static
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      */
     public static function fromSource(string $schema): self
@@ -115,8 +113,6 @@ class DocumentAST implements Serializable, Arrayable
      * This operation will overwrite existing definitions with the same name.
      *
      * @param  \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node  $directive
-     *
-     * @return $this
      */
     public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self
     {

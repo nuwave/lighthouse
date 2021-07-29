@@ -197,12 +197,10 @@ GRAPHQL;
                 },
                 $ability
             );
-        } else {
-            if (! $gate->check($ability, $arguments)) {
-                throw new AuthorizationException(
-                    "You are not authorized to access {$this->nodeName()}"
-                );
-            }
+        } elseif (! $gate->check($ability, $arguments)) {
+            throw new AuthorizationException(
+                "You are not authorized to access {$this->nodeName()}"
+            );
         }
     }
 

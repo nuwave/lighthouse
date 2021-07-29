@@ -195,7 +195,6 @@ class DirectiveLocator
 
     /**
      * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
-     * @return $this
      */
     public function setResolved(string $directiveName, string $directiveClass): self
     {

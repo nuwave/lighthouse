@@ -1,21 +1,22 @@
 <?php
 
+use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
+use Rector\CodeQuality\Rector\ClassMethod\DateTimeToDateTimeInterfaceRector;
+use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
 use Rector\Core\Configuration\Option;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector;
+use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\SetList;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
+    $containerConfigurator->import(SetList::CODE_QUALITY);
+    $containerConfigurator->import(SetList::DEAD_CODE);
+
+    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_EXCEPTION);
+    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD);
+    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER);
+
     $parameters = $containerConfigurator->parameters();
-
-    $parameters->set(Option::SETS, [
-        SetList::CODE_QUALITY,
-        SetList::DEAD_CODE,
-        SetList::PHPUNIT_EXCEPTION,
-        SetList::PHPUNIT_SPECIFIC_METHOD,
-        SetList::PHPUNIT_YIELD_DATA_PROVIDER,
-    ]);
-
     $parameters->set(Option::SKIP, [
         // Does not fit autoloading standards
         __DIR__.'/tests/database/migrations',
@@ -23,7 +24,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         // Gets stuck on WhereConditionsBaseDirective for some reason
         __DIR__.'/src/WhereConditions',
 
-        // Having unused parameters can increase clarity, e.g. in event handlers
-        RemoveUnusedParameterRector::class,
+        // It is shorter and more efficient
+        CallableThisArrayToAnonymousFunctionRector::class,
+
+        // isset() is nice when moving towards typed properties
+        IssetOnPropertyObjectToPropertyExistsRector::class,
+
+        // We just want Carbon
+        DateTimeToDateTimeInterfaceRector::class,
     ]);
 };

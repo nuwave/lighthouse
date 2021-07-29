@@ -145,7 +145,6 @@ class ArgumentSet
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string>  $scopes
-     * @param  \Closure  $directiveFilter
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
      */
@@ -172,7 +171,6 @@ class ArgumentSet
      * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
@@ -216,7 +214,6 @@ class ArgumentSet
      * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      */
     protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder): void
@@ -234,7 +231,6 @@ class ArgumentSet
      * Works just like @see \Illuminate\Support\Arr::add().
      *
      * @param  mixed  $value Any value to inject.
-     * @return $this
      */
     public function addValue(string $path, $value): self
     {

@@ -62,7 +62,6 @@ abstract class BaseDirective implements Directive
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
      * @param  ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode  $definitionNode
-     * @return $this
      */
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
