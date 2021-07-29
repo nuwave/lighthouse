@@ -32,6 +32,7 @@ class EqualFieldRule implements Rule, DataAwareRule, WithReferenceRule
     public function passes($attribute, $value): bool
     {
         $this->attribute = $attribute;
+
         return $this->reference === $value;
     }
 
@@ -51,6 +52,6 @@ class EqualFieldRule implements Rule, DataAwareRule, WithReferenceRule
 
     public function setArgumentPath(string $argumentPath): void
     {
-        $this->field = $argumentPath . '.' . $this->field;
+        $this->field = $argumentPath.'.'.$this->field;
     }
 }

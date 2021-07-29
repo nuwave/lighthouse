@@ -435,6 +435,7 @@ class ValidationTest extends TestCase
     {
         ValidatorFactory::extendDependent('equal_field', function ($attribute, $value, $parameters, Validator $validator) {
             $reference = Arr::get($validator->getData(), $parameters[0]);
+
             return $reference === $value;
         }, 'The :attribute must be equal to :other.');
 

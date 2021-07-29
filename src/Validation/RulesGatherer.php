@@ -228,6 +228,7 @@ class RulesGatherer
                     if ($rule instanceof WithReferenceRule) {
                         $rule->setArgumentPath(implode('.', $argumentPath));
                     }
+
                     return $rule;
                 }
 
