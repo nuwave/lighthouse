@@ -40,7 +40,6 @@ class PaginationManipulator
      * Set the model class to use for code generation.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @return $this
      */
     public function setModelClass(string $modelClass): self
     {
@@ -54,8 +53,6 @@ class PaginationManipulator
      *
      * This makes either an offset-based Paginator or a cursor-based Connection.
      * The types in between are automatically generated and applied to the schema.
-     *
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      */
     public function transformToPaginatedField(
         PaginationType $paginationType,

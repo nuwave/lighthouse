@@ -225,8 +225,6 @@ class ASTHelper
 
     /**
      * Attach directive to all registered object type fields.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): void
     {
