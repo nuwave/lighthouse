@@ -10,7 +10,7 @@ class EqualFieldCustomRuleValidator extends Validator
     public function rules(): array
     {
         return [
-            'bar' => [new EqualFieldRule('foo')],
+            'bar' => [new EqualFieldRule()],
         ];
     }
 }

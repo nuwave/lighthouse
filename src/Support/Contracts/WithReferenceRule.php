@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+/**
+ * Used for custom validation classes with references to other arguments.
+ */
 interface WithReferenceRule
 {
     /**
-     * Used for custom validation classes so they can add the absolute argument
-     * path to any parameters that reference other fields that are being
-     * validated.
+     * Called with the argument path leading up to this argument, before validation runs.
      *
      * @param array<int|string> $argumentPath
      */
