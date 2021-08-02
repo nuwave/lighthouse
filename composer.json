@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "php": ">= 7.2",
+        "php": ">= 7.4",
         "ext-json": "*",
         "haydenpierce/class-finder": "^0.4",
         "illuminate/auth": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
