@@ -17,11 +17,23 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove interface `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`
 - Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
 
+## v5.17.0
+
+### Added
+
+- Add support for custom rules that reference other arguments https://github.com/nuwave/lighthouse/pull/1903
+
+## v5.16.2
+
+### Fixed
+
+- Allow using date validation rules that reference other arguments https://github.com/nuwave/lighthouse/pull/1900
+
 ## v5.16.1
 
 ### Fixed
 
-- Fix `ValidationErrorHandler` returned error type
+- Fix `ValidationErrorHandler` returned error type https://github.com/nuwave/lighthouse/commit/e9f97c117a50aab3c61cb104628696a97b5bfa2b
 
 ## v5.16.0
 

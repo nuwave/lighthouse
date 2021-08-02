@@ -20,9 +20,9 @@ class FirstDirectiveTest extends DBTestCase
         }
         ';
 
-        $userA = factory(User::class)->create(['name' => 'A']);
+        factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
-        $userC = factory(User::class)->create(['name' => 'C']);
+        factory(User::class)->create(['name' => 'C']);
 
         $this->graphQL("
         {
@@ -53,8 +53,8 @@ class FirstDirectiveTest extends DBTestCase
         ';
 
         $userA = factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'A']);
-        $userC = factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
+        factory(User::class)->create(['name' => 'B']);
 
         $this->graphQL('
         {

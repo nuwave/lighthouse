@@ -64,8 +64,6 @@ class SubscriptionRegistry
 
     /**
      * Add subscription to registry.
-     *
-     * @return $this
      */
     public function register(GraphQLSubscription $subscription, string $field): self
     {
@@ -119,9 +117,6 @@ class SubscriptionRegistry
 
     /**
      * Add subscription to registry.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @return $this
      */
     public function subscriber(Subscriber $subscriber, string $topic): self
     {
@@ -134,7 +129,6 @@ class SubscriptionRegistry
     /**
      * Get registered subscriptions.
      *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
      */
     public function subscriptions(Subscriber $subscriber): Collection

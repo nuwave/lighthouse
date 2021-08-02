@@ -81,9 +81,6 @@ class TypeRegistry
         $this->argumentFactory = $argumentFactory;
     }
 
-    /**
-     * @return $this
-     */
     public function setDocumentAST(DocumentAST $documentAST): self
     {
         $this->documentAST = $documentAST;
@@ -122,8 +119,6 @@ EOL
 
     /**
      * Register an executable GraphQL type.
-     *
-     * @return $this
      */
     public function register(Type $type): self
     {
@@ -139,8 +134,6 @@ EOL
 
     /**
      * Register a type, overwriting if it exists already.
-     *
-     * @return $this
      */
     public function overwrite(Type $type): self
     {
@@ -446,11 +439,9 @@ EOL
     protected function typeResolverFallback(): Closure
     {
         return function ($root): Type {
-            if (is_array($root) && isset($root['__typename'])) {
-                $name = $root['__typename'];
-            } else {
-                $name = class_basename($root);
-            }
+            $name = is_array($root) && isset($root['__typename'])
+                ? $root['__typename']
+                : class_basename($root);
 
             return $this->get($name);
         };

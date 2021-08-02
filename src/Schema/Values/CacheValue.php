@@ -52,7 +52,6 @@ class CacheValue
     /**
      * @param  mixed|null  $root The root that was passed to the query.
      * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      */
     public function __construct(
         $root,

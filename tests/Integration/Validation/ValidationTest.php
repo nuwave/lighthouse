@@ -3,6 +3,9 @@
 namespace Tests\Integration\Validation;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator as ValidatorFactory;
+use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
@@ -384,6 +387,130 @@ class ValidationTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is baz.');
+    }
+
+    public function testOptionalFieldReferencesAreQualified(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom {
+            foo: String @rules(apply: ["after:2018-01-01"])
+            bar: String @rules(apply: ["after:foo"])
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "2019-01-01"
+                        bar: "2020-01-01"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "2017-01-01"
+                        bar: "2016-01-01"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.foo', 'The input.foo must be a date after 2018-01-01.')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar must be a date after input.foo.');
+    }
+
+    public function testCustomValidationWithReferencesAreQualified(): void
+    {
+        ValidatorFactory::extendDependent('equal_field', function ($attribute, $value, $parameters, Validator $validator) {
+            $reference = Arr::get($validator->getData(), $parameters[0]);
+
+            return $reference === $value;
+        }, 'The :attribute must be equal to :other.');
+
+        ValidatorFactory::replacer('equal_field', function (string $message, string $attribute, string $rule, array $parameters) {
+            return str_replace(':other', implode(', ', $parameters), $message);
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom {
+            foo: Int
+            bar: Int @rules(apply: ["with_reference:equal_field,0,foo"])
+            baz: Int @rules(apply: ["with_reference:equal_field,0_1,foo,bar"])
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: 5
+                        bar: 5
+                        baz: 5
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: 5
+                        bar: 6
+                        baz: 7
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar must be equal to input.foo.')
+            ->assertGraphQLValidationError('input.baz', 'The input.baz must be equal to input.foo, input.bar.');
+    }
+
+    public function testCustomValidationClassWithReferencesAreQualified(): void
+    {
+        config(['app.debug' => true]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String
+        }
+
+        input Custom @validator(class: "Tests\\\\Utils\\\\Validators\\\\EqualFieldCustomRuleValidator") {
+            foo: Int
+            bar: Int
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: 5
+                        bar: 6
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'input');
     }
 
     public function testMultipleFieldReferencesAreQualified(): void

@@ -154,7 +154,6 @@ class Subscriber implements Serializable
     /**
      * Set root data.
      *
-     * @return $this
      * @deprecated set the attribute directly
      */
     public function setRoot($root): self

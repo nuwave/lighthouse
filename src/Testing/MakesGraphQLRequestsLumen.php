@@ -41,7 +41,6 @@ trait MakesGraphQLRequestsLumen
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
-     * @return $this
      */
     protected function graphQL(string $query, array $variables = [], array $extraParams = []): self
     {
@@ -65,7 +64,6 @@ trait MakesGraphQLRequestsLumen
      *
      * @param  array<mixed, mixed>  $data
      * @param  array<string, string>  $headers
-     * @return $this
      */
     protected function postGraphQL(array $data, array $headers = []): self
     {
@@ -116,8 +114,6 @@ trait MakesGraphQLRequestsLumen
 
     /**
      * Execute the introspection query on the GraphQL server.
-     *
-     * @return $this
      */
     protected function introspect(): self
     {

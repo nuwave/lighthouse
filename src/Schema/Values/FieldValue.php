@@ -61,8 +61,6 @@ class FieldValue
 
     /**
      * Overwrite the current/default resolver.
-     *
-     * @return $this
      */
     public function setResolver(callable $resolver): self
     {
@@ -73,8 +71,6 @@ class FieldValue
 
     /**
      * Use the default resolver.
-     *
-     * @return $this
      */
     public function useDefaultResolver(): self
     {
@@ -87,8 +83,6 @@ class FieldValue
 
     /**
      * Define a closure that is used to determine the complexity of the field.
-     *
-     * @return $this
      */
     public function setComplexity(Closure $complexity): self
     {

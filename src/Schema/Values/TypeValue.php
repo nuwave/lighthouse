@@ -58,8 +58,6 @@ class TypeValue
 
     /**
      * Set node cache key.
-     *
-     * @return $this
      */
     public function setCacheKey(string $key = null): self
     {
