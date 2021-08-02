@@ -14,9 +14,9 @@ class Any extends ScalarType
 {
     const MESSAGE = 'Expected an input with a field `__typename` and matching fields, got: ';
 
-    public $name = '_Any';
+    public string $name = '_Any';
 
-    public $description = /** @lang Markdown */ <<<'DESCRIPTION'
+    public ?string $description = /** @lang Markdown */ <<<'DESCRIPTION'
 Representation of entities from external services for the root `_entities` field.
 DESCRIPTION;
 

@@ -105,9 +105,12 @@ GRAPHQL;
         return ' '
             .implode(
                 ' ',
-                Utils::map($directives, static function (DirectiveNode $directive): string {
-                    return Printer::doPrint($directive);
-                })
+                array_map(
+                    static function (DirectiveNode $directive): string {
+                        return Printer::doPrint($directive);
+                    },
+                    $directives
+                )
             );
     }
 }
