@@ -9,7 +9,6 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter as GraphQLSchemaPrinter;
-use GraphQL\Utils\Utils;
 
 class SchemaPrinter extends GraphQLSchemaPrinter
 {
