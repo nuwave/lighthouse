@@ -208,8 +208,7 @@ EOL
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
                 $typeResolver = $this->directiveLocator->exclusiveOfType($definition, TypeResolver::class);
-                if ($typeResolver !== null) {
-                    /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
+                if ($typeResolver instanceof TypeResolver) {
                     return $typeResolver->resolveNode($value);
                 }
 
@@ -253,12 +252,11 @@ EOL
         $values = [];
 
         foreach ($enumDefinition->values as $enumValue) {
-            /** @var \Nuwave\Lighthouse\Schema\Directives\EnumDirective|null $enumDirective */
             $enumDirective = $this->directiveLocator->exclusiveOfType($enumValue, EnumDirective::class);
 
             $values[$enumValue->name->value] = [
                 // If no explicit value is given, we default to the name of the value
-                'value' => $enumDirective !== null
+                'value' => $enumDirective instanceof EnumDirective
                     ? $enumDirective->value()
                     : $enumValue->name->value,
                 'description' => data_get($enumValue->description, 'value'),
