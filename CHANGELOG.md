@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.18.0
+
+### Changed
+
+- Mark `@guard` and `@namespace` directives as `repeatable` https://github.com/nuwave/lighthouse/issues/1907
+
 ## v5.17.0
 
 ### Added

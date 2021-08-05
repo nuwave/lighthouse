@@ -1183,12 +1183,12 @@ users to still receive partial results.
 Used upon an object, it applies to all fields within.
 """
 directive @guard(
-  """
-  Specify which guards to use, e.g. ["api"].
-  When not defined, the default from `lighthouse.php` is used.
-  """
-  with: [String!]
-) on FIELD_DEFINITION | OBJECT
+    """
+    Specify which guards to use, e.g. ["api"].
+    When not defined, the default from `lighthouse.php` is used.
+    """
+    with: [String!]
+) repeatable on FIELD_DEFINITION | OBJECT
 ```
 
 Note that [@guard](#guard) does not log in users.
@@ -1791,7 +1791,7 @@ union Imageable = Post | User
 Redefine the default namespaces used in other directives.
 The arguments are a map from directive names to namespaces.
 """
-directive @namespace on FIELD_DEFINITION | OBJECT
+directive @namespace repeatable on FIELD_DEFINITION | OBJECT
 ```
 
 The following example applies the namespace `App\Blog`
