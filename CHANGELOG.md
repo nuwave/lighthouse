@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.18.1
+
+### Fixed
+
+- Fix compatibility with Laravel Octane https://github.com/nuwave/lighthouse/pull/1911
+
 ## v5.18.0
 
 ### Changed
