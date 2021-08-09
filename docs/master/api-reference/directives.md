@@ -1183,11 +1183,11 @@ users to still receive partial results.
 Used upon an object, it applies to all fields within.
 """
 directive @guard(
-    """
-    Specify which guards to use, e.g. ["api"].
-    When not defined, the default from `lighthouse.php` is used.
-    """
-    with: [String!]
+  """
+  Specify which guards to use, e.g. ["api"].
+  When not defined, the default from `lighthouse.php` is used.
+  """
+  with: [String!]
 ) repeatable on FIELD_DEFINITION | OBJECT
 ```
 
