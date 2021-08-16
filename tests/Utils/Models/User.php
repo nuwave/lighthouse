@@ -117,4 +117,19 @@ class User extends Authenticatable
         return $this->tasksLoaded()
             && $this->postsCommentsLoaded();
     }
+
+    public function postsTaskLoaded(): bool
+    {
+        return $this->relationLoaded('posts')
+            && $this
+                ->posts
+                ->first()
+                ->relationLoaded('task');
+    }
+
+    public function postTasksAndPostsCommentsLoaded(): bool
+    {
+        return $this->postsTaskLoaded()
+            && $this->postsCommentsLoaded();
+    }
 }

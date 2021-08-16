@@ -287,6 +287,66 @@ class WithDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users: User
+                @first
+        }
+
+        type User {
+            postTasksAndPostsCommentsLoaded: Boolean!
+                @with(relation: "posts.task")
+                @with(relation: "posts.comments")
+                @method
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+        $taskA = factory(Task::class)->create([
+            'user_id' => $user->getKey(),
+        ]);
+        $taskB = factory(Task::class)->create([
+            'user_id' => $user->getKey(),
+        ]);
+        $postA = factory(Post::class)->create([
+            'user_id' => $user->id,
+            'task_id' => $taskA->getKey(),
+        ]);
+        $postB = factory(Post::class)->create([
+            'user_id' => $user->id,
+            'task_id' => $taskB->getKey(),
+        ]);
+
+        foreach ([$postA, $postB] as $post) {
+            factory(Comment::class)->create([
+                'post_id' => $post->id,
+                'user_id' => $user->id,
+            ]);
+        }
+
+        // Sanity check
+        $this->assertFalse(
+            $user->tasksAndPostsCommentsLoaded()
+        );
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                postTasksAndPostsCommentsLoaded
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'postTasksAndPostsCommentsLoaded' => true,
+                ],
+            ],
+        ]);
+    }
+
     public function testWithDirectiveOnRootFieldThrows(): void
     {
         $this->expectException(DefinitionException::class);
