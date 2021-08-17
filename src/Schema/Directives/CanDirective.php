@@ -56,6 +56,11 @@ directive @can(
   find: String
 
   """
+  If you need to resolve your model by a different primary key than the default one.
+  """
+  field: String
+
+  """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
   """
@@ -151,7 +156,11 @@ GRAPHQL;
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
 
-                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
+                if ($field = $this->directiveArgValue('field')) {
+                    $modelOrModels = $enhancedBuilder->where($field, $findValue)->firstOrFail();
+                } else {
+                    $modelOrModels = $enhancedBuilder->findOrFail($findValue);
+                }
             } catch (ModelNotFoundException $exception) {
                 throw new Error($exception->getMessage());
             }
