@@ -122,7 +122,7 @@ GRAPHQL;
                             $this->getModelClass()::query(),
                             $this->directiveArgValue('scopes', [])
                         )->get();
-                    if (!$models->count()) {
+                    if (! $models->count()) {
                         $exception = (new ModelNotFoundException)->setModel($this->getModelClass());
                         throw new Error($exception->getMessage());
                     }
@@ -264,7 +264,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
         if ($this->directiveHasArgument('field') && $this->directiveHasArgument('findByArgs')) {
-            throw new DefinitionException("Can not use the argument `field` in combination with the `findByArgs` argument.");
+            throw new DefinitionException('Can not use the argument `field` in combination with the `findByArgs` argument.');
         }
     }
 }
