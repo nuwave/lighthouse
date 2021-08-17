@@ -544,6 +544,18 @@ directive @can(
   injectArgs: Boolean = false
 
   """
+  Resolve the model by directive args like @eq, @where etc.
+  You may not use the find argument in combination with findByArgs
+  """
+  findByArgs: Boolean = false
+  
+  """
+  Apply scopes to the underlying query.
+  The scopes can only be used in combination with the findByArgs argument
+  """
+  scopes: [String!]
+
+  """
   Statically defined arguments that are passed to `Gate::check`.
 
   You may pass pass arbitrary GraphQL literals,
@@ -567,6 +579,15 @@ type Mutation {
     @can(ability: "create", model: "App\\Post")
 }
 ```
+
+To resolve the `model` by the same query as applied for the `@find` directive you may use the `findByArgs` argument. Be aware that the `find` argument can't be used in combination.
+
+```graphql
+type Query {
+  fetchUserByEmail(email: String @eq): User @can(ability: "view", findByArgs: true) @find
+}
+```
+
 
 You can find usage examples of this directive in [the authorization docs](../security/authorization.md#restrict-fields-through-policies).
 

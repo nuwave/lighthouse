@@ -113,6 +113,20 @@ Finding models combines nicely with [soft deleting](../eloquent/soft-deleting.md
 Lighthouse will detect if the query will require a filter for trashed models and
 apply that as needed.
 
+If you need to resolve the `model` by another key than the primary key you may use the `findByArgs` argument.  
+Be aware that the `find` argument can't be used in combination.
+
+In the below example, the `model` is fetched by the email instead of the users ID.
+
+```graphql
+type Query {
+  fetchUserByEmail(email: String @eq): User
+    @can(ability: "view", findByArgs: true)
+    @find 
+    @softDeletes
+}
+```
+
 ### Passing additional arguments
 
 You can pass additional arguments to the policy checks by specifying them as `args`:

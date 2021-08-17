@@ -2,7 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
@@ -283,6 +286,242 @@ class CanDirectiveDBTest extends DBTestCase
             'data' => [
                 'task' => [
                     'name' => $task->name,
+                ],
+            ],
+        ]);
+    }
+
+    public function testQueriesForSpecificModelWithFindByArgs(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(name: String @eq): User
+                @can(ability: "view", findByArgs: true)
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(name: \"{$user->name}\") {
+                name
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    public function testFailsToFindSpecificModelWithFindByArgs(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolverExpects(
+            $this->never()
+        );
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", findByArgs: true)
+                @mock
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        //$this->expectException(ModelNotFoundException::class);
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(id: "not-present") {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+            'errors' => [
+                [
+                    'message' => 'No query results for model [Tests\Utils\Models\User].',
+                ],
+            ],
+        ]);
+    }
+
+    public function testHandleMultipleModelsWithFindByArgs(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $postA = factory(Post::class)->create([
+            'user_id' => $user->getKey(),
+            'title' => 'Harry Potter and the Half-Blood Prince',
+        ]);
+        $postB = factory(Post::class)->create([
+            'user_id' => $user->getKey(),
+            'title' => 'Harry Potter and the Chamber of Secrets',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            deletePosts(ids: [ID!]!): [Post!]!
+                @can(ability: "delete", findByArgs: true)
+                @delete
+        }
+
+        type Post {
+            id: ID!
+            title: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            deletePosts(ids: [{$postA->getKey()}, {$postB->getKey()}]) {
+                title
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'deletePosts' => [
+                    [
+                        'title' => 'Harry Potter and the Half-Blood Prince',
+                    ],
+                    [
+                        'title' => 'Harry Potter and the Chamber of Secrets',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWorksWithSoftDeletesWithFindByArgs(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $task = factory(Task::class)->create();
+        $task->delete();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            task(id: ID @eq): Task
+                @can(ability: "adminOnly", findByArgs: true)
+                @softDeletes
+                @find
+        }
+
+        type Task {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            task(id: {$task->getKey()}, trashed: WITH) {
+                name
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'task' => [
+                    'name' => $task->name,
+                ],
+            ],
+        ]);
+    }
+
+    public function testFindAndFindByArgsValidation(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", find: "id", findByArgs: true)
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(id: {$user->getKey()}) {
+                name
+            }
+        }
+        ");
+    }
+
+    public function testScopesWithFindByArgs(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $user = factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(name: String @eq): User
+                @can(ability: "view", findByArgs: true)
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(name: \"{$user->name}\") {
+                name
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
                 ],
             ],
         ]);

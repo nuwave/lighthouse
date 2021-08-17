@@ -4,23 +4,28 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\AppVersion;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-class CanDirective extends BaseDirective implements FieldMiddleware
+class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     /**
      * @var \Illuminate\Contracts\Auth\Access\Gate
@@ -67,6 +72,18 @@ directive @can(
   injectArgs: Boolean = false
 
   """
+  Resolve the model by directive args like @eq, @where etc.
+  You may not use the find argument in combination with findByArgs
+  """
+  findByArgs: Boolean = false
+
+  """
+  Apply scopes to the underlying query.
+  The scopes can only be used in combination with the findByArgs argument
+  """
+  scopes: [String!]
+
+  """
   Statically defined arguments that are passed to `Gate::check`.
 
   You may pass pass arbitrary GraphQL literals,
@@ -95,7 +112,25 @@ GRAPHQL;
                 $gate = $this->gate->forUser($context->user());
                 $checkArguments = $this->buildCheckArguments($args);
 
-                foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
+                if ($this->directiveArgValue('findByArgs') === true) {
+                    if ($this->directiveArgValue('find') !== null) {
+                        throw new DefinitionException("Can not use the argument 'find' when 'findByArgs' is true");
+                    }
+                    $models = $resolveInfo
+                        ->argumentSet
+                        ->enhanceBuilder(
+                            $this->getModelClass()::query(),
+                            $this->directiveArgValue('scopes', [])
+                        )->get();
+                    if (!$models->count()) {
+                        $exception = (new ModelNotFoundException)->setModel($this->getModelClass());
+                        throw new Error($exception->getMessage());
+                    }
+                } else {
+                    $models = $this->modelsToCheck($resolveInfo->argumentSet, $args);
+                }
+
+                foreach ($models as $model) {
                     $this->authorize($gate, $ability, $model, $checkArguments);
                 }
 
@@ -147,7 +182,7 @@ GRAPHQL;
                  */
                 $enhancedBuilder = $argumentSet->enhanceBuilder(
                     $queryBuilder,
-                    [],
+                    $this->directiveArgValue('scopes', []),
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
 
@@ -224,5 +259,12 @@ GRAPHQL;
         }
 
         return $checkArguments;
+    }
+
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    {
+        if ($this->directiveHasArgument('field') && $this->directiveHasArgument('findByArgs')) {
+            throw new DefinitionException("Can not use the argument `field` in combination with the `findByArgs` argument.");
+        }
     }
 }
