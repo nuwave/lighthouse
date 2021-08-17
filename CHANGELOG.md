@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
+- Allow the @can directive to resolve models by a custom key https://github.com/nuwave/lighthouse/issues/1916
 
 ## v5.18.1
 
