@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
