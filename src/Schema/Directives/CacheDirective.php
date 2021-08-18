@@ -70,20 +70,20 @@ GRAPHQL;
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
                 $cacheValue = new CacheValue(
-                $root,
-                $args,
-                $context,
-                $resolveInfo,
-                $fieldValue,
-                $isPrivate
-            );
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo,
+                    $fieldValue,
+                    $isPrivate
+                );
 
                 $cacheKey = $cacheValue->getKey();
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
-                ? $this->cacheRepository->tags($cacheValue->getTags())
-                : $this->cacheRepository;
+                    ? $this->cacheRepository->tags($cacheValue->getTags())
+                    : $this->cacheRepository;
 
                 // We found a matching value in the cache, so we can just return early
                 // without actually running the query
@@ -118,9 +118,9 @@ GRAPHQL;
                 $resolved = $resolver($root, $args, $context, $resolveInfo);
 
                 $storeInCache = $maxAge
-                ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
-                    $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
-                }
+                    ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
+                        $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
+                    }
                 : static function ($result) use ($cacheKey, $cache): void {
                     $cache->forever($cacheKey, $result);
                 };

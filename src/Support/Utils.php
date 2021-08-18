@@ -101,7 +101,7 @@ class Utils
     /**
      * Determine if a class uses a trait.
      *
-     * @param  object|string  $class
+     * @param  object|class-string  $class
      */
     public static function classUsesTrait($class, string $trait): bool
     {
@@ -114,6 +114,7 @@ class Utils
     /**
      * Construct a callback that checks if its input is a given class.
      *
+     * @param  class-string  $classLike
      * @return Closure(mixed): bool
      */
     public static function instanceofMatcher(string $classLike): Closure

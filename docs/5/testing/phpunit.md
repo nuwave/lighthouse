@@ -48,7 +48,7 @@ If you want to use variables within your query, pass an associative array as the
 public function testCreatePost(): void
 {
     $response = $this->graphQL(/** @lang GraphQL */ '
-        mutation CreatePost($title: String!) {
+        mutation ($title: String!) {
             createPost(title: $title) {
                 id
             }
@@ -87,9 +87,9 @@ public function testQueriesPosts(): void
                 [
                     'id' => $post->id,
                     'title' => $post->title,
-                ]
-            ]
-        ]
+                ],
+            ],
+        ],
     ]);
 }
 ```
@@ -189,10 +189,11 @@ helper method.
 
 ```php
 $operations = [
-    'operationName' => 'upload',
-    'query' => 'mutation upload ($file: Upload!) {
-                    upload (file: $file)
-                }',
+    'query' => /** @lang GraphQL */ '
+        mutation ($file: Upload!) {
+            upload(file: $file)
+        }
+    ',
     'variables' => [
         'file' => null,
     ],
@@ -307,8 +308,8 @@ public function testHelloWorld(): void
     }
     ')->seeJson([
         'data' => [
-            'hello' => 'world'
-        ]
+            'hello' => 'world',
+        ],
     ])->seeHeader('SomeHeader', 'value');
 }
 ```

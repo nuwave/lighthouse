@@ -18,6 +18,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
 - Remove support for PHP 7.2, 7.3
 
+## v5.18.1
+
+### Fixed
+
+- Fix compatibility with Laravel Octane https://github.com/nuwave/lighthouse/pull/1911
+
+## v5.18.0
+
+### Changed
+
+- Mark `@guard` and `@namespace` directives as `repeatable` https://github.com/nuwave/lighthouse/issues/1907
+
 ## v5.17.0
 
 ### Added

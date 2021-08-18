@@ -56,31 +56,36 @@ class ConnectionField
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
 
-        return $paginator
-            ->values()
-            ->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
-                $data = [];
+        /**
+         * The return type `static` refers to the wrong class because it is a proxied method call.
+         *
+         * @var \Illuminate\Support\Collection<mixed> $values
+         */
+        $values = $paginator->values();
 
-                foreach ($returnTypeFields as $field) {
-                    switch ($field->name) {
-                        case 'cursor':
-                            $data['cursor'] = Cursor::encode((int) $firstItem + $index);
-                            break;
+        return $values->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
+            $data = [];
 
-                        case 'node':
-                            $data['node'] = $item;
-                            break;
+            foreach ($returnTypeFields as $field) {
+                switch ($field->name) {
+                    case 'cursor':
+                        $data['cursor'] = Cursor::encode((int) $firstItem + $index);
+                        break;
 
-                        default:
-                            // All other fields on the return type are assumed to be part
-                            // of the edge, so we try to locate them in the pivot attribute
-                            if (isset($item->pivot->{$field->name})) {
-                                $data[$field->name] = $item->pivot->{$field->name};
-                            }
-                    }
+                    case 'node':
+                        $data['node'] = $item;
+                        break;
+
+                    default:
+                        // All other fields on the return type are assumed to be part
+                        // of the edge, so we try to locate them in the pivot attribute
+                        if (isset($item->pivot->{$field->name})) {
+                            $data[$field->name] = $item->pivot->{$field->name};
+                        }
                 }
+            }
 
-                return $data;
-            });
+            return $data;
+        });
     }
 }

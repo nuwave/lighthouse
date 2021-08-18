@@ -32,7 +32,13 @@ class SimplePaginatorField
      */
     public function dataResolver(Paginator $root): Collection
     {
-        // @phpstan-ignore-next-line static refers to the wrong class because it is a proxied method call
-        return $root->values();
+        /**
+         * The return type `static` refers to the wrong class because it is a proxied method call.
+         *
+         * @var \Illuminate\Support\Collection<mixed> $values
+         */
+        $values = $root->values();
+
+        return $values;
     }
 }

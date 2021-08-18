@@ -36,8 +36,11 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run authentication through one or more guards.
+
 This is run per field and may allow unauthenticated
 users to still receive partial results.
+
+Used upon an object, it applies to all fields within.
 """
 directive @guard(
   """
@@ -45,7 +48,7 @@ directive @guard(
   When not defined, the default from `lighthouse.php` is used.
   """
   with: [String!]
-) on FIELD_DEFINITION | OBJECT
+) repeatable on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
