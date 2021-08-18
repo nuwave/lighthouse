@@ -16,6 +16,7 @@ trait ClearsSchemaCache
     {
         if (! static::$schemaCacheWasCleared) {
             $this->artisan('lighthouse:clear-cache');
+            self::$schemaCacheWasCleared = true;
         }
     }
 }
