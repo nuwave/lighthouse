@@ -551,7 +551,6 @@ directive @can(
   
   """
   Apply scopes to the underlying query.
-  The scopes can only be used in combination with the findByArgs argument
   """
   scopes: [String!]
 

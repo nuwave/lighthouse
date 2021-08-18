@@ -341,7 +341,7 @@ class CanDirectiveDBTest extends DBTestCase
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", findByArgs: true)
-                @mock
+                @find
         }
 
         type User {
@@ -359,11 +359,6 @@ class CanDirectiveDBTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => null,
-            ],
-            'errors' => [
-                [
-                    'message' => 'No query results for model [Tests\Utils\Models\User].',
-                ],
             ],
         ]);
     }

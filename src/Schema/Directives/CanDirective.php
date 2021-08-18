@@ -118,10 +118,6 @@ GRAPHQL;
                             $this->getModelClass()::query(),
                             $this->directiveArgValue('scopes', [])
                         )->get();
-                    if (! $models->count()) {
-                        $exception = (new ModelNotFoundException)->setModel($this->getModelClass());
-                        throw new Error($exception->getMessage());
-                    }
                 } else {
                     $models = $this->modelsToCheck($resolveInfo->argumentSet, $args);
                 }
