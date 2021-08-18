@@ -14,13 +14,12 @@ class CanDirectiveDBTest extends DBTestCase
 {
     public function testQueriesForSpecificModel(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
-        $user = factory(User::class)->create([
-            'name' => 'foo',
-        ]);
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -30,21 +29,22 @@ class CanDirectiveDBTest extends DBTestCase
         }
 
         type User {
-            id: ID!
             name: String!
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            user(id: {$user->getKey()}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            user(id: $id) {
                 name
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $user->getKey(),
+        ])->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foo',
+                    'name' => $user->name,
                 ],
             ],
         ]);
@@ -68,7 +68,6 @@ class CanDirectiveDBTest extends DBTestCase
         }
 
         type User {
-            id: ID!
             name: String!
         }
         ';
@@ -105,7 +104,6 @@ class CanDirectiveDBTest extends DBTestCase
         }
 
         type User {
-            id: ID!
             name: String!
         }
         ';
@@ -121,9 +119,8 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testFindUsingNestedInputWithDotNotation(): void
     {
-        $user = factory(User::class)->create([
-            'name' => 'foo',
-        ]);
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
         $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
@@ -134,17 +131,16 @@ class CanDirectiveDBTest extends DBTestCase
         }
 
         type User {
-            id: ID!
             name: String!
         }
 
         input FindUserInput {
-          id: ID
+          id: ID!
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($id: ID){
+        query ($id: ID!) {
             user(input: {
               id: $id
             }) {
@@ -156,7 +152,7 @@ class CanDirectiveDBTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foo',
+                    'name' => $user->name,
                 ],
             ],
         ]);
@@ -164,18 +160,17 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testThrowsIfNotAuthorized(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
-        $userB = new User();
-        $userB->name = 'foo';
-        $userB->save();
+        /** @var \Tests\Utils\Models\User $author */
+        $author = factory(User::class)->create();
 
-        $postB = factory(Post::class)->create([
-            'user_id' => $userB->getKey(),
-            'title' => 'Harry Potter and the Half-Blood Prince',
-        ]);
+        /** @var \Tests\Utils\Models\Post $post */
+        $post = factory(Post::class)->make();
+        $post->user()->associate($author);
+        $post->save();
 
         $this->mockResolverExpects(
             $this->never()
@@ -183,68 +178,71 @@ class CanDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            post(foo: ID @eq): Post
+            post(foo: ID! @eq): Post
                 @can(ability: "view", find: "foo")
                 @mock
         }
 
         type Post {
-            id: ID!
             title: String!
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            post(foo: {$postB->getKey()}) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($foo: ID!) {
+            post(foo: $foo) {
                 title
             }
         }
-        ")->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        ', [
+            'foo' => $post->id,
+        ])->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testHandleMultipleModels(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
-        $postA = factory(Post::class)->create([
-            'user_id' => $user->getKey(),
-            'title' => 'Harry Potter and the Half-Blood Prince',
-        ]);
-        $postB = factory(Post::class)->create([
-            'user_id' => $user->getKey(),
-            'title' => 'Harry Potter and the Chamber of Secrets',
-        ]);
+        /** @var \Tests\Utils\Models\Post $postA */
+        $postA = factory(Post::class)->make();
+        $postA->user()->associate($admin);
+        $postA->save();
+
+        /** @var \Tests\Utils\Models\Post $postB */
+        $postB = factory(Post::class)->make();
+        $postB->user()->associate($admin);
+        $postB->save();
 
         $this->schema = /** @lang GraphQL */ '
-        type Query {
+        type Mutation {
             deletePosts(ids: [ID!]!): [Post!]!
                 @can(ability: "delete", find: "ids")
                 @delete
         }
 
         type Post {
-            id: ID!
             title: String!
         }
-        ';
+        ' . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            deletePosts(ids: [{$postA->getKey()}, {$postB->getKey()}]) {
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($ids: [ID!]!) {
+            deletePosts(ids: $ids) {
                 title
             }
         }
-        ")->assertJson([
+        ', [
+            'ids' => [$postA->id, $postB->id],
+        ])->assertJson([
             'data' => [
                 'deletePosts' => [
                     [
-                        'title' => 'Harry Potter and the Half-Blood Prince',
+                        'title' => $postA->title,
                     ],
                     [
-                        'title' => 'Harry Potter and the Chamber of Secrets',
+                        'title' => $postB->title,
                     ],
                 ],
             ],
@@ -253,16 +251,17 @@ class CanDirectiveDBTest extends DBTestCase
 
     public function testWorksWithSoftDeletes(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
+        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
         $task->delete();
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            task(id: ID @eq): Task
+            task(id: ID! @eq): Task
                 @can(ability: "adminOnly", find: "id")
                 @softDeletes
                 @find
@@ -273,13 +272,15 @@ class CanDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            task(id: {$task->getKey()}, trashed: WITH) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            task(id: $id, trashed: WITH) {
                 name
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $task->id,
+        ])->assertJson([
             'data' => [
                 'task' => [
                     'name' => $task->name,
@@ -288,49 +289,49 @@ class CanDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testQueriesForSpecificModelWithFindByArgs(): void
+    public function testQueriesForSpecificModelWithQuery(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
-        $user = factory(User::class)->create([
-            'name' => 'foo',
-        ]);
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(name: String @eq): User
+            user(name: String! @eq): User
                 @can(ability: "view", query: true)
                 @first
         }
 
         type User {
-            id: ID!
             name: String!
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            user(name: \"{$user->name}\") {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($name: String!) {
+            user(name: $name) {
                 name
             }
         }
-        ")->assertJson([
+        ', [
+            'name' => $user->name,
+        ])->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foo',
+                    'name' => $user->name,
                 ],
             ],
         ]);
     }
 
-    public function testFailsToFindSpecificModelWithFindByArgs(): void
+    public function testFailsToFindSpecificModelWithQuery(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
         $this->mockResolverExpects(
             $this->never()
@@ -338,21 +339,20 @@ class CanDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @eq): User
+            user(id: ID! @eq): User
                 @can(ability: "view", query: true)
                 @find
         }
 
         type User {
             id: ID!
-            name: String!
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             user(id: "not-present") {
-                name
+                id
             }
         }
         ')->assertJson([
@@ -362,66 +362,69 @@ class CanDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testHandleMultipleModelsWithFindByArgs(): void
+    public function testHandleMultipleModelsWithQuery(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
-        $postA = factory(Post::class)->create([
-            'user_id' => $user->getKey(),
-            'title' => 'Harry Potter and the Half-Blood Prince',
-        ]);
-        $postB = factory(Post::class)->create([
-            'user_id' => $user->getKey(),
-            'title' => 'Harry Potter and the Chamber of Secrets',
-        ]);
+        /** @var \Tests\Utils\Models\Post $postA */
+        $postA = factory(Post::class)->make();
+        $postA->user()->associate($admin);
+        $postA->save();
+
+        /** @var \Tests\Utils\Models\Post $postB */
+        $postB = factory(Post::class)->make();
+        $postB->user()->associate($admin);
+        $postB->save();
 
         $this->schema = /** @lang GraphQL */ '
-        type Query {
+        type Mutation {
             deletePosts(ids: [ID!]!): [Post!]!
                 @can(ability: "delete", query: true)
                 @delete
         }
 
         type Post {
-            id: ID!
             title: String!
         }
-        ';
+        ' . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            deletePosts(ids: [{$postA->getKey()}, {$postB->getKey()}]) {
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($ids: [ID!]!) {
+            deletePosts(ids: $ids) {
                 title
             }
         }
-        ")->assertJson([
+        ', [
+            'ids' => [$postA->id, $postB->id],
+        ])->assertJson([
             'data' => [
                 'deletePosts' => [
                     [
-                        'title' => 'Harry Potter and the Half-Blood Prince',
+                        'title' => $postA->title,
                     ],
                     [
-                        'title' => 'Harry Potter and the Chamber of Secrets',
+                        'title' => $postB->title,
                     ],
                 ],
             ],
         ]);
     }
 
-    public function testWorksWithSoftDeletesWithFindByArgs(): void
+    public function testWorksWithSoftDeletesWithQuery(): void
     {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
 
+        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
         $task->delete();
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            task(id: ID @eq): Task
+            task(id: ID! @eq): Task
                 @can(ability: "adminOnly", query: true)
                 @softDeletes
                 @find
@@ -432,54 +435,18 @@ class CanDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            task(id: {$task->getKey()}, trashed: WITH) {
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            task(id: $id, trashed: WITH) {
                 name
             }
         }
-        ")->assertJson([
+        ', [
+            'id' => $task->id,
+        ])->assertJson([
             'data' => [
                 'task' => [
                     'name' => $task->name,
-                ],
-            ],
-        ]);
-    }
-
-    public function testScopesWithFindByArgs(): void
-    {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
-
-        $user = factory(User::class)->create([
-            'name' => 'foo',
-        ]);
-
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            user(name: String @eq): User
-                @can(ability: "view", query: true)
-                @first
-        }
-
-        type User {
-            id: ID!
-            name: String!
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            user(name: \"{$user->name}\") {
-                name
-            }
-        }
-        ")->assertJson([
-            'data' => [
-                'user' => [
-                    'name' => 'foo',
                 ],
             ],
         ]);
