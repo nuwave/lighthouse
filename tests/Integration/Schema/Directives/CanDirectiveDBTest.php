@@ -463,7 +463,8 @@ class CanDirectiveDBTest extends DBTestCase
             'name' => 'foo',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->expectException(DefinitionException::class);
+        $this->buildSchema(/** @lang GraphQL */ '
         type Query {
             user(id: ID @eq): User
                 @can(ability: "view", find: "id", findByArgs: true)
@@ -474,16 +475,8 @@ class CanDirectiveDBTest extends DBTestCase
             id: ID!
             name: String!
         }
-        ';
+        ');
 
-        $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            user(id: {$user->getKey()}) {
-                name
-            }
-        }
-        ");
     }
 
     public function testScopesWithFindByArgs(): void

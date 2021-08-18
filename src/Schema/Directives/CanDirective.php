@@ -79,7 +79,6 @@ directive @can(
 
   """
   Apply scopes to the underlying query.
-  The scopes can only be used in combination with the findByArgs argument
   """
   scopes: [String!]
 
@@ -113,9 +112,6 @@ GRAPHQL;
                 $checkArguments = $this->buildCheckArguments($args);
 
                 if ($this->directiveArgValue('findByArgs') === true) {
-                    if ($this->directiveArgValue('find') !== null) {
-                        throw new DefinitionException("Can not use the argument 'find' when 'findByArgs' is true");
-                    }
                     $models = $resolveInfo
                         ->argumentSet
                         ->enhanceBuilder(
@@ -263,7 +259,7 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        if ($this->directiveHasArgument('field') && $this->directiveHasArgument('findByArgs')) {
+        if ($this->directiveHasArgument('find') && $this->directiveHasArgument('findByArgs')) {
             throw new DefinitionException('Can not use the argument `field` in combination with the `findByArgs` argument.');
         }
     }
