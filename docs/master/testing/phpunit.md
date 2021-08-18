@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 +   use ClearsSchemaCache;
 
-    
+
     protected function setUp(): void
     {
         parent::setUp();
