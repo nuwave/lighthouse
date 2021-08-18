@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
-- Add `findByArgs` and `scopes` arguments to the `@can` directive https://github.com/nuwave/lighthouse/issues/1916
+
+### Added
+
+- Add `query` and `scopes` arguments to the `@can` directive https://github.com/nuwave/lighthouse/issues/1916
 
 ## v5.18.1
 

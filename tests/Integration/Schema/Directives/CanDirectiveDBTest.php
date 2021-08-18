@@ -302,7 +302,7 @@ class CanDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(name: String @eq): User
-                @can(ability: "view", findByArgs: true)
+                @can(ability: "view", query: true)
                 @first
         }
 
@@ -340,7 +340,7 @@ class CanDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(id: ID @eq): User
-                @can(ability: "view", findByArgs: true)
+                @can(ability: "view", query: true)
                 @find
         }
 
@@ -381,7 +381,7 @@ class CanDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             deletePosts(ids: [ID!]!): [Post!]!
-                @can(ability: "delete", findByArgs: true)
+                @can(ability: "delete", query: true)
                 @delete
         }
 
@@ -423,7 +423,7 @@ class CanDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             task(id: ID @eq): Task
-                @can(ability: "adminOnly", findByArgs: true)
+                @can(ability: "adminOnly", query: true)
                 @softDeletes
                 @find
         }
@@ -448,32 +448,6 @@ class CanDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testFindAndFindByArgsValidation(): void
-    {
-        $user = new User();
-        $user->name = UserPolicy::ADMIN;
-        $this->be($user);
-
-        $user = factory(User::class)->create([
-            'name' => 'foo',
-        ]);
-
-        $this->expectException(DefinitionException::class);
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Query {
-            user(id: ID @eq): User
-                @can(ability: "view", find: "id", findByArgs: true)
-                @first
-        }
-
-        type User {
-            id: ID!
-            name: String!
-        }
-        ');
-
-    }
-
     public function testScopesWithFindByArgs(): void
     {
         $user = new User();
@@ -487,7 +461,7 @@ class CanDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(name: String @eq): User
-                @can(ability: "view", findByArgs: true)
+                @can(ability: "view", query: true)
                 @first
         }
 

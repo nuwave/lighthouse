@@ -89,13 +89,15 @@ class PostPolicy
 ### Protect specific model instances
 
 For some models, you may want to restrict access for specific instances of a model.
-Use the `find` parameter to specify the name of an input argument that is the primary
-key of the model. Lighthouse will use that to find a specific model
-instance against which the permissions should be checked:
+Set the `query` argument to `true` to have Lighthouse fetch the queried model(s)
+before checking permissions against them:
 
 ```graphql
 type Query {
-  post(id: ID @eq): Post @can(ability: "view", find: "id")
+  post(id: ID! @eq): Post
+    @can(ability: "view", query: true)
+    @find
+    @softDeletes
 }
 ```
 
@@ -109,23 +111,8 @@ class PostPolicy
 }
 ```
 
-Finding models combines nicely with [soft deleting](../eloquent/soft-deleting.md).
-Lighthouse will detect if the query will require a filter for trashed models and
-apply that as needed.
-
-If you need to resolve the `model` by another key than the primary key you may use the `findByArgs` argument.  
-Be aware that the `find` argument can't be used in combination.
-
-In the below example, the `model` is fetched by the email instead of the users ID.
-
-```graphql
-type Query {
-  fetchUserByEmail(email: String @eq): User
-    @can(ability: "view", findByArgs: true)
-    @find 
-    @softDeletes
-}
-```
+Arguments with directives such as `@eq` will constrain the query builder.
+Additional constraints for [soft deleting](../eloquent/soft-deleting.md) also apply.
 
 ### Passing additional arguments
 

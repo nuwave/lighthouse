@@ -519,48 +519,52 @@ When `injectArgs` and `args` are used together, the client given
 arguments will be passed before the static args.
 """
 directive @can(
-  """
-  The ability to check permissions for.
-  """
-  ability: String!
+    """
+    The ability to check permissions for.
+    """
+    ability: String!
 
-  """
-  If your policy checks against specific model instances, specify
-  the name of the field argument that contains its primary key(s).
+    """
+    Query for specific model instances to check the policy against, using arguments
+    with directives that add constraints to the query builder, such as `@eq`.
 
-  You may pass the string in dot notation to use nested inputs.
-  """
-  find: String
+    Mutually exclusive with `find`.
+    """
+    query: Boolean = false
 
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model detection does not work.
-  """
-  model: String
+    """
+    Apply scopes to the underlying query.
+    """
+    scopes: [String!]
 
-  """
-  Pass along the client given input data as arguments to `Gate::check`.
-  """
-  injectArgs: Boolean = false
+    """
+    Specify the class name of the model to use.
+    This is only needed when the default model detection does not work.
+    """
+    model: String
 
-  """
-  Resolve the model by directive args like @eq, @where etc.
-  You may not use the find argument in combination with findByArgs
-  """
-  findByArgs: Boolean = false
-  
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+    """
+    Pass along the client given input data as arguments to `Gate::check`.
+    """
+    injectArgs: Boolean = false
 
-  """
-  Statically defined arguments that are passed to `Gate::check`.
+    """
+    Statically defined arguments that are passed to `Gate::check`.
 
-  You may pass pass arbitrary GraphQL literals,
-  e.g.: [1, 2, 3] or { foo: "bar" }
-  """
-  args: CanArgs
+    You may pass pass arbitrary GraphQL literals,
+    e.g.: [1, 2, 3] or { foo: "bar" }
+    """
+    args: CanArgs
+
+    """
+    If your policy checks against specific model instances, specify
+    the name of the field argument that contains its primary key(s).
+
+    You may pass the string in dot notation to use nested inputs.
+
+    Mutually exclusive with `search`.
+    """
+    find: String
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -570,23 +574,24 @@ scalar CanArgs
 ```
 
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
-passing the `model` argument.
+passing the `model` argument:
 
 ```graphql
 type Mutation {
-  createBlogPost(input: PostInput): BlogPost
+  createBlogPost(input: PostInput!): BlogPost
     @can(ability: "create", model: "App\\Post")
 }
 ```
 
-To resolve the `model` by the same query as applied for the `@find` directive you may use the `findByArgs` argument. Be aware that the `find` argument can't be used in combination.
+Query for specific model instances to check the policy against with the `query` argument:
 
 ```graphql
 type Query {
-  fetchUserByEmail(email: String @eq): User @can(ability: "view", findByArgs: true) @find
+  fetchUserByEmail(email: String! @eq): User
+    @can(ability: "view", query: true)
+    @find
 }
 ```
-
 
 You can find usage examples of this directive in [the authorization docs](../security/authorization.md#restrict-fields-through-policies).
 

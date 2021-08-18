@@ -53,12 +53,17 @@ directive @can(
   ability: String!
 
   """
-  If your policy checks against specific model instances, specify
-  the name of the field argument that contains its primary key(s).
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
 
-  You may pass the string in dot notation to use nested inputs.
+  Mutually exclusive with `find`.
   """
-  find: String
+  query: Boolean = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 
   """
   Specify the class name of the model to use.
@@ -72,23 +77,22 @@ directive @can(
   injectArgs: Boolean = false
 
   """
-  Resolve the model by directive args like @eq, @where etc.
-  You may not use the find argument in combination with findByArgs
-  """
-  findByArgs: Boolean = false
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-
-  """
   Statically defined arguments that are passed to `Gate::check`.
 
   You may pass pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: CanArgs
+
+  """
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
+
+  You may pass the string in dot notation to use nested inputs.
+
+  Mutually exclusive with `search`.
+  """
+  find: String
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -111,18 +115,7 @@ GRAPHQL;
                 $gate = $this->gate->forUser($context->user());
                 $checkArguments = $this->buildCheckArguments($args);
 
-                if ($this->directiveArgValue('findByArgs') === true) {
-                    $models = $resolveInfo
-                        ->argumentSet
-                        ->enhanceBuilder(
-                            $this->getModelClass()::query(),
-                            $this->directiveArgValue('scopes', [])
-                        )->get();
-                } else {
-                    $models = $this->modelsToCheck($resolveInfo->argumentSet, $args);
-                }
-
-                foreach ($models as $model) {
+                foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
                     $this->authorize($gate, $ability, $model, $checkArguments);
                 }
 
@@ -135,12 +128,21 @@ GRAPHQL;
 
     /**
      * @param  array<string, mixed>  $args
-     * @return iterable<\Illuminate\Database\Eloquent\Model|string>
+     * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      *
      * @throws \GraphQL\Error\Error
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
+        if ($this->directiveArgValue('query')) {
+            return $argumentSet
+                ->enhanceBuilder(
+                    $this->getModelClass()::query(),
+                    $this->directiveArgValue('scopes', [])
+                )
+                ->get();
+        }
+
         if ($find = $this->directiveArgValue('find')) {
             $findValue = Arr::get($args, $find);
             if ($findValue === null) {
@@ -232,7 +234,7 @@ GRAPHQL;
     }
 
     /**
-     * Additional arguments that are passed to `Gate::check`.
+     * Additional arguments that are passed to @see Gate::check().
      *
      * @param  array<string, mixed>  $args
      * @return array<int, mixed>
@@ -255,8 +257,13 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        if ($this->directiveHasArgument('find') && $this->directiveHasArgument('findByArgs')) {
-            throw new DefinitionException('Can not use the argument `field` in combination with the `findByArgs` argument.');
+        if ($this->directiveHasArgument('find') && $this->directiveHasArgument('query')) {
+            throw new DefinitionException(self::findAndQueryAreMutuallyExclusive());
         }
+    }
+
+    public static function findAndQueryAreMutuallyExclusive(): string
+    {
+        return 'The arguments `find` and `query` are mutually exclusive in the `@can` directive.';
     }
 }
