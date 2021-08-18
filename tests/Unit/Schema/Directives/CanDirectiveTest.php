@@ -3,6 +3,8 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\CanDirective;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
@@ -307,6 +309,25 @@ class CanDirectiveTest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    public function testFindAndQueryAreMutuallyExclusive(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage(CanDirective::findAndQueryAreMutuallyExclusive());
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            user(id: ID! @eq): User
+                @can(ability: "view", find: "id", query: true)
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ');
     }
 
     public function resolveUser(): User

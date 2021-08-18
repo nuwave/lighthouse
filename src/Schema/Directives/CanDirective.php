@@ -4,23 +4,28 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\AppVersion;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-class CanDirective extends BaseDirective implements FieldMiddleware
+class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     /**
      * @var \Illuminate\Contracts\Auth\Access\Gate
@@ -48,12 +53,17 @@ directive @can(
   ability: String!
 
   """
-  If your policy checks against specific model instances, specify
-  the name of the field argument that contains its primary key(s).
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
 
-  You may pass the string in dot notation to use nested inputs.
+  Mutually exclusive with `find`.
   """
-  find: String
+  query: Boolean = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 
   """
   Specify the class name of the model to use.
@@ -73,6 +83,16 @@ directive @can(
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: CanArgs
+
+  """
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
+
+  You may pass the string in dot notation to use nested inputs.
+
+  Mutually exclusive with `search`.
+  """
+  find: String
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -108,12 +128,21 @@ GRAPHQL;
 
     /**
      * @param  array<string, mixed>  $args
-     * @return iterable<\Illuminate\Database\Eloquent\Model|string>
+     * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      *
      * @throws \GraphQL\Error\Error
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
+        if ($this->directiveArgValue('query')) {
+            return $argumentSet
+                ->enhanceBuilder(
+                    $this->getModelClass()::query(),
+                    $this->directiveArgValue('scopes', [])
+                )
+                ->get();
+        }
+
         if ($find = $this->directiveArgValue('find')) {
             $findValue = Arr::get($args, $find);
             if ($findValue === null) {
@@ -147,7 +176,7 @@ GRAPHQL;
                  */
                 $enhancedBuilder = $argumentSet->enhanceBuilder(
                     $queryBuilder,
-                    [],
+                    $this->directiveArgValue('scopes', []),
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
 
@@ -205,7 +234,7 @@ GRAPHQL;
     }
 
     /**
-     * Additional arguments that are passed to `Gate::check`.
+     * Additional arguments that are passed to @see Gate::check().
      *
      * @param  array<string, mixed>  $args
      * @return array<int, mixed>
@@ -224,5 +253,17 @@ GRAPHQL;
         }
 
         return $checkArguments;
+    }
+
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    {
+        if ($this->directiveHasArgument('find') && $this->directiveHasArgument('query')) {
+            throw new DefinitionException(self::findAndQueryAreMutuallyExclusive());
+        }
+    }
+
+    public static function findAndQueryAreMutuallyExclusive(): string
+    {
+        return 'The arguments `find` and `query` are mutually exclusive in the `@can` directive.';
     }
 }
