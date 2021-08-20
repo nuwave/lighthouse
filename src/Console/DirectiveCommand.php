@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Language\DirectiveLocation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
@@ -62,9 +63,16 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * The implemented interfaces.
      *
-     * @var \Illuminate\Support\Collection<string>
+     * @var \Illuminate\Support\Collection<class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected $implements;
+
+    /**
+     * The possible locations.
+     *
+     * @var \Illuminate\Support\Collection<string>
+     */
+    protected $locations;
 
     /**
      * The method stubs.
@@ -92,6 +100,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     {
         $this->imports = new Collection();
         $this->implements = new Collection();
+        $this->locations = new Collection();
         $this->methods = new Collection();
 
         $stub = parent::buildClass($name);
@@ -106,10 +115,19 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
         if ($forType) {
             $this->askForInterfaces(self::TYPE_INTERFACES);
+            $this->askForLocations([
+                DirectiveLocation::OBJECT,
+                DirectiveLocation::IFACE,
+                DirectiveLocation::ENUM,
+                DirectiveLocation::INPUT_OBJECT,
+                DirectiveLocation::SCALAR,
+                DirectiveLocation::UNION,
+            ]);
         }
 
         if ($forField) {
             $this->askForInterfaces(self::FIELD_INTERFACES);
+            $this->addLocation(DirectiveLocation::FIELD_DEFINITION);
         }
 
         if ($forArgument) {
@@ -121,6 +139,10 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             }
 
             $this->askForInterfaces(self::ARGUMENT_INTERFACES);
+            $this->askForLocations([
+                DirectiveLocation::ARGUMENT_DEFINITION,
+                DirectiveLocation::INPUT_FIELD_DEFINITION,
+            ]);
         }
 
         $stub = str_replace(
@@ -129,6 +151,19 @@ class DirectiveCommand extends LighthouseGeneratorCommand
                 ->filter()
                 ->unique()
                 ->implode("\n"),
+            $stub
+        );
+
+        $directiveName = parent::getNameInput();
+        $stub = str_replace(
+            '{{ name }}',
+            lcfirst($directiveName),
+            $stub
+        );
+
+        $stub = str_replace(
+            '{{ locations }}',
+            $this->locations->implode(' | '),
             $stub
         );
 
@@ -148,14 +183,38 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<class-string> $interfaces
+     * @param  array<class-string> $availableInterfaces
      */
-    protected function askForInterfaces(array $interfaces): void
+    protected function askForInterfaces(array $availableInterfaces): void
     {
-        foreach ($interfaces as $interface) {
-            if ($this->confirm("Should the directive implement the {$this->shortName($interface)} middleware?")) {
-                $this->implementInterface($interface);
-            }
+        $implementedInterfaces = $this->choice(
+            'Which interfaces should the directive implement?',
+            $availableInterfaces,
+            null,
+            null,
+            true
+        );
+
+        foreach ($implementedInterfaces as $interface) {
+            $this->implementInterface($interface);
+        }
+    }
+
+    /**
+     * @param array<int, string> $availableLocations
+     */
+    public function askForLocations(array $availableLocations): void
+    {
+        $usedLocations = $this->choice(
+            'On which locations can the directive be used?',
+            $availableLocations,
+            null,
+            null,
+            true
+        );
+
+        foreach ($usedLocations as $location) {
+            $this->addLocation($location);
         }
     }
 
@@ -184,6 +243,11 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         if ($methods = $this->interfaceMethods($shortName)) {
             $this->methods->push($methods);
         }
+    }
+
+    private function addLocation(string $location): void
+    {
+        $this->locations->push($location);
     }
 
     protected function getStub(): string
