@@ -183,11 +183,11 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<class-string> $availableInterfaces
+     * @param  array<class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>> $availableInterfaces
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
-        /** @var array<string> $implementedInterfaces Because we set $multiple = true */
+        /** @var array<class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>> $implementedInterfaces Because we set $multiple = true */
         $implementedInterfaces = $this->choice(
             'Which interfaces should the directive implement?',
             $availableInterfaces,
