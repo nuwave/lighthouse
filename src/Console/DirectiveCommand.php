@@ -187,7 +187,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
-        /** @var array<string> $usedLocations Because we set $multiple = true */
+        /** @var array<string> $implementedInterfaces Because we set $multiple = true */
         $implementedInterfaces = $this->choice(
             'Which interfaces should the directive implement?',
             $availableInterfaces,
