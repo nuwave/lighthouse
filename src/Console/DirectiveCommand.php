@@ -110,7 +110,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $forArgument = $this->option('argument');
 
         if (! $forType && ! $forField && ! $forArgument) {
-            throw new \Exception('Must specify at least one of: --type, --field or --argument');
+            throw new \Exception('Must specify at least one of: --type, --field, --argument');
         }
 
         if ($forType) {
@@ -187,6 +187,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
+        /** @var array<string> $usedLocations Because we set $multiple = true */
         $implementedInterfaces = $this->choice(
             'Which interfaces should the directive implement?',
             $availableInterfaces,
@@ -205,8 +206,9 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     public function askForLocations(array $availableLocations): void
     {
+        /** @var array<string> $usedLocations Because we set $multiple = true */
         $usedLocations = $this->choice(
-            'On which locations can the directive be used?',
+            'In which schema locations can the directive be used?',
             $availableLocations,
             null,
             null,

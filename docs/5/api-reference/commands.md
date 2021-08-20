@@ -21,10 +21,7 @@ Create a class for a custom schema directive.
 
     php artisan lighthouse:directive
 
-Use the `--type`, `--field` and `--argument` options to create type, field and
-argument directives, respectively. The command will then ask you which
-interfaces the directive should implement and add the required method stubs and
-imports for you.
+Use the `--type`, `--field` and `--argument` options to define where your directive can be used.
 
 ## ide-helper
 

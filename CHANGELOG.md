@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.20.0
+
+### Added
+
+- Include definition when generating directives via `artisan lighthouse:directive`
+
 ## v5.19.0
 
 ### Added
