@@ -9,11 +9,23 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v5.19.0
+## v5.21.0
 
 ### Added
 
 - Add trait `ClearsSchemaCache` to clear the schema cache once before any tests are run https://github.com/nuwave/lighthouse/pull/1920
+
+## v5.20.0
+
+### Added
+
+- Include definition when generating directives via `artisan lighthouse:directive` https://github.com/nuwave/lighthouse/pull/1921
+
+## v5.19.0
+
+### Added
+
+- Add `query` and `scopes` arguments to the `@can` directive https://github.com/nuwave/lighthouse/issues/1916
 
 ## v5.18.1
 
