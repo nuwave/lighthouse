@@ -22,6 +22,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class DirectiveCommand extends LighthouseGeneratorCommand
 {
+    /** @var array<int, class-string> */
     const ARGUMENT_INTERFACES = [
         ArgTransformerDirective::class,
         ArgBuilderDirective::class,
@@ -29,12 +30,14 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         ArgManipulator::class,
     ];
 
+    /** @var array<int, class-string> */
     const FIELD_INTERFACES = [
         FieldResolver::class,
         FieldMiddleware::class,
         FieldManipulator::class,
     ];
 
+    /** @var array<int, class-string> */
     const TYPE_INTERFACES = [
         TypeManipulator::class,
         TypeMiddleware::class,
@@ -63,7 +66,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * The implemented interfaces.
      *
-     * @var \Illuminate\Support\Collection<class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
+     * @var \Illuminate\Support\Collection<class-string>
      */
     protected $implements;
 
@@ -183,11 +186,11 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>> $availableInterfaces
+     * @param  array<class-string> $availableInterfaces
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
-        /** @var array<class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>> $implementedInterfaces Because we set $multiple = true */
+        /** @var array<class-string> $implementedInterfaces Because we set $multiple = true */
         $implementedInterfaces = $this->choice(
             'Which interfaces should the directive implement?',
             $availableInterfaces,
