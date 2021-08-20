@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Include definition when generating directives via `artisan lighthouse:directive`
+- Include definition when generating directives via `artisan lighthouse:directive` https://github.com/nuwave/lighthouse/pull/1921
 
 ## v5.19.0
 
