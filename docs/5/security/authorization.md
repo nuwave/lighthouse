@@ -94,10 +94,7 @@ before checking permissions against them:
 
 ```graphql
 type Query {
-  post(id: ID! @eq): Post
-    @can(ability: "view", query: true)
-    @find
-    @softDeletes
+  post(id: ID! @eq): Post @can(ability: "view", query: true) @find @softDeletes
 }
 ```
 
