@@ -519,52 +519,52 @@ When `injectArgs` and `args` are used together, the client given
 arguments will be passed before the static args.
 """
 directive @can(
-    """
-    The ability to check permissions for.
-    """
-    ability: String!
+  """
+  The ability to check permissions for.
+  """
+  ability: String!
 
-    """
-    Query for specific model instances to check the policy against, using arguments
-    with directives that add constraints to the query builder, such as `@eq`.
+  """
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
 
-    Mutually exclusive with `find`.
-    """
-    query: Boolean = false
+  Mutually exclusive with `find`.
+  """
+  query: Boolean = false
 
-    """
-    Apply scopes to the underlying query.
-    """
-    scopes: [String!]
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 
-    """
-    Specify the class name of the model to use.
-    This is only needed when the default model detection does not work.
-    """
-    model: String
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
-    """
-    Pass along the client given input data as arguments to `Gate::check`.
-    """
-    injectArgs: Boolean = false
+  """
+  Pass along the client given input data as arguments to `Gate::check`.
+  """
+  injectArgs: Boolean = false
 
-    """
-    Statically defined arguments that are passed to `Gate::check`.
+  """
+  Statically defined arguments that are passed to `Gate::check`.
 
-    You may pass pass arbitrary GraphQL literals,
-    e.g.: [1, 2, 3] or { foo: "bar" }
-    """
-    args: CanArgs
+  You may pass pass arbitrary GraphQL literals,
+  e.g.: [1, 2, 3] or { foo: "bar" }
+  """
+  args: CanArgs
 
-    """
-    If your policy checks against specific model instances, specify
-    the name of the field argument that contains its primary key(s).
+  """
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
 
-    You may pass the string in dot notation to use nested inputs.
+  You may pass the string in dot notation to use nested inputs.
 
-    Mutually exclusive with `search`.
-    """
-    find: String
+  Mutually exclusive with `search`.
+  """
+  find: String
 ) repeatable on FIELD_DEFINITION
 
 """
