@@ -44,6 +44,28 @@ class SchemaBuilderTest extends TestCase
         $this->assertTrue($queryType->hasField('_service'));
     }
 
+    public function testAllowSchemaWithoutQueryType(): void
+    {
+        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        type Foo @key(fields: "id") {
+            id: ID!
+            foo: String!
+        }
+        ');
+
+        $this->assertTrue($schema->hasType('_Entity'));
+        $this->assertTrue($schema->hasType('_Service'));
+
+        $this->assertTrue($schema->hasType('_Any'));
+        $this->assertTrue($schema->hasType('_FieldSet'));
+
+        $queryType = $schema->getQueryType();
+        $this->assertInstanceOf(ObjectType::class, $queryType);
+
+        $this->assertTrue($queryType->hasField('_entities'));
+        $this->assertTrue($queryType->hasField('_service'));
+    }
+
     /**
      * At least one type needs to be defined with the @key directive.
      *

@@ -2,8 +2,11 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
+use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -73,6 +76,15 @@ class ASTManipulator
 
     protected function addRootFields(DocumentAST &$documentAST): void
     {
+        if (! Arr::has($documentAST->types, 'Query')) {
+            $documentAST->setTypeDefinition(new ObjectTypeDefinitionNode([
+                'name' => new NameNode(['value' => 'Query']),
+                'interfaces' => new NodeList([]),
+                'directives' => new NodeList([]),
+                'fields' => new NodeList([]),
+            ]));
+        }
+
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types['Query'];
 
