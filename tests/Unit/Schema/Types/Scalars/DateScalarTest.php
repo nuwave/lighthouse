@@ -10,7 +10,6 @@ use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
 use Illuminate\Support\Carbon as IlluminateCarbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
 abstract class DateScalarTest extends TestCase
