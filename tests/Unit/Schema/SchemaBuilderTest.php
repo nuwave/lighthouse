@@ -17,7 +17,7 @@ class SchemaBuilderTest extends TestCase
 {
     public function testGeneratesValidSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery();
+        $schema = $this->buildSchema(self::PLACEHOLDER_QUERY);
 
         $this->assertInstanceOf(Schema::class, $schema);
         // This would throw if the schema were invalid
@@ -39,7 +39,7 @@ class SchemaBuilderTest extends TestCase
         $schema->assertValid();
     }
 
-    public function testGeneratesWithEmptyMutationType(): void
+    public function testWithEmptyMutationType(): void
     {
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type Query
@@ -56,6 +56,20 @@ class SchemaBuilderTest extends TestCase
         $foo = $mutationObjectType->getField('foo');
 
         $this->assertSame('foo', $foo->name);
+    }
+
+    public function testWithOnlyMutationType(): void
+    {
+        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        type Mutation
+
+        extend type Mutation {
+            foo(bar: String! baz: String): String
+        }
+        ');
+
+        dump($schema->validate());
+        $this->assertCount(0, $schema->validate());
     }
 
     public function testResolveEnumTypes(): void

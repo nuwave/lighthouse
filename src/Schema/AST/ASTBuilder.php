@@ -147,6 +147,12 @@ class ASTBuilder
             )
         );
 
+        if (! isset($this->documentAST->types['Query'])) {
+            $this->documentAST->setTypeDefinition(
+                Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query')
+            );
+        }
+
         // Apply transformations from directives
         $this->applyTypeDefinitionManipulators();
         $this->applyTypeExtensionManipulators();

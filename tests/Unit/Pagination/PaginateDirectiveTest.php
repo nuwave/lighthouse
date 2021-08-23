@@ -15,7 +15,7 @@ class PaginateDirectiveTest extends TestCase
 {
     public function testIncludesPaginationInfoObjectsInSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery();
+        $schema = $this->buildSchema(self::PLACEHOLDER_QUERY);
         $schemaString = SchemaPrinter::doPrint($schema);
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'

@@ -26,9 +26,25 @@ class IntrospectionTest extends TestCase
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
 
+    public function testWorksWithJustMutation(): void
+    {
+        $this->schema = /** @lang GraphQL */'
+        type Mutation {
+            foo: Int
+        }
+        ';
+
+        $this->assertNotNull(
+            $this->introspectType(RootType::QUERY)
+        );
+        $this->assertNotNull(
+            $this->introspectType(RootType::MUTATION)
+        );
+    }
+
     public function testFindsTypesFromSchema(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Foo {
             bar: Int
         }
@@ -37,10 +53,6 @@ class IntrospectionTest extends TestCase
         $this->assertNotNull(
             $this->introspectType('Foo')
         );
-        $this->assertNotNull(
-            $this->introspectType(RootType::QUERY)
-        );
-
         $this->assertNull(
             $this->introspectType('Bar')
         );

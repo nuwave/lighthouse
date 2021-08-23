@@ -186,7 +186,7 @@ GRAPHQL;
     protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
     {
         return $this->buildSchema(
-            $schema.self::PLACEHOLDER_QUERY
+            $schema //.self::PLACEHOLDER_QUERY
         );
     }
 
