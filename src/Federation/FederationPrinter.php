@@ -54,16 +54,28 @@ class FederationPrinter
         }
 
         $originalQueryType = Arr::pull($types, 'Query');
-        $config->setQuery(new ObjectType([
-            'name' => 'Query',
-            'fields' => array_filter(
-                $originalQueryType->getFields(),
-                static function (FieldDefinition $field): bool {
-                    return ! in_array($field->name, static::FEDERATION_FIELDS);
-                }
-            ),
-            'interfaces' => $originalQueryType->getInterfaces(),
-        ]));
+
+        $newQueryFields = array_filter(
+            $originalQueryType->getFields(),
+            static function (FieldDefinition $field): bool {
+                return ! in_array($field->name, static::FEDERATION_FIELDS);
+            }
+        );
+
+        if (count($newQueryFields ?? []) === 0) {
+            $config->setQuery(null);
+        } else {
+            $config->setQuery(new ObjectType([
+                'name' => 'Query',
+                'fields' => array_filter(
+                    $originalQueryType->getFields(),
+                    static function (FieldDefinition $field): bool {
+                        return ! in_array($field->name, static::FEDERATION_FIELDS);
+                    }
+                ),
+                'interfaces' => $originalQueryType->getInterfaces(),
+            ]));
+        }
 
         $config->setMutation(Arr::pull($types, 'Mutation'));
 
