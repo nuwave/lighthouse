@@ -9,11 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.22.0
+
 ### Added
 
 - Add `AuthenticationException::fromLaravel()` and `AuthenticationErrorHandler` to handle laravel native `AuthenticationException` https://github.com/nuwave/lighthouse/pull/1922
 - Add `AuthorizationException::fromLaravel()` and `AuthorizationErrorHandler` to handle laravel native `AuthorizationException` https://github.com/nuwave/lighthouse/pull/1922
-
 
 ## v5.21.0
 
