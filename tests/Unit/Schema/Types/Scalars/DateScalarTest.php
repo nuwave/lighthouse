@@ -10,6 +10,7 @@ use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
 use Illuminate\Support\Carbon as IlluminateCarbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
 abstract class DateScalarTest extends TestCase
@@ -48,6 +49,11 @@ abstract class DateScalarTest extends TestCase
 
     public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
     {
+        // TODO remove when we stop supporting Laravel 5.6
+        if (! class_exists('\Illuminate\Support\Carbon')) {
+            $this->markTestSkipped('CarbonImmutable is not available with older Laravel versions');
+        }
+
         $this->assertInstanceOf(
             IlluminateCarbon::class,
             $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())
