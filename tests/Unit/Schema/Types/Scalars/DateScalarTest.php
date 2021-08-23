@@ -44,6 +44,14 @@ abstract class DateScalarTest extends TestCase
         );
     }
 
+    public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
+    {
+        $this->assertInstanceOf(
+            \Illuminate\Support\Carbon::class,
+            $this->scalarInstance()->parseValue(\Carbon\CarbonImmutable::now())
+        );
+    }
+
     /**
      * Those values should fail passing as a date.
      *
