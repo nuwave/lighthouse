@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class AuthenticationErrorHandlerTest extends TestCase
 {
-    public function testWrapsLaravelAuthorizationException(): void
+    public function testWrapsLaravelAuthenticationException(): void
     {
         $handler = new AuthenticationErrorHandler();
 
@@ -25,6 +25,6 @@ class AuthenticationErrorHandlerTest extends TestCase
         $handler($original, $next);
         $this->assertInstanceOf(Error::class, $error);
         $this->assertInstanceOf(AuthenticationException::class, $error->getPrevious());
-        $this->assertEquals(['user'], $error->getPrevious()->guards());
+        $this->assertSame(['user'], $error->getPrevious()->guards());
     }
 }

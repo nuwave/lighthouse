@@ -8,7 +8,7 @@ use Illuminate\Auth\Access\AuthorizationException as LaravelAuthorizationExcepti
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 /**
- * Wrap native Laravel validation exceptions, adding structured data to extensions.
+ * Wrap native Laravel authorization exceptions, adding structured data to extensions.
  */
 class AuthorizationErrorHandler implements ErrorHandler
 {
