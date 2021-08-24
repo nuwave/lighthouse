@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.22.2
+
 ### Fixed
 
 - Support schema without `Query` type when using federation https://github.com/nuwave/lighthouse/pull/1925
