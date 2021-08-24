@@ -2,14 +2,12 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\NameNode;
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\RootType;
 
 class ASTManipulator
 {
@@ -76,17 +74,14 @@ class ASTManipulator
 
     protected function addRootFields(DocumentAST &$documentAST): void
     {
-        if (! Arr::has($documentAST->types, 'Query')) {
-            $documentAST->setTypeDefinition(new ObjectTypeDefinitionNode([
-                'name' => new NameNode(['value' => 'Query']),
-                'interfaces' => new NodeList([]),
-                'directives' => new NodeList([]),
-                'fields' => new NodeList([]),
-            ]));
+        // In federation it is fine for a schema to not have a user-defined root query type,
+        // since we add two federation related fields to it here.
+        if (! isset($documentAST->types[RootType::QUERY])) {
+            $documentAST->types[RootType::QUERY] = Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
         }
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types['Query'];
+        $queryType = $documentAST->types[RootType::QUERY];
 
         $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(

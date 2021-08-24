@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Federation;
 
-use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
@@ -37,14 +37,10 @@ class SchemaBuilderTest extends TestCase
         $this->assertTrue($schema->hasType('_Any'));
         $this->assertTrue($schema->hasType('_FieldSet'));
 
-        $queryType = $schema->getQueryType();
-        $this->assertInstanceOf(ObjectType::class, $queryType);
-
-        $this->assertTrue($queryType->hasField('_entities'));
-        $this->assertTrue($queryType->hasField('_service'));
+        $this->assertSchemaHasQueryTypeWithFederationFields($schema);
     }
 
-    public function testAllowSchemaWithoutQueryType(): void
+    public function testAddsQueryTypeIfNotDefined(): void
     {
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type Foo @key(fields: "id") {
@@ -53,12 +49,11 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        $this->assertTrue($schema->hasType('_Entity'));
-        $this->assertTrue($schema->hasType('_Service'));
+        $this->assertSchemaHasQueryTypeWithFederationFields($schema);
+    }
 
-        $this->assertTrue($schema->hasType('_Any'));
-        $this->assertTrue($schema->hasType('_FieldSet'));
-
+    protected function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
+    {
         $queryType = $schema->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);
 
