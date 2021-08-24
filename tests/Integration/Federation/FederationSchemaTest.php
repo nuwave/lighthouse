@@ -56,7 +56,7 @@ GRAPHQL;
         $sdl = $this->_serviceSdl();
 
         $this->assertStringContainsString($foo, $sdl);
-        $this->assertStringNotContainsString('type Query', $sdl);
+        $this->assertStringNotContainsString(/** @lang GraphQL */ 'type Query', $sdl);
     }
 
     public function testFederatedSchemaShouldContainCorrectEntityUnion(): void
