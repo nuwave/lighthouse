@@ -41,6 +41,24 @@ GRAPHQL;
         $this->assertStringContainsString($query, $sdl);
     }
 
+    public function testServiceQueryShouldReturnValidSdlWithoutQuery(): void
+    {
+        $foo = /** @lang GraphQL */ <<<'GRAPHQL'
+type Foo @key(fields: "id") {
+  id: ID! @external
+  foo: String!
+}
+
+GRAPHQL;
+
+        $this->schema = $foo;
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString($foo, $sdl);
+        $this->assertStringNotContainsString(/** @lang GraphQL */ 'type Query', $sdl);
+    }
+
     public function testFederatedSchemaShouldContainCorrectEntityUnion(): void
     {
         $schema = $this->buildSchema(/** @lang GraphQL */ '
