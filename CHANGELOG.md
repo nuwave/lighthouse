@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Make `TestReponse::assertGraphQLValidationError()` work for fields with multiple messages https://github.com/nuwave/lighthouse/pull/1926
+
 ## v5.22.2
 
 ### Fixed

@@ -55,7 +55,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
                 @all
                 @whereAuth(
                     relation: "user"
-                    guard: "api"
+                    guard: "web"
                 )
         }
         ';
@@ -66,7 +66,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
         factory(Post::class, 3)->create();
 
         $authFactory = $this->app->make(AuthFactory::class);
-        $authFactory->guard('api')->setUser($user);
+        $authFactory->guard('web')->setUser($user);
 
         $response = $this
             ->graphQL(/** @lang GraphQL */ '
