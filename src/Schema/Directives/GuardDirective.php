@@ -75,7 +75,7 @@ GRAPHQL;
     /**
      * Determine if the user is logged in to any of the given guards.
      *
-     * @param  array<string>  $guards
+     * @param  array<string|null>  $guards
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
