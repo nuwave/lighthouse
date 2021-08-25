@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 
 /**
@@ -14,16 +13,22 @@ class TestResponseUtils
 {
     /**
      * @param  \Illuminate\Testing\TestResponse  $response
+     *
+     * @return array<string, array<int, string>>|null
      */
     public static function extractValidationErrors($response): ?array
     {
         $errors = $response->json('errors') ?? [];
 
-        return Arr::first(
-            $errors,
-            function (array $error): bool {
-                return Arr::get($error, 'extensions.category') === ValidationException::CATEGORY;
+        foreach ($errors as $error) {
+            $validation = $error['extensions'][ValidationException::CATEGORY]
+                ?? null;
+
+            if (is_array($validation)) {
+                return $validation;
             }
-        );
+        }
+
+        return null;
     }
 }
