@@ -3,8 +3,6 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Exceptions\ValidationException;
 use PHPUnit\Framework\Assert;
 
 /**
