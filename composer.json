@@ -50,7 +50,7 @@
         "mockery/mockery": "^1",
         "nunomaduro/larastan": "^0.6 || ^0.7",
         "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || ^6",
-        "phpbench/phpbench": "1.0.0-alpha4",
+        "phpbench/phpbench": "1.1.0",
         "phpstan/phpstan": "0.12.89",
         "phpstan/phpstan-mockery": "^0.12.5",
         "phpstan/phpstan-phpunit": "^0.12.17",
