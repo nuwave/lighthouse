@@ -20,6 +20,7 @@ class TestResponseUtils
     {
         $errors = $response->json('errors') ?? [];
 
+        // @phpstan-ignore-next-line PHPStan 0.11 fails with "Empty array passed to foreach" TODO remove once no longer supporting Laravel 6
         foreach ($errors as $error) {
             $validation = $error['extensions'][ValidationException::CATEGORY]
                 ?? null;
