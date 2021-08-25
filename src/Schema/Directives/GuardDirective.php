@@ -83,6 +83,7 @@ GRAPHQL;
     {
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
+                // @phpstan-ignore-next-line passing null works fine here
                 $this->auth->shouldUse($guard);
 
                 return;
