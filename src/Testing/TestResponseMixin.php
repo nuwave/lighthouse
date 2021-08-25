@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use PHPUnit\Framework\Assert;
 
@@ -14,19 +15,21 @@ class TestResponseMixin
     public function assertGraphQLValidationError(): Closure
     {
         return function (string $key, ?string $message) {
-            $this->assertJson([
-                'errors' => [
-                    [
-                        'extensions' => [
-                            'validation' => [
-                                $key => [
-                                    $message,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
+            $errors = TestResponseUtils::extractValidationErrors($this) ?? [];
+
+            $validation = Arr::get($errors, 'extensions.validation', []);
+
+            Assert::assertArrayHasKey(
+                $key,
+                $validation,
+                "Expected the query to return validation errors for field `{$key}`."
+            );
+
+            Assert::assertContains(
+                $message,
+                $validation[$key],
+                "Expected the query to return validation error message `{$message}` for field `{$key}`."
+            );
 
             return $this;
         };
