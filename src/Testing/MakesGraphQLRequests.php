@@ -144,7 +144,7 @@ trait MakesGraphQLRequests
     {
         return Arr::first(
             $this->introspect()->json($path),
-            static fn(array $result): bool => $result['name'] === $name
+            static fn (array $result): bool => $result['name'] === $name
         );
     }
 
