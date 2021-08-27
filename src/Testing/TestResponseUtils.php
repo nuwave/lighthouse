@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Nuwave\Lighthouse\Exceptions\ValidationException;
-
 /**
  * Because we can not have non-mixin methods in mixin classes.
  *
