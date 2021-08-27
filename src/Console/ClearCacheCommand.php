@@ -10,12 +10,7 @@ use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 
 class ClearCacheCommand extends Command
 {
-    /**
-     * TODO remove once we require Laravel 6 which allows $this->call(ClearCacheCommand::class).
-     */
-    const NAME = 'lighthouse:clear-cache';
-
-    protected $name = self::NAME;
+    protected $name = 'lighthouse:clear-cache';
 
     protected $description = 'Clear the GraphQL schema cache.';
 

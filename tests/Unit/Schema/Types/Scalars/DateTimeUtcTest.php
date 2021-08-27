@@ -8,15 +8,6 @@ use Nuwave\Lighthouse\Support\AppVersion;
 
 class DateTimeUtcTest extends DateScalarTest
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(5.8)) {
-            $this->markTestSkipped('This only works with Illuminate\Support\Carbon::createFromIsoFormat().');
-        }
-    }
-
     protected function scalarInstance(): DateScalar
     {
         return new DateTimeUtc();

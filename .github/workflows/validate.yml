@@ -26,14 +26,7 @@ jobs:
           - 7.4
           - 8.0
         laravel-version:
-          - ^6
-          - ^7
           - ^8
-        exclude:
-          - php-version: 8.0
-            laravel-version: ^6
-          - php-version: 8.0
-            laravel-version: ^7
 
     steps:
       - uses: actions/checkout@v2
@@ -54,10 +47,6 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
-      - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
-        run: composer remove --dev laravel/legacy-factories --no-update
-
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpstan
@@ -73,23 +62,7 @@ jobs:
           - 7.4
           - 8.0
         laravel-version:
-          - 5.6.*
-          - 5.7.*
-          - 5.8.*
-          - ^6
-          - ^7
           - ^8
-        exclude:
-          - php-version: 8.0
-            laravel-version: 5.6.*
-          - php-version: 8.0
-            laravel-version: 5.7.*
-          - php-version: 8.0
-            laravel-version: 5.8.*
-          - php-version: 8.0
-            laravel-version: ^6
-          - php-version: 8.0
-            laravel-version: ^7
 
     steps:
       - uses: actions/checkout@v2
@@ -112,10 +85,6 @@ jobs:
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
-
-      - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
-        run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
@@ -157,10 +126,6 @@ jobs:
 
       - run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
-      - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
-        run: composer remove --dev laravel/legacy-factories --no-update
-
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: |
@@ -197,10 +162,6 @@ jobs:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
           restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
-
-      - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
-        run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 

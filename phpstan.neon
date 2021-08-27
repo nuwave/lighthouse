@@ -23,11 +23,6 @@ parameters:
   # Intentionally wrong
   - tests/Utils/Models/WithoutRelationClassImport.php
 
-  # Compatibility fix because Laravel moved the TestResponse class
-  - tests/TestCase.php
-  - tests/Laravel7ExceptionHandler.php
-  - tests/PreLaravel7ExceptionHandler.php
-
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false
   ignoreErrors:
@@ -48,9 +43,6 @@ parameters:
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
 
-  # Compatibility fix because Laravel moved the TestResponse class
-  - '#.*TestResponse.*#'
-
   # We are monkeypatching ResolveInfo to pass information through resolver middleware
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
@@ -63,5 +55,5 @@ parameters:
   # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
   - '#Property .* in isset\(\) is not nullable\.#'
 
-  # TODO remove when https://github.com/FakerPHP/Faker/pull/345 is merged
+  # TODO remove when v1.16 is released https://github.com/FakerPHP/Faker/issues/365
   - '#.* undefined .* Faker\\UniqueGenerator::.*#'

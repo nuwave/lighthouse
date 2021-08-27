@@ -32,10 +32,6 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiterReturnsRequest(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
-        }
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(name: "test")
@@ -62,10 +58,6 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiter(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
-        }
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(name: "test")

@@ -89,28 +89,10 @@ class NestedOneToMany implements ArgResolver
             $relation
                 ->make()
                 ->whereIn(
-                    self::getLocalKeyName($relation),
+                    $relation->getLocalKeyName(),
                     $args->arguments['disconnect']->value
                 )
                 ->update([$relation->getForeignKeyName() => null]);
         }
-    }
-
-    /**
-     * TODO remove this horrible hack when we no longer support Laravel 5.6.
-     */
-    protected static function getLocalKeyName(HasOneOrMany $relation): string
-    {
-        $getLocalKeyName = Closure::bind(
-            function () {
-                /** @psalm-suppress InvalidScope */
-                // @phpstan-ignore-next-line This is a dirty hack
-                return $this->localKey;
-            },
-            $relation,
-            get_class($relation)
-        );
-
-        return $getLocalKeyName();
     }
 }

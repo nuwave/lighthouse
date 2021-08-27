@@ -44,16 +44,8 @@ trait TestsSerialization
 
     protected function useSerializingArrayStore(Container $app): void
     {
-        /** @var \Illuminate\Cache\CacheManager $cache */
-        $cache = $app->make(CacheManager::class);
-        $cache->extend('serializing-array', function () {
-            return new Repository(
-                new SerializingArrayStore()
-            );
-        });
-
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
-        $config->set('cache.stores.array.driver', 'serializing-array');
+        $config->set('cache.stores.array.serialize', true);
     }
 }

@@ -39,11 +39,6 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
     {
-        // TODO remove with Laravel < 6 support
-        if (AppVersion::below(6.0)) {
-            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
-        }
-
         $this->be(new User);
 
         $this->schema = /** @lang GraphQL */ '
@@ -71,11 +66,6 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
     {
-        // TODO remove with Laravel < 6 support
-        if (AppVersion::below(6.0)) {
-            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
-        }
-
         $this->be(new User);
 
         $this->schema = /** @lang GraphQL */ '
@@ -140,10 +130,6 @@ class CanDirectiveTest extends TestCase
 
     public function testAcceptsGuestUser(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support guest user.');
-        }
-
         $this->mockResolver(function (): User {
             return $this->resolveUser();
         });

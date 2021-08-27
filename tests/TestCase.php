@@ -172,11 +172,7 @@ GRAPHQL;
     protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
-            if (AppVersion::atLeast(7.0)) {
-                return new Laravel7ExceptionHandler();
-            }
-
-            return new PreLaravel7ExceptionHandler();
+            return new ThrowingExceptionHandler();
         });
     }
 

@@ -11,15 +11,6 @@ use Tests\Utils\Models\User;
 
 class AggregateDirectiveTest extends DBTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Eager aggregate loading is only available in Laravel 8+.');
-        }
-    }
-
     public function testRequiresARelationOrModelArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '

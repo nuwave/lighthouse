@@ -5,7 +5,7 @@ namespace Tests;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Throwable;
 
-class Laravel7ExceptionHandler implements ExceptionHandler
+class ThrowingExceptionHandler implements ExceptionHandler
 {
     public function report(Throwable $e)
     {

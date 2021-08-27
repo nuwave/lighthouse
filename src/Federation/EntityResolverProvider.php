@@ -104,11 +104,6 @@ class EntityResolverProvider
             throw new Error(self::unknownTypename($typename));
         }
 
-        /**
-         * TODO remove when upgrading graphql-php.
-         *
-         * @var (\GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode)|null $definition
-         */
         $definition = $type->astNode;
         if ($definition === null) {
             throw new FederationException("Must provide AST definition for type `{$typename}`.");

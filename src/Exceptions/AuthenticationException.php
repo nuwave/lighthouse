@@ -15,6 +15,9 @@ class AuthenticationException extends IlluminateAuthenticationException implemen
         return true;
     }
 
+    /**
+     * @return array{guards: array<string>}
+     */
     public function getExtensions(): array
     {
         return [

@@ -132,11 +132,6 @@ GRAPHQL;
     {
         $name = $this->directiveArgValue('name');
         if ($name !== null) {
-            if (AppVersion::below(8.0)) {
-                throw new DefinitionException('Named limiter requires Laravel 8.x or later');
-            }
-
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
             // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
             if (is_null($limiter)) {
