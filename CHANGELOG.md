@@ -18,6 +18,49 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
 - Remove support for PHP 7.2, 7.3
 
+## v5.22.3
+
+### Fixed
+
+- Make `TestReponse::assertGraphQLValidationError()` work for fields with multiple messages https://github.com/nuwave/lighthouse/pull/1926
+
+## v5.22.2
+
+### Fixed
+
+- Support schema without `Query` type when using federation https://github.com/nuwave/lighthouse/pull/1925
+
+## v5.22.1
+
+### Fixed
+
+- Allow `\Carbon\CarbonImmutable` for date scalars https://github.com/nuwave/lighthouse/pull/1924
+
+## v5.22.0
+
+### Added
+
+- Add `AuthenticationException::fromLaravel()` and `AuthenticationErrorHandler` to handle laravel native `AuthenticationException` https://github.com/nuwave/lighthouse/pull/1922
+- Add `AuthorizationException::fromLaravel()` and `AuthorizationErrorHandler` to handle laravel native `AuthorizationException` https://github.com/nuwave/lighthouse/pull/1922
+
+## v5.21.0
+
+### Added
+
+- Add trait `ClearsSchemaCache` to clear the schema cache once before any tests are run https://github.com/nuwave/lighthouse/pull/1920
+
+## v5.20.0
+
+### Added
+
+- Include definition when generating directives via `artisan lighthouse:directive` https://github.com/nuwave/lighthouse/pull/1921
+
+## v5.19.0
+
+### Added
+
+- Add `query` and `scopes` arguments to the `@can` directive https://github.com/nuwave/lighthouse/issues/1916
+
 ## v5.18.1
 
 ### Fixed

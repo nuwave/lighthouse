@@ -13,4 +13,9 @@ class AuthorizationException extends IlluminateAuthorizationException implements
     {
         return true;
     }
+
+    public static function fromLaravel(IlluminateAuthorizationException $laravelException): self
+    {
+        return new static($laravelException->getMessage(), $laravelException->getCode());
+    }
 }

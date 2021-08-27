@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Federation;
 
-use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
@@ -37,6 +37,23 @@ class SchemaBuilderTest extends TestCase
         $this->assertTrue($schema->hasType('_Any'));
         $this->assertTrue($schema->hasType('_FieldSet'));
 
+        $this->assertSchemaHasQueryTypeWithFederationFields($schema);
+    }
+
+    public function testAddsQueryTypeIfNotDefined(): void
+    {
+        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        type Foo @key(fields: "id") {
+            id: ID!
+            foo: String!
+        }
+        ');
+
+        $this->assertSchemaHasQueryTypeWithFederationFields($schema);
+    }
+
+    protected function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
+    {
         $queryType = $schema->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);
 

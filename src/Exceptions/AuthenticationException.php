@@ -21,4 +21,9 @@ class AuthenticationException extends IlluminateAuthenticationException implemen
             'guards' => $this->guards,
         ];
     }
+
+    public static function fromLaravel(IlluminateAuthenticationException $laravelException): self
+    {
+        return new static($laravelException->getMessage(), $laravelException->guards());
+    }
 }

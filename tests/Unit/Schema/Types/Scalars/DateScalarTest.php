@@ -2,11 +2,13 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
+use Carbon\Carbon as CarbonCarbon;
+use Carbon\CarbonImmutable as CarbonCarbonImmutable;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Tests\TestCase;
 
@@ -39,8 +41,21 @@ abstract class DateScalarTest extends TestCase
     public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
     {
         $this->assertInstanceOf(
-            \Illuminate\Support\Carbon::class,
-            $this->scalarInstance()->parseValue(\Carbon\Carbon::now())
+            IlluminateCarbon::class,
+            $this->scalarInstance()->parseValue(CarbonCarbon::now())
+        );
+    }
+
+    public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
+    {
+        // TODO remove when we stop supporting Laravel 5.7
+        if (! class_exists('\Carbon\CarbonImmutable')) {
+            $this->markTestSkipped('CarbonImmutable is not available with older Laravel versions');
+        }
+
+        $this->assertInstanceOf(
+            IlluminateCarbon::class,
+            $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())
         );
     }
 
@@ -65,7 +80,7 @@ abstract class DateScalarTest extends TestCase
     public function testParsesValueString(string $date): void
     {
         $this->assertInstanceOf(
-            Carbon::class,
+            IlluminateCarbon::class,
             $this->scalarInstance()->parseValue($date)
         );
     }
@@ -80,7 +95,7 @@ abstract class DateScalarTest extends TestCase
         );
         $parsed = $this->scalarInstance()->parseLiteral($dateLiteral);
 
-        $this->assertInstanceOf(Carbon::class, $parsed);
+        $this->assertInstanceOf(IlluminateCarbon::class, $parsed);
     }
 
     public function testThrowsIfParseLiteralNonString(): void
@@ -94,7 +109,7 @@ abstract class DateScalarTest extends TestCase
 
     public function testSerializesCarbonInstance(): void
     {
-        $now = Carbon::now();
+        $now = IlluminateCarbon::now();
         $result = $this->scalarInstance()->serialize($now);
 
         // TODO use native assertIsString when upgrading PHPUnit

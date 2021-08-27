@@ -118,8 +118,8 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTasks(id: ID!): Task!
-                @can(ability: "delete", find: "id")
+            forceDeleteTasks(id: ID! @eq): Task!
+                @can(ability: "delete", query: true)
                 @forceDelete
         }
         ';
@@ -153,8 +153,8 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTasks(id: ID!): Task!
-                @can(ability: "delete", find: "id")
+            forceDeleteTasks(id: ID! @eq): Task!
+                @can(ability: "delete", query: true)
                 @forceDelete
                 # The order has to be like this, otherwise @forceDelete will throw
                 @softDeletes

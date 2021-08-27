@@ -586,4 +586,32 @@ class ValidationTest extends TestCase
             ')
             ->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
     }
+
+    public function testReturnsMultipleValidationErrorsPerField(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                input: FooInput
+            ): Int
+        }
+
+        input FooInput {
+            email: String @rules(apply: ["email", "min:16"])
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        email: "invalid"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.email', 'The input.email must be a valid email address.')
+            ->assertGraphQLValidationError('input.email', 'The input.email must be at least 16 characters.');
+    }
 }

@@ -525,12 +525,17 @@ directive @can(
   ability: String!
 
   """
-  If your policy checks against specific model instances, specify
-  the name of the field argument that contains its primary key(s).
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
 
-  You may pass the string in dot notation to use nested inputs.
+  Mutually exclusive with `find`.
   """
-  find: String
+  query: Boolean = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 
   """
   Specify the class name of the model to use.
@@ -550,6 +555,16 @@ directive @can(
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: CanArgs
+
+  """
+  If your policy checks against specific model instances, specify
+  the name of the field argument that contains its primary key(s).
+
+  You may pass the string in dot notation to use nested inputs.
+
+  Mutually exclusive with `search`.
+  """
+  find: String
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -559,12 +574,22 @@ scalar CanArgs
 ```
 
 The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
-passing the `model` argument.
+passing the `model` argument:
 
 ```graphql
 type Mutation {
-  createBlogPost(input: PostInput): BlogPost
+  createBlogPost(input: PostInput!): BlogPost
     @can(ability: "create", model: "App\\Post")
+}
+```
+
+Query for specific model instances to check the policy against with the `query` argument:
+
+```graphql
+type Query {
+  fetchUserByEmail(email: String! @eq): User
+    @can(ability: "view", query: true)
+    @find
 }
 ```
 
