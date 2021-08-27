@@ -5,7 +5,6 @@ namespace Tests\Unit\Schema\Directives;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\CanDirective;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;

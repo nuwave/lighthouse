@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Directives;
 
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 

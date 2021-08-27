@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Subscriptions\Storage;
 use Exception;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;

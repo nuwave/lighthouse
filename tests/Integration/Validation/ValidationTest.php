@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;
 use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Validators\FooClosureValidator;
 

@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Illuminate\Cache\CacheManager;
-use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;

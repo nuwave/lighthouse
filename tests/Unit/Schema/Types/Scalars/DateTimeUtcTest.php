@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Types\Scalars;
 
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateTimeUtc;
-use Nuwave\Lighthouse\Support\AppVersion;
 
 class DateTimeUtcTest extends DateScalarTest
 {
