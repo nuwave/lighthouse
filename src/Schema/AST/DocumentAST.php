@@ -20,6 +20,11 @@ use Serializable;
  * Explicitly implementing Serializable provides performance gains by:
  * - stripping unnecessary data
  * - leveraging lazy instantiation of schema types
+ *
+ * @phpstan-type SerializableArray array{
+ *     types: array<int, array<string, mixed>>,
+ *     directives: array<int, array<string, mixed>>,
+ * }
  */
 class DocumentAST implements Serializable, Arrayable
 {
@@ -127,7 +132,7 @@ class DocumentAST implements Serializable, Arrayable
      * We exclude the type extensions stored in $typeExtensions,
      * as they are merged with the actual types at this point.
      *
-     * @return array<string, mixed>
+     * @return SerializableArray
      */
     public function toArray(): array
     {
@@ -146,7 +151,7 @@ class DocumentAST implements Serializable, Arrayable
     /**
      * Instantiate from a serialized array.
      *
-     * @param array<string, mixed> $ast
+     * @param  SerializableArray  $ast
      */
     public static function fromArray(array $ast): DocumentAST
     {
@@ -167,18 +172,16 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param array<string, mixed> $ast
+     * @param  SerializableArray  $ast
      */
     protected function hydrateFromArray(array $ast): void
     {
-        [
-            'types' => $types,
-            'directives' => $directives,
-        ] = $ast;
-
         // Utilize the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
-        $this->types = new NodeList($types);
-        $this->directives = new NodeList($directives);
+
+        // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
+        $this->types = new NodeList($ast['types']);
+        // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
+        $this->directives = new NodeList($ast['directives']);
     }
 }
