@@ -99,7 +99,6 @@
         }
     },
     "scripts": {
-        "bench": "phpbench run",
         "rector": "rector process -v src/ tests/",
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",

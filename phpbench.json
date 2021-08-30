@@ -1,12 +1,4 @@
 {
     "runner.bootstrap": "vendor/autoload.php",
-    "runner.path": "benchmarks",
-    "report.generators": {
-        "ast": {
-            "extends": "aggregate",
-            "title": "AST unserialization",
-            "description": "Efficiently unserialize the schema AST",
-            "cols": ["subject", "mean", "diff"]
-        }
-    }
+    "runner.path": "benchmarks"
 }
