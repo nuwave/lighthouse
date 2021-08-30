@@ -54,6 +54,8 @@ GRAPHQL;
      */
     public function benchmark1(): void
     {
+        throw new \Exception('this error leads to an unexpected result');
+
         $this->graphQL(/** @lang GraphQL */ '
         {
             parent {
