@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.22.5
+
+### Fixed
+
+- Allow Laravel default guard to be `null` for applications that do not use auth at all
+
 ## v5.22.4
 
 ### Fixed

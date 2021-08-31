@@ -20,7 +20,7 @@ class AuthServiceProvider extends ServiceProvider
         );
     }
 
-    public static function guard(): string
+    public static function guard(): ?string
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = Container::getInstance()->make(ConfigRepository::class);
