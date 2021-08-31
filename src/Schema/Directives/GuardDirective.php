@@ -7,6 +7,7 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -58,7 +59,7 @@ GRAPHQL;
         // TODO remove cast in v6
         $with = (array) (
             $this->directiveArgValue('with')
-            ?? [config('lighthouse.guard')]
+            ?? [AuthServiceProvider::guard()]
         );
 
         $fieldValue->setResolver(
@@ -75,7 +76,7 @@ GRAPHQL;
     /**
      * Determine if the user is logged in to any of the given guards.
      *
-     * @param  array<string|null>  $guards
+     * @param  array<string>  $guards
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -83,7 +84,6 @@ GRAPHQL;
     {
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
-                // @phpstan-ignore-next-line passing null works fine here
                 $this->auth->shouldUse($guard);
 
                 return;

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Support\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 
 /**
  * Attempt to authenticate the user, but don't do anything if they are not.
@@ -38,7 +39,7 @@ class AttemptAuthentication
     protected function attemptAuthentication(array $guards): void
     {
         if (empty($guards)) {
-            $guards = [config('lighthouse.guard')];
+            $guards = [AuthServiceProvider::guard()];
         }
 
         foreach ($guards as $guard) {
