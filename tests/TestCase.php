@@ -133,6 +133,8 @@ GRAPHQL;
             | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
         );
 
+        $config->set('lighthouse.guard', null);
+
         $config->set('lighthouse.subscriptions', [
             'version' => 1,
             'storage' => 'array',
