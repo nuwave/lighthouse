@@ -58,7 +58,6 @@ GRAPHQL;
      */
     public function benchUnserializeDocumentNode(): void
     {
-        throw new \Exception('this error is dealt with properly');
         unserialize($this->documentNode);
     }
 
