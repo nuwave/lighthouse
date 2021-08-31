@@ -7,7 +7,6 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;

@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Auth;
 
-use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Auth\CanDirective;
+use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;

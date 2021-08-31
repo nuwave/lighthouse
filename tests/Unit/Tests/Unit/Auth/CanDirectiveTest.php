@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Auth;
 
+use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
