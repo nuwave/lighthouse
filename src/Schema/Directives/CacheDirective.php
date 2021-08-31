@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\Schema\Values\CacheValue;
+use Nuwave\Lighthouse\Schema\Values\CacheKeyAndTags;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -69,7 +69,7 @@ GRAPHQL;
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
-                $cacheValue = new CacheValue(
+                $cacheKeyAndTags = new CacheKeyAndTags(
                     $root,
                     $args,
                     $context,
@@ -78,11 +78,11 @@ GRAPHQL;
                     $isPrivate
                 );
 
-                $cacheKey = $cacheValue->getKey();
+                $cacheKey = $cacheKeyAndTags->key();
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
-                    ? $this->cacheRepository->tags($cacheValue->getTags())
+                    ? $this->cacheRepository->tags($cacheKeyAndTags->tags())
                     : $this->cacheRepository;
 
                 // We found a matching value in the cache, so we can just return early

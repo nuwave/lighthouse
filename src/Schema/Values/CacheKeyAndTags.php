@@ -6,51 +6,31 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CacheValue
+class CacheKeyAndTags
 {
-    /**
-     * @var mixed|null The root that was passed to the query.
-     */
+    /** @var mixed|null */
     protected $root;
 
-    /**
-     * The args that were passed to the query.
-     *
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> */
     protected $args;
 
-    /**
-     * The context that was passed to the query.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-     */
+    /** @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext */
     protected $context;
 
-    /**
-     * The ResolveInfo that was passed to the query.
-     *
-     * @var \GraphQL\Type\Definition\ResolveInfo
-     */
+    /** @var \GraphQL\Type\Definition\ResolveInfo */
     protected $resolveInfo;
 
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
+    /** @var \Nuwave\Lighthouse\Schema\Values\FieldValue */
     protected $fieldValue;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $isPrivate;
 
-    /**
-     * @var mixed The key to use for caching this field.
-     */
+    /** @var mixed */
     protected $fieldKey;
 
     /**
-     * @param  mixed|null  $root The root that was passed to the query.
+     * @param  mixed|null  $root
      * @param  array<string, mixed>  $args
      */
     public function __construct(
@@ -71,10 +51,7 @@ class CacheValue
         $this->fieldKey = $this->fieldKey();
     }
 
-    /**
-     * Resolve key from root value.
-     */
-    public function getKey(): string
+    public function key(): string
     {
         $parts = [];
 
@@ -88,30 +65,29 @@ class CacheValue
         $parts [] = $this->fieldKey;
         $parts [] = strtolower($this->resolveInfo->fieldName);
 
-        $argKeys = $this->argKeys();
-        if ($argKeys->isNotEmpty()) {
-            $parts [] = $argKeys->implode(':');
+        foreach ($this->convertInputArgumentsToKeys() as $argKey) {
+            $parts [] = $argKey;
         }
 
         return $this->implode($parts);
     }
 
     /**
-     * Get cache tags.
-     *
-     * @return array{0: string, 1: string}
+     * @return array{string, string}
      */
-    public function getTags(): array
+    public function tags(): array
     {
+        $parent = strtolower($this->resolveInfo->parentType->name);
+
         $typeTag = $this->implode([
             'graphql',
-            strtolower($this->fieldValue->getParentName()),
+            $parent,
             $this->fieldKey,
         ]);
 
         $fieldTag = $this->implode([
             'graphql',
-            strtolower($this->fieldValue->getParentName()),
+            $parent,
             $this->fieldKey,
             $this->resolveInfo->fieldName,
         ]);
@@ -120,11 +96,9 @@ class CacheValue
     }
 
     /**
-     * Convert input arguments to keys.
-     *
      * @return \Illuminate\Support\Collection<string>
      */
-    protected function argKeys(): Collection
+    protected function convertInputArgumentsToKeys(): Collection
     {
         return (new Collection($this->args))
             ->sortKeys()
@@ -138,23 +112,19 @@ class CacheValue
     }
 
     /**
-     * Get the field key.
-     *
-     * @return mixed|void
+     * @return mixed Can be anything
      */
     protected function fieldKey()
     {
         if ($this->root === null) {
-            return;
+            return null;
         }
 
         $cacheFieldKey = $this->fieldValue
             ->getParent()
             ->getCacheKey();
 
-        if ($cacheFieldKey) {
-            return data_get($this->root, $cacheFieldKey);
-        }
+        return data_get($this->root, $cacheFieldKey);
     }
 
     /**
