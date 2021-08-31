@@ -44,6 +44,7 @@ class AttemptAuthentication
 
         foreach ($guards as $guard) {
             if ($this->authFactory->guard($guard)->check()) {
+                // @phpstan-ignore-next-line passing null works fine here
                 $this->authFactory->shouldUse($guard);
 
                 return;
