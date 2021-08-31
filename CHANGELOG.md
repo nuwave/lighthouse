@@ -9,6 +9,16 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.22.4
+
+### Fixed
+
+- Fall back to Laravel default guard if Lighthouse default is undefined https://github.com/nuwave/lighthouse/pull/1930
+
+### Changed
+
+- Move authentication and authorization functionality to `Nuwave\Lighthouse\Auth` and a dedicated `AuthServiceProvider` https://github.com/nuwave/lighthouse/pull/1930
+
 ## v5.22.3
 
 ### Fixed

@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Auth;
 
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Schema\Directives\CanDirective;
+use Nuwave\Lighthouse\Auth\CanDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;

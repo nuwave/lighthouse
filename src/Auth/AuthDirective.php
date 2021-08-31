@@ -1,12 +1,14 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Auth;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Nuwave\Lighthouse\Auth\AuthServiceProvider;
-use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
+class AuthDirective extends BaseDirective implements FieldResolver
 {
     /**
      * @var \Illuminate\Contracts\Auth\Factory
@@ -22,14 +24,9 @@ class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Filter a type to only return instances owned by the current user.
+Return the currently authenticated user as the result of a query.
 """
-directive @whereAuth(
-  """
-  Name of the relationship that links to the user model.
-  """
-  relation: String!
-
+directive @auth(
   """
   Specify which guard to use, e.g. "api".
   When not defined, the default from `lighthouse.php` is used.
@@ -39,21 +36,19 @@ directive @whereAuth(
 GRAPHQL;
     }
 
-    public function handleFieldBuilder(object $builder): object
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        // @phpstan-ignore-next-line Mixins are magic
-        return $builder->whereHas(
-            $this->directiveArgValue('relation'),
-            function ($query): void {
+        return $fieldValue->setResolver(
+            function (): ?Authenticatable {
+                /** @var string|null $guard */
                 $guard = $this->directiveArgValue('guard')
                     ?? AuthServiceProvider::guard();
 
-                $userId = $this
+                // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
+                return $this
                     ->authFactory
                     ->guard($guard)
-                    ->id();
-
-                $query->whereKey($userId);
+                    ->user();
             }
         );
     }
