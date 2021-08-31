@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Unit\Auth;
 
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;

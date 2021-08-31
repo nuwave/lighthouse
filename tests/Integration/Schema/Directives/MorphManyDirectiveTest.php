@@ -17,7 +17,7 @@ class MorphManyDirectiveTest extends DBTestCase
     use WithFaker;
 
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */
