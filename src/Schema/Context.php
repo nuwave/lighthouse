@@ -33,8 +33,6 @@ class Context implements GraphQLContext
      * Get instance of authenticated user.
      *
      * May be null since some fields may be accessible without authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function user(): ?Authenticatable
     {

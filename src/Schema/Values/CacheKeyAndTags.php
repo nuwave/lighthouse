@@ -26,7 +26,6 @@ class CacheKeyAndTags
     /** @var bool */
     protected $isPrivate;
 
-    /** @var mixed */
     protected $fieldKey;
 
     /**
