@@ -9,10 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.23.0
+
 ### Added
 
-- Add `--federation` option to `lighthouse:print-schema` command to print the schema with federation directives and without federation spec additions, like `_service.sdl`  https://github.com/nuwave/lighthouse/pull/1932
-
+- Add `--federation` option to `lighthouse:print-schema` command to print the schema
+  with federation directives and without federation spec additions, like `_service.sdl` https://github.com/nuwave/lighthouse/pull/1932
 
 ## v5.22.5
 
