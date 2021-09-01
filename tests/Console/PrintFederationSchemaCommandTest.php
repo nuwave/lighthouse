@@ -49,7 +49,7 @@ GRAPHQL;
     {
         $this->schema = self::SCHEMA_TYPE.self::SCHEMA_QUERY;
 
-        Storage::fake();
+        $storage = Storage::fake();
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--federation' => true, '--write' => true]);
 

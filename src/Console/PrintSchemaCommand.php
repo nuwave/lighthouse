@@ -20,7 +20,7 @@ class PrintSchemaCommand extends Command
 lighthouse:print-schema
 {--W|write : Write the output to a file}
 {--json : Output JSON instead of GraphQL SDL}
-{--federation : Output federation subgraph schema}
+{--federation : Include federation directives and exclude federation spec additions, like _service.sdl}
 SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
