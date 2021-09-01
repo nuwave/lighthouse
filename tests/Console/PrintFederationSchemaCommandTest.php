@@ -48,11 +48,11 @@ GRAPHQL;
     {
         $this->schema = self::SCHEMA_TYPE.self::SCHEMA_QUERY;
 
-        $storage = Storage::fake();
+        Storage::fake();
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--federation' => true, '--write' => true]);
 
-        $fileContent = $storage->get(PrintSchemaCommand::GRAPHQL_FEDERATION_FILENAME);
+        $fileContent = Storage::get(PrintSchemaCommand::GRAPHQL_FEDERATION_FILENAME);
 
         $this->assertStringContainsString(self::SCHEMA_TYPE, $fileContent);
         $this->assertStringContainsString(self::SCHEMA_QUERY, $fileContent);
