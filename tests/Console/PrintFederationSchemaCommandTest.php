@@ -25,7 +25,6 @@ type Query {
 }
 GRAPHQL;
 
-
     protected function getPackageProviders($app): array
     {
         return array_merge(

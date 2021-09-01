@@ -35,6 +35,7 @@ SIGNATURE;
         if ($this->option('federation')) {
             if ($this->option('json')) {
                 $this->error('--json option is not supported with --federation');
+
                 return;
             }
             $filename = self::GRAPHQL_FEDERATION_FILENAME;
