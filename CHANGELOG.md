@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
+- Removed and old TODO related to https://github.com/FakerPHP/Faker/pull/345
+  for a faker related static analysis issues
 
 ## v5.23.0
 
