@@ -110,7 +110,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Try turning a client value into a Carbon instance.
      *
-     * @param  mixed  $value A possibly faulty client value.
+     * @param  mixed  $value  A possibly faulty client value.
      */
     abstract protected function parse($value): Carbon;
 }

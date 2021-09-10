@@ -112,7 +112,8 @@ GRAPHQL;
     }
 
     /**
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
+     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function define(string $directiveClass): string

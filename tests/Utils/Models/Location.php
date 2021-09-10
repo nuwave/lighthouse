@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes

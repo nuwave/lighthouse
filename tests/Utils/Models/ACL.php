@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes

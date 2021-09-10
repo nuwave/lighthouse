@@ -37,8 +37,7 @@ GRAPHQL;
 
         $fieldValue->resultHandler(
             /**
-             * @param Collection|LengthAwarePaginator $items
-             *
+             * @param  Collection|LengthAwarePaginator  $items
              * @return Collection|LengthAwarePaginator
              */
             static function ($items) use ($relations) {

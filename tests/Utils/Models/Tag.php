@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes

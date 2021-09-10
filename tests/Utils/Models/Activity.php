@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Timestamps

@@ -8,6 +8,7 @@ use Tests\Utils\LaravelEnums\AOrB;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes

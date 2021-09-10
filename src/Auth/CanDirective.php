@@ -173,6 +173,7 @@ GRAPHQL;
             try {
                 /**
                  * TODO use generics.
+                 *
                  * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
                  */
                 $enhancedBuilder = $argumentSet->enhanceBuilder(

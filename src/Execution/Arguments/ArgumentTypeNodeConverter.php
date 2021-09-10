@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 class ArgumentTypeNodeConverter extends TypeNodeConverter
 {
     /**
-     * @param \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType $type
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
      * @return \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType
      */
     protected function nonNull($type): object
