@@ -3,15 +3,15 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Closure;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 
 interface FieldMiddleware extends Directive
 {
     /**
      * Wrap around the final field resolver.
      *
-     * @param  \Closure(\Nuwave\Lighthouse\Schema\Values\FieldValue $field): \Nuwave\Lighthouse\Schema\Values\FieldValue  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
+     * @param  \Closure(\Nuwave\Lighthouse\Execution\ResolverArguments $field): mixed  $next
+     * @return mixed
      */
-    public function handleField(FieldValue $fieldValue, Closure $next);
+    public function handleField(ResolverArguments $arguments, Closure $next);
 }

@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 
 class TrimDirectiveTest extends DBTestCase
 {
@@ -74,8 +75,8 @@ class TrimDirectiveTest extends DBTestCase
 
     public function testTrimsAllFieldInputs(): void
     {
-        $this->mockResolver(static function ($root, array $args): array {
-            return $args;
+        $this->mockResolver(static function (ResolverArguments $args): array {
+            return $args->args->toArray();
         });
 
         $this->schema .= /** @lang GraphQL */ '

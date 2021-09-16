@@ -9,6 +9,7 @@ use GraphQL\Language\AST\TypeNode;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\ClientDirectives\ClientDirective;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -42,27 +43,17 @@ GRAPHQL;
         $this->defer = $defer;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(ResolverArguments $arguments, Closure $next): FieldValue
     {
-        $previousResolver = $fieldValue->getResolver();
-        $fieldType = $fieldValue->getField()->type;
+        $fieldType = $arguments->info->fieldDefinition->astNode->type;
+        $wrappedResolver = static fn() => $next($arguments);
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
-                $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
-                    return $previousResolver($root, $args, $context, $resolveInfo);
-                };
-                $path = implode('.', $resolveInfo->path);
+        $path = implode('.', $arguments->info->path);
+        if ($this->shouldDefer($fieldType, $arguments->info)) {
+            return $this->defer->defer($wrappedResolver, $path);
+        }
 
-                if ($this->shouldDefer($fieldType, $resolveInfo)) {
-                    return $this->defer->defer($wrappedResolver, $path);
-                }
-
-                return $this->defer->findOrResolve($wrappedResolver, $path);
-            }
-        );
-
-        return $next($fieldValue);
+        return $this->defer->findOrResolve($wrappedResolver, $path);
     }
 
     /**

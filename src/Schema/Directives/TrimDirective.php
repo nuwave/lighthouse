@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
@@ -43,24 +44,11 @@ GRAPHQL;
         );
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(ResolverArguments $arguments, Closure $next): FieldValue
     {
-        $resolver = $fieldValue->getResolver();
+        $arguments->args = $this->transformArgumentSet($arguments->args);
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $this->transformArgumentSet($resolveInfo->argumentSet);
-
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+        return $next($arguments);
     }
 
     protected function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -87,9 +88,12 @@ class FieldFactory
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
-                $resolveInfo->argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+                $arguments = new ResolverArguments();
+                $arguments->root = $root;
+                $arguments->args = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+                $arguments->info = $resolveInfo;
 
-                return $resolverWithMiddleware($root, $args, $context, $resolveInfo);
+                return $resolverWithMiddleware($arguments);
             }
         );
 

@@ -6,6 +6,7 @@ use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
@@ -16,24 +17,11 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddleware
 {
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(ResolverArguments $arguments, Closure $next): FieldValue
     {
-        $resolver = $fieldValue->getResolver();
+        $arguments->args = $this->transformRecursively($arguments->args);
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
-
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+        return $next($arguments);
     }
 
     public function transformRecursively(ArgumentSet $argumentSet): ArgumentSet

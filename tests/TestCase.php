@@ -133,6 +133,15 @@ GRAPHQL;
 
         $config->set('lighthouse.guard', null);
 
+        $config->set('lighthouse.field_middleware', [
+            \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
+//            \Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
+//            \Nuwave\Lighthouse\Validation\ValidateDirective::class,
+//            \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
+//            \Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
+//            \Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
+        ]);
+
         $config->set('lighthouse.subscriptions', [
             'version' => 1,
             'storage' => 'array',

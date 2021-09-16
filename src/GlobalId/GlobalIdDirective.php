@@ -3,7 +3,9 @@
 namespace Nuwave\Lighthouse\GlobalId;
 
 use Closure;
+use GraphQL\Deferred;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
@@ -62,19 +64,25 @@ enum GlobalIdDecode {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(ResolverArguments $arguments, Closure $next)
     {
-        $type = $fieldValue->getParentName();
+        $type = $arguments->info->parentType->name;
 
-        $fieldValue->resultHandler(function ($result) use ($type) {
+        $handle = function ($result) use ($type) {
             if (null === $result) {
                 return null;
             }
 
             return $this->globalId->encode($type, $result);
-        });
+        };
 
-        return $next($fieldValue);
+        $resolved = $next($arguments);
+
+        if ($resolved instanceof Deferred) {
+            return $resolved->then($handle);
+        }
+
+        return $handle($resolved);
     }
 
     /**

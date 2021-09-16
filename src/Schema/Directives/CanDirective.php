@@ -9,8 +9,10 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolverArguments;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
@@ -85,25 +87,19 @@ GRAPHQL;
     /**
      * Ensure the user is authorized to access this field.
      */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(ResolverArguments $arguments, Closure $next): FieldValue
     {
-        $previousResolver = $fieldValue->getResolver();
         $ability = $this->directiveArgValue('ability');
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($ability, $previousResolver) {
-                $gate = $this->gate->forUser($context->user());
-                $checkArguments = $this->buildCheckArguments($args);
+        $gate = $this->gate->forUser(Auth::user());
+        $args = $arguments->args->toArray();
+        $checkArguments = $this->buildCheckArguments($args);
 
-                foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
-                    $this->authorize($gate, $ability, $model, $checkArguments);
-                }
+        foreach ($this->modelsToCheck($arguments->args, $args) as $model) {
+            $this->authorize($gate, $ability, $model, $checkArguments);
+        }
 
-                return $previousResolver($root, $args, $context, $resolveInfo);
-            }
-        );
-
-        return $next($fieldValue);
+        return $next($arguments);
     }
 
     /**
@@ -115,7 +111,7 @@ GRAPHQL;
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($find = $this->directiveArgValue('find')) {
-            $findValue = Arr::get($args, $find);
+            $findValue = Arr::get($argumentSet, $find);
             if ($findValue === null) {
                 throw new Error(self::missingKeyToFindModel($find));
             }
