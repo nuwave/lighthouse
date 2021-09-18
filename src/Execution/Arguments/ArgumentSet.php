@@ -85,11 +85,12 @@ class ArgumentSet
             if ($value instanceof self) {
                 // Recurse down first, as that resolves the more deeply nested spreads first
                 $value = $value->spread();
-
-                if ($argument->directives->contains(
+                $directive = $argument->directives->first(
                     Utils::instanceofMatcher(SpreadDirective::class)
-                )) {
-                    $argumentSet->arguments += $value->arguments;
+                );
+
+                if ($directive) {
+                    $argumentSet->arguments += $directive->transformArguments($name, $value->arguments);
                     continue;
                 }
             }

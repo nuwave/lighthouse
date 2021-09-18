@@ -40,4 +40,14 @@ GRAPHQL;
             )
         );
     }
+
+    /**
+     * @param array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument> $arguments
+     *
+     * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    public function transformArguments(string $name, array $arguments): array
+    {
+        return $arguments;
+    }
 }
