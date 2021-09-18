@@ -34,7 +34,7 @@ class ArgumentSetTest extends TestCase
 
     public function testSpreadsNestedInput(): void
     {
-        $spreadDirective = new SpreadDirective();
+        $spreadDirective = $this->makeSpreadDirective();
         $directiveCollection = collect([$spreadDirective]);
 
         // Those are the leave values we want in the spread result
@@ -70,6 +70,47 @@ class ArgumentSetTest extends TestCase
 
         $this->assertSame($spreadArguments['foo']->value, $fooValue);
         $this->assertSame($spreadArguments['baz']->value, $bazValue);
+    }
+
+    public function testSpreadsNestedInputWithResolver(): void
+    {
+        $spreadDirective = $this->makeSpreadDirective($this->qualifyTestResolver('spread'));
+        $directiveCollection = collect([$spreadDirective]);
+
+        // Those are the leave values we want in the spread result
+        $foo = new Argument();
+        $fooValue = 1;
+        $foo->value = $fooValue;
+
+        $baz = new Argument();
+        $bazValue = 2;
+        $baz->value = $bazValue;
+
+        $barInput = new ArgumentSet();
+        $barInput->arguments['baz'] = $baz;
+
+        $barArgument = new Argument();
+        $barArgument->directives = $directiveCollection;
+        $barArgument->value = $barInput;
+
+        $fooInput = new ArgumentSet();
+        $fooInput->arguments['foo'] = $foo;
+        $fooInput->arguments['bar'] = $barArgument;
+
+        $inputArgument = new Argument();
+        $inputArgument->directives = $directiveCollection;
+        $inputArgument->value = $fooInput;
+
+        $argumentSet = new ArgumentSet();
+        $argumentSet->directives = $directiveCollection;
+        $argumentSet->arguments['input'] = $inputArgument;
+
+        $spreadArgumentSet = $argumentSet->spread();
+
+        $this->assertSame([
+            'input__foo' => $foo,
+            'input__bar__baz' => $baz
+        ], $spreadArgumentSet->arguments);
     }
 
     public function testSingleFieldToArray(): void
@@ -224,5 +265,20 @@ class ArgumentSetTest extends TestCase
         );
 
         return $renameDirective;
+    }
+
+    protected function makeSpreadDirective(string $resolver = null): SpreadDirective
+    {
+        $directiveNode   = $resolver
+            ? Parser::constDirective(/** @lang GraphQL */ "@spread(resolver: \"$resolver\")")
+            : Parser::constDirective(/** @lang GraphQL */ "@spread");
+        $definitionNode  = Parser::fieldDefinition(/** @lang GraphQL */ 'placeholder: ID');
+        $spreadDirective = (new SpreadDirective())->hydrate($directiveNode, $definitionNode);
+
+        return $spreadDirective;
+    }
+
+    public function spread(string $parent, string $current): string {
+        return "{$parent}__{$current}";
     }
 }

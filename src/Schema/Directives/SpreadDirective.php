@@ -17,7 +17,14 @@ class SpreadDirective extends BaseDirective implements FieldMiddleware
 Merge the fields of a nested input object into the arguments of its parent
 when processing the field arguments given by a client.
 """
-directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @spread(
+  """
+  A reference to the resolver function to be used.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
@@ -46,8 +53,19 @@ GRAPHQL;
      *
      * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
-    public function transformArguments(string $name, array $arguments): array
+    public function transformArguments(string $parent, array $arguments): array
     {
+        if ($this->directiveHasArgument('resolver')) {
+            $resolver = $this->getResolverFromArgument('resolver');
+            $transformed = [];
+
+            foreach ($arguments as $name => $argument) {
+                $transformed[$resolver($parent, $name)] = $argument;
+            }
+
+            $arguments = $transformed;
+        }
+
         return $arguments;
     }
 }
