@@ -32,19 +32,19 @@ class ArgumentSetTest extends TestCase
         $this->assertTrue($set->has('foo'));
     }
 
-    public function testSpreadsNestedInput(): void
+    public function testSpread(): void
     {
-        $spreadDirective = $this->makeSpreadDirective();
-        $directiveCollection = collect([$spreadDirective]);
+        $directiveCollection = collect([$this->makeSpreadDirective()]);
+        $directiveResolverCollection = collect([$this->makeSpreadDirective(
+            $this->qualifyTestResolver('spread')
+        )]);
 
         // Those are the leave values we want in the spread result
         $foo = new Argument();
-        $fooValue = 1;
-        $foo->value = $fooValue;
+        $foo->value = 1;
 
         $baz = new Argument();
-        $bazValue = 2;
-        $baz->value = $bazValue;
+        $baz->value = 2;
 
         $barInput = new ArgumentSet();
         $barInput->arguments['baz'] = $baz;
@@ -53,64 +53,54 @@ class ArgumentSetTest extends TestCase
         $barArgument->directives = $directiveCollection;
         $barArgument->value = $barInput;
 
+        $quxArgument = new Argument();
+        $quxArgument->directives = $directiveResolverCollection;
+        $quxArgument->value = $barInput;
+
+        $quuzArgument = new Argument();
+        $quuzArgument->directives = $directiveResolverCollection;
+        $quuzArgument->value = new ArgumentSet();
+        $quuzArgument->value->arguments['qux'] = $quxArgument;
+
         $fooInput = new ArgumentSet();
         $fooInput->arguments['foo'] = $foo;
         $fooInput->arguments['bar'] = $barArgument;
+        $fooInput->arguments['qux'] = $quxArgument;
+        $fooInput->arguments['quuz'] = $quuzArgument;
 
         $inputArgument = new Argument();
         $inputArgument->directives = $directiveCollection;
         $inputArgument->value = $fooInput;
 
+        $quuxArgument = new Argument();
+        $quuxArgument->value = [$fooInput, $barInput];
+
         $argumentSet = new ArgumentSet();
         $argumentSet->directives = $directiveCollection;
         $argumentSet->arguments['input'] = $inputArgument;
+        $argumentSet->arguments['quux'] = $quuxArgument;
 
         $spreadArgumentSet = $argumentSet->spread();
         $spreadArguments = $spreadArgumentSet->arguments;
 
-        $this->assertSame($spreadArguments['foo']->value, $fooValue);
-        $this->assertSame($spreadArguments['baz']->value, $bazValue);
-    }
-
-    public function testSpreadsNestedInputWithResolver(): void
-    {
-        $spreadDirective = $this->makeSpreadDirective($this->qualifyTestResolver('spread'));
-        $directiveCollection = collect([$spreadDirective]);
-
-        // Those are the leave values we want in the spread result
-        $foo = new Argument();
-        $fooValue = 1;
-        $foo->value = $fooValue;
-
-        $baz = new Argument();
-        $bazValue = 2;
-        $baz->value = $bazValue;
-
-        $barInput = new ArgumentSet();
-        $barInput->arguments['baz'] = $baz;
-
-        $barArgument = new Argument();
-        $barArgument->directives = $directiveCollection;
-        $barArgument->value = $barInput;
-
-        $fooInput = new ArgumentSet();
-        $fooInput->arguments['foo'] = $foo;
-        $fooInput->arguments['bar'] = $barArgument;
-
-        $inputArgument = new Argument();
-        $inputArgument->directives = $directiveCollection;
-        $inputArgument->value = $fooInput;
-
-        $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $directiveCollection;
-        $argumentSet->arguments['input'] = $inputArgument;
-
-        $spreadArgumentSet = $argumentSet->spread();
+        $this->assertSame([
+            'foo' => $foo,
+            'baz' => $baz,
+            'qux__baz' => $baz,
+            'quuz__qux__baz' => $baz,
+            'quux' => $quuxArgument,
+        ], $spreadArguments);
 
         $this->assertSame([
-            'input__foo' => $foo,
-            'input__bar__baz' => $baz
-        ], $spreadArgumentSet->arguments);
+            'foo' => $foo,
+            'baz' => $baz,
+            'qux__baz' => $baz,
+            'quuz__qux__baz' => $baz,
+        ], $spreadArguments['quux']->value[0]->arguments);
+
+        $this->assertSame([
+            'baz' => $baz,
+        ], $spreadArguments['quux']->value[1]->arguments);
     }
 
     public function testSingleFieldToArray(): void
@@ -269,16 +259,17 @@ class ArgumentSetTest extends TestCase
 
     protected function makeSpreadDirective(string $resolver = null): SpreadDirective
     {
-        $directiveNode   = $resolver
+        $directiveNode = $resolver
             ? Parser::constDirective(/** @lang GraphQL */ "@spread(resolver: \"$resolver\")")
             : Parser::constDirective(/** @lang GraphQL */ "@spread");
-        $definitionNode  = Parser::fieldDefinition(/** @lang GraphQL */ 'placeholder: ID');
+        $definitionNode = Parser::fieldDefinition(/** @lang GraphQL */ 'placeholder: ID');
         $spreadDirective = (new SpreadDirective())->hydrate($directiveNode, $definitionNode);
 
         return $spreadDirective;
     }
 
-    public function spread(string $parent, string $current): string {
+    public function spread(string $parent, string $current): string
+    {
         return "{$parent}__{$current}";
     }
 }

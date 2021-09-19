@@ -13,18 +13,30 @@ class SpreadDirectiveTest extends TestCase
                 'foo' => 1,
                 'baz' => 2,
                 'qux__baz' => 3,
+                'quuz__qux__baz' => 4,
+                'quux' => [
+                    [
+                        'foo' => 1,
+                        'baz' => 2,
+                        'qux__baz' => 3,
+                    ],
+                    [
+                        'quuz__qux__baz' => 4,
+                    ]
+                ],
             ]);
 
         $resolver = $this->qualifyTestResolver('spread');
         $this->schema = /** @lang GraphQL */ "
         type Query {
-            foo(input: Foo @spread): Int @mock
+            foo(input: Foo @spread, quux: [Foo!]!): Int @mock
         }
 
         input Foo {
             foo: Int
             bar: Bar @spread
             qux: Bar @spread(resolver: \"{$resolver}\")
+            quuz: Foo @spread(resolver: \"{$resolver}\")
         }
 
         input Bar {
@@ -34,15 +46,40 @@ class SpreadDirectiveTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            foo(input: {
-                foo: 1
-                bar: {
-                    baz: 2
+            foo(
+                input: {
+                    foo: 1
+                    bar: {
+                        baz: 2
+                    }
+                    qux: {
+                        baz: 3
+                    }
+                    quuz: {
+                        qux: {
+                            baz: 4
+                        }
+                    }
                 }
-                qux: {
-                    baz: 3
-                }
-            })
+                quux: [
+                    {
+                        foo: 1
+                        bar: {
+                            baz: 2
+                        }
+                        qux: {
+                            baz: 3
+                        }
+                    }
+                    {
+                        quuz: {
+                            qux: {
+                                baz: 4
+                            }
+                        }
+                    }
+                ]
+            )
         }
         ');
     }

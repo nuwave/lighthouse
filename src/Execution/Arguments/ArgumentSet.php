@@ -78,23 +78,34 @@ class ArgumentSet
         $argumentSet->directives = $this->directives;
 
         foreach ($this->arguments as $name => $argument) {
-            $value = $argument->value;
+            // Recursively apply the spread to nested inputs.
+            // We look for further ArgumentSet instances, they
+            // might be contained within an array.
+            $argument->value = Utils::applyEach(
+                function ($value) {
+                    if ($value instanceof self) {
+                        return $value->spread();
+                    }
 
-            // In this case, we do not care about argument sets nested within
-            // lists, spreading only makes sense for single nested inputs.
-            if ($value instanceof self) {
-                // Recurse down first, as that resolves the more deeply nested spreads first
-                $value = $value->spread();
+                    return $value;
+                },
+                $argument->value
+            );
+
+            // Spread arguments
+            if ($argument->value instanceof self) {
+                /** @var \Nuwave\Lighthouse\Schema\Directives\SpreadDirective $directive */
                 $directive = $argument->directives->first(
                     Utils::instanceofMatcher(SpreadDirective::class)
                 );
 
                 if ($directive) {
-                    $argumentSet->arguments += $directive->transformArguments($name, $value->arguments);
+                    $argumentSet->arguments += $directive->transformArguments($name, $argument->value->arguments);
                     continue;
                 }
             }
 
+            // Copy as is
             $argumentSet->arguments[$name] = $argument;
         }
 
