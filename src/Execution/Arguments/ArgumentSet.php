@@ -92,21 +92,17 @@ class ArgumentSet
                 $argument->value
             );
 
-            // Spread arguments
-            if ($argument->value instanceof self) {
-                /** @var \Nuwave\Lighthouse\Schema\Directives\SpreadDirective $directive */
-                $directive = $argument->directives->first(
-                    Utils::instanceofMatcher(SpreadDirective::class)
-                );
+            // Transform
+            /** @var \Nuwave\Lighthouse\Schema\Directives\SpreadDirective $directive */
+            $directive = $argument->directives->first(
+                Utils::instanceofMatcher(SpreadDirective::class)
+            );
 
-                if ($directive) {
-                    $argumentSet->arguments += $directive->transformArguments($name, $argument->value->arguments);
-                    continue;
-                }
+            if ($directive) {
+                $argumentSet = $directive->transformArgumentSet($argumentSet, $name, $argument);
+            } else {
+                $argumentSet->arguments[$name] = $argument;
             }
-
-            // Copy as is
-            $argumentSet->arguments[$name] = $argument;
         }
 
         return $argumentSet;

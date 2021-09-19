@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Arguments\Argument;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -48,24 +50,25 @@ GRAPHQL;
         );
     }
 
-    /**
-     * @param array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument> $arguments
-     *
-     * @return array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
-     */
-    public function transformArguments(string $parent, array $arguments): array
+    public function transformArgumentSet(ArgumentSet $argumentSet, string $argumentName, Argument $argument): ArgumentSet
     {
-        if ($this->directiveHasArgument('resolver')) {
-            $resolver = $this->getResolverFromArgument('resolver');
-            $transformed = [];
+        if ($argument->value instanceof ArgumentSet) {
+            $arguments = $argument->value->arguments;
 
-            foreach ($arguments as $name => $argument) {
-                $transformed[$resolver($parent, $name)] = $argument;
+            if ($this->directiveHasArgument('resolver')) {
+                $resolver = $this->getResolverFromArgument('resolver');
+                $arguments = [];
+
+                foreach ($argument->value->arguments as $name => $argument) {
+                    $arguments[$resolver($argumentName, $name)] = $argument;
+                }
             }
 
-            $arguments = $transformed;
+            $argumentSet->arguments += $arguments;
+        } else {
+            $argumentSet->arguments[$argumentName] = $argument;
         }
 
-        return $arguments;
+        return $argumentSet;
     }
 }
