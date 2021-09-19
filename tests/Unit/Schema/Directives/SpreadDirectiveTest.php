@@ -22,7 +22,7 @@ class SpreadDirectiveTest extends TestCase
                     ],
                     [
                         'quuz__qux__baz' => 4,
-                    ]
+                    ],
                 ],
             ]);
 
@@ -84,7 +84,8 @@ class SpreadDirectiveTest extends TestCase
         ');
     }
 
-    public function spread(string $parent, string $current): string {
+    public function spread(string $parent, string $current): string
+    {
         return "{$parent}__{$current}";
     }
 }

@@ -261,7 +261,7 @@ class ArgumentSetTest extends TestCase
     {
         $directiveNode = $resolver
             ? Parser::constDirective(/** @lang GraphQL */ "@spread(resolver: \"$resolver\")")
-            : Parser::constDirective(/** @lang GraphQL */ "@spread");
+            : Parser::constDirective(/** @lang GraphQL */ '@spread');
         $definitionNode = Parser::fieldDefinition(/** @lang GraphQL */ 'placeholder: ID');
         $spreadDirective = (new SpreadDirective())->hydrate($directiveNode, $definitionNode);
 
