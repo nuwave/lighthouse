@@ -92,3 +92,28 @@ type Image {
 
 union Imageable = Post | User
 ```
+
+## Querying
+
+Now that you have the definition in place, you could query the images like so (supposing you have an images query `images: [Image!]! @all`)
+
+```graphql
+{ 
+  images {
+    id,
+    url,
+    imageable {
+      __typename,
+      ... on Post {
+        id,
+        name
+      },
+      ... on User {
+        id,
+        name
+      }
+      
+    }
+  }
+}
+```
