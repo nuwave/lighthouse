@@ -32,46 +32,6 @@ class ArgumentSetTest extends TestCase
         $this->assertTrue($set->has('foo'));
     }
 
-    public function testSpreadsNestedInput(): void
-    {
-        $spreadDirective = new SpreadDirective();
-        $directiveCollection = collect([$spreadDirective]);
-
-        // Those are the leave values we want in the spread result
-        $foo = new Argument();
-        $fooValue = 1;
-        $foo->value = $fooValue;
-
-        $baz = new Argument();
-        $bazValue = 2;
-        $baz->value = $bazValue;
-
-        $barInput = new ArgumentSet();
-        $barInput->arguments['baz'] = $baz;
-
-        $barArgument = new Argument();
-        $barArgument->directives = $directiveCollection;
-        $barArgument->value = $barInput;
-
-        $fooInput = new ArgumentSet();
-        $fooInput->arguments['foo'] = $foo;
-        $fooInput->arguments['bar'] = $barArgument;
-
-        $inputArgument = new Argument();
-        $inputArgument->directives = $directiveCollection;
-        $inputArgument->value = $fooInput;
-
-        $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $directiveCollection;
-        $argumentSet->arguments['input'] = $inputArgument;
-
-        $spreadArgumentSet = $argumentSet->spread();
-        $spreadArguments = $spreadArgumentSet->arguments;
-
-        $this->assertSame($spreadArguments['foo']->value, $fooValue);
-        $this->assertSame($spreadArguments['baz']->value, $bazValue);
-    }
-
     public function testSingleFieldToArray(): void
     {
         $foo = new Argument();

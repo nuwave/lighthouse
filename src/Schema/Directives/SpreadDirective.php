@@ -48,7 +48,7 @@ GRAPHQL;
      *
      * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
      */
-    protected static function spread(ArgumentSet $original): ArgumentSet
+    protected function spread(ArgumentSet $original): ArgumentSet
     {
         $next = new ArgumentSet();
         $next->directives = $original->directives;
@@ -60,7 +60,7 @@ GRAPHQL;
             // lists, spreading only makes sense for single nested inputs.
             if ($value instanceof ArgumentSet) {
                 // Recurse down first, as that resolves the more deeply nested spreads first
-                $value = self::spread($value);
+                $value = $this->spread($value);
 
                 if ($argument->directives->contains(
                     Utils::instanceofMatcher(static::class)
