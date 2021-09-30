@@ -40,4 +40,42 @@ class SpreadDirectiveTest extends TestCase
         }
         ');
     }
+
+    public function testNestedSpreadInList(): void
+    {
+        $this->mockResolver()
+            ->with(null, [
+                'input' => [
+                    [
+                        'baz' => 1,
+                    ],
+                ],
+            ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: [Foo!]!): Int @mock
+        }
+
+        input Foo {
+            bar: Bar! @spread
+        }
+
+        input Bar {
+            baz: Int!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(input: [
+                {
+                    bar: {
+                        baz: 1
+                    }
+                }
+            ])
+        }
+        ');
+    }
 }
