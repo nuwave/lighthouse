@@ -4,9 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class SpreadDirective extends BaseDirective implements FieldMiddleware
 {
@@ -28,7 +30,7 @@ GRAPHQL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $resolveInfo->argumentSet->spread();
+                    $resolveInfo->argumentSet = $this->spread($resolveInfo->argumentSet);
 
                     return $resolver(
                         $root,
@@ -39,5 +41,38 @@ GRAPHQL;
                 }
             )
         );
+    }
+
+    /**
+     * Apply the @spread directive and return a new, modified ArgumentSet.
+     *
+     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
+     */
+    protected static function spread(ArgumentSet $original): ArgumentSet
+    {
+        $next = new ArgumentSet();
+        $next->directives = $original->directives;
+
+        foreach ($original->arguments as $name => $argument) {
+            $value = $argument->value;
+
+            // In this case, we do not care about argument sets nested within
+            // lists, spreading only makes sense for single nested inputs.
+            if ($value instanceof ArgumentSet) {
+                // Recurse down first, as that resolves the more deeply nested spreads first
+                $value = self::spread($value);
+
+                if ($argument->directives->contains(
+                    Utils::instanceofMatcher(static::class)
+                )) {
+                    $next->arguments += $value->arguments;
+                    continue;
+                }
+            }
+
+            $next->arguments[$name] = $argument;
+        }
+
+        return $next;
     }
 }
