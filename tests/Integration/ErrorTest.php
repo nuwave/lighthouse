@@ -150,4 +150,19 @@ class ErrorTest extends TestCase
             ->assertGraphQLErrorMessage('Field TestInput.string of required type String! was not provided.')
             ->assertGraphQLErrorMessage('Field TestInput.integer of required type Int! was not provided.');
     }
+
+    public function testUnknownTypeInVariableDefinition(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: ID): ID
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($bar: UnknownType) {
+            foo(bar: $bar)
+        }
+        ');
+    }
 }
