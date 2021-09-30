@@ -41,6 +41,7 @@ class Subscriber implements Serializable
      * The name of the queried field.
      *
      * Guaranteed be be unique because of
+     *
      * @see \GraphQL\Validator\Rules\SingleFieldSubscription
      *
      * @var string
@@ -155,6 +156,7 @@ class Subscriber implements Serializable
      * Set root data.
      *
      * @return $this
+     *
      * @deprecated set the attribute directly
      */
     public function setRoot($root): self

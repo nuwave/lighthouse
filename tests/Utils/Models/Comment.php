@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes
@@ -19,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Timestamps
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
- *
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Tests\Utils\Models\Post $post
  */

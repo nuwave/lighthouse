@@ -13,6 +13,7 @@ use Laravel\Scout\Searchable;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes
@@ -27,7 +28,6 @@ use Laravel\Scout\Searchable;
  * @property int|null $user_id
  * @property int $task_id
  * @property int|null $parent_id
- *
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Activity> $activity
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Comment> $comments

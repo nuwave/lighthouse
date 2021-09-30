@@ -30,9 +30,9 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     /**
      * Provide a resolver for a subscription field in case no resolver directive is defined.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
     {

@@ -36,6 +36,7 @@ GRAPHQL;
      * Resolves parent.
      *
      * @skip
+     *
      * @return array<string, mixed>
      */
     public function resolve(): array

@@ -29,6 +29,7 @@ class ArgumentFactory
      * Convert an argument definition to an executable type.
      *
      * The returned array will be used to construct one of:
+     *
      * @see \GraphQL\Type\Definition\FieldArgument
      * @see \GraphQL\Type\Definition\InputObjectField
      *

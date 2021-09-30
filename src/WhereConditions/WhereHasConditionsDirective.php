@@ -43,7 +43,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>|null  $value The client given conditions
+     * @param  array<string, mixed>|null  $value  The client given conditions
      */
     public function handleBuilder($builder, $value): object
     {

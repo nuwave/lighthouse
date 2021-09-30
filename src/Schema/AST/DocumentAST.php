@@ -99,7 +99,6 @@ class DocumentAST implements Serializable, Arrayable
      * This operation will overwrite existing definitions with the same name.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $type
-     *
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
@@ -115,7 +114,6 @@ class DocumentAST implements Serializable, Arrayable
      * This operation will overwrite existing definitions with the same name.
      *
      * @param  \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node  $directive
-     *
      * @return $this
      */
     public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self
@@ -150,7 +148,7 @@ class DocumentAST implements Serializable, Arrayable
     /**
      * Instantiate from a serialized array.
      *
-     * @param array<string, mixed> $ast
+     * @param  array<string, mixed>  $ast
      */
     public static function fromArray(array $ast): DocumentAST
     {
@@ -171,7 +169,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param array<string, mixed> $ast
+     * @param  array<string, mixed>  $ast
      */
     protected function hydrateFromArray(array $ast): void
     {

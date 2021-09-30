@@ -20,7 +20,7 @@ class ExtensionsResponse
     protected $content;
 
     /**
-     * @param  mixed  $content JSON-encodable content
+     * @param  mixed  $content  JSON-encodable content
      */
     public function __construct(string $key, $content)
     {

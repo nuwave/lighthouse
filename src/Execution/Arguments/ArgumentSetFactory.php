@@ -109,7 +109,7 @@ class ArgumentSetFactory
     /**
      * Wrap a single client-given argument with type information.
      *
-     * @param  mixed  $value The client given value.
+     * @param  mixed  $value  The client given value.
      * @return \Nuwave\Lighthouse\Execution\Arguments\Argument
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
@@ -157,7 +157,7 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value The client given value.
+     * @param  mixed  $value  The client given value.
      * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $namedType
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */

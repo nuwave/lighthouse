@@ -67,7 +67,7 @@ class NestedManyToMany implements ArgResolver
      * data to store in the pivot table. That array expects passing the id's
      * as keys, so we transform the passed arguments to match that.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument  $args
      * @return array<mixed>
      */
     protected function generateRelationArray(Argument $args): array

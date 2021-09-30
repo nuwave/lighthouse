@@ -46,7 +46,7 @@ class SerializingArrayStore extends ArrayStore
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed  $value Some storable value
+     * @param  mixed  $value  Some storable value
      * @param  int  $seconds
      */
     public function put($key, $value, $seconds): bool

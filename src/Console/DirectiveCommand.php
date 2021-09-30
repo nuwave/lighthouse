@@ -148,7 +148,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<class-string> $interfaces
+     * @param  array<class-string>  $interfaces
      */
     protected function askForInterfaces(array $interfaces): void
     {

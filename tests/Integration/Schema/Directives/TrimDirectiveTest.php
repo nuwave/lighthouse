@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\DBTestCase;
 use Nuwave\Lighthouse\Execution\ResolverArguments;
+use Tests\DBTestCase;
 
 class TrimDirectiveTest extends DBTestCase
 {

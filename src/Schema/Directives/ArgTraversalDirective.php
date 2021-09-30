@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\ResolverArguments;
@@ -12,7 +11,6 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddleware
@@ -54,7 +52,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
     }
 
     /**
-     * @param  mixed  $value The client given value
+     * @param  mixed  $value  The client given value
      * @return mixed The transformed value
      */
     protected function transform($value, Collection $directivesForArgument)
@@ -67,7 +65,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
     }
 
     /**
-     * @param  mixed  $value The client given value
+     * @param  mixed  $value  The client given value
      * @return mixed The transformed value
      */
     abstract protected function applyDirective(Directive $directive, $value);

@@ -43,8 +43,8 @@ class Utils
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param  class-string  $className This class is resolved through the container.
-     * @param  string  $methodName The method that gets passed the arguments of the closure.
+     * @param  class-string  $className  This class is resolved through the container.
+     * @param  string  $methodName  The method that gets passed the arguments of the closure.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -68,7 +68,7 @@ class Utils
      * @param  mixed  $object  Object with protected member.
      * @param  string  $memberName  Name of object's protected member.
      * @param  mixed|null  $default  Default value to return in case of access error.
-     * @return mixed  Value of object's protected member.
+     * @return mixed Value of object's protected member.
      */
     public static function accessProtected($object, string $memberName, $default = null)
     {

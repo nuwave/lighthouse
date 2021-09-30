@@ -7,7 +7,6 @@ use GraphQL\Deferred;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ResolverArguments;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;

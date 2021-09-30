@@ -246,7 +246,7 @@ class DirectiveLocator
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
+     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Primary key.
+ *
  * @property string $barcode
  * @property string $uuid
  *

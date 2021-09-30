@@ -63,7 +63,7 @@ abstract class TypeNodeConverter
     /**
      * Wrap or mark the type as non-null.
      *
-     * @param  mixed  $type The type to wrap.
+     * @param  mixed  $type  The type to wrap.
      * @return mixed The type wrapped with non-null.
      */
     abstract protected function nonNull($type);
@@ -71,7 +71,7 @@ abstract class TypeNodeConverter
     /**
      * Wrap or mark the type as a list.
      *
-     * @param  mixed  $type The type to wrap.
+     * @param  mixed  $type  The type to wrap.
      * @return mixed The type wrapped as a list.
      */
     abstract protected function listOf($type);

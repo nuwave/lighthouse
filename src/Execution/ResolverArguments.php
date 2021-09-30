@@ -9,8 +9,6 @@ class ResolverArguments
 {
     /**
      * The value given by the parent resolver.
-     *
-     * @var mixed
      */
     public $root;
 

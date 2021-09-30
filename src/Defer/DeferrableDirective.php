@@ -14,7 +14,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeferrableDirective extends BaseDirective implements FieldMiddleware
 {
@@ -46,7 +45,7 @@ GRAPHQL;
     public function handleField(ResolverArguments $arguments, Closure $next): FieldValue
     {
         $fieldType = $arguments->info->fieldDefinition->astNode->type;
-        $wrappedResolver = static fn() => $next($arguments);
+        $wrappedResolver = static fn () => $next($arguments);
 
         $path = implode('.', $arguments->info->path);
         if ($this->shouldDefer($fieldType, $arguments->info)) {

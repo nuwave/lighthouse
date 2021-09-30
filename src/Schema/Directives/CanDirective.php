@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Error\Error;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -19,7 +18,6 @@ use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class CanDirective extends BaseDirective implements FieldMiddleware
@@ -139,6 +137,7 @@ GRAPHQL;
             try {
                 /**
                  * TODO use generics.
+                 *
                  * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
                  */
                 $enhancedBuilder = $argumentSet->enhanceBuilder(

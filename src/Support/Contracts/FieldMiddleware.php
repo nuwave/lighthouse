@@ -11,7 +11,6 @@ interface FieldMiddleware extends Directive
      * Wrap around the final field resolver.
      *
      * @param  \Closure(\Nuwave\Lighthouse\Execution\ResolverArguments $field): mixed  $next
-     * @return mixed
      */
     public function handleField(ResolverArguments $arguments, Closure $next);
 }

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes

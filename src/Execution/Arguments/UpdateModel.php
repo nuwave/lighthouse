@@ -16,7 +16,7 @@ class UpdateModel implements ArgResolver
     protected $previous;
 
     /**
-     * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous
+     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
      */
     public function __construct(callable $previous)
     {

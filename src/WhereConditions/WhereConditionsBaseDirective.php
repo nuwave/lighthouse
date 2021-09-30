@@ -91,7 +91,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param array<string, mixed>|null $condition
+     * @param  array<string, mixed>|null  $condition
      */
     public function handleHasCondition(
         Model $model,

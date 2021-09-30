@@ -45,7 +45,6 @@ class NodeRegistry
      *
      * The name of the ObjectType that can be resolved with the Node interface
      * e.g. "User"
-     *
      * @param  \Closure  $resolve
      *
      * A function that returns the actual value by ID, e.g.
@@ -54,7 +53,6 @@ class NodeRegistry
      * {
      *   return $this->db->getUserById($id)
      * }
-     *
      * @return $this
      */
     public function registerNode(string $typeName, Closure $resolve): self

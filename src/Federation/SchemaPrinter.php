@@ -54,7 +54,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param  array<string, mixed>  $options
      */
     protected static function printInterface(InterfaceType $type, array $options): string
     {
