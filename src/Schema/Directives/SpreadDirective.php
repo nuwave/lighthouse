@@ -54,23 +54,28 @@ GRAPHQL;
         $next->directives = $original->directives;
 
         foreach ($original->arguments as $name => $argument) {
-            $value = $argument->value;
+            // Recurse down first, as that resolves the more deeply nested spreads first
+            $argument->value = Utils::applyEach(
+                function ($value) {
+                    if ($value instanceof ArgumentSet) {
+                        return $this->spread($value);
+                    }
 
-            // In this case, we do not care about argument sets nested within
-            // lists, spreading only makes sense for single nested inputs.
-            if ($value instanceof ArgumentSet) {
-                // Recurse down first, as that resolves the more deeply nested spreads first
-                $value = $this->spread($value);
+                    return $value;
+                },
+                $argument->value
+            );
 
-                if ($argument->directives->contains(
+            if (
+                $argument->value instanceof ArgumentSet
+                && $argument->directives->contains(
                     Utils::instanceofMatcher(static::class)
-                )) {
-                    $next->arguments += $value->arguments;
-                    continue;
-                }
+                )
+            ) {
+                $next->arguments += $argument->value->arguments;
+            } else {
+                $next->arguments[$name] = $argument;
             }
-
-            $next->arguments[$name] = $argument;
         }
 
         return $next;

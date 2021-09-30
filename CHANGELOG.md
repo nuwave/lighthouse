@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.23.1
+
+### Fixed
+
+- Apply `@spread` to inputs nested within lists https://github.com/nuwave/lighthouse/pull/1944
+
 ## v5.23.0
 
 ### Added
