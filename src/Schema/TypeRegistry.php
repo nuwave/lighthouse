@@ -93,19 +93,19 @@ class TypeRegistry
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public function get(string $name): Type
+    public function get(string $name): ?Type
     {
-        if (! $this->has($name)) {
-            throw new DefinitionException(<<<EOL
-Lighthouse failed while trying to load a type: $name
+//        if (! $this->has($name)) {
+//            throw new DefinitionException(<<<EOL
+//Lighthouse failed while trying to load a type: $name
+//
+//Make sure the type is present in your schema definition.
+//
+//EOL
+//            );
+//        }
 
-Make sure the type is present in your schema definition.
-
-EOL
-            );
-        }
-
-        return $this->types[$name];
+        return $this->types[$name] ?? null;
     }
 
     /**
