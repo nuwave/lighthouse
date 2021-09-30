@@ -97,11 +97,11 @@ class TypeRegistry
     {
 //        if (! $this->has($name)) {
 //            throw new DefinitionException(<<<EOL
-//Lighthouse failed while trying to load a type: $name
+        //Lighthouse failed while trying to load a type: $name
 //
-//Make sure the type is present in your schema definition.
+        //Make sure the type is present in your schema definition.
 //
-//EOL
+        //EOL
 //            );
 //        }
 
