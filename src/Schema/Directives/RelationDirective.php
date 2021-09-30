@@ -35,8 +35,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
                 $relation = $parent->{$relationName}();
          
-                $sameConnection = $relation->getParent()->getConnectionName() == $relation->getRelated()->getConnectionName();
-                if (config('lighthouse.batchload_relations') && $sameConnection) {
+                if (
+                    config('lighthouse.batchload_relations')
+                    // Batch loading joins across both models, thus only works if they are on the same connection
+                    && $relation->getParent()->getConnectionName() === $relation->getRelated()->getConnectionName()
+                ) {
                     /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                     $relationBatchLoader = BatchLoaderRegistry::instance(
                         $this->qualifyPath($args, $resolveInfo),
