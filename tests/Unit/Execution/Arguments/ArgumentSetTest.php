@@ -6,7 +6,6 @@ use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
-use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Tests\TestCase;
 
 class ArgumentSetTest extends TestCase
