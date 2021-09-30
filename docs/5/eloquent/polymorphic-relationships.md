@@ -12,7 +12,7 @@ Let's start off with the plain type definitions, without any relations.
 ```graphql
 type Post {
   id: ID!
-  name: String!
+  title: String!
 }
 
 type User {
@@ -33,7 +33,7 @@ with the [@morphOne](../api-reference/directives.md#morphone) directive.
 ```graphql
 type Post {
   id: ID!
-  name: String!
+  title: String!
   image: Image! @morphOne
 }
 
@@ -70,6 +70,24 @@ type Image {
 The default type resolver will be able to determine which concrete object type is returned
 when dealing with Eloquent models, so your definition should just work.
 
+Given you have a field `images` that returns a list of `[Image!]!`, you could query it like this:
+
+```graphql
+{
+    images {
+        imageable {
+            __typename
+            ... on Post {
+                title
+            }
+            ... on User {
+                name
+            }
+        }
+    }
+}
+```
+
 ## One to Many
 
 Based on the above example, you could change your application to allow
@@ -80,7 +98,7 @@ with the [@morphMany](../api-reference/directives.md#morphmany) directive.
 ```graphql
 type Post {
   id: ID!
-  name: String!
+  title: String!
   images: [Image]! @morphMany
 }
 
