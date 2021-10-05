@@ -188,7 +188,7 @@ trait MakesGraphQLRequestsLumen
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
-     * @return array<int, mixed>  The chunked results
+     * @return array<int, mixed> The chunked results
      */
     protected function streamGraphQL(string $query, array $variables = [], array $extraParams = []): array
     {

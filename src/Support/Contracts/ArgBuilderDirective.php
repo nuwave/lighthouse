@@ -9,7 +9,7 @@ interface ArgBuilderDirective extends Directive
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
      * @param  mixed  $value  The client given value of the argument.
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  The modified builder.
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder The modified builder.
      */
     public function handleBuilder($builder, $value);
 }

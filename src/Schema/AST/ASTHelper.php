@@ -35,6 +35,7 @@ class ASTHelper
      * Merge two lists of AST nodes.
      *
      * @template TNode of \GraphQL\Language\AST\Node
+     *
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
@@ -76,6 +77,7 @@ class ASTHelper
 
     /**
      * @template TNode of \GraphQL\Language\AST\Node
+     *
      * @param  \GraphQL\Language\AST\NodeList<TNode>  $nodeList
      * @param  TNode  $node
      * @return \GraphQL\Language\AST\NodeList<TNode>
@@ -125,7 +127,7 @@ class ASTHelper
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param  mixed  $default Is returned if the directive does not have the argument.
+     * @param  mixed  $default  Is returned if the directive does not have the argument.
      * @return mixed The value given to the directive.
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
@@ -190,7 +192,8 @@ class ASTHelper
      * Out of a list of nodes, get the first that matches the given name.
      *
      * @template TNode of \GraphQL\Language\AST\Node
-     * @param  iterable<TNode> $nodes
+     *
+     * @param  iterable<TNode>  $nodes
      * @return TNode|null
      */
     public static function firstByName($nodes, string $name): ?Node

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Auth;
 
 use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -58,7 +59,7 @@ GRAPHQL;
         // TODO remove cast in v6
         $with = (array) (
             $this->directiveArgValue('with')
-            ?? [config('lighthouse.guard')]
+            ?? [AuthServiceProvider::guard()]
         );
 
         $fieldValue->setResolver(

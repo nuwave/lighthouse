@@ -1,8 +1,9 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 
 class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
@@ -45,7 +46,7 @@ GRAPHQL;
             $this->directiveArgValue('relation'),
             function ($query): void {
                 $guard = $this->directiveArgValue('guard')
-                    ?? config('lighthouse.guard');
+                    ?? AuthServiceProvider::guard();
 
                 $userId = $this
                     ->authFactory

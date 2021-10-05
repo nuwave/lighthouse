@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Unit\Auth;
 
+use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\CanDirective;

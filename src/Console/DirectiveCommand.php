@@ -186,7 +186,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<class-string> $availableInterfaces
+     * @param  array<class-string>  $availableInterfaces
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
@@ -205,7 +205,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param array<int, string> $availableLocations
+     * @param  array<int, string>  $availableLocations
      */
     public function askForLocations(array $availableLocations): void
     {

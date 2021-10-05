@@ -27,7 +27,7 @@ test: up ## Runs tests with PHPUnit
 
 .PHONY: bench
 bench: up ## Run benchmarks
-	docker-compose exec php composer bench
+	docker-compose exec php vendor/bin/phpbench run --report=aggregate
 
 .PHONY: rector
 rector: up ## Automatic code fixes with Rector

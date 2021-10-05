@@ -19,6 +19,35 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for PHP 7.2, 7.3
 - Remove support for Laravel 5, 6, 7
 
+## v5.23.1
+
+### Fixed
+
+- Apply `@spread` to inputs nested within lists https://github.com/nuwave/lighthouse/pull/1944
+
+## v5.23.0
+
+### Added
+
+- Add `--federation` option to `lighthouse:print-schema` command to print the schema
+  with federation directives and without federation spec additions, like `_service.sdl` https://github.com/nuwave/lighthouse/pull/1932
+
+## v5.22.5
+
+### Fixed
+
+- Allow Laravel default guard to be `null` for applications that do not use auth at all
+
+## v5.22.4
+
+### Fixed
+
+- Fall back to Laravel default guard if Lighthouse default is undefined https://github.com/nuwave/lighthouse/pull/1930
+
+### Changed
+
+- Move authentication and authorization functionality to `Nuwave\Lighthouse\Auth` and a dedicated `AuthServiceProvider` https://github.com/nuwave/lighthouse/pull/1930
+
 ## v5.22.3
 
 ### Fixed

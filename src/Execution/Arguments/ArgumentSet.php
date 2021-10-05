@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
-use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -68,39 +67,6 @@ class ArgumentSet
     }
 
     /**
-     * Apply the @spread directive and return a new, modified instance.
-     *
-     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
-     */
-    public function spread(): self
-    {
-        $argumentSet = new self();
-        $argumentSet->directives = $this->directives;
-
-        foreach ($this->arguments as $name => $argument) {
-            $value = $argument->value;
-
-            // In this case, we do not care about argument sets nested within
-            // lists, spreading only makes sense for single nested inputs.
-            if ($value instanceof self) {
-                // Recurse down first, as that resolves the more deeply nested spreads first
-                $value = $value->spread();
-
-                if ($argument->directives->contains(
-                    Utils::instanceofMatcher(SpreadDirective::class)
-                )) {
-                    $argumentSet->arguments += $value->arguments;
-                    continue;
-                }
-            }
-
-            $argumentSet->arguments[$name] = $argument;
-        }
-
-        return $argumentSet;
-    }
-
-    /**
      * Apply the @rename directive and return a new, modified instance.
      *
      * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
@@ -145,7 +111,6 @@ class ArgumentSet
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string>  $scopes
-     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
@@ -230,7 +195,7 @@ class ArgumentSet
      *
      * Works just like @see \Illuminate\Support\Arr::add().
      *
-     * @param  mixed  $value Any value to inject.
+     * @param  mixed  $value  Any value to inject.
      */
     public function addValue(string $path, $value): self
     {

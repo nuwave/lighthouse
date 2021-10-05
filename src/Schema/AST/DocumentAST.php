@@ -102,7 +102,6 @@ class DocumentAST implements Serializable, Arrayable
      * This operation will overwrite existing definitions with the same name.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $type
-     *
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self

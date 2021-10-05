@@ -10,6 +10,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
+use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
@@ -67,6 +68,7 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            LighthouseAuthServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Primary key.
+ *
  * @property int $category_id
  *
  * Attributes

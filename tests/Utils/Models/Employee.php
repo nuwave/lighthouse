@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes

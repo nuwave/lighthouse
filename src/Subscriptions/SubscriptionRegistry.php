@@ -104,6 +104,7 @@ class SubscriptionRegistry
         if (! isset($this->subscriptions[$key])) {
             /**
              * Loading the field has the side effect of triggering a call to.
+             *
              * @see \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver::provideSubscriptionResolver()
              * which is then expected to call @see register().
              *
