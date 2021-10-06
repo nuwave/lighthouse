@@ -74,17 +74,17 @@ Given you have a field `images` that returns a list of `[Image!]!`, you could qu
 
 ```graphql
 {
-    images {
-        imageable {
-            __typename
-            ... on Post {
-                title
-            }
-            ... on User {
-                name
-            }
-        }
+  images {
+    imageable {
+      __typename
+      ... on Post {
+        title
+      }
+      ... on User {
+        name
+      }
     }
+  }
 }
 ```
 
