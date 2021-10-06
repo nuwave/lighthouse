@@ -2,12 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Utils;
 
-class ComplexityDirective extends BaseDirective implements FieldMiddleware
+class ComplexityDirective extends BaseDirective
 {
     public static function definition(): string
     {
@@ -26,7 +25,7 @@ directive @complexity(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function complexityResolver(FieldValue $fieldValue): callable
     {
         if ($this->directiveHasArgument('resolver')) {
             [$className, $methodName] = $this->getMethodArgumentParts('resolver');
@@ -36,18 +35,26 @@ GRAPHQL;
                 $fieldValue->defaultNamespacesForParent()
             );
 
-            $resolver = Utils::constructResolver($namespacedClassName, $methodName);
+            return Utils::constructResolver($namespacedClassName, $methodName);
         } else {
-            $resolver = static function (int $childrenComplexity, array $args): int {
-                /** @var int $complexity */
-                $complexity = $args['first'] ?? 1;
-
-                return $childrenComplexity * $complexity;
-            };
+            return [self::class, 'defaultComplexityResolver'];
         }
+    }
 
-        $fieldValue->setComplexity($resolver);
+    /**
+     * @param array<string, mixed> $args
+     */
+    public static function defaultComplexityResolver(int $childrenComplexity, array $args): int
+    {
+        /**
+         * Assuming pagination, @see PaginationManipulator::countArgument().
+         */
+        $first = $args['first'] ?? null;
 
-        return $next($fieldValue);
+        $probableNumberOfChildren = is_int($first)
+            ? $first
+            : 1;
+
+        return $childrenComplexity * $probableNumberOfChildren;
     }
 }
