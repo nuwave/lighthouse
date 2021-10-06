@@ -7,7 +7,7 @@ interface ArgSanitizerDirective extends Directive
     /**
      * Sanitize the value of an argument given to a field.
      *
-     * @param  mixed  $argumentValue The value given by the client
+     * @param  mixed  $argumentValue  The value given by the client
      * @return mixed The sanitized value.
      */
     public function sanitize($argumentValue);

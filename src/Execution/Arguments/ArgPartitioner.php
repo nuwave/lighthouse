@@ -151,7 +151,7 @@ class ArgPartitioner
      * - the first one contains all arguments for which the predicate matched
      * - the second one contains all arguments for which the predicate did not match
      *
-     * @return  array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
+     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
      */
     public static function partition(ArgumentSet $argumentSet, \Closure $predicate): array
     {

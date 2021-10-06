@@ -212,4 +212,4 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
-      - run: vendor/bin/phpbench run --progress=none --report=ast
+      - run: vendor/bin/phpbench run --progress=none --report=aggregate

@@ -12,7 +12,7 @@ use Tests\Utils\Models\User;
 class BelongsToDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */

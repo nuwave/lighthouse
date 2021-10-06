@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes

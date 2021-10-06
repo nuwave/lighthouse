@@ -1,10 +1,9 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Unit\Auth;
 
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;
-use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
 
 class GuardDirectiveTest extends TestCase
@@ -28,7 +27,7 @@ class GuardDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Int @guard(with: ["api"])
+            foo: Int @guard(with: ["web"])
         }
         ';
 
@@ -42,7 +41,7 @@ class GuardDirectiveTest extends TestCase
                     'message' => AuthenticationException::MESSAGE,
                     'extensions' => [
                         'guards' => [
-                            'api',
+                            'web',
                         ],
                     ],
                 ],
@@ -57,7 +56,7 @@ class GuardDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Int @guard(with: "api")
+            foo: Int @guard(with: "web")
         }
         ';
 
@@ -71,7 +70,7 @@ class GuardDirectiveTest extends TestCase
                     'message' => AuthenticationException::MESSAGE,
                     'extensions' => [
                         'guards' => [
-                            'api',
+                            'web',
                         ],
                     ],
                 ],
@@ -81,12 +80,10 @@ class GuardDirectiveTest extends TestCase
 
     public function testPassesOneFieldButThrowsInAnother(): void
     {
-        $this->be(new User());
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Int @guard
-            bar: String @guard(with: ["api"])
+            foo: Int
+            bar: String @guard
         }
         ';
 

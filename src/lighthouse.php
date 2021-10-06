@@ -52,8 +52,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The guard to use for authenticating GraphQL requests, if needed.
-    | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
-    | such as `@guard` and when applying the `AttemptAuthentication` middleware.
+    | Used in directives such as `@guard` or the `AttemptAuthentication` middleware.
+    | Falls back to the Laravel default if the defined guard is either `null` or not found.
     |
     */
 
@@ -227,6 +227,8 @@ return [
     */
 
     'error_handlers' => [
+        \Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,

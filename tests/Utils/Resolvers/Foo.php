@@ -18,6 +18,7 @@ class Foo
 
     /**
      * @param  array<string, mixed>  $args
+     *
      * @see \Tests\Unit\Schema\Directives\FieldDirectiveTest
      */
     public function baz($root, array $args): string

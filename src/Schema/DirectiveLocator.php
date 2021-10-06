@@ -231,6 +231,7 @@ class DirectiveLocator
      * Get all directives of a certain type that are associated with an AST node.
      *
      * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
+     *
      * @param  class-string<TDirective>  $directiveClass
      * @return \Illuminate\Support\Collection<TDirective>
      */
@@ -255,6 +256,7 @@ class DirectiveLocator
      * This throws if more than one such directive is found.
      *
      * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
+     *
      * @param  class-string<TDirective>  $directiveClass
      * @return TDirective|null
      *

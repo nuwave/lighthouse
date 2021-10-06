@@ -335,7 +335,6 @@ $user = User::create([
 We use [phpbench](https://github.com/phpbench/phpbench) for running benchmarks
 on performance critical pieces of code.
 
-Run the reports that are defined in `phpbench.json` via the command line,
-for example:
+Run the reports that are defined in `phpbench.json` via the command line:
 
-    vendor/bin/phpbench run --report=ast
+    make bench

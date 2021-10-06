@@ -186,12 +186,13 @@ class EntityResolverProvider
     }
 
     /**
-     * @param array<string, mixed> $representation
+     * @param  array<string, mixed>  $representation
      */
     protected function satisfiesKeyFields(SelectionSetNode $keyFields, array $representation): bool
     {
         /**
          * Fragments or spreads are not allowed in key fields.
+         *
          * @see \Nuwave\Lighthouse\Federation\SchemaValidator
          *
          * @var \GraphQL\Language\AST\FieldNode $field
@@ -220,7 +221,7 @@ class EntityResolverProvider
     }
 
     /**
-     * @param array<string, mixed> $representation
+     * @param  array<string, mixed>  $representation
      */
     protected function applySatisfiedSelection(Builder $builder, SelectionSetNode $keyFields, array $representation): void
     {
@@ -257,8 +258,8 @@ class EntityResolverProvider
     }
 
     /**
-     * @param \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode> $keyFieldsSelections
-     * @param array<string, mixed> $representation
+     * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
+     * @param  array<string, mixed>  $representation
      */
     public function firstSatisfiedKeyFields(Collection $keyFieldsSelections, array $representation): SelectionSetNode
     {

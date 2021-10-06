@@ -82,6 +82,7 @@ class ScoutEnhancer
         // @phpstan-ignore-next-line Can not use traits as types
         /**
          * @psalm-suppress UndefinedDocblockClass
+         *
          * @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $model
          */
         $scoutBuilder = $model::search($searchArgument->toPlain());

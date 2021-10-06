@@ -192,7 +192,7 @@ EOL
     /**
      * Transform a definition node to an executable type.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $definition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $definition
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -219,7 +219,7 @@ EOL
     /**
      * The default type transformations.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
      *
      * @throws \GraphQL\Error\InvariantViolation
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -334,7 +334,6 @@ EOL
      * Returns a closure that lazy loads the fields for a constructed type.
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
-     *
      * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): Closure

@@ -19,7 +19,7 @@ class Laravel7ExceptionHandler implements ExceptionHandler
 
     public function renderForConsole($output, Throwable $e)
     {
-        //
+        throw $e;
     }
 
     public function shouldReport(Throwable $e)

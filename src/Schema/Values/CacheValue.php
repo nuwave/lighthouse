@@ -50,7 +50,7 @@ class CacheValue
     protected $fieldKey;
 
     /**
-     * @param  mixed|null  $root The root that was passed to the query.
+     * @param  mixed|null  $root  The root that was passed to the query.
      * @param  array<string, mixed>  $args
      */
     public function __construct(
@@ -158,7 +158,7 @@ class CacheValue
     }
 
     /**
-     * @param  array<mixed|null> $items
+     * @param  array<mixed|null>  $items
      */
     protected function implode(array $items): string
     {
