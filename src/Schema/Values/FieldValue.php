@@ -193,7 +193,7 @@ class FieldValue
      *          return null;
      *     }
      *
-     *     // You can also run side-effects
+     *     // You can also run side effects
      *     Log::debug("Doubled to {$result}.");
      *
      *     // Don't forget to return something
