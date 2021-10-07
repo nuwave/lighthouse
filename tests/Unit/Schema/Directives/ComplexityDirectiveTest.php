@@ -11,7 +11,9 @@ class ComplexityDirectiveTest extends TestCase
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
-            posts: [Post!]! @complexity @hasMany
+            posts: [Post!]!
+                @complexity
+                @hasMany
         }
 
         type Post {
@@ -25,7 +27,7 @@ class ComplexityDirectiveTest extends TestCase
             ->getField('posts')
             ->getComplexityFn();
 
-        $this->assertSame(100, $complexityFn(10, ['first' => 10]));
+        $this->assertSame(101, $complexityFn(10, ['first' => 10]));
     }
 
     public function testSetCustomComplexityResolver(): void
@@ -56,8 +58,7 @@ GRAPHQL
     {
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type Query {
-            foo: Int
-                @complexity(resolver: "Foo@complexity")
+            foo: Int @complexity(resolver: "Foo@complexity")
         }
         ');
 

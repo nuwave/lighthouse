@@ -51,10 +51,14 @@ GRAPHQL;
          */
         $first = $args['first'] ?? null;
 
-        $probableNumberOfChildren = is_int($first)
+        $expectedNumberOfChildren = is_int($first)
             ? $first
             : 1;
 
-        return $childrenComplexity * $probableNumberOfChildren;
+        return
+            // Default complexity for this field itself
+            1
+            // Scale children complexity by the expected number of results
+            + ($childrenComplexity * $expectedNumberOfChildren);
     }
 }
