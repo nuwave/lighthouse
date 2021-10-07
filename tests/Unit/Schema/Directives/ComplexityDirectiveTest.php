@@ -11,7 +11,7 @@ class ComplexityDirectiveTest extends TestCase
 {
     const CUSTOM_COMPLEXITY = 123;
 
-    public function testDeniesQuery(): void
+    public function testDefaultComplexity(): void
     {
         $max = 1;
         $this->setMaxQueryComplexity($max);
@@ -19,6 +19,36 @@ class ComplexityDirectiveTest extends TestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             posts: [Post!]! @all
+        }
+
+        type Post {
+            title: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts {
+                title
+            }
+        }
+        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
+    }
+
+    public function testMaintainsDefaultBehaviour(): void
+    {
+        // TODO reenable in v6
+        self::markTestSkipped('not respecting the cost of a field itself right now');
+
+        // @phpstan-ignore-next-line unreachable
+        $max = 1;
+        $this->setMaxQueryComplexity($max);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            posts: [Post!]!
+                @complexity
+                @all
         }
 
         type Post {
@@ -52,9 +82,9 @@ class ComplexityDirectiveTest extends TestCase
         }
         ';
 
-        // 1 for the field posts
+        // TODO add 1 for the field posts in v6
         // + 2 for data & title * 10 first items
-        $expectedCount = 21;
+        $expectedCount = 20;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -65,6 +95,30 @@ class ComplexityDirectiveTest extends TestCase
             }
         }
         ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $expectedCount));
+    }
+
+    public function testIgnoresFirstArgumentUnrelatedToPagination(): void
+    {
+        $max = 1;
+        $this->setMaxQueryComplexity($max);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            posts(first: String!): [Post!]! @all
+        }
+
+        type Post {
+            title: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts(first: "named like the generated argument of @paginate, but should not increase complexity here") {
+                title
+            }
+        }
+        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
     }
 
     public function testCustomComplexityResolver(): void

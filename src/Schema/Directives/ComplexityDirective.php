@@ -57,8 +57,9 @@ GRAPHQL;
 
         return
             // Default complexity for this field itself
-            1
+            // TODO add this in v6
+            // 1 +
             // Scale children complexity by the expected number of results
-            + ($childrenComplexity * $expectedNumberOfChildren);
+            ($childrenComplexity * $expectedNumberOfChildren);
     }
 }
