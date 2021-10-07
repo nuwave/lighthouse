@@ -37,7 +37,7 @@ GRAPHQL;
 
             return Utils::constructResolver($namespacedClassName, $methodName);
         } else {
-            return [self::class, 'defaultComplexityResolver'];
+            return [static::class, 'defaultComplexityResolver'];
         }
     }
 

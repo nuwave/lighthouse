@@ -15,6 +15,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Ensure non-pagination related arguments called `first` do not mistakenly increase `@complexity` https://github.com/nuwave/lighthouse/pull/1947
 
+### Deprecated
+
+- Deprecate methods to set a query complexity resolver through `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1947
+
 ## v5.23.1
 
 ### Fixed
