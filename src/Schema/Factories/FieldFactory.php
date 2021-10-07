@@ -112,7 +112,7 @@ class FieldFactory
 
     protected function complexity(FieldValue $fieldValue): ?callable
     {
-        /** @var \Nuwave\Lighthouse\Schema\Directives\ComplexityDirective $complexityDirective */
+        /** @var \Nuwave\Lighthouse\Schema\Directives\ComplexityDirective|null $complexityDirective */
         $complexityDirective = $this->directiveLocator->exclusiveOfType(
             $fieldValue->getField(),
             ComplexityDirective::class
