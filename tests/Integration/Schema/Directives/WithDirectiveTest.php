@@ -300,9 +300,6 @@ class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
     {
-        $this->markTestSkipped('Not working due to the current naive usage of \Illuminate\Database\Eloquent\Collection::load() in \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::load().');
-
-        // @phpstan-ignore-next-line unreachable due to markTestSkipped
         $this->schema = /** @lang GraphQL */ '
         type Query {
             users: User
