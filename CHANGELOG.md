@@ -9,6 +9,21 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.24.0
+
+### Added
+
+- Add `Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective` interface to allow
+  overwriting the default query complexity calculation https://github.com/nuwave/lighthouse/pull/1947
+
+### Fixed
+
+- Ensure non-pagination related arguments called `first` do not mistakenly increase `@complexity` https://github.com/nuwave/lighthouse/pull/1947
+
+### Deprecated
+
+- Deprecate methods to set a query complexity resolver through `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1947
+
 ## v5.23.1
 
 ### Fixed

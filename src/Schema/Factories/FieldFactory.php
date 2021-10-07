@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -103,9 +104,24 @@ class FieldFactory
             ),
             'resolve' => $fieldValue->getResolver(),
             'description' => data_get($fieldDefinitionNode->description, 'value'),
-            'complexity' => $fieldValue->getComplexity(),
+            'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
             'astNode' => $fieldDefinitionNode,
         ];
+    }
+
+    protected function complexity(FieldValue $fieldValue): ?callable
+    {
+        /** @var \Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective|null $complexityDirective */
+        $complexityDirective = $this->directiveLocator->exclusiveOfType(
+            $fieldValue->getField(),
+            ComplexityResolverDirective::class
+        );
+
+        if ($complexityDirective === null) {
+            return null;
+        }
+
+        return $complexityDirective->complexityResolver($fieldValue);
     }
 }

@@ -49,6 +49,8 @@ class FieldValue
     /**
      * A closure that determines the complexity of executing the field.
      *
+     * @deprecated will be removed in v6
+     *
      * @var \Closure|null
      */
     protected $complexity;
@@ -83,6 +85,8 @@ class FieldValue
 
     /**
      * Define a closure that is used to determine the complexity of the field.
+     *
+     * @deprecated will be removed in v6
      */
     public function setComplexity(Closure $complexity): self
     {
@@ -157,6 +161,8 @@ class FieldValue
 
     /**
      * Get current complexity.
+     *
+     * @deprecated will be removed in v6
      */
     public function getComplexity(): ?Closure
     {
