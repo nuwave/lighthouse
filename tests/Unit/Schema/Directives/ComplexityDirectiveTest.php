@@ -90,7 +90,7 @@ GRAPHQL;
         $max = 1;
         $this->setMaxQueryComplexity($max);
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @complexity(resolver: "Foo@complexity")
         }
