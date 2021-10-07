@@ -9,7 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v5.23.2
+## v5.24.0
+
+### Added
+
+- Add `Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective` interface to allow
+  overwriting the default query complexity calculation https://github.com/nuwave/lighthouse/pull/1947
 
 ### Fixed
 

@@ -7,8 +7,8 @@ use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Schema\Directives\ComplexityDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -112,10 +112,10 @@ class FieldFactory
 
     protected function complexity(FieldValue $fieldValue): ?callable
     {
-        /** @var \Nuwave\Lighthouse\Schema\Directives\ComplexityDirective|null $complexityDirective */
+        /** @var \Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective|null $complexityDirective */
         $complexityDirective = $this->directiveLocator->exclusiveOfType(
             $fieldValue->getField(),
-            ComplexityDirective::class
+            ComplexityResolverDirective::class
         );
 
         if ($complexityDirective === null) {

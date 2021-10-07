@@ -4,9 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
-class ComplexityDirective extends BaseDirective
+class ComplexityDirective extends BaseDirective implements ComplexityResolverDirective
 {
     public static function definition(): string
     {
