@@ -229,7 +229,7 @@ class RelationBatchLoaderTest extends DBTestCase
             }
         }
         ');
-        $this->assertSame(3, $queryCount);
+        $this->assertSame(2, $queryCount);
     }
 
     public function testSplitsEagerLoadsWithArguments(): void
@@ -266,7 +266,7 @@ class RelationBatchLoaderTest extends DBTestCase
             }
         }
         ');
-        $this->assertSame(3, $queryCount);
+        $this->assertSame(2, $queryCount);
     }
 
     public function testResolveFieldsByCustomBatchLoader(): void
