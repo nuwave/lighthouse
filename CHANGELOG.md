@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.23.2
+
+### Fixed
+
+- Respect query complexity of paginated fields in `@complexity` https://github.com/nuwave/lighthouse/pull/1947
+
 ## v5.23.1
 
 ### Fixed
