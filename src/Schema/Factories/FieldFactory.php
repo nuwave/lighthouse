@@ -10,11 +10,14 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldFactory
 {
@@ -64,7 +67,7 @@ class FieldFactory
         if ($resolverDirective instanceof FieldResolver) {
             $fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
-            $fieldValue = $fieldValue->useDefaultResolver();
+            $this->useDefaultResolver($fieldValue);
         }
 
         // Middleware resolve in reversed order
@@ -139,5 +142,14 @@ class FieldFactory
         }
 
         return $complexityDirective->complexityResolver($fieldValue);
+    }
+
+    protected function useDefaultResolver(FieldValue $fieldValue): void
+    {
+        $fieldValue->setResolver(
+            $fieldValue->getParentName() === RootType::SUBSCRIPTION
+                ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
+                : app(ProvidesResolver::class)->provideResolver($this)
+        );
     }
 }
