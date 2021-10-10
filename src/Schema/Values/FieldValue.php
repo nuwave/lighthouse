@@ -97,6 +97,8 @@ class FieldValue
 
     /**
      * Get an instance of the return type of the field.
+     *
+     * @deprecated will be removed in v6
      */
     public function getReturnType(): Type
     {

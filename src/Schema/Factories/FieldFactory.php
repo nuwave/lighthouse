@@ -2,11 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -50,7 +53,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @return array<string, mixed> Configuration array for a \GraphQL\Type\Definition\FieldDefinition
+     * @return array<string, mixed> Configuration array for @see \GraphQL\Type\Definition\FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
@@ -98,7 +101,7 @@ class FieldFactory
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
             'name' => $fieldDefinitionNode->name->value,
-            'type' => $fieldValue->getReturnType(),
+            'type' => $this->type($fieldDefinitionNode),
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
@@ -108,6 +111,19 @@ class FieldFactory
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
             'astNode' => $fieldDefinitionNode,
         ];
+    }
+
+    /**
+     * @return \Closure(): Type
+     */
+    protected function type(FieldDefinitionNode $fieldDefinition): \Closure
+    {
+        return static function () use ($fieldDefinition) {
+            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
+            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+
+            return $typeNodeConverter->convert($fieldDefinition->type);
+        };
     }
 
     protected function complexity(FieldValue $fieldValue): ?callable
