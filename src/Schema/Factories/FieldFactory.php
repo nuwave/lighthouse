@@ -149,10 +149,12 @@ class FieldFactory
         if ($fieldValue->getParentName() === RootType::SUBSCRIPTION) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
             $providesSubscriptionResolver = app(ProvidesSubscriptionResolver::class);
+
             return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
         } else {
             /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver $providesResolver */
             $providesResolver = app(ProvidesResolver::class);
+
             return $providesResolver->provideResolver($fieldValue);
         }
     }

@@ -148,6 +148,7 @@ class FieldValue
      * Return the namespaces configured for the parent type.
      *
      * @deprecated will be removed in v6
+     *
      * @return array<string>
      */
     public function defaultNamespacesForParent(): array
