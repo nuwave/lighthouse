@@ -19,7 +19,7 @@ class ResolverProvider implements ProvidesResolver
      */
     public function provideResolver(FieldValue $fieldValue): Closure
     {
-        if ($fieldValue->parentIsRootType()) {
+        if (RootType::isRootType($fieldValue->getParentName())) {
             $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
             if ($resolverClass === null) {
                 $this->throwMissingResolver($fieldValue);
@@ -43,7 +43,7 @@ class ResolverProvider implements ProvidesResolver
     {
         return Utils::namespaceClassname(
             Str::studly($fieldValue->getFieldName()),
-            $fieldValue->defaultNamespacesForParent(),
+            RootType::defaultNamespaces($fieldValue->getParentName()),
             function (string $class) use ($methodName): bool {
                 return method_exists($class, $methodName);
             }

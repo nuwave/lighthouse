@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950
+
+### Deprecated
+
+- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
+
 ## v5.24.0
 
 ### Added
