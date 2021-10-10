@@ -121,6 +121,7 @@ class FieldFactory
         return static function () use ($fieldDefinition) {
             /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
             $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+
             return $typeNodeConverter->convert($fieldDefinition->type);
         };
     }
