@@ -9,10 +9,9 @@ use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldValue
 {
@@ -181,9 +180,7 @@ class FieldValue
      */
     public function useDefaultResolver(): self
     {
-        $this->resolver = $this->getParentName() === RootType::SUBSCRIPTION
-            ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
-            : app(ProvidesResolver::class)->provideResolver($this);
+        $this->resolver = FieldFactory::defaultResolver($this);
 
         return $this;
     }

@@ -67,7 +67,7 @@ class FieldFactory
         if ($resolverDirective instanceof FieldResolver) {
             $fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
-            $this->useDefaultResolver($fieldValue);
+            $fieldValue->setResolver(static::defaultResolver($fieldValue));
         }
 
         // Middleware resolve in reversed order
@@ -144,12 +144,16 @@ class FieldFactory
         return $complexityDirective->complexityResolver($fieldValue);
     }
 
-    protected function useDefaultResolver(FieldValue $fieldValue): void
+    public static function defaultResolver(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(
-            $fieldValue->getParentName() === RootType::SUBSCRIPTION
-                ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
-                : app(ProvidesResolver::class)->provideResolver($this)
-        );
+        if ($fieldValue->getParentName() === RootType::SUBSCRIPTION) {
+            /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
+            $providesSubscriptionResolver = app(ProvidesSubscriptionResolver::class);
+            return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
+        } else {
+            /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver $providesResolver */
+            $providesResolver = app(ProvidesResolver::class);
+            return $providesResolver->provideResolver($fieldValue);
+        }
     }
 }
