@@ -15,7 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue`
+- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
 
 ## v5.24.0
 
