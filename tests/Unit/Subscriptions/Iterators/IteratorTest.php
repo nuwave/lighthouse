@@ -66,7 +66,7 @@ abstract class IteratorTest extends TestCase
     public function generateSubscriber(): Subscriber
     {
         $resolveInfo = $this->createMock(ResolveInfo::class);
-
+        $resolveInfo->fieldName = 'foo';
         $resolveInfo->operation = new OperationDefinitionNode([
             'name' => new NameNode([
                 'value' => 'lighthouse',
