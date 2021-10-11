@@ -14,7 +14,7 @@ class ArgumentFactory
      * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $definitionNodes
      * @return array<string, array<string, mixed>>
      */
-    public function toTypeMap($definitionNodes): array
+    public function toTypeMap(iterable $definitionNodes): array
     {
         $arguments = [];
 
@@ -44,7 +44,7 @@ class ArgumentFactory
 
         $config = [
             'name' => $definitionNode->name->value,
-            'description' => data_get($definitionNode->description, 'value'),
+            'description' => $definitionNode->description->value ?? null,
             'type' => $type,
             'astNode' => $definitionNode,
         ];

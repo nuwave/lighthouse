@@ -259,14 +259,14 @@ EOL
                 'value' => $enumDirective instanceof EnumDirective
                     ? $enumDirective->value()
                     : $enumValue->name->value,
-                'description' => data_get($enumValue->description, 'value'),
+                'description' => $enumValue->description->value ?? null,
                 'deprecationReason' => ASTHelper::deprecationReason($enumValue),
             ];
         }
 
         return new EnumType([
             'name' => $enumDefinition->name->value,
-            'description' => data_get($enumDefinition->description, 'value'),
+            'description' => $enumDefinition->description->value ?? null,
             'values' => $values,
             'astNode' => $enumDefinition,
         ]);
@@ -301,7 +301,7 @@ EOL
 
         return new $className([
             'name' => $scalarName,
-            'description' => data_get($scalarDefinition->description, 'value'),
+            'description' => $scalarDefinition->description->value ?? null,
             'astNode' => $scalarDefinition,
         ]);
     }
@@ -310,7 +310,7 @@ EOL
     {
         return new ObjectType([
             'name' => $objectDefinition->name->value,
-            'description' => data_get($objectDefinition->description, 'value'),
+            'description' => $objectDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($objectDefinition),
             'interfaces' =>
                 /**
@@ -363,7 +363,7 @@ EOL
     {
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
-            'description' => data_get($inputDefinition->description, 'value'),
+            'description' => $inputDefinition->description->value ?? null,
             'fields' =>
                 /**
                  * @return array<string, array<string, mixed>>
@@ -394,7 +394,7 @@ EOL
 
         return new InterfaceType([
             'name' => $nodeName,
-            'description' => data_get($interfaceDefinition->description, 'value'),
+            'description' => $interfaceDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
             'astNode' => $interfaceDefinition,
@@ -463,7 +463,7 @@ EOL
 
         return new UnionType([
             'name' => $nodeName,
-            'description' => data_get($unionDefinition->description, 'value'),
+            'description' => $unionDefinition->description->value ?? null,
             'types' =>
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>

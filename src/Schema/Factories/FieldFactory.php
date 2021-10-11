@@ -109,7 +109,7 @@ class FieldFactory
                 $fieldValue->getField()->arguments
             ),
             'resolve' => $fieldValue->getResolver(),
-            'description' => data_get($fieldDefinitionNode->description, 'value'),
+            'description' => $fieldDefinitionNode->description->value ?? null,
             'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
             'astNode' => $fieldDefinitionNode,
