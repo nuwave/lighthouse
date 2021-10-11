@@ -9,10 +9,9 @@ use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldValue
 {
@@ -49,6 +48,8 @@ class FieldValue
     /**
      * A closure that determines the complexity of executing the field.
      *
+     * @deprecated will be removed in v6
+     *
      * @var \Closure|null
      */
     protected $complexity;
@@ -60,49 +61,16 @@ class FieldValue
     }
 
     /**
-     * Overwrite the current/default resolver.
+     * Get the underlying AST definition for the field.
      */
-    public function setResolver(callable $resolver): self
+    public function getField(): FieldDefinitionNode
     {
-        $this->resolver = $resolver;
-
-        return $this;
+        return $this->field;
     }
 
-    /**
-     * Use the default resolver.
-     */
-    public function useDefaultResolver(): self
+    public function getFieldName(): string
     {
-        $this->resolver = $this->getParentName() === RootType::SUBSCRIPTION
-            ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
-            : app(ProvidesResolver::class)->provideResolver($this);
-
-        return $this;
-    }
-
-    /**
-     * Define a closure that is used to determine the complexity of the field.
-     */
-    public function setComplexity(Closure $complexity): self
-    {
-        $this->complexity = $complexity;
-
-        return $this;
-    }
-
-    /**
-     * Get an instance of the return type of the field.
-     */
-    public function getReturnType(): Type
-    {
-        if ($this->returnType === null) {
-            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
-            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
-            $this->returnType = $typeNodeConverter->convert($this->field->type);
-        }
-
-        return $this->returnType;
+        return $this->field->name->value;
     }
 
     public function getParent(): TypeValue
@@ -112,15 +80,7 @@ class FieldValue
 
     public function getParentName(): string
     {
-        return $this->getParent()->getTypeDefinitionName();
-    }
-
-    /**
-     * Get the underlying AST definition for the field.
-     */
-    public function getField(): FieldDefinitionNode
-    {
-        return $this->field;
+        return $this->parent->getTypeDefinitionName();
     }
 
     /**
@@ -132,48 +92,13 @@ class FieldValue
     }
 
     /**
-     * Return the namespaces configured for the parent type.
-     *
-     * @return array<string>
+     * Overwrite the current/default resolver.
      */
-    public function defaultNamespacesForParent(): array
+    public function setResolver(callable $resolver): self
     {
-        switch ($this->getParentName()) {
-            case RootType::QUERY:
-                return (array) config('lighthouse.namespaces.queries');
-            case RootType::MUTATION:
-                return (array) config('lighthouse.namespaces.mutations');
-            case RootType::SUBSCRIPTION:
-                return (array) config('lighthouse.namespaces.subscriptions');
-            default:
-               return [];
-        }
-    }
+        $this->resolver = $resolver;
 
-    public function getDescription(): ?StringValueNode
-    {
-        return $this->field->description;
-    }
-
-    /**
-     * Get current complexity.
-     */
-    public function getComplexity(): ?Closure
-    {
-        return $this->complexity;
-    }
-
-    public function getFieldName(): string
-    {
-        return $this->field->name->value;
-    }
-
-    /**
-     * Is the parent of this field one of the root types?
-     */
-    public function parentIsRootType(): bool
-    {
-        return RootType::isRootType($this->getParentName());
+        return $this;
     }
 
     /**
@@ -193,7 +118,7 @@ class FieldValue
      *          return null;
      *     }
      *
-     *     // You can also run side-effects
+     *     // You can also run side effects
      *     Log::debug("Doubled to {$result}.");
      *
      *     // Don't forget to return something
@@ -217,5 +142,85 @@ class FieldValue
 
             return $handle($resolved, $args, $context, $resolveInfo);
         };
+    }
+
+    /**
+     * Return the namespaces configured for the parent type.
+     *
+     * @deprecated will be removed in v6
+     *
+     * @return array<string>
+     */
+    public function defaultNamespacesForParent(): array
+    {
+        return RootType::defaultNamespaces($this->getParentName());
+    }
+
+    /**
+     * @deprecated will be removed in v6
+     */
+    public function getDescription(): ?StringValueNode
+    {
+        return $this->field->description;
+    }
+
+    /**
+     * Is the parent of this field one of the root types?
+     *
+     * @deprecated will be removed in v6
+     */
+    public function parentIsRootType(): bool
+    {
+        return RootType::isRootType($this->getParentName());
+    }
+
+    /**
+     * Use the default resolver.
+     *
+     * @deprecated will be removed in v6
+     */
+    public function useDefaultResolver(): self
+    {
+        $this->resolver = FieldFactory::defaultResolver($this);
+
+        return $this;
+    }
+
+    /**
+     * Get current complexity.
+     *
+     * @deprecated will be removed in v6
+     */
+    public function getComplexity(): ?Closure
+    {
+        return $this->complexity;
+    }
+
+    /**
+     * Define a closure that is used to determine the complexity of the field.
+     *
+     * @deprecated will be removed in v6
+     */
+    public function setComplexity(Closure $complexity): self
+    {
+        $this->complexity = $complexity;
+
+        return $this;
+    }
+
+    /**
+     * Get an instance of the return type of the field.
+     *
+     * @deprecated will be removed in v6
+     */
+    public function getReturnType(): Type
+    {
+        if ($this->returnType === null) {
+            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
+            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+            $this->returnType = $typeNodeConverter->convert($this->field->type);
+        }
+
+        return $this->returnType;
     }
 }

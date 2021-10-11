@@ -19,6 +19,29 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for PHP 7.2, 7.3
 - Remove support for Laravel 5, 6, 7
 
+### Changed
+
+- Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950
+
+### Deprecated
+
+- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
+
+## v5.24.0
+
+### Added
+
+- Add `Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective` interface to allow
+  overwriting the default query complexity calculation https://github.com/nuwave/lighthouse/pull/1947
+
+### Fixed
+
+- Ensure non-pagination related arguments called `first` do not mistakenly increase `@complexity` https://github.com/nuwave/lighthouse/pull/1947
+
+### Deprecated
+
+- Deprecate methods to set a query complexity resolver through `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1947
+
 ## v5.23.1
 
 ### Fixed

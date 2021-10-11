@@ -85,6 +85,16 @@ The setting `non_null_pagination_results` was removed and is now always `true`.
 This is generally more convenient for clients, but will
 cause validation errors to bubble further up in the result.
 
+### Include field cost in `@complexity` calculation
+
+Previous to `v6`, the default query complexity calculation of fields with `@complexity`
+did not include the cost of the field itself - other than the default without the directive.
+In the future, a value of `1` will be added to represent the complexity more accurately.
+
+This change will increase the complexity of queries on fields using `@complexity` without
+a custom complexity resolver. If you configured `security.max_query_complexity`, complex
+queries that previously passed might now fail.
+
 ### Removed error extension field `category`
 
 See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category
