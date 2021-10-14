@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Auth;
 use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;

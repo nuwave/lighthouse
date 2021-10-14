@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface ArgManipulator extends Directive

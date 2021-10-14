@@ -12,7 +12,7 @@ interface FieldManipulator extends Directive
     /**
      * Manipulate the AST based on a field definition.
      *
-     * @param ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode $parentType
+     * @param  ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode  $parentType
      * @return void
      */
     public function manipulateFieldDefinition(
