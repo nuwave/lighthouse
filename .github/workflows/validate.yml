@@ -27,6 +27,7 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
+          - 8.1
         laravel-version:
           - ^6
           - ^7
@@ -37,6 +38,10 @@ jobs:
           - php-version: 8.0
             laravel-version: ^6
           - php-version: 8.0
+            laravel-version: ^7
+          - php-version: 8.1
+            laravel-version: ^6
+          - php-version: 8.1
             laravel-version: ^7
 
     steps:
@@ -78,6 +83,7 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
+          - 8.1
         laravel-version:
           - 5.6.*
           - 5.7.*
@@ -97,6 +103,16 @@ jobs:
           - php-version: 8.0
             laravel-version: ^6
           - php-version: 8.0
+            laravel-version: ^7
+          - php-version: 8.1
+            laravel-version: 5.6.*
+          - php-version: 8.1
+            laravel-version: 5.7.*
+          - php-version: 8.1
+            laravel-version: 5.8.*
+          - php-version: 8.1
+            laravel-version: ^6
+          - php-version: 8.1
             laravel-version: ^7
 
     steps:
