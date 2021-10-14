@@ -57,7 +57,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ): void {
         parent::manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
 

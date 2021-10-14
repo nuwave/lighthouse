@@ -107,7 +107,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ): void {
         // Ensure there is only a single argument defined on the field.
         if (count($fieldDefinition->arguments) !== 1) {

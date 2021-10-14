@@ -257,7 +257,7 @@ GRAPHQL;
         return $checkArguments;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, &$parentType)
     {
         if ($this->directiveHasArgument('find') && $this->directiveHasArgument('query')) {
             throw new DefinitionException(self::findAndQueryAreMutuallyExclusive());

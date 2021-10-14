@@ -79,7 +79,7 @@ enum PaginateType {
 GRAPHQL;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
 

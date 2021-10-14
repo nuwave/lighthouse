@@ -57,7 +57,7 @@ class PaginationManipulator
     public function transformToPaginatedField(
         PaginationType $paginationType,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        &$parentType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
@@ -73,7 +73,7 @@ class PaginationManipulator
 
     protected function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        &$parentType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
@@ -159,7 +159,7 @@ GRAPHQL
 
     protected function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        &$parentType,
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): void {
@@ -195,7 +195,7 @@ GRAPHQL
 
     protected function registerSimplePaginator(
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        &$parentType,
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): void {

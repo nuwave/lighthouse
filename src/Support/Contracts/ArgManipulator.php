@@ -18,6 +18,6 @@ interface ArgManipulator extends Directive
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     );
 }

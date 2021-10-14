@@ -35,7 +35,7 @@ directive @with(
 GRAPHQL;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, &$parentType)
     {
         if (RootType::isRootType($parentType->name->value)) {
             throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");

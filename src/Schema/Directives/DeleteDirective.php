@@ -105,7 +105,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ) {
         if (! $this->directiveArgValue('relation')) {
             throw new DefinitionException(

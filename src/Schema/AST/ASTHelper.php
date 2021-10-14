@@ -307,7 +307,7 @@ class ASTHelper
     public static function qualifiedArgType(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ): string {
         return Str::studly($parentType->name->value)
             .Str::studly($parentField->name->value)

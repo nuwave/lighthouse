@@ -50,7 +50,7 @@ GRAPHQL;
         return $next($fieldValue);
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, &$parentType)
     {
         $relations = $this->directiveArgValue('relations');
         if (! is_array($relations) || count($relations) === 0) {

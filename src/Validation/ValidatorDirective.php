@@ -98,7 +98,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ) {
         if ($this->directiveHasArgument('class')) {
             $classCandidate = $this->directiveArgValue('class');

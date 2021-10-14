@@ -34,7 +34,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ): void {
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
         if ($argType !== Type::INT) {

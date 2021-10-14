@@ -299,7 +299,7 @@ class ASTBuilder
     protected function applyFieldManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (

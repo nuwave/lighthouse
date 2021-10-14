@@ -65,7 +65,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ): void {
         $paginationType = $this->paginationType();
 

@@ -131,7 +131,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
             $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).$this->generatedInputSuffix();

@@ -45,7 +45,7 @@ trait GeneratesColumnsEnum
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        &$parentType
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
 
@@ -77,7 +77,7 @@ trait GeneratesColumnsEnum
     protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType,
+        &$parentType,
         array $allowedColumns,
         string $allowedColumnsEnumName
     ): EnumTypeDefinitionNode {
