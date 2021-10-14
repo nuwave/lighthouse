@@ -141,7 +141,7 @@ GRAPHQL;
 
     public function testInterfaceManipulation()
     {
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         interface HasPosts {
             posts: [Post!]! @paginate
         }
