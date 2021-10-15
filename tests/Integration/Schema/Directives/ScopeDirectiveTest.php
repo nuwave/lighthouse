@@ -70,7 +70,7 @@ class ScopeDirectiveTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            tasks(whereTags: [String!] @scope(name: "whereTags")): [Task!]! @all
+            tasks(whereTags: [String!] @scope): [Task!]! @all
         }
 
         type Task {
