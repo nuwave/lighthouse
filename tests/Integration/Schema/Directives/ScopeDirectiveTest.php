@@ -6,7 +6,6 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
 
 class ScopeDirectiveTest extends DBTestCase
 {
