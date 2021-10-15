@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Allow omitting `name` in `@scope` by defaulting to the argument name
+- Allow omitting `name` in `@scope` by defaulting to the argument name https://github.com/nuwave/lighthouse/pull/1957
 
 ### Changed
 
