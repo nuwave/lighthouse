@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.25.0
+
+### Added
+
+- Allow omitting `name` in `@scope` by defaulting to the argument name
+
 ### Changed
 
 - Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950

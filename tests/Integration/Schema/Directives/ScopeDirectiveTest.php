@@ -10,60 +10,88 @@ use Tests\Utils\Models\User;
 
 class ScopeDirectiveTest extends DBTestCase
 {
-    public function testApplyDirective(): void
+    public function testExplicitName(): void
     {
-        /** @var User $user */
-        $user = factory(User::class)->create();
-
-        $user->tasks()->saveMany(
-            factory(Task::class)->times(2)->create()
-        );
+        factory(Task::class)->times(2)->create();
 
         /** @var Task $taskWithTag */
         $taskWithTag = factory(Task::class)->create();
-        $taskWithTag->tags()->save(
-            factory(Tag::class)->create(['name' => 'Lighthouse'])
-        );
-        $user->tasks()->save($taskWithTag);
 
-        $this->be($user);
+        /** @var Tag $tag */
+        $tag = factory(Tag::class)->make();
+        $taskWithTag->tags()->save($tag);
 
         $this->schema = /** @lang GraphQL */ '
-        type User {
-            tasks(tags: [String!] @scope(name: "whereTags")): [Task!]! @hasMany
+        type Query {
+            tasks(tags: [String!] @scope(name: "whereTags")): [Task!]! @all
         }
 
         type Task {
             id: ID!
-            name: String!
-            tags: [Tag!]!
-        }
-
-        type Tag {
-            id: ID!
-            name: String!
-        }
-
-        type Query {
-            user: User @auth
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            user {
-                tasks(tags: ["Lighthouse"]) {
-                    id
-                }
+            tasks {
+                id
             }
         }
-        ')->assertJson([
+        ')->assertJsonCount(3, 'data.tasks');
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($tags: [String!]!) {
+            tasks(tags: $tags) {
+                id
+            }
+        }
+        ', [
+            'tags' => [$tag->name],
+        ])->assertExactJson([
             'data' => [
-                'user' => [
-                    'tasks' => [
-                        [
-                            'id' => $taskWithTag->getKey(),
-                        ],
+                'tasks' => [
+                    [
+                        'id' => "$taskWithTag->id",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testDefaultsScopeToEqualArgumentName(): void
+    {
+        factory(Task::class)->times(2)->create();
+
+        /** @var Task $taskWithTag */
+        $taskWithTag = factory(Task::class)->create();
+
+        /** @var Tag $tag */
+        $tag = factory(Tag::class)->make();
+        $taskWithTag->tags()->save($tag);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks(whereTags: [String!] @scope(name: "whereTags")): [Task!]! @all
+        }
+
+        type Task {
+            id: ID!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($whereTags: [String!]!) {
+            tasks(whereTags: $whereTags) {
+                id
+            }
+        }
+        ', [
+            'whereTags' => [$tag->name],
+        ])->assertExactJson([
+            'data' => [
+                'tasks' => [
+                    [
+                        'id' => "$taskWithTag->id",
                     ],
                 ],
             ],
@@ -78,7 +106,7 @@ class ScopeDirectiveTest extends DBTestCase
                 name: String @scope(name: "nonExistantScope")
             ): [Task!]! @all
         }
-        
+
         type Task {
             id: ID
         }
