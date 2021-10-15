@@ -2707,7 +2707,7 @@ You can use the `name` argument if your scope is named differently from your arg
 
 ```graphql
 type Query {
-    posts(isTrending: Boolean @scope(name: "trending")): [Post!] @all
+  posts(isTrending: Boolean @scope(name: "trending")): [Post!] @all
 }
 ```
 
