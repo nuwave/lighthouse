@@ -9,26 +9,17 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v5.25.0
-
-### Added
-
-- Allow omitting `name` in `@scope` by defaulting to the argument name https://github.com/nuwave/lighthouse/pull/1957
-
-### Changed
-
-- Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950
-
-### Deprecated
-
-- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
-
 ## v5.24.0
 
 ### Added
 
 - Add `Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective` interface to allow
   overwriting the default query complexity calculation https://github.com/nuwave/lighthouse/pull/1947
+- Allow omitting `name` in `@scope` by defaulting to the argument name https://github.com/nuwave/lighthouse/pull/1957
+
+### Changed
+
+- Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950
 
 ### Fixed
 
@@ -37,6 +28,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Deprecated
 
 - Deprecate methods to set a query complexity resolver through `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1947
+- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
 
 ## v5.23.1
 
