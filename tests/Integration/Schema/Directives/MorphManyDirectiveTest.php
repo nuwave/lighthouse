@@ -52,8 +52,7 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->taskImages = Collection
-            ::times(10)
+        $this->taskImages = Collection::times(10)
             ->map(function (): Image {
                 $image = $this->task
                     ->images()
@@ -71,8 +70,7 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->postImages = Collection
-            ::times(
+        $this->postImages = Collection::times(
                 $this->faker()->numberBetween(1, 10)
             )
             ->map(function () {

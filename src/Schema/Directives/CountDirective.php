@@ -50,8 +50,7 @@ GRAPHQL;
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
                     $query = $this
-                        ->namespaceModelClass($modelArg)
-                        ::query();
+                        ->namespaceModelClass($modelArg)::query();
 
                     $this->makeBuilderDecorator($resolveInfo)($query);
 
