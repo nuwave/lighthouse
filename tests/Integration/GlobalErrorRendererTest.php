@@ -2,16 +2,11 @@
 
 namespace Tests\Integration;
 
-use Exception;
 use GraphQL\Error\Error;
-use Illuminate\Auth\AuthManager;
-use Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication;
 use Tests\TestCase;
-use Tests\Utils\NullErrorHandler;
 
 class GlobalErrorRendererTest extends TestCase
 {
-
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
@@ -22,7 +17,7 @@ class GlobalErrorRendererTest extends TestCase
         $config->set('lighthouse.route.middleware', [
             function () {
                 throw new Error('safe');
-            }
+            },
         ]);
     }
 
