@@ -120,8 +120,7 @@ GRAPHQL;
                         $this->directiveArgValue('scopes', [])
                     );
 
-                return PaginationArgs
-                    ::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
+                return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
                     ->applyToBuilder($query);
             }
         );
