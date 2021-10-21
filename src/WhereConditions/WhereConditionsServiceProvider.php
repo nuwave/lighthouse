@@ -72,8 +72,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = Parser
-            ::enumTypeDefinition(
+        $operatorName = Parser::enumTypeDefinition(
                 $operator->enumDefinition()
             )
             ->name
@@ -113,8 +112,7 @@ GRAPHQL
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = Parser
-            ::enumTypeDefinition(
+        $operatorName = Parser::enumTypeDefinition(
                 $operator->enumDefinition()
             )
             ->name
