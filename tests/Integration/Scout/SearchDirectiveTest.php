@@ -30,8 +30,7 @@ class SearchDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->engineManager = Mockery::mock(EngineManager::class);
-        $this->engine = Mockery
-            ::mock(NullEngine::class)
+        $this->engine = Mockery::mock(NullEngine::class)
             ->makePartial();
 
         $this->app->singleton(EngineManager::class, function (): MockInterface {
