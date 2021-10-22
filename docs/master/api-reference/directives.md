@@ -3129,14 +3129,14 @@ This directive can also be used as a [nested arg resolver](../concepts/arg-resol
 Provide validation rules through a PHP class.
 """
 directive @validator(
-    """
-    The name of the class to use.
+  """
+  The name of the class to use.
 
-    If defined on an input, this defaults to a class called `{$inputName}Validator` in the
-    default validator namespace. For fields, it uses the namespace of the parent type
-    and the field name: `{$parent}\{$field}Validator`.
-    """
-    class: String
+  If defined on an input, this defaults to a class called `{$inputName}Validator` in the
+  default validator namespace. For fields, it uses the namespace of the parent type
+  and the field name: `{$parent}\{$field}Validator`.
+  """
+  class: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
 ```
 
