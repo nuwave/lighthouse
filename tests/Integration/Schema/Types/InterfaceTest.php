@@ -62,6 +62,56 @@ GRAPHQL;
         $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
     }
 
+    public function testConsidersRenamedModels(): void
+    {
+        // This creates one team with it
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Nameable {
+            name: String!
+        }
+
+        type Foo implements Nameable @model(class: "User") {
+            id: ID!
+            name: String!
+        }
+
+        type Team implements Nameable {
+            name: String!
+        }
+
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            namedThings {
+                name
+                ... on User {
+                    id
+                }
+            }
+        }
+        ')->assertJsonStructure([
+            'data' => [
+                'namedThings' => [
+                    [
+                        'name',
+                        'id',
+                    ],
+                    [
+                        'name',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
+    }
+
     public function testUseCustomTypeResolver(): void
     {
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
