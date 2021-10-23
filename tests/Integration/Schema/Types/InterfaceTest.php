@@ -90,7 +90,7 @@ GRAPHQL;
         {
             namedThings {
                 name
-                ... on User {
+                ... on Foo {
                     id
                 }
             }

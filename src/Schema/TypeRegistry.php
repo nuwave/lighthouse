@@ -427,20 +427,26 @@ EOL
     /**
      * Default type resolver for resolving interfaces or union types.
      *
-     * We just assume that the rootValue that shall be returned from the
-     * field is a class that is named just like the concrete Object Type
-     * that is supposed to be returned.
-     *
      * @return Closure(mixed): Type
      */
     protected function typeResolverFallback(): Closure
     {
         return function ($root): Type {
-            $name = is_array($root) && isset($root['__typename'])
-                ? $root['__typename']
-                : class_basename($root);
+            $explicitTypename = data_get($root, '__typename');
+            if (null !== $explicitTypename) {
+                return $this->get($explicitTypename);
+            }
 
-            return $this->get($name);
+            if (is_object($root)) {
+                $explicitSchemaMap = $this->documentAST->classNameToObjectTypeName[get_class($root)] ?? null;
+                if (null !== $explicitSchemaMap) {
+                    return $this->get($explicitSchemaMap);
+                }
+
+                return $this->get(class_basename($root));
+            }
+
+            return $this->get($root);
         };
     }
 

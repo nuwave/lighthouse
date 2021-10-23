@@ -6,10 +6,12 @@ use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
+use Tests\Utils\Models\User;
 
 class DocumentASTTest extends TestCase
 {
@@ -47,6 +49,18 @@ class DocumentASTTest extends TestCase
         ');
     }
 
+    public function testThrowsOnUnknownModelClasses(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("Failed to find a model class for Unknown, referenced in @model on type Query");
+
+        DocumentAST::fromSource(/** @lang GraphQL */ '
+        type Query @model(class: "Unknown") {
+            foo: Int!
+        }
+        ');
+    }
+
     public function testOverwritesDefinitionWithSameName(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
@@ -72,7 +86,7 @@ class DocumentASTTest extends TestCase
     public function testBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
-        type Query {
+        type Query @model(class: "User") {
             foo: Int
         }
 
@@ -89,6 +103,11 @@ class DocumentASTTest extends TestCase
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $queryType
+        );
+
+        $this->assertSame(
+            'Query',
+            $reserialized->classNameToObjectTypeName[User::class]
         );
 
         $this->assertInstanceOf(
