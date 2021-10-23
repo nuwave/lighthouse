@@ -64,6 +64,7 @@ class DocumentAST implements Serializable, Arrayable
      * A map from class names to their respective object types.
      *
      * This is useful for the performant resolution of abstract types.
+     *
      * @see \Nuwave\Lighthouse\Schema\TypeRegistry::typeResolverFallback()
      *
      * @var array<class-string, string>
@@ -128,7 +129,7 @@ class DocumentAST implements Serializable, Arrayable
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new Exception('Unknown definition type: ' . get_class($definition));
+                throw new Exception('Unknown definition type: '.get_class($definition));
             }
         }
 
