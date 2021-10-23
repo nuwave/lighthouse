@@ -51,7 +51,7 @@ class GlobalIdServiceProvider extends ServiceProvider
     {
         $node = self::NODE;
         $globalId = config('lighthouse.global_id_field');
-        
+
         // Double slashes to escape the slashes in the namespace.
         $documentAST->setTypeDefinition(
             Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
