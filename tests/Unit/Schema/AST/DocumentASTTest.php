@@ -98,26 +98,12 @@ class DocumentASTTest extends TestCase
             serialize($documentAST)
         );
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $reserialized->types[RootType::QUERY];
-        $this->assertInstanceOf(
-            ObjectTypeDefinitionNode::class,
-            $queryType
-        );
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $queryType->fields[0]);
 
-        $this->assertSame(
-            'Query',
-            $reserialized->classNameToObjectTypeName[User::class]
-        );
+        $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
 
-        $this->assertInstanceOf(
-            FieldDefinitionNode::class,
-            $queryType->fields[0]
-        );
-
-        $this->assertInstanceOf(
-            DirectiveDefinitionNode::class,
-            $reserialized->directives['foo']
-        );
+        $this->assertSame('Query', $reserialized->classNameToObjectTypeName[User::class]);
     }
 }
