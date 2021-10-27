@@ -43,8 +43,12 @@ trait MakesGraphQLRequests
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function graphQL(string $query, array $variables = [], array $extraParams = [])
-    {
+    protected function graphQL(
+        string $query,
+        array $variables = [],
+        array $extraParams = [],
+        array $headers = []
+    ) {
         $params = ['query' => $query];
 
         if ($variables !== []) {
@@ -53,7 +57,7 @@ trait MakesGraphQLRequests
 
         $params += $extraParams;
 
-        return $this->postGraphQL($params);
+        return $this->postGraphQL($params, $headers);
     }
 
     /**
@@ -205,7 +209,7 @@ trait MakesGraphQLRequests
      */
     protected function setUpDeferStream(): void
     {
-        $this->deferStream = new MemoryStream;
+        $this->deferStream = new MemoryStream();
 
         Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;
