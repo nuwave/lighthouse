@@ -41,6 +41,7 @@ trait MakesGraphQLRequests
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
+     * @param  array<string, mixed>  $headers  Headers
      * @return \Illuminate\Testing\TestResponse
      */
     protected function graphQL(
