@@ -58,7 +58,6 @@ to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
 
             // ... other middleware
-
         ],
     ],
     'guard' => 'sanctum',
