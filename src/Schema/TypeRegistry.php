@@ -389,7 +389,9 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.interfaces')
                 )
-                ?: $this->typeResolverFallback();
+                ?: $this->typeResolverFallback(
+                    $this->possibleImplementations($interfaceDefinition)
+                );
         }
 
         return new InterfaceType([
@@ -399,6 +401,28 @@ EOL
             'resolveType' => $typeResolver,
             'astNode' => $interfaceDefinition,
         ]);
+    }
+
+    /**
+     * @return list<\GraphQL\Language\AST\ObjectTypeDefinitionNode>
+     */
+    protected function possibleImplementations(InterfaceTypeDefinitionNode $interfaceTypeDefinitionNode): array
+    {
+        $name = $interfaceTypeDefinitionNode->name->value;
+
+        /** @var list<\GraphQL\Language\AST\ObjectTypeDefinitionNode> $implementations */
+        $implementations = [];
+
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if (
+                $typeDefinition instanceof ObjectTypeDefinitionNode
+                && ASTHelper::typeImplementsInterface($typeDefinition, $name)
+            ) {
+                $implementations []= $typeDefinition;
+            }
+        }
+
+        return $implementations;
     }
 
     /**
@@ -427,20 +451,31 @@ EOL
     /**
      * Default type resolver for resolving interfaces or union types.
      *
+     * @param  list<string>  $possibleTypes
      * @return Closure(mixed): Type
      */
-    protected function typeResolverFallback(): Closure
+    protected function typeResolverFallback(array $possibleTypes): Closure
     {
-        return function ($root): Type {
+        return function ($root) use ($possibleTypes): Type {
             $explicitTypename = data_get($root, '__typename');
             if (null !== $explicitTypename) {
                 return $this->get($explicitTypename);
             }
 
             if (is_object($root)) {
-                $explicitSchemaMap = $this->documentAST->classNameToObjectTypeName[get_class($root)] ?? null;
-                if (null !== $explicitSchemaMap) {
-                    return $this->get($explicitSchemaMap);
+                $fqcn = get_class($root);
+                $explicitSchemaMapping = $this->documentAST->classNameToObjectTypeNames[$fqcn] ?? null;
+                if (null !== $explicitSchemaMapping) {
+                    $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
+
+                    if (count($actuallyPossibleTypes) !== 1) {
+                        $ambiguousMapping = implode(', ', $actuallyPossibleTypes);
+                        throw new DefinitionException(
+                            "Expected to map {$fqcn} to a single possible type, got: {$ambiguousMapping}."
+                        );
+                    }
+
+                    return $this->get($actuallyPossibleTypes[0]);
                 }
 
                 return $this->get(class_basename($root));
@@ -464,7 +499,9 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.unions')
                 )
-                ?: $this->typeResolverFallback();
+                ?: $this->typeResolverFallback(
+                    $this->possibleUnionTypes($unionDefinition)
+                );
         }
 
         return new UnionType([
@@ -495,5 +532,19 @@ EOL
         }
 
         return $this->fieldFactory;
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function possibleUnionTypes(UnionTypeDefinitionNode $unionDefinition): array
+    {
+        $types = [];
+
+        foreach ($unionDefinition->types as $type) {
+            $types []= $type->name->value;
+        }
+
+        return $types;
     }
 }

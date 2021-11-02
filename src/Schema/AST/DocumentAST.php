@@ -67,9 +67,9 @@ class DocumentAST implements Serializable, Arrayable
      *
      * @see \Nuwave\Lighthouse\Schema\TypeRegistry::typeResolverFallback()
      *
-     * @var array<class-string, string>
+     * @var array<class-string, list<string>>
      */
-    public $classNameToObjectTypeName = [];
+    public $classNameToObjectTypeNames = [];
 
     /**
      * Create a new DocumentAST instance from a schema.
@@ -117,11 +117,10 @@ class DocumentAST implements Serializable, Arrayable
                         throw new DefinitionException("Failed to find a model class for {$modelName}, referenced in @model on type {$name}");
                     }
 
-                    // TODO throw when detecting a duplicate setting?
                     // It might be valid to have multiple types that correspond to a single model
-                    // in order to hide some fields in some scenarios, but we cannot decide on a
-                    // single object type for a given class name unambiguously then.
-                    $instance->classNameToObjectTypeName[$modelClass] = $name;
+                    // in order to hide some fields in some scenarios, so we cannot decide on a
+                    // single object type for a given class name unambiguously right here.
+                    $instance->classNameToObjectTypeNames[$modelClass][] = $name;
                 }
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
@@ -184,7 +183,7 @@ class DocumentAST implements Serializable, Arrayable
             self::TYPES => array_map($nodeToArray, $this->types),
             // @phpstan-ignore-next-line Before serialization, those are arrays
             self::DIRECTIVES => array_map($nodeToArray, $this->directives),
-            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeName,
+            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ];
     }
 
@@ -219,7 +218,7 @@ class DocumentAST implements Serializable, Arrayable
         [
             self::TYPES => $types,
             self::DIRECTIVES => $directives,
-            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeName,
+            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ] = $ast;
 
         // Utilize the NodeList for lazy unserialization for performance gains.

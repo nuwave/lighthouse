@@ -104,6 +104,6 @@ class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
 
-        $this->assertSame('Query', $reserialized->classNameToObjectTypeName[User::class]);
+        $this->assertSame('Query', $reserialized->classNameToObjectTypeNames[User::class]);
     }
 }
