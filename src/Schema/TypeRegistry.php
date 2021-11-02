@@ -418,7 +418,7 @@ EOL
                 $typeDefinition instanceof ObjectTypeDefinitionNode
                 && ASTHelper::typeImplementsInterface($typeDefinition, $name)
             ) {
-                $implementations []= $typeDefinition;
+                $implementations [] = $typeDefinition;
             }
         }
 
@@ -542,7 +542,7 @@ EOL
         $types = [];
 
         foreach ($unionDefinition->types as $type) {
-            $types []= $type->name->value;
+            $types [] = $type->name->value;
         }
 
         return $types;
