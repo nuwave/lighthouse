@@ -141,7 +141,7 @@ class ArgumentSet
      */
     protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
     {
-        $unboxBenSampoEnumEnumInstances = config('unbox_bensampo_enum_enum_instances');
+        $unboxBenSampoEnumEnumInstances = config('lighthouse.unbox_bensampo_enum_enum_instances');
 
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();

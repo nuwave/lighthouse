@@ -144,7 +144,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
                 ],
             ],
         ]);
-        config(['unbox_bensampo_enum_enum_instances' => false]);
+        config(['lighthouse.unbox_bensampo_enum_enum_instances' => false]);
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($type: AOrB) {
