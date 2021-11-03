@@ -13,11 +13,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add setting `unbox_bensampo_enum_enum_instances` to turn off `BenSampo\Enum\Enum` unboxing
+- Add setting `unbox_bensampo_enum_enum_instances` to turn off `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
 
 ### Deprecated
 
-- Deprecate `BenSampo\Enum\Enum` unboxing
+- Deprecate `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
 
 ## v5.24.0
 
