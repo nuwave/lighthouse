@@ -148,7 +148,7 @@ class ArgumentSet
 
             // TODO remove in v6, Laravel automagically calls the Enum's __toString() method
             // Unbox Enum values to ensure their underlying value is used for queries
-            if (is_a($value, '\BenSampo\Enum\Enum') && $unboxBenSampoEnumEnumInstances) {
+            if ($unboxBenSampoEnumEnumInstances && is_a($value, '\BenSampo\Enum\Enum')) {
                 $value = $value->value;
             }
 
