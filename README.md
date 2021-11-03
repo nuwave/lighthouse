@@ -65,7 +65,7 @@ If you discover a security vulnerability within Lighthouse,
 please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
 or visit https://tidelift.com/security.
 
-# Sponsors
+## Sponsors
 
 Lighthouse is supported by [its awesome sponsors](https://lighthouse-php.com/sponsors).
 
