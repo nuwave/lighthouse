@@ -141,8 +141,8 @@ class LaravelEnumTypeDBTest extends DBTestCase
             'data' => [
                 'withEnum' => [
                     'type' => $a->key,
-                ]
-            ]
+                ],
+            ],
         ]);
         config(['unbox_bensampo_enum_enum_instances' => false]);
 
@@ -158,8 +158,8 @@ class LaravelEnumTypeDBTest extends DBTestCase
             'data' => [
                 'withEnum' => [
                     'type' => $a->key,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

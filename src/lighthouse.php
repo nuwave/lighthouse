@@ -348,7 +348,6 @@ return [
 
     'unbox_bensampo_enum_enum_instances' => true,
 
-
     /*
     |--------------------------------------------------------------------------
     | GraphQL Subscriptions

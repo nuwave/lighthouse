@@ -17,6 +17,7 @@ use Tests\Utils\LaravelEnums\AOrB;
  * @property AOrB|null $type
  *
  * Scopes
+ *
  * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
  * @method static \Illuminate\Database\Eloquent\Builder&static byTypeInternal(string $aOrB) TODO remove in v6
  */
@@ -39,7 +40,7 @@ class WithEnum extends Model
     }
 
     /**
-     * TODO remove in v6
+     * TODO remove in v6.
      */
     public function scopeByTypeInternal(Builder $builder, string $aOrB): Builder
     {
