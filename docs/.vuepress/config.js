@@ -36,7 +36,7 @@ module.exports = {
     logo: "/logo.svg",
     editLinks: true, //  "Edit this page" at the bottom of each page
     repo: "nuwave/lighthouse", //  Github repo
-    docsDir: "docs/", //  Github repo docs folder
+    docsDir: "docs", //  Github repo docs folder
     latest,
     nav: [
       {
@@ -48,15 +48,15 @@ module.exports = {
       },
       {
         text: "Tutorial",
-        link: "/tutorial/",
+        link: "/tutorial",
       },
       {
         text: "Resources",
-        link: "/resources/",
+        link: "/resources",
       },
       {
-        text: "Users",
-        link: "/users/",
+        text: "Sponsors",
+        link: "/sponsors",
       },
       {
         text: "Changelog",
