@@ -141,12 +141,14 @@ class ArgumentSet
      */
     protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
     {
+        $unboxBenSampoEnumEnumInstances = config('lighthouse.unbox_bensampo_enum_enum_instances');
+
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
 
-            // TODO switch to instanceof when we require bensampo/laravel-enum
+            // TODO remove in v6, Laravel automagically calls the Enum's __toString() method
             // Unbox Enum values to ensure their underlying value is used for queries
-            if (is_a($value, '\BenSampo\Enum\Enum')) {
+            if ($unboxBenSampoEnumEnumInstances && is_a($value, '\BenSampo\Enum\Enum')) {
                 $value = $value->value;
             }
 
