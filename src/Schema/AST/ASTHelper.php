@@ -10,9 +10,11 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
@@ -113,15 +115,18 @@ class ASTHelper
             return $node;
         }
 
-        $type = data_get($node, 'type');
-
-        if (! $type) {
-            throw new DefinitionException(
-                "The node '$node->kind' does not have a type associated with it."
-            );
+        if (
+            $node instanceof NonNullTypeNode
+            || $node instanceof ListTypeNode
+            || $node instanceof FieldDefinitionNode
+            || $node instanceof InputValueDefinitionNode
+        ) {
+            return self::getUnderlyingNamedTypeNode($node->type);
         }
 
-        return self::getUnderlyingNamedTypeNode($type);
+        throw new DefinitionException(
+            "The node '$node->kind' does not have a type associated with it."
+        );
     }
 
     /**

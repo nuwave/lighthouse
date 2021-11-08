@@ -49,3 +49,7 @@ node: up ## Open an interactive shell into the Node container
 .PHONY: release
 release: up ## Prepare the docs for a new release
 	docker-compose exec node yarn run release
+
+.PHONY: docs
+docs: up ## Render the docs in a development server
+	docker-compose exec node yarn run start

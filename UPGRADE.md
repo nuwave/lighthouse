@@ -80,7 +80,7 @@ a smooth transition period.
 ### Nullability of pagination results
 
 Generated result types of paginated lists are now always marked as non-nullable.
-The setting `non_null_pagination_results` was removed and is now always `true`.
+The setting `non_null_pagination_results` was removed and now always behaves as if it were `true`.
 
 This is generally more convenient for clients, but will
 cause validation errors to bubble further up in the result.
@@ -94,6 +94,37 @@ In the future, a value of `1` will be added to represent the complexity more acc
 This change will increase the complexity of queries on fields using `@complexity` without
 a custom complexity resolver. If you configured `security.max_query_complexity`, complex
 queries that previously passed might now fail.
+
+### Passing of BenSampo\Enum\Enum instances to ArgBuilderDirective::handleBuilder()
+
+Previous to `v6`, Lighthouse would extract the internal `$value` from instances of
+`BenSampo\Enum\Enum` before passing it to `ArgBuilderDirective::handleBuilder()`
+if the setting `unbox_bensampo_enum_enum_instances` was `true`.
+
+This is generally unnecessary, because Laravel automagically calls the Enum's `__toString()`
+method when using it in a query. This might affect users who use an `ArgBuilderDirective`
+that delegates to a method that relies on an internal value being passed.
+
+```graphql
+type Query {
+    withEnum(byType: AOrB @scope): WithEnum @find
+}
+```
+
+```php
+// WithEnum.php
+public function scopeByType(Builder $builder, int $aOrB): Builder
+{
+    return $builder->where('type', $aOrB);
+}
+```
+
+In the future, Lighthouse will pass the actual Enum instance along. You can opt in to
+the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instances` to `false`. 
+
+```php
+public function scopeByType(Builder $builder, AOrB $aOrB): Builder
+```
 
 ### Removed error extension field `category`
 

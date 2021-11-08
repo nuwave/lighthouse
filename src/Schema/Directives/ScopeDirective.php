@@ -19,8 +19,9 @@ The scope method will receive the client-given value of the argument as the seco
 directive @scope(
   """
   The name of the scope.
+  Defaults to the name of the argument.
   """
-  name: String!
+  name: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
@@ -30,7 +31,8 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $value): object
     {
-        $scope = $this->directiveArgValue('name');
+        $scope = $this->directiveArgValue('name')
+            ?? $this->nodeName();
 
         try {
             return $builder->{$scope}($value);
