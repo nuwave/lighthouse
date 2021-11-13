@@ -6,7 +6,7 @@ your extensions in isolation from the rest of your application.
 ## Use a test schema
 
 When you enhance functionality related to the schema definition, such as adding
-a [custom directive](../custom-directives), you need a test schema where you can use it.
+a [custom directive](../custom-directives/getting-started.md), you need a test schema where you can use it.
 Add the `UsesTestSchema` trait to your test class, call `setUpTestSchema()` and define your test schema:
 
 ```php
