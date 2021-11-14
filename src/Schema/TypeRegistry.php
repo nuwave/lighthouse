@@ -81,6 +81,16 @@ class TypeRegistry
         $this->argumentFactory = $argumentFactory;
     }
 
+    /**
+     * @param  array<string>  $possibleTypes
+     */
+    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): string
+    {
+        $ambiguousMapping = implode(', ', $possibleTypes);
+
+        return "Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].";
+    }
+
     public function setDocumentAST(DocumentAST $documentAST): self
     {
         $this->documentAST = $documentAST;
@@ -404,13 +414,13 @@ EOL
     }
 
     /**
-     * @return list<\GraphQL\Language\AST\ObjectTypeDefinitionNode>
+     * @return list<string>
      */
     protected function possibleImplementations(InterfaceTypeDefinitionNode $interfaceTypeDefinitionNode): array
     {
         $name = $interfaceTypeDefinitionNode->name->value;
 
-        /** @var list<\GraphQL\Language\AST\ObjectTypeDefinitionNode> $implementations */
+        /** @var list<string> $implementations */
         $implementations = [];
 
         foreach ($this->documentAST->types as $typeDefinition) {
@@ -418,7 +428,7 @@ EOL
                 $typeDefinition instanceof ObjectTypeDefinitionNode
                 && ASTHelper::typeImplementsInterface($typeDefinition, $name)
             ) {
-                $implementations [] = $typeDefinition;
+                $implementations [] = $typeDefinition->name->value;
             }
         }
 
@@ -469,9 +479,8 @@ EOL
                     $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
 
                     if (count($actuallyPossibleTypes) !== 1) {
-                        $ambiguousMapping = implode(', ', $actuallyPossibleTypes);
                         throw new DefinitionException(
-                            "Expected to map {$fqcn} to a single possible type, got: {$ambiguousMapping}."
+                            self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes)
                         );
                     }
 
