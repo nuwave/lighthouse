@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Consider renamed models in default type resolver https://github.com/nuwave/lighthouse/pull/1967
+
 ## v5.25.0
 
 ### Added
