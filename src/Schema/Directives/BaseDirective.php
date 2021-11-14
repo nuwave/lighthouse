@@ -151,7 +151,7 @@ abstract class BaseDirective implements Directive
 
         if (! $model) {
             throw new DefinitionException(
-                "A `model` argument must be assigned to the '@{$this->name()}' directive on '{$this->nodeName()}."
+                "Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}."
             );
         }
 
