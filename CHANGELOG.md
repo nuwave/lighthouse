@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Render `GraphQL\Error\ClientAware` exceptions outside of GraphQL context with extensions content
+
 ## v5.25.1
 
 ### Fixed
