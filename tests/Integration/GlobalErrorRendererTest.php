@@ -3,6 +3,7 @@
 namespace Tests\Integration;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Orchestra\Testbench\Exceptions\Handler as OrchestraHandler;
 use Tests\TestCase;
 use Tests\Utils\Exceptions\WithExtensionsException;
@@ -29,6 +30,15 @@ class GlobalErrorRendererTest extends TestCase
     protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, OrchestraHandler::class);
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        if (AppVersion::below(8.0)) {
+            $this->markTestSkipped('This only works with \Illuminate\Foundation\Exceptions\Handler::renderable().');
+        }
     }
 
     public function testCatchesErrorWithExtensions(): void
