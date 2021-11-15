@@ -15,6 +15,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Allow specifying headers in `MakesGraphQLRequests` and `MakesGraphQLRequestsLumen` test helpers
 
+### Fixed
+
+- Do not batchload relations with different database connections
+
 ## v5.25.1
 
 ### Fixed

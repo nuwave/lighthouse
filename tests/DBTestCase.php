@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    const ALTERNATE_CONNECTION = 'alternate';
     /**
      * Indicates if migrations ran.
      *
@@ -47,6 +48,7 @@ abstract class DBTestCase extends TestCase
 
         $config->set('database.default', 'mysql');
         $config->set('database.connections.mysql', $this->mysqlOptions());
+        $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $this->mysqlOptions());
     }
 
     /**
