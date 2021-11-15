@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Directive;
@@ -14,7 +13,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use GraphQL\Utils\Utils;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
@@ -92,30 +90,32 @@ class FederationPrinter
             }
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {
-                return SchemaPrinter::printDirectives(
-                    Utils::filter(
-                        $astNode->directives,
-                        static function (DirectiveNode $directive): bool {
-                            $name = $directive->name->value;
+                $federationDirectives = [];
+                foreach ($astNode->directives as $directive) {
+                    $name = $directive->name->value;
 
-                            return $name === KeyDirective::NAME
-                                || $name === ExtendsDirective::NAME;
-                        }
-                    )
-                );
+                    if ($name === KeyDirective::NAME
+                        || $name === ExtendsDirective::NAME
+                    ) {
+                        $federationDirectives []= $directive;
+                    }
+                }
+
+                return SchemaPrinter::printDirectives($federationDirectives);
             } elseif ($astNode instanceof FieldDefinitionNode) {
-                return SchemaPrinter::printDirectives(
-                    Utils::filter(
-                        $astNode->directives,
-                        static function (DirectiveNode $directive): bool {
-                            $name = $directive->name->value;
+                $federationDirectives = [];
+                foreach ($astNode->directives as $directive) {
+                    $name = $directive->name->value;
 
-                            return $name === ProvidesDirective::NAME
-                                || $name === RequiresDirective::NAME
-                                || $name === ExternalDirective::NAME;
-                        }
-                    )
-                );
+                    if ($name === ProvidesDirective::NAME
+                        || $name === RequiresDirective::NAME
+                        || $name === ExternalDirective::NAME
+                    ) {
+                        $federationDirectives []= $directive;
+                    }
+                }
+
+                return SchemaPrinter::printDirectives($federationDirectives);
             }
 
             return '';
