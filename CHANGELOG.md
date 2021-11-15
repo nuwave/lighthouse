@@ -9,13 +9,27 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-### Changed
+## v5.26.0
 
-- Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950
+### Added
+
+- Allow specifying headers in `MakesGraphQLRequests` and `MakesGraphQLRequestsLumen` test helpers
+
+## v5.25.1
+
+### Fixed
+
+- Consider renamed models in default type resolver https://github.com/nuwave/lighthouse/pull/1967
+
+## v5.25.0
+
+### Added
+
+- Add setting `unbox_bensampo_enum_enum_instances` to turn off `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
 
 ### Deprecated
 
-- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
+- Deprecate `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
 
 ## v5.24.0
 
@@ -23,6 +37,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add `Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective` interface to allow
   overwriting the default query complexity calculation https://github.com/nuwave/lighthouse/pull/1947
+- Allow omitting `name` in `@scope` by defaulting to the argument name https://github.com/nuwave/lighthouse/pull/1957
+
+### Changed
+
+- Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950
 
 ### Fixed
 
@@ -31,6 +50,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Deprecated
 
 - Deprecate methods to set a query complexity resolver through `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1947
+- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
 
 ## v5.23.1
 

@@ -3,6 +3,7 @@
 namespace Tests\Utils\Models;
 
 use BenSampo\Enum\Traits\CastsEnums;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
 
@@ -14,6 +15,11 @@ use Tests\Utils\LaravelEnums\AOrB;
  * Attributes
  * @property string|null $name
  * @property AOrB|null $type
+ *
+ * Scopes
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
+ * @method static \Illuminate\Database\Eloquent\Builder&static byTypeInternal(string $aOrB) TODO remove in v6
  */
 class WithEnum extends Model
 {
@@ -27,4 +33,17 @@ class WithEnum extends Model
     protected $enumCasts = [
         'type' => AOrB::class,
     ];
+
+    public function scopeByType(Builder $builder, AOrB $aOrB): Builder
+    {
+        return $builder->where('type', $aOrB);
+    }
+
+    /**
+     * TODO remove in v6.
+     */
+    public function scopeByTypeInternal(Builder $builder, string $aOrB): Builder
+    {
+        return $builder->where('type', $aOrB);
+    }
 }

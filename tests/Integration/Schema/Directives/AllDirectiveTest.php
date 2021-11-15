@@ -11,16 +11,16 @@ class AllDirectiveTest extends DBTestCase
 {
     public function testGetAllModelsAsRootField(): void
     {
-        factory(User::class, 2)->create();
+        $count = 2;
+        factory(User::class, $count)->create();
 
         $this->schema = /** @lang GraphQL */'
         type User {
             id: ID!
-            name: String!
         }
 
         type Query {
-            users: [User!]! @all(model: "User")
+            users: [User!]! @all
         }
         ';
 
@@ -28,10 +28,57 @@ class AllDirectiveTest extends DBTestCase
         {
             users {
                 id
-                name
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertJsonCount($count, 'data.users');
+    }
+
+    public function testExplicitModelName(): void
+    {
+        $count = 2;
+        factory(User::class, $count)->create();
+
+        $this->schema = /** @lang GraphQL */'
+        type Foo {
+            id: ID!
+        }
+
+        type Query {
+            foos: [Foo!]! @all(model: "User")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foos {
+                id
+            }
+        }
+        ')->assertJsonCount($count, 'data.foos');
+    }
+
+    public function testRenamedModelWithModelDirective(): void
+    {
+        $count = 2;
+        factory(User::class, $count)->create();
+
+        $this->schema = /** @lang GraphQL */'
+        type Foo @model(class: "User") {
+            id: ID!
+        }
+
+        type Query {
+            foos: [Foo!]! @all
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foos {
+                id
+            }
+        }
+        ')->assertJsonCount($count, 'data.foos');
     }
 
     public function testGetAllAsNestedField(): void

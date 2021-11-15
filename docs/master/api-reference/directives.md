@@ -2677,8 +2677,9 @@ The scope method will receive the client-given value of the argument as the seco
 directive @scope(
   """
   The name of the scope.
+  Defaults to the name of the argument.
   """
-  name: String!
+  name: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -2686,7 +2687,27 @@ You may use this in combination with field directives such as [@all](#all).
 
 ```graphql
 type Query {
-  posts(trending: Boolean @scope(name: "trending")): [Post!]! @all
+  posts(trending: Boolean @scope): [Post!]! @all
+}
+```
+
+The scope will be passed the value of the client-given argument:
+
+```php
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    public function scopeTrending(Builder $query, bool $trending): Builder { ... }
+}
+```
+
+You can use the `name` argument if your scope is named differently from your argument:
+
+```graphql
+type Query {
+  posts(isTrending: Boolean @scope(name: "trending")): [Post!] @all
 }
 ```
 
@@ -3112,8 +3133,8 @@ directive @validator(
   The name of the class to use.
 
   If defined on an input, this defaults to a class called `{$inputName}Validator` in the
-  default validator namespace. For fields, it uses the name of the parent type
-  and the field name: `{$parent}{$field}Validator`.
+  default validator namespace. For fields, it uses the namespace of the parent type
+  and the field name: `{$parent}\{$field}Validator`.
   """
   class: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT

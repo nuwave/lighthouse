@@ -193,9 +193,8 @@ jobs:
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
-      - run: bash <(curl -s https://codecov.io/bash)
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: "Upload to Codecov"
+        uses: codecov/codecov-action@v2
 
   benchmarks:
     runs-on: ubuntu-18.04
