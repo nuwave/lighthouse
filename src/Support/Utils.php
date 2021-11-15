@@ -26,10 +26,8 @@ class Utils
             return $classCandidate;
         }
 
-        // Stop if the class is found or we are out of namespaces to try
-        while (! empty($namespacesToTry)) {
-            // Pop off the first namespace and try it
-            $className = array_shift($namespacesToTry).'\\'.$classCandidate;
+        foreach ($namespacesToTry as $namespace) {
+            $className = $namespace.'\\'.$classCandidate;
 
             if ($determineMatch($className)) {
                 /** @var class-string $className */

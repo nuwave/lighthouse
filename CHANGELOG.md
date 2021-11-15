@@ -9,6 +9,32 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.26.0
+
+### Added
+
+- Allow specifying headers in `MakesGraphQLRequests` and `MakesGraphQLRequestsLumen` test helpers
+
+### Fixed
+
+- Do not batchload relations with different database connections
+
+## v5.25.1
+
+### Fixed
+
+- Consider renamed models in default type resolver https://github.com/nuwave/lighthouse/pull/1967
+
+## v5.25.0
+
+### Added
+
+- Add setting `unbox_bensampo_enum_enum_instances` to turn off `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
+
+### Deprecated
+
+- Deprecate `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
+
 ## v5.24.0
 
 ### Added

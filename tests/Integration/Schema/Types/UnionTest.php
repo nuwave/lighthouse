@@ -3,6 +3,8 @@
 namespace Tests\Integration\Schema\Types;
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -36,10 +38,142 @@ class UnionTest extends DBTestCase
         ]);
     }
 
+    public function testConsidersRenamedModels(): void
+    {
+        // This creates a user with it
+        factory(Post::class)->create(
+            // Prevent creating more users through nested factory
+            ['task_id' => 1]
+        );
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        union Stuff = Foo | Post
+
+        type Foo @model(class: "User") {
+            name: String!
+        }
+
+        type Post {
+            title: String!
+        }
+
+        type Query {
+            stuff: [Stuff!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            stuff {
+                ... on Foo {
+                    name
+                }
+                ... on Post {
+                    title
+                }
+            }
+        }
+        ')->assertJsonStructure([
+            'data' => [
+                'stuff' => [
+                    [
+                        'name',
+                    ],
+                    [
+                        'title',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testThrowsOnAmbiguousSchemaMapping(): void
+    {
+        // This creates a user with it
+        factory(Post::class)->create(
+            // Prevent creating more users through nested factory
+            ['task_id' => 1]
+        );
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        union Nameable = Foo | Post
+
+        type Foo @model(class: "User") {
+            name: String!
+        }
+
+        type Post @model(class: "User") {
+            title: String!
+        }
+
+        type Query {
+            stuff: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $this->expectExceptionObject(
+            new DefinitionException(
+                TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Post'])
+            )
+        );
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            stuff {
+                ... on Foo {
+                    name
+                }
+                ... on Post {
+                    title
+                }
+            }
+        }
+        ');
+    }
+
+    public function testThrowsOnNonOverlappingSchemaMapping(): void
+    {
+        // This creates a user with it
+        factory(Post::class)->create(
+            // Prevent creating more users through nested factory
+            ['task_id' => 1]
+        );
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        union Stuff = Post
+
+        type Post {
+            title: String!
+        }
+
+        type NotPartOfUnion @model(class: "User") {
+            id: String!
+        }
+
+        type Query {
+            stuff: [Stuff!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $this->expectExceptionObject(
+            new DefinitionException(
+                TypeRegistry::unresolvableAbstractTypeMapping(User::class, [])
+            )
+        );
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            stuff {
+                ... on Post {
+                    title
+                }
+            }
+        }
+        ');
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function resolve(): Collection
+    public function fetchResults(): Collection
     {
         $users = User::all();
         $posts = Post::all();
@@ -86,7 +220,7 @@ class UnionTest extends DBTestCase
             }
 
             type Query {
-                stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver()}\")
+                stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver('fetchResults')}\")
             }
             ",
 /** @lang GraphQL */ "
