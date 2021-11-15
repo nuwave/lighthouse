@@ -102,4 +102,64 @@ class LaravelEnumTypeDBTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testScopeUsingEnumType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            withEnum(
+                byType: AOrB @scope
+                byTypeInternal: AOrB @scope # TODO remove in v6
+            ): WithEnum @find
+        }
+
+        type WithEnum {
+            type: AOrB
+        }
+        ';
+
+        $this->typeRegistry->register(
+            new LaravelEnumType(AOrB::class)
+        );
+
+        $a = AOrB::A();
+
+        $withEnum = new WithEnum();
+        $withEnum->type = $a;
+        $withEnum->save();
+
+        // TODO remove in v6
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($type: AOrB) {
+            withEnum(byTypeInternal: $type) {
+                type
+            }
+        }
+        ', [
+            'type' => $a->key,
+        ])->assertJson([
+            'data' => [
+                'withEnum' => [
+                    'type' => $a->key,
+                ],
+            ],
+        ]);
+        config(['lighthouse.unbox_bensampo_enum_enum_instances' => false]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($type: AOrB) {
+            withEnum(byType: $type) {
+                type
+            }
+        }
+        ', [
+            'type' => $a->key,
+        ])->assertJson([
+            'data' => [
+                'withEnum' => [
+                    'type' => $a->key,
+                ],
+            ],
+        ]);
+    }
 }

@@ -92,7 +92,7 @@ GRAPHQL;
         }
 
         /** @var \GraphQL\Language\AST\NamedTypeNode $namedTypeNode */
-        $namedTypeNode = Parser::parseType('Node', ['noLocation' => true]);
+        $namedTypeNode = Parser::parseType(GlobalIdServiceProvider::NODE, ['noLocation' => true]);
         $typeDefinition->interfaces [] = $namedTypeNode;
 
         $globalIdFieldName = config('lighthouse.global_id_field');

@@ -78,6 +78,33 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.tasks');
     }
 
+    public function testHasManyWithRenamedModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            foos: [Foo!]! @hasMany(relation: "tasks")
+        }
+
+        type Foo @model(class: "Task") {
+            id: Int
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                foos {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(3, 'data.user.foos');
+    }
+
     public function testQueryHasManyWithCondition(): void
     {
         $this->schema = /** @lang GraphQL */ '

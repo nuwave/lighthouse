@@ -30,13 +30,13 @@ and offer flexibility when you need it.
 
 ## Documentation
 
-The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
+The documentation lives at [lighthouse-php.com](https://lighthouse-php.com).
 
 The site includes the latest docs for each major version of Lighthouse.
 You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
 at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
 
-A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn/) and is maintained
+A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn) and is maintained
 over at https://github.com/haxibiao/lighthouse.
 
 ## Get involved
@@ -64,3 +64,9 @@ We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTIN
 If you discover a security vulnerability within Lighthouse,
 please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
 or visit https://tidelift.com/security.
+
+## Sponsors
+
+Lighthouse is supported by [its awesome sponsors](https://lighthouse-php.com/sponsors).
+
+If you want to support the development of Lighthouse and see your logo there, consider [sponsoring](https://github.com/sponsors/spawnia).
