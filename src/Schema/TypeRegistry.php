@@ -67,7 +67,7 @@ class TypeRegistry
     /**
      * Map from type names to resolved types.
      *
-     * @var array<string, \GraphQL\Type\Definition\Type>
+     * @var array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     protected $types = [];
 
@@ -92,6 +92,8 @@ class TypeRegistry
      * Get the given GraphQL type by name.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     public function get(string $name): Type
     {
@@ -119,6 +121,8 @@ EOL
 
     /**
      * Register an executable GraphQL type.
+     *
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function register(Type $type): self
     {
@@ -134,6 +138,8 @@ EOL
 
     /**
      * Register a type, overwriting if it exists already.
+     *
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function overwrite(Type $type): self
     {
@@ -144,6 +150,8 @@ EOL
 
     /**
      * Attempt to make a type of the given name from the AST.
+     *
+     * @return (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null
      */
     protected function fromAST(string $name): ?Type
     {
@@ -158,7 +166,7 @@ EOL
     /**
      * Return all possible types that are registered.
      *
-     * @return array<string, \GraphQL\Type\Definition\Type>
+     * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     public function possibleTypes(): array
     {
@@ -179,10 +187,10 @@ EOL
     /**
      * Get the types that are currently resolved.
      *
-     * Note that this does not all possible types, only those that
+     * Note that this does not return all possible types, only those that
      * are programmatically registered or already resolved.
      *
-     * @return array<string, \GraphQL\Type\Definition\Type>
+     * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     public function resolvedTypes(): array
     {
@@ -193,6 +201,7 @@ EOL
      * Transform a definition node to an executable type.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $definition
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -223,6 +232,8 @@ EOL
      *
      * @throws \GraphQL\Error\InvariantViolation
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {
