@@ -2,12 +2,9 @@
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Tests\DBTestCase;
-use Tests\Utils\LaravelEnums\AOrB;
 
 /**
  * Primary key.
