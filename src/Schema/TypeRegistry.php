@@ -101,9 +101,9 @@ class TypeRegistry
     /**
      * Get the given GraphQL type by name.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function get(string $name): Type
     {
@@ -239,11 +239,10 @@ EOL
      * The default type transformations.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      *
      * @throws \GraphQL\Error\InvariantViolation
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
-     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {
