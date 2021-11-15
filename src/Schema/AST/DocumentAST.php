@@ -7,11 +7,16 @@ use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
+use Nuwave\Lighthouse\Support\Utils;
 use Serializable;
 
 /**
@@ -28,6 +33,10 @@ use Serializable;
  */
 class DocumentAST implements Serializable, Arrayable
 {
+    const TYPES = 'types';
+    const DIRECTIVES = 'directives';
+    const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
+
     /**
      * The types within the schema.
      *
@@ -57,6 +66,17 @@ class DocumentAST implements Serializable, Arrayable
     public $directives = [];
 
     /**
+     * A map from class names to their respective object types.
+     *
+     * This is useful for the performant resolution of abstract types.
+     *
+     * @see \Nuwave\Lighthouse\Schema\TypeRegistry::typeResolverFallback()
+     *
+     * @var array<class-string, list<string>>
+     */
+    public $classNameToObjectTypeNames = [];
+
+    /**
      * Create a new DocumentAST instance from a schema.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
@@ -79,17 +99,41 @@ class DocumentAST implements Serializable, Arrayable
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
+                $name = $definition->name->value;
+
                 // Store the types in an associative array for quick lookup
-                $instance->types[$definition->name->value] = $definition;
+                $instance->types[$name] = $definition;
+
+                if ($definition instanceof ObjectTypeDefinitionNode) {
+                    $modelName = ModelDirective::modelClass($definition);
+                    if (null === $modelName) {
+                        continue;
+                    }
+
+                    $modelClass = Utils::namespaceClassName(
+                        $modelName,
+                        (array) config('lighthouse.namespaces.models'),
+                        static function (string $classCandidate): bool {
+                            return is_subclass_of($classCandidate, Model::class);
+                        }
+                    );
+
+                    if (null === $modelClass) {
+                        throw new DefinitionException("Failed to find a model class for {$modelName}, referenced in @model on type {$name}");
+                    }
+
+                    // It might be valid to have multiple types that correspond to a single model
+                    // in order to hide some fields in some scenarios, so we cannot decide on a
+                    // single object type for a given class name unambiguously right here.
+                    $instance->classNameToObjectTypeNames[$modelClass][] = $name;
+                }
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
                 $instance->typeExtensions[$definition->name->value] [] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new Exception(
-                    'Unknown definition type'
-                );
+                throw new Exception('Unknown definition type: '.get_class($definition));
             }
         }
 
@@ -141,9 +185,10 @@ class DocumentAST implements Serializable, Arrayable
 
         return [
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            'types' => array_map($nodeToArray, $this->types),
+            self::TYPES => array_map($nodeToArray, $this->types),
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            'directives' => array_map($nodeToArray, $this->directives),
+            self::DIRECTIVES => array_map($nodeToArray, $this->directives),
+            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ];
     }
 
@@ -175,6 +220,12 @@ class DocumentAST implements Serializable, Arrayable
      */
     protected function hydrateFromArray(array $ast): void
     {
+        [
+            self::TYPES => $types,
+            self::DIRECTIVES => $directives,
+            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
+        ] = $ast;
+
         // Utilize the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
 

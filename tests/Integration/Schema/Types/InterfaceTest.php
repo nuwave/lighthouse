@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Types;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
@@ -60,6 +61,130 @@ GRAPHQL;
         ]);
 
         $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
+    }
+
+    public function testConsidersRenamedModels(): void
+    {
+        // This creates one team with it
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Nameable {
+            name: String!
+        }
+
+        type Foo implements Nameable @model(class: "User") {
+            id: ID!
+            name: String!
+        }
+
+        type Team implements Nameable {
+            name: String!
+        }
+
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            namedThings {
+                name
+                ... on Foo {
+                    id
+                }
+            }
+        }
+        ')->assertJsonStructure([
+            'data' => [
+                'namedThings' => [
+                    [
+                        'name',
+                        'id',
+                    ],
+                    [
+                        'name',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
+    }
+
+    public function testThrowsOnAmbiguousSchemaMapping(): void
+    {
+        // This creates one team with it
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Nameable {
+            name: String!
+        }
+
+        type Foo implements Nameable @model(class: "User") {
+            name: String!
+        }
+
+        type Team implements Nameable @model(class: "User") {
+            name: String!
+        }
+
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $this->expectExceptionObject(
+            new DefinitionException(
+                TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Team'])
+            )
+        );
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            namedThings {
+                name
+            }
+        }
+        ');
+    }
+
+    public function testThrowsOnNonOverlappingSchemaMapping(): void
+    {
+        // This creates one team with it
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Nameable {
+            name: String!
+        }
+
+        type Team implements Nameable {
+            name: String!
+        }
+
+        type NotPartOfInterface @model(class: "User") {
+            id: String!
+        }
+
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $this->expectExceptionObject(
+            new DefinitionException(
+                TypeRegistry::unresolvableAbstractTypeMapping(User::class, [])
+            )
+        );
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            namedThings {
+                name
+            }
+        }
+        ');
     }
 
     public function testUseCustomTypeResolver(): void

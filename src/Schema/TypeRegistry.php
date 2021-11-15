@@ -81,6 +81,16 @@ class TypeRegistry
         $this->argumentFactory = $argumentFactory;
     }
 
+    /**
+     * @param  array<string>  $possibleTypes
+     */
+    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): string
+    {
+        $ambiguousMapping = implode(', ', $possibleTypes);
+
+        return "Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].";
+    }
+
     public function setDocumentAST(DocumentAST $documentAST): self
     {
         $this->documentAST = $documentAST;
@@ -400,7 +410,9 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.interfaces')
                 )
-                ?: $this->typeResolverFallback();
+                ?: $this->typeResolverFallback(
+                    $this->possibleImplementations($interfaceDefinition)
+                );
         }
 
         return new InterfaceType([
@@ -410,6 +422,28 @@ EOL
             'resolveType' => $typeResolver,
             'astNode' => $interfaceDefinition,
         ]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function possibleImplementations(InterfaceTypeDefinitionNode $interfaceTypeDefinitionNode): array
+    {
+        $name = $interfaceTypeDefinitionNode->name->value;
+
+        /** @var list<string> $implementations */
+        $implementations = [];
+
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if (
+                $typeDefinition instanceof ObjectTypeDefinitionNode
+                && ASTHelper::typeImplementsInterface($typeDefinition, $name)
+            ) {
+                $implementations [] = $typeDefinition->name->value;
+            }
+        }
+
+        return $implementations;
     }
 
     /**
@@ -438,20 +472,36 @@ EOL
     /**
      * Default type resolver for resolving interfaces or union types.
      *
-     * We just assume that the rootValue that shall be returned from the
-     * field is a class that is named just like the concrete Object Type
-     * that is supposed to be returned.
-     *
+     * @param  list<string>  $possibleTypes
      * @return Closure(mixed): Type
      */
-    protected function typeResolverFallback(): Closure
+    protected function typeResolverFallback(array $possibleTypes): Closure
     {
-        return function ($root): Type {
-            $name = is_array($root) && isset($root['__typename'])
-                ? $root['__typename']
-                : class_basename($root);
+        return function ($root) use ($possibleTypes): Type {
+            $explicitTypename = data_get($root, '__typename');
+            if (null !== $explicitTypename) {
+                return $this->get($explicitTypename);
+            }
 
-            return $this->get($name);
+            if (is_object($root)) {
+                $fqcn = get_class($root);
+                $explicitSchemaMapping = $this->documentAST->classNameToObjectTypeNames[$fqcn] ?? null;
+                if (null !== $explicitSchemaMapping) {
+                    $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
+
+                    if (count($actuallyPossibleTypes) !== 1) {
+                        throw new DefinitionException(
+                            self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes)
+                        );
+                    }
+
+                    return $this->get($actuallyPossibleTypes[0]);
+                }
+
+                return $this->get(class_basename($root));
+            }
+
+            return $this->get($root);
         };
     }
 
@@ -469,7 +519,9 @@ EOL
                     $nodeName,
                     (array) config('lighthouse.namespaces.unions')
                 )
-                ?: $this->typeResolverFallback();
+                ?: $this->typeResolverFallback(
+                    $this->possibleUnionTypes($unionDefinition)
+                );
         }
 
         return new UnionType([
@@ -500,5 +552,19 @@ EOL
         }
 
         return $this->fieldFactory;
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function possibleUnionTypes(UnionTypeDefinitionNode $unionDefinition): array
+    {
+        $types = [];
+
+        foreach ($unionDefinition->types as $type) {
+            $types [] = $type->name->value;
+        }
+
+        return $types;
     }
 }
