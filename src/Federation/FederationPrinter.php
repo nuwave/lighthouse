@@ -97,7 +97,7 @@ class FederationPrinter
                     if ($name === KeyDirective::NAME
                         || $name === ExtendsDirective::NAME
                     ) {
-                        $federationDirectives []= $directive;
+                        $federationDirectives [] = $directive;
                     }
                 }
 
@@ -111,7 +111,7 @@ class FederationPrinter
                         || $name === RequiresDirective::NAME
                         || $name === ExternalDirective::NAME
                     ) {
-                        $federationDirectives []= $directive;
+                        $federationDirectives [] = $directive;
                     }
                 }
 
