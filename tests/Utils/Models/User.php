@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Tests\DBTestCase;
 use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
 
