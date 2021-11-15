@@ -27,6 +27,11 @@ class WithExtensionsException extends \Exception implements ClientAware, Renders
         return true;
     }
 
+    public function getCategory(): string
+    {
+        return 'literally no one cares';
+    }
+
     public function extensionsContent(): array
     {
         return $this->extensionsContent;
