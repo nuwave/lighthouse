@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    const DEFAULT_CONNECTION = 'mysql';
     const ALTERNATE_CONNECTION = 'alternate';
+
     /**
      * Indicates if migrations ran.
      *
@@ -46,8 +48,8 @@ abstract class DBTestCase extends TestCase
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
 
-        $config->set('database.default', 'mysql');
-        $config->set('database.connections.mysql', $this->mysqlOptions());
+        $config->set('database.default', self::DEFAULT_CONNECTION);
+        $config->set('database.connections.' . self::DEFAULT_CONNECTION, $this->mysqlOptions());
         $config->set('database.connections.'.self::ALTERNATE_CONNECTION, $this->mysqlOptions());
     }
 

@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
+use Tests\DBTestCase;
+use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
 
 /**
  * Primary key.
@@ -41,6 +44,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
+    /**
+     * Ensure that this is functionally equivalent to leaving this as null.
+     *
+     * @see RelationBatchLoaderTest::testDoesNotBatchloadRelationsWithDifferentDatabaseConnections()
+     */
+    protected $connection = DBTestCase::DEFAULT_CONNECTION;
+
     public function alternateConnections(): HasMany
     {
         return $this->hasMany(AlternateConnection::class);
