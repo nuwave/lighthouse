@@ -14,6 +14,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Allow specifying headers in `MakesGraphQLRequests` and `MakesGraphQLRequestsLumen` test helpers
+- Render `GraphQL\Error\ClientAware` exceptions outside of GraphQL context with extensions content
+
+### Fixed
+
+- Do not batchload relations with different database connections
 
 ## v5.25.1
 

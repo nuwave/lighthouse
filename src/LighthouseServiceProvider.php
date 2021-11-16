@@ -4,9 +4,15 @@ namespace Nuwave\Lighthouse;
 
 use Closure;
 use Exception;
+use GraphQL\Error\ClientAware;
+use GraphQL\Error\Error;
+use GraphQL\Executor\ExecutionResult;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Foundation\Application as LaravelApplication;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Lumen\Application as LumenApplication;
@@ -23,6 +29,7 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
+use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
@@ -142,6 +149,36 @@ class LighthouseServiceProvider extends ServiceProvider
         ], 'lighthouse-schema');
 
         $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
+
+        $exceptionHandler = $this->app->make(ExceptionHandlerContract::class);
+        if (
+            $exceptionHandler instanceof ExceptionHandler
+            // TODO remove when requiring a later Laravel version
+            && method_exists($exceptionHandler, 'renderable')
+        ) {
+            $exceptionHandler->renderable(
+                function (ClientAware $error) {
+                    /** @var \GraphQL\Error\ClientAware&\Throwable $error Only throwables can end up in here */
+                    if (! $error instanceof Error) {
+                        $error = new Error(
+                            $error->getMessage(),
+                            null,
+                            null,
+                            [],
+                            null,
+                            $error,
+                            $error instanceof RendersErrorsExtensions ? $error->extensionsContent() : []
+                        );
+                    }
+
+                    /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
+                    $graphQL = $this->app->make(GraphQL::class);
+                    $executionResult = new ExecutionResult(null, [$error]);
+
+                    return new JsonResponse($graphQL->serializable($executionResult));
+                }
+            );
+        }
     }
 
     protected function loadRoutesFrom($path): void
