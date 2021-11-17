@@ -172,14 +172,15 @@ abstract class BaseDirective implements Directive
         array $namespacesToTry = [],
         callable $determineMatch = null
     ): string {
-        // Always try the explicitly set namespace first
-        array_unshift(
-            $namespacesToTry,
-            ASTHelper::getNamespaceForDirective(
-                $this->definitionNode,
-                $this->name()
-            )
+        $namespaceForDirective = ASTHelper::namespaceForDirective(
+            $this->definitionNode,
+            $this->name()
         );
+
+        if (is_string($namespaceForDirective)) {
+            // Always try the explicitly set namespace first
+            array_unshift($namespacesToTry, $namespaceForDirective);
+        }
 
         if (! $determineMatch) {
             $determineMatch = 'class_exists';
