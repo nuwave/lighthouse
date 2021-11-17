@@ -295,7 +295,7 @@ EOL
             $className = $scalarName;
         }
 
-        $namespacesToTry = (array)config('lighthouse.namespaces.scalars');
+        $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
