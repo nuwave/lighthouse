@@ -619,7 +619,7 @@ GRAPHQL
     public function testThrowsIfBuilderIsNotPresent(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('No class `NonexistingClass` was found for directive `@paginate`');
+        $this->expectExceptionMessage('Failed to find class NonexistingClass in namespaces [] for directive @paginate.');
 
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {

@@ -52,7 +52,7 @@ class DocumentASTTest extends TestCase
     public function testThrowsOnUnknownModelClasses(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('Failed to find a model class for Unknown, referenced in @model on type Query');
+        $this->expectExceptionMessage('Failed to find a model class Unknown in namespaces [Tests\Utils\Models, Tests\Utils\ModelsSecondary] referenced in @model on type Query.');
 
         DocumentAST::fromSource(/** @lang GraphQL */ '
         type Query @model(class: "Unknown") {
