@@ -13,8 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Improve error message when failing to find classes in namespaces
-- 
+- Improve error message when failing to find classes in namespaces https://github.com/nuwave/lighthouse/pull/1983
 
 ## v5.26.0
 
