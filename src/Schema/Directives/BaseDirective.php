@@ -192,8 +192,9 @@ abstract class BaseDirective implements Directive
         );
 
         if (! $className) {
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No class `{$classCandidate}` was found for directive `@{$this->name()}`"
+                "Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}."
             );
         }
 
