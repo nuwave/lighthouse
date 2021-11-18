@@ -172,14 +172,15 @@ abstract class BaseDirective implements Directive
         array $namespacesToTry = [],
         callable $determineMatch = null
     ): string {
-        // Always try the explicitly set namespace first
-        array_unshift(
-            $namespacesToTry,
-            ASTHelper::getNamespaceForDirective(
-                $this->definitionNode,
-                $this->name()
-            )
+        $namespaceForDirective = ASTHelper::namespaceForDirective(
+            $this->definitionNode,
+            $this->name()
         );
+
+        if (is_string($namespaceForDirective)) {
+            // Always try the explicitly set namespace first
+            array_unshift($namespacesToTry, $namespaceForDirective);
+        }
 
         if (! $determineMatch) {
             $determineMatch = 'class_exists';
@@ -192,8 +193,9 @@ abstract class BaseDirective implements Directive
         );
 
         if (! $className) {
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No class `{$classCandidate}` was found for directive `@{$this->name()}`"
+                "Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}."
             );
         }
 

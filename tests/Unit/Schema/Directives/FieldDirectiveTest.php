@@ -106,7 +106,7 @@ class FieldDirectiveTest extends TestCase
     public function testThrowsAnErrorWhenNoClassFound(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('No class `NonExisting` was found for directive `@field`');
+        $this->expectExceptionMessage('Failed to find class NonExisting in namespaces [Tests\Utils\Queries, Tests\Utils\QueriesSecondary] for directive @field.');
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
