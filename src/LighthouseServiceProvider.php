@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
+use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
@@ -29,7 +30,6 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
@@ -167,7 +167,7 @@ class LighthouseServiceProvider extends ServiceProvider
                             [],
                             null,
                             $error,
-                            $error instanceof RendersErrorsExtensions ? $error->extensionsContent() : []
+                            $error instanceof ProvidesExtensions ? $error->getExtensions() : []
                         );
                     }
 

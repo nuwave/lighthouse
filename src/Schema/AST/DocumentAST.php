@@ -26,9 +26,12 @@ use Serializable;
  * - stripping unnecessary data
  * - leveraging lazy instantiation of schema types
  *
+ * @phpstan-type ClassNameToObjectTypeName array<class-string, list<string>>
+ *
  * @phpstan-type SerializableArray array{
  *     types: array<int, array<string, mixed>>,
  *     directives: array<int, array<string, mixed>>,
+ *     classNameToObjectTypeName: ClassNameToObjectTypeName,
  * }
  */
 class DocumentAST implements Serializable, Arrayable
@@ -72,7 +75,7 @@ class DocumentAST implements Serializable, Arrayable
      *
      * @see \Nuwave\Lighthouse\Schema\TypeRegistry::typeResolverFallback()
      *
-     * @var array<class-string, list<string>>
+     * @var ClassNameToObjectTypeName
      */
     public $classNameToObjectTypeNames = [];
 
