@@ -19,6 +19,23 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for PHP 7.2, 7.3
 - Remove support for Laravel 5, 6, 7
 
+## v5.26.1
+
+### Changed
+
+- Improve error message when failing to find classes in namespaces https://github.com/nuwave/lighthouse/pull/1983
+
+## v5.26.0
+
+### Added
+
+- Allow specifying headers in `MakesGraphQLRequests` and `MakesGraphQLRequestsLumen` test helpers
+- Render `GraphQL\Error\ClientAware` exceptions outside of GraphQL context with extensions content
+
+### Fixed
+
+- Do not batchload relations with different database connections
+
 ## v5.25.1
 
 ### Fixed

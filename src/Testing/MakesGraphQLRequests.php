@@ -38,9 +38,14 @@ trait MakesGraphQLRequests
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
+     * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
      */
-    protected function graphQL(string $query, array $variables = [], array $extraParams = []): TestResponse
-    {
+    protected function graphQL(
+        string $query,
+        array $variables = [],
+        array $extraParams = [],
+        array $headers = []
+    ): TestResponse {
         $params = ['query' => $query];
 
         if ($variables !== []) {
@@ -49,7 +54,7 @@ trait MakesGraphQLRequests
 
         $params += $extraParams;
 
-        return $this->postGraphQL($params);
+        return $this->postGraphQL($params, $headers);
     }
 
     /**
@@ -58,8 +63,8 @@ trait MakesGraphQLRequests
      * Use this over graphQL() when you need more control or want to
      * test how your server behaves on incorrect inputs.
      *
-     * @param  array<mixed, mixed>  $data
-     * @param  array<string, string>  $headers
+     * @param  array<mixed, mixed>  $data  JSON-serializable payload
+     * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
      */
     protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
@@ -81,8 +86,12 @@ trait MakesGraphQLRequests
      * @param  array<\Illuminate\Http\Testing\File>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      */
-    protected function multipartGraphQL(array $operations, array $map, array $files, array $headers = []): TestResponse
-    {
+    protected function multipartGraphQL(
+        array $operations,
+        array $map,
+        array $files,
+        array $headers = []
+    ): TestResponse {
         $parameters = [
             'operations' => \Safe\json_encode($operations),
             'map' => \Safe\json_encode($map),
@@ -165,15 +174,20 @@ trait MakesGraphQLRequests
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
+     * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
      * @return array<int, mixed> The chunked results
      */
-    protected function streamGraphQL(string $query, array $variables = [], array $extraParams = []): array
-    {
+    protected function streamGraphQL(
+        string $query,
+        array $variables = [],
+        array $extraParams = [],
+        array $headers = []
+    ): array {
         if (! isset($this->deferStream)) {
             $this->setUpDeferStream();
         }
 
-        $response = $this->graphQL($query, $variables, $extraParams);
+        $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
         /** @var StreamedResponse|mixed $response */
         $response = $response->baseResponse;

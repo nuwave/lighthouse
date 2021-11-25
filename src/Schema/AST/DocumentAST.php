@@ -110,16 +110,20 @@ class DocumentAST implements Serializable, Arrayable
                         continue;
                     }
 
+                    $namespacesToTry = (array) config('lighthouse.namespaces.models');
                     $modelClass = Utils::namespaceClassName(
                         $modelName,
-                        (array) config('lighthouse.namespaces.models'),
+                        $namespacesToTry,
                         static function (string $classCandidate): bool {
                             return is_subclass_of($classCandidate, Model::class);
                         }
                     );
 
                     if (null === $modelClass) {
-                        throw new DefinitionException("Failed to find a model class for {$modelName}, referenced in @model on type {$name}");
+                        $consideredNamespaces = implode(', ', $namespacesToTry);
+                        throw new DefinitionException(
+                            "Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}."
+                        );
                     }
 
                     // It might be valid to have multiple types that correspond to a single model
