@@ -24,6 +24,10 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testUseLaravelEnumType(): void
     {
+        if (!class_exists(\BenSampo\Enum\Enum::class)) {
+            $this->markTestSkipped('BenSampo\Enum\Enum is not installed.');
+        }
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             withEnum(type: AOrB @eq): WithEnum @find
@@ -65,6 +69,10 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
+        if (!class_exists(\BenSampo\Enum\Enum::class)) {
+            $this->markTestSkipped('BenSampo\Enum\Enum is not installed.');
+        }
+
         // We use the "name" field to store the "type" JSON
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -105,6 +113,10 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testScopeUsingEnumType(): void
     {
+        if (!class_exists(\BenSampo\Enum\Enum::class)) {
+            $this->markTestSkipped('BenSampo\Enum\Enum is not installed.');
+        }
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             withEnum(
