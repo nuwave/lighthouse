@@ -67,6 +67,10 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
+      - name: "Remove laravel-enum on PHP 8.1"
+        if: matrix.php-version == '8.1'
+        run: composer remove --dev bensampo/laravel-enum --no-update
+
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpstan
