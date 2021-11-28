@@ -20,7 +20,7 @@ class LaravelEnumTypeTest extends TestCase
     {
         parent::setUp();
 
-        if (!class_exists(\BenSampo\Enum\Enum::class)) {
+        if (! class_exists(\BenSampo\Enum\Enum::class)) {
             $this->markTestSkipped('BenSampo\Enum\Enum is not installed.');
         }
 

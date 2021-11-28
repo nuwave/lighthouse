@@ -24,7 +24,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testUseLaravelEnumType(): void
     {
-        if (!class_exists(\BenSampo\Enum\Enum::class)) {
+        if (! class_exists(\BenSampo\Enum\Enum::class)) {
             $this->markTestSkipped('BenSampo\Enum\Enum is not installed.');
         }
 
@@ -69,7 +69,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
-        if (!class_exists(\BenSampo\Enum\Enum::class)) {
+        if (! class_exists(\BenSampo\Enum\Enum::class)) {
             $this->markTestSkipped('BenSampo\Enum\Enum is not installed.');
         }
 
@@ -113,7 +113,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testScopeUsingEnumType(): void
     {
-        if (!class_exists(\BenSampo\Enum\Enum::class)) {
+        if (! class_exists(\BenSampo\Enum\Enum::class)) {
             $this->markTestSkipped('BenSampo\Enum\Enum is not installed.');
         }
 
