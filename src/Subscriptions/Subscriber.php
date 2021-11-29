@@ -132,7 +132,7 @@ class Subscriber implements Serializable
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function __unserialize(array $data): void
     {

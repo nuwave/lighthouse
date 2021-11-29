@@ -123,7 +123,7 @@ class RedisStorageManagerTest extends TestCase
                 ]],
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
-                    serialize($subscriberUnderTopic)
+                    serialize($subscriberUnderTopic),
                 ]]
             );
 

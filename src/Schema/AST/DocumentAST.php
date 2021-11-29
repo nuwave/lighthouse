@@ -221,7 +221,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function __unserialize(array $data): void
     {
