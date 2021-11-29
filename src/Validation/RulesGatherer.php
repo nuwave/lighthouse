@@ -315,7 +315,7 @@ class RulesGatherer
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
                 $flatArgs = [$name];
                 foreach ($args as $arg) {
-                    $flatArgs []= $arg;
+                    $flatArgs [] = $arg;
                 }
 
                 return $flatArgs;
