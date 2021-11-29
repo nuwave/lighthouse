@@ -209,6 +209,7 @@ class ASTHelper
             }
 
             if ($node->name->value === $name) {
+                // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Schema\AST\ASTHelper::firstByName() should return TNode of GraphQL\Language\AST\Node|null but returns TNode of GraphQL\Language\AST\Node.
                 return $node;
             }
         }
