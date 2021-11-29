@@ -67,6 +67,10 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
+      - name: "Workaround missing laminas/laminas-code release"
+        if: matrix.laravel-version == '8.1'
+        run: composer require --dev laminas/laminas-code:dev-master --no-update
+
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpstan
