@@ -14,9 +14,11 @@ abstract class BatchLoaderRegistry
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
+     * @template TBatchLoader of object
+     *
      * @param  array<int|string>  $pathToField  Path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param  callable(): object  $makeInstance  Function to instantiate the instance once
-     * @return object The result of calling makeInstance
+     * @param  callable(): TBatchLoader  $makeInstance  Function to instantiate the instance once
+     * @return TBatchLoader The result of calling makeInstance
      *
      * @throws \Exception
      */
@@ -25,11 +27,12 @@ abstract class BatchLoaderRegistry
         // The path to the field serves as the unique key for the instance
         $instanceKey = static::instanceKey($pathToField);
 
-        if (isset(self::$instances[$instanceKey])) {
-            return self::$instances[$instanceKey];
+        if (! isset(self::$instances[$instanceKey])) {
+            return self::$instances[$instanceKey] = $makeInstance();
         }
 
-        return self::$instances[$instanceKey] = $makeInstance();
+        // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry::instance() should return TBatchLoader of object but returns object.
+        return self::$instances[$instanceKey];
     }
 
     /**

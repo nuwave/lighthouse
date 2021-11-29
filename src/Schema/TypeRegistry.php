@@ -296,6 +296,8 @@ EOL
         }
 
         $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
+
+        /** @var class-string<\GraphQL\Type\Definition\ScalarType>|null $className */
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,

@@ -225,6 +225,9 @@ class RulesGatherer
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
         return array_map(
+            /**
+             * @return object|array<int, mixed>
+             */
             static function ($rule) use ($argumentPath) {
                 if (is_object($rule)) {
                     if ($rule instanceof WithReferenceRule) {
@@ -310,7 +313,12 @@ class RulesGatherer
                 }
 
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
-                return array_merge([$name], $args);
+                $flatArgs = [$name];
+                foreach ($args as $arg) {
+                    $flatArgs [] = $arg;
+                }
+
+                return $flatArgs;
             },
             $rules
         );

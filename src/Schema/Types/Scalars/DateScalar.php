@@ -76,6 +76,8 @@ abstract class DateScalar extends ScalarType
                     || get_class($value) === \Carbon\CarbonImmutable::class
                 )
             ) {
+                /** @var \Carbon\Carbon|\Carbon\CarbonImmutable $value */
+
                 /**
                  * Given we had a valid \Carbon\Carbon before, this can not fail.
                  *

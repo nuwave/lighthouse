@@ -77,6 +77,8 @@ class RelationBatchLoader
         );
 
         foreach ($parentsGroupedByClass as $parentsOfSameClass) {
+            // TODO remove when Larastan fixes their inference https://github.com/nunomaduro/larastan/pull/1054
+            // @phpstan-ignore-next-line Parameter #1 $parents of method Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader::load() expects Illuminate\Database\Eloquent\Collection, Illuminate\Support\Collection<(int|string), mixed> given.
             $this->relationLoader->load($parentsOfSameClass);
         }
 
