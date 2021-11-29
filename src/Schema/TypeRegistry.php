@@ -295,17 +295,22 @@ EOL
             $className = $scalarName;
         }
 
+        $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
+
+        /** @var class-string<\GraphQL\Type\Definition\ScalarType>|null $className */
         $className = Utils::namespaceClassname(
             $className,
-            (array) config('lighthouse.namespaces.scalars'),
+            $namespacesToTry,
             function (string $className): bool {
                 return is_subclass_of($className, ScalarType::class);
             }
         );
 
         if (! $className) {
+            $scalarClass = ScalarType::class;
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No matching subclass of GraphQL\Type\Definition\ScalarType found for the scalar {$scalarName}"
+                "Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}."
             );
         }
 

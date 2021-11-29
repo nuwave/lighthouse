@@ -9,6 +9,22 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.27.0
+
+### Fixed
+
+- Avoid PHP 8.1 deprecation warning by implementing `__serialize()` and `__unserialize()` https://github.com/nuwave/lighthouse/pull/1987 
+
+### Deprecated
+
+- Deprecate `Serializable` implementation in favor of magic methods https://github.com/nuwave/lighthouse/pull/1987
+
+## v5.26.1
+
+### Changed
+
+- Improve error message when failing to find classes in namespaces https://github.com/nuwave/lighthouse/pull/1983
+
 ## v5.26.0
 
 ### Added

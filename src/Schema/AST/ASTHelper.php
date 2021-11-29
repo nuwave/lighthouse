@@ -209,6 +209,7 @@ class ASTHelper
             }
 
             if ($node->name->value === $name) {
+                // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Schema\AST\ASTHelper::firstByName() should return TNode of GraphQL\Language\AST\Node|null but returns TNode of GraphQL\Language\AST\Node.
                 return $node;
             }
         }
@@ -217,18 +218,15 @@ class ASTHelper
     }
 
     /**
-     * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
+     * Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective.
      */
-    public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
+    public static function namespaceForDirective(Node $definitionNode, string $directiveName): ?string
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
         return $namespaceDirective !== null
-            // The namespace directive can contain an argument with the name of the
-            // current directive, in which case it applies here
-            ? static::directiveArgValue($namespaceDirective, $directiveName, '')
-            // Default to an empty namespace if the namespace directive does not exist
-            : '';
+            ? static::directiveArgValue($namespaceDirective, $directiveName)
+            : null;
     }
 
     /**

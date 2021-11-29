@@ -105,16 +105,20 @@ class DocumentAST implements Serializable, Arrayable
                         continue;
                     }
 
+                    $namespacesToTry = (array) config('lighthouse.namespaces.models');
                     $modelClass = Utils::namespaceClassName(
                         $modelName,
-                        (array) config('lighthouse.namespaces.models'),
+                        $namespacesToTry,
                         static function (string $classCandidate): bool {
                             return is_subclass_of($classCandidate, Model::class);
                         }
                     );
 
                     if (null === $modelClass) {
-                        throw new DefinitionException("Failed to find a model class for {$modelName}, referenced in @model on type {$name}");
+                        $consideredNamespaces = implode(', ', $namespacesToTry);
+                        throw new DefinitionException(
+                            "Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}."
+                        );
                     }
 
                     // It might be valid to have multiple types that correspond to a single model
@@ -200,14 +204,36 @@ class DocumentAST implements Serializable, Arrayable
         return $documentAST;
     }
 
-    public function serialize(): string
+    /**
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
     {
-        return serialize($this->toArray());
+        return $this->toArray();
     }
 
+    /**
+     * @deprecated TODO remove in v6
+     */
+    public function serialize(): string
+    {
+        return serialize($this->__serialize());
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->hydrateFromArray($data);
+    }
+
+    /**
+     * @deprecated TODO remove in v6
+     */
     public function unserialize($data): void
     {
-        $this->hydrateFromArray(unserialize($data));
+        $this->__unserialize(unserialize($data));
     }
 
     /**
