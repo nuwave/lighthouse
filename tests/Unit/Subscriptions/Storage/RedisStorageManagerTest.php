@@ -72,6 +72,9 @@ class RedisStorageManagerTest extends TestCase
         $channel = 'private-lighthouse-foo';
         $subscriber = new DummySubscriber($channel, 'dummy-topic');
 
+        $storedTopic = 'some-topic';
+        $subscriberUnderTopic = new DummySubscriber($channel, $storedTopic);
+
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(3))
             ->method('command')
@@ -87,15 +90,12 @@ class RedisStorageManagerTest extends TestCase
                 ['setex', [
                     'graphql.subscriber.private-lighthouse-foo',
                     $ttl,
-                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
-                        'channel' => $channel,
-                        'topic' => 'some-topic',
-                    ]).'}',
+                    serialize($subscriberUnderTopic),
                 ]]
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
-        $manager->storeSubscriber($subscriber, 'some-topic');
+        $manager->storeSubscriber($subscriber, $storedTopic);
     }
 
     public function testStoreSubscriberWithoutTtl(): void
@@ -110,6 +110,9 @@ class RedisStorageManagerTest extends TestCase
         $channel = 'private-lighthouse-foo';
         $subscriber = new DummySubscriber($channel, 'dummy-topic');
 
+        $storedTopic = 'some-topic';
+        $subscriberUnderTopic = new DummySubscriber($channel, $storedTopic);
+
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(2))
             ->method('command')
@@ -120,15 +123,12 @@ class RedisStorageManagerTest extends TestCase
                 ]],
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
-                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
-                        'channel' => $channel,
-                        'topic' => 'some-topic',
-                    ]).'}',
+                    serialize($subscriberUnderTopic)
                 ]]
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
-        $manager->storeSubscriber($subscriber, 'some-topic');
+        $manager->storeSubscriber($subscriber, $storedTopic);
     }
 
     public function testSubscribersByTopic(): void

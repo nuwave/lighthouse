@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Deprecated
+
+- Deprecate `Serializable` implementation in favor of magic methods
+
 ## v5.26.1
 
 ### Changed
