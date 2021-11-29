@@ -69,7 +69,7 @@ jobs:
 
       - name: "Workaround missing laminas/laminas-code release"
         if: matrix.php-version == '8.1'
-        run: composer require --dev laminas/laminas-code:dev-4.5.x --no-update
+        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
