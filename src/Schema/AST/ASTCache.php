@@ -53,6 +53,7 @@ class ASTCache
 
     public function __construct(ConfigRepository $config)
     {
+        /** @var CacheConfig $cacheConfig */
         $cacheConfig = $config->get('lighthouse.cache');
 
         $this->enable = $cacheConfig['enable'];
