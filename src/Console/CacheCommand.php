@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\Command;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 
 class CacheCommand extends Command
 {
@@ -11,9 +12,9 @@ class CacheCommand extends Command
 
     protected $description = 'Compile the GraphQL schema and cache it.';
 
-    public function handle(ASTBuilder $builder): void
+    public function handle(ASTBuilder $builder, ASTCache $cache): void
     {
-        $builder->documentAST();
+        $cache->set($builder->documentAST());
 
         $this->info('GraphQL schema cache created.');
     }

@@ -1,0 +1,136 @@
+<?php
+
+namespace Nuwave\Lighthouse\Schema\AST;
+
+use Closure;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
+
+/**
+ * @phpstan-type CacheConfig array{
+ *   enable: bool,
+ *   version: 1|2|null,
+ *   store: string|null,
+ *   key: string,
+ *   ttl: int|null,
+ *   path: string|null,
+ * }
+ */
+class ASTCache
+{
+    /**
+     * @var bool
+     */
+    protected $enable;
+
+    /**
+     * @var 1|2
+     */
+    protected $version;
+
+    /**
+     * @var string|null
+     */
+    protected $store;
+
+    /**
+     * @var string
+     */
+    protected $key;
+
+    /**
+     * @var int|null
+     */
+    protected $ttl;
+
+    /**
+     * @var string
+     */
+    protected $path;
+
+    public function __construct(ConfigRepository $config)
+    {
+        $cacheConfig = $config->get('lighthouse.cache');
+
+        $this->enable = $cacheConfig['enable'];
+
+        $version = $cacheConfig['version'] ?? 1;
+        if (! in_array($version, [1, 2])) {
+            throw new UnknownCacheVersionException($version);
+        }
+        $this->version = $version;
+
+        // Version 1
+        $this->store = $cacheConfig['store'] ?? null;
+        $this->key = $cacheConfig['key'];
+        $this->ttl = $cacheConfig['ttl'];
+
+        // Version 2
+        $this->path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enable;
+    }
+
+    public function set(DocumentAST $documentAST): void
+    {
+        if ($this->version === 1) {
+            $this->store()->set($this->key, $documentAST, $this->ttl);
+            return;
+        }
+
+        $variable = var_export($documentAST->toArray(), true);
+        $this->filesystem()->put($this->path, /** @lang PHP */ "<?php return {$variable};");
+    }
+
+    public function clear(): void
+    {
+        if ($this->version === 1) {
+            $this->store()->forget($this->key);
+            return;
+        }
+
+        $this->filesystem()->delete($this->path);
+    }
+
+    /**
+     * @param \Closure(): DocumentAST $build
+     */
+    public function fromCacheOrBuild(Closure $build): DocumentAST
+    {
+        if ($this->version === 1) {
+            return $this->store()->remember(
+                $this->key,
+                $this->ttl,
+                $build
+            );
+        }
+
+        if ($this->filesystem()->exists($this->path)) {
+            return DocumentAST::fromArray(require $this->path);
+        }
+
+        $documentAST = $build();
+        $this->set($documentAST);
+
+        return $documentAST;
+    }
+
+    protected function store(): CacheRepository
+    {
+        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
+        $cacheFactory = app(CacheFactory::class);
+
+        return $cacheFactory->store($this->store);
+    }
+
+    protected function filesystem(): Filesystem
+    {
+        return app(Filesystem::class);
+    }
+}

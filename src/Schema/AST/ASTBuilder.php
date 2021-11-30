@@ -55,9 +55,9 @@ class ASTBuilder
     protected $eventsDispatcher;
 
     /**
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var \Nuwave\Lighthouse\Schema\AST\ASTCache
      */
-    protected $configRepository;
+    protected $astCache;
 
     /**
      * Initialized lazily in $this->documentAST().
@@ -70,63 +70,25 @@ class ASTBuilder
         DirectiveLocator $directiveLocator,
         SchemaSourceProvider $schemaSourceProvider,
         EventsDispatcher $eventsDispatcher,
-        ConfigRepository $configRepository
+        ASTCache $astCache
     ) {
         $this->directiveLocator = $directiveLocator;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->eventsDispatcher = $eventsDispatcher;
-        $this->configRepository = $configRepository;
+        $this->astCache = $astCache;
     }
 
     public function documentAST(): DocumentAST
     {
         if (! isset($this->documentAST)) {
-            $cacheConfig = $this->configRepository->get('lighthouse.cache');
-
-            $this->documentAST = $cacheConfig['enable']
-                ? $this->fromCacheOrBuild($cacheConfig)
+            return $this->documentAST = $this->astCache->isEnabled()
+                ? $this->astCache->fromCacheOrBuild(function (): DocumentAST {
+                    return $this->build();
+                })
                 : $this->build();
         }
 
         return $this->documentAST;
-    }
-
-    /**
-     * @param  array<string, mixed>  $cacheConfig
-     */
-    protected function fromCacheOrBuild(array $cacheConfig): DocumentAST
-    {
-        $version = $cacheConfig['version'] ?? 1;
-        switch ($version) {
-            case 1:
-                /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-                $cacheFactory = app(CacheFactory::class);
-                $cache = $cacheFactory->store($cacheConfig['store'] ?? null);
-
-                return $cache->remember(
-                    $cacheConfig['key'],
-                    $cacheConfig['ttl'],
-                    function (): DocumentAST {
-                        return $this->build();
-                    }
-                );
-            case 2:
-                /** @var \Illuminate\Filesystem\Filesystem $filesystem */
-                $filesystem = app(Filesystem::class);
-                $path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
-
-                if ($filesystem->exists($path)) {
-                    return DocumentAST::fromArray(require $path);
-                }
-
-                $documentAST = $this->build();
-                $variable = var_export($documentAST->toArray(), true);
-                $filesystem->put($path, /** @lang PHP */ "<?php return {$variable};");
-
-                return $documentAST;
-            default:
-                throw new UnknownCacheVersionException($version);
-        }
     }
 
     protected function build(): DocumentAST

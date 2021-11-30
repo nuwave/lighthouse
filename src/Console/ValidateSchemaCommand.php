@@ -6,6 +6,7 @@ use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\ValidateSchema;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
@@ -19,13 +20,14 @@ class ValidateSchemaCommand extends Command
     protected $description = 'Validate the GraphQL schema definition.';
 
     public function handle(
+        ASTCache $cache,
         EventsDispatcher $eventsDispatcher,
         SchemaBuilder $schemaBuilder,
         DirectiveLocator $directiveLocator,
         TypeRegistry $typeRegistry
     ): void {
         // Clear the cache so this always validates the current schema
-        $this->call(ClearCacheCommand::NAME);
+        $cache->clear();
 
         $originalSchema = $schemaBuilder->schema();
         $schemaConfig = $originalSchema->getConfig();

@@ -98,16 +98,16 @@ return [
         'version' => env('LIGHTHOUSE_CACHE_VERSION', 1),
 
         /*
-         * The name of the cache item for the schema cache.
-         * Only relevant if version is set to 1.
-         */
-        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
-
-        /*
          * Allows using a specific cache store, uses the app's default if set to null.
          * Only relevant if version is set to 1.
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
+
+        /*
+         * The name of the cache item for the schema cache.
+         * Only relevant if version is set to 1.
+         */
+        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
 
         /*
          * Duration in seconds the schema should remain cached, null means forever.
