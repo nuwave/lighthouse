@@ -14,7 +14,7 @@ class CacheCommand extends Command
 
     public function handle(ASTBuilder $builder, ASTCache $cache): void
     {
-        $cache->set($builder->documentAST());
+        $cache->set($builder->build());
 
         $this->info('GraphQL schema cache created.');
     }

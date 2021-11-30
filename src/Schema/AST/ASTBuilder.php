@@ -87,7 +87,7 @@ class ASTBuilder
         return $this->documentAST;
     }
 
-    protected function build(): DocumentAST
+    public function build(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
