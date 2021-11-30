@@ -81,6 +81,7 @@ class ASTCache
     {
         if ($this->version === 1) {
             $this->store()->set($this->key, $documentAST, $this->ttl);
+
             return;
         }
 
@@ -92,6 +93,7 @@ class ASTCache
     {
         if ($this->version === 1) {
             $this->store()->forget($this->key);
+
             return;
         }
 
