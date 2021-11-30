@@ -91,9 +91,9 @@ class ASTBuilder
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
-        // Allow to register listeners that add in additional schema definitions.
+        // Allow registering listeners that inject additional schema definitions.
         // This can be used by plugins to hook into the schema building process
-        // while still allowing the user to add in their schema as usual.
+        // while still allowing the user to define their schema as usual.
         $additionalSchemas = (array) $this->eventsDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );

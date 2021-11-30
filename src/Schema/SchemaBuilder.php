@@ -36,7 +36,7 @@ class SchemaBuilder
     public function schema(): Schema
     {
         if (! isset($this->schema)) {
-            $this->schema = $this->build(
+            return $this->schema = $this->build(
                 $this->astBuilder->documentAST()
             );
         }
