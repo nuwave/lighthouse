@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.27.1
+
+### Changed
+
+- Regenerate cache when calling `php artisan lighthouse:cache`
+
 ## v5.27.0
 
 ### Fixed

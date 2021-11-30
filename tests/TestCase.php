@@ -47,7 +47,9 @@ GRAPHQL;
     {
         parent::setUp();
 
-        if ($this->schema === null) {
+        // This default is only valid for testing Lighthouse itself and thus
+        // is not defined in the reusable test trait.
+        if (! isset($this->schema)) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
