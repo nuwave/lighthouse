@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Regenerate cache when calling `php artisan lighthouse:cache`
+- Regenerate cache when calling `php artisan lighthouse:cache` https://github.com/nuwave/lighthouse/pull/1990
 
 ## v5.27.0
 
