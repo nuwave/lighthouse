@@ -3176,7 +3176,7 @@ Use this directive on mutations that return no value, see [motivation](https://g
 
 ```graphql
 type Mutation {
-    fireAndForget: Unit! @void
+  fireAndForget: Unit! @void
 }
 ```
 
