@@ -213,7 +213,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @return array<string, mixed>
+     * @return SerializableArray
      */
     public function __serialize(): array
     {
@@ -229,7 +229,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  SerializableArray  $data
      */
     public function __unserialize(array $data): void
     {
