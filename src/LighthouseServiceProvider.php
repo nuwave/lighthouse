@@ -58,7 +58,7 @@ use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 class LighthouseServiceProvider extends ServiceProvider
 {
     /**
-     * @var array<int, class-string<\Illuminate\Console\Command>
+     * @var array<int, class-string<\Illuminate\Console\Command>>
      */
     const COMMANDS = [
         CacheCommand::class,

@@ -19,6 +19,22 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for PHP 7.2, 7.3
 - Remove support for Laravel 5, 6, 7
 
+## v5.27.1
+
+### Changed
+
+- Regenerate cache when calling `php artisan lighthouse:cache` https://github.com/nuwave/lighthouse/pull/1990
+
+## v5.27.0
+
+### Fixed
+
+- Avoid PHP 8.1 deprecation warning by implementing `__serialize()` and `__unserialize()` https://github.com/nuwave/lighthouse/pull/1987 
+
+### Deprecated
+
+- Deprecate `Serializable` implementation in favor of magic methods https://github.com/nuwave/lighthouse/pull/1987
+
 ## v5.26.1
 
 ### Changed

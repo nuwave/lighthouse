@@ -35,6 +35,7 @@ abstract class GraphQLSubscription
     /**
      * Decode topic name.
      *
+     * @param  mixed  $root  The root value.
      * @return string
      */
     public function decodeTopic(string $fieldName, $root)
@@ -47,6 +48,7 @@ abstract class GraphQLSubscription
     /**
      * Resolve the subscription.
      *
+     * @param  mixed  $root  The root value.
      * @param  array<string, mixed>  $args
      * @return mixed The root value.
      */
@@ -65,6 +67,7 @@ abstract class GraphQLSubscription
     /**
      * Filter which subscribers should receive the subscription.
      *
+     * @param  mixed  $root  The root value.
      * @return bool
      */
     abstract public function filter(Subscriber $subscriber, $root);

@@ -8,6 +8,7 @@ use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Federation\FederationPrinter;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 class PrintSchemaCommand extends Command
@@ -25,10 +26,10 @@ SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
 
-    public function handle(Filesystem $storage, SchemaBuilder $schemaBuilder): void
+    public function handle(ASTCache $cache, Filesystem $storage, SchemaBuilder $schemaBuilder): void
     {
         // Clear the cache so this always gets the current schema
-        $this->callSilent(ClearCacheCommand::class);
+        $cache->clear();
 
         $schema = $schemaBuilder->schema();
 
