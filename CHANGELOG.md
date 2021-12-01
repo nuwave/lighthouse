@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.28.0
+
+### Added
+
+- Add directive `@void` to unify the definition of fields with no return value
+
 ## v5.27.1
 
 ### Changed

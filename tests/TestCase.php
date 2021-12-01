@@ -23,6 +23,7 @@ use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
+use Nuwave\Lighthouse\Void\VoidServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Policies\AuthServiceProvider;
@@ -78,6 +79,7 @@ GRAPHQL;
             PaginationServiceProvider::class,
             SoftDeletesServiceProvider::class,
             ValidationServiceProvider::class,
+            VoidServiceProvider::class,
         ];
     }
 

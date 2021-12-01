@@ -3142,6 +3142,50 @@ directive @validator(
 
 Read more in the [validation docs](../security/validation.md#validator-classes).
 
+## @void
+
+```graphql
+"""
+Mark a field that returns no value.
+
+The return type of the field will be changed to `Unit!`, defined as `enum Unit { UNIT }`.
+Whatever result is returned from the resolver will be replaced with `UNIT`.
+"""
+directive @void on FIELD_DEFINITION
+```
+
+To enable this directive, add the service provider to your `config/app.php`:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\Void\VoidServiceProvider::class,
+],
+```
+
+Lighthouse will register the following type in your schema:
+
+```graphql
+"Allows only one value and thus can hold no information."
+enum Unit {
+  "The only possible value."
+  UNIT
+}
+```
+
+Use this directive on mutations that return no value, see [motivation](https://github.com/graphql/graphql-spec/issues/906).
+
+```graphql
+type Mutation {
+    fireAndForget: Unit! @void
+}
+```
+
+If your field is defined to return any other type,
+Lighthouse will modify the schema definition to have it return `Unit!`.
+
+Now, no matter what you return from your resolver (or if you return anything at all),
+the resulting value will always be `UNIT`.
+
 ## @where
 
 ```graphql
