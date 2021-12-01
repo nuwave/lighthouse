@@ -18,6 +18,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
 - Remove support for PHP 7.2, 7.3
 - Remove support for Laravel 5, 6, 7
+- Remove `Serializable` implementation
 
 ## v5.27.1
 
