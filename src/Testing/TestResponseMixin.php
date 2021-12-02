@@ -72,6 +72,19 @@ class TestResponseMixin
         };
     }
 
+    public function assertGraphQLErrorFree(): Closure
+    {
+        return function () {
+            $errors = $this->json('errors');
+            Assert::assertNull(
+                $errors,
+                'Expected the GraphQL response to contain no errors, got: '.\Safe\json_encode($errors)
+            );
+
+            return $this;
+        };
+    }
+
     public function assertGraphQLErrorCategory(): Closure
     {
         return function (string $category) {

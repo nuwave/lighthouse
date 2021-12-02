@@ -64,6 +64,16 @@ namespace Illuminate\Testing {
         }
 
         /**
+         * Assert the response contains no errors.
+         *
+         * @return $this
+         */
+        public function assertGraphQLErrorFree(): self
+        {
+            return $this;
+        }
+
+        /**
          * Assert the response contains an error from the given category.
          *
          * @param  string  $category  The name of the expected error category.

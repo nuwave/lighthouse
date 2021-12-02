@@ -14,6 +14,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add directive `@void` to unify the definition of fields with no return value
+- Mixin method `assertGraphQLErrorFree()` to `\Illuminate\Testing\TestResponse`
 
 ### Fixed
 
