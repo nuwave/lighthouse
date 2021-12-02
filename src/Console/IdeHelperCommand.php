@@ -133,6 +133,8 @@ GRAPHQL;
 
     protected function programmaticTypes(TypeRegistry $typeRegistry): void
     {
+        // TODO diff SchemaSource vs the final DocumentAST instead
+
         // Users may register types programmatically, e.g. in service providers
         // In order to allow referencing those in the schema, it is useful to print
         // those types to a helper schema, excluding types the user defined in the schema
