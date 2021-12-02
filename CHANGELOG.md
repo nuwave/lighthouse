@@ -15,6 +15,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add directive `@void` to unify the definition of fields with no return value
 
+### Fixed
+
+- Add missing types to `programmatic-types.graphql` in artisan command `lighthouse:ide-helper`
+
 ## v5.27.1
 
 ### Changed
