@@ -2,14 +2,16 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class IdeHelperCommand extends Command
@@ -28,10 +30,10 @@ GRAPHQL;
 
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    public function handle(DirectiveLocator $directiveLocator, TypeRegistry $typeRegistry): int
+    public function handle(DirectiveLocator $directiveLocator, SchemaSourceProvider $schemaSourceProvider, SchemaBuilder $schemaBuilder): int
     {
         $this->schemaDirectiveDefinitions($directiveLocator);
-        $this->programmaticTypes($typeRegistry);
+        $this->programmaticTypes($schemaSourceProvider, $schemaBuilder);
         $this->phpIdeHelper();
 
         $this->info("\nIt is recommended to add them to your .gitignore file.");
@@ -131,28 +133,42 @@ GRAPHQL;
         return base_path().'/schema-directives.graphql';
     }
 
-    protected function programmaticTypes(TypeRegistry $typeRegistry): void
+    /**
+     * Users may register types programmatically, e.g. in service providers.
+     * In order to allow referencing those in the schema, it is useful to print
+     * those types to a helper schema, excluding types the user defined in the schema.
+     */
+    protected function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, SchemaBuilder $schemaBuilder): void
     {
-        // TODO diff SchemaSource vs the final DocumentAST instead
+        $sourceSchema = Parser::parse($schemaSourceProvider->getSchemaString());
+        $sourceTypes = [];
+        foreach ($sourceSchema->definitions as $definition) {
+            if ($definition instanceof TypeDefinitionNode) {
+                $sourceTypes[$definition->name->value] = true;
+            }
+        }
 
-        // Users may register types programmatically, e.g. in service providers
-        // In order to allow referencing those in the schema, it is useful to print
-        // those types to a helper schema, excluding types the user defined in the schema
-        $types = new Collection($typeRegistry->resolvedTypes());
+        $allTypes = $schemaBuilder->schema()->getTypeMap();
+
+        $programmaticTypes = array_diff_key($allTypes, $sourceTypes);
 
         $filePath = static::programmaticTypesPath();
 
-        if ($types->isEmpty() && file_exists($filePath)) {
+        if (count($programmaticTypes) === 0 && file_exists($filePath)) {
             \Safe\unlink($filePath);
 
             return;
         }
 
-        $schema = $types
-            ->map(function (Type $type): string {
-                return SchemaPrinter::printType($type);
-            })
-            ->implode("\n");
+        $schema = implode(
+            "\n",
+            array_map(
+                function (Type $type): string {
+                    return SchemaPrinter::printType($type);
+                },
+                $programmaticTypes
+            )
+        );
 
         \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
 
