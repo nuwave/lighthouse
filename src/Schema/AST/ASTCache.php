@@ -59,12 +59,12 @@ class ASTCache
         $this->enable = $cacheConfig['enable'];
 
         $version = $cacheConfig['version'] ?? 1;
-        
+
         switch ($version) {
             case 1:
                 $this->store = $cacheConfig['store'] ?? null;
-                $this->key   = $cacheConfig['key'];
-                $this->ttl   = $cacheConfig['ttl'];
+                $this->key = $cacheConfig['key'];
+                $this->ttl = $cacheConfig['ttl'];
                 break;
             case 2:
                 $this->path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
