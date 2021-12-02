@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Prevent `Undefined array key` error when using cache version 2 and not having all version 1 configuration present https://github.com/nuwave/lighthouse/pull/1994
+
 ## v5.27.1
 
 ### Changed
