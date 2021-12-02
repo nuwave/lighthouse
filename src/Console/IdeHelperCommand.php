@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -30,11 +31,11 @@ GRAPHQL;
 
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    public function handle(DirectiveLocator $directiveLocator, SchemaSourceProvider $schemaSourceProvider, SchemaBuilder $schemaBuilder): int
+    public function handle(): int
     {
-        $this->schemaDirectiveDefinitions($directiveLocator);
-        $this->programmaticTypes($schemaSourceProvider, $schemaBuilder);
-        $this->phpIdeHelper();
+        $this->laravel->call([$this, 'schemaDirectiveDefinitions']);
+        $this->laravel->call([$this, 'programmaticTypes']);
+        $this->laravel->call([$this, 'phpIdeHelper']);
 
         $this->info("\nIt is recommended to add them to your .gitignore file.");
 
@@ -138,7 +139,7 @@ GRAPHQL;
      * In order to allow referencing those in the schema, it is useful to print
      * those types to a helper schema, excluding types the user defined in the schema.
      */
-    protected function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, SchemaBuilder $schemaBuilder): void
+    protected function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, ASTCache $astCache, SchemaBuilder $schemaBuilder): void
     {
         $sourceSchema = Parser::parse($schemaSourceProvider->getSchemaString());
         $sourceTypes = [];
@@ -147,6 +148,8 @@ GRAPHQL;
                 $sourceTypes[$definition->name->value] = true;
             }
         }
+
+        $astCache->clear();
 
         $allTypes = $schemaBuilder->schema()->getTypeMap();
 
