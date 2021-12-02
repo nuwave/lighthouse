@@ -173,7 +173,7 @@ GRAPHQL;
             )
         );
 
-        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema."\n");
 
         $this->info("Wrote definitions for programmatically registered types to $filePath.");
     }
