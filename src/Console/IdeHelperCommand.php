@@ -45,7 +45,7 @@ GRAPHQL;
     /**
      * Create and write schema directive definitions to a file.
      */
-    protected function schemaDirectiveDefinitions(DirectiveLocator $directiveLocator): void
+    public function schemaDirectiveDefinitions(DirectiveLocator $directiveLocator): void
     {
         $schema = /** @lang GraphQL */ <<<'GRAPHQL'
 """
@@ -139,7 +139,7 @@ GRAPHQL;
      * In order to allow referencing those in the schema, it is useful to print
      * those types to a helper schema, excluding types the user defined in the schema.
      */
-    protected function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, ASTCache $astCache, SchemaBuilder $schemaBuilder): void
+    public function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, ASTCache $astCache, SchemaBuilder $schemaBuilder): void
     {
         $sourceSchema = Parser::parse($schemaSourceProvider->getSchemaString());
         $sourceTypes = [];
@@ -183,7 +183,7 @@ GRAPHQL;
         return base_path().'/programmatic-types.graphql';
     }
 
-    protected function phpIdeHelper(): void
+    public function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
         $contents = \Safe\file_get_contents(__DIR__.'/../../_ide_helper.php');
