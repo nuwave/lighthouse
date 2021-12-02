@@ -3176,15 +3176,12 @@ Use this directive on mutations that return no value, see [motivation](https://g
 
 ```graphql
 type Mutation {
-  fireAndForget: Unit! @void
+  fireAndForget: _ @void
 }
 ```
 
-If your field is defined to return any other type,
-Lighthouse will modify the schema definition to have it return `Unit!`.
-
-Now, no matter what you return from your resolver (or if you return anything at all),
-the resulting value will always be `UNIT`.
+Lighthouse will modify the definition of your field and have it return `Unit!`.
+No matter what your resolver returns, the resulting value will always be `UNIT`.
 
 ## @where
 
