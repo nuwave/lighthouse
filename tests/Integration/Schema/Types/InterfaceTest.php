@@ -125,12 +125,10 @@ GRAPHQL;
 
         type Foo implements Nameable @model(class: "Team") {
             name: String!
-            users: [User!]! @hasMany
         }
 
         type Bar implements Nameable @model(class: "User") {
             name: String!
-            id: ID!
         }
 
         type Query {
