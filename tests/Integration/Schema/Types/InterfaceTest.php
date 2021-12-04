@@ -148,7 +148,6 @@ GRAPHQL;
         ');
     }
 
-
     public function testThrowsOnAmbiguousSchemaMapping(): void
     {
         // This creates one team with it
