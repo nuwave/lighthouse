@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Allow clients to order a list of models by an aggregated value of their relations with `@orderBy` https://github.com/nuwave/lighthouse/pull/1848
+
 ## v5.27.3
 
 ### Fixed

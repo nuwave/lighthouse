@@ -354,7 +354,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $commentTwo->comment = 'test';
         $commentTwo->save();
 
-        for ($i = 0; $i < 5; ++$i) {
+        for ($i = 0; $i < 5; $i++) {
             $commentBatch = new Comment();
             $commentBatch->post_id = 9;
             $commentBatch->user_id = 2;
@@ -470,7 +470,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        for ($i = 0; $i < 5; ++$i) {
+        for ($i = 0; $i < 5; $i++) {
             $commentBatchOne = new Comment();
             $commentBatchOne->user_id = 1;
             $commentBatchOne->post_id = 3;
@@ -478,7 +478,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchOne->save();
         }
 
-        for ($i = 0; $i < 2; ++$i) {
+        for ($i = 0; $i < 2; $i++) {
             $commentBatchTwo = new Comment();
             $commentBatchTwo->user_id = 1;
             $commentBatchTwo->post_id = 7;
@@ -516,7 +516,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        for ($i = 0; $i < 5; ++$i) {
+        for ($i = 0; $i < 5; $i++) {
             $commentBatchOne = new Comment();
             $commentBatchOne->user_id = 1;
             $commentBatchOne->post_id = 3;
@@ -524,7 +524,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchOne->save();
         }
 
-        for ($i = 0; $i < 6; ++$i) {
+        for ($i = 0; $i < 6; $i++) {
             $commentBatchTwo = new Comment();
             $commentBatchTwo->user_id = 1;
             $commentBatchTwo->post_id = 7;
@@ -748,7 +748,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id'   => $userNamedEmptyString->id,
+                        'id' => $userNamedEmptyString->id,
                         'name' => $userNamedEmptyString->name,
                     ],
                 ],
@@ -780,7 +780,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id'   => $userNamedNull->id,
+                        'id' => $userNamedNull->id,
                         'name' => $userNamedNull->name,
                     ],
                 ],
@@ -837,23 +837,23 @@ class WhereConditionsDirectiveTest extends DBTestCase
         // TODO: Replace with dms/phpunit-arraysubset-asserts when we require PHPUnit 9 + PHP 7.3
         $this->assertSame(
             [
-                'kind'        => 'ENUM',
-                'name'        => $expectedEnumName,
-                'description' => 'Allowed column names for the `where` argument on field `whitelistedColumns` on type `Query`.',
-                'fields'      => null,
+                'kind' => 'ENUM',
+                'name' => $expectedEnumName,
+                'description' => 'Allowed column names for Query.whitelistedColumns.where.',
+                'fields' => null,
                 'inputFields' => null,
-                'interfaces'  => null,
-                'enumValues'  => [
+                'interfaces' => null,
+                'enumValues' => [
                     [
-                        'name'              => 'ID',
-                        'description'       => null,
-                        'isDeprecated'      => false,
+                        'name' => 'ID',
+                        'description' => null,
+                        'isDeprecated' => false,
                         'deprecationReason' => null,
                     ],
                     [
-                        'name'              => 'CAMEL_CASE',
-                        'description'       => null,
-                        'isDeprecated'      => false,
+                        'name' => 'CAMEL_CASE',
+                        'description' => null,
+                        'isDeprecated' => false,
                         'deprecationReason' => null,
                     ],
                 ],
@@ -914,7 +914,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testWhereConditionOnJSONColumn(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type Location {
             id: Int!
         }
