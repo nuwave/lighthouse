@@ -20,6 +20,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 
+## v5.27.3
+
+### Fixed
+
+- Prevent possible `Undefined array key 0` error when there's an interface implemented by two renamed models https://github.com/nuwave/lighthouse/pull/1997
+
+## v5.27.2
+
+### Fixed
+
+- Prevent `Undefined array key` error when using cache version 2 and not having all version 1 configuration present https://github.com/nuwave/lighthouse/pull/1994
+
 ## v5.27.1
 
 ### Changed
