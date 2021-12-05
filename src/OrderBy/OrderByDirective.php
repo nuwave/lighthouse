@@ -166,6 +166,7 @@ GRAPHQL;
             : 'String';
 
         if ($this->directiveHasArgument('relations')) {
+            /** @var array<string, string> $relationsInputs */
             $relationsInputs = [];
 
             foreach ($this->directiveArgValue('relations') as $relation) {
@@ -209,6 +210,7 @@ GRAPHQL;
 
             $qualifiedRelationOrderByName = "{$qualifiedOrderByPrefix}RelationOrderByClause";
 
+            /** @var array<int, string> $relationNames */
             $relationNames = array_keys($relationsInputs);
 
             $inputMerged = <<<GRAPHQL
@@ -222,6 +224,7 @@ GRAPHQL;
 GRAPHQL;
 
             foreach ($relationsInputs as $relation => $input) {
+                /** @var array<int, string> $otherOptions */
                 $otherOptions = ['column'];
                 foreach ($relationNames as $relationName) {
                     if ($relationName !== $relation) {
