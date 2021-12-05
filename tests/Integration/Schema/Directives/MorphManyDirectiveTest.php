@@ -60,7 +60,7 @@ class MorphManyDirectiveTest extends DBTestCase
                         factory(Image::class)->create()
                     );
 
-                if ($image === false) {
+                if (false === $image) {
                     throw new Exception('Failed to save Image');
                 }
 
@@ -71,8 +71,8 @@ class MorphManyDirectiveTest extends DBTestCase
             'user_id' => $this->user->id,
         ]);
         $this->postImages = Collection::times(
-                $this->faker()->numberBetween(1, 10)
-            )
+            $this->faker()->numberBetween(1, 10)
+        )
             ->map(function () {
                 $image = $this->post
                     ->images()
@@ -80,7 +80,7 @@ class MorphManyDirectiveTest extends DBTestCase
                         factory(Image::class)->create()
                     );
 
-                if ($image === false) {
+                if (false === $image) {
                     throw new Exception('Failed to save Image');
                 }
 

@@ -35,7 +35,7 @@ class Subscription
         $broadcaster = app(BroadcastsSubscriptions::class);
 
         // Default to the configuration setting if not specified
-        if ($shouldQueue === null) {
+        if (null === $shouldQueue) {
             $shouldQueue = config('lighthouse.subscriptions.queue_broadcasts', false);
         }
 

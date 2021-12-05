@@ -94,7 +94,7 @@ GRAPHQL;
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedOrderByName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).'OrderByClause';
+            $restrictedOrderByName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . 'OrderByClause';
             $argDefinition->type = Parser::typeReference("[$restrictedOrderByName!]");
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
@@ -107,7 +107,7 @@ GRAPHQL;
                     )
                 );
         } else {
-            $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
+            $argDefinition->type = Parser::typeReference('[' . OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE . '!]');
         }
     }
 

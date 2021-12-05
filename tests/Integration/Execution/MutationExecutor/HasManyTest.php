@@ -81,7 +81,7 @@ class HasManyTest extends DBTestCase
         id: ID
         name: String
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewHasMany(): void
     {
@@ -653,7 +653,7 @@ GRAPHQL
         input UpsertRoleUsersRelation {
             sync: [ID!]
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         // Create the first User with a Role.
         $this->graphQL(/** @lang GraphQL */ '

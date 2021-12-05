@@ -190,6 +190,7 @@ GRAPHQL;
 
     /**
      * @param  array<string, mixed>  $args
+     *
      * @return array<string, string>
      */
     public function resolve($root, array $args): array

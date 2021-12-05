@@ -73,6 +73,6 @@ abstract class IteratorTest extends TestCase
             ]),
         ]);
 
-        return new Subscriber([], new Context(new Request), $resolveInfo);
+        return new Subscriber([], new Context(new Request()), $resolveInfo);
     }
 }

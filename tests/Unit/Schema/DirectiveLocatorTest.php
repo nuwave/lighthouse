@@ -62,8 +62,7 @@ class DirectiveLocatorTest extends TestCase
             foo: String @foo
         ');
 
-        $directive = new class implements FieldMiddleware
-        {
+        $directive = new class() implements FieldMiddleware {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'foo';

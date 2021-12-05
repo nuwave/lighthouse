@@ -17,6 +17,6 @@ class UnionCommand extends LighthouseGeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/typeResolver.stub';
+        return __DIR__ . '/stubs/typeResolver.stub';
     }
 }

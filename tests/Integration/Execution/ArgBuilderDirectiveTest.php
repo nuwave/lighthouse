@@ -185,14 +185,14 @@ class ArgBuilderDirectiveTest extends DBTestCase
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                createdBetween: ["'.$start.'", "'.$end.'"]
-            ) {
+        query ($between: [String!]!) {
+            users(createdBetween: $between) {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        ', [
+            'between' => [$start, $end],
+        ])->assertJsonCount(1, 'data.users');
     }
 
     public function testUseInputObjectsForWhereBetweenFilter(): void
@@ -219,17 +219,17 @@ class ArgBuilderDirectiveTest extends DBTestCase
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                created: {
-                    start: "'.$start.'"
-                    end: "'.$end.'"
-                }
-            ) {
+        query ($created: TimeRange!) {
+            users(created: $created) {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        ', [
+            'created' => [
+                'start' => $start,
+                'end' => $end,
+            ]
+        ])->assertJsonCount(1, 'data.users');
     }
 
     public function testAttachWhereNotBetweenFilterToQuery(): void
@@ -251,14 +251,14 @@ class ArgBuilderDirectiveTest extends DBTestCase
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                notCreatedBetween: ["'.$start.'", "'.$end.'"]
-            ) {
+        query ($range: [String!]!) {
+            users(notCreatedBetween: $range) {
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ', [
+            'range' => [$start, $end]
+        ])->assertJsonCount(2, 'data.users');
     }
 
     public function testAttachWhereClauseFilterToQuery(): void
@@ -276,15 +276,15 @@ class ArgBuilderDirectiveTest extends DBTestCase
         $user->created_at = now()->subYear();
         $user->save();
 
-        $year = now()->subYear()->format('Y');
-
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(created_at: "'.$year.'") {
+        query ($at: String!) {
+            users(created_at: $at) {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        ', [
+            'at' => now()->subYear()->format('Y'),
+        ])->assertJsonCount(1, 'data.users');
     }
 
     public function testOnlyProcessesFilledArguments(): void
@@ -299,14 +299,15 @@ class ArgBuilderDirectiveTest extends DBTestCase
         ';
 
         $users = factory(User::class, 3)->create();
-
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(name: "'.$users->first()->name.'") {
+        query ($name: String) {
+            users(name: $name) {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        ', [
+            'name' => $users->first()->name
+        ])->assertJsonCount(1, 'data.users');
     }
 
     public function testDoesNotProcessUnusedVariable(): void

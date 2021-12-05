@@ -15,15 +15,15 @@ class HasOneDirectiveTest extends DBTestCase
         // Creates a task and assigns it to this post
         $post = factory(Post::class)->create();
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: Int
         }
-        
+
         type Task {
             post: Post @hasOne
         }
-        
+
         type Query {
             tasks: [Task!]! @all
         }

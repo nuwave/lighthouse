@@ -24,10 +24,10 @@ class ConnectionField
         return [
             'hasNextPage' => $paginator->hasMorePages(),
             'hasPreviousPage' => $paginator->currentPage() > 1,
-            'startCursor' => $firstItem !== null
+            'startCursor' => null !== $firstItem
                 ? Cursor::encode($firstItem)
                 : null,
-            'endCursor' => $lastItem !== null
+            'endCursor' => null !== $lastItem
                 ? Cursor::encode($lastItem)
                 : null,
             'total' => $paginator->total(),

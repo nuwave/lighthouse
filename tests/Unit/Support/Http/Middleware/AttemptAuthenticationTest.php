@@ -44,7 +44,7 @@ class AttemptAuthenticationTest extends TestCase
                 null,
                 [],
                 new Callback(function (Context $context) {
-                    return $this->user === null;
+                    return null === $this->user;
                 })
             );
 

@@ -34,6 +34,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string, mixed>  $whereConditions
+     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleWhereConditions(
@@ -134,7 +135,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType).$this->generatedInputSuffix();
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
             $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
             $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
 
@@ -168,7 +169,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         // - must not start with a digit, dot or hyphen
         // - must contain only alphanumerics, digits, underscores, dots, hyphens or JSON references
         $match = \Safe\preg_match('/^(?![0-9.-])([A-Za-z0-9_.-]|->)*$/', $column);
-        if ($match === 0) {
+        if (0 === $match) {
             throw new Error(
                 self::invalidColumnName($column)
             );
@@ -182,12 +183,13 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * example when multiple tables with a column "id" are involved.
      *
      * @param  array<string, mixed>  $condition
+     *
      * @return array<string, mixed>
      */
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
         if ($column = $condition['column'] ?? null) {
-            $condition['column'] = $model->getTable().'.'.$column;
+            $condition['column'] = $model->getTable() . '.' . $column;
         }
 
         return $condition;

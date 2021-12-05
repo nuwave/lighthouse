@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Federation\EntityResolverProvider;
  */
 class Any extends ScalarType
 {
-    const MESSAGE = 'Expected an input with a field `__typename` and matching fields, got: ';
+    public const MESSAGE = 'Expected an input with a field `__typename` and matching fields, got: ';
 
     public $name = '_Any';
 
@@ -33,12 +33,12 @@ DESCRIPTION;
         // We do as much validation as possible here, before entering resolvers
 
         if (! is_array($value)) {
-            throw new Error(self::MESSAGE.\Safe\json_encode($value));
+            throw new Error(self::MESSAGE . \Safe\json_encode($value));
         }
 
         $typename = $value['__typename'] ?? null;
         if (! is_string($typename)) {
-            throw new Error(self::MESSAGE.\Safe\json_encode($value));
+            throw new Error(self::MESSAGE . \Safe\json_encode($value));
         }
 
         /** @var \Nuwave\Lighthouse\Federation\EntityResolverProvider $entityResolverProvider */

@@ -20,9 +20,9 @@ class OrderByDirectiveTest extends TestCase
         $schema = $this->buildSchema($schemaString);
         $input = $schema->getType(
             'Query' // Parent
-            .'Foo' // Field
-            .'OrderBy' // Arg
-            .'OrderByClause' // Suffix
+            . 'Foo' // Field
+            . 'OrderBy' // Arg
+            . 'OrderByClause' // Suffix
         );
         $this->assertInstanceOf(InputObjectType::class, $input);
     }

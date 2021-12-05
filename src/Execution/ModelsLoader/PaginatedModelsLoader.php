@@ -152,7 +152,7 @@ class PaginatedModelsLoader implements ModelsLoader
     {
         /** @var \Illuminate\Database\Eloquent\Model|null $model */
         $model = $collection->first();
-        if ($model === null) {
+        if (null === $model) {
             return;
         }
 

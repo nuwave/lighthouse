@@ -15,7 +15,7 @@ class ExtensionsResponse
     protected $key;
 
     /**
-     * @var mixed JSON-encodable content of the extension.
+     * @var mixed JSON-encodable content of the extension
      */
     protected $content;
 
@@ -37,7 +37,7 @@ class ExtensionsResponse
     }
 
     /**
-     * @return mixed JSON-encodable content of the extension.
+     * @return mixed JSON-encodable content of the extension
      */
     public function content()
     {

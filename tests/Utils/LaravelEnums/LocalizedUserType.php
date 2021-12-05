@@ -12,7 +12,7 @@ final class LocalizedUserType extends Enum implements LocalizedEnum
 
     public static function getDescription($value): string
     {
-        if ($value === self::Moderator) {
+        if (self::Moderator === $value) {
             return 'Localize Moderator';
         }
 

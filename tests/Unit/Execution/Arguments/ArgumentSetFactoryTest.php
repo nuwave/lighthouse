@@ -75,9 +75,9 @@ class ArgumentSetFactoryTest extends TestCase
         }
         ';
 
-        $barValue =
+        $barValue
             // Level 1
-            [
+            = [
                 // Level 2
                 [
                     // Level 3

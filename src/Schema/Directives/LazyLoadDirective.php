@@ -38,6 +38,7 @@ GRAPHQL;
         $fieldValue->resultHandler(
             /**
              * @param  Collection|LengthAwarePaginator  $items
+             *
              * @return Collection|LengthAwarePaginator
              */
             static function ($items) use ($relations) {
@@ -53,7 +54,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
         $relations = $this->directiveArgValue('relations');
-        if (! is_array($relations) || count($relations) === 0) {
+        if (! is_array($relations) || 0 === count($relations)) {
             throw new DefinitionException(
                 "Must specify non-empty list of relations in `@{$this->name()}` directive on `{$parentType->name->value}.{$fieldDefinition->name->value}`."
             );

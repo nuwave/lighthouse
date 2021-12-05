@@ -25,7 +25,7 @@ class SchemaValidatorTest extends TestCase
         type Foo @key(fields: "not_defined_on_the_object_type") {
           id: ID!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
         $tester = $this->commandTester(new ValidateSchemaCommand());
 
         $this->expectException(FederationException::class);

@@ -59,11 +59,11 @@ class ArgumentSet
     {
         $argument = $this->arguments[$key] ?? null;
 
-        if ($argument === null) {
+        if (null === $argument) {
             return false;
         }
 
-        return $argument->value !== null;
+        return null !== $argument->value;
     }
 
     /**
@@ -96,7 +96,7 @@ class ArgumentSet
                 return $directive instanceof RenameDirective;
             });
 
-            if ($renameDirective !== null) {
+            if (null !== $renameDirective) {
                 $argumentSet->arguments[$renameDirective->attributeArgValue()] = $argument;
             } else {
                 $argumentSet->arguments[$name] = $argument;
@@ -111,6 +111,7 @@ class ArgumentSet
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string>  $scopes
+     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
@@ -197,7 +198,7 @@ class ArgumentSet
      *
      * Works just like @see \Illuminate\Support\Arr::add().
      *
-     * @param  mixed  $value  Any value to inject.
+     * @param  mixed  $value  Any value to inject
      */
     public function addValue(string $path, $value): self
     {

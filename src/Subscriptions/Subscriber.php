@@ -51,7 +51,7 @@ class Subscriber implements Serializable
     /**
      * The root element of the query.
      *
-     * @var mixed Can be anything.
+     * @var mixed can be anything
      */
     public $root;
 
@@ -181,7 +181,7 @@ class Subscriber implements Serializable
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-lighthouse-'.Str::random(32).'-'.time();
+        return 'private-lighthouse-' . Str::random(32) . '-' . time();
     }
 
     protected function contextSerializer(): ContextSerializer

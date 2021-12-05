@@ -51,12 +51,12 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
             $argument->value = Utils::applyEach(
                 function ($value) use ($directivesForArgument) {
                     if ($value instanceof ArgumentSet) {
-                        $value = $this->transform($value, $directivesForArgument);
-
-                        return $this->transformRecursively($value);
-                    } else {
-                        return $this->transform($value, $directivesForArgument);
+                        return $this->transformRecursively(
+                            $this->transform($value, $directivesForArgument)
+                        );
                     }
+
+                    return $this->transform($value, $directivesForArgument);
                 },
                 $argument->value
             );
@@ -67,6 +67,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     /**
      * @param  mixed  $value  The client given value
+     *
      * @return mixed The transformed value
      */
     protected function transform($value, Collection $directivesForArgument)
@@ -80,6 +81,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     /**
      * @param  mixed  $value  The client given value
+     *
      * @return mixed The transformed value
      */
     abstract protected function applyDirective(Directive $directive, $value);
