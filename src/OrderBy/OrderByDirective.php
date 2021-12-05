@@ -117,7 +117,7 @@ GRAPHQL;
 
             if ($column === null) {
                 if (! $builder instanceof Builder) {
-                    throw new DefinitionException("Can not order by relations on non-Eloquent builders, got: " . get_class($builder));
+                    throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: '.get_class($builder));
                 }
 
                 // TODO use array_key_first() in PHP 7.3
@@ -132,7 +132,7 @@ GRAPHQL;
 
                     $column = "{$relationSnake}_count";
                 } else {
-                    $operator = 'with' . ucfirst($aggregate);
+                    $operator = 'with'.ucfirst($aggregate);
                     $relationColumn = $relationValues['column'];
                     $builder->{$operator}($relation, $relationColumn);
 
@@ -171,7 +171,7 @@ GRAPHQL;
                 $relationName = $relation['relation'];
                 $relationUpper = ucfirst($relationName);
 
-                $inputName = $qualifiedOrderByPrefix . $relationUpper;
+                $inputName = $qualifiedOrderByPrefix.$relationUpper;
 
                 $relationsInputs[$relationName] = $inputName;
 

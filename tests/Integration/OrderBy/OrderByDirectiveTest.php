@@ -75,7 +75,7 @@ class OrderByDirectiveTest extends TestCase
             .'Foo' // Field
             .'OrderBy' // Arg
             .'Baz' // Relation
-            . 'Column' // Suffix
+            .'Column' // Suffix
         );
         $this->assertInstanceOf(EnumType::class, $bazEnum);
     }
@@ -106,8 +106,8 @@ class OrderByDirectiveTest extends TestCase
                 })
             }
             ')
-            ->assertGraphQLValidationError("orderBy.0.column", "The order by.0.column field prohibits order by.0.foo / order by.0.baz from being present.")
-            ->assertGraphQLValidationError("orderBy.0.foo", "The order by.0.foo field prohibits order by.0.column / order by.0.baz from being present.");
+            ->assertGraphQLValidationError('orderBy.0.column', 'The order by.0.column field prohibits order by.0.foo / order by.0.baz from being present.')
+            ->assertGraphQLValidationError('orderBy.0.foo', 'The order by.0.foo field prohibits order by.0.column / order by.0.baz from being present.');
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -119,7 +119,7 @@ class OrderByDirectiveTest extends TestCase
                 })
             }
             ')
-            ->assertGraphQLValidationError("orderBy.0.foo", "The order by.0.foo field prohibits order by.0.column / order by.0.baz from being present.")
-            ->assertGraphQLValidationError("orderBy.0.baz", "The order by.0.baz field prohibits order by.0.column / order by.0.foo from being present.");
+            ->assertGraphQLValidationError('orderBy.0.foo', 'The order by.0.foo field prohibits order by.0.column / order by.0.baz from being present.')
+            ->assertGraphQLValidationError('orderBy.0.baz', 'The order by.0.baz field prohibits order by.0.column / order by.0.foo from being present.');
     }
 }
