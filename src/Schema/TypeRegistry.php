@@ -489,7 +489,7 @@ EOL
                         );
                     }
 
-                    return $this->get(array_pop($actuallyPossibleTypes));
+                    return $this->get(end($actuallyPossibleTypes));
                 }
 
                 return $this->get(class_basename($root));
