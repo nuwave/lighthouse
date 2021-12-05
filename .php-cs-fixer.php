@@ -9,4 +9,6 @@ $finder = PhpCsFixer\Finder::create()
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 
-return config($finder);
+return config($finder, [
+    'heredoc_indentation' => false,
+]);
