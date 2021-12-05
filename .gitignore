@@ -4,6 +4,7 @@
 # Individual per developer
 .env
 .idea
+.vscode
 phpunit.xml
 
 # Generated files
