@@ -14,8 +14,8 @@ use GraphQL\Utils\Utils;
 class SchemaPrinter extends GraphQLSchemaPrinter
 {
     /**
-     * @param  array<string, mixed>  $options
-     * @param  \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType  $type
+     * @param array<string, mixed>                                                       $options
+     * @param \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $type
      */
     protected static function printFields(array $options, $type): string
     {
@@ -46,7 +46,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     protected static function printObject(ObjectType $type, array $options): string
     {
@@ -54,7 +54,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     protected static function printInterface(InterfaceType $type, array $options): string
     {
@@ -62,8 +62,8 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param  \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType  $type
-     * @param  array<string, mixed>  $options
+     * @param \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $type
+     * @param array<string, mixed>                                                       $options
      */
     protected static function printObjectLike(string $kind, Type $type, array $options): string
     {
@@ -94,7 +94,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<\GraphQL\Language\AST\DirectiveNode>  $directives
+     * @param array<\GraphQL\Language\AST\DirectiveNode> $directives
      */
     public static function printDirectives(array $directives): string
     {

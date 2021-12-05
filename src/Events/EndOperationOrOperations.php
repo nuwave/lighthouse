@@ -15,7 +15,7 @@ class EndOperationOrOperations
     public $resultOrResults;
 
     /**
-     * @param  array<string, mixed>|array<int, array<string, mixed>>  $resultOrResults
+     * @param array<string, mixed>|array<int, array<string, mixed>> $resultOrResults
      */
     public function __construct(array $resultOrResults)
     {

@@ -61,8 +61,8 @@ GRAPHQL;
     /**
      * Delete on ore more related models.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  mixed|array<mixed>  $idOrIds
+     * @param \Illuminate\Database\Eloquent\Model $parent
+     * @param mixed|array<mixed>                  $idOrIds
      */
     public function __invoke($parent, $idOrIds): void
     {
@@ -107,7 +107,7 @@ GRAPHQL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ) {
-        if (! $this->directiveArgValue('relation')) {
+        if (!$this->directiveArgValue('relation')) {
             throw new DefinitionException(
                 'The @delete directive requires the "relation" to be set when used as an argument resolver.'
             );

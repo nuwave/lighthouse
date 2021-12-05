@@ -55,9 +55,10 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             }
         );
 
-        if (! $className) {
+        if (!$className) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
+
             throw new DefinitionException(
                 "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
@@ -84,7 +85,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
                 $resolveInfo
             );
 
-            if (! $subscription->can($subscriber)) {
+            if (!$subscription->can($subscriber)) {
                 throw new UnauthorizedSubscriber(
                     'Unauthorized subscription request'
                 );

@@ -351,7 +351,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             'email' => $username,
         ]);
         factory(User::class)->create([
-            'name' => $username,
+            'name'  => $username,
             'email' => $username,
         ]);
 

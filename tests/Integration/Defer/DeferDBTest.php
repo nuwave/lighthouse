@@ -216,7 +216,7 @@ class DeferDBTest extends DBTestCase
                 $company->users
                     ->map(function (User $user): array {
                         return [
-                            'email' => $user->email,
+                            'email'   => $user->email,
                             'company' => null,
                         ];
                     })

@@ -47,7 +47,7 @@ class ASTManipulator
         $entities = [];
 
         foreach ($documentAST->types as $type) {
-            if (! $type instanceof ObjectTypeDefinitionNode) {
+            if (!$type instanceof ObjectTypeDefinitionNode) {
                 continue;
             }
 
@@ -76,7 +76,7 @@ class ASTManipulator
     {
         // In federation it is fine for a schema to not have a user-defined root query type,
         // since we add two federation related fields to it here.
-        if (! isset($documentAST->types[RootType::QUERY])) {
+        if (!isset($documentAST->types[RootType::QUERY])) {
             $documentAST->types[RootType::QUERY] = Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
         }
 

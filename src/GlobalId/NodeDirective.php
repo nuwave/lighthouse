@@ -79,13 +79,13 @@ GRAPHQL;
     }
 
     /**
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
+     * @param \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        if (! $typeDefinition instanceof ObjectTypeDefinitionNode) {
+        if (!$typeDefinition instanceof ObjectTypeDefinitionNode) {
             throw new DefinitionException(
                 "The {$this->name()} directive must only be used on object type definitions, not on {$typeDefinition->kind} {$typeDefinition->name->value}."
             );

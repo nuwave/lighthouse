@@ -14,7 +14,7 @@ use Tests\Utils\LaravelEnums\AOrB;
  *
  * Attributes
  * @property string|null $name
- * @property AOrB|null $type
+ * @property AOrB|null   $type
  *
  * Scopes
  *

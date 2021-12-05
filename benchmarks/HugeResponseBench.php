@@ -32,15 +32,15 @@ GRAPHQL;
     public function resolve(): array
     {
         static $parent;
-        if (! isset($parent)) {
+        if (!isset($parent)) {
             $parent = [
-                'name' => 'parent',
+                'name'     => 'parent',
                 'children' => [],
             ];
 
             for ($i = 0; $i < 100; ++$i) {
                 $parent['children'][] = [
-                    'name' => "child {$i}",
+                    'name'   => "child {$i}",
                     'parent' => $parent,
                 ];
             }

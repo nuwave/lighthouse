@@ -158,7 +158,7 @@ class LighthouseServiceProvider extends ServiceProvider
             $exceptionHandler->renderable(
                 function (ClientAware $error) {
                     /** @var \GraphQL\Error\ClientAware&\Throwable $error Only throwables can end up in here */
-                    if (! $error instanceof Error) {
+                    if (!$error instanceof Error) {
                         $error = new Error(
                             $error->getMessage(),
                             null,

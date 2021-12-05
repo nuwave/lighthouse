@@ -13,7 +13,7 @@ class WithExtensionsException extends \Exception implements ClientAware, Renders
     protected $extensionsContent;
 
     /**
-     * @param  array<string, mixed>  $extensionsContent
+     * @param array<string, mixed> $extensionsContent
      */
     public function __construct(string $message, array $extensionsContent)
     {

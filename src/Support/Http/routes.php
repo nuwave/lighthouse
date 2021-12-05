@@ -5,7 +5,7 @@ if ($routeConfig = config('lighthouse.route')) {
     $router = app('router');
 
     $actions = [
-        'as' => $routeConfig['name'] ?? 'graphql',
+        'as'   => $routeConfig['name'] ?? 'graphql',
         'uses' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
     ];
 

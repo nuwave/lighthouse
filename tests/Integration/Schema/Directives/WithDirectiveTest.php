@@ -204,33 +204,33 @@ class WithDirectiveTest extends DBTestCase
             'data' => [
                 'activity' => [
                     [
-                        'id' => '1',
+                        'id'      => '1',
                         'content' => [
                             '__typename' => 'Post',
-                            'id' => "{$post1->id}",
-                            'images' => $post1->images()->get()
+                            'id'         => "{$post1->id}",
+                            'images'     => $post1->images()->get()
                                 ->map(function (Image $image) {
                                     return ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
                     [
-                        'id' => '2',
+                        'id'      => '2',
                         'content' => [
                             '__typename' => 'Post',
-                            'id' => "{$post2->id}",
-                            'images' => $post2->images()->get()
+                            'id'         => "{$post2->id}",
+                            'images'     => $post2->images()->get()
                                 ->map(function (Image $image) {
                                     return ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
                     [
-                        'id' => '3',
+                        'id'      => '3',
                         'content' => [
                             '__typename' => 'Task',
-                            'id' => "{$task->id}",
-                            'images' => $task->images()->get()
+                            'id'         => "{$task->id}",
+                            'images'     => $task->images()->get()
                                 ->map(static function (Image $image): array {
                                     return ['id' => "{$image->id}"];
                                 }),

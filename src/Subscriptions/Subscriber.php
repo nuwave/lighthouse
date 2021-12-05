@@ -77,7 +77,7 @@ class Subscriber implements Serializable
     public $context;
 
     /**
-     * @param  array<string, mixed>  $args
+     * @param array<string, mixed> $args
      */
     public function __construct(
         array $args,
@@ -112,14 +112,14 @@ class Subscriber implements Serializable
     {
         return [
             'channel' => $this->channel,
-            'topic' => $this->topic,
-            'query' => serialize(
+            'topic'   => $this->topic,
+            'query'   => serialize(
                 AST::toArray($this->query)
             ),
             'field_name' => $this->fieldName,
-            'args' => $this->args,
-            'variables' => $this->variables,
-            'context' => $this->contextSerializer()->serialize($this->context),
+            'args'       => $this->args,
+            'variables'  => $this->variables,
+            'context'    => $this->contextSerializer()->serialize($this->context),
         ];
     }
 
@@ -132,7 +132,7 @@ class Subscriber implements Serializable
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     public function __unserialize(array $data): void
     {

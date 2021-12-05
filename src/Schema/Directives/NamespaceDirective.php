@@ -34,7 +34,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode $objectType
      */
     protected function addNamespacesToFields(&$objectType): void
     {

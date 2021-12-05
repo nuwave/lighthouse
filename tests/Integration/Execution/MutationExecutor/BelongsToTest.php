@@ -102,7 +102,7 @@ class BelongsToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -130,7 +130,7 @@ class BelongsToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => null,
                 ],
@@ -161,7 +161,7 @@ class BelongsToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -199,7 +199,7 @@ class BelongsToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => null,
                 ],
@@ -229,7 +229,7 @@ class BelongsToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -262,7 +262,7 @@ class BelongsToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -295,7 +295,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -328,7 +328,7 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -362,7 +362,7 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -400,10 +400,10 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '1',
+                        'id'   => '1',
                         'name' => 'bar',
                     ],
                 ],
@@ -440,10 +440,10 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '1',
+                        'id'   => '1',
                         'name' => 'bar',
                     ],
                 ],
@@ -480,10 +480,10 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '1',
+                        'id'   => '1',
                         'name' => 'bar',
                     ],
                 ],
@@ -531,7 +531,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => null,
                 ],
@@ -576,7 +576,7 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => null,
                 ],
@@ -627,7 +627,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => null,
                 ],
@@ -669,7 +669,7 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => null,
                 ],
@@ -720,7 +720,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
@@ -802,7 +802,7 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'name' => 'foo',
+                    'name'  => 'foo',
                     'roles' => [
                         [
                             'name' => 'bar',
@@ -887,11 +887,11 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'    => '1',
+                    'name'  => 'foo',
                     'roles' => [
                         [
-                            'id' => '1',
+                            'id'   => '1',
                             'name' => 'bar',
                         ],
                     ],
@@ -937,8 +937,8 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'id' => '1',
-                    'name' => 'fooz',
+                    'id'    => '1',
+                    'name'  => 'fooz',
                     'roles' => [],
                 ],
             ],
@@ -1028,13 +1028,13 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'createRoleUser' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'user' => [
-                        'id' => '2',
+                        'id'   => '2',
                         'name' => 'user 1',
                     ],
                     'role' => [
-                        'id' => '3',
+                        'id'   => '3',
                         'name' => 'role 1',
                     ],
                 ],
@@ -1126,14 +1126,14 @@ GRAPHQL
         $this->graphQL($query)->assertJson([
             'data' => [
                 'createRoleUser' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'meta' => 'asdf',
                     'user' => [
-                        'id' => '1',
+                        'id'   => '1',
                         'name' => 'some username',
                     ],
                     'role' => [
-                        'id' => '1',
+                        'id'   => '1',
                         'name' => 'some rolename',
                     ],
                 ],
@@ -1144,14 +1144,14 @@ GRAPHQL
         $this->graphQL($query)->assertJson([
             'data' => [
                 'createRoleUser' => [
-                    'id' => '2',
+                    'id'   => '2',
                     'meta' => 'asdf',
                     'user' => [
-                        'id' => '2',
+                        'id'   => '2',
                         'name' => 'some username',
                     ],
                     'role' => [
-                        'id' => '2',
+                        'id'   => '2',
                         'name' => 'some rolename',
                     ],
                 ],

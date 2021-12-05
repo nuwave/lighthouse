@@ -579,7 +579,7 @@ GRAPHQL
             ')
             ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
 
-        if (! $nonNullPaginationResults) {
+        if (!$nonNullPaginationResults) {
             $result->assertJson([
                 'data' => [
                     'users' => null,

@@ -44,8 +44,8 @@ class PaginateDirectiveDBTest extends DBTestCase
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
-                        'count' => 2,
-                        'total' => 3,
+                        'count'       => 2,
+                        'total'       => 3,
                         'currentPage' => 1,
                     ],
                     'data' => [],
@@ -129,8 +129,8 @@ class PaginateDirectiveDBTest extends DBTestCase
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
-                        'count' => 1,
-                        'total' => 1,
+                        'count'       => 1,
+                        'total'       => 1,
                         'currentPage' => 1,
                     ],
                     'data' => [
@@ -314,14 +314,14 @@ class PaginateDirectiveDBTest extends DBTestCase
             'data' => [
                 'users' => [
                     'pageInfo' => [
-                        'count' => 0,
-                        'currentPage' => 1,
-                        'endCursor' => null,
-                        'hasNextPage' => false,
+                        'count'           => 0,
+                        'currentPage'     => 1,
+                        'endCursor'       => null,
+                        'hasNextPage'     => false,
                         'hasPreviousPage' => false,
-                        'lastPage' => 1,
-                        'startCursor' => null,
-                        'total' => 0,
+                        'lastPage'        => 1,
+                        'startCursor'     => null,
+                        'total'           => 0,
                     ],
                 ],
             ],
@@ -362,14 +362,14 @@ class PaginateDirectiveDBTest extends DBTestCase
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
-                        'count' => 0,
-                        'currentPage' => 1,
-                        'firstItem' => null,
+                        'count'        => 0,
+                        'currentPage'  => 1,
+                        'firstItem'    => null,
                         'hasMorePages' => false,
-                        'lastItem' => null,
-                        'lastPage' => 1,
-                        'perPage' => 5,
-                        'total' => 0,
+                        'lastItem'     => null,
+                        'lastPage'     => 1,
+                        'perPage'      => 5,
+                        'total'        => 0,
                     ],
                 ],
             ],
@@ -549,11 +549,11 @@ class PaginateDirectiveDBTest extends DBTestCase
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
-                        'count' => 3,
+                        'count'       => 3,
                         'currentPage' => 1,
-                        'firstItem' => 1,
-                        'lastItem' => 3,
-                        'perPage' => 10,
+                        'firstItem'   => 1,
+                        'lastItem'    => 3,
+                        'perPage'     => 10,
                     ],
                 ],
             ],

@@ -77,10 +77,10 @@ class MorphToManyDirectiveTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'post' => [
-                    'id' => $this->post->id,
+                    'id'   => $this->post->id,
                     'tags' => $this->postTags->map(function (Tag $tag) {
                         return [
-                            'id' => $tag->id,
+                            'id'   => $tag->id,
                             'name' => $tag->name,
                         ];
                     })->toArray(),
@@ -129,10 +129,10 @@ class MorphToManyDirectiveTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'post' => [
-                    'id' => $this->post->id,
+                    'id'         => $this->post->id,
                     'customTags' => $this->postTags->map(function (Tag $tag) {
                         return [
-                            'id' => $tag->id,
+                            'id'   => $tag->id,
                             'name' => $tag->name,
                         ];
                     })->toArray(),
@@ -243,13 +243,13 @@ class MorphToManyDirectiveTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    'id' => $user->id,
+                    'id'    => $user->id,
                     'posts' => [
                         [
-                            'id' => $post->id,
+                            'id'   => $post->id,
                             'tags' => $postTags->map(function (Tag $tag) {
                                 return [
-                                    'id' => $tag->id,
+                                    'id'   => $tag->id,
                                     'name' => $tag->name,
                                 ];
                             })->toArray(),
@@ -257,10 +257,10 @@ class MorphToManyDirectiveTest extends DBTestCase
                     ],
                     'tasks' => [
                         [
-                            'id' => $task->id,
+                            'id'   => $task->id,
                             'tags' => $taskTags->map(function (Tag $tag) {
                                 return [
-                                    'id' => $tag->id,
+                                    'id'    => $tag->id,
                                     'title' => $tag->name,
                                 ];
                             })->toArray(),

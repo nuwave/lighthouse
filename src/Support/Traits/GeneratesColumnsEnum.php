@@ -24,8 +24,8 @@ trait GeneratesColumnsEnum
      */
     protected function hasAllowedColumns(): bool
     {
-        $hasColumns = ! is_null($this->directiveArgValue('columns'));
-        $hasColumnsEnum = ! is_null($this->directiveArgValue('columnsEnum'));
+        $hasColumns = !is_null($this->directiveArgValue('columns'));
+        $hasColumnsEnum = !is_null($this->directiveArgValue('columnsEnum'));
 
         if ($hasColumns && $hasColumnsEnum) {
             throw new DefinitionException(
@@ -49,7 +49,7 @@ trait GeneratesColumnsEnum
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
 
-        if (! is_null($columnsEnum)) {
+        if (!is_null($columnsEnum)) {
             return $columnsEnum;
         }
 
@@ -72,7 +72,7 @@ trait GeneratesColumnsEnum
     /**
      * Create the Enum that holds the allowed columns.
      *
-     * @param  array<mixed, string>  $allowedColumns
+     * @param array<mixed, string> $allowedColumns
      */
     protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,

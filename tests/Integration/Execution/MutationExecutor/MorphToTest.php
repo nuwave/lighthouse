@@ -97,10 +97,10 @@ class MorphToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createImage' => [
-                    'id' => '1',
-                    'url' => 'foo',
+                    'id'        => '1',
+                    'url'       => 'foo',
                     'imageable' => [
-                        'id' => '1',
+                        'id'   => '1',
                         'name' => 'first_task',
                     ],
                 ],
@@ -135,10 +135,10 @@ class MorphToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'upsertImage' => [
-                    'id' => '1',
-                    'url' => 'foo',
+                    'id'        => '1',
+                    'url'       => 'foo',
                     'imageable' => [
-                        'id' => '1',
+                        'id'   => '1',
                         'name' => 'first_task',
                     ],
                 ],
@@ -170,7 +170,7 @@ class MorphToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'updateImage' => [
-                    'url' => 'foo',
+                    'url'       => 'foo',
                     'imageable' => null,
                 ],
             ],
@@ -222,7 +222,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 $field => [
-                    'url' => 'foo',
+                    'url'       => 'foo',
                     'imageable' => null,
                 ],
             ],
@@ -264,7 +264,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 $field => [
-                    'url' => 'foo',
+                    'url'       => 'foo',
                     'imageable' => null,
                 ],
             ],

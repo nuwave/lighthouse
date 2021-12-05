@@ -41,14 +41,14 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $contextAttributeName = $this->directiveArgValue('context');
-        if (! $contextAttributeName) {
+        if (!$contextAttributeName) {
             throw new DefinitionException(
                 "The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `context` argument"
             );
         }
 
         $argumentName = $this->directiveArgValue('name');
-        if (! $argumentName) {
+        if (!$argumentName) {
             throw new DefinitionException(
                 "The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `name` argument"
             );

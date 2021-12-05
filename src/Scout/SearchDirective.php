@@ -27,7 +27,7 @@ GRAPHQL;
     {
         $within = $this->directiveArgValue('within');
         if (null !== $within) {
-            if (! is_string($within)) {
+            if (!is_string($within)) {
                 throw new DefinitionException(
                     "Expected the value of the `within` argument of @{$this->name()} on {$this->nodeName()} to be a string, got: " . \Safe\json_encode($within)
                 );

@@ -16,9 +16,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \lluminate\Support\Carbon $updated_at
  *
  * Foreign keys
- * @property int $activity_id
+ * @property int    $activity_id
  * @property string $activity_type
- * @property int $user_id
+ * @property int    $user_id
  *
  * Relations
  * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content

@@ -40,7 +40,7 @@ class Authorizer implements AuthorizesSubscriptions
     {
         try {
             $channel = $request->input('channel_name');
-            if (! is_string($channel)) {
+            if (!is_string($channel)) {
                 return false;
             }
 
@@ -58,7 +58,7 @@ class Authorizer implements AuthorizesSubscriptions
 
             /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
             foreach ($subscriptions as $subscription) {
-                if (! $subscription->authorize($subscriber, $request)) {
+                if (!$subscription->authorize($subscriber, $request)) {
                     $this->storage->deleteSubscriber($subscriber->channel);
 
                     return false;

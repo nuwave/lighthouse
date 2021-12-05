@@ -29,7 +29,7 @@ class Upload extends ScalarType
      */
     public function parseValue($value): UploadedFile
     {
-        if (! $value instanceof UploadedFile) {
+        if (!$value instanceof UploadedFile) {
             throw new Error(
                 'Could not get uploaded file, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec Instead got: ' . Utils::printSafe($value)
             );
@@ -41,8 +41,8 @@ class Upload extends ScalarType
     /**
      * This always throws, as the Upload scalar must be used with a multipart form request.
      *
-     * @param  \GraphQL\Language\AST\Node  $valueNode
-     * @param  array<string, mixed>|null  $variables
+     * @param \GraphQL\Language\AST\Node $valueNode
+     * @param array<string, mixed>|null  $variables
      *
      * @throws \GraphQL\Error\Error
      */

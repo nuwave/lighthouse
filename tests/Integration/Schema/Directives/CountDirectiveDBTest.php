@@ -283,26 +283,26 @@ class CountDirectiveDBTest extends DBTestCase
             'data' => [
                 'activity' => [
                     [
-                        'id' => '1',
+                        'id'      => '1',
                         'content' => [
-                            '__typename' => 'Post',
-                            'id' => "{$post1->id}",
+                            '__typename'   => 'Post',
+                            'id'           => "{$post1->id}",
                             'images_count' => $post1->images()->count(),
                         ],
                     ],
                     [
-                        'id' => '2',
+                        'id'      => '2',
                         'content' => [
-                            '__typename' => 'Post',
-                            'id' => "{$post2->id}",
+                            '__typename'   => 'Post',
+                            'id'           => "{$post2->id}",
                             'images_count' => $post2->images()->count(),
                         ],
                     ],
                     [
-                        'id' => '3',
+                        'id'      => '3',
                         'content' => [
-                            '__typename' => 'Task',
-                            'id' => "{$task->id}",
+                            '__typename'   => 'Task',
+                            'id'           => "{$task->id}",
                             'images_count' => $task->images()->count(),
                         ],
                     ],

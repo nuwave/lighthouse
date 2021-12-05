@@ -748,7 +748,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => $userNamedEmptyString->id,
+                        'id'   => $userNamedEmptyString->id,
                         'name' => $userNamedEmptyString->name,
                     ],
                 ],
@@ -780,7 +780,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => $userNamedNull->id,
+                        'id'   => $userNamedNull->id,
                         'name' => $userNamedNull->name,
                     ],
                 ],
@@ -837,23 +837,23 @@ class WhereConditionsDirectiveTest extends DBTestCase
         // TODO: Replace with dms/phpunit-arraysubset-asserts when we require PHPUnit 9 + PHP 7.3
         $this->assertSame(
             [
-                'kind' => 'ENUM',
-                'name' => $expectedEnumName,
+                'kind'        => 'ENUM',
+                'name'        => $expectedEnumName,
                 'description' => 'Allowed column names for the `where` argument on field `whitelistedColumns` on type `Query`.',
-                'fields' => null,
+                'fields'      => null,
                 'inputFields' => null,
-                'interfaces' => null,
-                'enumValues' => [
+                'interfaces'  => null,
+                'enumValues'  => [
                     [
-                        'name' => 'ID',
-                        'description' => null,
-                        'isDeprecated' => false,
+                        'name'              => 'ID',
+                        'description'       => null,
+                        'isDeprecated'      => false,
                         'deprecationReason' => null,
                     ],
                     [
-                        'name' => 'CAMEL_CASE',
-                        'description' => null,
-                        'isDeprecated' => false,
+                        'name'              => 'CAMEL_CASE',
+                        'description'       => null,
+                        'isDeprecated'      => false,
                         'deprecationReason' => null,
                     ],
                 ],

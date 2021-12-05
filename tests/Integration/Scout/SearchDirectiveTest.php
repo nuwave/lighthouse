@@ -181,7 +181,7 @@ class SearchDirectiveTest extends DBTestCase
     }
 
     /**
-     * @param  array{id: int}  $value
+     * @param array{id: int} $value
      */
     public function customBuilderMethod(ScoutBuilder $builder, array $value): ScoutBuilder
     {

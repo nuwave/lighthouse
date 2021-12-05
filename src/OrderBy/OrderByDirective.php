@@ -73,7 +73,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<array{column: string, order: string}>  $value
+     * @param array<array{column: string, order: string}> $value
      */
     public function handleBuilder($builder, $value): object
     {

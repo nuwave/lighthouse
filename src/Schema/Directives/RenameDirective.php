@@ -45,7 +45,7 @@ GRAPHQL;
     {
         $attribute = $this->directiveArgValue('attribute');
 
-        if (! $attribute) {
+        if (!$attribute) {
             throw new DefinitionException(
                 "The @{$this->name()} directive requires an `attribute` argument."
             );

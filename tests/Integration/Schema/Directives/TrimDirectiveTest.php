@@ -29,7 +29,7 @@ class TrimDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createCompany' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                 ],
             ],
@@ -65,7 +65,7 @@ class TrimDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createCompany' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                 ],
             ],

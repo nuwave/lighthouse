@@ -11,8 +11,8 @@ class FooBarRule implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value  The user-given value
+     * @param string $attribute
+     * @param mixed  $value     The user-given value
      */
     public function passes($attribute, $value): bool
     {

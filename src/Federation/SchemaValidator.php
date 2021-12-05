@@ -59,7 +59,7 @@ class SchemaValidator
     protected function validateKeySelectionSet(SelectionSetNode $selectionSet, ObjectType $type): void
     {
         foreach ($selectionSet->selections as $selection) {
-            if (! $selection instanceof FieldNode) {
+            if (!$selection instanceof FieldNode) {
                 throw new FederationException("Must only use field selections in the `fields` argument of @key, got: {$selection->kind}.");
             }
 
@@ -72,7 +72,7 @@ class SchemaValidator
 
             if (
                 ASTHelper::hasDirective($type->astNode, ExtendsDirective::NAME)
-                && ! ASTHelper::hasDirective($field->astNode, ExternalDirective::NAME)
+                && !ASTHelper::hasDirective($field->astNode, ExternalDirective::NAME)
             ) {
                 throw new FederationException("A @key directive on `{$type->name}` specifies the `{$field->name}` field which has no @external directive.");
             }

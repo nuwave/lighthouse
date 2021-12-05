@@ -17,7 +17,7 @@ class Foo
     }
 
     /**
-     * @param  array<string, mixed>  $args
+     * @param array<string, mixed> $args
      *
      * @see \Tests\Unit\Schema\Directives\FieldDirectiveTest
      */

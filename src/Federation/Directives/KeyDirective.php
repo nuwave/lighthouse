@@ -33,7 +33,7 @@ GRAPHQL;
     public function fields(): SelectionSetNode
     {
         $fields = $this->directiveArgValue('fields');
-        if (! is_string($fields)) {
+        if (!is_string($fields)) {
             throw new DefinitionException('Argument `fields` on the `@key` directive is required.');
         }
 
