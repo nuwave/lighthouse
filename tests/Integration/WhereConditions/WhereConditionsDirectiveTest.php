@@ -839,7 +839,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             [
                 'kind' => 'ENUM',
                 'name' => $expectedEnumName,
-                'description' => 'Allowed column names for the `where` argument on field `whitelistedColumns` on type `Query`.',
+                'description' => 'Allowed column names for the Query.whitelistedColumns.where.',
                 'fields' => null,
                 'inputFields' => null,
                 'interfaces' => null,

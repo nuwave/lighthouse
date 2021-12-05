@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -209,29 +210,28 @@ GRAPHQL;
             $qualifiedRelationOrderByName = "{$qualifiedOrderByPrefix}RelationOrderByClause";
 
             $relationNames = array_keys($relationsInputs);
-            $relationNamesOptions = implode(',', $relationNames);
 
             $inputMerged = <<<GRAPHQL
                 "Order by clause for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
                 input {$qualifiedRelationOrderByName} {
                     "The column that is used for ordering."
-                    column: $allowedColumnsTypeName @rules(apply: ["prohibits:{$relationNamesOptions}"])
+                    column: $allowedColumnsTypeName {$this->mutuallyExclusiveRule($relationNames)}
 
                     "The direction that is used for ordering."
                     order: SortOrder!
 GRAPHQL;
 
             foreach ($relationsInputs as $relation => $input) {
-                $otherOptions = 'column';
+                $otherOptions = ['column'];
                 foreach ($relationNames as $relationName) {
                     if ($relationName !== $relation) {
-                        $otherOptions .= ",{$relationName}";
+                        $otherOptions []= $relationName;
                     }
                 }
 
                 $inputMerged .= <<<GRAPHQL
                     "Aggregate specification."
-                    {$relation}: {$input} @rules(apply: ["prohibits:{$otherOptions}"])
+                    {$relation}: {$input} {$this->mutuallyExclusiveRule($otherOptions)}
 
 GRAPHQL;
             }
@@ -259,5 +259,18 @@ GRAPHQL;
             $this->directiveArgValue('column'),
             $this->directiveArgValue('direction', 'ASC')
         );
+    }
+
+    /**
+     * @param array<string> $otherOptions
+     */
+    protected function mutuallyExclusiveRule(array $otherOptions): string
+    {
+        if (AppVersion::below(8.0)) {
+            return '';
+        }
+
+        $optionsString = implode(',', $otherOptions);
+        return "@rules(apply: [\"prohibits:{$optionsString}\"])";
     }
 }
