@@ -16,6 +16,10 @@ build: ## Build the local Docker containers
 up: ## Bring up the docker-compose stack
 	docker-compose up -d
 
+.PHONY: fix
+fix: up
+	vendor/bin/php-cs-fixer fix
+
 .PHONY: stan
 stan: up ## Runs static analysis
 	docker-compose exec php vendor/bin/phpstan
