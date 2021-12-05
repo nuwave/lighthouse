@@ -7,8 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
+ * Primary key.
+ *
  * @property int $category_id
+ *
+ * Attributes
  * @property string $name
+ *
+ * Timestamps
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
  */

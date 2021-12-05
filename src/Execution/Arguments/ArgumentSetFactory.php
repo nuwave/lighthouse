@@ -26,23 +26,22 @@ class ArgumentSetFactory
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     public function __construct(
         ASTBuilder $astBuilder,
         ArgumentTypeNodeConverter $argumentTypeNodeConverter,
-        DirectiveLocator $directiveFactory
+        DirectiveLocator $directiveLocator
     ) {
         $this->documentAST = $astBuilder->documentAST();
         $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveLocator = $directiveLocator;
     }
 
     /**
      * Wrap client-given args with type information.
      *
      * @param  array<mixed>  $args
-     * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
@@ -61,12 +60,11 @@ class ArgumentSetFactory
      *
      * @param  \GraphQL\Language\AST\FieldDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      * @param  array<mixed>  $args
-     * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $this->directiveFactory->associated($definition);
+        $argumentSet->directives = $this->directiveLocator->associated($definition);
 
         if ($definition instanceof FieldDefinitionNode) {
             $argDefinitions = $definition->arguments;
@@ -109,15 +107,14 @@ class ArgumentSetFactory
     /**
      * Wrap a single client-given argument with type information.
      *
-     * @param  mixed  $value The client given value.
-     * @return \Nuwave\Lighthouse\Execution\Arguments\Argument
+     * @param  mixed  $value  The client given value.
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
     {
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $this->directiveFactory->associated($definition);
+        $argument->directives = $this->directiveLocator->associated($definition);
         $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
 
@@ -157,8 +154,7 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value The client given value.
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $namedType
+     * @param  mixed  $value  The client given value.
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */
     protected function wrapWithNamedType($value, NamedType $namedType)

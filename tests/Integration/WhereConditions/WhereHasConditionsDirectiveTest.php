@@ -320,7 +320,7 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         $category5->parent()->associate($category4);
         $category5->save();
 
-        $post1 = factory(Post::class)->create();
+        factory(Post::class)->create();
 
         $post2 = factory(Post::class)->create();
         $post2->categories()->attach($category2);

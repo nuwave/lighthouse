@@ -40,7 +40,7 @@ class RedisStorageManager implements StoresSubscriptions
     public function __construct(ConfigRepository $config, RedisFactory $redis)
     {
         $this->connection = $redis->connection(
-            $config->get('lighthouse.broadcasters.echo.connection') ?? 'default'
+            $config->get('lighthouse.subscriptions.broadcasters.echo.connection') ?? 'default'
         );
         $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl');
     }
@@ -152,8 +152,9 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param mixed $value Value to serialize.
+     * @param  mixed  $value  Value to serialize.
      * @return mixed Storable value.
+     *
      * @see \Illuminate\Cache\RedisStore::serialize
      */
     protected function serialize($value)
@@ -168,7 +169,7 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param mixed $value Value to unserialize.
+     * @param  mixed  $value  Value to unserialize.
      * @return mixed Unserialized value.
      */
     protected function unserialize($value)

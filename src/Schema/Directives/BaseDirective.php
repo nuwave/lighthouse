@@ -62,7 +62,6 @@ abstract class BaseDirective implements Directive
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
      * @param  ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode  $definitionNode
-     * @return $this
      */
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
@@ -140,7 +139,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param  string  $argumentName The default argument name "model" may be overwritten
+     * @param  string  $argumentName  The default argument name "model" may be overwritten
      * @return class-string<\Illuminate\Database\Eloquent\Model>
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -152,7 +151,7 @@ abstract class BaseDirective implements Directive
 
         if (! $model) {
             throw new DefinitionException(
-                "A `model` argument must be assigned to the '@{$this->name()}' directive on '{$this->nodeName()}."
+                "Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}."
             );
         }
 
@@ -164,24 +163,24 @@ abstract class BaseDirective implements Directive
      *
      * @param  array<string>  $namespacesToTry
      * @param  callable(string $className): bool $determineMatch
+     * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
-     * @return class-string
      */
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
         callable $determineMatch = null
     ): string {
-        // Always try the explicitly set namespace first
-        array_unshift(
-            $namespacesToTry,
-            ASTHelper::getNamespaceForDirective(
-                $this->definitionNode,
-                $this->name()
-            )
+        $namespaceForDirective = ASTHelper::namespaceForDirective(
+            $this->definitionNode,
+            $this->name()
         );
+
+        if (is_string($namespaceForDirective)) {
+            // Always try the explicitly set namespace first
+            array_unshift($namespacesToTry, $namespaceForDirective);
+        }
 
         if (! $determineMatch) {
             $determineMatch = 'class_exists';
@@ -194,8 +193,9 @@ abstract class BaseDirective implements Directive
         );
 
         if (! $className) {
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No class `{$classCandidate}` was found for directive `@{$this->name()}`"
+                "Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}."
             );
         }
 
@@ -209,9 +209,9 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {

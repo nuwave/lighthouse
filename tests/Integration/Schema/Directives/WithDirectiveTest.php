@@ -29,9 +29,12 @@ class WithDirectiveTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        factory(Task::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+
+        /** @var \Tests\Utils\Models\Task $task */
+        foreach (factory(Task::class, 3)->make() as $task) {
+            $task->user()->associate($user);
+            $task->save();
+        }
 
         // Sanity check
         $this->assertFalse(
@@ -69,14 +72,17 @@ class WithDirectiveTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        $posts = factory(Post::class, 2)->create([
-            'user_id' => $user->id,
-        ]);
-        foreach ($posts as $post) {
-            factory(Comment::class)->create([
-                'post_id' => $post->id,
-                'user_id' => $user->id,
-            ]);
+
+        /** @var \Tests\Utils\Models\Post $post */
+        foreach (factory(Post::class, 2)->make() as $post) {
+            $post->user()->associate($user);
+            $post->save();
+
+            /** @var \Tests\Utils\Models\Comment $comment */
+            $comment = factory(Comment::class)->make();
+            $comment->user()->associate($user);
+            $comment->post()->associate($post);
+            $comment->save();
         }
 
         // Sanity check
@@ -253,18 +259,23 @@ class WithDirectiveTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        factory(Task::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
 
-        $posts = factory(Post::class, 2)->create([
-            'user_id' => $user->id,
-        ]);
-        foreach ($posts as $post) {
-            factory(Comment::class)->create([
-                'post_id' => $post->id,
-                'user_id' => $user->id,
-            ]);
+        /** @var \Tests\Utils\Models\Task $task */
+        foreach (factory(Task::class, 3)->make() as $task) {
+            $task->user()->associate($user);
+            $task->save();
+        }
+
+        /** @var \Tests\Utils\Models\Post $post */
+        foreach (factory(Post::class, 2)->make() as $post) {
+            $post->user()->associate($user);
+            $post->save();
+
+            /** @var \Tests\Utils\Models\Comment $comment */
+            $comment = factory(Comment::class)->make();
+            $comment->user()->associate($user);
+            $comment->post()->associate($post);
+            $comment->save();
         }
 
         // Sanity check
@@ -282,6 +293,78 @@ class WithDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     'tasksAndPostsCommentsLoaded' => true,
+                ],
+            ],
+        ]);
+    }
+
+    public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
+    {
+        $this->markTestSkipped('Not working due to the current naive usage of \Illuminate\Database\Eloquent\Collection::load() in \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::load().');
+
+        // @phpstan-ignore-next-line unreachable due to markTestSkipped
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users: User
+                @first
+        }
+
+        type User {
+            postTasksAndPostsCommentsLoaded: Boolean!
+                @with(relation: "posts.task")
+                @with(relation: "posts.comments")
+                @method
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        /** @var \Tests\Utils\Models\Task $taskA */
+        $taskA = factory(Task::class)->make();
+        $taskA->user()->associate($user);
+        $taskA->save();
+
+        /** @var \Tests\Utils\Models\Task $taskB */
+        $taskB = factory(Task::class)->make();
+        $taskB->user()->associate($user);
+        $taskB->save();
+
+        /** @var \Tests\Utils\Models\Post $postA */
+        $postA = factory(Post::class)->make();
+        $postA->user()->associate($user);
+        $postA->task()->associate($taskA);
+        $postA->save();
+
+        /** @var \Tests\Utils\Models\Post $postB */
+        $postB = factory(Post::class)->make();
+        $postB->user()->associate($user);
+        $postB->task()->associate($taskB);
+        $postB->save();
+
+        foreach ([$postA, $postB] as $post) {
+            /** @var \Tests\Utils\Models\Comment $comment */
+            $comment = factory(Comment::class)->make();
+            $comment->user()->associate($user);
+            $comment->post()->associate($post);
+            $comment->save();
+        }
+
+        // Sanity check
+        $this->assertFalse(
+            $user->postTasksAndPostsCommentsLoaded()
+        );
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                postTasksAndPostsCommentsLoaded
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'postTasksAndPostsCommentsLoaded' => true,
                 ],
             ],
         ]);

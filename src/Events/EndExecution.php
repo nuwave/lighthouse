@@ -6,12 +6,12 @@ use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Carbon;
 
 /**
- * Fires after resolving each individual query.
+ * Fires after resolving a single operation.
  */
 class EndExecution
 {
     /**
-     * The result of resolving an individual query.
+     * The result of resolving a single operation.
      *
      * @var \GraphQL\Executor\ExecutionResult
      */

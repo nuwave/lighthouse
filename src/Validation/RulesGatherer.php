@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
-use Closure;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -12,8 +12,10 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation;
 use Nuwave\Lighthouse\Support\Contracts\ArgumentValidation;
+use Nuwave\Lighthouse\Support\Contracts\WithReferenceRule;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentValue;
 use Nuwave\Lighthouse\Support\Utils;
+use Throwable;
 
 class RulesGatherer
 {
@@ -87,6 +89,7 @@ class RulesGatherer
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
                     /**
                      * @psalm-suppress UndefinedDocblockClass
+                     *
                      * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
                      */
                     // @phpstan-ignore-next-line using trait in typehint
@@ -110,6 +113,7 @@ class RulesGatherer
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
                     /**
                      * @psalm-suppress UndefinedDocblockClass
+                     *
                      * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
                      */
                     // @phpstan-ignore-next-line using trait in typehint
@@ -191,7 +195,7 @@ class RulesGatherer
     /**
      * @param  array<string, mixed>  $rulesOrMessages
      * @param  array<int|string>  $path
-     * @return  array<string, mixed>
+     * @return array<string, mixed>
      */
     protected function wrap(array $rulesOrMessages, array $path): array
     {
@@ -216,17 +220,20 @@ class RulesGatherer
      *
      * @param  array<int, mixed>  $rules
      * @param  array<int|string>  $argumentPath
-     * @return array<int, array<int, mixed>|\Illuminate\Contracts\Validation\Rule|Closure>
+     * @return array<int, array<int, mixed>|object>
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
         return array_map(
+            /**
+             * @return object|array<int, mixed>
+             */
             static function ($rule) use ($argumentPath) {
-                if ($rule instanceof Rule) {
-                    return $rule;
-                }
+                if (is_object($rule)) {
+                    if ($rule instanceof WithReferenceRule) {
+                        $rule->setArgumentPath($argumentPath);
+                    }
 
-                if ($rule instanceof Closure) {
                     return $rule;
                 }
 
@@ -240,6 +247,21 @@ class RulesGatherer
 
                 $name = $parsed[0];
                 $args = $parsed[1];
+
+                if ($name === 'WithReference') {
+                    $indexes = explode('_', $args[1]);
+                    array_splice($args, 1, 1);
+                    foreach ($indexes as $index) {
+                        // Skipping over the first index, which is the name
+                        $index = (int) $index + 1;
+                        $args[$index] = implode('.', array_merge($argumentPath, [$args[$index]]));
+                    }
+
+                    $parsed = ValidationRuleParser::parse($args);
+
+                    $name = $parsed[0];
+                    $args = $parsed[1];
+                }
 
                 // Those rule lists are a subset of https://github.com/illuminate/validation/blob/8079fd53dee983e7c52d1819ae3b98c71a64fbc0/Validator.php#L206-L236
                 // using the docs to know which ones reference other fields: https://laravel.com/docs/8.x/validation#available-validation-rules
@@ -276,8 +298,27 @@ class RulesGatherer
                     );
                 }
 
+                // Rules where the first argument is a date or a field reference
+                if (is_string($args[0] ?? null) && in_array($name, [
+                    'After',
+                    'AfterOrEqual',
+                    'Before',
+                    'BeforeOrEqual',
+                ])) {
+                    try {
+                        Carbon::parse($args[0]);
+                    } catch (Throwable $argumentIsNotADate) {
+                        $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
+                    }
+                }
+
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
-                return array_merge([$name], $args);
+                $flatArgs = [$name];
+                foreach ($args as $arg) {
+                    $flatArgs [] = $arg;
+                }
+
+                return $flatArgs;
             },
             $rules
         );

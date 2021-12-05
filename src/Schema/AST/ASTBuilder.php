@@ -13,8 +13,6 @@ use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Cache\Factory as CacheFactory;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
@@ -53,9 +51,9 @@ class ASTBuilder
     protected $eventsDispatcher;
 
     /**
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var \Nuwave\Lighthouse\Schema\AST\ASTCache
      */
-    protected $configRepository;
+    protected $astCache;
 
     /**
      * Initialized lazily in $this->documentAST().
@@ -65,48 +63,37 @@ class ASTBuilder
     protected $documentAST;
 
     public function __construct(
-        DirectiveLocator $directiveFactory,
+        DirectiveLocator $directiveLocator,
         SchemaSourceProvider $schemaSourceProvider,
         EventsDispatcher $eventsDispatcher,
-        ConfigRepository $configRepository
+        ASTCache $astCache
     ) {
-        $this->directiveLocator = $directiveFactory;
+        $this->directiveLocator = $directiveLocator;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->eventsDispatcher = $eventsDispatcher;
-        $this->configRepository = $configRepository;
+        $this->astCache = $astCache;
     }
 
     public function documentAST(): DocumentAST
     {
         if (! isset($this->documentAST)) {
-            $cacheConfig = $this->configRepository->get('lighthouse.cache');
-            if ($cacheConfig['enable']) {
-                /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-                $cacheFactory = app(CacheFactory::class);
-                $cache = $cacheFactory->store($cacheConfig['store'] ?? null);
-
-                $this->documentAST = $cache->remember(
-                    $cacheConfig['key'],
-                    $cacheConfig['ttl'],
-                    function (): DocumentAST {
-                        return $this->build();
-                    }
-                );
-            } else {
-                $this->documentAST = $this->build();
-            }
+            return $this->documentAST = $this->astCache->isEnabled()
+                ? $this->astCache->fromCacheOrBuild(function (): DocumentAST {
+                    return $this->build();
+                })
+                : $this->build();
         }
 
         return $this->documentAST;
     }
 
-    protected function build(): DocumentAST
+    public function build(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
-        // Allow to register listeners that add in additional schema definitions.
+        // Allow registering listeners that inject additional schema definitions.
         // This can be used by plugins to hook into the schema building process
-        // while still allowing the user to add in their schema as usual.
+        // while still allowing the user to define their schema as usual.
         $additionalSchemas = (array) $this->eventsDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );

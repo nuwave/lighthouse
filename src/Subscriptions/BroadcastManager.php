@@ -38,6 +38,7 @@ class BroadcastManager extends DriverManager
 
     /**
      * @param  array<string, mixed>  $config
+     *
      * @throws \RuntimeException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster

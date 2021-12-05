@@ -8,10 +8,6 @@ Lighthouse offers some useful test helpers that make it easy to call your API
 from within a PHPUnit test. Just add the `MakesGraphQLRequests` trait to your test class.
 
 ```diff
-<?php
-
-namespace Tests;
-
 +use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -19,6 +15,27 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 +   use MakesGraphQLRequests;
+}
+```
+
+Enabling the schema cache speeds up your tests. To ensure the schema is fresh
+before running tests, add the `ClearSchemaCache` trait to your test class and call it during set up.
+
+```diff
++use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+    use CreatesApplication;
++   use ClearsSchemaCache;
+
+
+    protected function setUp(): void
+    {
+        parent::setUp();
++       $this->bootClearsSchemaCache();
+     }
 }
 ```
 
@@ -48,7 +65,7 @@ If you want to use variables within your query, pass an associative array as the
 public function testCreatePost(): void
 {
     $response = $this->graphQL(/** @lang GraphQL */ '
-        mutation CreatePost($title: String!) {
+        mutation ($title: String!) {
             createPost(title: $title) {
                 id
             }
@@ -87,9 +104,9 @@ public function testQueriesPosts(): void
                 [
                     'id' => $post->id,
                     'title' => $post->title,
-                ]
-            ]
-        ]
+                ],
+            ],
+        ],
     ]);
 }
 ```
@@ -127,7 +144,7 @@ public function testOrdersUsersByName(): void
 ### TestResponse Assertion Mixins
 
 Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
-Make sure to generate the latest [IDE-helper file](/_ide_helper.php) to get proper autocompletion:
+Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#ide-helper) to get proper autocompletion:
 
 ```bash
 php artisan lighthouse:ide-helper
@@ -147,6 +164,39 @@ $this
     ->assertGraphQLValidationKeys(['email']);
 ```
 
+## Testing Errors
+
+Depending on your debug and error handling configuration, Lighthouse catches most if
+not all errors produced within queries and includes them within the result.
+
+One way to test for errors is to examine the `TestResponse`, either by looking
+at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins)
+such as `assertGraphQLErrorMessage()`:
+
+```php
+$this
+    ->graphQL(/** @lang GraphQL */ '
+    mutation {
+        shouldTriggerSomeError
+    }
+    ')
+    ->assertGraphQLErrorMessage($expectedMessage);
+```
+
+Another way is to leverage PHPUnit's built-in methods such as `expectException()`.
+You must disable Lighthouse's error handling with `rethrowGraphQLErrors()` to ensure errors reach your test:
+
+```php
+$this->rethrowGraphQLErrors();
+
+$this->expectException(SomethingWentWrongException::class);
+$this->graphQL(/** @lang GraphQL */ '
+{
+    oops
+}
+');
+```
+
 ## Simulating File Uploads
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
@@ -156,10 +206,11 @@ helper method.
 
 ```php
 $operations = [
-    'operationName' => 'upload',
-    'query' => 'mutation upload ($file: Upload!) {
-                    upload (file: $file)
-                }',
+    'query' => /** @lang GraphQL */ '
+        mutation ($file: Upload!) {
+            upload(file: $file)
+        }
+    ',
     'variables' => [
         'file' => null,
     ],
@@ -274,8 +325,8 @@ public function testHelloWorld(): void
     }
     ')->seeJson([
         'data' => [
-            'hello' => 'world'
-        ]
+            'hello' => 'world',
+        ],
     ])->seeHeader('SomeHeader', 'value');
 }
 ```

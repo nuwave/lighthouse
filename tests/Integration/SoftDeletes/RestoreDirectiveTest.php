@@ -98,8 +98,8 @@ class RestoreDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            restoreTasks(id: ID!): Task!
-                @can(ability: "delete", find: "id")
+            restoreTasks(id: ID! @eq): Task!
+                @can(ability: "delete", query: true)
                 @restore
         }
         ';

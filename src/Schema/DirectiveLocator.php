@@ -195,7 +195,6 @@ class DirectiveLocator
 
     /**
      * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
-     * @return $this
      */
     public function setResolved(string $directiveName, string $directiveClass): self
     {
@@ -231,13 +230,23 @@ class DirectiveLocator
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> of type <$directiveClass>
+     * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
+     *
+     * @param  class-string<TDirective>  $directiveClass
+     * @return \Illuminate\Support\Collection<TDirective>
      */
     public function associatedOfType(Node $node, string $directiveClass): Collection
     {
-        return $this
+        /**
+         * Ensured by instanceofMatcher.
+         *
+         * @var \Illuminate\Support\Collection<TDirective> $associatedOfType
+         */
+        $associatedOfType = $this
             ->associated($node)
             ->filter(Utils::instanceofMatcher($directiveClass));
+
+        return $associatedOfType;
     }
 
     /**
@@ -246,7 +255,10 @@ class DirectiveLocator
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
+     * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
+     *
+     * @param  class-string<TDirective>  $directiveClass
+     * @return TDirective|null
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */

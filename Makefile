@@ -27,7 +27,7 @@ test: up ## Runs tests with PHPUnit
 
 .PHONY: bench
 bench: up ## Run benchmarks
-	docker-compose exec php composer bench
+	docker-compose exec php vendor/bin/phpbench run --report=aggregate
 
 .PHONY: rector
 rector: up ## Automatic code fixes with Rector
@@ -45,3 +45,11 @@ php: up ## Open an interactive shell into the PHP container
 .PHONY: node
 node: up ## Open an interactive shell into the Node container
 	docker-compose exec node bash
+
+.PHONY: release
+release: up ## Prepare the docs for a new release
+	docker-compose exec node yarn run release
+
+.PHONY: docs
+docs: up ## Render the docs in a development server
+	docker-compose exec node yarn run start

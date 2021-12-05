@@ -15,7 +15,9 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 
 class GlobalIdServiceProvider extends ServiceProvider
 {
-    public function register()
+    const NODE = 'Node';
+
+    public function register(): void
     {
         $this->app->bind(GlobalIdContract::class, GlobalId::class);
         $this->app->singleton(NodeRegistry::class);
@@ -27,7 +29,13 @@ class GlobalIdServiceProvider extends ServiceProvider
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
                 $documentAST = $manipulateAST->documentAST;
-                $this->addNodeSupport($documentAST);
+
+                // Only add the node type and node field if a type actually implements them.
+                // If we were to add it regardless, a validation error is thrown because an
+                // interface without implementations is pointless to have in the schema.
+                if ($this->hasTypeImplementingNodeInterface($documentAST)) {
+                    $this->addNodeSupport($documentAST);
+                }
             }
         );
 
@@ -39,25 +47,18 @@ class GlobalIdServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * Inject the Node interface and a node field into the Query type.
-     */
     protected function addNodeSupport(DocumentAST $documentAST): void
     {
-        // Only add the node type and node field if a type actually implements them
-        // Otherwise, a validation error is thrown
-        if (! $this->hasTypeImplementingInterface($documentAST, 'Node')) {
-            return;
-        }
-
+        $node = self::NODE;
         $globalId = config('lighthouse.global_id_field');
+
         // Double slashes to escape the slashes in the namespace.
         $documentAST->setTypeDefinition(
             Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-"Node global interface"
-interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolveType") {
-"Global identifier that can be used to resolve any Node implementation."
-$globalId: ID!
+"Any object implementing this type can be found by ID through `Query.node`."
+interface $node @interface(resolveType: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolveType") {
+  "Global identifier that can be used to resolve any Node implementation."
+  $globalId: ID!
 }
 GRAPHQL
             )
@@ -65,20 +66,18 @@ GRAPHQL
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
-        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
-            node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolve")
-        ');
+        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+  node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
+GRAPHQL
+);
     }
 
-    /**
-     * Returns whether or not the given interface is used within the defined types.
-     */
-    protected function hasTypeImplementingInterface(DocumentAST $documentAST, string $interfaceName): bool
+    protected function hasTypeImplementingNodeInterface(DocumentAST $documentAST): bool
     {
         foreach ($documentAST->types as $typeDefinition) {
             if (
                 $typeDefinition instanceof ObjectTypeDefinitionNode
-                && ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName)
+                && ASTHelper::typeImplementsInterface($typeDefinition, self::NODE)
             ) {
                 return true;
             }

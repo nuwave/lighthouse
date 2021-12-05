@@ -10,7 +10,7 @@ class ErrorPool
     /**
      * The buffered errors.
      *
-     * @var array<\Throwable>
+     * @var array<int, \Throwable>
      */
     protected $throwables = [];
 

@@ -13,19 +13,20 @@ class TestResponseMixin
     public function assertGraphQLValidationError(): Closure
     {
         return function (string $key, ?string $message) {
-            $this->assertJson([
-                'errors' => [
-                    [
-                        'extensions' => [
-                            'validation' => [
-                                $key => [
-                                    $message,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
+            $validation = TestResponseUtils::extractValidationErrors($this);
+            Assert::assertNotNull($validation, 'Expected the query to return an error with extensions.validation.');
+
+            Assert::assertArrayHasKey(
+                $key,
+                $validation,
+                "Expected the query to return validation errors for field `{$key}`."
+            );
+
+            Assert::assertContains(
+                $message,
+                $validation[$key],
+                "Expected the query to return validation error message `{$message}` for field `{$key}`."
+            );
 
             return $this;
         };
@@ -35,17 +36,11 @@ class TestResponseMixin
     {
         return function (array $keys) {
             $validation = TestResponseUtils::extractValidationErrors($this);
+            Assert::assertNotNull($validation, 'Expected the query to return an error with extensions.validation.');
 
-            Assert::assertNotNull($validation, 'Expected the query to return validation errors for specific fields.');
-            /** @var array<string, mixed> $validation */
-            Assert::assertArrayHasKey('extensions', $validation);
-            $extensions = $validation['extensions'];
-
-            Assert::assertNotNull($extensions, 'Expected the query to return validation errors for specific fields.');
-            /** @var array<string, mixed> $extensions */
             Assert::assertSame(
                 $keys,
-                array_keys($extensions['validation']),
+                array_keys($validation),
                 'Expected the query to return validation errors for specific fields.'
             );
 
@@ -57,7 +52,6 @@ class TestResponseMixin
     {
         return function () {
             $validation = TestResponseUtils::extractValidationErrors($this);
-
             Assert::assertNull($validation, 'Expected the query to have no validation errors.');
 
             return $this;

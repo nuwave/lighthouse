@@ -7,11 +7,13 @@ use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\EndExecution;
+use Nuwave\Lighthouse\Events\EndOperationOrOperations;
 use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Tests\TestCase;
 
@@ -48,6 +50,7 @@ class LifecycleEventsTest extends TestCase
         ');
 
         $this->assertInstanceOf(StartRequest::class, array_shift($events));
+        $this->assertInstanceOf(StartOperationOrOperations::class, array_shift($events));
         $this->assertInstanceOf(BuildSchemaString::class, array_shift($events));
         $this->assertInstanceOf(RegisterDirectiveNamespaces::class, array_shift($events));
         $this->assertInstanceOf(ManipulateAST::class, array_shift($events));
@@ -55,6 +58,7 @@ class LifecycleEventsTest extends TestCase
         $this->assertInstanceOf(BuildExtensionsResponse::class, array_shift($events));
         $this->assertInstanceOf(ManipulateResult::class, array_shift($events));
         $this->assertInstanceOf(EndExecution::class, array_shift($events));
+        $this->assertInstanceOf(EndOperationOrOperations::class, array_shift($events));
         $this->assertInstanceOf(EndRequest::class, array_shift($events));
     }
 }

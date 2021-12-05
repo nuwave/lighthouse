@@ -30,7 +30,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
                         .$f->name
                         .static::printArgs($options, $f->args, '  ')
                         .': '
-                        .(string) $f->getType()
+                        .$f->getType()
                         .(isset($options['printDirectives'])
                             ? $options['printDirectives']($f)
                             : '')
@@ -54,7 +54,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param  array<string, mixed>  $options
      */
     protected static function printInterface(InterfaceType $type, array $options): string
     {

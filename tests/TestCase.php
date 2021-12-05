@@ -4,13 +4,14 @@ namespace Tests;
 
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
+use Illuminate\Console\Application as ConsoleApplication;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
+use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
@@ -46,7 +47,9 @@ GRAPHQL;
     {
         parent::setUp();
 
-        if ($this->schema === null) {
+        // This default is only valid for testing Lighthouse itself and thus
+        // is not defined in the reusable test trait.
+        if (! isset($this->schema)) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
@@ -68,6 +71,7 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            LighthouseAuthServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
@@ -157,6 +161,10 @@ GRAPHQL;
         $config->set('lighthouse.federation', [
             'entities_resolver_namespace' => 'Tests\\Utils\\Entities',
         ]);
+
+        $config->set('lighthouse.cache.enable', false);
+
+        $config->set('lighthouse.unbox_bensampo_enum_enum_instances', true);
     }
 
     /**
@@ -181,7 +189,7 @@ GRAPHQL;
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
      */
-    protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
+    protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
     {
         return $this->buildSchema(
             $schema.self::PLACEHOLDER_QUERY
@@ -215,6 +223,9 @@ GRAPHQL;
     protected function commandTester(Command $command): CommandTester
     {
         $command->setLaravel($this->app);
+        $command->setApplication($this->app->make(ConsoleApplication::class, [
+            'version' => $this->app->version(),
+        ]));
 
         return new CommandTester($command);
     }

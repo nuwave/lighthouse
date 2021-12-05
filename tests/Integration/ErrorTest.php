@@ -17,6 +17,13 @@ class ErrorTest extends TestCase
             ->assertGraphQLErrorCategory('request');
     }
 
+    public function testEmptyQuery(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '')
+            ->assertGraphQLErrorMessage('GraphQL Request parameter "query" is required and must not be empty.')
+            ->assertGraphQLErrorCategory('request');
+    }
+
     public function testRejectsInvalidQuery(): void
     {
         $result = $this->graphQL(/** @lang GraphQL */ '
@@ -91,7 +98,7 @@ class ErrorTest extends TestCase
     public function testRethrowsInternalExceptions(): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $this->mockResolver()

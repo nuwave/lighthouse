@@ -2,16 +2,19 @@ includes:
 - vendor/bensampo/laravel-enum/extension.neon
 - vendor/nesbot/carbon/extension.neon
 - vendor/nunomaduro/larastan/extension.neon
+- vendor/phpstan/phpstan/conf/bleedingEdge.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 - vendor/phpstan/phpstan-phpunit/extension.neon
 - vendor/phpstan/phpstan-phpunit/rules.neon
 - vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon
 parameters:
-  level: max
+  # TODO level up to max
+  level: 8
   paths:
   - benchmarks
   - src
   - tests
+  checkOctaneCompatibility: true
   excludePaths:
   - tests/database/migrations/*
 
@@ -28,6 +31,7 @@ parameters:
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false
+
   ignoreErrors:
   # Some parts of Laravel are just really magical
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
@@ -53,7 +57,11 @@ parameters:
   - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
 
   # This really has no type in root resolvers
+  - '#Method .* has parameter \$root with no type specified\.#'
   - '#Method .* has parameter \$root with no typehint specified\.#'
 
   # PHPStan and PHPUnit disagree with themselves
   - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
+
+  # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
+  - '#Property .* in isset\(\) is not nullable\.#'

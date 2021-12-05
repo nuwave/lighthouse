@@ -26,10 +26,8 @@ class Utils
             return $classCandidate;
         }
 
-        // Stop if the class is found or we are out of namespaces to try
-        while (! empty($namespacesToTry)) {
-            // Pop off the first namespace and try it
-            $className = array_shift($namespacesToTry).'\\'.$classCandidate;
+        foreach ($namespacesToTry as $namespace) {
+            $className = $namespace.'\\'.$classCandidate;
 
             if ($determineMatch($className)) {
                 /** @var class-string $className */
@@ -43,8 +41,8 @@ class Utils
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param  class-string  $className This class is resolved through the container.
-     * @param  string  $methodName The method that gets passed the arguments of the closure.
+     * @param  class-string  $className  This class is resolved through the container.
+     * @param  string  $methodName  The method that gets passed the arguments of the closure.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -68,7 +66,7 @@ class Utils
      * @param  mixed  $object  Object with protected member.
      * @param  string  $memberName  Name of object's protected member.
      * @param  mixed|null  $default  Default value to return in case of access error.
-     * @return mixed  Value of object's protected member.
+     * @return mixed Value of object's protected member.
      */
     public static function accessProtected($object, string $memberName, $default = null)
     {
@@ -101,7 +99,7 @@ class Utils
     /**
      * Determine if a class uses a trait.
      *
-     * @param  object|string  $class
+     * @param  object|class-string  $class
      */
     public static function classUsesTrait($class, string $trait): bool
     {
@@ -114,6 +112,7 @@ class Utils
     /**
      * Construct a callback that checks if its input is a given class.
      *
+     * @param  class-string  $classLike
      * @return Closure(mixed): bool
      */
     public static function instanceofMatcher(string $classLike): Closure

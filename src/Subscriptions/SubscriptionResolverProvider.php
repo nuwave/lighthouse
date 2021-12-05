@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Subscriptions\Directives\SubscriptionDirective;
@@ -30,9 +31,9 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     /**
      * Provide a resolver for a subscription field in case no resolver directive is defined.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
     {
@@ -45,17 +46,20 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             $className = Str::studly($fieldName);
         }
 
+        $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
         $className = Utils::namespaceClassname(
             $className,
-            $fieldValue->defaultNamespacesForParent(),
+            $namespacesToTry,
             function (string $class): bool {
                 return is_subclass_of($class, GraphQLSubscription::class);
             }
         );
 
         if (! $className) {
+            $subscriptionClass = GraphQLSubscription::class;
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No class found for the subscription field {$fieldName}"
+                "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
         }
 

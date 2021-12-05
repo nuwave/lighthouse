@@ -70,33 +70,57 @@ GRAPHQL;
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
                 $cacheValue = new CacheValue(
-                $root,
-                $args,
-                $context,
-                $resolveInfo,
-                $fieldValue,
-                $isPrivate
-            );
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo,
+                    $fieldValue,
+                    $isPrivate
+                );
 
                 $cacheKey = $cacheValue->getKey();
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
-                ? $this->cacheRepository->tags($cacheValue->getTags())
-                : $this->cacheRepository;
+                    ? $this->cacheRepository->tags($cacheValue->getTags())
+                    : $this->cacheRepository;
 
                 // We found a matching value in the cache, so we can just return early
                 // without actually running the query
-                if ($value = $cache->get($cacheKey)) {
+                $value = $cache->get($cacheKey);
+                if ($value !== null) {
                     return $value;
                 }
+                // In Laravel cache, null is considered as "non-existant" value. As mentioned in laravel documentation,
+                // https://laravel.com/docs/8.x/cache#checking-for-item-existence
+                // > The `has` method [...] will also return false if the item exists but its value is null.
+                //
+                // If caching `null` value becomes something worthwhile, one possible way to achieve it is to
+                // encapsulate the `$result` at writing time :
+                //
+                //    $storeInCache = static function ($result) use ($cacheKey, $maxAge, $cache): void {
+                //        $value = ['rawValue' => $result];
+                //        $maxAge
+                //        ? $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge))
+                //        : $cache->forever($cacheKey, $value);
+                //    };
+                //
+                // and restoring original value back at reading :
+                //
+                //    if (is_array($value) && array_key_exists('rawValue', $value)) { // don't use isset !
+                //        return $value['rawValue'];
+                //    }
+                //
+                // Such a change would introduce some potential BC, if for instance cached value was already containing
+                // an object with a `rawValue` key prior the implementation change. A possible workaround is to choose a
+                // less collision-probable key instead of `rawValue` (eg. "com.lighthouse-php:rawValue" ?)
 
                 $resolved = $resolver($root, $args, $context, $resolveInfo);
 
                 $storeInCache = $maxAge
-                ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
-                    $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
-                }
+                    ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
+                        $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
+                    }
                 : static function ($result) use ($cacheKey, $cache): void {
                     $cache->forever($cacheKey, $result);
                 };

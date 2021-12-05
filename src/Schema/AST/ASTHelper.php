@@ -9,9 +9,12 @@ use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
@@ -20,6 +23,7 @@ use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\AST;
+use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -33,6 +37,7 @@ class ASTHelper
      * Merge two lists of AST nodes.
      *
      * @template TNode of \GraphQL\Language\AST\Node
+     *
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
@@ -74,6 +79,7 @@ class ASTHelper
 
     /**
      * @template TNode of \GraphQL\Language\AST\Node
+     *
      * @param  \GraphQL\Language\AST\NodeList<TNode>  $nodeList
      * @param  TNode  $node
      * @return \GraphQL\Language\AST\NodeList<TNode>
@@ -109,21 +115,24 @@ class ASTHelper
             return $node;
         }
 
-        $type = data_get($node, 'type');
-
-        if (! $type) {
-            throw new DefinitionException(
-                "The node '$node->kind' does not have a type associated with it."
-            );
+        if (
+            $node instanceof NonNullTypeNode
+            || $node instanceof ListTypeNode
+            || $node instanceof FieldDefinitionNode
+            || $node instanceof InputValueDefinitionNode
+        ) {
+            return self::getUnderlyingNamedTypeNode($node->type);
         }
 
-        return self::getUnderlyingNamedTypeNode($type);
+        throw new DefinitionException(
+            "The node '$node->kind' does not have a type associated with it."
+        );
     }
 
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param  mixed  $default Is returned if the directive does not have the argument.
+     * @param  mixed  $default  Is returned if the directive does not have the argument.
      * @return mixed The value given to the directive.
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
@@ -188,7 +197,8 @@ class ASTHelper
      * Out of a list of nodes, get the first that matches the given name.
      *
      * @template TNode of \GraphQL\Language\AST\Node
-     * @param  iterable<TNode> $nodes
+     *
+     * @param  iterable<TNode>  $nodes
      * @return TNode|null
      */
     public static function firstByName($nodes, string $name): ?Node
@@ -199,6 +209,7 @@ class ASTHelper
             }
 
             if ($node->name->value === $name) {
+                // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Schema\AST\ASTHelper::firstByName() should return TNode of GraphQL\Language\AST\Node|null but returns TNode of GraphQL\Language\AST\Node.
                 return $node;
             }
         }
@@ -207,24 +218,19 @@ class ASTHelper
     }
 
     /**
-     * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
+     * Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective.
      */
-    public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
+    public static function namespaceForDirective(Node $definitionNode, string $directiveName): ?string
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
         return $namespaceDirective !== null
-            // The namespace directive can contain an argument with the name of the
-            // current directive, in which case it applies here
-            ? static::directiveArgValue($namespaceDirective, $directiveName, '')
-            // Default to an empty namespace if the namespace directive does not exist
-            : '';
+            ? static::directiveArgValue($namespaceDirective, $directiveName)
+            : null;
     }
 
     /**
      * Attach directive to all registered object type fields.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): void
     {
@@ -266,7 +272,7 @@ class ASTHelper
         }
 
         /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator $directiveLocator */
-        $directiveLocator = app(DirectiveLocator::class);
+        $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
         $directive = $directiveLocator->resolve($name);
         $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
 
@@ -390,7 +396,7 @@ class ASTHelper
             $definitionNode = static::underlyingType($definitionNode);
         }
 
-        if ($definitionNode instanceof ObjectTypeDefinitionNode) {
+        if ($definitionNode instanceof ObjectTypeDefinitionNode || $definitionNode instanceof InterfaceTypeDefinitionNode) {
             return ModelDirective::modelClass($definitionNode)
                 ?? $definitionNode->name->value;
         }

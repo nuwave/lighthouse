@@ -17,10 +17,10 @@ Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/erro
 ## Additional Error Information
 
 The interface [`\Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`](https://github.com/nuwave/lighthouse/blob/master/src/Exceptions/RendersErrorsExtensions.php)
-may be extended to add more information then just an error message to the rendered error output.
+may be extended to add more information than just an error message to the rendered error output.
 
 Let's say you want to have a custom exception type that contains information about
-the reason why the exception was thrown.
+the reason the exception was thrown.
 
 ```php
 <?php
@@ -132,7 +132,7 @@ A query that produces an error will render like this:
 
 ## Registering Error Handlers
 
-Error handlers receive the Errors that occur during GraphQL execution.
+Error handlers receive the errors that occur during GraphQL execution.
 They can be used to log, filter or format the errors.
 
 Add them to your `lighthouse.php` config file, for example:
@@ -191,3 +191,7 @@ try {
 
 return $result;
 ```
+
+## Testing Errors
+
+See [PHPUnit - Testing Errors](../testing/phpunit.md#testing-errors).

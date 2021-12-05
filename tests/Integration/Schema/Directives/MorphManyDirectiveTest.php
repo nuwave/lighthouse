@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Exception;
-use GraphQL\Error\Error;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -18,7 +17,7 @@ class MorphManyDirectiveTest extends DBTestCase
     use WithFaker;
 
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */
@@ -53,8 +52,7 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->taskImages = Collection
-            ::times(10)
+        $this->taskImages = Collection::times(10)
             ->map(function (): Image {
                 $image = $this->task
                     ->images()
@@ -72,8 +70,7 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->postImages = Collection
-            ::times(
+        $this->postImages = Collection::times(
                 $this->faker()->numberBetween(1, 10)
             )
             ->map(function () {
@@ -330,27 +327,21 @@ class MorphManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ "
-        {
-            post(id: {$this->post->id}) {
-                id
-                title
-                images(first: 0) {
-                    data {
-                        id
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($id: ID!) {
+                post(id: $id) {
+                    images(first: 0) {
+                        data {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ")->assertJson([
-            'data' => [
-                'post' => [
-                    'id' => $this->post->id,
-                    'title' => $this->post->title,
-                    'images' => null,
-                ],
-            ],
-        ])->assertGraphQLErrorCategory(Error::CATEGORY_GRAPHQL);
+            ', [
+                'id' => $this->post->id,
+            ])
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
     }
 
     public function testQueryMorphManyPaginatorWithADefaultCount(): void

@@ -948,7 +948,7 @@ GRAPHQL
     public function testConnectUserWithRoleAndPivotMetaByUsingSync(): void
     {
         $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        factory(Role::class)->create();
         $role2 = factory(Role::class)->create();
         $user->roles()->attach($role2);
 
@@ -1005,7 +1005,7 @@ GRAPHQL
     public function testConnectUserWithRoleAndPivotMetaByUsingSyncWithoutDetach(): void
     {
         $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        factory(Role::class)->create();
         $role2 = factory(Role::class)->create();
         $user->roles()->attach($role2);
 

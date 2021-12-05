@@ -18,10 +18,12 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\EndExecution;
+use Nuwave\Lighthouse\Events\EndOperationOrOperations;
 use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\StartOperationOrOperations;
+use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -66,7 +68,7 @@ class GraphQL
     /**
      * @var \Illuminate\Contracts\Config\Repository
      */
-    protected $config;
+    protected $configRepository;
 
     /**
      * Lazily initialized.
@@ -85,7 +87,7 @@ class GraphQL
         ErrorPool $errorPool,
         ProvidesValidationRules $providesValidationRules,
         GraphQLHelper $graphQLHelper,
-        ConfigRepository $config
+        ConfigRepository $configRepository
     ) {
         $this->schemaBuilder = $schemaBuilder;
         $this->pipeline = $pipeline;
@@ -93,7 +95,7 @@ class GraphQL
         $this->errorPool = $errorPool;
         $this->providesValidationRules = $providesValidationRules;
         $this->graphQLHelper = $graphQLHelper;
-        $this->config = $config;
+        $this->configRepository = $configRepository;
     }
 
     /**
@@ -104,7 +106,11 @@ class GraphQL
      */
     public function executeOperationOrOperations($operationOrOperations, GraphQLContext $context): array
     {
-        return LighthouseUtils::applyEach(
+        $this->eventDispatcher->dispatch(
+            new StartOperationOrOperations($operationOrOperations)
+        );
+
+        $resultOrResults = LighthouseUtils::applyEach(
             /**
              * @return array<string, mixed>
              */
@@ -113,6 +119,12 @@ class GraphQL
             },
             $operationOrOperations
         );
+
+        $this->eventDispatcher->dispatch(
+            new EndOperationOrOperations($resultOrResults)
+        );
+
+        return $resultOrResults;
     }
 
     /**
@@ -123,6 +135,13 @@ class GraphQL
     public function executeOperation(OperationParams $params, GraphQLContext $context): array
     {
         $errors = $this->graphQLHelper->validateOperationParams($params);
+
+        $query = $params->query;
+        if (! is_string($query) || $query === '') {
+            $errors[] = new RequestError(
+                'GraphQL Request parameter "query" is required and must not be empty.'
+            );
+        }
 
         if (count($errors) > 0) {
             $errors = array_map(
@@ -136,9 +155,9 @@ class GraphQL
                 new ExecutionResult(null, $errors)
             );
         }
-
+        /** @var string $query Otherwise we would have bailed with an error */
         $result = $this->executeQuery(
-            $params->query,
+            $query,
             $context,
             $params->variables,
             null,
@@ -257,7 +276,7 @@ class GraphQL
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
-                foreach ($this->config->get('lighthouse.error_handlers', []) as $handlerClass) {
+                foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
                     $handlers [] = app($handlerClass);
                 }
 
@@ -287,8 +306,8 @@ class GraphQL
         // If debugging is set to false globally, do not add GraphQL specific
         // debugging info either. If it is true, then we fetch the debug
         // level from the Lighthouse configuration.
-        return $this->config->get('app.debug')
-            ? (int) $this->config->get('lighthouse.debug')
+        return $this->configRepository->get('app.debug')
+            ? (int) $this->configRepository->get('lighthouse.debug')
             : DebugFlag::NONE;
     }
 

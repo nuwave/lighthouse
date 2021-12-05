@@ -19,7 +19,7 @@ class EchoSubscriptionEvent implements ShouldBroadcastNow
     public $data;
 
     /**
-     * @param mixed $data The data to broadcast.
+     * @param  mixed  $data  The data to broadcast.
      */
     public function __construct(string $channel, $data)
     {

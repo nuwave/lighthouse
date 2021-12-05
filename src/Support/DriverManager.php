@@ -94,8 +94,6 @@ abstract class DriverManager
 
     /**
      * Register a custom driver creator Closure.
-     *
-     * @return $this
      */
     public function extend(string $driver, Closure $callback): self
     {
