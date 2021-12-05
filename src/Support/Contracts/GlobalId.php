@@ -12,7 +12,7 @@ interface GlobalId
     /**
      * Glue together a type and an id to create a global id.
      *
-     * @param  string|int  $id
+     * @param string|int $id
      */
     public function encode(string $type, $id): string;
 

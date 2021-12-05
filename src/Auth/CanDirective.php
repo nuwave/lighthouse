@@ -128,10 +128,11 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>  $args
-     * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
+     * @param array<string, mixed> $args
      *
      * @throws \GraphQL\Error\Error
+     *
+     * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
@@ -203,9 +204,9 @@ GRAPHQL;
     }
 
     /**
-     * @param  string|array<string>  $ability
-     * @param  string|\Illuminate\Database\Eloquent\Model  $model
-     * @param  array<int, mixed>  $arguments
+     * @param string|array<string>                       $ability
+     * @param string|\Illuminate\Database\Eloquent\Model $model
+     * @param array<int, mixed>                          $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
@@ -228,7 +229,7 @@ GRAPHQL;
                 },
                 $ability
             );
-        } elseif (! $gate->check($ability, $arguments)) {
+        } elseif (!$gate->check($ability, $arguments)) {
             throw new AuthorizationException(
                 "You are not authorized to access {$this->nodeName()}"
             );
@@ -238,7 +239,8 @@ GRAPHQL;
     /**
      * Additional arguments that are passed to @see Gate::check().
      *
-     * @param  array<string, mixed>  $args
+     * @param array<string, mixed> $args
+     *
      * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
@@ -247,11 +249,11 @@ GRAPHQL;
 
         // The injected args come before the static args
         if ($this->directiveArgValue('injectArgs')) {
-            $checkArguments [] = $args;
+            $checkArguments[] = $args;
         }
 
         if ($this->directiveHasArgument('args')) {
-            $checkArguments [] = $this->directiveArgValue('args');
+            $checkArguments[] = $this->directiveArgValue('args');
         }
 
         return $checkArguments;

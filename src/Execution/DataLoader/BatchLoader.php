@@ -41,9 +41,9 @@ abstract class BatchLoader
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
-     * @param  string  $loaderClass  The class name of the concrete BatchLoader to instantiate
-     * @param  array<int|string>  $pathToField  Path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param  array<mixed>  $constructorArgs  Those arguments are passed to the constructor of the new BatchLoader instance
+     * @param string            $loaderClass     The class name of the concrete BatchLoader to instantiate
+     * @param array<int|string> $pathToField     Path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param array<mixed>      $constructorArgs Those arguments are passed to the constructor of the new BatchLoader instance
      *
      * @throws \Exception
      */
@@ -62,7 +62,7 @@ abstract class BatchLoader
     /**
      * Generate a unique key for the instance, using the path in the query.
      *
-     * @param  array<int|string>  $path
+     * @param array<int|string> $path
      */
     public static function instanceKey(array $path): string
     {
@@ -72,7 +72,7 @@ abstract class BatchLoader
                 // Ignore numeric path entries, as those signify a list of fields.
                 // Combining the queries for those is the very purpose of the
                 // batch loader, so they must not be included.
-                return ! is_numeric($path);
+                return !is_numeric($path);
             }
         );
         $pathIgnoringLists = implode('.', $significantPathSegments);
@@ -94,14 +94,14 @@ abstract class BatchLoader
     /**
      * Schedule a result to be loaded.
      *
-     * @param  array<mixed>  $metaInfo
+     * @param array<mixed> $metaInfo
      */
     public function load(string $key, array $metaInfo = []): Deferred
     {
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
-            if (! $this->hasLoaded) {
+            if (!$this->hasLoaded) {
                 $this->results = $this->resolve();
                 $this->hasLoaded = true;
             }
@@ -113,8 +113,9 @@ abstract class BatchLoader
     /**
      * Schedule multiple results to be loaded.
      *
-     * @param  array<mixed>  $keys
-     * @param  array<mixed>  $metaInfo
+     * @param array<mixed> $keys
+     * @param array<mixed> $metaInfo
+     *
      * @return array<\GraphQL\Deferred>
      */
     public function loadMany(array $keys, array $metaInfo = []): array

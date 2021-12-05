@@ -73,8 +73,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $operator = app(Operator::class);
 
         $operatorName = Parser::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
+            $operator->enumDefinition()
+        )
             ->name
             ->value;
         $operatorDefault = $operator->default();
@@ -113,8 +113,8 @@ GRAPHQL
         $operator = app(Operator::class);
 
         $operatorName = Parser::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
+            $operator->enumDefinition()
+        )
             ->name
             ->value;
         $operatorDefault = $operator->defaultHasOperator();

@@ -36,8 +36,9 @@ abstract class Validator implements ArgumentSetValidation
     /**
      * Retrieve the value of an argument.
      *
-     * @param  string  $key  The key of the argument, may use dot notation to get nested values.
-     * @param  mixed|null  $default  Returned in case the argument is not present.
+     * @param string     $key     The key of the argument, may use dot notation to get nested values.
+     * @param mixed|null $default Returned in case the argument is not present.
+     *
      * @return mixed The value of the argument or the default.
      */
     protected function arg(string $key, $default = null)

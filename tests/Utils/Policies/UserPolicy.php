@@ -47,7 +47,7 @@ class UserPolicy
     }
 
     /**
-     * @param  array<string, string>  $injectedArgs
+     * @param array<string, string> $injectedArgs
      */
     public function injectArgs(User $viewer, array $injectedArgs): bool
     {
@@ -55,8 +55,8 @@ class UserPolicy
     }
 
     /**
-     * @param  array<string, string>  $injectedArgs
-     * @param  array<string, string>  $staticArgs
+     * @param array<string, string> $injectedArgs
+     * @param array<string, string> $staticArgs
      */
     public function argsWithInjectedArgs(User $viewer, array $injectedArgs, array $staticArgs): bool
     {

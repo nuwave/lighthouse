@@ -16,7 +16,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
     /**
      * Ensure the model uses the SoftDeletes trait.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     * @param class-string<\Illuminate\Database\Eloquent\Model> $modelClass
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
@@ -24,7 +24,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
     {
-        if (! Utils::classUsesTrait($modelClass, SoftDeletes::class)) {
+        if (!Utils::classUsesTrait($modelClass, SoftDeletes::class)) {
             throw new DefinitionException($exceptionMessage);
         }
     }

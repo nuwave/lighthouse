@@ -10,24 +10,26 @@ class SimplePaginatorField
     /**
      * Resolve simple paginator info for connection.
      *
-     * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     * @param \Illuminate\Pagination\Paginator<mixed> $root
+     *
      * @return array<string, mixed>
      */
     public function paginatorInfoResolver(Paginator $root): array
     {
         return [
-            'count' => $root->count(),
+            'count'       => $root->count(),
             'currentPage' => $root->currentPage(),
-            'firstItem' => $root->firstItem(),
-            'lastItem' => $root->lastItem(),
-            'perPage' => $root->perPage(),
+            'firstItem'   => $root->firstItem(),
+            'lastItem'    => $root->lastItem(),
+            'perPage'     => $root->perPage(),
         ];
     }
 
     /**
      * Resolve data for connection.
      *
-     * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     * @param \Illuminate\Pagination\Paginator<mixed> $root
+     *
      * @return \Illuminate\Support\Collection<mixed>
      */
     public function dataResolver(Paginator $root): Collection

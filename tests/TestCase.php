@@ -49,7 +49,7 @@ GRAPHQL;
 
         // This default is only valid for testing Lighthouse itself and thus
         // is not defined in the reusable test trait.
-        if (! isset($this->schema)) {
+        if (!isset($this->schema)) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
@@ -59,7 +59,8 @@ GRAPHQL;
     /**
      * Get package providers.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
@@ -84,7 +85,7 @@ GRAPHQL;
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      */
     protected function getEnvironmentSetUp($app): void
     {
@@ -128,7 +129,8 @@ GRAPHQL;
         ]);
 
         $config->set('app.debug', true);
-        $config->set('lighthouse.debug',
+        $config->set(
+            'lighthouse.debug',
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
@@ -138,16 +140,16 @@ GRAPHQL;
         $config->set('lighthouse.guard', null);
 
         $config->set('lighthouse.subscriptions', [
-            'version' => 1,
-            'storage' => 'array',
+            'version'     => 1,
+            'storage'     => 'array',
             'broadcaster' => 'log',
         ]);
 
         $config->set('database.redis.default', [
-            'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
-            'host' => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
+            'url'      => env('LIGHTHOUSE_TEST_REDIS_URL'),
+            'host'     => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
             'password' => env('LIGHTHOUSE_TEST_REDIS_PASSWORD'),
-            'port' => env('LIGHTHOUSE_TEST_REDIS_PORT', '6379'),
+            'port'     => env('LIGHTHOUSE_TEST_REDIS_PORT', '6379'),
             'database' => env('LIGHTHOUSE_TEST_REDIS_DB', '0'),
         ]);
 
@@ -173,7 +175,7 @@ GRAPHQL;
      * This makes debugging the tests much simpler as Exceptions
      * are fully dumped to the console when making requests.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      */
     protected function resolveApplicationExceptionHandler($app): void
     {

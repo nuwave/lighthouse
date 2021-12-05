@@ -34,7 +34,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode $objectType
      */
     protected function addNamespacesToFields(&$objectType): void
     {
@@ -47,7 +47,7 @@ GRAPHQL;
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
-            $fieldDefinition->directives [] = $namespaceDirective;
+            $fieldDefinition->directives[] = $namespaceDirective;
         }
     }
 

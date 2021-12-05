@@ -22,26 +22,26 @@ class ConnectionField
         $lastItem = $paginator->lastItem();
 
         return [
-            'hasNextPage' => $paginator->hasMorePages(),
+            'hasNextPage'     => $paginator->hasMorePages(),
             'hasPreviousPage' => $paginator->currentPage() > 1,
-            'startCursor' => $firstItem !== null
+            'startCursor'     => $firstItem !== null
                 ? Cursor::encode($firstItem)
                 : null,
             'endCursor' => $lastItem !== null
                 ? Cursor::encode($lastItem)
                 : null,
-            'total' => $paginator->total(),
-            'count' => $paginator->count(),
+            'total'       => $paginator->total(),
+            'count'       => $paginator->count(),
             'currentPage' => $paginator->currentPage(),
-            'lastPage' => $paginator->lastPage(),
+            'lastPage'    => $paginator->lastPage(),
         ];
     }
 
     /**
      * Resolve edges for connection.
      *
-     * @param  \Illuminate\Pagination\LengthAwarePaginator<mixed>  $paginator
-     * @param  array<string, mixed>  $args
+     * @param \Illuminate\Pagination\LengthAwarePaginator<mixed> $paginator
+     * @param array<string, mixed>                               $args
      */
     public function edgeResolver(LengthAwarePaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {

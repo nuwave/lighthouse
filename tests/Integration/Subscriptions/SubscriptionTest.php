@@ -128,8 +128,8 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 1,
-                    'channel' => $subscriber->channel,
+                    'version'  => 1,
+                    'channel'  => $subscriber->channel,
                     'channels' => [
                         'onPostCreated' => $subscriber->channel,
                     ],
@@ -189,7 +189,8 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>  $args
+     * @param array<string, mixed> $args
+     *
      * @return array<string, string>
      */
     public function resolve($root, array $args): array
@@ -226,8 +227,8 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 1,
-                    'channel' => $channel,
+                    'version'  => 1,
+                    'channel'  => $channel,
                     'channels' => [
                         $channelName => $channel,
                     ],

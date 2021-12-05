@@ -152,7 +152,8 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param  mixed  $value  Value to serialize.
+     * @param mixed $value Value to serialize.
+     *
      * @return mixed Storable value.
      *
      * @see \Illuminate\Cache\RedisStore::serialize
@@ -161,7 +162,7 @@ class RedisStorageManager implements StoresSubscriptions
     {
         $isProperNumber = is_numeric($value)
             && ($value !== INF && $value !== -INF)
-            && ! is_nan(floatval($value));
+            && !is_nan(floatval($value));
 
         return $isProperNumber
             ? $value
@@ -169,7 +170,8 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param  mixed  $value  Value to unserialize.
+     * @param mixed $value Value to unserialize.
+     *
      * @return mixed Unserialized value.
      */
     protected function unserialize($value)

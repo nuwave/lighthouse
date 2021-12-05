@@ -98,7 +98,7 @@ class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver(
             /**
-             * @param  array<string, mixed>  $args
+             * @param array<string, mixed> $args
              */
             static function ($root, array $args): array {
                 return $args['input']['bar'];
@@ -138,7 +138,7 @@ class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver(
             /**
-             * @param  array<string, mixed>  $args
+             * @param array<string, mixed> $args
              */
             static function ($root, array $args): array {
                 return $args;
@@ -178,8 +178,8 @@ class GlobalIdDirectiveTest extends TestCase
         ")->assertJson([
             'data' => [
                 'foo' => [
-                    'type' => 'Foo',
-                    'id' => 'bar',
+                    'type'  => 'Foo',
+                    'id'    => 'bar',
                     'array' => [
                         'Foo',
                         'bar',

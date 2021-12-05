@@ -24,7 +24,8 @@ class Entities
     }
 
     /**
-     * @param  array{representations: array<int, mixed>}  $args
+     * @param array{representations: array<int, mixed>} $args
+     *
      * @return list<mixed>
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
@@ -35,7 +36,7 @@ class Entities
             $typename = $representation['__typename'];
             $resolver = $this->entityResolverProvider->resolver($typename);
 
-            $results [] = $resolver($representation);
+            $results[] = $resolver($representation);
         }
 
         return $results;

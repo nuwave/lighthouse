@@ -180,7 +180,7 @@ class ArgPartitioner
         string $name,
         string $relationClass
     ): bool {
-        if (! $modelReflection->hasMethod($name)) {
+        if (!$modelReflection->hasMethod($name)) {
             return false;
         }
 
@@ -191,11 +191,11 @@ class ArgPartitioner
             return false;
         }
 
-        if (! $returnType instanceof ReflectionNamedType) {
+        if (!$returnType instanceof ReflectionNamedType) {
             return false;
         }
 
-        if (! class_exists($returnType->getName())) {
+        if (!class_exists($returnType->getName())) {
             throw new DefinitionException('Class '.$returnType->getName().' does not exist, did you forget to import the Eloquent relation class?');
         }
 

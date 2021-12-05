@@ -35,7 +35,7 @@ class SchemaBuilder
 
     public function schema(): Schema
     {
-        if (! isset($this->schema)) {
+        if (!isset($this->schema)) {
             return $this->schema = $this->build(
                 $this->astBuilder->documentAST()
             );
@@ -97,7 +97,7 @@ class SchemaBuilder
 
         $directives = [];
         foreach ($documentAST->directives as $directiveDefinition) {
-            $directives [] = $directiveFactory->handle($directiveDefinition);
+            $directives[] = $directiveFactory->handle($directiveDefinition);
         }
 
         $config->setDirectives(

@@ -31,7 +31,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
                 $modelClass = $this->getModelClass();
-                $model = new $modelClass;
+                $model = new $modelClass();
 
                 $executeMutation = function () use ($model, $resolveInfo): Model {
                     /** @var \Illuminate\Database\Eloquent\Model $mutated */
@@ -56,8 +56,9 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
+     * @param \Illuminate\Database\Eloquent\Model                                                                          $parent
+     * @param \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet> $args
+     *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
     public function __invoke($parent, $args)
@@ -77,7 +78,8 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
+     * @param \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet> $args
+     *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
     protected function executeMutation(Model $model, $args, ?Relation $parentRelation = null)

@@ -15,8 +15,9 @@ class Utils
      * If the class itself exists, it is simply returned as is.
      * Else, the given namespaces are tried in order.
      *
-     * @param  array<string>  $namespacesToTry
+     * @param array<string> $namespacesToTry
      * @param  callable(string $className): bool  $determineMatch
+     *
      * @return class-string|null
      */
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
@@ -41,14 +42,14 @@ class Utils
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param  class-string  $className  This class is resolved through the container.
-     * @param  string  $methodName  The method that gets passed the arguments of the closure.
+     * @param class-string $className  This class is resolved through the container.
+     * @param string       $methodName The method that gets passed the arguments of the closure.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function constructResolver(string $className, string $methodName): Closure
     {
-        if (! method_exists($className, $methodName)) {
+        if (!method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
@@ -63,9 +64,10 @@ class Utils
      *
      * Returns a default value in case of error.
      *
-     * @param  mixed  $object  Object with protected member.
-     * @param  string  $memberName  Name of object's protected member.
-     * @param  mixed|null  $default  Default value to return in case of access error.
+     * @param mixed      $object     Object with protected member.
+     * @param string     $memberName Name of object's protected member.
+     * @param mixed|null $default    Default value to return in case of access error.
+     *
      * @return mixed Value of object's protected member.
      */
     public static function accessProtected($object, string $memberName, $default = null)
@@ -84,7 +86,8 @@ class Utils
     /**
      * Apply a callback to a value or each value in an array.
      *
-     * @param  mixed|array<mixed>  $valueOrValues
+     * @param mixed|array<mixed> $valueOrValues
+     *
      * @return mixed|array<mixed>
      */
     public static function applyEach(\Closure $callback, $valueOrValues)
@@ -99,7 +102,7 @@ class Utils
     /**
      * Determine if a class uses a trait.
      *
-     * @param  object|class-string  $class
+     * @param object|class-string $class
      */
     public static function classUsesTrait($class, string $trait): bool
     {
@@ -112,7 +115,8 @@ class Utils
     /**
      * Construct a callback that checks if its input is a given class.
      *
-     * @param  class-string  $classLike
+     * @param class-string $classLike
+     *
      * @return Closure(mixed): bool
      */
     public static function instanceofMatcher(string $classLike): Closure

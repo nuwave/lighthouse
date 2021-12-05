@@ -12,7 +12,7 @@ class UpsertModel implements ArgResolver
     protected $previous;
 
     /**
-     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
+     * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous
      */
     public function __construct(callable $previous)
     {
@@ -20,8 +20,8 @@ class UpsertModel implements ArgResolver
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param \Illuminate\Database\Eloquent\Model                $model
+     * @param \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $args
      */
     public function __invoke($model, $args)
     {

@@ -28,7 +28,7 @@ GRAPHQL;
 
     public function handleBuilder($builder, $value): object
     {
-        if (! $builder instanceof EloquentBuilder) {
+        if (!$builder instanceof EloquentBuilder) {
             throw new Exception('Can not get model from builder of class: '.get_class($builder));
         }
         $model = $builder->getModel();

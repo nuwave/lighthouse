@@ -32,8 +32,9 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array<string, mixed>  $whereConditions
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param array<string, mixed>                                                     $whereConditions
+     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleWhereConditions(
@@ -91,7 +92,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     }
 
     /**
-     * @param  array<string, mixed>|null  $condition
+     * @param array<string, mixed>|null $condition
      */
     public function handleHasCondition(
         Model $model,
@@ -181,7 +182,8 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
      * This is important for queries which can otherwise be ambiguous, for
      * example when multiple tables with a column "id" are involved.
      *
-     * @param  array<string, mixed>  $condition
+     * @param array<string, mixed> $condition
+     *
      * @return array<string, mixed>
      */
     protected function prefixConditionWithTableName(array $condition, Model $model): array

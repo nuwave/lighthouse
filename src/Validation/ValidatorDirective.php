@@ -80,7 +80,7 @@ GRAPHQL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
+        if (!$typeDefinition instanceof InputObjectTypeDefinitionNode) {
             throw new DefinitionException(
                 "Can not use @validator on non input type {$typeDefinition->name->value}."
             );

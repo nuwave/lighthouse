@@ -109,8 +109,9 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array<string>  $scopes
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param array<string>                                                            $scopes
+     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
@@ -136,7 +137,7 @@ class ArgumentSet
      * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
@@ -181,7 +182,7 @@ class ArgumentSet
      * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
      */
     protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder): void
     {
@@ -197,7 +198,7 @@ class ArgumentSet
      *
      * Works just like @see \Illuminate\Support\Arr::add().
      *
-     * @param  mixed  $value  Any value to inject.
+     * @param mixed $value Any value to inject.
      */
     public function addValue(string $path, $value): self
     {
@@ -210,7 +211,7 @@ class ArgumentSet
             // If the key doesn't exist at this depth, we will just create an empty ArgumentSet
             // to hold the next value, allowing us to create the ArgumentSet to hold a final
             // value at the correct depth. Then we'll keep digging into the ArgumentSet.
-            if (! isset($argumentSet->arguments[$key])) {
+            if (!isset($argumentSet->arguments[$key])) {
                 $argument = new Argument();
                 $argument->value = new self();
                 $argumentSet->arguments[$key] = $argument;

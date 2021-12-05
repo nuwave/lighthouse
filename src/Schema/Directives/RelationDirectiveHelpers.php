@@ -45,7 +45,8 @@ trait RelationDirectiveHelpers
     }
 
     /**
-     * @param  array<string, mixed>  $args
+     * @param array<string, mixed> $args
+     *
      * @return array<int, int|string>
      */
     protected function qualifyPath(array $args, ResolveInfo $resolveInfo): array
@@ -59,7 +60,7 @@ trait RelationDirectiveHelpers
         }
 
         // Each relation must be loaded separately
-        $path [] = $this->relation();
+        $path[] = $this->relation();
 
         // Scopes influence the result of the query
         return array_merge($path, $this->scopes());

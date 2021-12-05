@@ -95,7 +95,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param  string  $name
+     * @param string $name
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -112,7 +112,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $forField = $this->option('field');
         $forArgument = $this->option('argument');
 
-        if (! $forType && ! $forField && ! $forArgument) {
+        if (!$forType && !$forField && !$forArgument) {
             throw new \Exception('Must specify at least one of: --type, --field, --argument');
         }
 
@@ -186,7 +186,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<class-string>  $availableInterfaces
+     * @param array<class-string> $availableInterfaces
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
@@ -205,7 +205,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param  array<int, string>  $availableLocations
+     * @param array<int, string> $availableLocations
      */
     public function askForLocations(array $availableLocations): void
     {
@@ -224,7 +224,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param  class-string  $interface
+     * @param class-string $interface
      */
     protected function shortName(string $interface): string
     {
@@ -232,7 +232,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param  class-string  $interface
+     * @param class-string $interface
      */
     protected function implementInterface(string $interface): void
     {
@@ -276,7 +276,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getFileIfExists(string $path): ?string
     {
-        if (! $this->files->exists($path)) {
+        if (!$this->files->exists($path)) {
             return null;
         }
 

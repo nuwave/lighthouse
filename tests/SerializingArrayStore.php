@@ -20,12 +20,13 @@ class SerializingArrayStore extends ArrayStore
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed The value or null
      */
     public function get($key)
     {
-        if (! isset($this->storage[$key])) {
+        if (!isset($this->storage[$key])) {
             return null;
         }
 
@@ -45,14 +46,14 @@ class SerializingArrayStore extends ArrayStore
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed  $value  Some storable value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value   Some storable value
+     * @param int    $seconds
      */
     public function put($key, $value, $seconds): bool
     {
         $this->storage[$key] = [
-            'value' => serialize($value),
+            'value'     => serialize($value),
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
 
@@ -62,7 +63,7 @@ class SerializingArrayStore extends ArrayStore
     /**
      * Get the expiration time of the key.
      *
-     * @param  int  $seconds
+     * @param int $seconds
      */
     protected function calculateExpiration($seconds): int
     {
@@ -72,7 +73,7 @@ class SerializingArrayStore extends ArrayStore
     /**
      * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $seconds
+     * @param int $seconds
      */
     protected function toTimestamp($seconds): int
     {

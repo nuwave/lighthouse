@@ -105,9 +105,9 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @return object The resolved driver.
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return object The resolved driver.
      */
     protected function resolve(string $name)
     {
@@ -129,7 +129,8 @@ abstract class DriverManager
     /**
      * Call a custom driver creator.
      *
-     * @param  array<string, mixed>  $config
+     * @param array<string, mixed> $config
+     *
      * @return object The created driver.
      */
     protected function callCustomCreator(array $config)
@@ -140,16 +141,17 @@ abstract class DriverManager
     /**
      * Validate driver implements the proper interface.
      *
-     * @param  object  $driver
-     * @return object
+     * @param object $driver
      *
      * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
+     *
+     * @return object
      */
     protected function validateDriver($driver)
     {
         $interface = $this->interface();
 
-        if (! (new ReflectionClass($driver))->implementsInterface($interface)) {
+        if (!(new ReflectionClass($driver))->implementsInterface($interface)) {
             throw new InvalidDriverException(get_class($driver)." does not implement {$interface}");
         }
 
@@ -159,7 +161,8 @@ abstract class DriverManager
     /**
      * Dynamically call the default driver instance.
      *
-     * @param  array<mixed>  $parameters
+     * @param array<mixed> $parameters
+     *
      * @return mixed Whatever the driver returned.
      */
     public function __call(string $method, array $parameters)

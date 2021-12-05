@@ -36,7 +36,7 @@ class EventDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createCompany' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                 ],
             ],

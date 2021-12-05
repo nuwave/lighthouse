@@ -27,7 +27,7 @@ class Subscription
         /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
 
-        if (! $registry->has($subscriptionField)) {
+        if (!$registry->has($subscriptionField)) {
             throw new InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
 

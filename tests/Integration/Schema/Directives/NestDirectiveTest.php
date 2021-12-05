@@ -53,7 +53,7 @@ class NestDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'createUser' => [
-                    'name' => 'foo',
+                    'name'  => 'foo',
                     'tasks' => [
                         [
                             'name' => 'Uniq',

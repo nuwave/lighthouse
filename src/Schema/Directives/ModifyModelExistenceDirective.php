@@ -63,7 +63,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 }
 
                 $modifyModelExistence = function (Model $model): void {
-                    if (! $this->modifyExistence($model)) {
+                    if (!$this->modifyExistence($model)) {
                         $this->errorPool->record(
                             new Error(
                                 self::couldNotModify($model)
@@ -116,7 +116,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
             );
         }
 
-        if (! $this->idArgument() instanceof NonNullTypeNode) {
+        if (!$this->idArgument() instanceof NonNullTypeNode) {
             throw new DefinitionException(
                 'The @'.$this->name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
             );
@@ -124,7 +124,8 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     }
 
     /**
-     * @param  string|array<string>  $idOrIds
+     * @param string|array<string> $idOrIds
+     *
      * @return string|array<string>
      */
     protected function decodeIdOrIds($idOrIds)
@@ -147,8 +148,9 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     /**
      * Find one or more models by id.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @param  string|int|array<string>|array<int>  $idOrIds
+     * @param class-string<\Illuminate\Database\Eloquent\Model> $modelClass
+     * @param string|int|array<string>|array<int>               $idOrIds
+     *
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
      */
     abstract protected function find(string $modelClass, $idOrIds);

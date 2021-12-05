@@ -18,7 +18,7 @@ trait UsesTestSchema
         app()->bind(
             SchemaSourceProvider::class,
             function (): TestSchemaProvider {
-                if (! isset($this->schema)) {
+                if (!isset($this->schema)) {
                     throw new \Exception('Missing test schema, provide one by setting $this->schema.');
                 }
 

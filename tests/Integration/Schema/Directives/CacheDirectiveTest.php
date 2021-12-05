@@ -27,7 +27,7 @@ class CacheDirectiveTest extends DBTestCase
     public function testStoreResolverResultInCache(): void
     {
         $this->mockResolver([
-            'id' => 1,
+            'id'   => 1,
             'name' => 'foobar',
         ]);
 
@@ -62,8 +62,8 @@ class CacheDirectiveTest extends DBTestCase
     public function testPlaceCacheKeyOnAnyField(): void
     {
         $this->mockResolver([
-            'id' => 1,
-            'name' => 'foobar',
+            'id'    => 1,
+            'name'  => 'foobar',
             'email' => 'foo@bar.com',
         ]);
 
@@ -103,7 +103,7 @@ class CacheDirectiveTest extends DBTestCase
         $cacheKey = "auth:{$user->getKey()}:user:1:name";
 
         $this->mockResolver([
-            'id' => 1,
+            'id'   => 1,
             'name' => 'foobar',
         ]);
 
@@ -138,7 +138,7 @@ class CacheDirectiveTest extends DBTestCase
     public function testStoreResolverResultInCacheWhenUsingNodeDirective(): void
     {
         $this->mockResolver([
-            'id' => 1,
+            'id'   => 1,
             'name' => 'foobar',
         ]);
 
@@ -177,7 +177,7 @@ class CacheDirectiveTest extends DBTestCase
     public function testFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
     {
         $this->mockResolver([
-            'id' => 1,
+            'id'   => 1,
             'name' => 'foobar',
         ]);
 
@@ -371,9 +371,9 @@ class CacheDirectiveTest extends DBTestCase
     public function testUseFalsyResultsInCache(): void
     {
         $this->mockResolver([
-            'id' => 1,
+            'id'            => 1,
             'field_boolean' => true,
-            'field_string' => 'value',
+            'field_string'  => 'value',
             'field_integer' => 1,
         ]);
 
@@ -394,7 +394,7 @@ class CacheDirectiveTest extends DBTestCase
         // @see https://laravel.com/docs/5.8/upgrade#psr-16-conformity
         $this->cache->setMultiple([
             'user:1:field_boolean' => false,
-            'user:1:field_string' => '',
+            'user:1:field_string'  => '',
             'user:1:field_integer' => 0,
         ], 1);
 
@@ -410,7 +410,7 @@ class CacheDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'field_boolean' => false,
-                    'field_string' => '',
+                    'field_string'  => '',
                     'field_integer' => 0,
                 ],
             ],

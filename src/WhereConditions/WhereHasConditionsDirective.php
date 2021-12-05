@@ -43,7 +43,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>|null  $value  The client given conditions
+     * @param array<string, mixed>|null $value The client given conditions
      */
     public function handleBuilder($builder, $value): object
     {
@@ -51,7 +51,7 @@ GRAPHQL;
             return $builder;
         }
 
-        if (! $builder instanceof EloquentBuilder) {
+        if (!$builder instanceof EloquentBuilder) {
             throw new Exception('Can not get model from builder of class: '.get_class($builder));
         }
         $model = $builder->getModel();
@@ -60,9 +60,9 @@ GRAPHQL;
             $builder,
             [
                 'HAS' => [
-                    'relation' => $this->getRelationName(),
-                    'amount' => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
-                    'operator' => '>=',
+                    'relation'  => $this->getRelationName(),
+                    'amount'    => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
+                    'operator'  => '>=',
                     'condition' => $value,
                 ],
             ],

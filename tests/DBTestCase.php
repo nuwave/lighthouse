@@ -21,9 +21,9 @@ abstract class DBTestCase extends TestCase
     {
         parent::setUp();
 
-        if (! static::$migrated) {
+        if (!static::$migrated) {
             $this->artisan('migrate:fresh', [
-                '--path' => __DIR__.'/database/migrations',
+                '--path'     => __DIR__.'/database/migrations',
                 '--realpath' => true,
             ]);
 
@@ -59,12 +59,12 @@ abstract class DBTestCase extends TestCase
     protected function mysqlOptions(): array
     {
         return [
-            'driver' => 'mysql',
-            'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
-            'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
-            'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
-            'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
-            'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
+            'driver'      => 'mysql',
+            'database'    => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
+            'username'    => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
+            'password'    => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
+            'host'        => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
+            'port'        => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
             'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
         ];
     }

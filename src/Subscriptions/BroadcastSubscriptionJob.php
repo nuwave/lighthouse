@@ -10,7 +10,8 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class BroadcastSubscriptionJob implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * The subscription field that was requested.

@@ -94,6 +94,7 @@ class Defer implements CreatesResponse
      * Register deferred field.
      *
      * @param  \Closure(): mixed  $resolver
+     *
      * @return mixed The data if it is already available.
      */
     public function defer(Closure $resolver, string $path)
@@ -109,7 +110,7 @@ class Defer implements CreatesResponse
             return $this->resolve($deferredResolver, $path);
         }
 
-        if (! $this->shouldDeferFurther) {
+        if (!$this->shouldDeferFurther) {
             return $this->resolve($resolver, $path);
         }
 
@@ -128,18 +129,20 @@ class Defer implements CreatesResponse
 
     /**
      * @param  \Closure(): mixed  $resolver
+     *
      * @return mixed The loaded data
      */
     protected function resolve(Closure $resolver, string $path)
     {
         unset($this->deferred[$path]);
-        $this->resolved [] = $path;
+        $this->resolved[] = $path;
 
         return $resolver();
     }
 
     /**
      * @param  \Closure(): mixed  $originalResolver
+     *
      * @return mixed The loaded data
      */
     public function findOrResolve(Closure $originalResolver, string $path)
@@ -159,12 +162,13 @@ class Defer implements CreatesResponse
     /**
      * Return either a final response or a stream of responses.
      *
-     * @param  array<string, mixed>  $result
+     * @param array<string, mixed> $result
+     *
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function createResponse(array $result): Response
     {
-        if (! $this->hasRemainingDeferred()) {
+        if (!$this->hasRemainingDeferred()) {
             return response($result);
         }
 
@@ -178,8 +182,8 @@ class Defer implements CreatesResponse
                 $nested = 1;
                 while (
                     $this->hasRemainingDeferred()
-                    && ! $this->maxExecutionTimeReached()
-                    && ! $this->maxNestedFieldsResolved($nested)
+                    && !$this->maxExecutionTimeReached()
+                    && !$this->maxNestedFieldsResolved($nested)
                 ) {
                     $nested++;
                     $this->executeDeferred();
@@ -197,7 +201,7 @@ class Defer implements CreatesResponse
             200,
             [
                 'X-Accel-Buffering' => 'no',
-                'Content-Type' => 'multipart/mixed; boundary="-"',
+                'Content-Type'      => 'multipart/mixed; boundary="-"',
             ]
         );
     }
@@ -212,7 +216,7 @@ class Defer implements CreatesResponse
         $this->stream->stream(
             $this->result,
             $this->resolved,
-            ! $this->hasRemainingDeferred()
+            !$this->hasRemainingDeferred()
         );
     }
 

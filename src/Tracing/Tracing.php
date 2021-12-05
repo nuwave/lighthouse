@@ -78,10 +78,10 @@ class Tracing
         return new ExtensionsResponse(
             'tracing',
             [
-                'version' => 1,
+                'version'   => 1,
                 'startTime' => $this->requestStart->format(Carbon::RFC3339_EXTENDED),
-                'endTime' => $requestEnd->format(Carbon::RFC3339_EXTENDED),
-                'duration' => $this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise),
+                'endTime'   => $requestEnd->format(Carbon::RFC3339_EXTENDED),
+                'duration'  => $this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise),
                 'execution' => [
                     'resolvers' => $this->resolverTraces,
                 ],
@@ -92,18 +92,18 @@ class Tracing
     /**
      * Record resolver execution time.
      *
-     * @param  float|int  $start
-     * @param  float|int  $end
+     * @param float|int $start
+     * @param float|int $end
      */
     public function record(ResolveInfo $resolveInfo, $start, $end): void
     {
-        $this->resolverTraces [] = [
-            'path' => $resolveInfo->path,
-            'parentType' => $resolveInfo->parentType->name,
-            'returnType' => $resolveInfo->returnType->__toString(),
-            'fieldName' => $resolveInfo->fieldName,
+        $this->resolverTraces[] = [
+            'path'        => $resolveInfo->path,
+            'parentType'  => $resolveInfo->parentType->name,
+            'returnType'  => $resolveInfo->returnType->__toString(),
+            'fieldName'   => $resolveInfo->fieldName,
             'startOffset' => $this->diffTimeInNanoseconds($this->requestStartPrecise, $start),
-            'duration' => $this->diffTimeInNanoseconds($start, $end),
+            'duration'    => $this->diffTimeInNanoseconds($start, $end),
         ];
     }
 
@@ -124,8 +124,8 @@ class Tracing
     /**
      * Diff the time results to each other and convert to nanoseconds if needed.
      *
-     * @param  float|int  $start
-     * @param  float|int  $end
+     * @param float|int $start
+     * @param float|int $end
      */
     protected function diffTimeInNanoseconds($start, $end): int
     {

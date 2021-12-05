@@ -104,8 +104,8 @@ class MorphManyTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [
                         [
                             'url' => 'foo',
@@ -139,8 +139,8 @@ class MorphManyTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [
                         [
                             'url' => 'foo',
@@ -167,7 +167,7 @@ class MorphManyTest extends DBTestCase
             }
         ', [
             'input' => [
-                'name' => 'foo',
+                'name'   => 'foo',
                 'images' => [
                     'connect' => [
                         $image1->id,
@@ -177,7 +177,7 @@ class MorphManyTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'createTask' => [
-                    'name' => 'foo',
+                    'name'   => 'foo',
                     'images' => [
                         [
                             'url' => $image1->url,
@@ -212,11 +212,11 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [
                         [
-                            'id' => 1,
+                            'id'  => 1,
                             'url' => 'foo',
                         ],
                     ],
@@ -250,7 +250,7 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'updateTask' => [
-                    'name' => 'foo',
+                    'name'   => 'foo',
                     'images' => [],
                 ],
             ],
@@ -296,8 +296,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [
                         [
                             'url' => 'foo',
@@ -342,8 +342,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [
                         [
                             'url' => 'foo',
@@ -388,8 +388,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [
                         [
                             'url' => 'foo',
@@ -431,8 +431,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [],
                 ],
             ],
@@ -461,8 +461,8 @@ GRAPHQL
             }
         ", [
             'input' => [
-                'id' => $task->id,
-                'name' => 'foo',
+                'id'     => $task->id,
+                'name'   => 'foo',
                 'images' => [
                     'connect' => [
                         $image->id,
@@ -472,8 +472,8 @@ GRAPHQL
         ])->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [
                         [
                             'url' => $image->url,
@@ -510,8 +510,8 @@ GRAPHQL
             }
         ", [
             'input' => [
-                'id' => $task->id,
-                'name' => 'foo',
+                'id'     => $task->id,
+                'name'   => 'foo',
                 'images' => [
                     'disconnect' => [
                         $image->id,
@@ -521,8 +521,8 @@ GRAPHQL
         ])->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
+                    'id'     => '1',
+                    'name'   => 'foo',
                     'images' => [],
                 ],
             ],

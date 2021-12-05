@@ -68,7 +68,7 @@ class DirectiveLocator
                     config('lighthouse.namespaces.directives'),
 
                     // Plugin developers defined directives
-                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces),
+                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
 
                     // Lighthouse defined directives
                     'Nuwave\\Lighthouse\\Schema\\Directives',
@@ -96,11 +96,11 @@ class DirectiveLocator
 
             foreach ($classesInNamespace as $class) {
                 $reflection = new \ReflectionClass($class);
-                if (! $reflection->isInstantiable()) {
+                if (!$reflection->isInstantiable()) {
                     continue;
                 }
 
-                if (! is_a($class, Directive::class, true)) {
+                if (!is_a($class, Directive::class, true)) {
                     continue;
                 }
                 $name = self::directiveName($class);
@@ -127,7 +127,7 @@ class DirectiveLocator
         $definitions = [];
 
         foreach ($this->classes() as $directiveClass) {
-            $definitions [] = ASTHelper::extractDirectiveDefinition($directiveClass::definition());
+            $definitions[] = ASTHelper::extractDirectiveDefinition($directiveClass::definition());
         }
 
         return $definitions;
@@ -146,9 +146,9 @@ class DirectiveLocator
     /**
      * Resolve the class for a given directive name.
      *
-     * @return class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     *
+     * @return class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function resolve(string $directiveName): string
     {
@@ -161,7 +161,7 @@ class DirectiveLocator
             $directiveClass = $baseNamespace.'\\'.static::className($directiveName);
 
             if (class_exists($directiveClass)) {
-                if (! is_a($directiveClass, Directive::class, true)) {
+                if (!is_a($directiveClass, Directive::class, true)) {
                     throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
                 }
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
@@ -194,7 +194,7 @@ class DirectiveLocator
     }
 
     /**
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
+     * @param class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
      */
     public function setResolved(string $directiveName, string $directiveClass): self
     {
@@ -210,7 +210,7 @@ class DirectiveLocator
      */
     public function associated(Node $node): Collection
     {
-        if (! property_exists($node, 'directives')) {
+        if (!property_exists($node, 'directives')) {
             throw new Exception('Expected Node class with property `directives`, got: '.get_class($node));
         }
 
@@ -232,7 +232,8 @@ class DirectiveLocator
      *
      * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
      *
-     * @param  class-string<TDirective>  $directiveClass
+     * @param class-string<TDirective> $directiveClass
+     *
      * @return \Illuminate\Support\Collection<TDirective>
      */
     public function associatedOfType(Node $node, string $directiveClass): Collection
@@ -257,10 +258,11 @@ class DirectiveLocator
      *
      * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
      *
-     * @param  class-string<TDirective>  $directiveClass
-     * @return TDirective|null
+     * @param class-string<TDirective> $directiveClass
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     *
+     * @return TDirective|null
      */
     public function exclusiveOfType(Node $node, string $directiveClass): ?Directive
     {
@@ -277,7 +279,7 @@ class DirectiveLocator
                 })
                 ->implode(', ');
 
-            if (! property_exists($node, 'name')) {
+            if (!property_exists($node, 'name')) {
                 throw new Exception('Expected Node class with property `name`, got: '.get_class($node));
             }
 

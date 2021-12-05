@@ -101,7 +101,7 @@ class SubscriptionRegistry
      */
     public function subscription(string $key): GraphQLSubscription
     {
-        if (! isset($this->subscriptions[$key])) {
+        if (!isset($this->subscriptions[$key])) {
             /**
              * Loading the field has the side effect of triggering a call to.
              *
@@ -153,7 +153,7 @@ class SubscriptionRegistry
                     return $this->subscription($subscriptionField);
                 }
 
-                return new NotFoundSubscription;
+                return new NotFoundSubscription();
             });
     }
 
@@ -181,8 +181,8 @@ class SubscriptionRegistry
         switch ((int) $version) {
             case 1:
                 $content = [
-                    'version' => 1,
-                    'channel' => $channel,
+                    'version'  => 1,
+                    'channel'  => $channel,
                     'channels' => $this->subscribers,
                 ];
                 break;

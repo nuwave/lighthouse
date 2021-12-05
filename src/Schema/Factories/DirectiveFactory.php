@@ -31,9 +31,9 @@ class DirectiveFactory
             $argumentType = $this->typeNodeConverter->convert($argument->type);
 
             $fieldArgumentConfig = [
-                'name' => $argument->name->value,
+                'name'        => $argument->name->value,
                 'description' => $argument->description->value ?? null,
-                'type' => $argumentType,
+                'type'        => $argumentType,
             ];
 
             if ($defaultValue = $argument->defaultValue) {
@@ -42,7 +42,7 @@ class DirectiveFactory
                 ];
             }
 
-            $arguments [] = new FieldArgument($fieldArgumentConfig);
+            $arguments[] = new FieldArgument($fieldArgumentConfig);
         }
 
         $locations = [];
@@ -52,12 +52,12 @@ class DirectiveFactory
         }
 
         return new Directive([
-            'name' => $directive->name->value,
-            'description' => $directive->description->value ?? null,
-            'locations' => $locations,
-            'args' => $arguments,
+            'name'         => $directive->name->value,
+            'description'  => $directive->description->value ?? null,
+            'locations'    => $locations,
+            'args'         => $arguments,
             'isRepeatable' => $directive->repeatable,
-            'astNode' => $directive,
+            'astNode'      => $directive,
         ]);
     }
 }

@@ -41,7 +41,7 @@ class ArgumentSetFactory
     /**
      * Wrap client-given args with type information.
      *
-     * @param  array<mixed>  $args
+     * @param array<mixed> $args
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
@@ -58,8 +58,8 @@ class ArgumentSetFactory
     /**
      * Wrap client-given args with type information.
      *
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
-     * @param  array<mixed>  $args
+     * @param \GraphQL\Language\AST\FieldDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode $definition
+     * @param array<mixed>                                                                                  $args
      */
     public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
@@ -90,7 +90,8 @@ class ArgumentSetFactory
     /**
      * Make a map with the name as keys.
      *
-     * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $argumentDefinitions
+     * @param iterable<\GraphQL\Language\AST\InputValueDefinitionNode> $argumentDefinitions
+     *
      * @return array<string, \GraphQL\Language\AST\InputValueDefinitionNode>
      */
     protected function makeDefinitionMap($argumentDefinitions): array
@@ -107,7 +108,7 @@ class ArgumentSetFactory
     /**
      * Wrap a single client-given argument with type information.
      *
-     * @param  mixed  $value  The client given value.
+     * @param mixed $value The client given value.
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
     {
@@ -124,8 +125,9 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a type.
      *
-     * @param  mixed|array<mixed>  $valueOrValues
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
+     * @param mixed|array<mixed>                                                                               $valueOrValues
+     * @param \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType $type
+     *
      * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     protected function wrapWithType($valueOrValues, $type)
@@ -142,7 +144,7 @@ class ArgumentSetFactory
 
             $values = [];
             foreach ($valueOrValues as $singleValue) {
-                $values [] = $this->wrapWithType($singleValue, $typeInList);
+                $values[] = $this->wrapWithType($singleValue, $typeInList);
             }
 
             return $values;
@@ -154,7 +156,8 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value  The client given value.
+     * @param mixed $value The client given value.
+     *
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */
     protected function wrapWithNamedType($value, NamedType $namedType)

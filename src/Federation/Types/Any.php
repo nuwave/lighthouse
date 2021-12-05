@@ -32,12 +32,12 @@ DESCRIPTION;
     {
         // We do as much validation as possible here, before entering resolvers
 
-        if (! is_array($value)) {
+        if (!is_array($value)) {
             throw new Error(self::MESSAGE.\Safe\json_encode($value));
         }
 
         $typename = $value['__typename'] ?? null;
-        if (! is_string($typename)) {
+        if (!is_string($typename)) {
             throw new Error(self::MESSAGE.\Safe\json_encode($value));
         }
 

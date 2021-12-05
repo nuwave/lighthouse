@@ -233,9 +233,9 @@ class HasManyDirectiveTest extends DBTestCase
                     'user' => [
                         'tasks' => [
                             'paginatorInfo' => [
-                                'count' => 2,
+                                'count'        => 2,
                                 'hasMorePages' => true,
-                                'total' => 3,
+                                'total'        => 3,
                             ],
                         ],
                         'posts' => [
@@ -286,9 +286,9 @@ class HasManyDirectiveTest extends DBTestCase
                 'user' => [
                     'tasks' => [
                         'paginatorInfo' => [
-                            'count' => 2,
+                            'count'        => 2,
                             'hasMorePages' => true,
-                            'total' => 3,
+                            'total'        => 3,
                         ],
                     ],
                 ],
@@ -557,9 +557,9 @@ class HasManyDirectiveTest extends DBTestCase
                 'user' => [
                     'tasks' => [
                         'paginatorInfo' => [
-                            'count' => 2,
+                            'count'        => 2,
                             'hasMorePages' => true,
-                            'total' => 3,
+                            'total'        => 3,
                         ],
                     ],
                 ],
@@ -717,12 +717,12 @@ class HasManyDirectiveTest extends DBTestCase
         ]);
 
         $post2 = factory(Post::class)->create([
-            'id' => 2,
+            'id'        => 2,
             'parent_id' => $post1->getKey(),
         ]);
 
         factory(Post::class)->create([
-            'id' => 3,
+            'id'        => 3,
             'parent_id' => $post2->getKey(),
         ]);
 
@@ -753,20 +753,20 @@ class HasManyDirectiveTest extends DBTestCase
             'data' => [
                 'posts' => [
                     [
-                        'id' => 1,
+                        'id'     => 1,
                         'parent' => null,
                     ],
                     [
-                        'id' => 2,
+                        'id'     => 2,
                         'parent' => [
-                            'id' => 1,
+                            'id'     => 1,
                             'parent' => null,
                         ],
                     ],
                     [
-                        'id' => 3,
+                        'id'     => 3,
                         'parent' => [
-                            'id' => 2,
+                            'id'     => 2,
                             'parent' => [
                                 'id' => 1,
                             ],

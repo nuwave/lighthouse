@@ -59,13 +59,13 @@ class FederationPrinter
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
             static function (FieldDefinition $field): bool {
-                return ! in_array($field->name, static::FEDERATION_FIELDS);
+                return !in_array($field->name, static::FEDERATION_FIELDS);
             }
         );
         $newQueryType = count($queryFieldsWithoutFederation) > 0
             ? new ObjectType([
-                'name' => RootType::QUERY,
-                'fields' => $queryFieldsWithoutFederation,
+                'name'       => RootType::QUERY,
+                'fields'     => $queryFieldsWithoutFederation,
                 'interfaces' => $originalQueryType->getInterfaces(),
             ])
             : null;
@@ -80,7 +80,7 @@ class FederationPrinter
         $config->setDirectives(array_filter(
             $schema->getDirectives(),
             static function (Directive $directive): bool {
-                return ! in_array($directive->name, static::FEDERATION_DIRECTIVES);
+                return !in_array($directive->name, static::FEDERATION_DIRECTIVES);
             }
         ));
 

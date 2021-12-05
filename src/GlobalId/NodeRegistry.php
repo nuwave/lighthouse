@@ -41,11 +41,11 @@ class NodeRegistry
     }
 
     /**
-     * @param  string  $typeName  The name of the ObjectType that can be resolved with the Node interface
+     * @param string $typeName The name of the ObjectType that can be resolved with the Node interface
      *
      * @example "User"
      *
-     * @param  \Closure  $resolve  A function that returns the actual value by ID
+     * @param \Closure $resolve A function that returns the actual value by ID
      *
      * @example fn($id, GraphQLContext $context, ResolveInfo $resolveInfo) => $this->db->getUserById($id)
      */
@@ -59,10 +59,11 @@ class NodeRegistry
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param  array<string, mixed>  $args
-     * @return mixed The result of calling the resolver.
+     * @param array<string, mixed> $args
      *
      * @throws \GraphQL\Error\Error
+     *
+     * @return mixed The result of calling the resolver.
      */
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
@@ -72,12 +73,12 @@ class NodeRegistry
         // happened if the client only references it indirectly through an interface.
         // Loading the type in turn causes the TypeMiddleware to run and thus register
         // the type in the NodeRegistry.
-        if (! $this->typeRegistry->has($decodedType)) {
+        if (!$this->typeRegistry->has($decodedType)) {
             throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
         }
 
         // Check if we have a resolver registered for the given type
-        if (! $resolver = Arr::get($this->nodeResolver, $decodedType)) {
+        if (!$resolver = Arr::get($this->nodeResolver, $decodedType)) {
             throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
         }
 

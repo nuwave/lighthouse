@@ -50,8 +50,8 @@ class CacheValue
     protected $fieldKey;
 
     /**
-     * @param  mixed|null  $root  The root that was passed to the query.
-     * @param  array<string, mixed>  $args
+     * @param mixed|null           $root The root that was passed to the query.
+     * @param array<string, mixed> $args
      */
     public function __construct(
         $root,
@@ -80,17 +80,17 @@ class CacheValue
 
         $user = $this->context->user();
         if ($this->isPrivate && $user !== null) {
-            $parts [] = 'auth';
-            $parts [] = $user->getAuthIdentifier();
+            $parts[] = 'auth';
+            $parts[] = $user->getAuthIdentifier();
         }
 
-        $parts [] = strtolower($this->resolveInfo->parentType->name);
-        $parts [] = $this->fieldKey;
-        $parts [] = strtolower($this->resolveInfo->fieldName);
+        $parts[] = strtolower($this->resolveInfo->parentType->name);
+        $parts[] = $this->fieldKey;
+        $parts[] = strtolower($this->resolveInfo->fieldName);
 
         $argKeys = $this->argKeys();
         if ($argKeys->isNotEmpty()) {
-            $parts [] = $argKeys->implode(':');
+            $parts[] = $argKeys->implode(':');
         }
 
         return $this->implode($parts);
@@ -158,7 +158,7 @@ class CacheValue
     }
 
     /**
-     * @param  array<mixed|null>  $items
+     * @param array<mixed|null> $items
      */
     protected function implode(array $items): string
     {

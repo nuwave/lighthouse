@@ -18,7 +18,7 @@ trait HasArgumentValue
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argument
+     * @param \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $argument
      */
     public function setArgumentValue($argument): self
     {

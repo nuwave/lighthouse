@@ -79,7 +79,8 @@ class BuilderDirectiveTest extends DBTestCase
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function limit(object $builder, int $value = 2): object

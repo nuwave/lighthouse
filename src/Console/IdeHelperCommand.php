@@ -77,7 +77,8 @@ GRAPHQL;
     /**
      * Scan the given namespaces for directive classes.
      *
-     * @param  array<string>  $directiveNamespaces
+     * @param array<string> $directiveNamespaces
+     *
      * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected function scanForDirectives(array $directiveNamespaces): array
@@ -90,11 +91,11 @@ GRAPHQL;
 
             foreach ($classesInNamespace as $class) {
                 $reflection = new \ReflectionClass($class);
-                if (! $reflection->isInstantiable()) {
+                if (!$reflection->isInstantiable()) {
                     continue;
                 }
 
-                if (! is_a($class, Directive::class, true)) {
+                if (!is_a($class, Directive::class, true)) {
                     continue;
                 }
                 $name = DirectiveLocator::directiveName($class);
@@ -112,7 +113,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
+     * @param class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

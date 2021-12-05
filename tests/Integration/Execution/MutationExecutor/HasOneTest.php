@@ -101,10 +101,10 @@ class HasOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'post' => [
-                        'id' => '1',
+                        'id'    => '1',
                         'title' => 'bar',
                     ],
                 ],
@@ -136,10 +136,10 @@ class HasOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'post' => [
-                        'id' => '1',
+                        'id'    => '1',
                         'title' => 'bar',
                     ],
                 ],
@@ -172,10 +172,10 @@ class HasOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '2',
+                    'id'   => '2',
                     'name' => 'foo',
                     'post' => [
-                        'id' => '3',
+                        'id'    => '3',
                         'title' => 'bar',
                     ],
                 ],
@@ -206,10 +206,10 @@ class HasOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'post' => [
-                        'id' => '1',
+                        'id'    => '1',
                         'title' => 'bar',
                     ],
                 ],
@@ -288,18 +288,18 @@ GRAPHQL
             }
         }
 GRAPHQL
-            )->assertJson([
-                'data' => [
-                    "${action}Task" => [
-                        'id' => '1',
-                        'name' => 'foo',
-                        'post' => [
-                            'id' => '1',
-                            'title' => 'bar',
-                        ],
+        )->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id'   => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id'    => '1',
+                        'title' => 'bar',
                     ],
                 ],
-            ]);
+            ],
+        ]);
     }
 
     /**
@@ -338,10 +338,10 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'post' => [
-                        'id' => '1',
+                        'id'    => '1',
                         'title' => 'bar',
                     ],
                 ],
@@ -385,10 +385,10 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'post' => [
-                        'id' => '1',
+                        'id'    => '1',
                         'title' => 'bar',
                     ],
                 ],
@@ -430,7 +430,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id' => '1',
+                    'id'   => '1',
                     'name' => 'foo',
                     'post' => null,
                 ],

@@ -22,7 +22,7 @@ class ExceptionHandler implements SubscriptionExceptionHandler
     {
         info('graphql.broadcast.exception', [
             'message' => $e->getMessage(),
-            'stack' => $e->getTrace(),
+            'stack'   => $e->getTrace(),
         ]);
     }
 }

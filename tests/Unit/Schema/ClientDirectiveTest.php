@@ -31,15 +31,15 @@ class ClientDirectiveTest extends TestCase
 
         $this->assertSame(
             [
-                'name' => 'bar',
+                'name'        => 'bar',
                 'description' => 'foo',
-                'args' => [
+                'args'        => [
                     [
-                        'name' => 'baz',
+                        'name'        => 'baz',
                         'description' => 'foobar',
-                        'type' => [
-                            'kind' => 'SCALAR',
-                            'name' => 'String',
+                        'type'        => [
+                            'kind'   => 'SCALAR',
+                            'name'   => 'String',
                             'ofType' => null,
                         ],
                         'defaultValue' => '"barbaz"',

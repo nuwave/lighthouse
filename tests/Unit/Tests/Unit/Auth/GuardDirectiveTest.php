@@ -38,7 +38,7 @@ class GuardDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => AuthenticationException::MESSAGE,
+                    'message'    => AuthenticationException::MESSAGE,
                     'extensions' => [
                         'guards' => [
                             'web',
@@ -67,7 +67,7 @@ class GuardDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => AuthenticationException::MESSAGE,
+                    'message'    => AuthenticationException::MESSAGE,
                     'extensions' => [
                         'guards' => [
                             'web',
@@ -100,7 +100,7 @@ class GuardDirectiveTest extends TestCase
             'errors' => [
                 [
                     'message' => AuthenticationException::MESSAGE,
-                    'path' => [
+                    'path'    => [
                         'bar',
                     ],
                 ],

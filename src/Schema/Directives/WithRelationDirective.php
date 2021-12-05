@@ -37,7 +37,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     }
 
     /**
-     * @param  array<string, mixed>  $args
+     * @param array<string, mixed> $args
      */
     protected function loadRelation(Model $parent, array $args, ResolveInfo $resolveInfo): Deferred
     {

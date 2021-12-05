@@ -46,7 +46,7 @@ class RulesGatherer
     }
 
     /**
-     * @param  array<int|string>  $argumentPath
+     * @param array<int|string> $argumentPath
      */
     public function gatherRulesRecursively(ArgumentSet $argumentSet, array $argumentPath): void
     {
@@ -79,8 +79,8 @@ class RulesGatherer
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
-     * @param  array<int|string>  $path
+     * @param \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> $directives
+     * @param array<int|string>                                                              $path
      */
     public function gatherRulesForArgumentSet(ArgumentSet $argumentSet, Collection $directives, array $path): void
     {
@@ -102,9 +102,9 @@ class RulesGatherer
     }
 
     /**
-     * @param  mixed  $value  Any argument value is possible
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
-     * @param  array<int|string>  $path
+     * @param mixed                                                                          $value      Any argument value is possible
+     * @param \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> $directives
+     * @param array<int|string>                                                              $path
      */
     public function gatherRulesForArgument($value, Collection $directives, array $path): void
     {
@@ -126,9 +126,9 @@ class RulesGatherer
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed  $value
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
-     * @param  array<int|string>  $path
+     * @param \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed $value
+     * @param \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>                           $directives
+     * @param array<int|string>                                                                                        $path
      */
     protected function handleArgumentValue($value, Collection $directives, array $path): void
     {
@@ -140,7 +140,7 @@ class RulesGatherer
     }
 
     /**
-     * @param  array<int|string>  $argumentPath
+     * @param array<int|string> $argumentPath
      */
     public function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
@@ -165,7 +165,7 @@ class RulesGatherer
     }
 
     /**
-     * @param  array<int|string>  $argumentPath
+     * @param array<int|string> $argumentPath
      */
     public function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
     {
@@ -193,8 +193,9 @@ class RulesGatherer
     }
 
     /**
-     * @param  array<string, mixed>  $rulesOrMessages
-     * @param  array<int|string>  $path
+     * @param array<string, mixed> $rulesOrMessages
+     * @param array<int|string>    $path
+     *
      * @return array<string, mixed>
      */
     protected function wrap(array $rulesOrMessages, array $path): array
@@ -218,8 +219,9 @@ class RulesGatherer
      * on an input value that is nested within the arguments under `input.0`.
      * It is thus changed to the full reference `required_with:input.0.foo`.
      *
-     * @param  array<int, mixed>  $rules
-     * @param  array<int|string>  $argumentPath
+     * @param array<int, mixed> $rules
+     * @param array<int|string> $argumentPath
+     *
      * @return array<int, array<int, mixed>|object>
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
@@ -315,7 +317,7 @@ class RulesGatherer
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
                 $flatArgs = [$name];
                 foreach ($args as $arg) {
-                    $flatArgs [] = $arg;
+                    $flatArgs[] = $arg;
                 }
 
                 return $flatArgs;

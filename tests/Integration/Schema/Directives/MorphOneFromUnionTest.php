@@ -25,12 +25,12 @@ class MorphOneFromUnionTest extends DBTestCase
         /** @var \Tests\Utils\Models\User $employeeUser */
         $employeeUser = factory(User::class)->create([
             'company_id' => $companyId,
-            'team_id' => $teamId,
+            'team_id'    => $teamId,
         ]);
         /** @var \Tests\Utils\Models\User $contractorUser */
         $contractorUser = factory(User::class)->create([
             'company_id' => $companyId,
-            'team_id' => $teamId,
+            'team_id'    => $teamId,
         ]);
 
         $employee->user()->save($employeeUser);
@@ -103,27 +103,27 @@ class MorphOneFromUnionTest extends DBTestCase
             'data' => [
                 'colors' => [
                     [
-                        'id' => (string) $employeeColor->id,
-                        'name' => $employeeColor->name,
+                        'id'      => (string) $employeeColor->id,
+                        'name'    => $employeeColor->name,
                         'creator' => [
                             '__typename' => 'Employee',
-                            'id' => (string) $employee->id,
-                            'user' => [
-                                'id' => (string) $employeeUser->id,
-                                'name' => $employeeUser->name,
+                            'id'         => (string) $employee->id,
+                            'user'       => [
+                                'id'    => (string) $employeeUser->id,
+                                'name'  => $employeeUser->name,
                                 'email' => $employeeUser->email,
                             ],
                         ],
                     ],
                     [
-                        'id' => (string) $contractorColor->id,
-                        'name' => $contractorColor->name,
+                        'id'      => (string) $contractorColor->id,
+                        'name'    => $contractorColor->name,
                         'creator' => [
                             '__typename' => 'Contractor',
-                            'id' => (string) $contractor->id,
-                            'user' => [
-                                'id' => (string) $contractorUser->id,
-                                'name' => $contractorUser->name,
+                            'id'         => (string) $contractor->id,
+                            'user'       => [
+                                'id'    => (string) $contractorUser->id,
+                                'name'  => $contractorUser->name,
                                 'email' => $contractorUser->email,
                             ],
                         ],

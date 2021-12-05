@@ -166,7 +166,7 @@ class DeleteDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'updateUser' => [
-                    'id' => 1,
+                    'id'    => 1,
                     'tasks' => [
                         [
                             'id' => 1,
@@ -215,7 +215,7 @@ class DeleteDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'updateTask' => [
-                    'id' => 1,
+                    'id'   => 1,
                     'post' => [
                         'id' => 1,
                     ],
@@ -235,7 +235,7 @@ class DeleteDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'updateTask' => [
-                    'id' => 1,
+                    'id'   => 1,
                     'post' => null,
                 ],
             ],
@@ -281,7 +281,7 @@ class DeleteDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'updateTask' => [
-                    'id' => 1,
+                    'id'   => 1,
                     'user' => null,
                 ],
             ],

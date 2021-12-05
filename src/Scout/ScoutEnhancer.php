@@ -44,7 +44,7 @@ class ScoutEnhancer
     protected $argumentsWithScoutBuilderDirectives = [];
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
      */
     public function __construct(ArgumentSet $argumentSet, object $builder)
     {
@@ -70,12 +70,12 @@ class ScoutEnhancer
             throw new ScoutException('Found arg builder arguments that do not work with @search');
         }
 
-        if (! $this->builder instanceof EloquentBuilder) {
+        if (!$this->builder instanceof EloquentBuilder) {
             throw new ScoutException('Can only get Model from \Illuminate\Database\Eloquent\Builder, got: '.get_class($this->builder));
         }
         $model = $this->builder->getModel();
 
-        if (! Utils::classUsesTrait($model, Searchable::class)) {
+        if (!Utils::classUsesTrait($model, Searchable::class)) {
             throw new ScoutException('Model class '.get_class($model).' does not implement trait '.Searchable::class);
         }
 
@@ -118,7 +118,7 @@ class ScoutEnhancer
                 ->contains(Utils::instanceofMatcher(SearchDirective::class));
 
             if ($argumentHasSearchDirective && is_string($argument->value)) {
-                $this->searchArguments [] = $argument;
+                $this->searchArguments[] = $argument;
             }
 
             $argumentHasArgBuilderDirective = $argument
@@ -129,12 +129,12 @@ class ScoutEnhancer
                 ->directives
                 ->contains(Utils::instanceofMatcher(ScoutBuilderDirective::class));
 
-            if ($argumentHasArgBuilderDirective && ! $argumentHasScoutBuilderDirective) {
-                $this->argumentsWithOnlyArgBuilders [] = $argument;
+            if ($argumentHasArgBuilderDirective && !$argumentHasScoutBuilderDirective) {
+                $this->argumentsWithOnlyArgBuilders[] = $argument;
             }
 
             if ($argumentHasScoutBuilderDirective) {
-                $this->argumentsWithScoutBuilderDirectives [] = $argument;
+                $this->argumentsWithScoutBuilderDirectives[] = $argument;
             }
 
             Utils::applyEach(

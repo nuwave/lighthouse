@@ -11,7 +11,8 @@ class ArgumentFactory
     /**
      * Convert input value definitions to a executable types.
      *
-     * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $definitionNodes
+     * @param iterable<\GraphQL\Language\AST\InputValueDefinitionNode> $definitionNodes
+     *
      * @return array<string, array<string, mixed>>
      */
     public function toTypeMap(iterable $definitionNodes): array
@@ -43,10 +44,10 @@ class ArgumentFactory
         $type = $definitionNodeConverter->convert($definitionNode->type);
 
         $config = [
-            'name' => $definitionNode->name->value,
+            'name'        => $definitionNode->name->value,
             'description' => $definitionNode->description->value ?? null,
-            'type' => $type,
-            'astNode' => $definitionNode,
+            'type'        => $type,
+            'astNode'     => $definitionNode,
         ];
 
         if ($defaultValue = $definitionNode->defaultValue) {

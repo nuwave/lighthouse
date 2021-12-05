@@ -23,7 +23,8 @@ class AttemptAuthentication
     }
 
     /**
-     * @param  string  ...$guards
+     * @param string ...$guards
+     *
      * @return mixed Any kind of response
      */
     public function handle(Request $request, Closure $next, ...$guards)
@@ -34,7 +35,7 @@ class AttemptAuthentication
     }
 
     /**
-     * @param  array<string>  ...$guards
+     * @param array<string> ...$guards
      */
     protected function attemptAuthentication(array $guards): void
     {

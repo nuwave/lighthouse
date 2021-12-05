@@ -101,7 +101,8 @@ class GraphQL
     /**
      * Run one ore more GraphQL operations against the schema.
      *
-     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
+     * @param \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams> $operationOrOperations
+     *
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
     public function executeOperationOrOperations($operationOrOperations, GraphQLContext $context): array
@@ -137,7 +138,7 @@ class GraphQL
         $errors = $this->graphQLHelper->validateOperationParams($params);
 
         $query = $params->query;
-        if (! is_string($query) || $query === '') {
+        if (!is_string($query) || $query === '') {
             $errors[] = new RequestError(
                 'GraphQL Request parameter "query" is required and must not be empty.'
             );
@@ -173,9 +174,9 @@ class GraphQL
      * To render the @see ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
      *
-     * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  array<string, mixed>|null  $variables
-     * @param  mixed|null  $rootValue
+     * @param string|\GraphQL\Language\AST\DocumentNode $query
+     * @param array<string, mixed>|null                 $variables
+     * @param mixed|null                                $rootValue
      */
     public function executeQuery(
         $query,
@@ -215,7 +216,7 @@ class GraphQL
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse
+            new BuildExtensionsResponse()
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {
@@ -225,7 +226,7 @@ class GraphQL
         }
 
         foreach ($this->errorPool->errors() as $error) {
-            $result->errors [] = $error;
+            $result->errors[] = $error;
         }
 
         // Allow listeners to manipulate the result after each resolved query
@@ -271,13 +272,13 @@ class GraphQL
      */
     protected function errorsHandler(): \Closure
     {
-        if (! isset($this->errorsHandler)) {
+        if (!isset($this->errorsHandler)) {
             $this->errorsHandler = function (array $errors, callable $formatter): array {
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
                 foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers [] = app($handlerClass);
+                    $handlers[] = app($handlerClass);
                 }
 
                 return (new Collection($errors))

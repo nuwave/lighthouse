@@ -45,7 +45,7 @@ GRAPHQL;
         }
 
         $relation = $this->directiveArgValue('relation');
-        if (! is_string($relation)) {
+        if (!is_string($relation)) {
             throw new DefinitionException("You must specify the argument relation in the {$this->name()} directive on {$this->definitionNode->name->value}.");
         }
     }

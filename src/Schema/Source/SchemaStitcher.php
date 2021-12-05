@@ -16,7 +16,7 @@ class SchemaStitcher implements SchemaSourceProvider
 
     public function __construct(string $rootSchemaPath)
     {
-        if (! file_exists($rootSchemaPath)) {
+        if (!file_exists($rootSchemaPath)) {
             throw new FileNotFoundException(
                 "Failed to find a GraphQL schema file at {$rootSchemaPath}. If you just installed Lighthouse, run php artisan vendor:publish --tag=lighthouse-schema"
             );
@@ -40,14 +40,14 @@ class SchemaStitcher implements SchemaSourceProvider
     {
         return (new Collection(\Safe\file($path)))
             ->map(function (string $line) use ($path): string {
-                if (! Str::startsWith(trim($line), '#import ')) {
+                if (!Str::startsWith(trim($line), '#import ')) {
                     return rtrim($line, PHP_EOL).PHP_EOL;
                 }
 
                 $importFileName = trim(Str::after($line, '#import '));
                 $importFilePath = dirname($path).'/'.$importFileName;
 
-                if (! Str::contains($importFileName, '*')) {
+                if (!Str::contains($importFileName, '*')) {
                     try {
                         $realpath = \Safe\realpath($importFilePath);
                     } catch (FilesystemException $exception) {

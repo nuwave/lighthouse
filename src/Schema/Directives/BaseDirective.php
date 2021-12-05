@@ -61,7 +61,7 @@ abstract class BaseDirective implements Directive
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
-     * @param  ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode  $definitionNode
+     * @param ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode $definitionNode
      */
     public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
     {
@@ -104,7 +104,7 @@ abstract class BaseDirective implements Directive
      */
     public function directiveHasArgument(string $name): bool
     {
-        if (! isset($this->directiveArgs)) {
+        if (!isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
@@ -114,12 +114,13 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param  mixed|null  $default
+     * @param mixed|null $default
+     *
      * @return mixed|null
      */
     protected function directiveArgValue(string $name, $default = null)
     {
-        if (! isset($this->directiveArgs)) {
+        if (!isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
@@ -139,17 +140,18 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param  string  $argumentName  The default argument name "model" may be overwritten
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @param string $argumentName The default argument name "model" may be overwritten
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
         $model = $this->directiveArgValue($argumentName)
             ?? ASTHelper::modelName($this->definitionNode);
 
-        if (! $model) {
+        if (!$model) {
             throw new DefinitionException(
                 "Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}."
             );
@@ -161,11 +163,12 @@ abstract class BaseDirective implements Directive
     /**
      * Find a class name in a set of given namespaces.
      *
-     * @param  array<string>  $namespacesToTry
+     * @param array<string> $namespacesToTry
      * @param  callable(string $className): bool $determineMatch
-     * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return class-string
      */
     protected function namespaceClassName(
         string $classCandidate,
@@ -182,7 +185,7 @@ abstract class BaseDirective implements Directive
             array_unshift($namespacesToTry, $namespaceForDirective);
         }
 
-        if (! $determineMatch) {
+        if (!$determineMatch) {
             $determineMatch = 'class_exists';
         }
 
@@ -192,8 +195,9 @@ abstract class BaseDirective implements Directive
             $determineMatch
         );
 
-        if (! $className) {
+        if (!$className) {
             $consideredNamespaces = implode(', ', $namespacesToTry);
+
             throw new DefinitionException(
                 "Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}."
             );
@@ -209,9 +213,9 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {

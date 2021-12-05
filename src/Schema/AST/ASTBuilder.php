@@ -29,10 +29,10 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 class ASTBuilder
 {
     public const EXTENSION_TO_DEFINITION_CLASS = [
-        ObjectTypeExtensionNode::class => ObjectTypeDefinitionNode::class,
+        ObjectTypeExtensionNode::class      => ObjectTypeDefinitionNode::class,
         InputObjectTypeExtensionNode::class => InputObjectTypeDefinitionNode::class,
-        InterfaceTypeExtensionNode::class => InterfaceTypeDefinitionNode::class,
-        EnumTypeExtensionNode::class => EnumTypeDefinitionNode::class,
+        InterfaceTypeExtensionNode::class   => InterfaceTypeDefinitionNode::class,
+        EnumTypeExtensionNode::class        => EnumTypeDefinitionNode::class,
     ];
 
     /**
@@ -76,7 +76,7 @@ class ASTBuilder
 
     public function documentAST(): DocumentAST
     {
-        if (! isset($this->documentAST)) {
+        if (!isset($this->documentAST)) {
             return $this->documentAST = $this->astCache->isEnabled()
                 ? $this->astCache->fromCacheOrBuild(function (): DocumentAST {
                     return $this->build();
@@ -170,7 +170,7 @@ class ASTBuilder
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
+     * @param \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode $typeExtension
      */
     protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
     {
@@ -229,7 +229,7 @@ class ASTBuilder
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $typeExtension
+     * @param \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode $typeExtension
      */
     protected function missingBaseDefinition(string $typeName, TypeExtensionNode $typeExtension): string
     {
@@ -237,8 +237,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode  $definition
+     * @param \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode     $extension
+     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode $definition
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

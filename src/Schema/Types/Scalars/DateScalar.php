@@ -15,11 +15,11 @@ abstract class DateScalar extends ScalarType
     /**
      * Serialize an internal value, ensuring it is a valid date string.
      *
-     * @param  \Illuminate\Support\Carbon|string  $value
+     * @param \Illuminate\Support\Carbon|string $value
      */
     public function serialize($value): string
     {
-        if (! $value instanceof Carbon) {
+        if (!$value instanceof Carbon) {
             $value = $this->tryParsingDate($value, InvariantViolation::class);
         }
 
@@ -29,7 +29,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Parse a externally provided variable value into a Carbon instance.
      *
-     * @param  string  $value
+     * @param string $value
      */
     public function parseValue($value): Carbon
     {
@@ -39,14 +39,14 @@ abstract class DateScalar extends ScalarType
     /**
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
-     * @param  \GraphQL\Language\AST\Node  $valueNode
-     * @param  array<string, mixed>|null  $variables
+     * @param \GraphQL\Language\AST\Node $valueNode
+     * @param array<string, mixed>|null  $variables
      *
      * @throws \GraphQL\Error\Error
      */
     public function parseLiteral($valueNode, ?array $variables = null): Carbon
     {
-        if (! $valueNode instanceof StringValueNode) {
+        if (!$valueNode instanceof StringValueNode) {
             throw new Error(
                 "Query error: Can only parse strings, got {$valueNode->kind}",
                 $valueNode
@@ -59,8 +59,8 @@ abstract class DateScalar extends ScalarType
     /**
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
-     * @param  mixed  $value  Any value that might be a Date
-     * @param  class-string<\Exception>  $exceptionClass
+     * @param mixed                    $value          Any value that might be a Date
+     * @param class-string<\Exception> $exceptionClass
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */
@@ -112,7 +112,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Try turning a client value into a Carbon instance.
      *
-     * @param  mixed  $value  A possibly faulty client value.
+     * @param mixed $value A possibly faulty client value.
      */
     abstract protected function parse($value): Carbon;
 }

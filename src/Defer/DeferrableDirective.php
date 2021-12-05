@@ -100,7 +100,7 @@ GRAPHQL;
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
 
-        return ! in_array(
+        return !in_array(
             [Directive::IF_ARGUMENT_NAME => false],
             $includes,
             true
@@ -108,7 +108,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<array<string, mixed>|null>  $defers
+     * @param array<array<string, mixed>|null> $defers
      */
     protected function anyFieldHasDefer(array $defers): bool
     {

@@ -96,15 +96,15 @@ GRAPHQL;
 
             foreach (Arr::wrap($limiterResponse) as $limit) {
                 $limits[] = [
-                    'key' => sha1($name.$limit->key),
-                    'maxAttempts' => $limit->maxAttempts,
+                    'key'          => sha1($name.$limit->key),
+                    'maxAttempts'  => $limit->maxAttempts,
                     'decayMinutes' => $limit->decayMinutes,
                 ];
             }
         } else {
             $limits[] = [
-                'key' => sha1($this->directiveArgValue('prefix', '').$this->request->ip()),
-                'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
+                'key'          => sha1($this->directiveArgValue('prefix', '').$this->request->ip()),
+                'maxAttempts'  => $this->directiveArgValue('maxAttempts') ?? 60,
                 'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
             ];
         }

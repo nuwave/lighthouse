@@ -82,7 +82,7 @@ class TypeRegistry
     }
 
     /**
-     * @param  array<string>  $possibleTypes
+     * @param array<string> $possibleTypes
      */
     public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): string
     {
@@ -105,8 +105,9 @@ class TypeRegistry
      */
     public function get(string $name): Type
     {
-        if (! $this->has($name)) {
-            throw new DefinitionException(<<<EOL
+        if (!$this->has($name)) {
+            throw new DefinitionException(
+                <<<EOL
 Lighthouse failed while trying to load a type: $name
 
 Make sure the type is present in your schema definition.
@@ -178,7 +179,7 @@ EOL
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
-            if (! isset($this->types[$name])) {
+            if (!isset($this->types[$name])) {
                 $this->types[$name] = $this->handle($typeDefinition);
             }
         }
@@ -202,7 +203,7 @@ EOL
     /**
      * Transform a definition node to an executable type.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $definition
+     * @param \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $definition
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -229,7 +230,7 @@ EOL
     /**
      * The default type transformations.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
+     * @param \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
      *
      * @throws \GraphQL\Error\InvariantViolation
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -269,16 +270,16 @@ EOL
                 'value' => $enumDirective instanceof EnumDirective
                     ? $enumDirective->value()
                     : $enumValue->name->value,
-                'description' => $enumValue->description->value ?? null,
+                'description'       => $enumValue->description->value ?? null,
                 'deprecationReason' => ASTHelper::deprecationReason($enumValue),
             ];
         }
 
         return new EnumType([
-            'name' => $enumDefinition->name->value,
+            'name'        => $enumDefinition->name->value,
             'description' => $enumDefinition->description->value ?? null,
-            'values' => $values,
-            'astNode' => $enumDefinition,
+            'values'      => $values,
+            'astNode'     => $enumDefinition,
         ]);
     }
 
@@ -306,28 +307,29 @@ EOL
             }
         );
 
-        if (! $className) {
+        if (!$className) {
             $scalarClass = ScalarType::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
+
             throw new DefinitionException(
                 "Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}."
             );
         }
 
         return new $className([
-            'name' => $scalarName,
+            'name'        => $scalarName,
             'description' => $scalarDefinition->description->value ?? null,
-            'astNode' => $scalarDefinition,
+            'astNode'     => $scalarDefinition,
         ]);
     }
 
     protected function resolveObjectType(ObjectTypeDefinitionNode $objectDefinition): ObjectType
     {
         return new ObjectType([
-            'name' => $objectDefinition->name->value,
+            'name'        => $objectDefinition->name->value,
             'description' => $objectDefinition->description->value ?? null,
-            'fields' => $this->makeFieldsLoader($objectDefinition),
-            'interfaces' =>
+            'fields'      => $this->makeFieldsLoader($objectDefinition),
+            'interfaces'  =>
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>
                  */
@@ -336,7 +338,7 @@ EOL
 
                     // Might be a NodeList, so we can not use array_map()
                     foreach ($objectDefinition->interfaces as $interface) {
-                        $interfaces [] = $this->get($interface->name->value);
+                        $interfaces[] = $this->get($interface->name->value);
                     }
 
                     return $interfaces;
@@ -348,7 +350,8 @@ EOL
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
+     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode $typeDefinition
+     *
      * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): Closure
@@ -377,9 +380,9 @@ EOL
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
         return new InputObjectType([
-            'name' => $inputDefinition->name->value,
+            'name'        => $inputDefinition->name->value,
             'description' => $inputDefinition->description->value ?? null,
-            'fields' =>
+            'fields'      =>
                 /**
                  * @return array<string, array<string, mixed>>
                  */
@@ -395,7 +398,7 @@ EOL
         $nodeName = $interfaceDefinition->name->value;
 
         if (($directiveNode = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) !== null) {
-            $interfaceDirective = (new InterfaceDirective)->hydrate($directiveNode, $interfaceDefinition);
+            $interfaceDirective = (new InterfaceDirective())->hydrate($directiveNode, $interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
@@ -410,11 +413,11 @@ EOL
         }
 
         return new InterfaceType([
-            'name' => $nodeName,
+            'name'        => $nodeName,
             'description' => $interfaceDefinition->description->value ?? null,
-            'fields' => $this->makeFieldsLoader($interfaceDefinition),
+            'fields'      => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
-            'astNode' => $interfaceDefinition,
+            'astNode'     => $interfaceDefinition,
         ]);
     }
 
@@ -433,7 +436,7 @@ EOL
                 $typeDefinition instanceof ObjectTypeDefinitionNode
                 && ASTHelper::typeImplementsInterface($typeDefinition, $name)
             ) {
-                $implementations [] = $typeDefinition->name->value;
+                $implementations[] = $typeDefinition->name->value;
             }
         }
 
@@ -441,7 +444,7 @@ EOL
     }
 
     /**
-     * @param  array<string>  $namespaces
+     * @param array<string> $namespaces
      */
     protected function typeResolverFromClass(string $nodeName, array $namespaces): ?Closure
     {
@@ -466,7 +469,8 @@ EOL
     /**
      * Default type resolver for resolving interfaces or union types.
      *
-     * @param  list<string>  $possibleTypes
+     * @param list<string> $possibleTypes
+     *
      * @return Closure(mixed): Type
      */
     protected function typeResolverFallback(array $possibleTypes): Closure
@@ -504,7 +508,7 @@ EOL
         $nodeName = $unionDefinition->name->value;
 
         if (($directiveNode = ASTHelper::directiveDefinition($unionDefinition, 'union')) !== null) {
-            $unionDirective = (new UnionDirective)->hydrate($directiveNode, $unionDefinition);
+            $unionDirective = (new UnionDirective())->hydrate($directiveNode, $unionDefinition);
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
@@ -519,9 +523,9 @@ EOL
         }
 
         return new UnionType([
-            'name' => $nodeName,
+            'name'        => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
-            'types' =>
+            'types'       =>
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>
                  */
@@ -535,13 +539,13 @@ EOL
                     return $types;
                 },
             'resolveType' => $typeResolver,
-            'astNode' => $unionDefinition,
+            'astNode'     => $unionDefinition,
         ]);
     }
 
     protected function fieldFactory(): FieldFactory
     {
-        if (! isset($this->fieldFactory)) {
+        if (!isset($this->fieldFactory)) {
             $this->fieldFactory = app(FieldFactory::class);
         }
 
@@ -556,7 +560,7 @@ EOL
         $types = [];
 
         foreach ($unionDefinition->types as $type) {
-            $types [] = $type->name->value;
+            $types[] = $type->name->value;
         }
 
         return $types;

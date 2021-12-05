@@ -90,7 +90,7 @@ class DocumentAST implements Serializable, Arrayable
             throw new ParseException($syntaxError);
         }
 
-        $instance = new static;
+        $instance = new static();
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
@@ -116,6 +116,7 @@ class DocumentAST implements Serializable, Arrayable
 
                     if (null === $modelClass) {
                         $consideredNamespaces = implode(', ', $namespacesToTry);
+
                         throw new DefinitionException(
                             "Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}."
                         );
@@ -128,7 +129,7 @@ class DocumentAST implements Serializable, Arrayable
                 }
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
-                $instance->typeExtensions[$definition->name->value] [] = $definition;
+                $instance->typeExtensions[$definition->name->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
@@ -144,7 +145,8 @@ class DocumentAST implements Serializable, Arrayable
      *
      * This operation will overwrite existing definitions with the same name.
      *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $type
+     * @param \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $type
+     *
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
@@ -159,7 +161,7 @@ class DocumentAST implements Serializable, Arrayable
      *
      * This operation will overwrite existing definitions with the same name.
      *
-     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node  $directive
+     * @param \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node $directive
      */
     public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self
     {
@@ -186,7 +188,7 @@ class DocumentAST implements Serializable, Arrayable
             // @phpstan-ignore-next-line Before serialization, those are arrays
             self::TYPES => array_map($nodeToArray, $this->types),
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            self::DIRECTIVES => array_map($nodeToArray, $this->directives),
+            self::DIRECTIVES                     => array_map($nodeToArray, $this->directives),
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ];
     }
@@ -194,7 +196,7 @@ class DocumentAST implements Serializable, Arrayable
     /**
      * Instantiate from a serialized array.
      *
-     * @param  array<string, mixed>  $ast
+     * @param array<string, mixed> $ast
      */
     public static function fromArray(array $ast): DocumentAST
     {
@@ -221,7 +223,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     public function __unserialize(array $data): void
     {
@@ -237,13 +239,13 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param  array<string, mixed>  $ast
+     * @param array<string, mixed> $ast
      */
     protected function hydrateFromArray(array $ast): void
     {
         [
-            self::TYPES => $types,
-            self::DIRECTIVES => $directives,
+            self::TYPES                          => $types,
+            self::DIRECTIVES                     => $directives,
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ] = $ast;
 

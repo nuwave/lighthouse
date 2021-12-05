@@ -80,7 +80,7 @@ class SubscriptionServiceProvider extends ServiceProvider
             $this->app->bind(SubscriptionIterator::class, AuthenticatingSyncIterator::class);
 
             $this->app->make(AuthManager::class)->extend(SubscriptionGuard::GUARD_NAME, static function () {
-                return new SubscriptionGuard;
+                return new SubscriptionGuard();
             });
         }
     }

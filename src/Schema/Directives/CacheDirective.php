@@ -128,7 +128,8 @@ GRAPHQL;
                 Resolved::handle($resolved, $storeInCache);
 
                 return $resolved;
-            });
+            }
+        );
 
         return $fieldValue;
     }

@@ -15,7 +15,7 @@ class StartOperationOrOperations
     public $operationOrOperations;
 
     /**
-     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
+     * @param \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams> $operationOrOperations
      */
     public function __construct($operationOrOperations)
     {

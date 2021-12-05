@@ -33,7 +33,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                     ->all();
 
                 $errors = $this->chunkError($path, $data);
-                if (! empty($errors)) {
+                if (!empty($errors)) {
                     $chunk['errors'] = $errors;
                 }
 
@@ -63,7 +63,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * Format chunked data.
      *
-     * @param  array<mixed>  $data
+     * @param array<mixed> $data
      */
     protected function chunk(array $data, bool $terminating): string
     {

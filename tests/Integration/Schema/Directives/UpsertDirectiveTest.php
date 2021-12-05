@@ -14,7 +14,7 @@ class UpsertDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
         factory(Task::class)->create([
-            'id' => 1,
+            'id'   => 1,
             'name' => 'old',
         ]);
 
@@ -71,14 +71,14 @@ class UpsertDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'updateUser' => [
-                    'name' => 'foo',
+                    'name'  => 'foo',
                     'tasks' => [
                         [
-                            'id' => 1,
+                            'id'   => 1,
                             'name' => 'updated',
                         ],
                         [
-                            'id' => 2,
+                            'id'   => 2,
                             'name' => 'new',
                         ],
                     ],
@@ -139,7 +139,7 @@ class UpsertDirectiveTest extends DBTestCase
         }')->assertJson([
             'data' => [
                 'updateUser' => [
-                    'name' => 'foo',
+                    'name'  => 'foo',
                     'tasks' => [
                         [
                             'name' => 'foo',
@@ -190,7 +190,7 @@ GRAPHQL;
         ')->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'id' => 1,
+                    'id'   => 1,
                     'name' => 'foo',
                 ],
             ],

@@ -235,7 +235,7 @@ class MorphToManyTest extends DBTestCase
                 'createTask' => [
                     'tags' => [
                         [
-                            'id' => 1,
+                            'id'   => 1,
                             'name' => 'php',
                         ],
                     ],
@@ -270,7 +270,7 @@ class MorphToManyTest extends DBTestCase
                 'upsertTask' => [
                     'tags' => [
                         [
-                            'id' => 1,
+                            'id'   => 1,
                             'name' => 'php',
                         ],
                     ],
@@ -306,7 +306,7 @@ class MorphToManyTest extends DBTestCase
                 'upsertTask' => [
                     'tags' => [
                         [
-                            'id' => 1,
+                            'id'   => 1,
                             'name' => 'php',
                         ],
                     ],
@@ -340,10 +340,10 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id' => 1,
+                    'id'   => 1,
                     'tags' => [
                         [
-                            'id' => 1,
+                            'id'   => 1,
                             'name' => 'php',
                         ],
                     ],

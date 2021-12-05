@@ -63,7 +63,8 @@ SIGNATURE;
     {
         $introspectionResult = Introspection::fromSchema($schema);
         if ($introspectionResult === null) {
-            throw new \Exception(<<<'MESSAGE'
+            throw new \Exception(
+                <<<'MESSAGE'
 Did not receive a valid introspection result.
 Check if your schema is correct with:
 

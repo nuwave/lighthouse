@@ -19,7 +19,7 @@ class ListType
     public $nonNull = false;
 
     /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType|\Nuwave\Lighthouse\Execution\Arguments\ListType  $type
+     * @param \Nuwave\Lighthouse\Execution\Arguments\NamedType|\Nuwave\Lighthouse\Execution\Arguments\ListType $type
      */
     public function __construct($type)
     {

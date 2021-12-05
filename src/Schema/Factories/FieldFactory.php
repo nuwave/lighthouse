@@ -108,11 +108,11 @@ class FieldFactory
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
-            'resolve' => $fieldValue->getResolver(),
-            'description' => $fieldDefinitionNode->description->value ?? null,
-            'complexity' => $this->complexity($fieldValue),
+            'resolve'           => $fieldValue->getResolver(),
+            'description'       => $fieldDefinitionNode->description->value ?? null,
+            'complexity'        => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
-            'astNode' => $fieldDefinitionNode,
+            'astNode'           => $fieldDefinitionNode,
         ];
     }
 

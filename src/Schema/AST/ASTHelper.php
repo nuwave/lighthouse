@@ -38,10 +38,11 @@ class ASTHelper
      *
      * @template TNode of \GraphQL\Language\AST\Node
      *
-     * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
-     * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
-     * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
-     *                                     If set to true, the fields of the original list will be overwritten.
+     * @param \GraphQL\Language\AST\NodeList<TNode>|array<TNode> $original
+     * @param \GraphQL\Language\AST\NodeList<TNode>|array<TNode> $addition
+     * @param bool                                               $overwriteDuplicates By default this function throws if a collision occurs.
+     *                                                                                If set to true, the fields of the original list will be overwritten.
+     *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
@@ -56,7 +57,7 @@ class ASTHelper
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
 
-                if ($collisionOccurred && ! $overwriteDuplicates) {
+                if ($collisionOccurred && !$overwriteDuplicates) {
                     throw new DefinitionException(
                         static::duplicateDefinition($oldName)
                     );
@@ -80,8 +81,9 @@ class ASTHelper
     /**
      * @template TNode of \GraphQL\Language\AST\Node
      *
-     * @param  \GraphQL\Language\AST\NodeList<TNode>  $nodeList
-     * @param  TNode  $node
+     * @param \GraphQL\Language\AST\NodeList<TNode> $nodeList
+     * @param TNode                                 $node
+     *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function prepend(NodeList $nodeList, Node $node): NodeList
@@ -132,7 +134,8 @@ class ASTHelper
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param  mixed  $default  Is returned if the directive does not have the argument.
+     * @param mixed $default Is returned if the directive does not have the argument.
+     *
      * @return mixed The value given to the directive.
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
@@ -148,8 +151,9 @@ class ASTHelper
     /**
      * Return the PHP internal value of an arguments default value.
      *
-     * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
-     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
+     * @param \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node       $defaultValue
+     * @param \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType
+     *
      * @return mixed The plain PHP value.
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
@@ -176,7 +180,7 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        if (! property_exists($definitionNode, 'directives')) {
+        if (!property_exists($definitionNode, 'directives')) {
             throw new Exception('Expected Node class with property `directives`, got: '.get_class($definitionNode));
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
@@ -198,13 +202,14 @@ class ASTHelper
      *
      * @template TNode of \GraphQL\Language\AST\Node
      *
-     * @param  iterable<TNode>  $nodes
+     * @param iterable<TNode> $nodes
+     *
      * @return TNode|null
      */
     public static function firstByName($nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
-            if (! property_exists($node, 'name')) {
+            if (!property_exists($node, 'name')) {
                 throw new Exception('Expected a Node with a name property, got: '.get_class($node));
             }
 
@@ -254,7 +259,7 @@ class ASTHelper
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode|mixed  $objectType
+     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode|mixed $objectType
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -263,8 +268,8 @@ class ASTHelper
         $name = $directiveNode->name->value;
 
         if (
-            ! $objectType instanceof ObjectTypeDefinitionNode
-            && ! $objectType instanceof ObjectTypeExtensionNode
+            !$objectType instanceof ObjectTypeDefinitionNode
+            && !$objectType instanceof ObjectTypeExtensionNode
         ) {
             throw new DefinitionException(
                 "The @{$name} directive may only be placed on fields or object types."
@@ -284,7 +289,7 @@ class ASTHelper
             // Field directives are more specific than those defined on a type.
             if (
                 self::hasDirective($fieldDefinition, $name)
-                && ! $directiveDefinition->repeatable
+                && !$directiveDefinition->repeatable
             ) {
                 continue;
             }
@@ -315,7 +320,8 @@ class ASTHelper
     /**
      * Given a collection of directives, returns the string value for the deprecation reason.
      *
-     * @param  \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $node
+     * @param \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode $node
+     *
      * @return string
      */
     public static function deprecationReason(Node $node): ?string

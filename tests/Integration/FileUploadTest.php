@@ -81,7 +81,7 @@ class FileUploadTest extends TestCase
             ->multipartGraphQL($operations, $map, $files)
             ->assertJson([
                 'data' => [
-                    'first' => true,
+                    'first'  => true,
                     'second' => true,
                 ],
             ]);
@@ -90,7 +90,7 @@ class FileUploadTest extends TestCase
     public function testResolvesQueryViaMultipartRequest(): void
     {
         $operations = [
-            'query' => '{ foo }',
+            'query'     => '{ foo }',
             'variables' => [],
         ];
 

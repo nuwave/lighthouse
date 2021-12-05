@@ -50,7 +50,7 @@ class ClientDirective
 
         $arguments = [];
         foreach ($resolveInfo->fieldNodes as $fieldNode) {
-            $arguments [] = Values::getDirectiveValues($directive, $fieldNode, $resolveInfo->variableValues);
+            $arguments[] = Values::getDirectiveValues($directive, $fieldNode, $resolveInfo->variableValues);
         }
 
         return $arguments;

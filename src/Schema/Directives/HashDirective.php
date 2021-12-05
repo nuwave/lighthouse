@@ -32,7 +32,7 @@ GRAPHQL;
     }
 
     /**
-     * @param  string  $argumentValue
+     * @param string $argumentValue
      */
     public function transform($argumentValue): string
     {

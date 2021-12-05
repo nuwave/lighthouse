@@ -32,7 +32,7 @@ class AttemptAuthenticationTest extends TestCase
         ]);
         $config->set('lighthouse.guard', 'foo');
         $config->set('auth.guards.foo', [
-            'driver' => 'foo',
+            'driver'   => 'foo',
             'provider' => 'users',
         ]);
     }

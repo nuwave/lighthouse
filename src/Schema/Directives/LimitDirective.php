@@ -44,7 +44,7 @@ GRAPHQL;
             );
         }
 
-        $parentField->directives [] = $this->directiveNode;
+        $parentField->directives[] = $this->directiveNode;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next)
@@ -67,7 +67,7 @@ GRAPHQL;
             }
 
             // Do not apply a limit if the client passes null explicitly
-            if (! is_int($limit)) {
+            if (!is_int($limit)) {
                 return $result;
             }
 
@@ -79,7 +79,7 @@ GRAPHQL;
                 }
                 $limit--;
 
-                $limited [] = $value;
+                $limited[] = $value;
             }
 
             return $limited;
