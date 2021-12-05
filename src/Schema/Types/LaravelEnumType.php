@@ -24,7 +24,7 @@ class LaravelEnumType extends EnumType
      */
     public function __construct(string $enumClass, ?string $name = null)
     {
-        if (!is_subclass_of($enumClass, Enum::class)) {
+        if (! is_subclass_of($enumClass, Enum::class)) {
             throw new InvalidArgumentException(
                 "Must pass an instance of \BenSampo\Enum\Enum, got {$enumClass}."
             );
@@ -33,15 +33,15 @@ class LaravelEnumType extends EnumType
         $this->enumClass = $enumClass;
 
         parent::__construct([
-            'name'   => $name ?? class_basename($enumClass),
+            'name' => $name ?? class_basename($enumClass),
             'values' => array_map(
                 /**
                  * @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition
                  */
                 function (Enum $enum): array {
                     return [
-                        'name'        => $enum->key,
-                        'value'       => $enum,
+                        'name' => $enum->key,
+                        'value' => $enum,
                         'description' => $enum->description,
                     ];
                 },
@@ -55,7 +55,7 @@ class LaravelEnumType extends EnumType
      */
     public function serialize($value): string
     {
-        if (!$value instanceof Enum) {
+        if (! $value instanceof Enum) {
             $value = $this->enumClass::fromValue($value);
         }
 

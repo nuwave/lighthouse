@@ -18,11 +18,11 @@ class PrintSchemaCommand extends Command
     public const JSON_FILENAME = 'lighthouse-schema.json';
 
     protected $signature = <<<'SIGNATURE'
-lighthouse:print-schema
-{--W|write : Write the output to a file}
-{--json : Output JSON instead of GraphQL SDL}
-{--federation : Include federation directives and exclude federation spec additions, like _service.sdl}
-SIGNATURE;
+        lighthouse:print-schema
+        {--W|write : Write the output to a file}
+        {--json : Output JSON instead of GraphQL SDL}
+        {--federation : Include federation directives and exclude federation spec additions, like _service.sdl}
+        SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
 
@@ -65,12 +65,12 @@ SIGNATURE;
         if (null === $introspectionResult) {
             throw new \Exception(
                 <<<'MESSAGE'
-Did not receive a valid introspection result.
-Check if your schema is correct with:
+                    Did not receive a valid introspection result.
+                    Check if your schema is correct with:
 
-    php artisan lighthouse:validate-schema
+                        php artisan lighthouse:validate-schema
 
-MESSAGE
+                    MESSAGE
             );
         }
 

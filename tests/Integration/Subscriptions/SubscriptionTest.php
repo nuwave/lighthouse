@@ -18,24 +18,24 @@ class SubscriptionTest extends TestCase
         parent::setUp();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        type Post {
-            body: String
-        }
+                    type Post {
+                        body: String
+                    }
 
-        type Subscription {
-            onPostCreated: Post
-        }
+                    type Subscription {
+                        onPostCreated: Post
+                    }
 
-        type Mutation {
-            createPost(post: String!): Post
-                @field(resolver: "{$this->qualifyTestResolver()}")
-                @broadcast(subscription: "onPostCreated")
-        }
+                    type Mutation {
+                        createPost(post: String!): Post
+                            @field(resolver: "{$this->qualifyTestResolver()}")
+                            @broadcast(subscription: "onPostCreated")
+                    }
 
-        type Query {
-            foo: String
-        }
-GRAPHQL;
+                    type Query {
+                        foo: String
+                    }
+            GRAPHQL;
     }
 
     public function testSendsSubscriptionChannelInResponse(): void

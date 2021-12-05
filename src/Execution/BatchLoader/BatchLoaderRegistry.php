@@ -28,7 +28,7 @@ abstract class BatchLoaderRegistry
         // The path to the field serves as the unique key for the instance
         $instanceKey = static::instanceKey($pathToField);
 
-        if (!isset(self::$instances[$instanceKey])) {
+        if (! isset(self::$instances[$instanceKey])) {
             return self::$instances[$instanceKey] = $makeInstance();
         }
 
@@ -60,7 +60,7 @@ abstract class BatchLoaderRegistry
                 // Ignore numeric path entries, as those signify a list of fields.
                 // Combining the queries for those is the very purpose of the
                 // batch loader, so they must not be included.
-                return !is_numeric($segment);
+                return ! is_numeric($segment);
             }
         );
 

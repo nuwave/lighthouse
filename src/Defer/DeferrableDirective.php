@@ -24,12 +24,12 @@ class DeferrableDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Do not use this directive directly, it is automatically added to the schema
-when using the defer extension.
-"""
-directive @deferrable on FIELD_DEFINITION
-GRAPHQL;
+            """
+            Do not use this directive directly, it is automatically added to the schema
+            when using the defer extension.
+            """
+            directive @deferrable on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     /**
@@ -100,7 +100,7 @@ GRAPHQL;
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
 
-        return !in_array(
+        return ! in_array(
             [Directive::IF_ARGUMENT_NAME => false],
             $includes,
             true

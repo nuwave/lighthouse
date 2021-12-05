@@ -11,19 +11,19 @@ class ScopeDirective extends BaseDirective implements ArgBuilderDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Adds a scope to the query builder.
+            """
+            Adds a scope to the query builder.
 
-The scope method will receive the client-given value of the argument as the second parameter.
-"""
-directive @scope(
-  """
-  The name of the scope.
-  Defaults to the name of the argument.
-  """
-  name: String
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+            The scope method will receive the client-given value of the argument as the second parameter.
+            """
+            directive @scope(
+              """
+              The name of the scope.
+              Defaults to the name of the argument.
+              """
+              name: String
+            ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+            GRAPHQL;
     }
 
     /**

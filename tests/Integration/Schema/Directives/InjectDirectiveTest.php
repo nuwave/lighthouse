@@ -47,7 +47,7 @@ class InjectDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id'   => '1',
+                    'id' => '1',
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',

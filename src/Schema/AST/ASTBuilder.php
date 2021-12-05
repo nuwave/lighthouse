@@ -29,10 +29,10 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 class ASTBuilder
 {
     public const EXTENSION_TO_DEFINITION_CLASS = [
-        ObjectTypeExtensionNode::class      => ObjectTypeDefinitionNode::class,
+        ObjectTypeExtensionNode::class => ObjectTypeDefinitionNode::class,
         InputObjectTypeExtensionNode::class => InputObjectTypeDefinitionNode::class,
-        InterfaceTypeExtensionNode::class   => InterfaceTypeDefinitionNode::class,
-        EnumTypeExtensionNode::class        => EnumTypeDefinitionNode::class,
+        InterfaceTypeExtensionNode::class => InterfaceTypeDefinitionNode::class,
+        EnumTypeExtensionNode::class => EnumTypeDefinitionNode::class,
     ];
 
     /**
@@ -76,7 +76,7 @@ class ASTBuilder
 
     public function documentAST(): DocumentAST
     {
-        if (!isset($this->documentAST)) {
+        if (! isset($this->documentAST)) {
             return $this->documentAST = $this->astCache->isEnabled()
                 ? $this->astCache->fromCacheOrBuild(function (): DocumentAST {
                     return $this->build();

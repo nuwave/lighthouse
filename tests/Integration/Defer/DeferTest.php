@@ -47,7 +47,7 @@ class DeferTest extends TestCase
     public function testDeferFields(): void
     {
         $this->mockResolver([
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
@@ -80,7 +80,7 @@ class DeferTest extends TestCase
                 [
                     'data' => [
                         'user' => [
-                            'name'   => 'John Doe',
+                            'name' => 'John Doe',
                             'parent' => null,
                         ],
                     ],
@@ -100,9 +100,9 @@ class DeferTest extends TestCase
     public function testDeferNestedFields(): void
     {
         $data = [
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
-                'name'   => 'Jane Doe',
+                'name' => 'Jane Doe',
                 'parent' => [
                     'name' => 'Mr. Smith',
                 ],
@@ -154,7 +154,7 @@ class DeferTest extends TestCase
     public function testDeferNestedFieldsOnMutations(): void
     {
         $this->mockResolver([
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
@@ -193,7 +193,7 @@ class DeferTest extends TestCase
                 [
                     'data' => [
                         'updateUser' => [
-                            'name'   => 'John Doe',
+                            'name' => 'John Doe',
                             'parent' => null,
                         ],
                     ],
@@ -214,13 +214,13 @@ class DeferTest extends TestCase
     {
         $data = [
             [
-                'title'  => 'Foo',
+                'title' => 'Foo',
                 'author' => [
                     'name' => 'John Doe',
                 ],
             ],
             [
-                'title'  => 'Bar',
+                'title' => 'Bar',
                 'author' => [
                     'name' => 'Jane Doe',
                 ],
@@ -270,7 +270,7 @@ class DeferTest extends TestCase
     {
         $data = [
             [
-                'title'  => 'Foo',
+                'title' => 'Foo',
                 'author' => [
                     'name' => 'John Doe',
                 ],
@@ -279,7 +279,7 @@ class DeferTest extends TestCase
                 ],
             ],
             [
-                'title'  => 'Bar',
+                'title' => 'Bar',
                 'author' => [
                     'name' => 'Jane Doe',
                 ],
@@ -347,9 +347,9 @@ class DeferTest extends TestCase
     public function testCancelsDefermentAfterMaxExecutionTime(): void
     {
         $data = [
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
-                'name'   => 'Jane Doe',
+                'name' => 'Jane Doe',
                 'parent' => [
                     'name' => 'Mr. Smith',
                 ],
@@ -403,9 +403,9 @@ class DeferTest extends TestCase
     public function testCancelsDefermentAfterMaxNestedFields(): void
     {
         $data = [
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
-                'name'   => 'Jane Doe',
+                'name' => 'Jane Doe',
                 'parent' => [
                     'name' => 'Mr. Smith',
                 ],
@@ -457,7 +457,7 @@ class DeferTest extends TestCase
     public function testThrowsExceptionOnNunNullableFields(): void
     {
         $this->mockResolver([
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
@@ -556,7 +556,7 @@ class DeferTest extends TestCase
         }
         ', [
             'include' => false,
-            'skip'    => true,
+            'skip' => true,
         ])->assertExactJson([
             'data' => [
                 'userInclude' => [
@@ -578,7 +578,7 @@ class DeferTest extends TestCase
     public function testRequiresDeferDirectiveOnAllFieldDeclarations(): void
     {
         $data = [
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
@@ -647,7 +647,7 @@ class DeferTest extends TestCase
     public function testDoesNotDeferFieldsIfFalse(): void
     {
         $data = [
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],
@@ -684,7 +684,7 @@ class DeferTest extends TestCase
     public function testIncludesErrorsForDeferredFields(): void
     {
         $this->mockResolver([
-            'name'   => 'John Doe',
+            'name' => 'John Doe',
             'parent' => [
                 'name' => 'Jane Doe',
             ],

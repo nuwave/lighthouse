@@ -41,7 +41,7 @@ class ErrorTest extends TestCase
     public function testIgnoresInvalidJSONVariables(): void
     {
         $result = $this->postGraphQL([
-            'query'     => /** @lang GraphQL */ '{}',
+            'query' => /** @lang GraphQL */ '{}',
             'variables' => '{}',
         ]);
 

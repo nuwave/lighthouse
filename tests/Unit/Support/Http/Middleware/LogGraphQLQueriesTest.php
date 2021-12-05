@@ -31,10 +31,10 @@ class LogGraphQLQueriesTest extends TestCase
     public function testLogsEveryQuery(): void
     {
         $query = /** @lang GraphQL */ <<<'GRAPHQL'
-{
-    foo
-}
-GRAPHQL;
+            {
+                foo
+            }
+            GRAPHQL;
 
         $this->logger
             ->expects($this->once())

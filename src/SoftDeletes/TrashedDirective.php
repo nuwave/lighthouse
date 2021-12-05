@@ -19,11 +19,11 @@ class TrashedDirective extends BaseDirective implements ArgBuilderDirective, Sco
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Allows to filter if trashed elements should be fetched.
-"""
-directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+            """
+            Allows to filter if trashed elements should be fetched.
+            """
+            directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function handleBuilder($builder, $value): object

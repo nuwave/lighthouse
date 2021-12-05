@@ -163,7 +163,7 @@ class PaginatedModelsLoader implements ModelsLoader
         $unloadedWiths = array_filter(
             (array) $withProperty->getValue($model),
             static function (string $relation) use ($model): bool {
-                return !$model->relationLoaded($relation);
+                return ! $model->relationLoaded($relation);
             }
         );
 
@@ -194,11 +194,11 @@ class PaginatedModelsLoader implements ModelsLoader
             $paginator = app()->makeWith(
                 LengthAwarePaginator::class,
                 [
-                    'items'       => $model->getRelation($this->relation),
-                    'total'       => $total,
-                    'perPage'     => $this->paginationArgs->first,
+                    'items' => $model->getRelation($this->relation),
+                    'total' => $total,
+                    'perPage' => $this->paginationArgs->first,
                     'currentPage' => $this->paginationArgs->page,
-                    'options'     => [],
+                    'options' => [],
                 ]
             );
 

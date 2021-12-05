@@ -25,12 +25,12 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Do not use this directive directly, it is automatically added to the schema
-when using the tracing extension.
-"""
-directive @tracing on FIELD_DEFINITION
-GRAPHQL;
+            """
+            Do not use this directive directly, it is automatically added to the schema
+            when using the tracing extension.
+            """
+            directive @tracing on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

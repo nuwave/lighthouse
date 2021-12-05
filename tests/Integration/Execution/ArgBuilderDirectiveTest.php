@@ -228,7 +228,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             'created' => [
                 'start' => $start,
                 'end' => $end,
-            ]
+            ],
         ])->assertJsonCount(1, 'data.users');
     }
 
@@ -257,7 +257,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'range' => [$start, $end]
+            'range' => [$start, $end],
         ])->assertJsonCount(2, 'data.users');
     }
 
@@ -306,7 +306,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'name' => $users->first()->name
+            'name' => $users->first()->name,
         ])->assertJsonCount(1, 'data.users');
     }
 
@@ -351,7 +351,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
             'email' => $username,
         ]);
         factory(User::class)->create([
-            'name'  => $username,
+            'name' => $username,
             'email' => $username,
         ]);
 

@@ -18,65 +18,65 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Query multiple model entries as a paginated list.
-"""
-directive @paginate(
-  """
-  Which pagination style should be used.
-  """
-  type: PaginateType = PAGINATOR
+            """
+            Query multiple model entries as a paginated list.
+            """
+            directive @paginate(
+              """
+              Which pagination style should be used.
+              """
+              type: PaginateType = PAGINATOR
 
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model detection does not work.
-  """
-  model: String
+              """
+              Specify the class name of the model to use.
+              This is only needed when the default model detection does not work.
+              """
+              model: String
 
-  """
-  Point to a function that provides a Query Builder instance.
-  This replaces the use of a model.
-  """
-  builder: String
+              """
+              Point to a function that provides a Query Builder instance.
+              This replaces the use of a model.
+              """
+              builder: String
 
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+              """
+              Apply scopes to the underlying query.
+              """
+              scopes: [String!]
 
-  """
-  Allow clients to query paginated lists without specifying the amount of items.
-  Overrules the `pagination.default_count` setting from `lighthouse.php`.
-  """
-  defaultCount: Int
+              """
+              Allow clients to query paginated lists without specifying the amount of items.
+              Overrules the `pagination.default_count` setting from `lighthouse.php`.
+              """
+              defaultCount: Int
 
-  """
-  Limit the maximum amount of items that clients can request from paginated lists.
-  Overrules the `pagination.max_count` setting from `lighthouse.php`.
-  """
-  maxCount: Int
-) on FIELD_DEFINITION
+              """
+              Limit the maximum amount of items that clients can request from paginated lists.
+              Overrules the `pagination.max_count` setting from `lighthouse.php`.
+              """
+              maxCount: Int
+            ) on FIELD_DEFINITION
 
-"""
-Options for the `type` argument of `@paginate`.
-"""
-enum PaginateType {
-    """
-    Offset-based pagination, similar to the Laravel default.
-    """
-    PAGINATOR
+            """
+            Options for the `type` argument of `@paginate`.
+            """
+            enum PaginateType {
+                """
+                Offset-based pagination, similar to the Laravel default.
+                """
+                PAGINATOR
 
-    """
-    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
-    """
-    SIMPLE
+                """
+                Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+                """
+                SIMPLE
 
-    """
-    Cursor-based pagination, compatible with the Relay specification.
-    """
-    CONNECTION
-}
-GRAPHQL;
+                """
+                Cursor-based pagination, compatible with the Relay specification.
+                """
+                CONNECTION
+            }
+            GRAPHQL;
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void

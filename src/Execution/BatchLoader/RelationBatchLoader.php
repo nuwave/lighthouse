@@ -48,7 +48,7 @@ class RelationBatchLoader
         $this->parents[$modelKey] = $model;
 
         return new Deferred(function () use ($modelKey) {
-            if (!$this->hasResolved) {
+            if (! $this->hasResolved) {
                 $this->resolve();
             }
 

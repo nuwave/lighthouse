@@ -69,9 +69,9 @@ class ValidationTest extends TestCase
             ->assertExactJson([
                 'errors' => [
                     [
-                        'message'    => 'Validation failed for the field [foo].',
+                        'message' => 'Validation failed for the field [foo].',
                         'extensions' => [
-                            'category'                    => ValidationException::CATEGORY,
+                            'category' => ValidationException::CATEGORY,
                             ValidationException::CATEGORY => [
                                 'bar' => [
                                     'The bar field is required.',
@@ -80,7 +80,7 @@ class ValidationTest extends TestCase
                         ],
                         'locations' => [
                             [
-                                'line'   => 3,
+                                'line' => 3,
                                 'column' => 17,
                             ],
                         ],
@@ -131,8 +131,8 @@ class ValidationTest extends TestCase
                 ],
                 'errors' => [
                     [
-                        'path'       => ['foo'],
-                        'message'    => 'Validation failed for the field [foo.baz].',
+                        'path' => ['foo'],
+                        'message' => 'Validation failed for the field [foo.baz].',
                         'extensions' => [
                             ValidationException::CATEGORY => [
                                 'required' => [

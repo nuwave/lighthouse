@@ -80,8 +80,8 @@ class MorphOneDirectiveTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'task' => [
-                    'id'    => $this->task->id,
-                    'name'  => $this->task->name,
+                    'id' => $this->task->id,
+                    'name' => $this->task->name,
                     'image' => [
                         'id' => $this->image->id,
                     ],
@@ -125,8 +125,8 @@ class MorphOneDirectiveTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'task' => [
-                    'id'          => $this->task->id,
-                    'name'        => $this->task->name,
+                    'id' => $this->task->id,
+                    'name' => $this->task->name,
                     'customImage' => [
                         'id' => $this->image->id,
                     ],

@@ -68,9 +68,9 @@ class SchemaStitcherTest extends TestCase
         $this->expectException(FileNotFoundException::class);
 
         $foo = <<<'EOT'
-#import does-not-exist.graphql
+            #import does-not-exist.graphql
 
-EOT;
+            EOT;
         $this->putRootSchema($foo);
 
         $this->assertSchemaResultIsSame($foo);
@@ -79,9 +79,9 @@ EOT;
     public function testLeavesImportlessFileAsBefore(): void
     {
         $foo = <<<'EOT'
-foo
+            foo
 
-EOT;
+            EOT;
         $this->putRootSchema($foo);
 
         $this->assertSchemaResultIsSame($foo);
@@ -91,26 +91,26 @@ EOT;
     {
         $this->putRootSchema(
             <<<'EOT'
-foo
-#import bar
+                foo
+                #import bar
 
-EOT
+                EOT
         );
 
         $this->filesystem->put(
             'bar',
             <<<'EOT'
-bar
+                bar
 
-EOT
+                EOT
         );
 
         $this->assertSchemaResultIsSame(
             <<<'EOT'
-foo
-bar
+                foo
+                bar
 
-EOT
+                EOT
         );
     }
 
@@ -118,35 +118,35 @@ EOT
     {
         $this->putRootSchema(
             <<<'EOT'
-foo
-#import bar
+                foo
+                #import bar
 
-EOT
+                EOT
         );
 
         $this->filesystem->put(
             'bar',
             <<<'EOT'
-bar
-#import baz
-EOT
+                bar
+                #import baz
+                EOT
         );
 
         $this->filesystem->put(
             'baz',
             <<<'EOT'
-baz
+                baz
 
-EOT
+                EOT
         );
 
         $this->assertSchemaResultIsSame(
             <<<'EOT'
-foo
-bar
-baz
+                foo
+                bar
+                baz
 
-EOT
+                EOT
         );
     }
 
@@ -154,27 +154,27 @@ EOT
     {
         $this->putRootSchema(
             <<<'EOT'
-foo
-#import subdir/bar
+                foo
+                #import subdir/bar
 
-EOT
+                EOT
         );
 
         $this->filesystem->createDir('subdir');
         $this->filesystem->put(
             'subdir/bar',
             <<<'EOT'
-bar
+                bar
 
-EOT
+                EOT
         );
 
         $this->assertSchemaResultIsSame(
             <<<'EOT'
-foo
-bar
+                foo
+                bar
 
-EOT
+                EOT
         );
     }
 
@@ -182,26 +182,26 @@ EOT
     {
         $this->putRootSchema(
             <<<'EOT'
-    foo
-#import bar
+                    foo
+                #import bar
 
-EOT
+                EOT
         );
 
         $this->filesystem->put(
             'bar',
             <<<'EOT'
-        bar
+                        bar
 
-EOT
+                EOT
         );
 
         $this->assertSchemaResultIsSame(
             <<<'EOT'
-    foo
-        bar
+                    foo
+                        bar
 
-EOT
+                EOT
         );
     }
 
@@ -209,35 +209,35 @@ EOT
     {
         $this->putRootSchema(
             <<<'EOT'
-foo
-#import subdir/*.graphql
+                foo
+                #import subdir/*.graphql
 
-EOT
+                EOT
         );
 
         $this->filesystem->createDir('subdir');
         $this->filesystem->put(
             'subdir/bar.graphql',
             <<<'EOT'
-bar
+                bar
 
-EOT
+                EOT
         );
         $this->filesystem->put(
             'subdir/other.graphql',
             <<<'EOT'
-other
+                other
 
-EOT
+                EOT
         );
 
         $this->assertSchemaResultIsSame(
             <<<'EOT'
-foo
-bar
-other
+                foo
+                bar
+                other
 
-EOT
+                EOT
         );
     }
 
@@ -245,33 +245,33 @@ EOT
     {
         $this->putRootSchema(
             <<<'EOT'
-foo
-#import bar
-#import foobar
-EOT
+                foo
+                #import bar
+                #import foobar
+                EOT
         );
 
         $this->filesystem->put(
             'bar',
             <<<'EOT'
-bar
-EOT
+                bar
+                EOT
         );
 
         $this->filesystem->put(
             'foobar',
             <<<'EOT'
-foobar
-EOT
+                foobar
+                EOT
         );
 
         $this->assertSchemaResultIsSame(
             <<<'EOT'
-foo
-bar
-foobar
+                foo
+                bar
+                foobar
 
-EOT
+                EOT
         );
     }
 }

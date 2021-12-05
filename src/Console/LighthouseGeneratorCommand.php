@@ -17,7 +17,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     protected function getNameInput(): string
     {
         $name = $this->argument('name');
-        if (!is_string($name)) {
+        if (! is_string($name)) {
             throw new InvalidArgumentException('You must the name for the class to generate.');
         }
 
@@ -72,7 +72,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         $matching = [];
         foreach ($firstParts as $i => $part) {
             // We ran out of elements to compare, so we reached the maximum common length
-            if (!isset($lastParts[$i])) {
+            if (! isset($lastParts[$i])) {
                 break;
             }
 

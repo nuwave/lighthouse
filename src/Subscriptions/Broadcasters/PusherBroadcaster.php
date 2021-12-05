@@ -72,7 +72,7 @@ class PusherBroadcaster implements Broadcaster
                 $subscriber->channel,
                 self::EVENT_NAME,
                 [
-                    'more'   => true,
+                    'more' => true,
                     'result' => $data,
                 ]
             );

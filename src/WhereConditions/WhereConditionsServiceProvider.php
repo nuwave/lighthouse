@@ -80,27 +80,27 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $operatorDefault = $operator->default();
 
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
-                "The column that is used for the condition."
-                column: $columnType
+                        "$description"
+                        input $name {
+                            "The column that is used for the condition."
+                            column: $columnType
 
-                "The operator that is used for the condition."
-                operator: $operatorName = $operatorDefault
+                            "The operator that is used for the condition."
+                            operator: $operatorName = $operatorDefault
 
-                "The value that is used for the condition."
-                value: Mixed
+                            "The value that is used for the condition."
+                            value: Mixed
 
-                "A set of conditions that requires all conditions to match."
-                AND: [$name!]
+                            "A set of conditions that requires all conditions to match."
+                            AND: [$name!]
 
-                "A set of conditions that requires at least one condition to match."
-                OR: [$name!]
+                            "A set of conditions that requires at least one condition to match."
+                            OR: [$name!]
 
-                "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
-                HAS: $hasRelationInputName
-            }
-GRAPHQL
+                            "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
+                            HAS: $hasRelationInputName
+                        }
+            GRAPHQL
         );
     }
 
@@ -120,21 +120,21 @@ GRAPHQL
         $operatorDefault = $operator->defaultHasOperator();
 
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $hasRelationInputName {
-                "The relation that is checked."
-                relation: String!
+                        "$description"
+                        input $hasRelationInputName {
+                            "The relation that is checked."
+                            relation: String!
 
-                "The comparison operator to test against the amount."
-                operator: $operatorName = $operatorDefault
+                            "The comparison operator to test against the amount."
+                            operator: $operatorName = $operatorDefault
 
-                "The amount to test."
-                amount: Int = $defaultHasAmount
+                            "The amount to test."
+                            amount: Int = $defaultHasAmount
 
-                "Additional condition logic."
-                condition: $name
-            }
-GRAPHQL
+                            "Additional condition logic."
+                            condition: $name
+                        }
+            GRAPHQL
         );
     }
 }

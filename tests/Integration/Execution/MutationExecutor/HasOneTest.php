@@ -222,24 +222,24 @@ class HasOneTest extends DBTestCase
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
-            updateTask(input: {
-                id: 1
-                name: "foo"
-                post: {
-                    create: null
-                    update: null
-                    upsert: null
-                    delete: null
-                }
-            }) {
-                name
-                post {
-                    id
-                }
-            }
-        }
-GRAPHQL
+                    mutation {
+                        updateTask(input: {
+                            id: 1
+                            name: "foo"
+                            post: {
+                                create: null
+                                update: null
+                                upsert: null
+                                delete: null
+                            }
+                        }) {
+                            name
+                            post {
+                                id
+                            }
+                        }
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 'updateTask' => [
@@ -269,25 +269,25 @@ GRAPHQL
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Task(input: {
-                id: 1
-                name: "foo"
-                post: {
-                    create: {
-                        title: "bar"
+                    mutation {
+                        ${action}Task(input: {
+                            id: 1
+                            name: "foo"
+                            post: {
+                                create: {
+                                    title: "bar"
+                                }
+                            }
+                        }) {
+                            id
+                            name
+                            post {
+                                id
+                                title
+                            }
+                        }
                     }
-                }
-            }) {
-                id
-                name
-                post {
-                    id
-                    title
-                }
-            }
-        }
-GRAPHQL
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -315,26 +315,26 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Task(input: {
-                id: 1
-                name: "foo"
-                post: {
-                    update: {
-                        id: 1
-                        title: "bar"
+                    mutation {
+                        ${action}Task(input: {
+                            id: 1
+                            name: "foo"
+                            post: {
+                                update: {
+                                    id: 1
+                                    title: "bar"
+                                }
+                            }
+                        }) {
+                            id
+                            name
+                            post {
+                                id
+                                title
+                            }
+                        }
                     }
-                }
-            }) {
-                id
-                name
-                post {
-                    id
-                    title
-                }
-            }
-        }
-GRAPHQL
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -362,26 +362,26 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Task(input: {
-                id: 1
-                name: "foo"
-                post: {
-                    upsert: {
-                        id: 1
-                        title: "bar"
+                    mutation {
+                        ${action}Task(input: {
+                            id: 1
+                            name: "foo"
+                            post: {
+                                upsert: {
+                                    id: 1
+                                    title: "bar"
+                                }
+                            }
+                        }) {
+                            id
+                            name
+                            post {
+                                id
+                                title
+                            }
+                        }
                     }
-                }
-            }) {
-                id
-                name
-                post {
-                    id
-                    title
-                }
-            }
-        }
-GRAPHQL
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -409,24 +409,24 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Task(input: {
-                id: 1
-                name: "foo"
-                post: {
-                    delete: 1
-                }
-            }) {
-                id
-                name
-                post {
-                    id
-                    title
-                }
-            }
-        }
+                    mutation {
+                        ${action}Task(input: {
+                            id: 1
+                            name: "foo"
+                            post: {
+                                delete: 1
+                            }
+                        }) {
+                            id
+                            name
+                            post {
+                                id
+                                title
+                            }
+                        }
+                    }
 
-GRAPHQL
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [

@@ -23,11 +23,11 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgManipulat
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
-"""
-Allow clients to specify the maximum number of results to return.
-"""
-directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
-GRAPHQL;
+            """
+            Allow clients to specify the maximum number of results to return.
+            """
+            directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function manipulateArgDefinition(
@@ -67,7 +67,7 @@ GRAPHQL;
             }
 
             // Do not apply a limit if the client passes null explicitly
-            if (!is_int($limit)) {
+            if (! is_int($limit)) {
                 return $result;
             }
 

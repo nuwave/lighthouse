@@ -49,7 +49,7 @@ abstract class DateScalarTest extends TestCase
     public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
     {
         // TODO remove when we stop supporting Laravel 5.7
-        if (!class_exists('\Carbon\CarbonImmutable')) {
+        if (! class_exists('\Carbon\CarbonImmutable')) {
             $this->markTestSkipped('CarbonImmutable is not available with older Laravel versions');
         }
 

@@ -108,11 +108,11 @@ class TypeRegistry
         if (! $this->has($name)) {
             throw new DefinitionException(
                 <<<EOL
-Lighthouse failed while trying to load a type: $name
+                    Lighthouse failed while trying to load a type: $name
 
-Make sure the type is present in your schema definition.
+                    Make sure the type is present in your schema definition.
 
-EOL
+                    EOL
             );
         }
 
@@ -329,10 +329,9 @@ EOL
             'description' => $objectDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($objectDefinition),
             'interfaces'
-                /**
-                 * @return list<\GraphQL\Type\Definition\Type>
-                 */
-                => function () use ($objectDefinition): array {
+/**
+ * @return list<\GraphQL\Type\Definition\Type>
+ */ => function () use ($objectDefinition): array {
                     $interfaces = [];
 
                     // Might be a NodeList, so we can not use array_map()
@@ -382,10 +381,9 @@ EOL
             'name' => $inputDefinition->name->value,
             'description' => $inputDefinition->description->value ?? null,
             'fields'
-                /**
-                 * @return array<string, array<string, mixed>>
-                 */
-                => function () use ($inputDefinition): array {
+/**
+ * @return array<string, array<string, mixed>>
+ */ => function () use ($inputDefinition): array {
                     return $this->argumentFactory->toTypeMap($inputDefinition->fields);
                 },
             'astNode' => $inputDefinition,
@@ -525,10 +523,9 @@ EOL
             'name' => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
             'types'
-                /**
-                 * @return list<\GraphQL\Type\Definition\Type>
-                 */
-                => function () use ($unionDefinition): array {
+/**
+ * @return list<\GraphQL\Type\Definition\Type>
+ */ => function () use ($unionDefinition): array {
                     $types = [];
 
                     foreach ($unionDefinition->types as $type) {

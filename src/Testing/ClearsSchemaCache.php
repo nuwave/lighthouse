@@ -14,7 +14,7 @@ trait ClearsSchemaCache
 
     protected function bootClearsSchemaCache(): void
     {
-        if (!static::$schemaCacheWasCleared) {
+        if (! static::$schemaCacheWasCleared) {
             $this->artisan('lighthouse:clear-cache');
             self::$schemaCacheWasCleared = true;
         }

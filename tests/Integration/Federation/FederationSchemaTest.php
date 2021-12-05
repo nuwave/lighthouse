@@ -19,19 +19,19 @@ class FederationSchemaTest extends TestCase
     public function testServiceQueryShouldReturnValidSdl(): void
     {
         $foo = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID! @external
-  foo: String!
-}
+            type Foo @key(fields: "id") {
+              id: ID! @external
+              foo: String!
+            }
 
-GRAPHQL;
+            GRAPHQL;
 
         $query = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: Int!
-}
+            type Query {
+              foo: Int!
+            }
 
-GRAPHQL;
+            GRAPHQL;
 
         $this->schema = $foo . $query;
 
@@ -44,12 +44,12 @@ GRAPHQL;
     public function testServiceQueryShouldReturnValidSdlWithoutQuery(): void
     {
         $foo = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID! @external
-  foo: String!
-}
+            type Foo @key(fields: "id") {
+              id: ID! @external
+              foo: String!
+            }
 
-GRAPHQL;
+            GRAPHQL;
 
         $this->schema = $foo;
 

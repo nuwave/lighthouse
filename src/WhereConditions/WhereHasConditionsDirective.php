@@ -11,35 +11,35 @@ class WhereHasConditionsDirective extends WhereConditionsBaseDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Allows clients to filter a query based on the existence of a related model, using
-a dynamically controlled `WHERE` condition that applies to the relationship.
-"""
-directive @whereHasConditions(
-    """
-    The Eloquent relationship that the conditions will be applied to.
+            """
+            Allows clients to filter a query based on the existence of a related model, using
+            a dynamically controlled `WHERE` condition that applies to the relationship.
+            """
+            directive @whereHasConditions(
+                """
+                The Eloquent relationship that the conditions will be applied to.
 
-    This argument can be omitted if the argument name follows the naming
-    convention `has{$RELATION}`. For example, if the Eloquent relationship
-    is named `posts`, the argument name must be `hasPosts`.
-    """
-    relation: String
+                This argument can be omitted if the argument name follows the naming
+                convention `has{$RELATION}`. For example, if the Eloquent relationship
+                is named `posts`, the argument name must be `hasPosts`.
+                """
+                relation: String
 
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
-    """
-    columns: [String!]
+                """
+                Restrict the allowed column names to a well-defined list.
+                This improves introspection capabilities and security.
+                Mutually exclusive with the `columnsEnum` argument.
+                """
+                columns: [String!]
 
-    """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
-    """
-    columnsEnum: String
-) on ARGUMENT_DEFINITION
-GRAPHQL;
+                """
+                Use an existing enumeration type to restrict the allowed columns to a predefined list.
+                This allowes you to re-use the same enum for multiple fields.
+                Mutually exclusive with the `columns` argument.
+                """
+                columnsEnum: String
+            ) on ARGUMENT_DEFINITION
+            GRAPHQL;
     }
 
     /**

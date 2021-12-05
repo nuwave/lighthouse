@@ -124,7 +124,7 @@ class FindDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'id'   => $userA->id,
+                    'id' => $userA->id,
                     'name' => 'A',
                 ],
             ],
@@ -162,7 +162,7 @@ class FindDirectiveTest extends DBTestCase
     {
         $company = factory(Company::class)->create();
         $user = factory(User::class)->create([
-            'name'       => 'A',
+            'name' => 'A',
             'company_id' => $company->id,
         ]);
 
@@ -189,8 +189,8 @@ class FindDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'user' => [
-                    'id'          => (string) $user->id,
-                    'name'        => $user->name,
+                    'id' => (string) $user->id,
+                    'name' => $user->name,
                     'companyName' => $company->name,
                 ],
             ],

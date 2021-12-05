@@ -123,15 +123,15 @@ class OrderByDirectiveDBTest extends DBTestCase
                 'users' => [
                     [
                         'team_id' => 2,
-                        'name'    => 'B',
+                        'name' => 'B',
                     ],
                     [
                         'team_id' => 2,
-                        'name'    => 'C',
+                        'name' => 'C',
                     ],
                     [
                         'team_id' => 5,
-                        'name'    => 'A',
+                        'name' => 'A',
                     ],
                 ],
             ],

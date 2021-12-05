@@ -112,14 +112,14 @@ class Subscriber implements Serializable
     {
         return [
             'channel' => $this->channel,
-            'topic'   => $this->topic,
-            'query'   => serialize(
+            'topic' => $this->topic,
+            'query' => serialize(
                 AST::toArray($this->query)
             ),
             'field_name' => $this->fieldName,
-            'args'       => $this->args,
-            'variables'  => $this->variables,
-            'context'    => $this->contextSerializer()->serialize($this->context),
+            'args' => $this->args,
+            'variables' => $this->variables,
+            'context' => $this->contextSerializer()->serialize($this->context),
         ];
     }
 

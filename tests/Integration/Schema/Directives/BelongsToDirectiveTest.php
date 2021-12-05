@@ -40,7 +40,7 @@ class BelongsToDirectiveTest extends DBTestCase
         $this->team = factory(Team::class)->create();
         $this->user = factory(User::class)->create([
             'company_id' => $this->company->getKey(),
-            'team_id'    => $this->team->getKey(),
+            'team_id' => $this->team->getKey(),
         ]);
     }
 
@@ -261,11 +261,11 @@ class BelongsToDirectiveTest extends DBTestCase
                 'data' => [
                     'posts' => [
                         [
-                            'id'     => $parent->id,
+                            'id' => $parent->id,
                             'parent' => null,
                         ],
                         [
-                            'id'     => $child->id,
+                            'id' => $child->id,
                             'parent' => [
                                 'id' => $parent->id,
                             ],

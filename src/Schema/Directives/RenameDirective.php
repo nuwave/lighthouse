@@ -11,18 +11,18 @@ class RenameDirective extends BaseDirective implements FieldResolver
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Change the internally used name of a field or argument.
+            """
+            Change the internally used name of a field or argument.
 
-This does not change the schema from a client perspective.
-"""
-directive @rename(
-  """
-  The internal name of an attribute/property/key.
-  """
-  attribute: String!
-) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+            This does not change the schema from a client perspective.
+            """
+            directive @rename(
+              """
+              The internal name of an attribute/property/key.
+              """
+              attribute: String!
+            ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -45,7 +45,7 @@ GRAPHQL;
     {
         $attribute = $this->directiveArgValue('attribute');
 
-        if (!$attribute) {
+        if (! $attribute) {
             throw new DefinitionException(
                 "The @{$this->name()} directive requires an `attribute` argument."
             );

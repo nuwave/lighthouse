@@ -56,7 +56,7 @@ class GlobalErrorRendererTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message'    => self::MESSAGE,
+                    'message' => self::MESSAGE,
                     'extensions' => self::EXTENSIONS_CONTENT,
                 ],
             ],

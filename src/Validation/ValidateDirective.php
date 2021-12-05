@@ -16,11 +16,11 @@ class ValidateDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Run validation on a field.
-"""
-directive @validate on FIELD_DEFINITION
-GRAPHQL;
+            """
+            Run validation on a field.
+            """
+            directive @validate on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

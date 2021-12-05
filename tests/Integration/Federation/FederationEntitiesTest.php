@@ -31,7 +31,7 @@ class FederationEntitiesTest extends TestCase
 
         $foo = [
             '__typename' => 'Foo',
-            'id'         => 42,
+            'id' => 42,
         ];
 
         $this->graphQL(/** @lang GraphQL */ '

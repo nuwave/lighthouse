@@ -87,10 +87,10 @@ class SchemaPrinter extends GraphQLSchemaPrinter
         $fields = static::printFields($options, $type);
 
         return <<<GRAPHQL
-{$description}{$kind} {$type->name}{$implementedInterfaces}{$directives} {
-{$fields}
-}
-GRAPHQL;
+            {$description}{$kind} {$type->name}{$implementedInterfaces}{$directives} {
+            {$fields}
+            }
+            GRAPHQL;
     }
 
     /**

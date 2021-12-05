@@ -139,8 +139,8 @@ class MorphManyDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'post' => [
-                    'id'     => $this->post->id,
-                    'title'  => $this->post->title,
+                    'id' => $this->post->id,
+                    'title' => $this->post->title,
                     'images' => $this->postImages
                         ->map(function (Image $image) {
                             return [
@@ -150,8 +150,8 @@ class MorphManyDirectiveTest extends DBTestCase
                         ->toArray(),
                 ],
                 'task' => [
-                    'id'     => $this->task->id,
-                    'name'   => $this->task->name,
+                    'id' => $this->task->id,
+                    'name' => $this->task->name,
                     'images' => $this->taskImages
                         ->map(function (Image $image) {
                             return [
@@ -206,8 +206,8 @@ class MorphManyDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'post' => [
-                    'id'              => $this->post->id,
-                    'title'           => $this->post->title,
+                    'id' => $this->post->id,
+                    'title' => $this->post->title,
                     'imagesPaginated' => [
                         'data' => $this->postImages
                             ->map(function (Image $image) {
@@ -384,13 +384,13 @@ class MorphManyDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'task' => [
-                    'id'     => $this->task->id,
-                    'name'   => $this->task->name,
+                    'id' => $this->task->id,
+                    'name' => $this->task->name,
                     'images' => [
                         'paginatorInfo' => [
-                            'count'        => 3,
+                            'count' => 3,
                             'hasMorePages' => true,
-                            'total'        => 10,
+                            'total' => 10,
                         ],
                     ],
                 ],
@@ -438,8 +438,8 @@ class MorphManyDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'task' => [
-                    'id'     => $this->task->id,
-                    'name'   => $this->task->name,
+                    'id' => $this->task->id,
+                    'name' => $this->task->name,
                     'images' => [
                         'pageInfo' => [
                             'hasNextPage' => true,
@@ -578,8 +578,8 @@ class MorphManyDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'task' => [
-                    'id'     => $this->task->id,
-                    'name'   => $this->task->name,
+                    'id' => $this->task->id,
+                    'name' => $this->task->name,
                     'images' => [
                         'pageInfo' => [
                             'hasNextPage' => true,

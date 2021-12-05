@@ -149,7 +149,7 @@ class BelongsToManyTest extends DBTestCase
                     'id' => '1',
                 ],
                 'createRole' => [
-                    'id'    => '1',
+                    'id' => '1',
                     'users' => [
                         [
                             'id' => '2',
@@ -157,7 +157,7 @@ class BelongsToManyTest extends DBTestCase
                     ],
                 ],
                 'updateRole' => [
-                    'id'    => '1',
+                    'id' => '1',
                     'users' => [
                         [
                             'id' => '2',
@@ -199,11 +199,11 @@ class BelongsToManyTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createRole' => [
-                    'id'    => '1',
-                    'name'  => 'foobar',
+                    'id' => '1',
+                    'name' => 'foobar',
                     'users' => [
                         [
-                            'id'   => '1',
+                            'id' => '1',
                             'name' => 'bar',
                         ],
                     ],
@@ -243,15 +243,15 @@ class BelongsToManyTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'upsertRole' => [
-                    'id'    => '1',
-                    'name'  => 'is_user',
+                    'id' => '1',
+                    'name' => 'is_user',
                     'users' => [
                         [
-                            'id'   => '10',
+                            'id' => '10',
                             'name' => 'user1',
                         ],
                         [
-                            'id'   => '20',
+                            'id' => '20',
                             'name' => 'user2',
                         ],
                     ],
@@ -268,41 +268,41 @@ class BelongsToManyTest extends DBTestCase
     public function testUpsertBelongsToManyWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
-            upsertRole(input: {
-                name: "is_user"
-                users: {
-                    upsert: [
-                        {
-                            name: "user1"
-                        },
-                        {
-                            name: "user2"
+                    mutation {
+                        upsertRole(input: {
+                            name: "is_user"
+                            users: {
+                                upsert: [
+                                    {
+                                        name: "user1"
+                                    },
+                                    {
+                                        name: "user2"
+                                    }
+                                ]
+                            }
+                        }) {
+                            id
+                            name
+                            users {
+                                id
+                                name
+                            }
                         }
-                    ]
-                }
-            }) {
-                id
-                name
-                users {
-                    id
-                    name
-                }
-            }
-        }
-GRAPHQL
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertRole' => [
-                    'id'    => '1',
-                    'name'  => 'is_user',
+                    'id' => '1',
+                    'name' => 'is_user',
                     'users' => [
                         [
-                            'id'   => '1',
+                            'id' => '1',
                             'name' => 'user1',
                         ],
                         [
-                            'id'   => '2',
+                            'id' => '2',
                             'name' => 'user2',
                         ],
                     ],
@@ -340,15 +340,15 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'createRole' => [
-                    'id'    => '1',
-                    'name'  => 'foobar',
+                    'id' => '1',
+                    'name' => 'foobar',
                     'users' => [
                         [
-                            'id'   => '1',
+                            'id' => '1',
                             'name' => 'user_one',
                         ],
                         [
-                            'id'   => '2',
+                            'id' => '2',
                             'name' => 'user_two',
                         ],
                     ],
@@ -382,15 +382,15 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertRole' => [
-                    'id'    => '1',
-                    'name'  => 'foobar',
+                    'id' => '1',
+                    'name' => 'foobar',
                     'users' => [
                         [
-                            'id'   => '1',
+                            'id' => '1',
                             'name' => 'user_one',
                         ],
                         [
-                            'id'   => '2',
+                            'id' => '2',
                             'name' => 'user_two',
                         ],
                     ],
@@ -432,15 +432,15 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'updateRole' => [
-                    'id'    => '1',
-                    'name'  => 'is_user',
+                    'id' => '1',
+                    'name' => 'is_user',
                     'users' => [
                         [
-                            'id'   => '1',
+                            'id' => '1',
                             'name' => 'user1',
                         ],
                         [
-                            'id'   => '2',
+                            'id' => '2',
                             'name' => 'user2',
                         ],
                     ],
@@ -485,8 +485,8 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'updateRole' => [
-                    'id'    => '1',
-                    'name'  => 'is_user',
+                    'id' => '1',
+                    'name' => 'is_user',
                     'users' => [],
                 ],
             ],
@@ -528,15 +528,15 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'updateRole' => [
-                    'id'    => '1',
-                    'name'  => 'is_user',
+                    'id' => '1',
+                    'name' => 'is_user',
                     'users' => [
                         [
-                            'id'   => '1',
+                            'id' => '1',
                             'name' => 'user1',
                         ],
                         [
-                            'id'   => '2',
+                            'id' => '2',
                             'name' => 'user2',
                         ],
                     ],
@@ -576,42 +576,42 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Role(input: {
-                id: 1
-                name: "is_user"
-                users: {
-                    ${action}: [{
-                        id: 1
-                        name: "user1"
-                    },
-                    {
-                        id: 2
-                        name: "user2"
-                    }]
-                }
-            }) {
-                id
-                name
-                users {
-                    id
-                    name
-                }
-            }
-        }
-GRAPHQL
+                    mutation {
+                        ${action}Role(input: {
+                            id: 1
+                            name: "is_user"
+                            users: {
+                                ${action}: [{
+                                    id: 1
+                                    name: "user1"
+                                },
+                                {
+                                    id: 2
+                                    name: "user2"
+                                }]
+                            }
+                        }) {
+                            id
+                            name
+                            users {
+                                id
+                                name
+                            }
+                        }
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
-                    'id'    => '1',
-                    'name'  => 'is_user',
+                    'id' => '1',
+                    'name' => 'is_user',
                     'users' => [
                         [
-                            'id'   => '1',
+                            'id' => '1',
                             'name' => 'user1',
                         ],
                         [
-                            'id'   => '2',
+                            'id' => '2',
                             'name' => 'user2',
                         ],
                     ],
@@ -640,27 +640,27 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Role(input: {
-                id: 1
-                name: "is_user"
-                users: {
-                    delete: [1]
-                }
-            }) {
-                id
-                name
-                users {
-                    id
-                }
-            }
-        }
-GRAPHQL
+                    mutation {
+                        ${action}Role(input: {
+                            id: 1
+                            name: "is_user"
+                            users: {
+                                delete: [1]
+                            }
+                        }) {
+                            id
+                            name
+                            users {
+                                id
+                            }
+                        }
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
-                    'id'    => '1',
-                    'name'  => 'is_user',
+                    'id' => '1',
+                    'name' => 'is_user',
                     'users' => [
                         [
                             'id' => '2',
@@ -693,25 +693,25 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Role(input: {
-                id: 1
-                users: {
-                    connect: [1]
-                }
-            }) {
-                id
-                name
-                users {
-                    id
-                }
-            }
-        }
-GRAPHQL
+                    mutation {
+                        ${action}Role(input: {
+                            id: 1
+                            users: {
+                                connect: [1]
+                            }
+                        }) {
+                            id
+                            name
+                            users {
+                                id
+                            }
+                        }
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
-                    'id'    => '1',
+                    'id' => '1',
                     'users' => [
                         [
                             'id' => '2',
@@ -743,25 +743,25 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Role(input: {
-                id: 1
-                users: {
-                    sync: [1, 2]
-                }
-            }) {
-                id
-                name
-                users {
-                    id
-                }
-            }
-        }
-GRAPHQL
+                    mutation {
+                        ${action}Role(input: {
+                            id: 1
+                            users: {
+                                sync: [1, 2]
+                            }
+                        }) {
+                            id
+                            name
+                            users {
+                                id
+                            }
+                        }
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
-                    'id'    => '1',
+                    'id' => '1',
                     'users' => [
                         [
                             'id' => '2',
@@ -792,24 +792,24 @@ GRAPHQL
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
-            ${action}Role(input: {
-                id: 1
-                users: {
-                    disconnect: [1]
-                }
-            }) {
-                id
-                users {
-                    id
-                }
-            }
-        }
-GRAPHQL
+                    mutation {
+                        ${action}Role(input: {
+                            id: 1
+                            users: {
+                                disconnect: [1]
+                            }
+                        }) {
+                            id
+                            users {
+                                id
+                            }
+                        }
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
-                    'id'    => '1',
+                    'id' => '1',
                     'users' => [
                         [
                             'id' => '2',
@@ -849,8 +849,8 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'createRole' => [
-                    'id'    => '1',
-                    'name'  => 'foobar',
+                    'id' => '1',
+                    'name' => 'foobar',
                     'users' => [
                         [
                             'id' => '1',
@@ -887,8 +887,8 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'upsertRole' => [
-                    'id'    => '1',
-                    'name'  => 'foobar',
+                    'id' => '1',
+                    'name' => 'foobar',
                     'users' => [
                         [
                             'id' => '1',
@@ -934,7 +934,7 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Role" => [
-                    'id'    => '1',
+                    'id' => '1',
                     'users' => [],
                 ],
             ],
@@ -985,13 +985,13 @@ GRAPHQL
                 'pivotsUpdateUser' => [
                     'roles' => [
                         [
-                            'id'    => 2,
+                            'id' => 2,
                             'pivot' => [
                                 'meta' => null,
                             ],
                         ],
                         [
-                            'id'    => 1,
+                            'id' => 1,
                             'pivot' => [
                                 'meta' => $meta,
                             ],

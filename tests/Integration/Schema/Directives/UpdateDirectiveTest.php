@@ -43,7 +43,7 @@ class UpdateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'updateCompany' => [
-                    'id'   => '1',
+                    'id' => '1',
                     'name' => 'bar',
                 ],
             ],
@@ -87,7 +87,7 @@ class UpdateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'updateCompany' => [
-                    'id'   => '1',
+                    'id' => '1',
                     'name' => 'bar',
                 ],
             ],
@@ -149,7 +149,7 @@ class UpdateDirectiveTest extends DBTestCase
             'data' => [
                 'updateCategory' => [
                     'category_id' => '1',
-                    'name'        => 'bar',
+                    'name' => 'bar',
                 ],
             ],
         ]);
@@ -188,7 +188,7 @@ class UpdateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'updateCategory' => [
-                    'id'   => '1',
+                    'id' => '1',
                     'name' => 'bar',
                 ],
             ],
@@ -311,10 +311,10 @@ class UpdateDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'updateUser' => [
-                    'name'  => 'foo',
+                    'name' => 'foo',
                     'tasks' => [
                         [
-                            'id'   => 3,
+                            'id' => 3,
                             'name' => 'Uniq',
                         ],
                     ],
@@ -386,13 +386,13 @@ class UpdateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'updateUser' => [
-                    'name'  => 'foo',
+                    'name' => 'foo',
                     'tasks' => [
                         [
-                            'id'   => 3,
+                            'id' => 3,
                             'name' => 'Uniq',
                         ], [
-                            'id'   => 4,
+                            'id' => 4,
                             'name' => 'Foo',
                         ],
                     ],

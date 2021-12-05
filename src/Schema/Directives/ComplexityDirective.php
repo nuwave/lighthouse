@@ -13,18 +13,18 @@ class ComplexityDirective extends BaseDirective implements ComplexityResolverDir
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Customize the calculation of a fields complexity score before execution.
-"""
-directive @complexity(
-  """
-  Reference a function to customize the complexity score calculation.
-  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name, the method name defaults to `__invoke`.
-  """
-  resolver: String
-) on FIELD_DEFINITION
-GRAPHQL;
+            """
+            Customize the calculation of a fields complexity score before execution.
+            """
+            directive @complexity(
+              """
+              Reference a function to customize the complexity score calculation.
+              Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+              If you pass only a class name, the method name defaults to `__invoke`.
+              """
+              resolver: String
+            ) on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function complexityResolver(FieldValue $fieldValue): callable

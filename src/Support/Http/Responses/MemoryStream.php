@@ -22,7 +22,7 @@ class MemoryStream extends Stream implements CanStreamResponse
                 $response = ['data' => Arr::get($data, "data.{$path}", [])];
 
                 $errors = $this->chunkError($path, $data);
-                if (!empty($errors)) {
+                if (! empty($errors)) {
                     $response['errors'] = $errors;
                 }
 

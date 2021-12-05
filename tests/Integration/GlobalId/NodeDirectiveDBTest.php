@@ -26,11 +26,11 @@ class NodeDirectiveDBTest extends DBTestCase
      */
     protected $testTuples = [
         1 => [
-            'id'   => 1,
+            'id' => 1,
             'name' => 'foobar',
         ],
         2 => [
-            'id'   => 2,
+            'id' => 2,
             'name' => 'barbaz',
         ],
     ];
@@ -64,11 +64,11 @@ class NodeDirectiveDBTest extends DBTestCase
         ")->assertExactJson([
             'data' => [
                 'first' => [
-                    'id'   => $firstGlobalId,
+                    'id' => $firstGlobalId,
                     'name' => $this->testTuples[1]['name'],
                 ],
                 'second' => [
-                    'id'   => $secondGlobalId,
+                    'id' => $secondGlobalId,
                     'name' => $this->testTuples[2]['name'],
                 ],
             ],
@@ -100,7 +100,7 @@ class NodeDirectiveDBTest extends DBTestCase
         ")->assertExactJson([
             'data' => [
                 'node' => [
-                    'id'   => $globalId,
+                    'id' => $globalId,
                     'name' => $this->testTuples[1]['name'],
                 ],
             ],
@@ -201,7 +201,7 @@ class NodeDirectiveDBTest extends DBTestCase
         ")->assertExactJson([
             'data' => [
                 'node' => [
-                    'id'   => $globalId,
+                    'id' => $globalId,
                     'name' => 'Sepp',
                 ],
             ],

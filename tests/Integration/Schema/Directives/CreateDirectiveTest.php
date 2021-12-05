@@ -33,7 +33,7 @@ class CreateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createCompany' => [
-                    'id'   => '1',
+                    'id' => '1',
                     'name' => 'foo',
                 ],
             ],
@@ -69,7 +69,7 @@ class CreateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createCompany' => [
-                    'id'   => '1',
+                    'id' => '1',
                     'name' => 'foo',
                 ],
             ],
@@ -99,7 +99,7 @@ class CreateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTag' => [
-                    'name'           => 'foobar',
+                    'name' => 'foobar',
                     'default_string' => Constants::TAGS_DEFAULT_STRING,
                 ],
             ],
@@ -349,7 +349,7 @@ class CreateDirectiveTest extends DBTestCase
         ')->assertExactJson([
             'data' => [
                 'createUser' => [
-                    'name'  => 'foo',
+                    'name' => 'foo',
                     'tasks' => [
                         [
                             'name' => 'Uniq',
@@ -537,7 +537,7 @@ class CreateDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createUser' => [
-                    'name'  => 'foo',
+                    'name' => 'foo',
                     'tasks' => [
                         [
                             'name' => 'fooTask',

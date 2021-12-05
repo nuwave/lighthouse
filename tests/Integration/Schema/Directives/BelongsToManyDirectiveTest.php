@@ -144,9 +144,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 'user' => [
                     'rolesPaginated' => [
                         'paginatorInfo' => [
-                            'count'        => 2,
+                            'count' => 2,
                             'hasMorePages' => true,
-                            'total'        => $this->rolesCount,
+                            'total' => $this->rolesCount,
                         ],
                     ],
 
@@ -336,7 +336,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                     'roles' => [
                         'edges' => [
                             [
-                                'meta'    => 'new',
+                                'meta' => 'new',
                                 'nofield' => null,
                             ],
                         ],

@@ -34,7 +34,7 @@ class IdeHelperCommandTest extends TestCase
     {
         $typeRegistry = app(TypeRegistry::class);
         $programmaticType = new EnumType([
-            'name'   => 'Foo',
+            'name' => 'Foo',
             'values' => [
                 'BAR' => [
                     'value' => 'bar',

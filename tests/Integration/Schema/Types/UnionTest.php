@@ -47,20 +47,20 @@ class UnionTest extends DBTestCase
         );
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        union Stuff = Foo | Post
+                    union Stuff = Foo | Post
 
-        type Foo @model(class: "User") {
-            name: String!
-        }
+                    type Foo @model(class: "User") {
+                        name: String!
+                    }
 
-        type Post {
-            title: String!
-        }
+                    type Post {
+                        title: String!
+                    }
 
-        type Query {
-            stuff: [Stuff!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-        }
-GRAPHQL;
+                    type Query {
+                        stuff: [Stuff!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+                    }
+            GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -96,20 +96,20 @@ GRAPHQL;
         );
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        union Nameable = Foo | Post
+                    union Nameable = Foo | Post
 
-        type Foo @model(class: "User") {
-            name: String!
-        }
+                    type Foo @model(class: "User") {
+                        name: String!
+                    }
 
-        type Post @model(class: "User") {
-            title: String!
-        }
+                    type Post @model(class: "User") {
+                        title: String!
+                    }
 
-        type Query {
-            stuff: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-        }
-GRAPHQL;
+                    type Query {
+                        stuff: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+                    }
+            GRAPHQL;
 
         $this->expectExceptionObject(
             new DefinitionException(
@@ -139,20 +139,20 @@ GRAPHQL;
         );
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        union Stuff = Post
+                    union Stuff = Post
 
-        type Post {
-            title: String!
-        }
+                    type Post {
+                        title: String!
+                    }
 
-        type NotPartOfUnion @model(class: "User") {
-            id: String!
-        }
+                    type NotPartOfUnion @model(class: "User") {
+                        id: String!
+                    }
 
-        type Query {
-            stuff: [Stuff!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-        }
-GRAPHQL;
+                    type Query {
+                        stuff: [Stuff!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+                    }
+            GRAPHQL;
 
         $this->expectExceptionObject(
             new DefinitionException(

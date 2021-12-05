@@ -127,10 +127,10 @@ class ComplexityDirectiveTest extends TestCase
         $this->setMaxQueryComplexity($max);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        type Query {
-            foo: ID @complexity(resolver: "{$this->qualifyTestResolver('complexity')}")
-        }
-GRAPHQL;
+                    type Query {
+                        foo: ID @complexity(resolver: "{$this->qualifyTestResolver('complexity')}")
+                    }
+            GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -145,10 +145,10 @@ GRAPHQL;
         $this->setMaxQueryComplexity($max);
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
-        type Query {
-            foo: Int @complexity(resolver: "Foo@complexity")
-        }
-GRAPHQL;
+                    type Query {
+                        foo: Int @complexity(resolver: "Foo@complexity")
+                    }
+            GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {

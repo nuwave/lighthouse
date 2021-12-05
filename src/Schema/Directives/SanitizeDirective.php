@@ -10,11 +10,11 @@ class SanitizeDirective extends ArgTraversalDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Apply sanitization to the arguments of a field.
-"""
-directive @sanitize on FIELD_DEFINITION
-GRAPHQL;
+            """
+            Apply sanitization to the arguments of a field.
+            """
+            directive @sanitize on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     protected function applyDirective(Directive $directive, $value)

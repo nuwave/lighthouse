@@ -24,7 +24,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
     {
-        if (!Utils::classUsesTrait($modelClass, SoftDeletes::class)) {
+        if (! Utils::classUsesTrait($modelClass, SoftDeletes::class)) {
             throw new DefinitionException($exceptionMessage);
         }
     }

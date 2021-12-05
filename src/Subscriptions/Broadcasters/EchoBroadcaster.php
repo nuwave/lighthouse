@@ -37,7 +37,7 @@ class EchoBroadcaster implements Broadcaster
 
         return new JsonResponse([
             'channel_data' => [
-                'user_id'   => $userId,
+                'user_id' => $userId,
                 'user_info' => [],
             ],
         ], 200);

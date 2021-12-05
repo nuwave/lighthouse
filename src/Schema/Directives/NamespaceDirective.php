@@ -25,12 +25,12 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Redefine the default namespaces used in other directives.
-The arguments are a map from directive names to namespaces.
-"""
-directive @namespace repeatable on FIELD_DEFINITION | OBJECT
-GRAPHQL;
+            """
+            Redefine the default namespaces used in other directives.
+            The arguments are a map from directive names to namespaces.
+            """
+            directive @namespace repeatable on FIELD_DEFINITION | OBJECT
+            GRAPHQL;
     }
 
     /**

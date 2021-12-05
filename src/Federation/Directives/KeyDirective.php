@@ -17,23 +17,23 @@ class KeyDirective extends BaseDirective
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
-"""
-The @key directive is used to indicate a combination of fields that
-can be used to uniquely identify and fetch an object or interface.
-"""
-directive @key(
-    """
-    Fields that can be used to uniquely identify and fetch an object or interface.
-    """
-    fields: _FieldSet!
-) repeatable on OBJECT | INTERFACE
-GRAPHQL;
+            """
+            The @key directive is used to indicate a combination of fields that
+            can be used to uniquely identify and fetch an object or interface.
+            """
+            directive @key(
+                """
+                Fields that can be used to uniquely identify and fetch an object or interface.
+                """
+                fields: _FieldSet!
+            ) repeatable on OBJECT | INTERFACE
+            GRAPHQL;
     }
 
     public function fields(): SelectionSetNode
     {
         $fields = $this->directiveArgValue('fields');
-        if (!is_string($fields)) {
+        if (! is_string($fields)) {
             throw new DefinitionException('Argument `fields` on the `@key` directive is required.');
         }
 

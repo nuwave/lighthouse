@@ -20,65 +20,65 @@ class AggregateDirective extends BaseDirective implements FieldResolver
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Returns an aggregate of a column in a given relationship or model.
+            """
+            Returns an aggregate of a column in a given relationship or model.
 
-Requires Laravel 8+.
-"""
-directive @aggregate(
-  """
-  The column to aggregate.
-  """
-  column: String!
+            Requires Laravel 8+.
+            """
+            directive @aggregate(
+              """
+              The column to aggregate.
+              """
+              column: String!
 
-  """
-  The aggregate function to compute.
-  """
-  function: AggregateFunction!
+              """
+              The aggregate function to compute.
+              """
+              function: AggregateFunction!
 
-  """
-  The relationship with the column to aggregate.
-  Mutually exclusive with the `model` argument.
-  """
-  relation: String
+              """
+              The relationship with the column to aggregate.
+              Mutually exclusive with the `model` argument.
+              """
+              relation: String
 
-  """
-  The model with the column to aggregate.
-  Mutually exclusive with the `relation` argument.
-  """
-  model: String
+              """
+              The model with the column to aggregate.
+              Mutually exclusive with the `relation` argument.
+              """
+              model: String
 
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-) on FIELD_DEFINITION
+              """
+              Apply scopes to the underlying query.
+              """
+              scopes: [String!]
+            ) on FIELD_DEFINITION
 
-"""
-Options for the `function` argument of `@aggregate`.
-"""
-enum AggregateFunction {
-    """
-    Return the average value.
-    """
-    AVG
+            """
+            Options for the `function` argument of `@aggregate`.
+            """
+            enum AggregateFunction {
+                """
+                Return the average value.
+                """
+                AVG
 
-    """
-    Return the sum.
-    """
-    SUM
+                """
+                Return the sum.
+                """
+                SUM
 
-    """
-    Return the minimum.
-    """
-    MIN
+                """
+                Return the minimum.
+                """
+                MIN
 
-    """
-    Return the maximum.
-    """
-    MAX
-}
-GRAPHQL;
+                """
+                Return the maximum.
+                """
+                MAX
+            }
+            GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue

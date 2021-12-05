@@ -436,10 +436,10 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         ', [
             'hasCategories' => [
                 'HAS' => [
-                    'relation'  => 'parent.parent.parent',
+                    'relation' => 'parent.parent.parent',
                     'condition' => [
                         'column' => 'category_id',
-                        'value'  => $category1->category_id,
+                        'value' => $category1->category_id,
                     ],
                 ],
             ],
@@ -447,22 +447,22 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'posts' => [
                     [
-                        'id'         => (string) $post->id,
-                        'title'      => $post->title,
-                        'body'       => $post->body,
+                        'id' => (string) $post->id,
+                        'title' => $post->title,
+                        'body' => $post->body,
                         'categories' => [
                             [
                                 'category_id' => (string) $category4->category_id,
-                                'name'        => $category4->name,
-                                'parent'      => [
+                                'name' => $category4->name,
+                                'parent' => [
                                     'category_id' => (string) $category3->category_id,
-                                    'name'        => $category3->name,
-                                    'parent'      => [
+                                    'name' => $category3->name,
+                                    'parent' => [
                                         'category_id' => (string) $category2->category_id,
-                                        'name'        => $category2->name,
-                                        'parent'      => [
+                                        'name' => $category2->name,
+                                        'parent' => [
                                             'category_id' => (string) $category1->category_id,
-                                            'name'        => $category1->name,
+                                            'name' => $category1->name,
                                         ],
                                     ],
                                 ],
@@ -499,13 +499,13 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         ', [
             'hasParent' => [
                 'column' => 'ID',
-                'value'  => $parent->id,
+                'value' => $parent->id,
             ],
         ])->assertExactJson([
             'data' => [
                 'locations' => [
                     [
-                        'id'     => (string) $child->id,
+                        'id' => (string) $child->id,
                         'parent' => [
                             'id' => (string) $parent->id,
                         ],
@@ -541,14 +541,14 @@ class WhereHasConditionsDirectiveTest extends DBTestCase
         ', [
             'hasChildren' => [
                 'column' => 'ID',
-                'value'  => $child->id,
+                'value' => $child->id,
             ],
         ])->assertExactJson([
             'data' => [
                 'locations' => [
                     [
-                        'id'       => (string) $parent->id,
-                        'parent'   => null,
+                        'id' => (string) $parent->id,
+                        'parent' => null,
                         'children' => [
                             [
                                 'id' => (string) $child->id,

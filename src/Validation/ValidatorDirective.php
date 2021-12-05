@@ -30,20 +30,20 @@ class ValidatorDirective extends BaseDirective implements ArgDirective, Argument
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Provide validation rules through a PHP class.
-"""
-directive @validator(
-  """
-  The name of the class to use.
+            """
+            Provide validation rules through a PHP class.
+            """
+            directive @validator(
+              """
+              The name of the class to use.
 
-  If defined on an input, this defaults to a class called `{$inputName}Validator` in the
-  default validator namespace. For fields, it uses the namespace of the parent type
-  and the field name: `{$parent}\{$field}Validator`.
-  """
-  class: String
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
-GRAPHQL;
+              If defined on an input, this defaults to a class called `{$inputName}Validator` in the
+              default validator namespace. For fields, it uses the namespace of the parent type
+              and the field name: `{$parent}\{$field}Validator`.
+              """
+              class: String
+            ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
+            GRAPHQL;
     }
 
     public function rules(): array
@@ -80,7 +80,7 @@ GRAPHQL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        if (!$typeDefinition instanceof InputObjectTypeDefinitionNode) {
+        if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
             throw new DefinitionException(
                 "Can not use @validator on non input type {$typeDefinition->name->value}."
             );

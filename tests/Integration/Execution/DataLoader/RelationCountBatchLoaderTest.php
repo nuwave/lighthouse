@@ -52,13 +52,13 @@ class RelationCountBatchLoaderTest extends DBTestCase
         $this
             ->postGraphQL([
                 [
-                    'query'     => $query,
+                    'query' => $query,
                     'variables' => [
                         'id' => $users[0]->getKey(),
                     ],
                 ],
                 [
-                    'query'     => $query,
+                    'query' => $query,
                     'variables' => [
                         'id' => $users[1]->getKey(),
                     ],
@@ -146,9 +146,9 @@ class RelationCountBatchLoaderTest extends DBTestCase
 
         $this
             ->postGraphQL([
-                'query'     => $query,
+                'query' => $query,
                 'variables' => [
-                    'id'  => $users[0]->getKey(),
+                    'id' => $users[0]->getKey(),
                     'ids' => [$users[1]->getKey(), $users[2]->getKey()],
                 ],
             ])

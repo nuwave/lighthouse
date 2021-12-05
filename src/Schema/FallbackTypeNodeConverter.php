@@ -36,9 +36,9 @@ class FallbackTypeNodeConverter extends TypeNodeConverter
             return Type::getStandardTypes()[$nodeName];
         }
 
-        if (!$this->typeRegistry->has($nodeName)) {
+        if (! $this->typeRegistry->has($nodeName)) {
             $dummyType = new CustomScalarType([
-                'name'      => $nodeName,
+                'name' => $nodeName,
                 'serialize' => function () {
                 },
             ]);

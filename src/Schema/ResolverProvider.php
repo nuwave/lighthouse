@@ -63,14 +63,14 @@ class ResolverProvider implements ProvidesResolver
 
         throw new DefinitionException(
             <<<MESSAGE
-Could not locate a field resolver for the {$parent}: {$fieldName}.
+                Could not locate a field resolver for the {$parent}: {$fieldName}.
 
-Either add a resolver directive such as @all, @find or @create or add
-a resolver class through:
+                Either add a resolver directive such as @all, @find or @create or add
+                a resolver class through:
 
-php artisan lighthouse:{$parent} {$proposedResolverClass}
+                php artisan lighthouse:{$parent} {$proposedResolverClass}
 
-MESSAGE
+                MESSAGE
         );
     }
 }

@@ -11,21 +11,21 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 class ASTUnserializationBench
 {
     public const SCHEMA = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  query1: String
-  query2: String
-}
+        type Query {
+          query1: String
+          query2: String
+        }
 
-type Mutation {
-  mutation1: Int
-  mutation2: Int
-}
+        type Mutation {
+          mutation1: Int
+          mutation2: Int
+        }
 
-type Foo {
-  foo1: Boolean
-  foo2: Boolean
-}
-GRAPHQL;
+        type Foo {
+          foo1: Boolean
+          foo2: Boolean
+        }
+        GRAPHQL;
 
     /**
      * @var string

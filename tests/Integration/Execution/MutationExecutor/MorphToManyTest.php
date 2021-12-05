@@ -235,7 +235,7 @@ class MorphToManyTest extends DBTestCase
                 'createTask' => [
                     'tags' => [
                         [
-                            'id'   => 1,
+                            'id' => 1,
                             'name' => 'php',
                         ],
                     ],
@@ -270,7 +270,7 @@ class MorphToManyTest extends DBTestCase
                 'upsertTask' => [
                     'tags' => [
                         [
-                            'id'   => 1,
+                            'id' => 1,
                             'name' => 'php',
                         ],
                     ],
@@ -306,7 +306,7 @@ class MorphToManyTest extends DBTestCase
                 'upsertTask' => [
                     'tags' => [
                         [
-                            'id'   => 1,
+                            'id' => 1,
                             'name' => 'php',
                         ],
                     ],
@@ -318,32 +318,32 @@ class MorphToManyTest extends DBTestCase
     public function testUpsertMorphToManyWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
-            upsertTask(input: {
-                name: "Finish tests"
-                tags: {
-                    upsert: [
-                        {
-                            name: "php"
+                    mutation {
+                        upsertTask(input: {
+                            name: "Finish tests"
+                            tags: {
+                                upsert: [
+                                    {
+                                        name: "php"
+                                    }
+                                ]
+                            }
+                        }) {
+                            id
+                            tags {
+                                id
+                                name
+                            }
                         }
-                    ]
-                }
-            }) {
-                id
-                tags {
-                    id
-                    name
-                }
-            }
-        }
-GRAPHQL
+                    }
+            GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id'   => 1,
+                    'id' => 1,
                     'tags' => [
                         [
-                            'id'   => 1,
+                            'id' => 1,
                             'name' => 'php',
                         ],
                     ],

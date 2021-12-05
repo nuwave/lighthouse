@@ -16,7 +16,7 @@ class DummySubscriber extends Subscriber
     {
         return [
             'channel' => $this->channel,
-            'topic'   => $this->topic,
+            'topic' => $this->topic,
         ];
     }
 

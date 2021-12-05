@@ -85,7 +85,7 @@ class ExternalDirectiveTest extends TestCase
     public function testExternalDirectiveFallbackToDefaultFieldResolver(): void
     {
         $foo = [
-            'id'             => 1,
+            'id' => 1,
             'someFieldWeOwn' => 'Resolved by our own service',
         ];
         $this->mockResolver($foo);

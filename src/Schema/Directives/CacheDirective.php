@@ -33,24 +33,24 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Cache the result of a resolver.
-"""
-directive @cache(
-  """
-  Set the duration it takes for the cache to expire in seconds.
-  If not given, the result will be stored forever.
-  """
-  maxAge: Int
+            """
+            Cache the result of a resolver.
+            """
+            directive @cache(
+              """
+              Set the duration it takes for the cache to expire in seconds.
+              If not given, the result will be stored forever.
+              """
+              maxAge: Int
 
-  """
-  Limit access to cached data to the currently authenticated user.
-  When the field is accessible by guest users, this will not have
-  any effect, they will access a shared cache.
-  """
-  private: Boolean = false
-) on FIELD_DEFINITION
-GRAPHQL;
+              """
+              Limit access to cached data to the currently authenticated user.
+              When the field is accessible by guest users, this will not have
+              any effect, they will access a shared cache.
+              """
+              private: Boolean = false
+            ) on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

@@ -55,7 +55,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             }
         );
 
-        if (!$className) {
+        if (! $className) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
 
@@ -85,7 +85,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
                 $resolveInfo
             );
 
-            if (!$subscription->can($subscriber)) {
+            if (! $subscription->can($subscriber)) {
                 throw new UnauthorizedSubscriber(
                     'Unauthorized subscription request'
                 );

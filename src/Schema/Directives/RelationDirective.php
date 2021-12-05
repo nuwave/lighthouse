@@ -97,7 +97,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         if ($edgeTypeName = $this->directiveArgValue('edgeType')) {
             $edgeType = $documentAST->types[$edgeTypeName] ?? null;
-            if (!$edgeType instanceof ObjectTypeDefinitionNode) {
+            if (! $edgeType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException(
                     "The edgeType argument on {$this->nodeName()} must reference an existing object type definition."
                 );

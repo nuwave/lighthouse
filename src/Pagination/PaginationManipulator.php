@@ -91,30 +91,30 @@ class PaginationManipulator
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "A paginated list of {$fieldTypeName} edges."
-            type {$connectionTypeName} {
-                "Pagination information about the list of edges."
-                pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
+                        "A paginated list of {$fieldTypeName} edges."
+                        type {$connectionTypeName} {
+                            "Pagination information about the list of edges."
+                            pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
-                "A list of $fieldTypeName edges."
-                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
-            }
-GRAPHQL
+                            "A list of $fieldTypeName edges."
+                            edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
+                        }
+            GRAPHQL
         );
         $this->addPaginationWrapperType($connectionType);
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
             ?? Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-                "An edge that contains a node of type $fieldTypeName and a cursor."
-                type $connectionEdgeName {
-                    "The $fieldTypeName node."
-                    node: $fieldTypeName!
+                                "An edge that contains a node of type $fieldTypeName and a cursor."
+                                type $connectionEdgeName {
+                                    "The $fieldTypeName node."
+                                    node: $fieldTypeName!
 
-                    "A unique cursor that can be used for pagination."
-                    cursor: String!
-                }
-GRAPHQL
+                                    "A unique cursor that can be used for pagination."
+                                    cursor: String!
+                                }
+                GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
@@ -122,9 +122,9 @@ GRAPHQL
             self::countArgument($defaultCount, $maxCount)
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-"A cursor after which elements are returned."
-after: String
-GRAPHQL
+            "A cursor after which elements are returned."
+            after: String
+            GRAPHQL
         );
 
         $fieldDefinition->type = $this->paginationResultType($connectionTypeName);
@@ -168,15 +168,15 @@ GRAPHQL
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "A paginated list of {$fieldTypeName} items."
-            type {$paginatorTypeName} {
-                "Pagination information about the list of items."
-                paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                        "A paginated list of {$fieldTypeName} items."
+                        type {$paginatorTypeName} {
+                            "Pagination information about the list of items."
+                            paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
-                "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
-            }
-GRAPHQL
+                            "A list of {$fieldTypeName} items."
+                            data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+                        }
+            GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
@@ -184,9 +184,9 @@ GRAPHQL
             self::countArgument($defaultCount, $maxCount)
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-"The offset from which items are returned."
-page: Int
-GRAPHQL
+            "The offset from which items are returned."
+            page: Int
+            GRAPHQL
         );
 
         $fieldDefinition->type = $this->paginationResultType($paginatorTypeName);
@@ -204,15 +204,15 @@ GRAPHQL
         $paginatorFieldClassName = addslashes(SimplePaginatorField::class);
 
         $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "A paginated list of {$fieldTypeName} items."
-            type {$paginatorTypeName} {
-                "Pagination information about the list of items."
-                paginatorInfo: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                        "A paginated list of {$fieldTypeName} items."
+                        type {$paginatorTypeName} {
+                            "Pagination information about the list of items."
+                            paginatorInfo: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
-                "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
-            }
-GRAPHQL
+                            "A list of {$fieldTypeName} items."
+                            data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+                        }
+            GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
@@ -220,9 +220,9 @@ GRAPHQL
             self::countArgument($defaultCount, $maxCount)
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-"The offset from which items are returned."
-page: Int
-GRAPHQL
+            "The offset from which items are returned."
+            page: Int
+            GRAPHQL
         );
 
         $fieldDefinition->type = $this->paginationResultType($paginatorTypeName);

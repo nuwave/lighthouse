@@ -178,8 +178,8 @@ class GlobalIdDirectiveTest extends TestCase
         ")->assertJson([
             'data' => [
                 'foo' => [
-                    'type'  => 'Foo',
-                    'id'    => 'bar',
+                    'type' => 'Foo',
+                    'id' => 'bar',
                     'array' => [
                         'Foo',
                         'bar',

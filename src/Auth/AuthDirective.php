@@ -23,17 +23,17 @@ class AuthDirective extends BaseDirective implements FieldResolver
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Return the currently authenticated user as the result of a query.
-"""
-directive @auth(
-  """
-  Specify which guard to use, e.g. "api".
-  When not defined, the default from `lighthouse.php` is used.
-  """
-  guard: String
-) on FIELD_DEFINITION
-GRAPHQL;
+            """
+            Return the currently authenticated user as the result of a query.
+            """
+            directive @auth(
+              """
+              Specify which guard to use, e.g. "api".
+              When not defined, the default from `lighthouse.php` is used.
+              """
+              guard: String
+            ) on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue

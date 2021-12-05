@@ -99,8 +99,8 @@ class MorphOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id'    => '1',
-                    'name'  => 'foo',
+                    'id' => '1',
+                    'name' => 'foo',
                     'image' => [
                         'url' => 'foo',
                     ],
@@ -132,8 +132,8 @@ class MorphOneTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createTask' => [
-                    'id'    => '1',
-                    'name'  => 'foo',
+                    'id' => '1',
+                    'name' => 'foo',
                     'image' => [
                         'url' => 'foo',
                     ],
@@ -145,31 +145,31 @@ class MorphOneTest extends DBTestCase
     public function testUpsertMorphOneWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
-            upsertTask(input: {
-                name: "foo"
-                image: {
-                    upsert: {
-                        url: "foo"
+                    mutation {
+                        upsertTask(input: {
+                            name: "foo"
+                            image: {
+                                upsert: {
+                                    url: "foo"
+                                }
+                            }
+                        }) {
+                            id
+                            name
+                            image {
+                                id
+                                url
+                            }
+                        }
                     }
-                }
-            }) {
-                id
-                name
-                image {
-                    id
-                    url
-                }
-            }
-        }
-GRAPHQL
+            GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [
-                    'id'    => '1',
-                    'name'  => 'foo',
+                    'id' => '1',
+                    'name' => 'foo',
                     'image' => [
-                        'id'  => 1,
+                        'id' => 1,
                         'url' => 'foo',
                     ],
                 ],
@@ -202,7 +202,7 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'updateTask' => [
-                    'name'  => 'foo',
+                    'name' => 'foo',
                     'image' => null,
                 ],
             ],
@@ -248,8 +248,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id'    => '1',
-                    'name'  => 'foo',
+                    'id' => '1',
+                    'name' => 'foo',
                     'image' => [
                         'url' => 'foo',
                     ],
@@ -287,8 +287,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id'    => '1',
-                    'name'  => 'foo',
+                    'id' => '1',
+                    'name' => 'foo',
                     'image' => [
                         'url' => 'foo',
                     ],
@@ -331,8 +331,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id'    => '1',
-                    'name'  => 'foo',
+                    'id' => '1',
+                    'name' => 'foo',
                     'image' => [
                         'url' => 'foo',
                     ],
@@ -372,8 +372,8 @@ GRAPHQL
         ")->assertJson([
             'data' => [
                 "${action}Task" => [
-                    'id'    => '1',
-                    'name'  => 'foo',
+                    'id' => '1',
+                    'name' => 'foo',
                     'image' => null,
                 ],
             ],

@@ -42,31 +42,31 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
-"""
-directive @throttle(
-    """
-    Named preconfigured rate limiter. Requires Laravel 8.x or later.
-    """
-    name: String
+            """
+            Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
+            """
+            directive @throttle(
+                """
+                Named preconfigured rate limiter. Requires Laravel 8.x or later.
+                """
+                name: String
 
-    """
-    Maximum number of attempts in a specified time interval.
-    """
-    maxAttempts: Int = 60
+                """
+                Maximum number of attempts in a specified time interval.
+                """
+                maxAttempts: Int = 60
 
-    """
-    Time in minutes to reset attempts.
-    """
-    decayMinutes: Float = 1.0
+                """
+                Time in minutes to reset attempts.
+                """
+                decayMinutes: Float = 1.0
 
-    """
-    Prefix to distinguish several field groups.
-    """
-    prefix: String
-) on FIELD_DEFINITION
-GRAPHQL;
+                """
+                Prefix to distinguish several field groups.
+                """
+                prefix: String
+            ) on FIELD_DEFINITION
+            GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue

@@ -29,13 +29,13 @@ class Serializer implements ContextSerializer
 
         return serialize([
             'request' => [
-                'query'      => $request->query->all(),
-                'request'    => $request->request->all(),
+                'query' => $request->query->all(),
+                'request' => $request->request->all(),
                 'attributes' => $request->attributes->all(),
-                'cookies'    => [],
-                'files'      => [],
-                'server'     => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
-                'content'    => $request->getContent(),
+                'cookies' => [],
+                'files' => [],
+                'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
+                'content' => $request->getContent(),
             ],
             'user' => $this->getSerializedPropertyValue($context->user()),
         ]);
@@ -45,7 +45,7 @@ class Serializer implements ContextSerializer
     {
         [
             'request' => $rawRequest,
-            'user'    => $rawUser
+            'user' => $rawUser
         ] = unserialize($context);
 
         $request = new Request(

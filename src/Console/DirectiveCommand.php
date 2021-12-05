@@ -112,7 +112,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         $forField = $this->option('field');
         $forArgument = $this->option('argument');
 
-        if (!$forType && !$forField && !$forArgument) {
+        if (! $forType && ! $forField && ! $forArgument) {
             throw new \Exception('Must specify at least one of: --type, --field, --argument');
         }
 
@@ -276,7 +276,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getFileIfExists(string $path): ?string
     {
-        if (!$this->files->exists($path)) {
+        if (! $this->files->exists($path)) {
             return null;
         }
 

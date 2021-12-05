@@ -74,7 +74,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     {
         $rules = $this->directiveArgValue('apply');
 
-        if (!is_array($rules)) {
+        if (! is_array($rules)) {
             $this->invalidApplyArgument($rules);
         }
 
@@ -83,7 +83,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         }
 
         foreach ($rules as $rule) {
-            if (!is_string($rule)) {
+            if (! is_string($rule)) {
                 $this->invalidApplyArgument($rules);
             }
         }
@@ -96,33 +96,33 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             return;
         }
 
-        if (!is_array($messages)) {
+        if (! is_array($messages)) {
             $this->invalidMessageArgument($messages);
         }
 
         if (isset($messages[0])) {
             foreach ($messages as $messageMap) {
-                if (!is_array($messageMap)) {
+                if (! is_array($messageMap)) {
                     $this->invalidMessageArgument($messages);
                 }
 
                 $rule = $messageMap['rule'] ?? null;
-                if (!is_string($rule)) {
+                if (! is_string($rule)) {
                     $this->invalidMessageArgument($messages);
                 }
 
                 $message = $messageMap['message'] ?? null;
-                if (!is_string($message)) {
+                if (! is_string($message)) {
                     $this->invalidMessageArgument($messages);
                 }
             }
         } else {
             foreach ($messages as $rule => $message) {
-                if (!is_string($rule)) {
+                if (! is_string($rule)) {
                     $this->invalidMessageArgument($messages);
                 }
 
-                if (!is_string($message)) {
+                if (! is_string($message)) {
                     $this->invalidMessageArgument($messages);
                 }
             }
