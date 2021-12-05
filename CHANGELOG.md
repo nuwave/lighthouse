@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Prevent possible `Undefined array key 0` error when there's an interface implemented by two renamed models https://github.com/nuwave/lighthouse/pull/1997
+
 ## v5.27.2
 
 ### Fixed

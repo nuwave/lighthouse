@@ -113,6 +113,39 @@ GRAPHQL;
         $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
     }
 
+    public function testDoesNotErrorOnSecondRenamedModel(): void
+    {
+        // This creates one team with it
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Nameable {
+            name: String!
+        }
+
+        type Foo implements Nameable @model(class: "Team") {
+            name: String!
+        }
+
+        type Bar implements Nameable @model(class: "User") {
+            name: String!
+        }
+
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
+
+        $this->expectNotToPerformAssertions();
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            namedThings {
+                name
+            }
+        }
+        ');
+    }
+
     public function testThrowsOnAmbiguousSchemaMapping(): void
     {
         // This creates one team with it
