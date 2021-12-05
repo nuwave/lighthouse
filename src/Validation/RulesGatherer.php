@@ -274,10 +274,10 @@ class RulesGatherer
                     'Gte',
                     'Lt',
                     'Lte',
-                    'RequiredIf',
-                    'RequiredUnless',
                     'ProhibitedIf',
                     'ProhibitedUnless',
+                    'RequiredIf',
+                    'RequiredUnless',
                     'Same',
                 ])) {
                     $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
@@ -285,6 +285,7 @@ class RulesGatherer
 
                 // Rules where all arguments are field references
                 if (in_array($name, [
+                    'Prohibits',
                     'RequiredWith',
                     'RequiredWithAll',
                     'RequiredWithout',

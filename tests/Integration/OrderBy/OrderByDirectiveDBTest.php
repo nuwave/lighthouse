@@ -16,15 +16,6 @@ class OrderByDirectiveDBTest extends DBTestCase
             orderBy: _ @orderBy
             orderByRestricted: _ @orderBy(columns: ["name"])
             orderByRestrictedEnum: _ @orderBy(columnsEnum: "UserColumn")
-            orderByRelation: _ @orderBy(relations: [{ relation: "tasks" }])
-            orderByRelationRestricted: _ @orderBy(
-                columns: ["name"],
-                relations: [{ relation: "tasks" }]
-            )
-            orderByRelationRestrictedEnum: _ @orderBy(
-                columnsEnum: "UserColumn",
-                relations: [{ relation: "tasks" }]
-            )
         ): [User!]! @all
     }
 
@@ -272,36 +263,174 @@ class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testOrderWithRelation(): void
+    public function testOrderByRelationCount(): void
     {
-        $userB = factory(User::class)->create(['name' => 'B']);
-        $userA = factory(User::class)->create(['name' => 'A']);
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users(
+                orderBy: _ @orderBy(relations: [
+                    {
+                        relation: "tasks"
+                    }
+                ])
+            ): [User!]! @all
+        }
 
-        factory(Task::class)->create(['user_id' => $userA->id]);
-        factory(Task::class)->create(['user_id' => $userA->id]);
-        factory(Task::class)->create(['user_id' => $userB->id]);
+        type User {
+            id: Int!
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $userA */
+        $userA = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\User $userB */
+        $userB = factory(User::class)->create();
+
+        $userA->tasks()->saveMany(
+            factory(Task::class, 1)->create()
+        );
+        $userB->tasks()->saveMany(
+            factory(Task::class, 2)->create()
+        );
 
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(
-                orderByRelation: [
+                orderBy: [
                     {
                         tasks: { aggregate: COUNT }
                         order: DESC
                     }
                 ]
             ) {
-                name
+                id
             }
         }
         ')->assertExactJson([
             'data' => [
                 'users' => [
                     [
-                        'name' => 'A',
+                        'id' => $userB->id,
                     ],
                     [
-                        'name' => 'B',
+                        'id' => $userA->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderBy: [
+                    {
+                        tasks: { aggregate: COUNT }
+                        order: ASC
+                    }
+                ]
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => $userA->id,
+                    ],
+                    [
+                        'id' => $userB->id,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOrderByRelationAggregate(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users(
+                orderBy: _ @orderBy(relations: [
+                    {
+                        relation: "tasks"
+                        columns: ["difficulty"]
+                    }
+                ])
+            ): [User!]! @all
+        }
+
+        type User {
+            id: Int!
+        }
+
+        enum UserColumn {
+            NAME @enum(value: "name")
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $userA */
+        $userA = factory(User::class)->create();
+        /** @var \Tests\Utils\Models\User $userB */
+        $userB = factory(User::class)->create();
+
+        /** @var \Tests\Utils\Models\Task $taskA1 */
+        $taskA1 = factory(Task::class)->make();
+        $taskA1->difficulty = 1;
+        $userA->tasks()->save($taskA1);
+
+        /** @var \Tests\Utils\Models\Task $taskB1 */
+        $taskB1 = factory(Task::class)->make();
+        $taskB1->difficulty = 2;
+        $userB->tasks()->save($taskB1);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderBy: [
+                    {
+                        tasks: { aggregate: SUM, column: DIFFICULTY }
+                        order: DESC
+                    }
+                ]
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => $userB->id,
+                    ],
+                    [
+                        'id' => $userA->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                orderBy: [
+                    {
+                        tasks: { aggregate: SUM, column: DIFFICULTY }
+                        order: ASC
+                    }
+                ]
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => $userA->id,
+                    ],
+                    [
+                        'id' => $userB->id,
                     ],
                 ],
             ],

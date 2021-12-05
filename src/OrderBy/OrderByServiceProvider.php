@@ -31,7 +31,7 @@ class OrderByServiceProvider extends ServiceProvider
                 $documentAST = $manipulateAST->documentAST;
                 $documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/* @lang GraphQL */ '
-                        "The available directions for ordering a list of records."
+                        "Directions for ordering a list of records."
                         enum SortOrder {
                             "Sort records in ascending order."
                             ASC
@@ -39,41 +39,37 @@ class OrderByServiceProvider extends ServiceProvider
                             "Sort records in descending order."
                             DESC
                         }
-                    '
-                    )
+                    ')
                 );
                 $documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/* @lang GraphQL */ '
-                        "TODO: description"
-                        enum AggregateFunctionOrder {
-                            "TODO: description"
-                            COUNT
+                        "Aggregate functions when ordering by a relation without specifying a column."
+                        enum OrderByRelationAggregateFunction {
+                            "Amount of items."
+                            COUNT @enum(value: "count")
                         }
-                    '
-                    )
+                    ')
                 );
                 $documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/* @lang GraphQL */ '
-                        "TODO: description"
-                        enum AggregateFunctionOrderForColumn {
-                            "TODO: description"
-                            AVG
+                        "Aggregate functions when ordering by a relation that may specify a column."
+                        enum OrderByRelationWithColumnAggregateFunction {
+                            "Average."
+                            AVG @enum(value: "avg")
 
-                            "TODO: description"
-                            MIN
+                            "Minimum."
+                            MIN @enum(value: "min")
 
-                            "TODO: description"
-                            MAX
+                            "Maximum."
+                            MAX @enum(value: "max")
 
-                            "TODO: description"
-                            SUM
+                            "Sum."
+                            SUM @enum(value: "sum")
 
-                            "TODO: description"
-                            COUNT
-
+                            "Amount of items."
+                            COUNT @enum(value: "count")
                         }
-                    '
-                    )
+                    ')
                 );
                 $documentAST->setTypeDefinition(
                     static::createOrderByClauseInput(
@@ -101,28 +97,18 @@ GRAPHQL
         );
     }
 
-    public static function createOrderByRelationClauseInput(string $name, string $description, string $relation, string $configurationType): InputObjectTypeDefinitionNode
-    {
-        return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
-                "TODO: description"
-                $relation: $configurationType!
-
-                "The direction that is used for ordering."
-                order: SortOrder!
-            }
-GRAPHQL
-        );
-    }
-
+    /**
+     * We generate this in the same general shape as the input object with columns,
+     * even though it is unnecessarily complex for this specific case, to make it
+     * a non-breaking change when columns are added.
+     */
     public static function createRelationAggregateFunctionInput(string $name, string $description): InputObjectTypeDefinitionNode
     {
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
-                "TODO: description"
-                aggregate: AggregateFunctionOrder!
+                "Always COUNT."
+                aggregate: OrderByRelationAggregateFunction!
             }
 GRAPHQL
         );
@@ -133,10 +119,10 @@ GRAPHQL
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $name {
-                "TODO: description"
-                aggregate: AggregateFunctionOrderForColumn!
+                "The aggregate function to apply to the column."
+                aggregate: OrderByRelationWithColumnAggregateFunction!
 
-                "TODO: description"
+                "Name of the column to use."
                 column: $columnType
             }
 GRAPHQL
