@@ -99,11 +99,11 @@ class OrderByDirectiveTest extends TestCase
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
-                foo(orderBy: {
+                foo(orderBy: [{
                     column: BAR
                     foo: { aggregate: COUNT }
                     order: ASC
-                })
+                }])
             }
             ')
             ->assertGraphQLValidationError('orderBy.0.column', 'The order by.0.column field prohibits order by.0.foo / order by.0.baz from being present.')
@@ -112,11 +112,11 @@ class OrderByDirectiveTest extends TestCase
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
-                foo(orderBy: {
+                foo(orderBy: [{
                     foo: { aggregate: COUNT }
                     baz: { aggregate: COUNT }
                     order: ASC
-                })
+                }])
             }
             ')
             ->assertGraphQLValidationError('orderBy.0.foo', 'The order by.0.foo field prohibits order by.0.column / order by.0.baz from being present.')
