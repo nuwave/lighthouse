@@ -200,7 +200,7 @@ GRAPHQL;
                     $documentAST->setTypeDefinition(
                         OrderByServiceProvider::createRelationAggregateFunctionInput(
                             $inputName,
-                            "Aggregate specification for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}.{$relationName}.",
+                            "Aggregate specification for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}.{$relationName}."
                         )
                     );
                 }
