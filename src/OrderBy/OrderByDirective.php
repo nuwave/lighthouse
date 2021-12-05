@@ -225,7 +225,7 @@ GRAPHQL;
                 $otherOptions = ['column'];
                 foreach ($relationNames as $relationName) {
                     if ($relationName !== $relation) {
-                        $otherOptions []= $relationName;
+                        $otherOptions [] = $relationName;
                     }
                 }
 
@@ -262,7 +262,7 @@ GRAPHQL;
     }
 
     /**
-     * @param array<string> $otherOptions
+     * @param  array<string>  $otherOptions
      */
     protected function mutuallyExclusiveRule(array $otherOptions): string
     {
@@ -271,6 +271,7 @@ GRAPHQL;
         }
 
         $optionsString = implode(',', $otherOptions);
+
         return "@rules(apply: [\"prohibits:{$optionsString}\"])";
     }
 }
