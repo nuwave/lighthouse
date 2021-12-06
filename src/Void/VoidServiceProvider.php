@@ -23,7 +23,11 @@ class VoidServiceProvider extends ServiceProvider
                 $unit = self::UNIT;
                 $manipulateAST->documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-"Allows only one value and thus can hold no information."
+"""
+Allows only one value and thus can hold no information.
+
+https://en.wikipedia.org/wiki/Unit_type
+"""
 enum Unit {
   "The only possible value."
   {$unit}

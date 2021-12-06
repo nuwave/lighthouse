@@ -3165,7 +3165,11 @@ To enable this directive, add the service provider to your `config/app.php`:
 Lighthouse will register the following type in your schema:
 
 ```graphql
-"Allows only one value and thus can hold no information."
+"""
+Allows only one value and thus can hold no information.
+
+https://en.wikipedia.org/wiki/Unit_type
+"""
 enum Unit {
   "The only possible value."
   UNIT
