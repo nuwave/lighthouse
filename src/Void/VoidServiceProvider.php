@@ -13,21 +13,15 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
  */
 class VoidServiceProvider extends ServiceProvider
 {
-    public const UNIT = 'UNIT';
-
     public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
             ManipulateAST::class,
             static function (ManipulateAST $manipulateAST): void {
-                $unit = self::UNIT;
                 $manipulateAST->documentAST->setTypeDefinition(
-                    Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-"Allows only one value and thus can hold no information."
-enum Unit {
-  "The only possible value."
-  {$unit}
-}
+                    Parser::scalarTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+"Always null."
+scalar Null @scalar(class: "Nuwave\\\Lighthouse\\\Void\\\NullScalar")
 GRAPHQL
 )
                 );

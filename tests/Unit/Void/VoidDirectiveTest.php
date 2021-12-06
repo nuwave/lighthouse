@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Void;
 
-use Nuwave\Lighthouse\Void\VoidServiceProvider;
 use Tests\TestCase;
 
 class VoidDirectiveTest extends TestCase
@@ -11,7 +10,7 @@ class VoidDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Int @void
+            foo: Int! @void
         }
         ';
 
@@ -19,10 +18,15 @@ class VoidDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
-                'foo' => VoidServiceProvider::UNIT,
+                'foo' => null,
             ],
         ]);
+    }
+
+    public function testUseNull()
+    {
+        
     }
 }
