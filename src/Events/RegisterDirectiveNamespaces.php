@@ -12,4 +12,5 @@ namespace Nuwave\Lighthouse\Events;
  */
 class RegisterDirectiveNamespaces
 {
+    //
 }

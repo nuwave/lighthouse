@@ -115,7 +115,6 @@ abstract class BaseDirective implements Directive
      * Get the value of an argument on the directive.
      *
      * @param  mixed|null  $default
-     *
      * @return mixed|null
      */
     protected function directiveArgValue(string $name, $default = null)
@@ -141,10 +140,9 @@ abstract class BaseDirective implements Directive
      * Get the model class from the `model` argument of the field.
      *
      * @param  string  $argumentName  The default argument name "model" may be overwritten
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
@@ -165,10 +163,9 @@ abstract class BaseDirective implements Directive
      *
      * @param  array<string>  $namespacesToTry
      * @param  callable(string $className): bool $determineMatch
+     * @return class-string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
-     * @return class-string
      */
     protected function namespaceClassName(
         string $classCandidate,
@@ -212,9 +209,9 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {

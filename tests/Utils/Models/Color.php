@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $name
  *
  * Foreign keys
- * @property int|null    $creator_id
+ * @property int|null $creator_id
  * @property string|null $creator_type
  *
  * Timestamps

@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 use GraphQL\Deferred;
 
 /**
- * @deprecated implement your own batch loader instead
+ * @deprecated implement your own batch loader instead.
  * @see \Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry to resolve instances.
  */
 abstract class BatchLoader
@@ -77,7 +77,7 @@ abstract class BatchLoader
         );
         $pathIgnoringLists = implode('.', $significantPathSegments);
 
-        return 'nuwave/lighthouse/batchloader/' . $pathIgnoringLists;
+        return 'nuwave/lighthouse/batchloader/'.$pathIgnoringLists;
     }
 
     /**
@@ -115,7 +115,6 @@ abstract class BatchLoader
      *
      * @param  array<mixed>  $keys
      * @param  array<mixed>  $metaInfo
-     *
      * @return array<\GraphQL\Deferred>
      */
     public function loadMany(array $keys, array $metaInfo = []): array

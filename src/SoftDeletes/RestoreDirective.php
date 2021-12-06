@@ -16,26 +16,26 @@ class RestoreDirective extends ModifyModelExistenceDirective implements FieldMan
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Un-delete one or more soft deleted models by their ID.
-            The field must have a single non-null argument that may be a list.
-            """
-            directive @restore(
-              """
-              DEPRECATED use @globalId, will be removed in v6
+"""
+Un-delete one or more soft deleted models by their ID.
+The field must have a single non-null argument that may be a list.
+"""
+directive @restore(
+  """
+  DEPRECATED use @globalId, will be removed in v6
 
-              Set to `true` to use global ids for finding the model.
-              If set to `false`, regular non-global ids are used.
-              """
-              globalId: Boolean = false
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
 
-              """
-              Specify the class name of the model to use.
-              This is only needed when the default model detection does not work.
-              """
-              model: String
-            ) on FIELD_DEFINITION
-            GRAPHQL;
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+GRAPHQL;
     }
 
     protected function find(string $modelClass, $idOrIds)

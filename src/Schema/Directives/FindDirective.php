@@ -14,22 +14,22 @@ class FindDirective extends BaseDirective implements FieldResolver
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Find a model based on the arguments provided.
-            """
-            directive @find(
-              """
-              Specify the class name of the model to use.
-              This is only needed when the default model detection does not work.
-              """
-              model: String
+"""
+Find a model based on the arguments provided.
+"""
+directive @find(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
-              """
-              Apply scopes to the underlying query.
-              """
-              scopes: [String!]
-            ) on FIELD_DEFINITION
-            GRAPHQL;
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue

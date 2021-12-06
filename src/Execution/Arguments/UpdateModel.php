@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class UpdateModel implements ArgResolver
 {
-    public const MISSING_PRIMARY_KEY_FOR_UPDATE = 'Missing primary key for update.';
+    const MISSING_PRIMARY_KEY_FOR_UPDATE = 'Missing primary key for update.';
 
     /**
      * @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
@@ -16,7 +16,7 @@ class UpdateModel implements ArgResolver
     protected $previous;
 
     /**
-     * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous
+     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
      */
     public function __construct(callable $previous)
     {
@@ -24,8 +24,8 @@ class UpdateModel implements ArgResolver
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model                $model
-     * @param \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $args
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
     public function __invoke($model, $args)
     {
@@ -34,7 +34,7 @@ class UpdateModel implements ArgResolver
             ?? Arr::pull($args->arguments, $model->getKeyName())
             ?? null;
 
-        if (null === $id) {
+        if ($id === null) {
             throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
         }
 

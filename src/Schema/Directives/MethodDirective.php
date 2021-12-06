@@ -13,20 +13,20 @@ class MethodDirective extends BaseDirective implements FieldResolver
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Resolve a field by calling a method on the parent object.
+"""
+Resolve a field by calling a method on the parent object.
 
-            Use this if the data is not accessible through simple property access or if you
-            want to pass argument to the method.
-            """
-            directive @method(
-              """
-              Specify the method of which to fetch the data from.
-              Defaults to the name of the field if not given.
-              """
-              name: String
-            ) on FIELD_DEFINITION
-            GRAPHQL;
+Use this if the data is not accessible through simple property access or if you
+want to pass argument to the method.
+"""
+directive @method(
+  """
+  Specify the method of which to fetch the data from.
+  Defaults to the name of the field if not given.
+  """
+  name: String
+) on FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -34,7 +34,6 @@ class MethodDirective extends BaseDirective implements FieldResolver
         return $fieldValue->setResolver(
             /**
              * @param  array<string, mixed>  $args
-             *
              * @return mixed Really anything
              */
             function ($root, array $args) {
@@ -46,7 +45,7 @@ class MethodDirective extends BaseDirective implements FieldResolver
 
                 $orderedArgs = [];
                 foreach ($this->definitionNode->arguments as $argDefinition) {
-                    $orderedArgs[] = $args[$argDefinition->name->value] ?? null;
+                    $orderedArgs [] = $args[$argDefinition->name->value] ?? null;
                 }
 
                 return $root->{$method}(...$orderedArgs);

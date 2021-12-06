@@ -24,12 +24,12 @@ class DeferrableDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Do not use this directive directly, it is automatically added to the schema
-            when using the defer extension.
-            """
-            directive @deferrable on FIELD_DEFINITION
-            GRAPHQL;
+"""
+Do not use this directive directly, it is automatically added to the schema
+when using the defer extension.
+"""
+directive @deferrable on FIELD_DEFINITION
+GRAPHQL;
     }
 
     /**
@@ -75,7 +75,7 @@ class DeferrableDirective extends BaseDirective implements FieldMiddleware
         $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
 
         if ($this->anyFieldHasDefer($defers)) {
-            if (RootType::MUTATION === $resolveInfo->parentType->name) {
+            if ($resolveInfo->parentType->name === RootType::MUTATION) {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
             if ($fieldType instanceof NonNullTypeNode) {
@@ -86,7 +86,7 @@ class DeferrableDirective extends BaseDirective implements FieldMiddleware
         // Following the semantics of Apollo:
         // All declarations of a field have to contain @defer for the field to be deferred
         foreach ($defers as $defer) {
-            if (null === $defer || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
+            if ($defer === null || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
                 return false;
             }
         }
@@ -108,12 +108,12 @@ class DeferrableDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * @param array<array<string, mixed>|null> $defers
+     * @param  array<array<string, mixed>|null>  $defers
      */
     protected function anyFieldHasDefer(array $defers): bool
     {
         foreach ($defers as $defer) {
-            if (null !== $defer) {
+            if ($defer !== null) {
                 return true;
             }
         }

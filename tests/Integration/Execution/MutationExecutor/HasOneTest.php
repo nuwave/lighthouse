@@ -76,7 +76,7 @@ class HasOneTest extends DBTestCase
         id: ID
         title: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewHasOne(): void
     {
@@ -222,24 +222,24 @@ class HasOneTest extends DBTestCase
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-                    mutation {
-                        updateTask(input: {
-                            id: 1
-                            name: "foo"
-                            post: {
-                                create: null
-                                update: null
-                                upsert: null
-                                delete: null
-                            }
-                        }) {
-                            name
-                            post {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    create: null
+                    update: null
+                    upsert: null
+                    delete: null
+                }
+            }) {
+                name
+                post {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 'updateTask' => [
@@ -269,37 +269,37 @@ class HasOneTest extends DBTestCase
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Task(input: {
-                            id: 1
-                            name: "foo"
-                            post: {
-                                create: {
-                                    title: "bar"
-                                }
-                            }
-                        }) {
-                            id
-                            name
-                            post {
-                                id
-                                title
-                            }
-                        }
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    create: {
+                        title: "bar"
                     }
-            GRAPHQL
-        )->assertJson([
-            'data' => [
-                "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'post' => [
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+GRAPHQL
+            )->assertJson([
+                'data' => [
+                    "${action}Task" => [
                         'id' => '1',
-                        'title' => 'bar',
+                        'name' => 'foo',
+                        'post' => [
+                            'id' => '1',
+                            'title' => 'bar',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
     }
 
     /**
@@ -315,26 +315,26 @@ class HasOneTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Task(input: {
-                            id: 1
-                            name: "foo"
-                            post: {
-                                update: {
-                                    id: 1
-                                    title: "bar"
-                                }
-                            }
-                        }) {
-                            id
-                            name
-                            post {
-                                id
-                                title
-                            }
-                        }
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    update: {
+                        id: 1
+                        title: "bar"
                     }
-            GRAPHQL
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -362,26 +362,26 @@ class HasOneTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Task(input: {
-                            id: 1
-                            name: "foo"
-                            post: {
-                                upsert: {
-                                    id: 1
-                                    title: "bar"
-                                }
-                            }
-                        }) {
-                            id
-                            name
-                            post {
-                                id
-                                title
-                            }
-                        }
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    upsert: {
+                        id: 1
+                        title: "bar"
                     }
-            GRAPHQL
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -409,24 +409,24 @@ class HasOneTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Task(input: {
-                            id: 1
-                            name: "foo"
-                            post: {
-                                delete: 1
-                            }
-                        }) {
-                            id
-                            name
-                            post {
-                                id
-                                title
-                            }
-                        }
-                    }
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    delete: 1
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
 
-            GRAPHQL
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [

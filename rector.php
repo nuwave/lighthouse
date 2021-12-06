@@ -19,14 +19,14 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
     $parameters->set(Option::SKIP, [
         // Does not fit autoloading standards
-        __DIR__ . '/tests/database/migrations',
+        __DIR__.'/tests/database/migrations',
 
         // References PreLaravel7ExceptionHandler which is not compatible with newer Laravel
-        __DIR__ . '/tests/TestCase.php',
-        __DIR__ . '/tests/PreLaravel7ExceptionHandler.php',
+        __DIR__.'/tests/TestCase.php',
+        __DIR__.'/tests/PreLaravel7ExceptionHandler.php',
 
         // Gets stuck on WhereConditionsBaseDirective for some reason
-        __DIR__ . '/src/WhereConditions',
+        __DIR__.'/src/WhereConditions',
 
         // It is shorter and more efficient
         CallableThisArrayToAnonymousFunctionRector::class,

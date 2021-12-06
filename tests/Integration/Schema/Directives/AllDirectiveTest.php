@@ -14,7 +14,7 @@ class AllDirectiveTest extends DBTestCase
         $count = 2;
         factory(User::class, $count)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type User {
             id: ID!
         }
@@ -38,7 +38,7 @@ class AllDirectiveTest extends DBTestCase
         $count = 2;
         factory(User::class, $count)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type Foo {
             id: ID!
         }
@@ -62,7 +62,7 @@ class AllDirectiveTest extends DBTestCase
         $count = 2;
         factory(User::class, $count)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type Foo @model(class: "User") {
             id: ID!
         }
@@ -88,7 +88,7 @@ class AllDirectiveTest extends DBTestCase
             'task_id' => 1,
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type User {
             posts: [Post!]! @all
         }
@@ -143,7 +143,7 @@ class AllDirectiveTest extends DBTestCase
         $users = factory(User::class, 3)->create();
         $userName = $users->first()->name;
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type User {
             id: ID!
             name: String!
@@ -175,7 +175,7 @@ class AllDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @all(builder: "' . $this->qualifyTestResolver('builder') . '")
+            users: [User!]! @all(builder: "'.$this->qualifyTestResolver('builder').'")
         }
         ';
 

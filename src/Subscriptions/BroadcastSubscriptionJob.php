@@ -10,8 +10,7 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class BroadcastSubscriptionJob implements ShouldQueue
 {
-    use Queueable;
-    use SerializesModels;
+    use Queueable, SerializesModels;
 
     /**
      * The subscription field that was requested.
@@ -30,7 +29,7 @@ class BroadcastSubscriptionJob implements ShouldQueue
     /**
      * The root element to be passed when resolving the subscription.
      *
-     * @var mixed User defined
+     * @var mixed User defined.
      */
     public $root;
 

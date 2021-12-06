@@ -60,7 +60,7 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * @var array<int, class-string<\Illuminate\Console\Command>>
      */
-    public const COMMANDS = [
+    const COMMANDS = [
         CacheCommand::class,
         ClearCacheCommand::class,
         DirectiveCommand::class,
@@ -78,7 +78,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/lighthouse.php', 'lighthouse');
+        $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
         $this->app->singleton(ASTBuilder::class);
@@ -99,7 +99,8 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
         $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
-            return new class() implements ProvidesSubscriptionResolver {
+            return new class implements ProvidesSubscriptionResolver
+            {
                 public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
                 {
                     throw new Exception(
@@ -124,7 +125,7 @@ class LighthouseServiceProvider extends ServiceProvider
             }
 
             throw new Exception(
-                'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
+                'Could not correctly determine Laravel framework flavor, got '.get_class($app).'.'
             );
         });
 
@@ -140,14 +141,14 @@ class LighthouseServiceProvider extends ServiceProvider
     public function boot(ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__ . '/lighthouse.php' => $this->app->configPath() . '/lighthouse.php',
+            __DIR__.'/lighthouse.php' => $this->app->configPath().'/lighthouse.php',
         ], 'lighthouse-config');
 
         $this->publishes([
-            __DIR__ . '/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
+            __DIR__.'/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'lighthouse-schema');
 
-        $this->loadRoutesFrom(__DIR__ . '/Support/Http/routes.php');
+        $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
 
         $exceptionHandler = $this->app->make(ExceptionHandlerContract::class);
         if (

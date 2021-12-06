@@ -80,7 +80,7 @@ class PaginationManipulator
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
-        if (null !== $edgeType) {
+        if ($edgeType !== null) {
             $connectionEdgeName = $edgeType->name->value;
             $connectionTypeName = "{$connectionEdgeName}Connection";
         } else {
@@ -91,40 +91,40 @@ class PaginationManipulator
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-                        "A paginated list of {$fieldTypeName} edges."
-                        type {$connectionTypeName} {
-                            "Pagination information about the list of edges."
-                            pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
+            "A paginated list of {$fieldTypeName} edges."
+            type {$connectionTypeName} {
+                "Pagination information about the list of edges."
+                pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
-                            "A list of $fieldTypeName edges."
-                            edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
-                        }
-            GRAPHQL
+                "A list of $fieldTypeName edges."
+                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
+            }
+GRAPHQL
         );
         $this->addPaginationWrapperType($connectionType);
 
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
             ?? Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-                                "An edge that contains a node of type $fieldTypeName and a cursor."
-                                type $connectionEdgeName {
-                                    "The $fieldTypeName node."
-                                    node: $fieldTypeName!
+                "An edge that contains a node of type $fieldTypeName and a cursor."
+                type $connectionEdgeName {
+                    "The $fieldTypeName node."
+                    node: $fieldTypeName!
 
-                                    "A unique cursor that can be used for pagination."
-                                    cursor: String!
-                                }
-                GRAPHQL
+                    "A unique cursor that can be used for pagination."
+                    cursor: String!
+                }
+GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
-        $fieldDefinition->arguments[] = Parser::inputValueDefinition(
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-            "A cursor after which elements are returned."
-            after: String
-            GRAPHQL
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"A cursor after which elements are returned."
+after: String
+GRAPHQL
         );
 
         $fieldDefinition->type = $this->paginationResultType($connectionTypeName);
@@ -137,7 +137,7 @@ class PaginationManipulator
 
         // Reuse existing types to preserve directives or other modifications made to it
         $existingType = $this->documentAST->types[$typeName] ?? null;
-        if (null !== $existingType) {
+        if ($existingType !== null) {
             if (! $existingType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException(
                     "Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead."
@@ -151,7 +151,7 @@ class PaginationManipulator
             $this->modelClass
             && ! ASTHelper::hasDirective($objectType, ModelDirective::NAME)
         ) {
-            $objectType->directives[] = Parser::constDirective(/** @lang GraphQL */ '@model(class: "' . addslashes($this->modelClass) . '")');
+            $objectType->directives [] = Parser::constDirective(/** @lang GraphQL */'@model(class: "'.addslashes($this->modelClass).'")');
         }
 
         $this->documentAST->setTypeDefinition($objectType);
@@ -168,26 +168,26 @@ class PaginationManipulator
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-                        "A paginated list of {$fieldTypeName} items."
-                        type {$paginatorTypeName} {
-                            "Pagination information about the list of items."
-                            paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+            "A paginated list of {$fieldTypeName} items."
+            type {$paginatorTypeName} {
+                "Pagination information about the list of items."
+                paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
-                            "A list of {$fieldTypeName} items."
-                            data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
-                        }
-            GRAPHQL
+                "A list of {$fieldTypeName} items."
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+            }
+GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $fieldDefinition->arguments[] = Parser::inputValueDefinition(
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-            "The offset from which items are returned."
-            page: Int
-            GRAPHQL
-        );
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"The offset from which items are returned."
+page: Int
+GRAPHQL
+);
 
         $fieldDefinition->type = $this->paginationResultType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
@@ -204,25 +204,25 @@ class PaginationManipulator
         $paginatorFieldClassName = addslashes(SimplePaginatorField::class);
 
         $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-                        "A paginated list of {$fieldTypeName} items."
-                        type {$paginatorTypeName} {
-                            "Pagination information about the list of items."
-                            paginatorInfo: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+            "A paginated list of {$fieldTypeName} items."
+            type {$paginatorTypeName} {
+                "Pagination information about the list of items."
+                paginatorInfo: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
-                            "A list of {$fieldTypeName} items."
-                            data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
-                        }
-            GRAPHQL
+                "A list of {$fieldTypeName} items."
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+            }
+GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $fieldDefinition->arguments[] = Parser::inputValueDefinition(
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-            "The offset from which items are returned."
-            page: Int
-            GRAPHQL
+        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"The offset from which items are returned."
+page: Int
+GRAPHQL
         );
 
         $fieldDefinition->type = $this->paginationResultType($paginatorTypeName);
@@ -236,18 +236,17 @@ class PaginationManipulator
     {
         $description = '"Limits number of fetched items.';
         if ($maxCount) {
-            $description .= ' Maximum allowed value: ' . $maxCount . '.';
+            $description .= ' Maximum allowed value: '.$maxCount.'.';
         }
         $description .= "\"\n";
 
         $definition = 'first: Int'
-            . (
-                $defaultCount
-                ? ' = ' . $defaultCount
+            .($defaultCount
+                ? ' = '.$defaultCount
                 : '!'
             );
 
-        return $description . $definition;
+        return $description.$definition;
     }
 
     /**

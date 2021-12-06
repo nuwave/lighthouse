@@ -26,40 +26,40 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Converts between IDs/types and global IDs.
+"""
+Converts between IDs/types and global IDs.
 
-            When used upon a field, it encodes;
-            when used upon an argument, it decodes.
-            """
-            directive @globalId(
-              """
-              Decoding a global id produces a tuple of `$type` and `$id`.
-              This setting controls which of those is passed along.
-              """
-              decode: GlobalIdDecode = ARRAY
-            ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+When used upon a field, it encodes;
+when used upon an argument, it decodes.
+"""
+directive @globalId(
+  """
+  Decoding a global id produces a tuple of `$type` and `$id`.
+  This setting controls which of those is passed along.
+  """
+  decode: GlobalIdDecode = ARRAY
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 
-            """
-            Options for the `decode` argument of `@globalId`.
-            """
-            enum GlobalIdDecode {
-                """
-                Return an array of `[$type, $id]`.
-                """
-                ARRAY
+"""
+Options for the `decode` argument of `@globalId`.
+"""
+enum GlobalIdDecode {
+    """
+    Return an array of `[$type, $id]`.
+    """
+    ARRAY
 
-                """
-                Return just `$type`.
-                """
-                TYPE
+    """
+    Return just `$type`.
+    """
+    TYPE
 
-                """
-                Return just `$id`.
-                """
-                ID
-            }
-            GRAPHQL;
+    """
+    Return just `$id`.
+    """
+    ID
+}
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
@@ -81,7 +81,6 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
      * Decodes a global id given as an argument.
      *
      * @param  string|null  $argumentValue
-     *
      * @return string|array{0: string, 1: string}|null
      */
     public function sanitize($argumentValue)

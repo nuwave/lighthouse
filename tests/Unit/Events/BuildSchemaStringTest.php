@@ -37,13 +37,13 @@ class BuildSchemaStringTest extends TestCase
             }
         );
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */"
         type Query {
             foo: String @field(resolver: \"{$this->qualifyTestResolver('resolveFoo')}\")
         }
         ";
 
-        $queryForBaseSchema = /** @lang GraphQL */ '
+        $queryForBaseSchema = /** @lang GraphQL */'
         {
             foo
         }
@@ -54,7 +54,7 @@ class BuildSchemaStringTest extends TestCase
             ],
         ]);
 
-        $queryForAdditionalSchema = /** @lang GraphQL */ '
+        $queryForAdditionalSchema = /** @lang GraphQL */'
         {
             sayHello
         }

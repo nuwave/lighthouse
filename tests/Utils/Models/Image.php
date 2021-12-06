@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \lluminate\Support\Carbon $updated_at
  *
  * Foreign keys
- * @property int|null    $imageable_id
+ * @property int|null $imageable_id
  * @property string|null $imageable_type
  * @property-read \Tests\Utils\Models\Task|\Tests\Utils\Models\User|null $imageable
  */

@@ -46,7 +46,6 @@ trait RelationDirectiveHelpers
 
     /**
      * @param  array<string, mixed>  $args
-     *
      * @return array<int, int|string>
      */
     protected function qualifyPath(array $args, ResolveInfo $resolveInfo): array
@@ -55,12 +54,12 @@ trait RelationDirectiveHelpers
         $path = $resolveInfo->path;
 
         // In case we have no args, we can combine eager loads that are the same
-        if ([] === $args) {
+        if ($args === []) {
             array_pop($path);
         }
 
         // Each relation must be loaded separately
-        $path[] = $this->relation();
+        $path [] = $this->relation();
 
         // Scopes influence the result of the query
         return array_merge($path, $this->scopes());

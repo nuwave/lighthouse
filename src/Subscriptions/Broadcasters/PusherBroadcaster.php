@@ -57,7 +57,7 @@ class PusherBroadcaster implements Broadcaster
     public function hook(Request $request): JsonResponse
     {
         foreach ($request->input('events', []) as $event) {
-            if ('channel_vacated' === $event['name']) {
+            if ($event['name'] === 'channel_vacated') {
                 $this->storage->deleteSubscriber($event['channel']);
             }
         }

@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 class EmailCustomMessageValidator extends Validator
 {
-    public const MESSAGE = 'this is a custom error message';
+    const MESSAGE = 'this is a custom error message';
 
     public function rules(): array
     {

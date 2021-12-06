@@ -19,23 +19,23 @@ class InterfaceTest extends DBTestCase
         factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-                    interface Nameable {
-                        name: String!
-                    }
+        interface Nameable {
+            name: String!
+        }
 
-                    type User implements Nameable {
-                        id: ID!
-                        name: String!
-                    }
+        type User implements Nameable {
+            id: ID!
+            name: String!
+        }
 
-                    type Team implements Nameable {
-                        name: String!
-                    }
+        type Team implements Nameable {
+            name: String!
+        }
 
-                    type Query {
-                        namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-                    }
-            GRAPHQL;
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -69,23 +69,23 @@ class InterfaceTest extends DBTestCase
         factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-                    interface Nameable {
-                        name: String!
-                    }
+        interface Nameable {
+            name: String!
+        }
 
-                    type Foo implements Nameable @model(class: "User") {
-                        id: ID!
-                        name: String!
-                    }
+        type Foo implements Nameable @model(class: "User") {
+            id: ID!
+            name: String!
+        }
 
-                    type Team implements Nameable {
-                        name: String!
-                    }
+        type Team implements Nameable {
+            name: String!
+        }
 
-                    type Query {
-                        namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-                    }
-            GRAPHQL;
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -119,22 +119,22 @@ class InterfaceTest extends DBTestCase
         factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-                    interface Nameable {
-                        name: String!
-                    }
+        interface Nameable {
+            name: String!
+        }
 
-                    type Foo implements Nameable @model(class: "Team") {
-                        name: String!
-                    }
+        type Foo implements Nameable @model(class: "Team") {
+            name: String!
+        }
 
-                    type Bar implements Nameable @model(class: "User") {
-                        name: String!
-                    }
+        type Bar implements Nameable @model(class: "User") {
+            name: String!
+        }
 
-                    type Query {
-                        namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-                    }
-            GRAPHQL;
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
 
         $this->expectNotToPerformAssertions();
         $this->graphQL(/** @lang GraphQL */ '
@@ -152,22 +152,22 @@ class InterfaceTest extends DBTestCase
         factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-                    interface Nameable {
-                        name: String!
-                    }
+        interface Nameable {
+            name: String!
+        }
 
-                    type Foo implements Nameable @model(class: "User") {
-                        name: String!
-                    }
+        type Foo implements Nameable @model(class: "User") {
+            name: String!
+        }
 
-                    type Team implements Nameable @model(class: "User") {
-                        name: String!
-                    }
+        type Team implements Nameable @model(class: "User") {
+            name: String!
+        }
 
-                    type Query {
-                        namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-                    }
-            GRAPHQL;
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
 
         $this->expectExceptionObject(
             new DefinitionException(
@@ -189,22 +189,22 @@ class InterfaceTest extends DBTestCase
         factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-                    interface Nameable {
-                        name: String!
-                    }
+        interface Nameable {
+            name: String!
+        }
 
-                    type Team implements Nameable {
-                        name: String!
-                    }
+        type Team implements Nameable {
+            name: String!
+        }
 
-                    type NotPartOfInterface @model(class: "User") {
-                        id: String!
-                    }
+        type NotPartOfInterface @model(class: "User") {
+            id: String!
+        }
 
-                    type Query {
-                        namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-                    }
-            GRAPHQL;
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
 
         $this->expectExceptionObject(
             new DefinitionException(
@@ -223,19 +223,19 @@ class InterfaceTest extends DBTestCase
     public function testUseCustomTypeResolver(): void
     {
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-                    interface Nameable @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}"){
-                        name: String!
-                    }
+        interface Nameable @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}"){
+            name: String!
+        }
 
-                    type Guy implements Nameable {
-                        id: ID!
-                        name: String!
-                    }
+        type Guy implements Nameable {
+            id: ID!
+            name: String!
+        }
 
-                    type Query {
-                        namedThings: Nameable @field(resolver: "{$this->qualifyTestResolver('fetchGuy')}")
-                    }
-            GRAPHQL;
+        type Query {
+            namedThings: Nameable @field(resolver: "{$this->qualifyTestResolver('fetchGuy')}")
+        }
+GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -259,23 +259,23 @@ class InterfaceTest extends DBTestCase
         factory(User::class)->create();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-                    interface Nameable {
-                        name: String!
-                    }
+        interface Nameable {
+            name: String!
+        }
 
-                    type User implements Nameable {
-                        id: ID!
-                        name: String!
-                    }
+        type User implements Nameable {
+            id: ID!
+            name: String!
+        }
 
-                    type Team implements Nameable {
-                        name: String!
-                    }
+        type Team implements Nameable {
+            name: String!
+        }
 
-                    type Query {
-                        namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
-                    }
-            GRAPHQL;
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "{$this->qualifyTestResolver('fetchResults')}")
+        }
+GRAPHQL;
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {

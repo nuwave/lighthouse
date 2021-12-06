@@ -18,7 +18,7 @@ class Person
     }
 
     /**
-     * @param array<string, mixed> $value
+     * @param  array<string, mixed>  $value
      */
     public function resolveType(array $value): Type
     {

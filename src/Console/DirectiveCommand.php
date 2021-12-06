@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 class DirectiveCommand extends LighthouseGeneratorCommand
 {
     /** @var array<int, class-string> */
-    public const ARGUMENT_INTERFACES = [
+    const ARGUMENT_INTERFACES = [
         ArgTransformerDirective::class,
         ArgBuilderDirective::class,
         ArgResolver::class,
@@ -31,14 +31,14 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     ];
 
     /** @var array<int, class-string> */
-    public const FIELD_INTERFACES = [
+    const FIELD_INTERFACES = [
         FieldResolver::class,
         FieldMiddleware::class,
         FieldManipulator::class,
     ];
 
     /** @var array<int, class-string> */
-    public const TYPE_INTERFACES = [
+    const TYPE_INTERFACES = [
         TypeManipulator::class,
         TypeMiddleware::class,
         TypeResolver::class,
@@ -86,7 +86,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getNameInput(): string
     {
-        return parent::getNameInput() . 'Directive';
+        return parent::getNameInput().'Directive';
     }
 
     protected function namespaceConfigKey(): string
@@ -95,7 +95,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param string $name
+     * @param  string  $name
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -186,7 +186,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param array<class-string> $availableInterfaces
+     * @param  array<class-string>  $availableInterfaces
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
@@ -205,7 +205,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param array<int, string> $availableLocations
+     * @param  array<int, string>  $availableLocations
      */
     public function askForLocations(array $availableLocations): void
     {
@@ -224,7 +224,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param class-string $interface
+     * @param  class-string  $interface
      */
     protected function shortName(string $interface): string
     {
@@ -232,7 +232,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     }
 
     /**
-     * @param class-string $interface
+     * @param  class-string  $interface
      */
     protected function implementInterface(string $interface): void
     {
@@ -257,20 +257,20 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__ . '/stubs/directive.stub';
+        return __DIR__.'/stubs/directive.stub';
     }
 
     protected function interfaceMethods(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_methods.stub'
+            __DIR__.'/stubs/directives/'.Str::snake($interface).'_methods.stub'
         );
     }
 
     protected function interfaceImports(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_imports.stub'
+            __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub'
         );
     }
 

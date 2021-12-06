@@ -121,7 +121,7 @@ class AggregateDirectiveTest extends DBTestCase
 
         $queries = 0;
         DB::listen(static function () use (&$queries): void {
-            ++$queries;
+            $queries++;
         });
 
         $this->graphQL(/** @lang GraphQL */ '

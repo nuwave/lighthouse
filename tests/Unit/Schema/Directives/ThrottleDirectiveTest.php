@@ -16,7 +16,7 @@ class ThrottleDirectiveTest extends TestCase
             $this->markTestSkipped('Version less than 8.0 does not support named requests.');
         }
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type Query {
             foo: Int @throttle(name: "test")
         }
@@ -75,7 +75,7 @@ class ThrottleDirectiveTest extends TestCase
             $this->markTestSkipped('Version less than 8.0 does not support named requests.');
         }
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type Query {
             foo: Int @throttle(name: "test")
         }

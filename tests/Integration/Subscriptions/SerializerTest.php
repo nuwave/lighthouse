@@ -18,7 +18,7 @@ class SerializerTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $serializer = new Serializer(
-            $contextFactory = new ContextFactory()
+            $contextFactory = new ContextFactory
         );
 
         $request = new Request();

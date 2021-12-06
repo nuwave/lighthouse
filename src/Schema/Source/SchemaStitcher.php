@@ -41,11 +41,11 @@ class SchemaStitcher implements SchemaSourceProvider
         return (new Collection(\Safe\file($path)))
             ->map(function (string $line) use ($path): string {
                 if (! Str::startsWith(trim($line), '#import ')) {
-                    return rtrim($line, PHP_EOL) . PHP_EOL;
+                    return rtrim($line, PHP_EOL).PHP_EOL;
                 }
 
                 $importFileName = trim(Str::after($line, '#import '));
-                $importFilePath = dirname($path) . '/' . $importFileName;
+                $importFilePath = dirname($path).'/'.$importFileName;
 
                 if (! Str::contains($importFileName, '*')) {
                     try {

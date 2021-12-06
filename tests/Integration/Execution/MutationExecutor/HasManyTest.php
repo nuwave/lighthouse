@@ -81,7 +81,7 @@ class HasManyTest extends DBTestCase
         id: ID
         name: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewHasMany(): void
     {
@@ -329,25 +329,25 @@ class HasManyTest extends DBTestCase
         factory(User::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}User(input: {
-                            id: 1
-                            name: "foo"
-                            tasks: {
-                                create: [{
-                                    name: "bar"
-                                }]
-                            }
-                        }) {
-                            id
-                            name
-                            tasks {
-                                id
-                                name
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}User(input: {
+                id: 1
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
@@ -377,26 +377,26 @@ class HasManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}User(input: {
-                            id: 1
-                            name: "foo"
-                            tasks: {
-                                update: [{
-                                    id: 1
-                                    name: "bar"
-                                }]
-                            }
-                        }) {
-                            id
-                            name
-                            tasks {
-                                id
-                                name
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}User(input: {
+                id: 1
+                name: "foo"
+                tasks: {
+                    update: [{
+                        id: 1
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
@@ -426,26 +426,26 @@ class HasManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}User(input: {
-                            id: 1
-                            name: "foo"
-                            tasks: {
-                                upsert: [{
-                                    id: 1
-                                    name: "bar"
-                                }]
-                            }
-                        }) {
-                            id
-                            name
-                            tasks {
-                                id
-                                name
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}User(input: {
+                id: 1
+                name: "foo"
+                tasks: {
+                    upsert: [{
+                        id: 1
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
@@ -475,23 +475,23 @@ class HasManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}User(input: {
-                            id: 1
-                            name: "foo"
-                            tasks: {
-                                delete: [1]
-                            }
-                        }) {
-                            id
-                            name
-                            tasks {
-                                id
-                                name
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}User(input: {
+                id: 1
+                name: "foo"
+                tasks: {
+                    delete: [1]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
@@ -653,7 +653,7 @@ class HasManyTest extends DBTestCase
         input UpsertRoleUsersRelation {
             sync: [ID!]
         }
-        ' . self::PLACEHOLDER_QUERY;
+        '.self::PLACEHOLDER_QUERY;
 
         // Create the first User with a Role.
         $this->graphQL(/** @lang GraphQL */ '

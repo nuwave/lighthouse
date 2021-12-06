@@ -33,24 +33,24 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Cache the result of a resolver.
-            """
-            directive @cache(
-              """
-              Set the duration it takes for the cache to expire in seconds.
-              If not given, the result will be stored forever.
-              """
-              maxAge: Int
+"""
+Cache the result of a resolver.
+"""
+directive @cache(
+  """
+  Set the duration it takes for the cache to expire in seconds.
+  If not given, the result will be stored forever.
+  """
+  maxAge: Int
 
-              """
-              Limit access to cached data to the currently authenticated user.
-              When the field is accessible by guest users, this will not have
-              any effect, they will access a shared cache.
-              """
-              private: Boolean = false
-            ) on FIELD_DEFINITION
-            GRAPHQL;
+  """
+  Limit access to cached data to the currently authenticated user.
+  When the field is accessible by guest users, this will not have
+  any effect, they will access a shared cache.
+  """
+  private: Boolean = false
+) on FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
@@ -88,7 +88,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                 // We found a matching value in the cache, so we can just return early
                 // without actually running the query
                 $value = $cache->get($cacheKey);
-                if (null !== $value) {
+                if ($value !== null) {
                     return $value;
                 }
                 // In Laravel cache, null is considered as "non-existant" value. As mentioned in laravel documentation,
@@ -128,8 +128,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                 Resolved::handle($resolved, $storeInCache);
 
                 return $resolved;
-            }
-        );
+            });
 
         return $fieldValue;
     }
@@ -154,7 +153,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             // The cache key was already set, so we do not have to look again
             $typeValue->getCacheKey()
             // The Query type is exempt from requiring a cache key
-            || RootType::QUERY === $typeValue->getTypeDefinitionName()
+            || $typeValue->getTypeDefinitionName() === RootType::QUERY
         ) {
             return;
         }
@@ -179,7 +178,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             if (
                 $field->type instanceof NonNullTypeNode
                 && $field->type->type instanceof NamedTypeNode
-                && 'ID' === $field->type->type->name->value
+                && $field->type->type->name->value === 'ID'
             ) {
                 $typeValue->setCacheKey($field->name->value);
 

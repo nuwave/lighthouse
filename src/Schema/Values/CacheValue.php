@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class CacheValue
 {
     /**
-     * @var mixed|null The root that was passed to the query
+     * @var mixed|null The root that was passed to the query.
      */
     protected $root;
 
@@ -45,12 +45,12 @@ class CacheValue
     protected $isPrivate;
 
     /**
-     * @var mixed The key to use for caching this field
+     * @var mixed The key to use for caching this field.
      */
     protected $fieldKey;
 
     /**
-     * @param  mixed|null  $root The root that was passed to the query
+     * @param  mixed|null  $root  The root that was passed to the query.
      * @param  array<string, mixed>  $args
      */
     public function __construct(
@@ -79,18 +79,18 @@ class CacheValue
         $parts = [];
 
         $user = $this->context->user();
-        if ($this->isPrivate && null !== $user) {
-            $parts[] = 'auth';
-            $parts[] = $user->getAuthIdentifier();
+        if ($this->isPrivate && $user !== null) {
+            $parts [] = 'auth';
+            $parts [] = $user->getAuthIdentifier();
         }
 
-        $parts[] = strtolower($this->resolveInfo->parentType->name);
-        $parts[] = $this->fieldKey;
-        $parts[] = strtolower($this->resolveInfo->fieldName);
+        $parts [] = strtolower($this->resolveInfo->parentType->name);
+        $parts [] = $this->fieldKey;
+        $parts [] = strtolower($this->resolveInfo->fieldName);
 
         $argKeys = $this->argKeys();
         if ($argKeys->isNotEmpty()) {
-            $parts[] = $argKeys->implode(':');
+            $parts [] = $argKeys->implode(':');
         }
 
         return $this->implode($parts);
@@ -144,7 +144,7 @@ class CacheValue
      */
     protected function fieldKey()
     {
-        if (null === $this->root) {
+        if ($this->root === null) {
             return;
         }
 

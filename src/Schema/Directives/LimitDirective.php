@@ -23,11 +23,11 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgManipulat
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Allow clients to specify the maximum number of results to return.
-            """
-            directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
-            GRAPHQL;
+"""
+Allow clients to specify the maximum number of results to return.
+"""
+directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function manipulateArgDefinition(
@@ -37,20 +37,20 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgManipulat
         ObjectTypeDefinitionNode &$parentType
     ): void {
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
-        if (Type::INT !== $argType) {
+        if ($argType !== Type::INT) {
             throw new DefinitionException(
-                "The {$this->name()} directive must only be used on arguments of type " . Type::INT
-                . ", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
+                "The {$this->name()} directive must only be used on arguments of type ".Type::INT
+                .", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
             );
         }
 
-        $parentField->directives[] = $this->directiveNode;
+        $parentField->directives [] = $this->directiveNode;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
         $fieldValue->resultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
-            if (null === $result) {
+            if ($result === null) {
                 return null;
             }
 
@@ -74,12 +74,12 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgManipulat
             $limited = [];
 
             foreach ($result as $value) {
-                if (0 === $limit) {
+                if ($limit === 0) {
                     break;
                 }
-                --$limit;
+                $limit--;
 
-                $limited[] = $value;
+                $limited [] = $value;
             }
 
             return $limited;

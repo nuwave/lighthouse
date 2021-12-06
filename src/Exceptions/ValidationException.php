@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException as LaravelValidationException;
 
 class ValidationException extends Exception implements RendersErrorsExtensions
 {
-    public const CATEGORY = 'validation';
+    const CATEGORY = 'validation';
 
     /**
      * @var \Illuminate\Contracts\Validation\Validator
@@ -35,7 +35,7 @@ class ValidationException extends Exception implements RendersErrorsExtensions
      *
      * @see \Illuminate\Validation\ValidationException::withMessages()
      *
-     * @param array<string, string|array<string>> $messages
+     * @param  array<string, string|array<string>>  $messages
      */
     public static function withMessages(array $messages): self
     {

@@ -18,8 +18,8 @@ class NestedBelongsTo implements ArgResolver
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model                $parent
-     * @param \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $args
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
     public function __invoke($parent, $args): void
     {

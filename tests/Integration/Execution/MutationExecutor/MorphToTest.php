@@ -69,7 +69,7 @@ class MorphToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testConnectsMorphTo(): void
     {
@@ -203,22 +203,22 @@ class MorphToTest extends DBTestCase
 
         $field = "${action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        {$field}(input: {
-                            id: 1
-                            url: "foo"
-                            imageable: {
-                                disconnect: true
-                            }
-                        }) {
-                            url
-                            imageable {
-                                id
-                                name
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            {$field}(input: {
+                id: 1
+                url: "foo"
+                imageable: {
+                    disconnect: true
+                }
+            }) {
+                url
+                imageable {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 $field => [
@@ -244,23 +244,23 @@ class MorphToTest extends DBTestCase
 
         $field = "${action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        {$field}(input: {
-                            id: 1
-                            url: "foo"
-                            imageable: {
-                                delete: true
-                            }
-                        }) {
-                            url
-                            imageable {
-                                id
-                                name
-                            }
-                        }
-                    }
+        mutation {
+            {$field}(input: {
+                id: 1
+                url: "foo"
+                imageable: {
+                    delete: true
+                }
+            }) {
+                url
+                imageable {
+                    id
+                    name
+                }
+            }
+        }
 
-            GRAPHQL
+GRAPHQL
         )->assertJson([
             'data' => [
                 $field => [

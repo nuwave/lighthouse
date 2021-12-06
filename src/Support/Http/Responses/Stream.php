@@ -10,7 +10,6 @@ abstract class Stream
      * Get error from chunk if it exists.
      *
      * @param  array<string, mixed>  $data
-     *
      * @return array<array<string, mixed>>|null
      */
     protected function chunkError(string $path, array $data): ?array

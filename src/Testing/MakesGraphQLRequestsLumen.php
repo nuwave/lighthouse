@@ -51,7 +51,7 @@ trait MakesGraphQLRequestsLumen
     ): self {
         $params = ['query' => $query];
 
-        if ([] !== $variables) {
+        if ($variables !== []) {
             $params += ['variables' => $variables];
         }
 
@@ -91,7 +91,6 @@ trait MakesGraphQLRequestsLumen
      * @param  array<array<int, string>>  $map
      * @param  array<\Illuminate\Http\Testing\File>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
-     *
      * @return $this
      */
     protected function multipartGraphQL(
@@ -195,7 +194,6 @@ trait MakesGraphQLRequestsLumen
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
-     *
      * @return array<int, mixed> The chunked results
      */
     protected function streamGraphQL(
@@ -224,7 +222,7 @@ trait MakesGraphQLRequestsLumen
      */
     protected function setUpDeferStream(): void
     {
-        $this->deferStream = new MemoryStream();
+        $this->deferStream = new MemoryStream;
 
         Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;

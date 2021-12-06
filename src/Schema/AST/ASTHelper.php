@@ -42,7 +42,6 @@ class ASTHelper
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
-     *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
@@ -83,7 +82,6 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\NodeList<TNode>  $nodeList
      * @param  TNode  $node
-     *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function prepend(NodeList $nodeList, Node $node): NodeList
@@ -134,16 +132,15 @@ class ASTHelper
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param  mixed  $default Is returned if the directive does not have the argument
-     *
-     * @return mixed The value given to the directive
+     * @param  mixed  $default  Is returned if the directive does not have the argument.
+     * @return mixed The value given to the directive.
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
         /** @var \GraphQL\Language\AST\ArgumentNode|null $arg */
         $arg = self::firstByName($directive->arguments, $name);
 
-        return null !== $arg
+        return $arg !== null
             ? AST::valueFromASTUntyped($arg->value)
             : $default;
     }
@@ -153,8 +150,7 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
-     *
-     * @return mixed The plain PHP value
+     * @return mixed The plain PHP value.
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
@@ -181,7 +177,7 @@ class ASTHelper
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
+            throw new Exception('Expected Node class with property `directives`, got: '.get_class($definitionNode));
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
@@ -194,7 +190,7 @@ class ASTHelper
      */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
-        return null !== self::directiveDefinition($definitionNode, $name);
+        return self::directiveDefinition($definitionNode, $name) !== null;
     }
 
     /**
@@ -203,14 +199,13 @@ class ASTHelper
      * @template TNode of \GraphQL\Language\AST\Node
      *
      * @param  iterable<TNode>  $nodes
-     *
      * @return TNode|null
      */
     public static function firstByName($nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected a Node with a name property, got: ' . get_class($node));
+                throw new Exception('Expected a Node with a name property, got: '.get_class($node));
             }
 
             if ($node->name->value === $name) {
@@ -229,7 +224,7 @@ class ASTHelper
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
-        return null !== $namespaceDirective
+        return $namespaceDirective !== null
             ? static::directiveArgValue($namespaceDirective, $directiveName)
             : null;
     }
@@ -255,7 +250,7 @@ class ASTHelper
      */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        return null !== self::firstByName($type->interfaces, $interfaceName);
+        return self::firstByName($type->interfaces, $interfaceName) !== null;
     }
 
     /**
@@ -313,15 +308,14 @@ class ASTHelper
         ObjectTypeDefinitionNode &$parentType
     ): string {
         return Str::studly($parentType->name->value)
-            . Str::studly($parentField->name->value)
-            . Str::studly($argDefinition->name->value);
+            .Str::studly($parentField->name->value)
+            .Str::studly($argDefinition->name->value);
     }
 
     /**
      * Given a collection of directives, returns the string value for the deprecation reason.
      *
      * @param  \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $node
-     *
      * @return string
      */
     public static function deprecationReason(Node $node): ?string
@@ -353,7 +347,7 @@ class ASTHelper
         $directive = null;
         foreach ($document->definitions as $definitionNode) {
             if ($definitionNode instanceof DirectiveDefinitionNode) {
-                if (null !== $directive) {
+                if ($directive !== null) {
                     throw new DefinitionException(
                         "Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}"
                     );
@@ -363,7 +357,7 @@ class ASTHelper
             }
         }
 
-        if (null === $directive) {
+        if ($directive === null) {
             throw new DefinitionException(
                 "Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}"
             );
@@ -384,7 +378,7 @@ class ASTHelper
         $documentAST = $astBuilder->documentAST();
 
         $type = $documentAST->types[$typeName] ?? null;
-        if (null === $type) {
+        if ($type === null) {
             throw new DefinitionException(
                 "Type '$typeName' on '{$field->name->value}' can not be found in the schema.'"
             );

@@ -10,8 +10,8 @@ use Tests\Utils\Exceptions\WithExtensionsException;
 
 class GlobalErrorRendererTest extends TestCase
 {
-    public const MESSAGE = 'foo';
-    public const EXTENSIONS_CONTENT = ['bar' => 'baz'];
+    const MESSAGE = 'foo';
+    const EXTENSIONS_CONTENT = ['bar' => 'baz'];
 
     protected function getEnvironmentSetUp($app): void
     {

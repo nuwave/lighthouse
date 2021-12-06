@@ -17,7 +17,7 @@ class GlobalIdTest extends TestCase
     {
         parent::setUp();
 
-        $this->globalIdResolver = new GlobalId();
+        $this->globalIdResolver = new GlobalId;
     }
 
     public function testHandleGlobalIds(): void

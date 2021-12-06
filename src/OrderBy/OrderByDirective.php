@@ -27,84 +27,84 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Sort a result list by one or more given columns.
-            """
-            directive @orderBy(
-                """
-                Restrict the allowed column names to a well-defined list.
-                This improves introspection capabilities and security.
-                Mutually exclusive with the `columnsEnum` argument.
-                Only used when the directive is added on an argument.
-                """
-                columns: [String!]
+"""
+Sort a result list by one or more given columns.
+"""
+directive @orderBy(
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    Mutually exclusive with the `columnsEnum` argument.
+    Only used when the directive is added on an argument.
+    """
+    columns: [String!]
 
-                """
-                Use an existing enumeration type to restrict the allowed columns to a predefined list.
-                This allowes you to re-use the same enum for multiple fields.
-                Mutually exclusive with the `columns` argument.
-                Only used when the directive is added on an argument.
-                """
-                columnsEnum: String
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    Mutually exclusive with the `columns` argument.
+    Only used when the directive is added on an argument.
+    """
+    columnsEnum: String
 
-                """
-                Allow clients to sort by aggregates on relations.
-                Only used when the directive is added on an argument.
-                """
-                relations: [OrderByRelation!]
+    """
+    Allow clients to sort by aggregates on relations.
+    Only used when the directive is added on an argument.
+    """
+    relations: [OrderByRelation!]
 
-                """
-                The database column for which the order by clause will be applied on.
-                Only used when the directive is added on a field.
-                """
-                column: String
+    """
+    The database column for which the order by clause will be applied on.
+    Only used when the directive is added on a field.
+    """
+    column: String
 
-                """
-                The direction of the order by clause.
-                Only used when the directive is added on a field.
-                """
-                direction: OrderByDirection = ASC
-            ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
+    """
+    The direction of the order by clause.
+    Only used when the directive is added on a field.
+    """
+    direction: OrderByDirection = ASC
+) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 
-            """
-            Options for the `direction` argument on `@orderBy`.
-            """
-            enum OrderByDirection {
-                """
-                Sort in ascending order.
-                """
-                ASC
+"""
+Options for the `direction` argument on `@orderBy`.
+"""
+enum OrderByDirection {
+    """
+    Sort in ascending order.
+    """
+    ASC
 
-                """
-                Sort in descending order.
-                """
-                DESC
-            }
+    """
+    Sort in descending order.
+    """
+    DESC
+}
 
-            """
-            Options for the `relations` argument on `@orderBy`.
-            """
-            input OrderByRelation {
-                """
-                TODO: description
-                """
-                relation: String!
+"""
+Options for the `relations` argument on `@orderBy`.
+"""
+input OrderByRelation {
+    """
+    TODO: description
+    """
+    relation: String!
 
-                """
-                Restrict the allowed column names to a well-defined list.
-                This improves introspection capabilities and security.
-                Mutually exclusive with the `columnsEnum` argument.
-                """
-                columns: [String!]
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    Mutually exclusive with the `columnsEnum` argument.
+    """
+    columns: [String!]
 
-                """
-                Use an existing enumeration type to restrict the allowed columns to a predefined list.
-                This allowes you to re-use the same enum for multiple fields.
-                Mutually exclusive with the `columns` argument.
-                """
-                columnsEnum: String
-            }
-            GRAPHQL;
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    Mutually exclusive with the `columns` argument.
+    """
+    columnsEnum: String
+}
+GRAPHQL;
     }
 
     /**
@@ -116,9 +116,9 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
             $order = Arr::pull($orderByClause, 'order');
             $column = Arr::pull($orderByClause, 'column');
 
-            if (null === $column) {
+            if ($column === null) {
                 if (! $builder instanceof Builder) {
-                    throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: ' . get_class($builder));
+                    throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: '.get_class($builder));
                 }
 
                 // TODO use array_key_first() in PHP 7.3
@@ -128,12 +128,12 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
                 $relationValues = Arr::first($orderByClause);
 
                 $aggregate = $relationValues['aggregate'];
-                if ('count' === $aggregate) {
+                if ($aggregate === 'count') {
                     $builder->withCount($relation);
 
                     $column = "{$relationSnake}_count";
                 } else {
-                    $operator = 'with' . ucfirst($aggregate);
+                    $operator = 'with'.ucfirst($aggregate);
                     $relationColumn = $relationValues['column'];
                     $builder->{$operator}($relation, $relationColumn);
 
@@ -154,7 +154,7 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if (! $this->hasAllowedColumns() && ! $this->directiveHasArgument('relations')) {
-            $argDefinition->type = Parser::typeReference('[' . OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE . '!]');
+            $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
 
             return;
         }
@@ -173,7 +173,7 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
                 $relationName = $relation['relation'];
                 $relationUpper = ucfirst($relationName);
 
-                $inputName = $qualifiedOrderByPrefix . $relationUpper;
+                $inputName = $qualifiedOrderByPrefix.$relationUpper;
 
                 $relationsInputs[$relationName] = $inputName;
 
@@ -214,37 +214,37 @@ class OrderByDirective extends BaseDirective implements ArgBuilderDirective, Arg
             $relationNames = array_keys($relationsInputs);
 
             $inputMerged = <<<GRAPHQL
-                                "Order by clause for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
-                                input {$qualifiedRelationOrderByName} {
-                                    "The column that is used for ordering."
-                                    column: $allowedColumnsTypeName {$this->mutuallyExclusiveRule($relationNames)}
+                "Order by clause for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
+                input {$qualifiedRelationOrderByName} {
+                    "The column that is used for ordering."
+                    column: $allowedColumnsTypeName {$this->mutuallyExclusiveRule($relationNames)}
 
-                                    "The direction that is used for ordering."
-                                    order: SortOrder!
-                GRAPHQL;
+                    "The direction that is used for ordering."
+                    order: SortOrder!
+GRAPHQL;
 
             foreach ($relationsInputs as $relation => $input) {
                 /** @var array<int, string> $otherOptions */
                 $otherOptions = ['column'];
                 foreach ($relationNames as $relationName) {
                     if ($relationName !== $relation) {
-                        $otherOptions[] = $relationName;
+                        $otherOptions [] = $relationName;
                     }
                 }
 
                 $inputMerged .= <<<GRAPHQL
-                                        "Aggregate specification."
-                                        {$relation}: {$input} {$this->mutuallyExclusiveRule($otherOptions)}
+                    "Aggregate specification."
+                    {$relation}: {$input} {$this->mutuallyExclusiveRule($otherOptions)}
 
-                    GRAPHQL;
+GRAPHQL;
             }
 
             $argDefinition->type = Parser::typeReference("[{$qualifiedRelationOrderByName}!]");
 
             $documentAST->setTypeDefinition(Parser::inputObjectTypeDefinition("{$inputMerged}}"));
         } else {
-            $restrictedOrderByName = $qualifiedOrderByPrefix . 'OrderByClause';
-            $argDefinition->type = Parser::typeReference('[' . $restrictedOrderByName . '!]');
+            $restrictedOrderByName = $qualifiedOrderByPrefix.'OrderByClause';
+            $argDefinition->type = Parser::typeReference('['.$restrictedOrderByName.'!]');
 
             $documentAST->setTypeDefinition(
                 OrderByServiceProvider::createOrderByClauseInput(

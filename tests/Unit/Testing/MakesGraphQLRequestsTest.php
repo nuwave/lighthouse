@@ -73,8 +73,7 @@ class MakesGraphQLRequestsTest extends TestCase
         $value = 'bar';
 
         $this->graphQL(
-            /** @lang GraphQL */
-            '
+/** @lang GraphQL */ '
             {
                 foo
             }

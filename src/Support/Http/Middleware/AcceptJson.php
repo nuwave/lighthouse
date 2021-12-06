@@ -14,8 +14,8 @@ use Illuminate\Http\Request;
  */
 class AcceptJson
 {
-    public const ACCEPT = 'Accept';
-    public const APPLICATION_JSON = 'application/json';
+    const ACCEPT = 'Accept';
+    const APPLICATION_JSON = 'application/json';
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Http\JsonResponse

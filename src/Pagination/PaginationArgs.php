@@ -27,7 +27,7 @@ class PaginationArgs
     /**
      * Create a new instance from user given args.
      *
-     * @param array<string, mixed> $args
+     * @param  array<string, mixed>  $args
      *
      * @throws \GraphQL\Error\Error
      */
@@ -57,7 +57,7 @@ class PaginationArgs
 
         // Make sure the maximum pagination count is not exceeded
         if (
-            null !== $paginateMaxCount
+            $paginateMaxCount !== null
             && $instance->first > $paginateMaxCount
         ) {
             throw new Error(
@@ -91,7 +91,7 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @param \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder
+     * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      */
     public function applyToBuilder(object $builder): Paginator
     {

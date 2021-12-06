@@ -111,7 +111,7 @@ class EqDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */"
         type User {
             id: ID!
         }
@@ -136,7 +136,7 @@ class EqDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */'
         type User {
             id: ID!
         }
@@ -151,7 +151,7 @@ class EqDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */'
         type User {
             id: ID!
         }

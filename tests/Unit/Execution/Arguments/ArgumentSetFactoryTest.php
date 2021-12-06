@@ -75,9 +75,9 @@ class ArgumentSetFactoryTest extends TestCase
         }
         ';
 
-        $barValue
+        $barValue =
             // Level 1
-            = [
+            [
                 // Level 2
                 [
                     // Level 3
@@ -175,7 +175,7 @@ class ArgumentSetFactoryTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $args
+     * @param  array<string, mixed>  $args
      */
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {

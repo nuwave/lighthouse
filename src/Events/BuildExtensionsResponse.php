@@ -10,4 +10,5 @@ namespace Nuwave\Lighthouse\Events;
  */
 class BuildExtensionsResponse
 {
+    //
 }

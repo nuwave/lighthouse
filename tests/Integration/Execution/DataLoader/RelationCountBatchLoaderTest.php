@@ -68,14 +68,14 @@ class RelationCountBatchLoaderTest extends DBTestCase
             ->assertJson([
                 [
                     'data' => [
-                        'user' => [
+                        'user' =>  [
                             'tasks_count' => 3,
                         ],
                     ],
                 ],
                 [
                     'data' => [
-                        'user' => [
+                        'user' =>  [
                             'tasks_count' => 3,
                         ],
                     ],

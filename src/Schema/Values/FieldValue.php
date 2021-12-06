@@ -215,7 +215,7 @@ class FieldValue
      */
     public function getReturnType(): Type
     {
-        if (null === $this->returnType) {
+        if ($this->returnType === null) {
             /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
             $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
             $this->returnType = $typeNodeConverter->convert($this->field->type);

@@ -17,30 +17,30 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective, ScoutBui
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Add an equal conditional to a database query.
-            """
-            directive @eq(
-              """
-              Specify the database column to compare.
-              Required if the directive is:
-              - used on an argument and the database column has a different name
-              - used on a field
-              """
-              key: String
+"""
+Add an equal conditional to a database query.
+"""
+directive @eq(
+  """
+  Specify the database column to compare.
+  Required if the directive is:
+  - used on an argument and the database column has a different name
+  - used on a field
+  """
+  key: String
 
-              """
-              Provide a value to compare against.
-              Only required when this directive is used on a field.
-              """
-              value: EqValue
-            ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+  """
+  Provide a value to compare against.
+  Only required when this directive is used on a field.
+  """
+  value: EqValue
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
-            """
-            Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-            """
-            scalar EqValue
-            GRAPHQL;
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar EqValue
+GRAPHQL;
     }
 
     public function handleBuilder($builder, $value): object

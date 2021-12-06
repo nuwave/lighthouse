@@ -17,7 +17,7 @@ use Laravel\Scout\Searchable;
  * @property int $id
  *
  * Attributes
- * @property string      $title
+ * @property string $title
  * @property string|null $body
  *
  * Timestamps
@@ -26,7 +26,7 @@ use Laravel\Scout\Searchable;
  *
  * Foreign keys
  * @property int|null $user_id
- * @property int      $task_id
+ * @property int $task_id
  * @property int|null $parent_id
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Activity> $activity

@@ -97,7 +97,7 @@ class SchemaBuilder
 
         $directives = [];
         foreach ($documentAST->directives as $directiveDefinition) {
-            $directives[] = $directiveFactory->handle($directiveDefinition);
+            $directives [] = $directiveFactory->handle($directiveDefinition);
         }
 
         $config->setDirectives(

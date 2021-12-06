@@ -17,9 +17,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  *
  * Attributes
- * @property string                    $name
- * @property int|null                  $difficulty
- * @property string|null               $guard
+ * @property string $name
+ * @property int|null $difficulty
+ * @property string|null $guard
  * @property \lluminate\Support\Carbon $completed_at
  *
  * Timestamps
@@ -87,7 +87,7 @@ class Task extends Model
     }
 
     /**
-     * @param array<string, int> $args
+     * @param  array<string, int>  $args
      */
     public function scopeFoo(Builder $query, array $args): Builder
     {
@@ -95,7 +95,7 @@ class Task extends Model
     }
 
     /**
-     * @param iterable<string> $tags
+     * @param  iterable<string>  $tags
      */
     public function scopeWhereTags(Builder $query, iterable $tags): Builder
     {

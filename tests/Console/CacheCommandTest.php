@@ -51,7 +51,7 @@ class CacheCommandTest extends TestCase
         $cache = $this->app->make(CacheRepository::class);
         $this->assertFalse($cache->has($key));
 
-        $this->commandTester(new CacheCommand())->execute([]);
+        $this->commandTester(new CacheCommand)->execute([]);
 
         $this->assertTrue($cache->has($key));
         $this->assertInstanceOf(DocumentAST::class, $cache->get($key));
@@ -66,7 +66,7 @@ class CacheCommandTest extends TestCase
         $path = $this->schemaCachePath();
         $this->assertFalse($filesystem->exists($path));
 
-        $this->commandTester(new CacheCommand())->execute([]);
+        $this->commandTester(new CacheCommand)->execute([]);
 
         $this->assertTrue($filesystem->exists($path));
         $this->assertInstanceOf(DocumentAST::class, DocumentAST::fromArray(require $path));
@@ -77,6 +77,6 @@ class CacheCommandTest extends TestCase
         $this->config->set('lighthouse.cache.version', 3);
 
         $this->expectException(UnknownCacheVersionException::class);
-        $this->commandTester(new CacheCommand())->execute([]);
+        $this->commandTester(new CacheCommand)->execute([]);
     }
 }

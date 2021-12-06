@@ -14,7 +14,7 @@ class AuthenticationErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {
-        if (null === $error) {
+        if ($error === null) {
             return $next(null);
         }
 

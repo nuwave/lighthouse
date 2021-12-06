@@ -53,14 +53,14 @@ class ASTManipulator
 
             /** @var \GraphQL\Language\AST\DirectiveNode $directive */
             foreach ($type->directives as $directive) {
-                if ('key' === $directive->name->value) {
+                if ($directive->name->value === 'key') {
                     $entities[] = $type->name->value;
                     break;
                 }
             }
         }
 
-        if (0 === count($entities)) {
+        if (count($entities) === 0) {
             throw new FederationException('There must be at least one type using the @key directive when federation is enabled.');
         }
 
@@ -83,13 +83,13 @@ class ASTManipulator
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
 
-        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
+        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(
             representations: [_Any!]!
         ): [_Entity]! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Entities")
         ');
 
-        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
+        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _service: _Service! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Service")
         ');
     }

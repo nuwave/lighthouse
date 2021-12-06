@@ -57,7 +57,7 @@ class DeprecatedDirectiveTest extends TestCase
         $withoutDeprecatedIntrospection->assertJsonCount(1, 'data.__schema.queryType.fields');
         $types = $withoutDeprecatedIntrospection->json('data.__schema.types');
         $foo = Arr::first($types, static function (array $type): bool {
-            return 'Foo' === $type['name'];
+            return $type['name'] === 'Foo';
         });
         $this->assertCount(1, $foo['enumValues']);
 
@@ -88,7 +88,7 @@ class DeprecatedDirectiveTest extends TestCase
 
         $types = $includeDeprecatedIntrospection->json('data.__schema.types');
         $foo = Arr::first($types, static function (array $type): bool {
-            return 'Foo' === $type['name'];
+            return $type['name'] === 'Foo';
         });
         $this->assertCount(2, $foo['enumValues']);
     }

@@ -9,7 +9,7 @@ interface ScoutBuilderDirective
     /**
      * Modify the scout builder with a client given value.
      *
-     * @param mixed $value Any client given value
+     * @param  mixed  $value  Any client given value
      */
     public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder;
 }

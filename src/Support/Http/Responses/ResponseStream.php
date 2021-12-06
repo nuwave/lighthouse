@@ -52,18 +52,18 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     protected function boundary(): string
     {
-        return self::EOL . '---' . self::EOL;
+        return self::EOL.'---'.self::EOL;
     }
 
     protected function terminatingBoundary(): string
     {
-        return self::EOL . '-----' . self::EOL;
+        return self::EOL.'-----'.self::EOL;
     }
 
     /**
      * Format chunked data.
      *
-     * @param array<mixed> $data
+     * @param  array<mixed>  $data
      */
     protected function chunk(array $data, bool $terminating): string
     {
@@ -71,17 +71,17 @@ class ResponseStream extends Stream implements CanStreamResponse
 
         $length = $terminating
             ? strlen($json)
-            : strlen($json . self::EOL);
+            : strlen($json.self::EOL);
 
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
-            'Content-Length: ' . $length,
+            'Content-Length: '.$length,
             '',
             $json,
             '',
         ]);
 
-        return $this->boundary() . $chunk;
+        return $this->boundary().$chunk;
     }
 
     /**

@@ -42,31 +42,31 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
-            """
-            directive @throttle(
-                """
-                Named preconfigured rate limiter. Requires Laravel 8.x or later.
-                """
-                name: String
+"""
+Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
+"""
+directive @throttle(
+    """
+    Named preconfigured rate limiter. Requires Laravel 8.x or later.
+    """
+    name: String
 
-                """
-                Maximum number of attempts in a specified time interval.
-                """
-                maxAttempts: Int = 60
+    """
+    Maximum number of attempts in a specified time interval.
+    """
+    maxAttempts: Int = 60
 
-                """
-                Time in minutes to reset attempts.
-                """
-                decayMinutes: Float = 1.0
+    """
+    Time in minutes to reset attempts.
+    """
+    decayMinutes: Float = 1.0
 
-                """
-                Prefix to distinguish several field groups.
-                """
-                prefix: String
-            ) on FIELD_DEFINITION
-            GRAPHQL;
+    """
+    Prefix to distinguish several field groups.
+    """
+    prefix: String
+) on FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
@@ -75,7 +75,7 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
         $limits = [];
 
         $name = $this->directiveArgValue('name');
-        if (null !== $name) {
+        if ($name !== null) {
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
 
@@ -90,20 +90,20 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
 
             if ($limiterResponse instanceof Response) {
                 throw new DirectiveException(
-                    "Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse)
+                    "Expected named limiter {$name} to return an array, got instance of ".get_class($limiterResponse)
                 );
             }
 
             foreach (Arr::wrap($limiterResponse) as $limit) {
                 $limits[] = [
-                    'key' => sha1($name . $limit->key),
+                    'key' => sha1($name.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
                     'decayMinutes' => $limit->decayMinutes,
                 ];
             }
         } else {
             $limits[] = [
-                'key' => sha1($this->directiveArgValue('prefix', '') . $this->request->ip()),
+                'key' => sha1($this->directiveArgValue('prefix', '').$this->request->ip()),
                 'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
                 'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
             ];
@@ -131,7 +131,7 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $name = $this->directiveArgValue('name');
-        if (null !== $name) {
+        if ($name !== null) {
             if (AppVersion::below(8.0)) {
                 throw new DefinitionException('Named limiter requires Laravel 8.x or later');
             }

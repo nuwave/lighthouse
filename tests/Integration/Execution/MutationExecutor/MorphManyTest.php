@@ -80,7 +80,7 @@ class MorphManyTest extends DBTestCase
         id: ID
         url: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewMorphMany(): void
     {
@@ -191,24 +191,24 @@ class MorphManyTest extends DBTestCase
     public function testUpsertMorphManyWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-                    mutation {
-                        upsertTask(input: {
-                            name: "foo"
-                            images: {
-                                upsert: [{
-                                    url: "foo"
-                                }]
-                            }
-                        }) {
-                            id
-                            name
-                            images {
-                                id
-                                url
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                images: {
+                    upsert: [{
+                        url: "foo"
+                    }]
+                }
+            }) {
+                id
+                name
+                images {
+                    id
+                    url
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [

@@ -9,7 +9,7 @@ class GenericException extends Error
     protected $category = 'generic';
 
     /**
-     * @param array<string, mixed> $extensions
+     * @param  array<string, mixed>  $extensions
      */
     public function setExtensions(array $extensions): self
     {

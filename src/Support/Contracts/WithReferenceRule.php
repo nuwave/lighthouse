@@ -10,7 +10,7 @@ interface WithReferenceRule
     /**
      * Called with the argument path leading up to this argument, before validation runs.
      *
-     * @param array<int|string> $argumentPath
+     * @param  array<int|string>  $argumentPath
      */
     public function setArgumentPath(array $argumentPath): void;
 }

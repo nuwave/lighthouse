@@ -19,23 +19,23 @@ class TrashedDirective extends BaseDirective implements ArgBuilderDirective, Sco
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Allows to filter if trashed elements should be fetched.
-            """
-            directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-            GRAPHQL;
+"""
+Allows to filter if trashed elements should be fetched.
+"""
+directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function handleBuilder($builder, $value): object
     {
         if (! $builder instanceof EloquentBuilder) {
-            throw new Exception('Can not get model from builder of class: ' . get_class($builder));
+            throw new Exception('Can not get model from builder of class: '.get_class($builder));
         }
         $model = $builder->getModel();
 
         $this->assertModelUsesSoftDeletes($model);
 
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
@@ -51,7 +51,7 @@ class TrashedDirective extends BaseDirective implements ArgBuilderDirective, Sco
                 // @phpstan-ignore-next-line because it involves mixins
                 return $builder->withoutTrashed();
             default:
-                throw new InvalidArgument('Unexpected value for Trashed filter: ' . $value);
+                throw new InvalidArgument('Unexpected value for Trashed filter: '.$value);
         }
     }
 
@@ -61,7 +61,7 @@ class TrashedDirective extends BaseDirective implements ArgBuilderDirective, Sco
 
         $this->assertModelUsesSoftDeletes($model);
 
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
@@ -71,7 +71,7 @@ class TrashedDirective extends BaseDirective implements ArgBuilderDirective, Sco
             case 'only':
                 return $builder->onlyTrashed();
             default:
-                throw new ScoutException('Unexpected value for Trashed filter: ' . $value);
+                throw new ScoutException('Unexpected value for Trashed filter: '.$value);
         }
     }
 

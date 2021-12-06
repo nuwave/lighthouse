@@ -11,7 +11,7 @@ class MockResolver
     /**
      * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector
      *
-     * @return mixed|void anything whatsoever
+     * @return mixed|void Anything whatsoever.
      */
     public function __invoke()
     {

@@ -9,7 +9,7 @@ class FooClosureValidator extends Validator
 {
     public static function notFoo(string $attribute): string
     {
-        return 'The ' . $attribute . ' field must have a value of "foo".';
+        return 'The '.$attribute.' field must have a value of "foo".';
     }
 
     public function rules(): array
@@ -17,7 +17,7 @@ class FooClosureValidator extends Validator
         return [
             'foo' => [
                 static function (string $attribute, $value, Closure $fail): void {
-                    if ('foo' !== $value) {
+                    if ($value !== 'foo') {
                         $fail(self::notFoo($attribute));
                     }
                 },

@@ -17,7 +17,7 @@ class ResolveNested implements ArgResolver
     protected $argPartitioner;
 
     /**
-     * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver|null $previous
+     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver|null  $previous
      */
     public function __construct(callable $previous = null, callable $argPartitioner = null)
     {
@@ -26,7 +26,7 @@ class ResolveNested implements ArgResolver
     }
 
     /**
-     * @param \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $args
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
     public function __invoke($root, $args)
     {

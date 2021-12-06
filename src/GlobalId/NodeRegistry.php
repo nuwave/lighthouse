@@ -60,10 +60,9 @@ class NodeRegistry
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
      * @param  array<string, mixed>  $args
+     * @return mixed The result of calling the resolver.
      *
      * @throws \GraphQL\Error\Error
-     *
-     * @return mixed the result of calling the resolver
      */
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {

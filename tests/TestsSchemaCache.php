@@ -17,7 +17,7 @@ trait TestsSchemaCache
 
     protected function schemaCachePath(): string
     {
-        return __DIR__ . '/storage/lighthouse-schema.php';
+        return __DIR__.'/storage/lighthouse-schema.php';
     }
 
     protected function tearDownSchemaCache(): void

@@ -25,19 +25,19 @@ use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
 {
-    public const FEDERATION_TYPES = [
+    const FEDERATION_TYPES = [
         '_Any',
         '_Entity',
         '_FieldSet',
         '_Service',
     ];
 
-    public const FEDERATION_FIELDS = [
+    const FEDERATION_FIELDS = [
         '_service',
         '_entities',
     ];
 
-    public const FEDERATION_DIRECTIVES = [
+    const FEDERATION_DIRECTIVES = [
         ExtendsDirective::NAME,
         ExternalDirective::NAME,
         KeyDirective::NAME,
@@ -87,7 +87,7 @@ class FederationPrinter
         $printDirectives = static function ($definition): string {
             /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
-            if (null === $astNode) {
+            if ($astNode === null) {
                 return '';
             }
 
@@ -98,8 +98,8 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return KeyDirective::NAME === $name
-                                || ExtendsDirective::NAME === $name;
+                            return $name === KeyDirective::NAME
+                                || $name === ExtendsDirective::NAME;
                         }
                     )
                 );
@@ -110,9 +110,9 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return ProvidesDirective::NAME === $name
-                                || RequiresDirective::NAME === $name
-                                || ExternalDirective::NAME === $name;
+                            return $name === ProvidesDirective::NAME
+                                || $name === RequiresDirective::NAME
+                                || $name === ExternalDirective::NAME;
                         }
                     )
                 );

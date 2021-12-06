@@ -22,7 +22,7 @@ class ResolverProviderTest extends TestCase
     {
         parent::setUp();
 
-        $this->resolverProvider = new ResolverProvider();
+        $this->resolverProvider = new ResolverProvider;
     }
 
     public function testGetsTheWebonyxDefaultResolverForNonRootFields(): void

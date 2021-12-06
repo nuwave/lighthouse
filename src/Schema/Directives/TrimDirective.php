@@ -17,15 +17,15 @@ class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgD
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Remove whitespace from the beginning and end of a given input.
+"""
+Remove whitespace from the beginning and end of a given input.
 
-            This can be used on:
-            - a single argument or input field to sanitize that subtree
-            - a field to trim all strings
-            """
-            directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
-            GRAPHQL;
+This can be used on:
+- a single argument or input field to sanitize that subtree
+- a field to trim all strings
+"""
+directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+GRAPHQL;
     }
 
     /**
@@ -74,7 +74,6 @@ class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgD
 
     /**
      * @param  mixed  $value  The client given value
-     *
      * @return mixed The transformed value
      */
     protected function transformLeaf($value)

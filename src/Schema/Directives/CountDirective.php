@@ -19,28 +19,28 @@ class CountDirective extends BaseDirective implements FieldResolver
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Returns the count of a given relationship or model.
-            """
-            directive @count(
-              """
-              The relationship to count.
-              Mutually exclusive with the `model` argument.
-              """
-              relation: String
+"""
+Returns the count of a given relationship or model.
+"""
+directive @count(
+  """
+  The relationship to count.
+  Mutually exclusive with the `model` argument.
+  """
+  relation: String
 
-              """
-              The model to count.
-              Mutually exclusive with the `relation` argument.
-              """
-              model: String
+  """
+  The model to count.
+  Mutually exclusive with the `relation` argument.
+  """
+  model: String
 
-              """
-              Apply scopes to the underlying query.
-              """
-              scopes: [String!]
-            ) on FIELD_DEFINITION
-            GRAPHQL;
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue

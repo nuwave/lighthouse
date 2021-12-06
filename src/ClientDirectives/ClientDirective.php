@@ -50,7 +50,7 @@ class ClientDirective
 
         $arguments = [];
         foreach ($resolveInfo->fieldNodes as $fieldNode) {
-            $arguments[] = Values::getDirectiveValues($directive, $fieldNode, $resolveInfo->variableValues);
+            $arguments [] = Values::getDirectiveValues($directive, $fieldNode, $resolveInfo->variableValues);
         }
 
         return $arguments;
@@ -61,7 +61,7 @@ class ClientDirective
      */
     protected function definition(): Directive
     {
-        if (null !== $this->definition) {
+        if ($this->definition !== null) {
             return $this->definition;
         }
 
@@ -70,7 +70,7 @@ class ClientDirective
         $schema = $schemaBuilder->schema();
 
         $definition = $schema->getDirective($this->name);
-        if (null === $definition) {
+        if ($definition === null) {
             throw new DefinitionException("Missing a schema definition for the client directive $this->name");
         }
 

@@ -19,8 +19,8 @@ class LaravelEnumType extends EnumType
     /**
      * Create a GraphQL enum from a Laravel enum type.
      *
-     * @param class-string<\BenSampo\Enum\Enum> $enumClass
-     * @param string|null                       $name      The name the enum will have in the schema, defaults to the basename of the given class
+     * @param  class-string<\BenSampo\Enum\Enum>  $enumClass
+     * @param  string|null  $name  The name the enum will have in the schema, defaults to the basename of the given class
      */
     public function __construct(string $enumClass, ?string $name = null)
     {

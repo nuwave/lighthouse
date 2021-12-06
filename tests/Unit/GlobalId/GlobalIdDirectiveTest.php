@@ -98,7 +98,7 @@ class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver(
             /**
-             * @param array<string, mixed> $args
+             * @param  array<string, mixed>  $args
              */
             static function ($root, array $args): array {
                 return $args['input']['bar'];
@@ -138,14 +138,14 @@ class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver(
             /**
-             * @param array<string, mixed> $args
+             * @param  array<string, mixed>  $args
              */
             static function ($root, array $args): array {
                 return $args;
             }
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type Query {
             foo(
                 type: ID! @globalId(decode: TYPE)

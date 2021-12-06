@@ -12,7 +12,6 @@ class ArgumentFactory
      * Convert input value definitions to a executable types.
      *
      * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $definitionNodes
-     *
      * @return array<string, array<string, mixed>>
      */
     public function toTypeMap(iterable $definitionNodes): array

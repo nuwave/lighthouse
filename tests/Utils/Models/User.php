@@ -26,9 +26,9 @@ use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Foreign keys
- * @property int|null    $company_id
- * @property int|null    $team_id
- * @property int|null    $person_id
+ * @property int|null $company_id
+ * @property int|null $team_id
+ * @property int|null $person_id
  * @property string|null $person_type
  *
  * Relations

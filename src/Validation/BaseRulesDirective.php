@@ -32,7 +32,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     public function messages(): array
     {
         $messages = $this->directiveArgValue('messages');
-        if (null === $messages) {
+        if ($messages === null) {
             return [];
         }
 
@@ -78,7 +78,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             $this->invalidApplyArgument($rules);
         }
 
-        if (0 === count($rules)) {
+        if (count($rules) === 0) {
             $this->invalidApplyArgument($rules);
         }
 
@@ -92,7 +92,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     protected function validateMessageArg(): void
     {
         $messages = $this->directiveArgValue('messages');
-        if (null === $messages) {
+        if ($messages === null) {
             return;
         }
 
@@ -130,28 +130,26 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param mixed $messages Whatever faulty value was given for messages
+     * @param  mixed  $messages  Whatever faulty value was given for messages
      *
      * @throws DefinitionException
      */
     protected function invalidMessageArgument($messages): void
     {
         $encoded = \Safe\json_encode($messages);
-
         throw new DefinitionException(
             "The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$encoded}"
         );
     }
 
     /**
-     * @param mixed $apply Any invalid value
+     * @param  mixed  $apply  Any invalid value
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function invalidApplyArgument($apply): void
     {
         $encoded = \Safe\json_encode($apply);
-
         throw new DefinitionException(
             "The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$encoded}"
         );

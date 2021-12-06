@@ -57,7 +57,7 @@ class MorphToManyTest extends DBTestCase
         id: ID!
         name: String!
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCreateATaskWithExistingTagsByUsingConnect(): void
     {
@@ -318,25 +318,25 @@ class MorphToManyTest extends DBTestCase
     public function testUpsertMorphToManyWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-                    mutation {
-                        upsertTask(input: {
-                            name: "Finish tests"
-                            tags: {
-                                upsert: [
-                                    {
-                                        name: "php"
-                                    }
-                                ]
-                            }
-                        }) {
-                            id
-                            tags {
-                                id
-                                name
-                            }
+        mutation {
+            upsertTask(input: {
+                name: "Finish tests"
+                tags: {
+                    upsert: [
+                        {
+                            name: "php"
                         }
-                    }
-            GRAPHQL
+                    ]
+                }
+            }) {
+                id
+                tags {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [

@@ -102,7 +102,7 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testInlineLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */'
         type Query {
             foo: Int @throttle(maxAttempts: 1)
         }

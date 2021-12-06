@@ -135,7 +135,7 @@ class PaginatedModelsLoader implements ModelsLoader
     /**
      * Ensure the pivot relation is hydrated too, if it exists.
      *
-     * @param \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $relatedModels
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relatedModels
      */
     protected function hydratePivotRelation(EloquentCollection $parents, EloquentCollection $relatedModels): void
     {
@@ -152,7 +152,7 @@ class PaginatedModelsLoader implements ModelsLoader
     {
         /** @var \Illuminate\Database\Eloquent\Model|null $model */
         $model = $collection->first();
-        if (null === $model) {
+        if ($model === null) {
             return;
         }
 

@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 
 class GlobalIdServiceProvider extends ServiceProvider
 {
-    public const NODE = 'Node';
+    const NODE = 'Node';
 
     public function register(): void
     {
@@ -55,21 +55,21 @@ class GlobalIdServiceProvider extends ServiceProvider
         // Double slashes to escape the slashes in the namespace.
         $documentAST->setTypeDefinition(
             Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-                "Any object implementing this type can be found by ID through `Query.node`."
-                interface $node @interface(resolveType: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolveType") {
-                  "Global identifier that can be used to resolve any Node implementation."
-                  $globalId: ID!
-                }
-                GRAPHQL
+"Any object implementing this type can be found by ID through `Query.node`."
+interface $node @interface(resolveType: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolveType") {
+  "Global identifier that can be used to resolve any Node implementation."
+  $globalId: ID!
+}
+GRAPHQL
             )
         );
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
-        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-              node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
-            GRAPHQL
-        );
+        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+  node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
+GRAPHQL
+);
     }
 
     protected function hasTypeImplementingNodeInterface(DocumentAST $documentAST): bool

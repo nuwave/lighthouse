@@ -51,7 +51,7 @@ class Subscriber implements Serializable
     /**
      * The root element of the query.
      *
-     * @var mixed can be anything
+     * @var mixed Can be anything.
      */
     public $root;
 
@@ -77,7 +77,7 @@ class Subscriber implements Serializable
     public $context;
 
     /**
-     * @param array<string, mixed> $args
+     * @param  array<string, mixed>  $args
      */
     public function __construct(
         array $args,
@@ -132,7 +132,7 @@ class Subscriber implements Serializable
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function __unserialize(array $data): void
     {
@@ -181,7 +181,7 @@ class Subscriber implements Serializable
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-lighthouse-' . Str::random(32) . '-' . time();
+        return 'private-lighthouse-'.Str::random(32).'-'.time();
     }
 
     protected function contextSerializer(): ContextSerializer

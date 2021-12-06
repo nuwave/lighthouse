@@ -156,25 +156,25 @@ class UpsertDirectiveTest extends DBTestCase
     public function testUpsertUsingInterface(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
-                    type Mutation {
-                        upsertUser(input: UpsertUserInput! @spread): IUser @upsert
-                    }
+        type Mutation {
+            upsertUser(input: UpsertUserInput! @spread): IUser @upsert
+        }
 
-                    interface IUser
-                    @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}")
-                    @model(class: "Tests\\\\Utils\\\\Models\\\\User") {
-                        name: String
-                    }
+        interface IUser
+        @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}")
+        @model(class: "Tests\\\\Utils\\\\Models\\\\User") {
+            name: String
+        }
 
-                    type Admin implements IUser {
-                        id: ID!
-                        name: String
-                    }
+        type Admin implements IUser {
+            id: ID!
+            name: String
+        }
 
-                    input UpsertUserInput {
-                        name: String
-                    }
-            GRAPHQL;
+        input UpsertUserInput {
+            name: String
+        }
+GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {

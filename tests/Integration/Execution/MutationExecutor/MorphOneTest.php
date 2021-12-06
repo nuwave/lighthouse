@@ -75,7 +75,7 @@ class MorphOneTest extends DBTestCase
         id: ID
         url: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewMorphOne(): void
     {
@@ -145,24 +145,24 @@ class MorphOneTest extends DBTestCase
     public function testUpsertMorphOneWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-                    mutation {
-                        upsertTask(input: {
-                            name: "foo"
-                            image: {
-                                upsert: {
-                                    url: "foo"
-                                }
-                            }
-                        }) {
-                            id
-                            name
-                            image {
-                                id
-                                url
-                            }
-                        }
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                image: {
+                    upsert: {
+                        url: "foo"
                     }
-            GRAPHQL
+                }
+            }) {
+                id
+                name
+                image {
+                    id
+                    url
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [

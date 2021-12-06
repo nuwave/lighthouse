@@ -65,7 +65,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @paginate(builder: "' . $this->qualifyTestResolver('builder') . '")
+            users: [User!]! @paginate(builder: "'.$this->qualifyTestResolver('builder').'")
         }
         ';
 

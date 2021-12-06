@@ -13,7 +13,7 @@ class SchemaStitcherTest extends TestCase
     /**
      * @var string
      */
-    public const SCHEMA_PATH = __DIR__ . '/schema/';
+    public const SCHEMA_PATH = __DIR__.'/schema/';
 
     /**
      * @var string
@@ -47,7 +47,7 @@ class SchemaStitcherTest extends TestCase
 
     protected function assertSchemaResultIsSame(string $expected): void
     {
-        $schema = (new SchemaStitcher(self::SCHEMA_PATH . self::ROOT_SCHEMA_FILENAME))->getSchemaString();
+        $schema = (new SchemaStitcher(self::SCHEMA_PATH.self::ROOT_SCHEMA_FILENAME))->getSchemaString();
         $this->assertSame($expected, $schema);
     }
 
@@ -68,9 +68,9 @@ class SchemaStitcherTest extends TestCase
         $this->expectException(FileNotFoundException::class);
 
         $foo = <<<'EOT'
-            #import does-not-exist.graphql
+#import does-not-exist.graphql
 
-            EOT;
+EOT;
         $this->putRootSchema($foo);
 
         $this->assertSchemaResultIsSame($foo);
@@ -79,9 +79,9 @@ class SchemaStitcherTest extends TestCase
     public function testLeavesImportlessFileAsBefore(): void
     {
         $foo = <<<'EOT'
-            foo
+foo
 
-            EOT;
+EOT;
         $this->putRootSchema($foo);
 
         $this->assertSchemaResultIsSame($foo);
@@ -89,189 +89,159 @@ class SchemaStitcherTest extends TestCase
 
     public function testReplacesImportWithFileContent(): void
     {
-        $this->putRootSchema(
-            <<<'EOT'
-                foo
-                #import bar
+        $this->putRootSchema(<<<'EOT'
+foo
+#import bar
 
-                EOT
+EOT
         );
 
-        $this->filesystem->put(
-            'bar',
-            <<<'EOT'
-                bar
+        $this->filesystem->put('bar', <<<'EOT'
+bar
 
-                EOT
+EOT
         );
 
-        $this->assertSchemaResultIsSame(
-            <<<'EOT'
-                foo
-                bar
+        $this->assertSchemaResultIsSame(<<<'EOT'
+foo
+bar
 
-                EOT
+EOT
         );
     }
 
     public function testImportsRecursively(): void
     {
-        $this->putRootSchema(
-            <<<'EOT'
-                foo
-                #import bar
+        $this->putRootSchema(<<<'EOT'
+foo
+#import bar
 
-                EOT
+EOT
         );
 
-        $this->filesystem->put(
-            'bar',
-            <<<'EOT'
-                bar
-                #import baz
-                EOT
+        $this->filesystem->put('bar', <<<'EOT'
+bar
+#import baz
+EOT
         );
 
-        $this->filesystem->put(
-            'baz',
-            <<<'EOT'
-                baz
+        $this->filesystem->put('baz', <<<'EOT'
+baz
 
-                EOT
+EOT
         );
 
-        $this->assertSchemaResultIsSame(
-            <<<'EOT'
-                foo
-                bar
-                baz
+        $this->assertSchemaResultIsSame(<<<'EOT'
+foo
+bar
+baz
 
-                EOT
+EOT
         );
     }
 
     public function testImportsFromSubdirectory(): void
     {
-        $this->putRootSchema(
-            <<<'EOT'
-                foo
-                #import subdir/bar
+        $this->putRootSchema(<<<'EOT'
+foo
+#import subdir/bar
 
-                EOT
+EOT
         );
 
         $this->filesystem->createDir('subdir');
-        $this->filesystem->put(
-            'subdir/bar',
-            <<<'EOT'
-                bar
+        $this->filesystem->put('subdir/bar', <<<'EOT'
+bar
 
-                EOT
+EOT
         );
 
-        $this->assertSchemaResultIsSame(
-            <<<'EOT'
-                foo
-                bar
+        $this->assertSchemaResultIsSame(<<<'EOT'
+foo
+bar
 
-                EOT
+EOT
         );
     }
 
     public function testKeepsIndententation(): void
     {
-        $this->putRootSchema(
-            <<<'EOT'
-                    foo
-                #import bar
+        $this->putRootSchema(<<<'EOT'
+    foo
+#import bar
 
-                EOT
+EOT
         );
 
-        $this->filesystem->put(
-            'bar',
-            <<<'EOT'
-                        bar
+        $this->filesystem->put('bar', <<<'EOT'
+        bar
 
-                EOT
+EOT
         );
 
-        $this->assertSchemaResultIsSame(
-            <<<'EOT'
-                    foo
-                        bar
+        $this->assertSchemaResultIsSame(<<<'EOT'
+    foo
+        bar
 
-                EOT
+EOT
         );
     }
 
     public function testImportsViaGlob(): void
     {
-        $this->putRootSchema(
-            <<<'EOT'
-                foo
-                #import subdir/*.graphql
+        $this->putRootSchema(<<<'EOT'
+foo
+#import subdir/*.graphql
 
-                EOT
+EOT
         );
 
         $this->filesystem->createDir('subdir');
-        $this->filesystem->put(
-            'subdir/bar.graphql',
-            <<<'EOT'
-                bar
+        $this->filesystem->put('subdir/bar.graphql', <<<'EOT'
+bar
 
-                EOT
+EOT
         );
-        $this->filesystem->put(
-            'subdir/other.graphql',
-            <<<'EOT'
-                other
+        $this->filesystem->put('subdir/other.graphql', <<<'EOT'
+other
 
-                EOT
+EOT
         );
 
-        $this->assertSchemaResultIsSame(
-            <<<'EOT'
-                foo
-                bar
-                other
+        $this->assertSchemaResultIsSame(<<<'EOT'
+foo
+bar
+other
 
-                EOT
+EOT
         );
     }
 
     public function testAddsNewlineToTheEndOfImportedFile(): void
     {
-        $this->putRootSchema(
-            <<<'EOT'
-                foo
-                #import bar
-                #import foobar
-                EOT
+        $this->putRootSchema(<<<'EOT'
+foo
+#import bar
+#import foobar
+EOT
         );
 
-        $this->filesystem->put(
-            'bar',
-            <<<'EOT'
-                bar
-                EOT
+        $this->filesystem->put('bar', <<<'EOT'
+bar
+EOT
         );
 
-        $this->filesystem->put(
-            'foobar',
-            <<<'EOT'
-                foobar
-                EOT
+        $this->filesystem->put('foobar', <<<'EOT'
+foobar
+EOT
         );
 
-        $this->assertSchemaResultIsSame(
-            <<<'EOT'
-                foo
-                bar
-                foobar
+        $this->assertSchemaResultIsSame(<<<'EOT'
+foo
+bar
+foobar
 
-                EOT
+EOT
         );
     }
 }

@@ -19,7 +19,7 @@ class ErrorPool
      */
     public function record(Throwable $throwable): void
     {
-        $this->throwables[] = $throwable;
+        $this->throwables [] = $throwable;
     }
 
     /**

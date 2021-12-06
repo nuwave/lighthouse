@@ -46,14 +46,14 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
         $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {
             // If there is an authenticated user set in the context, set that user as the authenticated user
             $user = $item->context->user();
-            if (null !== $user) {
+            if ($user !== null) {
                 $guard->setUser($user);
             }
 
             try {
                 $handleSubscriber($item);
             } catch (Exception $e) {
-                if (null === $handleError) {
+                if ($handleError === null) {
                     throw $e;
                 }
 

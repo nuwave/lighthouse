@@ -22,9 +22,9 @@ class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return Broadcaster::EVENT_NAME === $event->broadcastAs()
-                    && 'test-123' === $event->broadcastOn()->name
-                    && 'foo' === $event->data;
+                return $event->broadcastAs() === Broadcaster::EVENT_NAME
+                    && $event->broadcastOn()->name === 'test-123'
+                    && $event->data === 'foo';
             }));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
@@ -40,7 +40,7 @@ class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return 'private-test-123' === $event->broadcastOn()->name;
+                return $event->broadcastOn()->name === 'private-test-123';
             }));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);

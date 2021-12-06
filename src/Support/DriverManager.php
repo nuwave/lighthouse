@@ -44,7 +44,7 @@ abstract class DriverManager
     /**
      * Get a driver instance by name.
      *
-     * @return object the driver instance
+     * @return object The driver instance.
      */
     public function driver(?string $name = null)
     {
@@ -56,7 +56,7 @@ abstract class DriverManager
     /**
      * Attempt to get the driver from the local cache.
      *
-     * @return object the resolved driver
+     * @return object The resolved driver.
      */
     protected function get(string $name)
     {
@@ -105,9 +105,9 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @throws \InvalidArgumentException
+     * @return object The resolved driver.
      *
-     * @return object the resolved driver
+     * @throws \InvalidArgumentException
      */
     protected function resolve(string $name)
     {
@@ -117,7 +117,7 @@ abstract class DriverManager
             return $this->validateDriver($this->callCustomCreator($config));
         }
 
-        $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
 
         if (method_exists($this, $driverMethod)) {
             return $this->validateDriver($this->{$driverMethod}($config));
@@ -130,8 +130,7 @@ abstract class DriverManager
      * Call a custom driver creator.
      *
      * @param  array<string, mixed>  $config
-     *
-     * @return object the created driver
+     * @return object The created driver.
      */
     protected function callCustomCreator(array $config)
     {
@@ -142,17 +141,16 @@ abstract class DriverManager
      * Validate driver implements the proper interface.
      *
      * @param  object  $driver
+     * @return object
      *
      * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
-     *
-     * @return object
      */
     protected function validateDriver($driver)
     {
         $interface = $this->interface();
 
         if (! (new ReflectionClass($driver))->implementsInterface($interface)) {
-            throw new InvalidDriverException(get_class($driver) . " does not implement {$interface}");
+            throw new InvalidDriverException(get_class($driver)." does not implement {$interface}");
         }
 
         return $driver;
@@ -162,8 +160,7 @@ abstract class DriverManager
      * Dynamically call the default driver instance.
      *
      * @param  array<mixed>  $parameters
-     *
-     * @return mixed whatever the driver returned
+     * @return mixed Whatever the driver returned.
      */
     public function __call(string $method, array $parameters)
     {

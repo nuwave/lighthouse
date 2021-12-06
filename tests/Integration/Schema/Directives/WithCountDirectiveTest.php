@@ -33,7 +33,7 @@ class WithCountDirectiveTest extends DBTestCase
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
-            ++$queries;
+            $queries++;
         });
 
         $this->graphQL(/** @lang GraphQL */ '

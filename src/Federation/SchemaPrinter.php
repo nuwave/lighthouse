@@ -14,8 +14,8 @@ use GraphQL\Utils\Utils;
 class SchemaPrinter extends GraphQLSchemaPrinter
 {
     /**
-     * @param array<string, mixed>                                                       $options
-     * @param \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $type
+     * @param  array<string, mixed>  $options
+     * @param  \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType  $type
      */
     protected static function printFields(array $options, $type): string
     {
@@ -26,15 +26,15 @@ class SchemaPrinter extends GraphQLSchemaPrinter
             array_map(
                 static function (FieldDefinition $f) use (&$firstInBlock, $options): string {
                     $description = static::printDescription($options, $f, '  ', $firstInBlock)
-                        . '  '
-                        . $f->name
-                        . static::printArgs($options, $f->args, '  ')
-                        . ': '
-                        . $f->getType()
-                        . (isset($options['printDirectives'])
+                        .'  '
+                        .$f->name
+                        .static::printArgs($options, $f->args, '  ')
+                        .': '
+                        .$f->getType()
+                        .(isset($options['printDirectives'])
                             ? $options['printDirectives']($f)
                             : '')
-                        . static::printDeprecated($f);
+                        .static::printDeprecated($f);
 
                     $firstInBlock = false;
 
@@ -46,7 +46,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param  array<string, mixed>  $options
      */
     protected static function printObject(ObjectType $type, array $options): string
     {
@@ -54,7 +54,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param  array<string, mixed>  $options
      */
     protected static function printInterface(InterfaceType $type, array $options): string
     {
@@ -62,14 +62,14 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $type
-     * @param array<string, mixed>                                                       $options
+     * @param  \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType  $type
+     * @param  array<string, mixed>  $options
      */
     protected static function printObjectLike(string $kind, Type $type, array $options): string
     {
         $interfaces = $type->getInterfaces();
         $implementedInterfaces = count($interfaces) > 0
-            ? ' implements ' . implode(
+            ? ' implements '.implode(
                 ' & ',
                 array_map(
                     static function (InterfaceType $interface): string {
@@ -87,23 +87,23 @@ class SchemaPrinter extends GraphQLSchemaPrinter
         $fields = static::printFields($options, $type);
 
         return <<<GRAPHQL
-            {$description}{$kind} {$type->name}{$implementedInterfaces}{$directives} {
-            {$fields}
-            }
-            GRAPHQL;
+{$description}{$kind} {$type->name}{$implementedInterfaces}{$directives} {
+{$fields}
+}
+GRAPHQL;
     }
 
     /**
-     * @param array<\GraphQL\Language\AST\DirectiveNode> $directives
+     * @param  array<\GraphQL\Language\AST\DirectiveNode>  $directives
      */
     public static function printDirectives(array $directives): string
     {
-        if (0 === count($directives)) {
+        if (count($directives) === 0) {
             return '';
         }
 
         return ' '
-            . implode(
+            .implode(
                 ' ',
                 Utils::map($directives, static function (DirectiveNode $directive): string {
                     return Printer::doPrint($directive);

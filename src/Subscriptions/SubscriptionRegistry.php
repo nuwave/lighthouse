@@ -89,7 +89,7 @@ class SubscriptionRegistry
      *
      * @return array<string>
      *
-     * @deprecated use the `GraphQL\Type\Schema::subscriptionType()->getFieldNames()` method directly
+     * @deprecated Use the `GraphQL\Type\Schema::subscriptionType()->getFieldNames()` method directly.
      */
     public function keys(): array
     {
@@ -139,7 +139,7 @@ class SubscriptionRegistry
                 Utils::instanceofMatcher(OperationDefinitionNode::class)
             )
             ->filter(function (OperationDefinitionNode $node): bool {
-                return 'subscription' === $node->operation;
+                return $node->operation === 'subscription';
             })
             ->flatMap(function (OperationDefinitionNode $node): array {
                 return (new Collection($node->selectionSet->selections))
@@ -153,7 +153,7 @@ class SubscriptionRegistry
                     return $this->subscription($subscriptionField);
                 }
 
-                return new NotFoundSubscription();
+                return new NotFoundSubscription;
             });
     }
 
@@ -173,7 +173,7 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
-        if (null === $channel && ($subscriptionsConfig['exclude_empty'] ?? false)) {
+        if ($channel === null && ($subscriptionsConfig['exclude_empty'] ?? false)) {
             return null;
         }
 
@@ -203,7 +203,7 @@ class SubscriptionRegistry
     {
         $subscriptionType = $this->schemaBuilder->schema()->getSubscriptionType();
 
-        if (null === $subscriptionType) {
+        if ($subscriptionType === null) {
             throw new DefinitionException('Schema is missing subscription root type.');
         }
 

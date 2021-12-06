@@ -30,31 +30,31 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Register a type for Relay's global object identification.
+"""
+Register a type for Relay's global object identification.
 
-            When used without any arguments, Lighthouse will attempt
-            to resolve the type through a model with the same name.
-            """
-            directive @node(
-              """
-              Reference to a function that receives the decoded `id` and returns a result.
-              Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-              If you pass only a class name, the method name defaults to `__invoke`.
+When used without any arguments, Lighthouse will attempt
+to resolve the type through a model with the same name.
+"""
+directive @node(
+  """
+  Reference to a function that receives the decoded `id` and returns a result.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
 
-              Mutually exclusive with the `model` argument.
-              """
-              resolver: String
+  Mutually exclusive with the `model` argument.
+  """
+  resolver: String
 
-              """
-              Specify the class name of the model to use.
-              This is only needed when the default model detection does not work.
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
 
-              Mutually exclusive with the `model` argument.
-              """
-              model: String
-            ) on OBJECT
-            GRAPHQL;
+  Mutually exclusive with the `model` argument.
+  """
+  model: String
+) on OBJECT
+GRAPHQL;
     }
 
     public function handleNode(TypeValue $value, Closure $next): Type
@@ -79,7 +79,7 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
     }
 
     /**
-     * @param \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -93,9 +93,9 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
 
         /** @var \GraphQL\Language\AST\NamedTypeNode $namedTypeNode */
         $namedTypeNode = Parser::parseType(GlobalIdServiceProvider::NODE, ['noLocation' => true]);
-        $typeDefinition->interfaces[] = $namedTypeNode;
+        $typeDefinition->interfaces [] = $namedTypeNode;
 
         $globalIdFieldName = config('lighthouse.global_id_field');
-        $typeDefinition->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
+        $typeDefinition->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
     }
 }

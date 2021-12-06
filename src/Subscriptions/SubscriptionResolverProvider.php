@@ -31,16 +31,16 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     /**
      * Provide a resolver for a subscription field in case no resolver directive is defined.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
     {
         $fieldName = $fieldValue->getFieldName();
 
         $directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME);
-        if (null !== $directive) {
+        if ($directive !== null) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
             $className = Str::studly($fieldName);
@@ -58,7 +58,6 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         if (! $className) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
-
             throw new DefinitionException(
                 "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );

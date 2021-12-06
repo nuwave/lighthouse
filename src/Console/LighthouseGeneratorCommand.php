@@ -25,11 +25,11 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     }
 
     /**
-     * @param string $rootNamespace
+     * @param  string  $rootNamespace
      */
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespaces = config('lighthouse.namespaces.' . $this->namespaceConfigKey());
+        $namespaces = config('lighthouse.namespaces.'.$this->namespaceConfigKey());
 
         return static::commonNamespace((array) $namespaces);
     }
@@ -44,17 +44,17 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      *
      * For example, ['App\\Foo\\A', 'App\\Foo\\B'] would return 'App\\Foo'.
      *
-     * @param array<string> $namespaces
+     * @param  array<string>  $namespaces
      */
     public static function commonNamespace(array $namespaces): string
     {
-        if ([] === $namespaces) {
+        if ($namespaces === []) {
             throw new InvalidArgumentException(
                 'A default namespace is required for code generation.'
             );
         }
 
-        if (1 === count($namespaces)) {
+        if (count($namespaces) === 1) {
             return reset($namespaces);
         }
 
@@ -81,12 +81,12 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
                 break;
             }
 
-            $matching[] = $part;
+            $matching [] = $part;
         }
 
         // We could not determine a common part of the configured namespaces,
         // so we just assume the user will prefer the first one in the list.
-        if ([] === $matching) {
+        if ($matching === []) {
             return $preferredNamespaceFallback;
         }
 

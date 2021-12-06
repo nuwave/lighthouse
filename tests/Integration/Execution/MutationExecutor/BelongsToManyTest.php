@@ -105,7 +105,7 @@ class BelongsToManyTest extends DBTestCase
         id: ID! # role ID
         meta: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testSyncWithoutDetaching(): void
     {
@@ -268,29 +268,29 @@ class BelongsToManyTest extends DBTestCase
     public function testUpsertBelongsToManyWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-                    mutation {
-                        upsertRole(input: {
-                            name: "is_user"
-                            users: {
-                                upsert: [
-                                    {
-                                        name: "user1"
-                                    },
-                                    {
-                                        name: "user2"
-                                    }
-                                ]
-                            }
-                        }) {
-                            id
-                            name
-                            users {
-                                id
-                                name
-                            }
+        mutation {
+            upsertRole(input: {
+                name: "is_user"
+                users: {
+                    upsert: [
+                        {
+                            name: "user1"
+                        },
+                        {
+                            name: "user2"
                         }
-                    }
-            GRAPHQL
+                    ]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertRole' => [
@@ -576,30 +576,30 @@ class BelongsToManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Role(input: {
-                            id: 1
-                            name: "is_user"
-                            users: {
-                                ${action}: [{
-                                    id: 1
-                                    name: "user1"
-                                },
-                                {
-                                    id: 2
-                                    name: "user2"
-                                }]
-                            }
-                        }) {
-                            id
-                            name
-                            users {
-                                id
-                                name
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Role(input: {
+                id: 1
+                name: "is_user"
+                users: {
+                    ${action}: [{
+                        id: 1
+                        name: "user1"
+                    },
+                    {
+                        id: 2
+                        name: "user2"
+                    }]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
@@ -640,22 +640,22 @@ class BelongsToManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Role(input: {
-                            id: 1
-                            name: "is_user"
-                            users: {
-                                delete: [1]
-                            }
-                        }) {
-                            id
-                            name
-                            users {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Role(input: {
+                id: 1
+                name: "is_user"
+                users: {
+                    delete: [1]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
@@ -693,21 +693,21 @@ class BelongsToManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Role(input: {
-                            id: 1
-                            users: {
-                                connect: [1]
-                            }
-                        }) {
-                            id
-                            name
-                            users {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Role(input: {
+                id: 1
+                users: {
+                    connect: [1]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
@@ -743,21 +743,21 @@ class BelongsToManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Role(input: {
-                            id: 1
-                            users: {
-                                sync: [1, 2]
-                            }
-                        }) {
-                            id
-                            name
-                            users {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Role(input: {
+                id: 1
+                users: {
+                    sync: [1, 2]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [
@@ -792,20 +792,20 @@ class BelongsToManyTest extends DBTestCase
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Role(input: {
-                            id: 1
-                            users: {
-                                disconnect: [1]
-                            }
-                        }) {
-                            id
-                            users {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Role(input: {
+                id: 1
+                users: {
+                    disconnect: [1]
+                }
+            }) {
+                id
+                users {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Role" => [

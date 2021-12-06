@@ -170,13 +170,13 @@ class ASTBuilder
     }
 
     /**
-     * @param \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode $typeExtension
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
      */
     protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
     {
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|null $extendedObjectLikeType */
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
-        if (null === $extendedObjectLikeType) {
+        if ($extendedObjectLikeType === null) {
             if (RootType::isRootType($typeName)) {
                 $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
@@ -214,7 +214,7 @@ class ASTBuilder
     {
         /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName] ?? null;
-        if (null === $extendedEnum) {
+        if ($extendedEnum === null) {
             throw new DefinitionException(
                 $this->missingBaseDefinition($typeName, $typeExtension)
             );
@@ -229,7 +229,7 @@ class ASTBuilder
     }
 
     /**
-     * @param \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode $typeExtension
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $typeExtension
      */
     protected function missingBaseDefinition(string $typeName, TypeExtensionNode $typeExtension): string
     {
@@ -237,8 +237,8 @@ class ASTBuilder
     }
 
     /**
-     * @param \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode     $extension
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode $definition
+     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode  $definition
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

@@ -45,16 +45,16 @@ class PaginationType
 
     public function isPaginator(): bool
     {
-        return self::PAGINATOR === $this->type;
+        return $this->type === self::PAGINATOR;
     }
 
     public function isConnection(): bool
     {
-        return self::CONNECTION === $this->type;
+        return $this->type === self::CONNECTION;
     }
 
     public function isSimple(): bool
     {
-        return self::SIMPLE === $this->type;
+        return $this->type === self::SIMPLE;
     }
 }

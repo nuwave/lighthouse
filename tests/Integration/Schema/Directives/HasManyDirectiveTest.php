@@ -512,12 +512,12 @@ class HasManyDirectiveTest extends DBTestCase
         $tasks = Arr::first(
             $user['fields'],
             function (array $field): bool {
-                return 'tasks' === $field['name'];
+                return $field['name'] === 'tasks';
             }
         );
         $this->assertSame(
             $expectedConnectionName,
-            $tasks['type']/* TODO add back in in v6 ['ofType'] */ ['name']
+            $tasks['type']/* TODO add back in in v6 ['ofType'] */['name']
         );
     }
 

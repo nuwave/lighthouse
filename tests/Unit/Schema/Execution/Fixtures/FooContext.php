@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class FooContext implements GraphQLContext
 {
-    public const FROM_FOO_CONTEXT = 'custom.context';
+    const FROM_FOO_CONTEXT = 'custom.context';
 
     /**
      * @var \Illuminate\Http\Request

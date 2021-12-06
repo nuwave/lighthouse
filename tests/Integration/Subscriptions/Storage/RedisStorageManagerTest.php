@@ -14,7 +14,7 @@ class RedisStorageManagerTest extends TestCase
     use TestsRedis;
     use TestsSubscriptions;
 
-    protected $schema = /** @lang GraphQL */ '
+    protected $schema = /** @lang GraphQL */'
     type Task {
         id: ID!
         name: String!
@@ -24,7 +24,7 @@ class RedisStorageManagerTest extends TestCase
         taskUpdated(id: ID!): Task
         taskCreated: Task
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testSubscriptionStoredWithPrefix(): void
     {
@@ -35,7 +35,7 @@ class RedisStorageManagerTest extends TestCase
         $this->assertStringStartsWith('private-lighthouse-', $channel);
 
         // internally when using the redis driver to access the keys there seems to be no prefix
-        $this->assertRedisHas('graphql.subscriber.' . $channel);
+        $this->assertRedisHas('graphql.subscriber.'.$channel);
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         // but in reality redis stores with a prefix
@@ -54,11 +54,11 @@ class RedisStorageManagerTest extends TestCase
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
 
         // when it's the only subscriber to a topic, the topic gets deleted with the subscriber
-        $this->assertRedisHas('graphql.subscriber.' . $channel);
+        $this->assertRedisHas('graphql.subscriber.'.$channel);
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         $storage->deleteSubscriber($channel);
-        $this->assertRedisMissing('graphql.subscriber.' . $channel);
+        $this->assertRedisMissing('graphql.subscriber.'.$channel);
         $this->assertRedisMissing('graphql.topic.TASK_UPDATED');
 
         // when there are multiple subscribers, the topic stays as long as there are subscribers

@@ -8,10 +8,10 @@ use Tests\TestCase;
 class TracingExtensionTest extends TestCase
 {
     protected $schema = <<<SCHEMA
-        type Query {
-            foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
-        }
-        SCHEMA;
+type Query {
+    foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
+}
+SCHEMA;
 
     protected function getPackageProviders($app): array
     {

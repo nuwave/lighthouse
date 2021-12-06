@@ -31,7 +31,7 @@ class SubscriptionGuard implements Guard
     }
 
     /**
-     * @param array<mixed> $credentials
+     * @param  array<mixed>  $credentials
      */
     public function validate(array $credentials = []): bool
     {

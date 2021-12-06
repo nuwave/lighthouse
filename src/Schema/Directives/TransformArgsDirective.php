@@ -10,11 +10,11 @@ class TransformArgsDirective extends ArgTraversalDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Transform the arguments of a field.
-            """
-            directive @transformArgs on FIELD_DEFINITION
-            GRAPHQL;
+"""
+Transform the arguments of a field.
+"""
+directive @transformArgs on FIELD_DEFINITION
+GRAPHQL;
     }
 
     protected function applyDirective(Directive $directive, $value)

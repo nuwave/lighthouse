@@ -12,7 +12,7 @@ class BuilderDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             users(
-                limit: Int @builder(method: "' . $this->qualifyTestResolver('limit') . '")
+                limit: Int @builder(method: "'.$this->qualifyTestResolver('limit').'")
             ): [User!]! @all
         }
 
@@ -36,7 +36,7 @@ class BuilderDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            users: [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '" value: 1)
+            users: [User!]! @all @builder(method: "'.$this->qualifyTestResolver('limit').'" value: 1)
         }
 
         type User {
@@ -59,7 +59,7 @@ class BuilderDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            users: [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '")
+            users: [User!]! @all @builder(method: "'.$this->qualifyTestResolver('limit').'")
         }
 
         type User {
@@ -80,7 +80,6 @@ class BuilderDirectiveTest extends DBTestCase
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function limit(object $builder, int $value = 2): object

@@ -159,7 +159,7 @@ class SearchDirectiveTest extends DBTestCase
 
         type Query {
             posts(
-                input: PostsInput! @builder(method: "' . $this->qualifyTestResolver('customBuilderMethod') . '")
+                input: PostsInput! @builder(method: "'.$this->qualifyTestResolver('customBuilderMethod').'")
                 search: String! @search
             ): [Post!]! @all
         }
@@ -181,7 +181,7 @@ class SearchDirectiveTest extends DBTestCase
     }
 
     /**
-     * @param array{id: int} $value
+     * @param  array{id: int}  $value
      */
     public function customBuilderMethod(ScoutBuilder $builder, array $value): ScoutBuilder
     {

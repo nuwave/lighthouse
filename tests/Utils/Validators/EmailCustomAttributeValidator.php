@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 class EmailCustomAttributeValidator extends Validator
 {
-    public const MESSAGE = 'The email address must be a valid email address.';
+    const MESSAGE = 'The email address must be a valid email address.';
 
     public function rules(): array
     {

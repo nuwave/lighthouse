@@ -12,13 +12,13 @@ use Nuwave\Lighthouse\Federation\EntityResolverProvider;
  */
 class Any extends ScalarType
 {
-    public const MESSAGE = 'Expected an input with a field `__typename` and matching fields, got: ';
+    const MESSAGE = 'Expected an input with a field `__typename` and matching fields, got: ';
 
     public $name = '_Any';
 
     public $description = /** @lang Markdown */ <<<'DESCRIPTION'
-        Representation of entities from external services for the root `_entities` field.
-        DESCRIPTION;
+Representation of entities from external services for the root `_entities` field.
+DESCRIPTION;
 
     public function serialize($value)
     {
@@ -33,12 +33,12 @@ class Any extends ScalarType
         // We do as much validation as possible here, before entering resolvers
 
         if (! is_array($value)) {
-            throw new Error(self::MESSAGE . \Safe\json_encode($value));
+            throw new Error(self::MESSAGE.\Safe\json_encode($value));
         }
 
         $typename = $value['__typename'] ?? null;
         if (! is_string($typename)) {
-            throw new Error(self::MESSAGE . \Safe\json_encode($value));
+            throw new Error(self::MESSAGE.\Safe\json_encode($value));
         }
 
         /** @var \Nuwave\Lighthouse\Federation\EntityResolverProvider $entityResolverProvider */

@@ -180,10 +180,10 @@ class ASTHelperTest extends TestCase
         $this->assertInstanceOf(
             DirectiveDefinitionNode::class,
             ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-                directive @foo on OBJECT
-                scalar Bar
-                GRAPHQL
-            )
+directive @foo on OBJECT
+scalar Bar
+GRAPHQL
+)
         );
     }
 
@@ -192,8 +192,8 @@ class ASTHelperTest extends TestCase
         $this->expectException(DefinitionException::class);
 
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-            invalid GraphQL
-            GRAPHQL
+invalid GraphQL
+GRAPHQL
         );
     }
 
@@ -202,8 +202,8 @@ class ASTHelperTest extends TestCase
         $this->expectException(DefinitionException::class);
 
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-            scalar Foo
-            GRAPHQL
+scalar Foo
+GRAPHQL
         );
     }
 
@@ -212,9 +212,9 @@ class ASTHelperTest extends TestCase
         $this->expectException(DefinitionException::class);
 
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-            directive @foo on OBJECT
-            directive @bar on OBJECT
-            GRAPHQL
+directive @foo on OBJECT
+directive @bar on OBJECT
+GRAPHQL
         );
     }
 }

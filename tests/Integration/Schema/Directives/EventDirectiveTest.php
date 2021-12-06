@@ -43,8 +43,8 @@ class EventDirectiveTest extends DBTestCase
         ]);
 
         Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event): bool {
-            return 1 === $event->company->id
-                && 'foo' === $event->company->name;
+            return $event->company->id === 1
+                && $event->company->name === 'foo';
         });
     }
 }

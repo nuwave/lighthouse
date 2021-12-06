@@ -78,7 +78,7 @@ class BelongsToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCreateAndConnectWithBelongsTo(): void
     {
@@ -275,23 +275,23 @@ class BelongsToTest extends DBTestCase
     public function testUpsertBelongsToWithoutId(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-                    mutation {
-                        upsertTask(input: {
-                            name: "foo"
-                            user: {
-                                upsert: {
-                                    name: "New User"
-                                }
-                            }
-                        }) {
-                            id
-                            name
-                            user {
-                                id
-                            }
-                        }
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                user: {
+                    upsert: {
+                        name: "New User"
                     }
-            GRAPHQL
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 'upsertTask' => [
@@ -512,22 +512,22 @@ class BelongsToTest extends DBTestCase
         $task->user()->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Task(input: {
-                            id: 1
-                            name: "foo"
-                            user: {
-                                disconnect: true
-                            }
-                        }) {
-                            id
-                            name
-                            user {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    disconnect: true
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -608,22 +608,22 @@ class BelongsToTest extends DBTestCase
         );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Task(input: {
-                            id: 1
-                            name: "foo"
-                            user: {
-                                delete: true
-                            }
-                        }) {
-                            id
-                            name
-                            user {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    delete: true
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -700,23 +700,23 @@ class BelongsToTest extends DBTestCase
         );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-                    mutation {
-                        ${action}Task(input: {
-                            id: 1
-                            name: "foo"
-                            user: {
-                                delete: null
-                                disconnect: false
-                            }
-                        }) {
-                            id
-                            name
-                            user {
-                                id
-                            }
-                        }
-                    }
-            GRAPHQL
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: "foo"
+                user: {
+                    delete: null
+                    disconnect: false
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}Task" => [
@@ -777,7 +777,7 @@ class BelongsToTest extends DBTestCase
         input UpsertRoleInput {
             name: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        '.self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -859,7 +859,7 @@ class BelongsToTest extends DBTestCase
         input UpsertRoleUsersRelation {
             sync: [ID!]
         }
-        ' . self::PLACEHOLDER_QUERY;
+        '.self::PLACEHOLDER_QUERY;
 
         // Create the first User with a Role.
         $this->graphQL(/** @lang GraphQL */ '
@@ -995,7 +995,7 @@ class BelongsToTest extends DBTestCase
             id: ID!
             name: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        '.self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -1092,7 +1092,7 @@ class BelongsToTest extends DBTestCase
             id: ID
             name: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        '.self::PLACEHOLDER_QUERY;
 
         $query = /** @lang GraphQL */ '
         mutation {

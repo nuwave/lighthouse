@@ -14,14 +14,14 @@ class UploadTest extends TestCase
     {
         $this->expectException(InvariantViolation::class);
 
-        (new Upload())->serialize('');
+        (new Upload)->serialize('');
     }
 
     public function testThrowsIfParsingLiteral(): void
     {
         $this->expectException(Error::class);
 
-        $upload = new Upload();
+        $upload = new Upload;
         // @phpstan-ignore-next-line Wrong use is on purpose
         $upload->parseLiteral('');
     }
@@ -30,14 +30,14 @@ class UploadTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Upload())->parseValue('not a file');
+        (new Upload)->parseValue('not a file');
     }
 
     public function testParsesValidFiles(): void
     {
         $value = UploadedFile::fake()
             ->create('my-file.jpg', 500);
-        $parsedValue = (new Upload())->parseValue($value);
+        $parsedValue = (new Upload)->parseValue($value);
 
         $this->assertEquals($value, $parsedValue);
     }

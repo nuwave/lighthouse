@@ -23,8 +23,8 @@ class SaveModel implements ArgResolver
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model                $model
-     * @param \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $args
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
     public function __invoke($model, $args): Model
     {

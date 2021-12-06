@@ -14,7 +14,7 @@ use Pusher\Pusher;
 use RuntimeException;
 
 /**
- * @method void                                       broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
+ * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
  * @method \Symfony\Component\HttpFoundation\Response hook(\Illuminate\Http\Request $request)
  * @method \Symfony\Component\HttpFoundation\Response authorized(\Illuminate\Http\Request $request)
  * @method \Symfony\Component\HttpFoundation\Response unauthorized(\Illuminate\Http\Request $request)
@@ -37,7 +37,7 @@ class BroadcastManager extends DriverManager
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      *
      * @throws \RuntimeException
      */
@@ -46,7 +46,7 @@ class BroadcastManager extends DriverManager
         $connection = $config['connection'] ?? 'pusher';
         $driverConfig = config("broadcasting.connections.{$connection}");
 
-        if (empty($driverConfig) || 'pusher' !== $driverConfig['driver']) {
+        if (empty($driverConfig) || $driverConfig['driver'] !== 'pusher') {
             throw new RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
         }
 
@@ -65,7 +65,7 @@ class BroadcastManager extends DriverManager
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     protected function createLogDriver(array $config): LogBroadcaster
     {

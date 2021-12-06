@@ -79,7 +79,7 @@ class EntityResolverProvider
             ?? $this->resolverFromModel($typename)
             ?? null;
 
-        if (null === $resolver) {
+        if ($resolver === null) {
             throw new Error(self::missingResolver($typename));
         }
 
@@ -100,7 +100,7 @@ class EntityResolverProvider
         } catch (DefinitionException $definitionException) {
             // Signalizes the type is unknown, handled by the null check below
         }
-        if (null === $type) {
+        if ($type === null) {
             throw new Error(self::unknownTypename($typename));
         }
 
@@ -110,7 +110,7 @@ class EntityResolverProvider
          * @var (\GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode)|null $definition
          */
         $definition = $type->astNode;
-        if (null === $definition) {
+        if ($definition === null) {
             throw new FederationException("Must provide AST definition for type `{$typename}`.");
         }
 
@@ -131,7 +131,7 @@ class EntityResolverProvider
             'class_exists'
         );
 
-        if (null === $resolverClass) {
+        if ($resolverClass === null) {
             return null;
         }
 
@@ -152,7 +152,7 @@ class EntityResolverProvider
                 return is_subclass_of($classCandidate, Model::class);
             }
         );
-        if (null === $modelClass) {
+        if ($modelClass === null) {
             return null;
         }
 
@@ -200,12 +200,12 @@ class EntityResolverProvider
         foreach ($keyFields->selections as $field) {
             $fieldName = $field->name->value;
             $value = $representation[$fieldName] ?? null;
-            if (null === $value) {
+            if ($value === null) {
                 return false;
             }
 
             $subSelection = $field->selectionSet;
-            if (null !== $subSelection) {
+            if ($subSelection !== null) {
                 if (! is_array($value)) {
                     return false;
                 }
@@ -235,7 +235,7 @@ class EntityResolverProvider
             $value = $representation[$fieldName];
 
             $subSelection = $field->selectionSet;
-            if (null === $subSelection) {
+            if ($subSelection === null) {
                 $builder->where($fieldName, $value);
 
                 return;
@@ -269,8 +269,8 @@ class EntityResolverProvider
             }
         );
 
-        if (null === $satisfiedKeyFields) {
-            throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
+        if ($satisfiedKeyFields === null) {
+            throw new Error('Representation does not satisfy any set of uniquely identifying keys: '.\Safe\json_encode($representation));
         }
 
         return $satisfiedKeyFields;

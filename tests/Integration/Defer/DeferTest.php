@@ -633,7 +633,7 @@ class DeferTest extends TestCase
         type Mutation {
             updateUser(name: String!): User @mock
         }
-        ' . self::PLACEHOLDER_QUERY;
+        '.self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation UpdateUser {

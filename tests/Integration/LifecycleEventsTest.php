@@ -31,7 +31,7 @@ class LifecycleEventsTest extends TestCase
             if (Str::startsWith($name, 'Nuwave\\Lighthouse')) {
                 // We only fire class-based events, so the payload
                 // always holds exactly a single class instance.
-                $events[] = $payload[0];
+                $events [] = $payload[0];
             }
         });
 

@@ -14,25 +14,25 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Inject a value from the context object into the arguments.
-            """
-            directive @inject(
-              """
-              A path to the property of the context that will be injected.
-              If the value is nested within the context, you may use dot notation
-              to get it, e.g. "user.id".
-              """
-              context: String!
+"""
+Inject a value from the context object into the arguments.
+"""
+directive @inject(
+  """
+  A path to the property of the context that will be injected.
+  If the value is nested within the context, you may use dot notation
+  to get it, e.g. "user.id".
+  """
+  context: String!
 
-              """
-              The target name of the argument into which the value is injected.
-              You can use dot notation to set the value at arbitrary depth
-              within the incoming argument.
-              """
-              name: String!
-            ) repeatable on FIELD_DEFINITION
-            GRAPHQL;
+  """
+  The target name of the argument into which the value is injected.
+  You can use dot notation to set the value at arbitrary depth
+  within the incoming argument.
+  """
+  name: String!
+) repeatable on FIELD_DEFINITION
+GRAPHQL;
     }
 
     /**

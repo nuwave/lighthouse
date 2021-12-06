@@ -37,11 +37,11 @@ abstract class TestCase extends BaseTestCase
      * A dummy query type definition that is added to tests by default.
      */
     public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
-        type Query {
-          foo: Int
-        }
+type Query {
+  foo: Int
+}
 
-        GRAPHQL;
+GRAPHQL;
 
     public function setUp(): void
     {
@@ -60,7 +60,6 @@ abstract class TestCase extends BaseTestCase
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     *
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
@@ -129,8 +128,7 @@ abstract class TestCase extends BaseTestCase
         ]);
 
         $config->set('app.debug', true);
-        $config->set(
-            'lighthouse.debug',
+        $config->set('lighthouse.debug',
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
@@ -194,7 +192,7 @@ abstract class TestCase extends BaseTestCase
     protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
     {
         return $this->buildSchema(
-            $schema . self::PLACEHOLDER_QUERY
+            $schema.self::PLACEHOLDER_QUERY
         );
     }
 
@@ -216,7 +214,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
-        return addslashes(static::class) . '@' . $method;
+        return addslashes(static::class).'@'.$method;
     }
 
     /**

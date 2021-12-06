@@ -22,9 +22,9 @@ class OrderByDirectiveTest extends TestCase
         $schema = $this->buildSchema($schemaString);
         $input = $schema->getType(
             'Query' // Parent
-            . 'Foo' // Field
-            . 'OrderBy' // Arg
-            . 'OrderByClause' // Suffix
+            .'Foo' // Field
+            .'OrderBy' // Arg
+            .'OrderByClause' // Suffix
         );
         $this->assertInstanceOf(InputObjectType::class, $input);
     }
@@ -49,34 +49,34 @@ class OrderByDirectiveTest extends TestCase
 
         $clause = $schema->getType(
             'Query' // Parent
-            . 'Foo' // Field
-            . 'OrderBy' // Arg
-            . 'RelationOrderByClause' // Suffix
+            .'Foo' // Field
+            .'OrderBy' // Arg
+            .'RelationOrderByClause' // Suffix
         );
         $this->assertInstanceOf(InputObjectType::class, $clause);
 
         $foo = $schema->getType(
             'Query' // Parent
-            . 'Foo' // Field
-            . 'OrderBy' // Arg
-            . 'Foo' // Relation
+            .'Foo' // Field
+            .'OrderBy' // Arg
+            .'Foo' // Relation
         );
         $this->assertInstanceOf(InputObjectType::class, $foo);
 
         $baz = $schema->getType(
             'Query' // Parent
-            . 'Foo' // Field
-            . 'OrderBy' // Arg
-            . 'Baz' // Relation
+            .'Foo' // Field
+            .'OrderBy' // Arg
+            .'Baz' // Relation
         );
         $this->assertInstanceOf(InputObjectType::class, $baz);
 
         $bazEnum = $schema->getType(
             'Query' // Parent
-            . 'Foo' // Field
-            . 'OrderBy' // Arg
-            . 'Baz' // Relation
-            . 'Column' // Suffix
+            .'Foo' // Field
+            .'OrderBy' // Arg
+            .'Baz' // Relation
+            .'Column' // Suffix
         );
         $this->assertInstanceOf(EnumType::class, $bazEnum);
     }

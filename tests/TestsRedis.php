@@ -41,7 +41,7 @@ trait TestsRedis
             'broadcasters' => [
                 'echo' => [
                     'driver' => 'echo',
-                    'routes' => SubscriptionRouter::class . '@echoRoutes',
+                    'routes' => SubscriptionRouter::class.'@echoRoutes',
                 ],
             ],
         ]);

@@ -35,22 +35,22 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Run authentication through one or more guards.
+"""
+Run authentication through one or more guards.
 
-            This is run per field and may allow unauthenticated
-            users to still receive partial results.
+This is run per field and may allow unauthenticated
+users to still receive partial results.
 
-            Used upon an object, it applies to all fields within.
-            """
-            directive @guard(
-              """
-              Specify which guards to use, e.g. ["api"].
-              When not defined, the default from `lighthouse.php` is used.
-              """
-              with: [String!]
-            ) repeatable on FIELD_DEFINITION | OBJECT
-            GRAPHQL;
+Used upon an object, it applies to all fields within.
+"""
+directive @guard(
+  """
+  Specify which guards to use, e.g. ["api"].
+  When not defined, the default from `lighthouse.php` is used.
+  """
+  with: [String!]
+) repeatable on FIELD_DEFINITION | OBJECT
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
@@ -76,7 +76,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
     /**
      * Determine if the user is logged in to any of the given guards.
      *
-     * @param array<string|null> $guards
+     * @param  array<string|null>  $guards
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -97,7 +97,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
     /**
      * Handle an unauthenticated user.
      *
-     * @param array<string|null> $guards
+     * @param  array<string|null>  $guards
      */
     protected function unauthenticated(array $guards): void
     {

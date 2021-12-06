@@ -6,4 +6,5 @@ use GraphQL\Error\Error;
 
 class UnauthorizedSubscriber extends Error
 {
+    //
 }

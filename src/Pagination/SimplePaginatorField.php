@@ -11,7 +11,6 @@ class SimplePaginatorField
      * Resolve simple paginator info for connection.
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
-     *
      * @return array<string, mixed>
      */
     public function paginatorInfoResolver(Paginator $root): array
@@ -29,7 +28,6 @@ class SimplePaginatorField
      * Resolve data for connection.
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
-     *
      * @return \Illuminate\Support\Collection<mixed>
      */
     public function dataResolver(Paginator $root): Collection

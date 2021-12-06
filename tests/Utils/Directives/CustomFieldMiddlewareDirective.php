@@ -12,8 +12,8 @@ class CustomFieldMiddlewareDirective extends BaseDirective implements FieldMiddl
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            directive @customFieldMiddleware on FIELD_DEFINITION
-            GRAPHQL;
+directive @customFieldMiddleware on FIELD_DEFINITION
+GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next)
@@ -22,7 +22,6 @@ class CustomFieldMiddlewareDirective extends BaseDirective implements FieldMiddl
             $fieldValue->setResolver(
                 /**
                  * @param  array<string, mixed>  $args
-                 *
                  * @return array<string, mixed>
                  */
                 static function ($root, array $args): array {

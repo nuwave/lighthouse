@@ -7,41 +7,41 @@ use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 
 class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
-    public const ESCAPE = '\\';
-    public const PERCENTAGE = '%';
-    public const UNDERSCORE = '_';
-    public const PLACEHOLDER = '{}';
+    const ESCAPE = '\\';
+    const PERCENTAGE = '%';
+    const UNDERSCORE = '_';
+    const PLACEHOLDER = '{}';
 
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-            """
-            Add a `LIKE` conditional to a database query.
-            """
-            directive @like(
-              """
-              Specify the database column to compare.
-              Required if the directive is:
-              - used on an argument and the database column has a different name
-              - used on a field
-              """
-              key: String
+"""
+Add a `LIKE` conditional to a database query.
+"""
+directive @like(
+  """
+  Specify the database column to compare.
+  Required if the directive is:
+  - used on an argument and the database column has a different name
+  - used on a field
+  """
+  key: String
 
-              """
-              Fixate the positions of wildcards (`%`, `_`) in the LIKE comparison around the
-              placeholder `{}`, e.g. `%{}`, `__{}` or `%{}%`.
-              If specified, wildcard characters in the client-given input are escaped.
-              If not specified, the client can pass wildcards unescaped.
-              """
-              template: String
+  """
+  Fixate the positions of wildcards (`%`, `_`) in the LIKE comparison around the
+  placeholder `{}`, e.g. `%{}`, `__{}` or `%{}%`.
+  If specified, wildcard characters in the client-given input are escaped.
+  If not specified, the client can pass wildcards unescaped.
+  """
+  template: String
 
-              """
-              Provide a value to compare against.
-              Only used when the directive is added on a field.
-              """
-              value: String
-            ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
-            GRAPHQL;
+  """
+  Provide a value to compare against.
+  Only used when the directive is added on a field.
+  """
+  value: String
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+GRAPHQL;
     }
 
     /**
@@ -49,7 +49,7 @@ class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldB
      */
     public function handleBuilder($builder, $value): object
     {
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
@@ -86,7 +86,7 @@ class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldB
     {
         return str_replace(
             [self::ESCAPE, self::PERCENTAGE, self::UNDERSCORE],
-            [self::ESCAPE . self::ESCAPE, self::ESCAPE . self::PERCENTAGE, self::ESCAPE . self::UNDERSCORE],
+            [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::PERCENTAGE, self::ESCAPE.self::UNDERSCORE],
             $value
         );
     }

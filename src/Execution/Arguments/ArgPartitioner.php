@@ -35,7 +35,7 @@ class ArgPartitioner
         return static::partition(
             $argumentSet,
             static function (string $name, Argument $argument): bool {
-                return null !== $argument->resolver;
+                return $argument->resolver !== null;
             }
         );
     }
@@ -187,7 +187,7 @@ class ArgPartitioner
         $relationMethodCandidate = $modelReflection->getMethod($name);
 
         $returnType = $relationMethodCandidate->getReturnType();
-        if (null === $returnType) {
+        if ($returnType === null) {
             return false;
         }
 
@@ -196,7 +196,7 @@ class ArgPartitioner
         }
 
         if (! class_exists($returnType->getName())) {
-            throw new DefinitionException("Class {$returnType->getName()} does not exist, did you forget to import the Eloquent relation class?");
+            throw new DefinitionException('Class '.$returnType->getName().' does not exist, did you forget to import the Eloquent relation class?');
         }
 
         return is_a($returnType->getName(), $relationClass, true);

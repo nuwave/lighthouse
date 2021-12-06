@@ -42,7 +42,7 @@ class Argument
     /**
      * Get the plain PHP value of this argument.
      *
-     * @return mixed The plain PHP value
+     * @return mixed The plain PHP value.
      */
     public function toPlain()
     {
@@ -53,7 +53,6 @@ class Argument
      * Convert the given value to plain PHP values recursively.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
-     *
      * @return mixed|array<mixed>
      */
     protected static function toPlainRecursive($value)

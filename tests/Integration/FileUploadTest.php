@@ -14,7 +14,7 @@ class FileUploadTest extends TestCase
     type Mutation {
         upload(file: Upload!): Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    '.self::PLACEHOLDER_QUERY;
 
     /**
      * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
@@ -22,7 +22,7 @@ class FileUploadTest extends TestCase
     public function testResolvesUploadViaMultipartRequest(): void
     {
         $operations = [
-            'query' => /** @lang GraphQL */ '
+            'query' => /** @lang GraphQL */'
                 mutation ($file: Upload!) {
                     upload(file: $file)
                 }

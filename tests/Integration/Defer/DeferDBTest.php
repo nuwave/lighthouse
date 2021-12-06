@@ -46,7 +46,7 @@ class DeferDBTest extends DBTestCase
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
-            ++$queries;
+            $queries++;
         });
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
@@ -100,7 +100,7 @@ class DeferDBTest extends DBTestCase
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
-            ++$queries;
+            $queries++;
         });
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
@@ -174,7 +174,7 @@ class DeferDBTest extends DBTestCase
 
         $queries = 0;
         DB::listen(function () use (&$queries): void {
-            ++$queries;
+            $queries++;
         });
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '

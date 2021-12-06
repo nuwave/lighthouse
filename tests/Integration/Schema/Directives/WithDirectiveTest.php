@@ -210,7 +210,7 @@ class WithDirectiveTest extends DBTestCase
                             'id' => "{$post1->id}",
                             'images' => $post1->images()->get()
                                 ->map(function (Image $image) {
-                                    return ['id' => "{$image->id}"];
+                                    return  ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
@@ -221,7 +221,7 @@ class WithDirectiveTest extends DBTestCase
                             'id' => "{$post2->id}",
                             'images' => $post2->images()->get()
                                 ->map(function (Image $image) {
-                                    return ['id' => "{$image->id}"];
+                                    return  ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
@@ -232,7 +232,7 @@ class WithDirectiveTest extends DBTestCase
                             'id' => "{$task->id}",
                             'images' => $task->images()->get()
                                 ->map(static function (Image $image): array {
-                                    return ['id' => "{$image->id}"];
+                                    return  ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
