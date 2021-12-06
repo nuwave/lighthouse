@@ -11,7 +11,6 @@
 [![Continuous Integration](https://github.com/nuwave/lighthouse/workflows/Continuous%20Integration/badge.svg)](https://github.com/nuwave/lighthouse/actions)
 [![Code Coverage](https://codecov.io/gh/nuwave/lighthouse/branch/master/graph/badge.svg)](https://codecov.io/gh/nuwave/lighthouse)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
-[![StyleCI](https://github.styleci.io/repos/59965104/shield?branch=master&style=flat)](https://github.styleci.io/repos/59965104)
 
 [![Packagist](https://img.shields.io/packagist/dt/nuwave/lighthouse.svg)](https://packagist.org/packages/nuwave/lighthouse)
 [![Latest Stable Version](https://poser.pugx.org/nuwave/lighthouse/v/stable)](https://packagist.org/packages/nuwave/lighthouse)

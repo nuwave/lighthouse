@@ -9,7 +9,6 @@ class PreLaravel7ExceptionHandler implements ExceptionHandler
 {
     public function report(Exception $e)
     {
-        //
     }
 
     public function render($request, Exception $e)

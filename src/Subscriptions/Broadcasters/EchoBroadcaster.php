@@ -32,7 +32,7 @@ class EchoBroadcaster implements Broadcaster
     {
         $userId = md5(
             $request->input('channel_name')
-            .$request->input('socket_id')
+            . $request->input('socket_id')
         );
 
         return new JsonResponse([

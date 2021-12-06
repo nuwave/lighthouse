@@ -34,6 +34,7 @@ GRAPHQL;
         return $fieldValue->setResolver(
             /**
              * @param  array<string, mixed>  $args
+             *
              * @return mixed Really anything
              */
             function ($root, array $args) {
@@ -45,7 +46,7 @@ GRAPHQL;
 
                 $orderedArgs = [];
                 foreach ($this->definitionNode->arguments as $argDefinition) {
-                    $orderedArgs [] = $args[$argDefinition->name->value] ?? null;
+                    $orderedArgs[] = $args[$argDefinition->name->value] ?? null;
                 }
 
                 return $root->{$method}(...$orderedArgs);

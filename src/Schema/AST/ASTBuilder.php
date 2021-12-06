@@ -176,7 +176,7 @@ class ASTBuilder
     {
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|null $extendedObjectLikeType */
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
-        if ($extendedObjectLikeType === null) {
+        if (null === $extendedObjectLikeType) {
             if (RootType::isRootType($typeName)) {
                 $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
@@ -214,7 +214,7 @@ class ASTBuilder
     {
         /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName] ?? null;
-        if ($extendedEnum === null) {
+        if (null === $extendedEnum) {
             throw new DefinitionException(
                 $this->missingBaseDefinition($typeName, $typeExtension)
             );

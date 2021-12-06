@@ -9,8 +9,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v5.28.0
-
 ### Added
 
 - Add directive `@void` to unify the definition of fields with no return value
@@ -19,6 +17,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Add missing types to `programmatic-types.graphql` in artisan command `lighthouse:ide-helper`
+
+## v5.28.0
+
+### Added
+
+- Allow clients to order a list of models by an aggregated value of their relations with `@orderBy` https://github.com/nuwave/lighthouse/pull/1848
+
+## v5.27.3
+
+### Fixed
+
+- Prevent possible `Undefined array key 0` error when there's an interface implemented by two renamed models https://github.com/nuwave/lighthouse/pull/1997
+
+## v5.27.2
+
+### Fixed
+
+- Prevent `Undefined array key` error when using cache version 2 and not having all version 1 configuration present https://github.com/nuwave/lighthouse/pull/1994
 
 ## v5.27.1
 

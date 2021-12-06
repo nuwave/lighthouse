@@ -59,18 +59,21 @@ class ASTCache
         $this->enable = $cacheConfig['enable'];
 
         $version = $cacheConfig['version'] ?? 1;
-        if (! in_array($version, [1, 2])) {
-            throw new UnknownCacheVersionException($version);
+
+        switch ($version) {
+            case 1:
+                $this->store = $cacheConfig['store'] ?? null;
+                $this->key = $cacheConfig['key'];
+                $this->ttl = $cacheConfig['ttl'];
+                break;
+            case 2:
+                $this->path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
+                break;
+            default:
+                throw new UnknownCacheVersionException($version);
         }
+
         $this->version = $version;
-
-        // Version 1
-        $this->store = $cacheConfig['store'] ?? null;
-        $this->key = $cacheConfig['key'];
-        $this->ttl = $cacheConfig['ttl'];
-
-        // Version 2
-        $this->path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
     }
 
     public function isEnabled(): bool
@@ -80,7 +83,7 @@ class ASTCache
 
     public function set(DocumentAST $documentAST): void
     {
-        if ($this->version === 1) {
+        if (1 === $this->version) {
             $this->store()->set($this->key, $documentAST, $this->ttl);
 
             return;
@@ -92,7 +95,7 @@ class ASTCache
 
     public function clear(): void
     {
-        if ($this->version === 1) {
+        if (1 === $this->version) {
             $this->store()->forget($this->key);
 
             return;
@@ -106,7 +109,7 @@ class ASTCache
      */
     public function fromCacheOrBuild(Closure $build): DocumentAST
     {
-        if ($this->version === 1) {
+        if (1 === $this->version) {
             return $this->store()->remember(
                 $this->key,
                 $this->ttl,

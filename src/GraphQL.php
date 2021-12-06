@@ -102,6 +102,7 @@ class GraphQL
      * Run one ore more GraphQL operations against the schema.
      *
      * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
+     *
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
     public function executeOperationOrOperations($operationOrOperations, GraphQLContext $context): array
@@ -137,7 +138,7 @@ class GraphQL
         $errors = $this->graphQLHelper->validateOperationParams($params);
 
         $query = $params->query;
-        if (! is_string($query) || $query === '') {
+        if (! is_string($query) || '' === $query) {
             $errors[] = new RequestError(
                 'GraphQL Request parameter "query" is required and must not be empty.'
             );
@@ -215,17 +216,17 @@ class GraphQL
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse
+            new BuildExtensionsResponse()
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {
-            if ($extensionsResponse !== null) {
+            if (null !== $extensionsResponse) {
                 $result->extensions[$extensionsResponse->key()] = $extensionsResponse->content();
             }
         }
 
         foreach ($this->errorPool->errors() as $error) {
-            $result->errors [] = $error;
+            $result->errors[] = $error;
         }
 
         // Allow listeners to manipulate the result after each resolved query
@@ -277,7 +278,7 @@ class GraphQL
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
                 foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers [] = app($handlerClass);
+                    $handlers[] = app($handlerClass);
                 }
 
                 return (new Collection($errors))
@@ -286,7 +287,7 @@ class GraphQL
                             ->send($error)
                             ->through($handlers)
                             ->then(function (?Error $error) use ($formatter): ?array {
-                                if ($error === null) {
+                                if (null === $error) {
                                     return null;
                                 }
 

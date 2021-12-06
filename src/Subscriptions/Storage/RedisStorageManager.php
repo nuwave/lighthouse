@@ -60,7 +60,7 @@ class RedisStorageManager implements StoresSubscriptions
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.
         // We can retrieve all members of a set using the command smembers.
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
-        if (count($subscriberIds) === 0) {
+        if (0 === count($subscriberIds)) {
             return new Collection();
         }
 
@@ -92,7 +92,7 @@ class RedisStorageManager implements StoresSubscriptions
             $subscriber->channel,
         ]);
         // ...and refresh the ttl of this set as well.
-        if ($this->ttl !== null) {
+        if (null !== $this->ttl) {
             $this->connection->command('expire', [$topicKey, $this->ttl]);
         }
 
@@ -102,7 +102,7 @@ class RedisStorageManager implements StoresSubscriptions
             $this->channelKey($subscriber->channel),
             $this->serialize($subscriber),
         ];
-        if ($this->ttl !== null) {
+        if (null !== $this->ttl) {
             $setCommand = 'setex';
             array_splice($setArguments, 1, 0, [$this->ttl]);
         }
@@ -114,7 +114,7 @@ class RedisStorageManager implements StoresSubscriptions
         $key = $this->channelKey($channel);
         $subscriber = $this->getSubscriber($key);
 
-        if ($subscriber !== null) {
+        if (null !== $subscriber) {
             // Like in storeSubscriber (but in reverse), we delete the subscriber...
             $this->connection->command('del', [$key]);
             // ...and remove it from the set of subscribers of this topic.
@@ -143,24 +143,25 @@ class RedisStorageManager implements StoresSubscriptions
 
     protected function channelKey(string $channel): string
     {
-        return self::SUBSCRIBER_KEY.'.'.$channel;
+        return self::SUBSCRIBER_KEY . '.' . $channel;
     }
 
     protected function topicKey(string $topic): string
     {
-        return self::TOPIC_KEY.'.'.$topic;
+        return self::TOPIC_KEY . '.' . $topic;
     }
 
     /**
-     * @param  mixed  $value  Value to serialize.
-     * @return mixed Storable value.
+     * @param  mixed  $value  value to serialize
+     *
+     * @return mixed storable value
      *
      * @see \Illuminate\Cache\RedisStore::serialize
      */
     protected function serialize($value)
     {
         $isProperNumber = is_numeric($value)
-            && ($value !== INF && $value !== -INF)
+            && (INF !== $value && $value !== -INF)
             && ! is_nan(floatval($value));
 
         return $isProperNumber
@@ -169,8 +170,9 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param  mixed  $value  Value to unserialize.
-     * @return mixed Unserialized value.
+     * @param  mixed  $value  value to unserialize
+     *
+     * @return mixed unserialized value
      */
     protected function unserialize($value)
     {

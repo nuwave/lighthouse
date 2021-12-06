@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ExternalDirective extends BaseDirective implements FieldResolver
 {
-    const NAME = 'external';
+    public const NAME = 'external';
 
     public static function definition(): string
     {

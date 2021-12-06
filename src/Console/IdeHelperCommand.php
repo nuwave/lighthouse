@@ -72,7 +72,7 @@ GRAPHQL;
         }
 
         $filePath = static::schemaDirectivesPath();
-        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
 
         $this->info("Wrote schema directive definitions to $filePath.");
     }
@@ -81,6 +81,7 @@ GRAPHQL;
      * Scan the given namespaces for directive classes.
      *
      * @param  array<string>  $directiveNamespaces
+     *
      * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected function scanForDirectives(array $directiveNamespaces): array
@@ -131,7 +132,7 @@ GRAPHQL;
 
     public static function schemaDirectivesPath(): string
     {
-        return base_path().'/schema-directives.graphql';
+        return base_path() . '/schema-directives.graphql';
     }
 
     /**
@@ -173,20 +174,20 @@ GRAPHQL;
             )
         );
 
-        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema."\n");
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema."\n");
 
         $this->info("Wrote definitions for programmatically registered types to $filePath.");
     }
 
     public static function programmaticTypesPath(): string
     {
-        return base_path().'/programmatic-types.graphql';
+        return base_path() . '/programmatic-types.graphql';
     }
 
     public function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
-        $contents = \Safe\file_get_contents(__DIR__.'/../../_ide_helper.php');
+        $contents = \Safe\file_get_contents(__DIR__ . '/../../_ide_helper.php');
 
         \Safe\file_put_contents($filePath, $this->withGeneratedNotice($contents));
 
@@ -195,14 +196,14 @@ GRAPHQL;
 
     public static function phpIdeHelperPath(): string
     {
-        return base_path().'/_lighthouse_ide_helper.php';
+        return base_path() . '/_lighthouse_ide_helper.php';
     }
 
     protected function withGeneratedNotice(string $phpContents): string
     {
         return substr_replace(
             $phpContents,
-            self::OPENING_PHP_TAG.self::GENERATED_NOTICE,
+            self::OPENING_PHP_TAG . self::GENERATED_NOTICE,
             0,
             strlen(self::OPENING_PHP_TAG)
         );

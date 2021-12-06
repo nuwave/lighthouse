@@ -41,7 +41,7 @@ class SchemaValidator
     protected function validateObjectType(ObjectType $type): void
     {
         $ast = $type->astNode;
-        if ($ast !== null) {
+        if (null !== $ast) {
             $directives = $this->directiveLocator->associated($ast);
 
             /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directive */
@@ -78,7 +78,7 @@ class SchemaValidator
             }
 
             $nestedSelection = $selection->selectionSet;
-            if ($nestedSelection !== null) {
+            if (null !== $nestedSelection) {
                 $type = $field->getType();
                 if ($type instanceof WrappingType) {
                     $type = $type->getWrappedType(true);

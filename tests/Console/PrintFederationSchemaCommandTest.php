@@ -9,8 +9,8 @@ use Tests\TestCase;
 
 class PrintFederationSchemaCommandTest extends TestCase
 {
-    protected const SCHEMA_TYPE = /** @lang GraphQL */
-        <<<'GRAPHQL'
+    protected const SCHEMA_TYPE /** @lang GraphQL */
+        = <<<'GRAPHQL'
 type Foo @key(fields: "id") {
   id: ID! @external
   foo: String!
@@ -18,8 +18,8 @@ type Foo @key(fields: "id") {
 
 GRAPHQL;
 
-    protected const SCHEMA_QUERY = /** @lang GraphQL */
-        <<<'GRAPHQL'
+    protected const SCHEMA_QUERY /** @lang GraphQL */
+        = <<<'GRAPHQL'
 type Query {
   foo: Int!
 }
@@ -35,7 +35,7 @@ GRAPHQL;
 
     public function testPrintsSchemaAsGraphQLSDL(): void
     {
-        $this->schema = self::SCHEMA_TYPE.self::SCHEMA_QUERY;
+        $this->schema = self::SCHEMA_TYPE . self::SCHEMA_QUERY;
 
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--federation' => true]);
@@ -46,7 +46,7 @@ GRAPHQL;
 
     public function testWritesSchema(): void
     {
-        $this->schema = self::SCHEMA_TYPE.self::SCHEMA_QUERY;
+        $this->schema = self::SCHEMA_TYPE . self::SCHEMA_QUERY;
 
         Storage::fake();
         $tester = $this->commandTester(new PrintSchemaCommand());

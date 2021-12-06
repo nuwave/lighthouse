@@ -75,7 +75,7 @@ class MorphOneTest extends DBTestCase
         id: ID
         url: String
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewMorphOne(): void
     {

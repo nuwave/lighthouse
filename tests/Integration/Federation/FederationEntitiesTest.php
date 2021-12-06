@@ -63,7 +63,7 @@ class FederationEntitiesTest extends TestCase
           id: ID! @external
           foo: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -92,7 +92,7 @@ class FederationEntitiesTest extends TestCase
           id: ID! @external
           foo: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -121,7 +121,7 @@ class FederationEntitiesTest extends TestCase
           id: ID! @external
           foo: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/** @lang GraphQL */ '
         {

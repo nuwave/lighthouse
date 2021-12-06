@@ -22,6 +22,7 @@ GRAPHQL;
             $fieldValue->setResolver(
                 /**
                  * @param  array<string, mixed>  $args
+                 *
                  * @return array<string, mixed>
                  */
                 static function ($root, array $args): array {

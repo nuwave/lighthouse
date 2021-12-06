@@ -67,6 +67,7 @@ class Defer implements CreatesResponse
      * @var float|int
      */
     protected $maxExecutionTime = 0;
+
     /**
      * @var int
      */
@@ -94,12 +95,13 @@ class Defer implements CreatesResponse
      * Register deferred field.
      *
      * @param  \Closure(): mixed  $resolver
-     * @return mixed The data if it is already available.
+     *
+     * @return mixed the data if it is already available
      */
     public function defer(Closure $resolver, string $path)
     {
         $data = $this->getData($path);
-        if ($data !== null) {
+        if (null !== $data) {
             return $data;
         }
 
@@ -128,18 +130,20 @@ class Defer implements CreatesResponse
 
     /**
      * @param  \Closure(): mixed  $resolver
+     *
      * @return mixed The loaded data
      */
     protected function resolve(Closure $resolver, string $path)
     {
         unset($this->deferred[$path]);
-        $this->resolved [] = $path;
+        $this->resolved[] = $path;
 
         return $resolver();
     }
 
     /**
      * @param  \Closure(): mixed  $originalResolver
+     *
      * @return mixed The loaded data
      */
     public function findOrResolve(Closure $originalResolver, string $path)
@@ -160,6 +164,7 @@ class Defer implements CreatesResponse
      * Return either a final response or a stream of responses.
      *
      * @param  array<string, mixed>  $result
+     *
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function createResponse(array $result): Response
@@ -181,7 +186,7 @@ class Defer implements CreatesResponse
                     && ! $this->maxExecutionTimeReached()
                     && ! $this->maxNestedFieldsResolved($nested)
                 ) {
-                    $nested++;
+                    ++$nested;
                     $this->executeDeferred();
                 }
 
@@ -221,7 +226,7 @@ class Defer implements CreatesResponse
      */
     protected function maxExecutionTimeReached(): bool
     {
-        if ($this->maxExecutionTime === 0) {
+        if (0 === $this->maxExecutionTime) {
             return false;
         }
 
@@ -233,7 +238,7 @@ class Defer implements CreatesResponse
      */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
-        if ($this->maxNestedFields === 0) {
+        if (0 === $this->maxNestedFields) {
             return false;
         }
 
