@@ -18,9 +18,10 @@ abstract class BatchLoaderRegistry
      *
      * @param  array<int|string>  $pathToField  Path to the GraphQL field from the root, is used as a key for BatchLoader instances
      * @param  callable(): TBatchLoader  $makeInstance  Function to instantiate the instance once
-     * @return TBatchLoader The result of calling makeInstance
      *
      * @throws \Exception
+     *
+     * @return TBatchLoader The result of calling makeInstance
      */
     public static function instance(array $pathToField, callable $makeInstance): object
     {

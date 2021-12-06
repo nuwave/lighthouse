@@ -23,19 +23,19 @@ use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
 {
-    const FEDERATION_TYPES = [
+    public const FEDERATION_TYPES = [
         '_Any',
         '_Entity',
         '_FieldSet',
         '_Service',
     ];
 
-    const FEDERATION_FIELDS = [
+    public const FEDERATION_FIELDS = [
         '_service',
         '_entities',
     ];
 
-    const FEDERATION_DIRECTIVES = [
+    public const FEDERATION_DIRECTIVES = [
         ExtendsDirective::NAME,
         ExternalDirective::NAME,
         KeyDirective::NAME,
@@ -85,7 +85,7 @@ class FederationPrinter
         $printDirectives = static function ($definition): string {
             /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
-            if ($astNode === null) {
+            if (null === $astNode) {
                 return '';
             }
 
@@ -94,24 +94,25 @@ class FederationPrinter
                 foreach ($astNode->directives as $directive) {
                     $name = $directive->name->value;
 
-                    if ($name === KeyDirective::NAME
-                        || $name === ExtendsDirective::NAME
+                    if (KeyDirective::NAME === $name
+                        || ExtendsDirective::NAME === $name
                     ) {
-                        $federationDirectives [] = $directive;
+                        $federationDirectives[] = $directive;
                     }
                 }
 
                 return SchemaPrinter::printDirectives($federationDirectives);
-            } elseif ($astNode instanceof FieldDefinitionNode) {
+            }
+            if ($astNode instanceof FieldDefinitionNode) {
                 $federationDirectives = [];
                 foreach ($astNode->directives as $directive) {
                     $name = $directive->name->value;
 
-                    if ($name === ProvidesDirective::NAME
-                        || $name === RequiresDirective::NAME
-                        || $name === ExternalDirective::NAME
+                    if (ProvidesDirective::NAME === $name
+                        || RequiresDirective::NAME === $name
+                        || ExternalDirective::NAME === $name
                     ) {
-                        $federationDirectives [] = $directive;
+                        $federationDirectives[] = $directive;
                     }
                 }
 

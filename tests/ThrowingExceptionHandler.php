@@ -9,7 +9,6 @@ class ThrowingExceptionHandler implements ExceptionHandler
 {
     public function report(Throwable $e)
     {
-        //
     }
 
     public function render($request, Throwable $e)

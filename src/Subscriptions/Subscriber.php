@@ -50,7 +50,7 @@ class Subscriber
     /**
      * The root element of the query.
      *
-     * @var mixed Can be anything.
+     * @var mixed can be anything
      */
     public $root;
 
@@ -164,7 +164,7 @@ class Subscriber
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-lighthouse-'.Str::random(32).'-'.time();
+        return 'private-lighthouse-' . Str::random(32) . '-' . time();
     }
 
     protected function contextSerializer(): ContextSerializer

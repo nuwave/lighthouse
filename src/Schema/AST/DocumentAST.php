@@ -35,9 +35,9 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 class DocumentAST implements Arrayable
 {
-    const TYPES = 'types';
-    const DIRECTIVES = 'directives';
-    const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
+    public const TYPES = 'types';
+    public const DIRECTIVES = 'directives';
+    public const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
 
     /**
      * The types within the schema.
@@ -97,7 +97,7 @@ class DocumentAST implements Arrayable
             throw new ParseException($syntaxError);
         }
 
-        $instance = new static;
+        $instance = new static();
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
@@ -135,11 +135,11 @@ class DocumentAST implements Arrayable
                 }
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
-                $instance->typeExtensions[$definition->name->value] [] = $definition;
+                $instance->typeExtensions[$definition->name->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new Exception('Unknown definition type: '.get_class($definition));
+                throw new Exception('Unknown definition type: ' . get_class($definition));
             }
         }
 
@@ -152,6 +152,7 @@ class DocumentAST implements Arrayable
      * This operation will overwrite existing definitions with the same name.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $type
+     *
      * @return $this
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self

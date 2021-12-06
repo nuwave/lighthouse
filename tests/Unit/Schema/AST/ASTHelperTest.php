@@ -183,7 +183,7 @@ class ASTHelperTest extends TestCase
 directive @foo on OBJECT
 scalar Bar
 GRAPHQL
-)
+            )
         );
     }
 

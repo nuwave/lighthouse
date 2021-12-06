@@ -83,7 +83,7 @@ class ASTCache
 
     public function set(DocumentAST $documentAST): void
     {
-        if ($this->version === 1) {
+        if (1 === $this->version) {
             $this->store()->set($this->key, $documentAST, $this->ttl);
 
             return;
@@ -95,7 +95,7 @@ class ASTCache
 
     public function clear(): void
     {
-        if ($this->version === 1) {
+        if (1 === $this->version) {
             $this->store()->forget($this->key);
 
             return;
@@ -109,7 +109,7 @@ class ASTCache
      */
     public function fromCacheOrBuild(Closure $build): DocumentAST
     {
-        if ($this->version === 1) {
+        if (1 === $this->version) {
             return $this->store()->remember(
                 $this->key,
                 $this->ttl,

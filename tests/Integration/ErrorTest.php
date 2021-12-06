@@ -126,7 +126,7 @@ class ErrorTest extends TestCase
 
     public function testReturnsMultipleErrors(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         input TestInput {
             string: String!
             integer: Int!

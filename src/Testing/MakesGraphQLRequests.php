@@ -48,7 +48,7 @@ trait MakesGraphQLRequests
     ): TestResponse {
         $params = ['query' => $query];
 
-        if ($variables !== []) {
+        if ([] !== $variables) {
             $params += ['variables' => $variables];
         }
 
@@ -175,6 +175,7 @@ trait MakesGraphQLRequests
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
+     *
      * @return array<int, mixed> The chunked results
      */
     protected function streamGraphQL(
@@ -205,7 +206,7 @@ trait MakesGraphQLRequests
      */
     protected function setUpDeferStream(): void
     {
-        $this->deferStream = new MemoryStream;
+        $this->deferStream = new MemoryStream();
 
         Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;

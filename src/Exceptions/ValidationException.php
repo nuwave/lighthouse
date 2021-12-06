@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException as LaravelValidationException;
 
 class ValidationException extends Exception implements ClientAware, ProvidesExtensions
 {
-    const KEY = 'validation';
+    public const KEY = 'validation';
 
     /**
      * @var \Illuminate\Contracts\Validation\Validator

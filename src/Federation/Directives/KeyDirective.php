@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class KeyDirective extends BaseDirective
 {
-    const NAME = 'key';
+    public const NAME = 'key';
 
     /**
      * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary

@@ -13,7 +13,7 @@ class RethrowingErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {
-        if ($error === null) {
+        if (null === $error) {
             return $next(null);
         }
 

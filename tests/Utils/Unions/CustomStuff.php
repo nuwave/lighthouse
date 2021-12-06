@@ -26,7 +26,7 @@ class CustomStuff
     {
         return $this->typeRegistry->get(
             // Add prefix
-            'Custom'.class_basename($rootValue)
+            'Custom' . class_basename($rootValue)
         );
     }
 }

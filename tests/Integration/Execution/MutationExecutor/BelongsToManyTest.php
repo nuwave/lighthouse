@@ -105,7 +105,7 @@ class BelongsToManyTest extends DBTestCase
         id: ID! # role ID
         meta: String
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testSyncWithoutDetaching(): void
     {

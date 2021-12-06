@@ -13,7 +13,7 @@ class CanDirectiveTest extends TestCase
 {
     public function testThrowsIfNotAuthorized(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -38,7 +38,7 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -65,7 +65,7 @@ class CanDirectiveTest extends TestCase
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -92,7 +92,7 @@ class CanDirectiveTest extends TestCase
 
     public function testPassesAuthIfAuthorized(): void
     {
-        $user = new User;
+        $user = new User();
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
@@ -162,7 +162,7 @@ class CanDirectiveTest extends TestCase
 
     public function testPassesMultiplePolicies(): void
     {
-        $user = new User;
+        $user = new User();
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
@@ -222,7 +222,7 @@ class CanDirectiveTest extends TestCase
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->mockResolver(function (): User {
             return $this->resolveUser();
@@ -257,7 +257,7 @@ class CanDirectiveTest extends TestCase
 
     public function testInjectedArgsAndStaticArgs(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->mockResolver(function (): User {
             return $this->resolveUser();
@@ -315,7 +315,7 @@ class CanDirectiveTest extends TestCase
 
     public function resolveUser(): User
     {
-        $user = new User;
+        $user = new User();
         $user->name = 'foo';
 
         return $user;

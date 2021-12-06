@@ -133,7 +133,7 @@ class FieldFactory
             ComplexityResolverDirective::class
         );
 
-        if ($complexityDirective === null) {
+        if (null === $complexityDirective) {
             return null;
         }
 
@@ -142,16 +142,15 @@ class FieldFactory
 
     public static function defaultResolver(FieldValue $fieldValue): callable
     {
-        if ($fieldValue->getParentName() === RootType::SUBSCRIPTION) {
+        if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
             $providesSubscriptionResolver = app(ProvidesSubscriptionResolver::class);
 
             return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
-        } else {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver $providesResolver */
-            $providesResolver = app(ProvidesResolver::class);
-
-            return $providesResolver->provideResolver($fieldValue);
         }
+        /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver $providesResolver */
+        $providesResolver = app(ProvidesResolver::class);
+
+        return $providesResolver->provideResolver($fieldValue);
     }
 }

@@ -11,7 +11,7 @@ class ThrottleDirectiveTest extends TestCase
 {
     public function testNamedLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(name: "test")
         }
@@ -66,7 +66,7 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testUnlimitedNamedLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(name: "test")
         }
