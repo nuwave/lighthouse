@@ -78,7 +78,7 @@ class TestResponseMixin
             $errors = $this->json('errors');
             Assert::assertNull(
                 $errors,
-                'Expected the GraphQL response to contain no errors, got: '.\Safe\json_encode($errors)
+                'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors)
             );
 
             return $this;

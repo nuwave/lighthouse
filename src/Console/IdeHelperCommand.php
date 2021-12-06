@@ -158,7 +158,7 @@ GRAPHQL;
 
         $filePath = static::programmaticTypesPath();
 
-        if (count($programmaticTypes) === 0 && file_exists($filePath)) {
+        if (0 === count($programmaticTypes) && file_exists($filePath)) {
             \Safe\unlink($filePath);
 
             return;
@@ -174,7 +174,7 @@ GRAPHQL;
             )
         );
 
-        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema."\n");
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema . "\n");
 
         $this->info("Wrote definitions for programmatically registered types to $filePath.");
     }

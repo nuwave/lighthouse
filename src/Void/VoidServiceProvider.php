@@ -33,7 +33,7 @@ enum Unit {
   {$unit}
 }
 GRAPHQL
-)
+                    )
                 );
             }
         );
