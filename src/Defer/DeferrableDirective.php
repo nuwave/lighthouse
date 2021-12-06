@@ -75,7 +75,7 @@ GRAPHQL;
         $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
 
         if ($this->anyFieldHasDefer($defers)) {
-            if ($resolveInfo->parentType->name === RootType::MUTATION) {
+            if (RootType::MUTATION === $resolveInfo->parentType->name) {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
             if ($fieldType instanceof NonNullTypeNode) {
@@ -86,7 +86,7 @@ GRAPHQL;
         // Following the semantics of Apollo:
         // All declarations of a field have to contain @defer for the field to be deferred
         foreach ($defers as $defer) {
-            if ($defer === null || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
+            if (null === $defer || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
                 return false;
             }
         }
@@ -113,7 +113,7 @@ GRAPHQL;
     protected function anyFieldHasDefer(array $defers): bool
     {
         foreach ($defers as $defer) {
-            if ($defer !== null) {
+            if (null !== $defer) {
                 return true;
             }
         }

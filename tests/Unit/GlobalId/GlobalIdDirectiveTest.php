@@ -145,7 +145,7 @@ class GlobalIdDirectiveTest extends TestCase
             }
         );
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(
                 type: ID! @globalId(decode: TYPE)

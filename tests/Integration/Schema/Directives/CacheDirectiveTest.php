@@ -268,7 +268,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $query = /** @lang GraphQL */ '
         {
-            user(id: '.$user->getKey().') {
+            user(id: ' . $user->getKey() . ') {
                 id
                 name
                 posts(first: 3) {
@@ -283,7 +283,7 @@ class CacheDirectiveTest extends DBTestCase
         $dbQueryCountForPost = 0;
         DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
             if (Str::contains($query->sql, 'select * from `posts`')) {
-                $dbQueryCountForPost++;
+                ++$dbQueryCountForPost;
             }
         });
 
@@ -332,7 +332,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $query = /** @lang GraphQL */ '
         {
-            user(id: '.$user->getKey().') {
+            user(id: ' . $user->getKey() . ') {
                 id
                 name
                 posts(first: 3) {
@@ -347,7 +347,7 @@ class CacheDirectiveTest extends DBTestCase
         $dbQueryCountForPost = 0;
         DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
             if (Str::contains($query->sql, 'select * from `posts`')) {
-                $dbQueryCountForPost++;
+                ++$dbQueryCountForPost;
             }
         });
 

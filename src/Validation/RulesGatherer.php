@@ -195,6 +195,7 @@ class RulesGatherer
     /**
      * @param  array<string, mixed>  $rulesOrMessages
      * @param  array<int|string>  $path
+     *
      * @return array<string, mixed>
      */
     protected function wrap(array $rulesOrMessages, array $path): array
@@ -220,6 +221,7 @@ class RulesGatherer
      *
      * @param  array<int, mixed>  $rules
      * @param  array<int|string>  $argumentPath
+     *
      * @return array<int, array<int, mixed>|object>
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
@@ -248,7 +250,7 @@ class RulesGatherer
                 $name = $parsed[0];
                 $args = $parsed[1];
 
-                if ($name === 'WithReference') {
+                if ('WithReference' === $name) {
                     $indexes = explode('_', $args[1]);
                     array_splice($args, 1, 1);
                     foreach ($indexes as $index) {
@@ -316,7 +318,7 @@ class RulesGatherer
                 // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
                 $flatArgs = [$name];
                 foreach ($args as $arg) {
-                    $flatArgs [] = $arg;
+                    $flatArgs[] = $arg;
                 }
 
                 return $flatArgs;

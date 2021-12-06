@@ -57,8 +57,7 @@ class SubscriptionTest extends TestCase
     {
         $subscriptionRegistry = app(SubscriptionRegistry::class);
 
-        $subscription = new class extends GraphQLSubscription
-        {
+        $subscription = new class() extends GraphQLSubscription {
             public function authorize(Subscriber $subscriber, Request $request): bool
             {
                 return true;

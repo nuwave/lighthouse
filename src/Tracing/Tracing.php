@@ -97,7 +97,7 @@ class Tracing
      */
     public function record(ResolveInfo $resolveInfo, $start, $end): void
     {
-        $this->resolverTraces [] = [
+        $this->resolverTraces[] = [
             'path' => $resolveInfo->path,
             'parentType' => $resolveInfo->parentType->name,
             'returnType' => $resolveInfo->returnType->__toString(),

@@ -28,22 +28,22 @@ class TracingServiceProvider extends ServiceProvider
 
         $eventsDispatcher->listen(
             ManipulateAST::class,
-            Tracing::class.'@handleManipulateAST'
+            Tracing::class . '@handleManipulateAST'
         );
 
         $eventsDispatcher->listen(
             StartRequest::class,
-            Tracing::class.'@handleStartRequest'
+            Tracing::class . '@handleStartRequest'
         );
 
         $eventsDispatcher->listen(
             StartExecution::class,
-            Tracing::class.'@handleStartExecution'
+            Tracing::class . '@handleStartExecution'
         );
 
         $eventsDispatcher->listen(
             BuildExtensionsResponse::class,
-            Tracing::class.'@handleBuildExtensionsResponse'
+            Tracing::class . '@handleBuildExtensionsResponse'
         );
     }
 }

@@ -9,7 +9,7 @@ use Tests\Utils\Queries\Foo;
 
 class ComplexityDirectiveTest extends TestCase
 {
-    const CUSTOM_COMPLEXITY = 123;
+    public const CUSTOM_COMPLEXITY = 123;
 
     public function testDefaultComplexity(): void
     {

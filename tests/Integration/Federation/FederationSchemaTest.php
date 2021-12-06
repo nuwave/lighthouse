@@ -33,7 +33,7 @@ type Query {
 
 GRAPHQL;
 
-        $this->schema = $foo.$query;
+        $this->schema = $foo . $query;
 
         $sdl = $this->_serviceSdl();
 

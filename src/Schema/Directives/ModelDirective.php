@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 class ModelDirective extends BaseDirective
 {
-    const NAME = 'model';
+    public const NAME = 'model';
 
     public static function definition(): string
     {
@@ -32,7 +32,7 @@ GRAPHQL;
     public static function modelClass(Node $node): ?string
     {
         $modelDirective = ASTHelper::directiveDefinition($node, self::NAME);
-        if ($modelDirective !== null) {
+        if (null !== $modelDirective) {
             return ASTHelper::directiveArgValue($modelDirective, 'class');
         }
 

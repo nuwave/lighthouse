@@ -71,12 +71,12 @@ class ScoutEnhancer
         }
 
         if (! $this->builder instanceof EloquentBuilder) {
-            throw new ScoutException('Can only get Model from \Illuminate\Database\Eloquent\Builder, got: '.get_class($this->builder));
+            throw new ScoutException('Can only get Model from \Illuminate\Database\Eloquent\Builder, got: ' . get_class($this->builder));
         }
         $model = $this->builder->getModel();
 
         if (! Utils::classUsesTrait($model, Searchable::class)) {
-            throw new ScoutException('Model class '.get_class($model).' does not implement trait '.Searchable::class);
+            throw new ScoutException('Model class ' . get_class($model) . ' does not implement trait ' . Searchable::class);
         }
 
         // @phpstan-ignore-next-line Can not use traits as types
@@ -118,7 +118,7 @@ class ScoutEnhancer
                 ->contains(Utils::instanceofMatcher(SearchDirective::class));
 
             if ($argumentHasSearchDirective && is_string($argument->value)) {
-                $this->searchArguments [] = $argument;
+                $this->searchArguments[] = $argument;
             }
 
             $argumentHasArgBuilderDirective = $argument
@@ -130,11 +130,11 @@ class ScoutEnhancer
                 ->contains(Utils::instanceofMatcher(ScoutBuilderDirective::class));
 
             if ($argumentHasArgBuilderDirective && ! $argumentHasScoutBuilderDirective) {
-                $this->argumentsWithOnlyArgBuilders [] = $argument;
+                $this->argumentsWithOnlyArgBuilders[] = $argument;
             }
 
             if ($argumentHasScoutBuilderDirective) {
-                $this->argumentsWithScoutBuilderDirectives [] = $argument;
+                $this->argumentsWithScoutBuilderDirectives[] = $argument;
             }
 
             Utils::applyEach(

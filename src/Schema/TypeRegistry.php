@@ -106,7 +106,8 @@ class TypeRegistry
     public function get(string $name): Type
     {
         if (! $this->has($name)) {
-            throw new DefinitionException(<<<EOL
+            throw new DefinitionException(
+                <<<EOL
 Lighthouse failed while trying to load a type: $name
 
 Make sure the type is present in your schema definition.
@@ -158,7 +159,7 @@ EOL
     protected function fromAST(string $name): ?Type
     {
         $typeDefinition = $this->documentAST->types[$name] ?? null;
-        if ($typeDefinition === null) {
+        if (null === $typeDefinition) {
             return null;
         }
 
@@ -327,16 +328,16 @@ EOL
             'name' => $objectDefinition->name->value,
             'description' => $objectDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($objectDefinition),
-            'interfaces' =>
+            'interfaces'
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>
                  */
-                function () use ($objectDefinition): array {
+                => function () use ($objectDefinition): array {
                     $interfaces = [];
 
                     // Might be a NodeList, so we can not use array_map()
                     foreach ($objectDefinition->interfaces as $interface) {
-                        $interfaces [] = $this->get($interface->name->value);
+                        $interfaces[] = $this->get($interface->name->value);
                     }
 
                     return $interfaces;
@@ -349,6 +350,7 @@ EOL
      * Returns a closure that lazy loads the fields for a constructed type.
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
+     *
      * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): Closure
@@ -379,11 +381,11 @@ EOL
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => $inputDefinition->description->value ?? null,
-            'fields' =>
+            'fields'
                 /**
                  * @return array<string, array<string, mixed>>
                  */
-                function () use ($inputDefinition): array {
+                => function () use ($inputDefinition): array {
                     return $this->argumentFactory->toTypeMap($inputDefinition->fields);
                 },
             'astNode' => $inputDefinition,
@@ -395,12 +397,12 @@ EOL
         $nodeName = $interfaceDefinition->name->value;
 
         if (($directiveNode = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) !== null) {
-            $interfaceDirective = (new InterfaceDirective)->hydrate($directiveNode, $interfaceDefinition);
+            $interfaceDirective = (new InterfaceDirective())->hydrate($directiveNode, $interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
-            $typeResolver =
-                $this->typeResolverFromClass(
+            $typeResolver
+                = $this->typeResolverFromClass(
                     $nodeName,
                     (array) config('lighthouse.namespaces.interfaces')
                 )
@@ -433,7 +435,7 @@ EOL
                 $typeDefinition instanceof ObjectTypeDefinitionNode
                 && ASTHelper::typeImplementsInterface($typeDefinition, $name)
             ) {
-                $implementations [] = $typeDefinition->name->value;
+                $implementations[] = $typeDefinition->name->value;
             }
         }
 
@@ -467,6 +469,7 @@ EOL
      * Default type resolver for resolving interfaces or union types.
      *
      * @param  list<string>  $possibleTypes
+     *
      * @return Closure(mixed): Type
      */
     protected function typeResolverFallback(array $possibleTypes): Closure
@@ -483,7 +486,7 @@ EOL
                 if (null !== $explicitSchemaMapping) {
                     $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
 
-                    if (count($actuallyPossibleTypes) !== 1) {
+                    if (1 !== count($actuallyPossibleTypes)) {
                         throw new DefinitionException(
                             self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes)
                         );
@@ -504,12 +507,12 @@ EOL
         $nodeName = $unionDefinition->name->value;
 
         if (($directiveNode = ASTHelper::directiveDefinition($unionDefinition, 'union')) !== null) {
-            $unionDirective = (new UnionDirective)->hydrate($directiveNode, $unionDefinition);
+            $unionDirective = (new UnionDirective())->hydrate($directiveNode, $unionDefinition);
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
-            $typeResolver =
-                $this->typeResolverFromClass(
+            $typeResolver
+                = $this->typeResolverFromClass(
                     $nodeName,
                     (array) config('lighthouse.namespaces.unions')
                 )
@@ -521,11 +524,11 @@ EOL
         return new UnionType([
             'name' => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
-            'types' =>
+            'types'
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>
                  */
-                function () use ($unionDefinition): array {
+                => function () use ($unionDefinition): array {
                     $types = [];
 
                     foreach ($unionDefinition->types as $type) {
@@ -556,7 +559,7 @@ EOL
         $types = [];
 
         foreach ($unionDefinition->types as $type) {
-            $types [] = $type->name->value;
+            $types[] = $type->name->value;
         }
 
         return $types;

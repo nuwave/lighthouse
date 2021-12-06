@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class ProvidesDirective extends BaseDirective
 {
-    const NAME = 'provides';
+    public const NAME = 'provides';
 
     public static function definition(): string
     {

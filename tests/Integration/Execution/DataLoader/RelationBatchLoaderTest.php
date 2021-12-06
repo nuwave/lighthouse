@@ -104,7 +104,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this
@@ -152,7 +152,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this
@@ -204,7 +204,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -265,7 +265,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -302,7 +302,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -514,7 +514,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queries = 0;
         DB::listen(static function () use (&$queries): void {
-            $queries++;
+            ++$queries;
         });
 
         $this

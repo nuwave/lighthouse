@@ -10,6 +10,7 @@ class Service
 {
     /**
      * @param  array<string, mixed>  $args  Always empty
+     *
      * @return array{sdl: string}
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array

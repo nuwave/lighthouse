@@ -116,9 +116,9 @@ GRAPHQL;
             $order = Arr::pull($orderByClause, 'order');
             $column = Arr::pull($orderByClause, 'column');
 
-            if ($column === null) {
+            if (null === $column) {
                 if (! $builder instanceof Builder) {
-                    throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: '.get_class($builder));
+                    throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: ' . get_class($builder));
                 }
 
                 // TODO use array_key_first() in PHP 7.3
@@ -128,12 +128,12 @@ GRAPHQL;
                 $relationValues = Arr::first($orderByClause);
 
                 $aggregate = $relationValues['aggregate'];
-                if ($aggregate === 'count') {
+                if ('count' === $aggregate) {
                     $builder->withCount($relation);
 
                     $column = "{$relationSnake}_count";
                 } else {
-                    $operator = 'with'.ucfirst($aggregate);
+                    $operator = 'with' . ucfirst($aggregate);
                     $relationColumn = $relationValues['column'];
                     $builder->{$operator}($relation, $relationColumn);
 
@@ -154,7 +154,7 @@ GRAPHQL;
         ObjectTypeDefinitionNode &$parentType
     ): void {
         if (! $this->hasAllowedColumns() && ! $this->directiveHasArgument('relations')) {
-            $argDefinition->type = Parser::typeReference('['.OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE.'!]');
+            $argDefinition->type = Parser::typeReference('[' . OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE . '!]');
 
             return;
         }
@@ -173,7 +173,7 @@ GRAPHQL;
                 $relationName = $relation['relation'];
                 $relationUpper = ucfirst($relationName);
 
-                $inputName = $qualifiedOrderByPrefix.$relationUpper;
+                $inputName = $qualifiedOrderByPrefix . $relationUpper;
 
                 $relationsInputs[$relationName] = $inputName;
 
@@ -228,7 +228,7 @@ GRAPHQL;
                 $otherOptions = ['column'];
                 foreach ($relationNames as $relationName) {
                     if ($relationName !== $relation) {
-                        $otherOptions [] = $relationName;
+                        $otherOptions[] = $relationName;
                     }
                 }
 
@@ -243,8 +243,8 @@ GRAPHQL;
 
             $documentAST->setTypeDefinition(Parser::inputObjectTypeDefinition("{$inputMerged}}"));
         } else {
-            $restrictedOrderByName = $qualifiedOrderByPrefix.'OrderByClause';
-            $argDefinition->type = Parser::typeReference('['.$restrictedOrderByName.'!]');
+            $restrictedOrderByName = $qualifiedOrderByPrefix . 'OrderByClause';
+            $argDefinition->type = Parser::typeReference('[' . $restrictedOrderByName . '!]');
 
             $documentAST->setTypeDefinition(
                 OrderByServiceProvider::createOrderByClauseInput(

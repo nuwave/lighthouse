@@ -74,6 +74,7 @@ GRAPHQL;
 
     /**
      * @param  mixed  $value  The client given value
+     *
      * @return mixed The transformed value
      */
     protected function transformLeaf($value)
