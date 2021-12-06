@@ -1,13 +1,14 @@
 {
     "name": "nuwave/lighthouse",
-    "description": "A framework for serving GraphQL from Laravel",
-    "license": "MIT",
     "type": "library",
+    "description": "A framework for serving GraphQL from Laravel",
     "keywords": [
         "graphql",
         "laravel",
         "laravel-graphql"
     ],
+    "homepage": "https://lighthouse-php.com",
+    "license": "MIT",
     "authors": [
         {
             "name": "Christopher Moore",
@@ -20,11 +21,6 @@
             "homepage": "https://franke.tech"
         }
     ],
-    "homepage": "https://lighthouse-php.com",
-    "support": {
-        "issues": "https://github.com/nuwave/lighthouse/issues",
-        "source": "https://github.com/nuwave/lighthouse"
-    },
     "require": {
         "php": ">= 7.2",
         "ext-json": "*",
@@ -72,17 +68,6 @@
         "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
     },
-    "autoload": {
-        "psr-4": {
-            "Nuwave\\Lighthouse\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/",
-            "Benchmarks\\": "benchmarks"
-        }
-    },
     "config": {
         "sort-packages": true
     },
@@ -103,11 +88,26 @@
             ]
         }
     },
+    "autoload": {
+        "psr-4": {
+            "Nuwave\\Lighthouse\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "Benchmarks\\": "benchmarks"
+        }
+    },
     "scripts": {
         "rector": "rector process -v src/ tests/",
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",
         "test:integration": "phpunit --colors=always --testsuite Integration",
         "test:unit": "phpunit --colors=always --testsuite Unit"
+    },
+    "support": {
+        "issues": "https://github.com/nuwave/lighthouse/issues",
+        "source": "https://github.com/nuwave/lighthouse"
     }
 }
