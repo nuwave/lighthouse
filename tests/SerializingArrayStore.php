@@ -21,6 +21,7 @@ class SerializingArrayStore extends ArrayStore
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
+     *
      * @return mixed The value or null
      */
     public function get($key)
@@ -33,7 +34,7 @@ class SerializingArrayStore extends ArrayStore
 
         $expiresAt = $item['expiresAt'] ?? 0;
 
-        if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
+        if (0 !== $expiresAt && $this->currentTime() > $expiresAt) {
             $this->forget($key);
 
             return null;

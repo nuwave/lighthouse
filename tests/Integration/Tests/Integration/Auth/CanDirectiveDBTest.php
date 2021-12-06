@@ -225,7 +225,7 @@ class CanDirectiveDBTest extends DBTestCase
         type Post {
             title: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation ($ids: [ID!]!) {
@@ -388,7 +388,7 @@ class CanDirectiveDBTest extends DBTestCase
         type Post {
             title: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation ($ids: [ID!]!) {

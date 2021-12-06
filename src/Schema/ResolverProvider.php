@@ -21,7 +21,7 @@ class ResolverProvider implements ProvidesResolver
     {
         if (RootType::isRootType($fieldValue->getParentName())) {
             $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
-            if ($resolverClass === null) {
+            if (null === $resolverClass) {
                 $this->throwMissingResolver($fieldValue);
             }
 
@@ -61,7 +61,8 @@ class ResolverProvider implements ProvidesResolver
         $fieldName = $fieldValue->getFieldName();
         $proposedResolverClass = ucfirst($fieldName);
 
-        throw new DefinitionException(<<<MESSAGE
+        throw new DefinitionException(
+            <<<MESSAGE
 Could not locate a field resolver for the {$parent}: {$fieldName}.
 
 Either add a resolver directive such as @all, @find or @create or add

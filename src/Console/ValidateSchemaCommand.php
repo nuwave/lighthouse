@@ -38,8 +38,8 @@ class ValidateSchemaCommand extends Command
         );
         foreach ($directiveLocator->definitions() as $directiveDefinition) {
             // TODO consider a solution that feels less hacky
-            if ($directiveDefinition->name->value !== 'deprecated') {
-                $schemaConfig->directives [] = $directiveFactory->handle($directiveDefinition);
+            if ('deprecated' !== $directiveDefinition->name->value) {
+                $schemaConfig->directives[] = $directiveFactory->handle($directiveDefinition);
             }
         }
 

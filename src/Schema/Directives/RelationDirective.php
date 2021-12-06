@@ -44,7 +44,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                     $relationBatchLoader = BatchLoaderRegistry::instance(
                         $this->qualifyPath($args, $resolveInfo),
                         function () use ($relationName, $decorateBuilder, $paginationArgs): RelationBatchLoader {
-                            $modelsLoader = $paginationArgs !== null
+                            $modelsLoader = null !== $paginationArgs
                                 ? new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
                                 : new SimpleModelsLoader($relationName, $decorateBuilder);
 
@@ -57,7 +57,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
                 $decorateBuilder($relation);
 
-                return $paginationArgs !== null
+                return null !== $paginationArgs
                     ? $paginationArgs->applyToBuilder($relation)
                     : $relation->getResults();
             }
@@ -75,7 +75,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
-        if ($paginationType === null) {
+        if (null === $paginationType) {
             return;
         }
 
@@ -116,7 +116,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         $paginationType = $this->paginationType();
 
-        return $paginationType !== null
+        return null !== $paginationType
             ? PaginationArgs::extractArgs($args, $paginationType, $this->paginationMaxCount())
             : null;
     }
@@ -125,7 +125,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         $type = $this->directiveArgValue('type');
 
-        return $type !== null
+        return null !== $type
             ? new PaginationType($type)
             : null;
     }

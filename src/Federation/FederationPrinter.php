@@ -25,19 +25,19 @@ use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
 {
-    const FEDERATION_TYPES = [
+    public const FEDERATION_TYPES = [
         '_Any',
         '_Entity',
         '_FieldSet',
         '_Service',
     ];
 
-    const FEDERATION_FIELDS = [
+    public const FEDERATION_FIELDS = [
         '_service',
         '_entities',
     ];
 
-    const FEDERATION_DIRECTIVES = [
+    public const FEDERATION_DIRECTIVES = [
         ExtendsDirective::NAME,
         ExternalDirective::NAME,
         KeyDirective::NAME,
@@ -87,7 +87,7 @@ class FederationPrinter
         $printDirectives = static function ($definition): string {
             /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
-            if ($astNode === null) {
+            if (null === $astNode) {
                 return '';
             }
 
@@ -98,8 +98,8 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return $name === KeyDirective::NAME
-                                || $name === ExtendsDirective::NAME;
+                            return KeyDirective::NAME === $name
+                                || ExtendsDirective::NAME === $name;
                         }
                     )
                 );
@@ -110,9 +110,9 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return $name === ProvidesDirective::NAME
-                                || $name === RequiresDirective::NAME
-                                || $name === ExternalDirective::NAME;
+                            return ProvidesDirective::NAME === $name
+                                || RequiresDirective::NAME === $name
+                                || ExternalDirective::NAME === $name;
                         }
                     )
                 );

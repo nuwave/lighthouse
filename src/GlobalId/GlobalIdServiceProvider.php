@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 
 class GlobalIdServiceProvider extends ServiceProvider
 {
-    const NODE = 'Node';
+    public const NODE = 'Node';
 
     public function register(): void
     {
@@ -66,10 +66,10 @@ GRAPHQL
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
-        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
   node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
 GRAPHQL
-);
+        );
     }
 
     protected function hasTypeImplementingNodeInterface(DocumentAST $documentAST): bool

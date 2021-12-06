@@ -60,6 +60,7 @@ GRAPHQL;
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
+     *
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
@@ -128,7 +129,8 @@ GRAPHQL;
         ]);
 
         $config->set('app.debug', true);
-        $config->set('lighthouse.debug',
+        $config->set(
+            'lighthouse.debug',
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
@@ -192,7 +194,7 @@ GRAPHQL;
     protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
     {
         return $this->buildSchema(
-            $schema.self::PLACEHOLDER_QUERY
+            $schema . self::PLACEHOLDER_QUERY
         );
     }
 
@@ -214,7 +216,7 @@ GRAPHQL;
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
-        return addslashes(static::class).'@'.$method;
+        return addslashes(static::class) . '@' . $method;
     }
 
     /**

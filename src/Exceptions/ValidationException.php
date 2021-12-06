@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException as LaravelValidationException;
 
 class ValidationException extends Exception implements RendersErrorsExtensions
 {
-    const CATEGORY = 'validation';
+    public const CATEGORY = 'validation';
 
     /**
      * @var \Illuminate\Contracts\Validation\Validator

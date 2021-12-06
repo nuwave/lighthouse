@@ -42,6 +42,7 @@ trait MakesGraphQLRequests
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
+     *
      * @return \Illuminate\Testing\TestResponse
      */
     protected function graphQL(
@@ -52,7 +53,7 @@ trait MakesGraphQLRequests
     ) {
         $params = ['query' => $query];
 
-        if ($variables !== []) {
+        if ([] !== $variables) {
             $params += ['variables' => $variables];
         }
 
@@ -69,6 +70,7 @@ trait MakesGraphQLRequests
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
+     *
      * @return \Illuminate\Testing\TestResponse
      */
     protected function postGraphQL(array $data, array $headers = [])
@@ -90,6 +92,7 @@ trait MakesGraphQLRequests
      * @param  array<int|string, array<int, string>>  $map
      * @param  array<int|string, \Illuminate\Http\Testing\File>|array<int|string, array>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
+     *
      * @return \Illuminate\Testing\TestResponse
      */
     protected function multipartGraphQL(
@@ -125,7 +128,7 @@ trait MakesGraphQLRequests
      */
     protected function introspect()
     {
-        if ($this->introspectionResult !== null) {
+        if (null !== $this->introspectionResult) {
             return $this->introspectionResult;
         }
 
@@ -159,7 +162,7 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if ($this->introspectionResult === null) {
+        if (null === $this->introspectionResult) {
             $this->introspect();
         }
 
@@ -191,6 +194,7 @@ trait MakesGraphQLRequests
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
+     *
      * @return array<int, mixed> The chunked results
      */
     protected function streamGraphQL(
@@ -199,7 +203,7 @@ trait MakesGraphQLRequests
         array $extraParams = [],
         array $headers = []
     ): array {
-        if ($this->deferStream === null) {
+        if (null === $this->deferStream) {
             $this->setUpDeferStream();
         }
 
@@ -219,7 +223,7 @@ trait MakesGraphQLRequests
      */
     protected function setUpDeferStream(): void
     {
-        $this->deferStream = new MemoryStream;
+        $this->deferStream = new MemoryStream();
 
         Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;

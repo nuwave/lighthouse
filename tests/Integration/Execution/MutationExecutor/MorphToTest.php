@@ -69,7 +69,7 @@ class MorphToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testConnectsMorphTo(): void
     {

@@ -43,11 +43,11 @@ GRAPHQL;
 
         foreach ($objectType->fields as $fieldDefinition) {
             $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);
-            if ($existingNamespaces !== null) {
+            if (null !== $existingNamespaces) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
-            $fieldDefinition->directives [] = $namespaceDirective;
+            $fieldDefinition->directives[] = $namespaceDirective;
         }
     }
 

@@ -13,6 +13,7 @@ class TestResponseUtils
 {
     /**
      * @param  \Illuminate\Testing\TestResponse  $response
+     *
      * @return array<string, array<int, string>>|null
      */
     public static function extractValidationErrors($response): ?array

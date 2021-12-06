@@ -11,6 +11,7 @@ class Resolved
      *
      * @param  \GraphQL\Deferred|mixed  $resolved  The result of calling a resolver
      * @param  callable(mixed $result): mixed  $handle A function that takes that result and transforms it
+     *
      * @return \GraphQL\Deferred|mixed The transformed result or enhanced Deferred
      */
     public static function handle($resolved, callable $handle)
