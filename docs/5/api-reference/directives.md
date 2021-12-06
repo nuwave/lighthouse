@@ -1989,78 +1989,78 @@ type Query {
 Sort a result list by one or more given columns.
 """
 directive @orderBy(
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
-    Only used when the directive is added on an argument.
-    """
-    columns: [String!]
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with the `columnsEnum` argument.
+  Only used when the directive is added on an argument.
+  """
+  columns: [String!]
 
-    """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
-    Only used when the directive is added on an argument.
-    """
-    columnsEnum: String
+  """
+  Use an existing enumeration type to restrict the allowed columns to a predefined list.
+  This allowes you to re-use the same enum for multiple fields.
+  Mutually exclusive with the `columns` argument.
+  Only used when the directive is added on an argument.
+  """
+  columnsEnum: String
 
-    """
-    Allow clients to sort by aggregates on relations.
-    Only used when the directive is added on an argument.
-    """
-    relations: [OrderByRelation!]
+  """
+  Allow clients to sort by aggregates on relations.
+  Only used when the directive is added on an argument.
+  """
+  relations: [OrderByRelation!]
 
-    """
-    The database column for which the order by clause will be applied on.
-    Only used when the directive is added on a field.
-    """
-    column: String
+  """
+  The database column for which the order by clause will be applied on.
+  Only used when the directive is added on a field.
+  """
+  column: String
 
-    """
-    The direction of the order by clause.
-    Only used when the directive is added on a field.
-    """
-    direction: OrderByDirection = ASC
+  """
+  The direction of the order by clause.
+  Only used when the directive is added on a field.
+  """
+  direction: OrderByDirection = ASC
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 
 """
 Options for the `direction` argument on `@orderBy`.
 """
 enum OrderByDirection {
-    """
-    Sort in ascending order.
-    """
-    ASC
+  """
+  Sort in ascending order.
+  """
+  ASC
 
-    """
-    Sort in descending order.
-    """
-    DESC
+  """
+  Sort in descending order.
+  """
+  DESC
 }
 
 """
 Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
-    """
-    TODO: description
-    """
-    relation: String!
+  """
+  TODO: description
+  """
+  relation: String!
 
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
-    """
-    columns: [String!]
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with the `columnsEnum` argument.
+  """
+  columns: [String!]
 
-    """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
-    """
-    columnsEnum: String
+  """
+  Use an existing enumeration type to restrict the allowed columns to a predefined list.
+  This allowes you to re-use the same enum for multiple fields.
+  Mutually exclusive with the `columns` argument.
+  """
+  columnsEnum: String
 }
 ```
 
