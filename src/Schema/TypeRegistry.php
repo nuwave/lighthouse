@@ -384,8 +384,8 @@ EOL
 /**
  * @return array<string, array<string, mixed>>
  */ => function () use ($inputDefinition): array {
-                    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-                },
+    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+},
             'astNode' => $inputDefinition,
         ]);
     }
@@ -525,8 +525,7 @@ EOL
             'types'
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>
-                 */
-                => function () use ($unionDefinition): array {
+                 */ => function () use ($unionDefinition): array {
                     $types = [];
 
                     foreach ($unionDefinition->types as $type) {
