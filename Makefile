@@ -1,9 +1,9 @@
 .PHONY: it
-it: vendor stan test ## Run useful checks before commits
+it: vendor fix stan test ## Run useful checks before commits
 
 .PHONY: help
 help: ## Displays this list of targets with descriptions
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: setup
 setup: build vendor ## Setup the local environment
@@ -18,7 +18,7 @@ up: ## Bring up the docker-compose stack
 
 .PHONY: fix
 fix: up
-	vendor/bin/php-cs-fixer fix
+	docker-compose exec php vendor/bin/php-cs-fixer fix
 
 .PHONY: stan
 stan: up ## Runs static analysis
