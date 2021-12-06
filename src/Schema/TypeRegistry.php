@@ -331,8 +331,7 @@ EOL
             'interfaces'
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>
-                 */
-                => function () use ($objectDefinition): array {
+                 */ => function () use ($objectDefinition): array {
                     $interfaces = [];
 
                     // Might be a NodeList, so we can not use array_map()
@@ -384,8 +383,7 @@ EOL
             'fields'
                 /**
                  * @return array<string, array<string, mixed>>
-                 */
-                => function () use ($inputDefinition): array {
+                 */ => function () use ($inputDefinition): array {
                     return $this->argumentFactory->toTypeMap($inputDefinition->fields);
                 },
             'astNode' => $inputDefinition,
@@ -527,8 +525,7 @@ EOL
             'types'
                 /**
                  * @return list<\GraphQL\Type\Definition\Type>
-                 */
-                => function () use ($unionDefinition): array {
+                 */ => function () use ($unionDefinition): array {
                     $types = [];
 
                     foreach ($unionDefinition->types as $type) {
