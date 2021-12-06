@@ -92,13 +92,14 @@ trait GeneratesColumnsEnum
             $allowedColumns
         );
 
-        $enumDefinition = "\"Allowed column names for the `{$argDefinition->name->value}` argument on field `{$parentField->name->value}` on type `{$parentType->name->value}`.\"\n"
-            . "enum $allowedColumnsEnumName {\n";
-        foreach ($enumValues as $enumValue) {
-            $enumDefinition .= "$enumValue\n";
-        }
-        $enumDefinition .= '}';
+        $enumValuesString = implode("\n", $enumValues);
 
-        return Parser::enumTypeDefinition($enumDefinition);
+        return Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+"Allowed column names for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
+enum $allowedColumnsEnumName {
+    {$enumValuesString}
+}
+GRAPHQL
+        );
     }
 }

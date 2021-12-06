@@ -85,9 +85,6 @@ class FederationPrinter
         $printDirectives = static function ($definition): string {
             /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
-            if (null === $astNode) {
-                return '';
-            }
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {
                 $federationDirectives = [];
@@ -103,6 +100,7 @@ class FederationPrinter
 
                 return SchemaPrinter::printDirectives($federationDirectives);
             }
+
             if ($astNode instanceof FieldDefinitionNode) {
                 $federationDirectives = [];
                 foreach ($astNode->directives as $directive) {

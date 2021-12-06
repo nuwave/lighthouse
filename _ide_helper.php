@@ -1,45 +1,5 @@
 <?php
 
-namespace Illuminate\Foundation\Testing {
-    class TestResponse
-    {
-        /**
-         * Assert that the returned result contains exactly the given validation keys.
-         *
-         * @param  array  $keys  the validation keys the result should have
-         *
-         * @return $this
-         */
-        public function assertGraphQLValidationKeys(array $keys): self
-        {
-            return $this;
-        }
-
-        /**
-         * Assert that a given validation error is present in the response.
-         *
-         * @param  string  $key  the validation key that should be present
-         * @param  string  $message  the expected validation message
-         *
-         * @return $this
-         */
-        public function assertGraphQLValidationError(string $key, string $message): self
-        {
-            return $this;
-        }
-
-        /**
-         * Assert that no validation errors are present in the response.
-         *
-         * @return $this
-         */
-        public function assertGraphQLValidationPasses(): self
-        {
-            return $this;
-        }
-    }
-}
-
 namespace Illuminate\Testing {
     class TestResponse
     {

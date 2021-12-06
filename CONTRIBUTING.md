@@ -235,8 +235,9 @@ function bar(){
 
 ## Code style
 
-We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
-at the Laravel coding style.
+We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer)
+
+    make fix
 
 Prefer explicit naming and short, focused functions over excessive comments.
 

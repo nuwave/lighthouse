@@ -52,6 +52,7 @@ module.exports = [
     title: "Digging Deeper",
     children: [
       "digging-deeper/schema-organisation",
+      "digging-deeper/ordering",
       "digging-deeper/relay",
       "digging-deeper/error-handling",
       "digging-deeper/adding-types-programmatically",

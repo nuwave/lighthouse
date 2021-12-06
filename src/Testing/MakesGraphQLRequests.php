@@ -118,7 +118,7 @@ trait MakesGraphQLRequests
     protected function introspect(): TestResponse
     {
         if (! isset($this->introspectionResult)) {
-            $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
+            return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
         }
 
         return $this->introspectionResult;
