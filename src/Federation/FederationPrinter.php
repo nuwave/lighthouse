@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\EnumValueDefinition;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectField;
+use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
@@ -83,7 +84,7 @@ class FederationPrinter
         ));
 
         $printDirectives = static function ($definition): string {
-            /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
+            /** @var (Type&NamedType)|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {

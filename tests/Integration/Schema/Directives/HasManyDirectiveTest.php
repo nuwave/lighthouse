@@ -2,8 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\NamedType;
+use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
@@ -779,9 +781,9 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessage('Found invalid pagination type: foo');
+        $this->expectExceptionObject(new DefinitionException('Found invalid pagination type: foo'));
 
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type: "foo")
         }
@@ -790,12 +792,6 @@ class HasManyDirectiveTest extends DBTestCase
             foo: String
         }
         ');
-
-        $type = $schema->getType('User');
-
-        $this->assertInstanceOf(Type::class, $type);
-        /** @var \GraphQL\Type\Definition\Type $type */
-        $type->config['fields']();
     }
 
     public function testQueryHasManyPaginatorBeforeQuery(): void

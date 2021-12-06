@@ -159,7 +159,7 @@ GRAPHQL;
             return;
         }
 
-        $qualifiedOrderByPrefix = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) ;
+        $qualifiedOrderByPrefix = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType);
 
         $allowedColumnsTypeName = $this->hasAllowedColumns()
             ? $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType)

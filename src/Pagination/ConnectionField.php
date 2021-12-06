@@ -48,8 +48,9 @@ class ConnectionField
         // We know those types because we manipulated them during PaginationManipulator
         /** @var \GraphQL\Type\Definition\NonNull $nonNullList */
         $nonNullList = $resolveInfo->returnType;
+
         /** @var \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $objectLikeType */
-        $objectLikeType = $nonNullList->getWrappedType(true);
+        $objectLikeType = $nonNullList->getInnermostType();
 
         $returnTypeFields = $objectLikeType->getFields();
 
