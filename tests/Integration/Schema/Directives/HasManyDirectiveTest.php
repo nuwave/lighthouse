@@ -2,8 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Type\Definition\NamedType;
-use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;

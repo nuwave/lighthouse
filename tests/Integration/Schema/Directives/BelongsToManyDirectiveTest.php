@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;

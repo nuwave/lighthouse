@@ -8,7 +8,6 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Utils\Utils;
 use Nuwave\Lighthouse\Events\ValidateSchema;
 use Nuwave\Lighthouse\Exceptions\FederationException;
@@ -74,7 +73,7 @@ class SchemaValidator
             }
 
             $fieldASTNode = $field->astNode;
-            if ($fieldASTNode === null) {
+            if (null === $fieldASTNode) {
                 throw new FederationException("Missing AST node for {$type->name}.{$field->name}.");
             }
 
