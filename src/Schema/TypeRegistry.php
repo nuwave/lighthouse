@@ -329,18 +329,18 @@ EOL
             'description' => $objectDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($objectDefinition),
             'interfaces'
-                /**
-                 * @return list<\GraphQL\Type\Definition\Type>
-                 */ => function () use ($objectDefinition): array {
-                    $interfaces = [];
+/**
+ * @return list<\GraphQL\Type\Definition\Type>
+ */ => function () use ($objectDefinition): array {
+    $interfaces = [];
 
-                    // Might be a NodeList, so we can not use array_map()
-                    foreach ($objectDefinition->interfaces as $interface) {
-                        $interfaces[] = $this->get($interface->name->value);
-                    }
+    // Might be a NodeList, so we can not use array_map()
+    foreach ($objectDefinition->interfaces as $interface) {
+        $interfaces[] = $this->get($interface->name->value);
+    }
 
-                    return $interfaces;
-                },
+    return $interfaces;
+},
             'astNode' => $objectDefinition,
         ]);
     }
@@ -381,11 +381,11 @@ EOL
             'name' => $inputDefinition->name->value,
             'description' => $inputDefinition->description->value ?? null,
             'fields'
-                /**
-                 * @return array<string, array<string, mixed>>
-                 */ => function () use ($inputDefinition): array {
-                    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-                },
+/**
+ * @return array<string, array<string, mixed>>
+ */ => function () use ($inputDefinition): array {
+    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+},
             'astNode' => $inputDefinition,
         ]);
     }
@@ -523,17 +523,17 @@ EOL
             'name' => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
             'types'
-                /**
-                 * @return list<\GraphQL\Type\Definition\Type>
-                 */ => function () use ($unionDefinition): array {
-                    $types = [];
+/**
+ * @return list<\GraphQL\Type\Definition\Type>
+ */ => function () use ($unionDefinition): array {
+    $types = [];
 
-                    foreach ($unionDefinition->types as $type) {
-                        $types[] = $this->get($type->name->value);
-                    }
+    foreach ($unionDefinition->types as $type) {
+        $types[] = $this->get($type->name->value);
+    }
 
-                    return $types;
-                },
+    return $types;
+},
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);

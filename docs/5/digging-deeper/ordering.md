@@ -57,10 +57,9 @@ You may pass more than one sorting option to add a secondary ordering.
 
 ```graphql
 {
-  posts(orderBy: [
-      { column: POSTED_AT, order: ASC }
-      { column: TITLE, order: DESC }
-  ]) {
+  posts(
+    orderBy: [{ column: POSTED_AT, order: ASC }, { column: TITLE, order: DESC }]
+  ) {
     title
   }
 }
@@ -96,14 +95,10 @@ You must specify which relations and which of their columns are allowed.
 
 ```graphql
 type Query {
-    users(
-        orderBy: _ @orderBy(relations: [
-            {
-                relation: "tasks"
-                columns: ["difficulty"]
-            }
-        ])
-    ): [User!]! @all
+  users(
+    orderBy: _
+      @orderBy(relations: [{ relation: "tasks", columns: ["difficulty"] }])
+  ): [User!]! @all
 }
 ```
 
@@ -111,18 +106,14 @@ Lighthouse will automatically generate the appropriate input types and enum valu
 
 ```graphql
 {
-    users(orderBy: [
-        {
-            tasks: { aggregate: COUNT }
-            order: ASC
-        }
-        {
-            tasks: { aggregate: MAX, column: DIFFICULTY }
-            order: DESC
-        }
-    ]) {
-        id
-    }
+  users(
+    orderBy: [
+      { tasks: { aggregate: COUNT }, order: ASC }
+      { tasks: { aggregate: MAX, column: DIFFICULTY }, order: DESC }
+    ]
+  ) {
+    id
+  }
 }
 ```
 

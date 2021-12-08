@@ -2,8 +2,9 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
-use Nuwave\Lighthouse\WhereConditions\WhereConditionsDirective;
+use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
@@ -721,7 +722,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertGraphQLErrorMessage(WhereConditionsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"));
+        ')->assertGraphQLErrorMessage(WhereConditionsHandler::invalidColumnName("Robert'); DROP TABLE Students;--"));
     }
 
     public function testQueriesEmptyStrings(): void
@@ -953,5 +954,61 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testHandler(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+        }
+    
+        type Query {
+            users(where: _ @whereConditions(
+                columns: ["name"],
+                handler: "{$this->qualifyTestResolver('handler')}")
+            ): [User!]! @all
+        }
+GRAPHQL;
+
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = factory(User::class)->make();
+        $user1->name = 'foo';
+        $user1->save();
+
+        /** @var \Tests\Utils\Models\User $user2 */
+        $user2 = factory(User::class)->make();
+        $user2->name = 'foofoo';
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    column: NAME,
+                    value: "foo"
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "$user2->id",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $conditions
+     */
+    public function handler(Builder $builder, array $conditions): void
+    {
+        $value = $conditions['value'];
+        $builder->where($conditions['column'], $value . $value);
     }
 }
