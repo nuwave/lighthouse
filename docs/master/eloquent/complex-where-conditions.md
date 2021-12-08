@@ -33,19 +33,32 @@ with advanced filter capabilities.
 Add a dynamically client-controlled WHERE condition to a fields query.
 """
 directive @whereConditions(
-  """
-  Restrict the allowed column names to a well-defined list.
-  This improves introspection capabilities and security.
-  Mutually exclusive with the `columnsEnum` argument.
-  """
-  columns: [String!]
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    Mutually exclusive with the `columnsEnum` argument.
+    """
+    columns: [String!]
 
-  """
-  Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
-  Mutually exclusive with the `columns` argument.
-  """
-  columnsEnum: String
+    """
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
+    This allowes you to re-use the same enum for multiple fields.
+    Mutually exclusive with the `columns` argument.
+    """
+    columnsEnum: String
+
+    """
+    Reference a method that applies the client given conditions to the query builder.
+
+    Expected signature: `(
+        \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
+        array<string, mixed> $whereConditions
+    ): void`
+
+    Consists of two parts: a class name and a method name, separated by an `@` symbol.
+    If you pass only a class name, the method name defaults to `__invoke`.
+    """
+    handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
 ) on ARGUMENT_DEFINITION
 ```
 
@@ -326,8 +339,8 @@ This query would retrieve all persons, no matter if they have a role or not:
 ## Custom operator
 
 If Lighthouse's default `SQLOperator` does not fit your use case, you can register a custom operator class.
-This may be necessary if your database uses different SQL operators then Lighthouse's default or you
-want to extend/restrict the allowed operators.
+This may be necessary if your database uses different SQL operators then Lighthouse's default,
+or you want to extend/restrict the allowed operators.
 
 First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`. For example:
 
@@ -377,4 +390,37 @@ Make sure to add it after Lighthouse's `\Nuwave\Lighthouse\WhereConditions\Where
      */
 +   \App\GraphQL\GraphQLServiceProvider::class,
 ],
+```
+
+## Custom handler
+
+If you want to take advantage of the schema generation that [@whereConditions](#whereconditions)
+and [@whereHasConditions](#wherehasconditions) provide, but customize the application of arguments
+to the query builder, you can provide a custom handler.
+
+
+```graphql
+type Query {
+  people(
+    where: _ @whereConditions(columns: ["age"], handler: "App\\MyCustomHandler")
+  ): [Person!]! @all
+}
+```
+
+When a client passes `where`, your handler will be called with the query builder and
+the passed conditions:
+
+```php
+namespace App;
+
+class MyCustomHandler {
+    /**
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  array<string, mixed>  $whereConditions
+     */
+    public function __invoke($builder, array $whereConditions): void
+    {
+        // TODO make calls to $builder depending on $whereConditions
+    }
+}
 ```

@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.29.0
+
+### Added
+
+- Add ability to provide custom handler for `@whereConditions` and `@whereHasConditions`
+
 ## v5.28.1
 
 ### Added
