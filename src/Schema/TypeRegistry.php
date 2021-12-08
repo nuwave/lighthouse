@@ -332,15 +332,15 @@ EOL
 /**
  * @return list<\GraphQL\Type\Definition\Type>
  */ => function () use ($objectDefinition): array {
-                    $interfaces = [];
+    $interfaces = [];
 
-                    // Might be a NodeList, so we can not use array_map()
-                    foreach ($objectDefinition->interfaces as $interface) {
-                        $interfaces[] = $this->get($interface->name->value);
-                    }
+    // Might be a NodeList, so we can not use array_map()
+    foreach ($objectDefinition->interfaces as $interface) {
+        $interfaces[] = $this->get($interface->name->value);
+    }
 
-                    return $interfaces;
-                },
+    return $interfaces;
+},
             'astNode' => $objectDefinition,
         ]);
     }
@@ -384,8 +384,8 @@ EOL
 /**
  * @return array<string, array<string, mixed>>
  */ => function () use ($inputDefinition): array {
-                    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-                },
+    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+},
             'astNode' => $inputDefinition,
         ]);
     }
@@ -526,14 +526,14 @@ EOL
 /**
  * @return list<\GraphQL\Type\Definition\Type>
  */ => function () use ($unionDefinition): array {
-                    $types = [];
+    $types = [];
 
-                    foreach ($unionDefinition->types as $type) {
-                        $types[] = $this->get($type->name->value);
-                    }
+    foreach ($unionDefinition->types as $type) {
+        $types[] = $this->get($type->name->value);
+    }
 
-                    return $types;
-                },
+    return $types;
+},
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);
