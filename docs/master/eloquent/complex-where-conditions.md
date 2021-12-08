@@ -33,32 +33,32 @@ with advanced filter capabilities.
 Add a dynamically client-controlled WHERE condition to a fields query.
 """
 directive @whereConditions(
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
-    """
-    columns: [String!]
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with the `columnsEnum` argument.
+  """
+  columns: [String!]
 
-    """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
-    """
-    columnsEnum: String
+  """
+  Use an existing enumeration type to restrict the allowed columns to a predefined list.
+  This allowes you to re-use the same enum for multiple fields.
+  Mutually exclusive with the `columns` argument.
+  """
+  columnsEnum: String
 
-    """
-    Reference a method that applies the client given conditions to the query builder.
+  """
+  Reference a method that applies the client given conditions to the query builder.
 
-    Expected signature: `(
-        \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
-        array<string, mixed> $whereConditions
-    ): void`
+  Expected signature: `(
+      \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
+      array<string, mixed> $whereConditions
+  ): void`
 
-    Consists of two parts: a class name and a method name, separated by an `@` symbol.
-    If you pass only a class name, the method name defaults to `__invoke`.
-    """
-    handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
+  Consists of two parts: a class name and a method name, separated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
 ) on ARGUMENT_DEFINITION
 ```
 
@@ -397,7 +397,6 @@ Make sure to add it after Lighthouse's `\Nuwave\Lighthouse\WhereConditions\Where
 If you want to take advantage of the schema generation that [@whereConditions](#whereconditions)
 and [@whereHasConditions](#wherehasconditions) provide, but customize the application of arguments
 to the query builder, you can provide a custom handler.
-
 
 ```graphql
 type Query {
