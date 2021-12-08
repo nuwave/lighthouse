@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add ability to provide custom handler for `@whereConditions` and `@whereHasConditions`
+- Add ability to provide custom handler for `@whereConditions` and `@whereHasConditions` https://github.com/nuwave/lighthouse/pull/2001/´
 
 ## v5.28.1
 
