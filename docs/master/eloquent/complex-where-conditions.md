@@ -430,7 +430,7 @@ class MyCustomHandler {
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string, mixed>  $whereConditions
      */
-    public function __invoke($builder, array $whereConditions): void
+    public function __invoke(object $builder, array $whereConditions): void
     {
         // TODO make calls to $builder depending on $whereConditions
     }
