@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.28.1
+
+### Added
+
+- Improve error message when calling `TestResponse::assertGraphQLErrorMessage()` on successful response
+
 ## v5.28.0
 
 ### Added

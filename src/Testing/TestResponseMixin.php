@@ -62,6 +62,8 @@ class TestResponseMixin
     {
         return function (string $message) {
             $messages = $this->json('errors.*.message');
+
+            Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
             Assert::assertContains(
                 $message,
                 $messages,
