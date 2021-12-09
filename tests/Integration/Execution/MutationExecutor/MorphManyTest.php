@@ -530,4 +530,54 @@ GRAPHQL
 
         $this->assertNull($image->refresh()->imageable);
     }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testDisconnectModelEventsMorphMany(string $action): void
+    {
+        /** @var \Tests\Utils\Models\Task $task */
+        $task = factory(Task::class)->create();
+
+        /** @var \Tests\Utils\Models\Image $image */
+        $image = factory(Image::class)->make();
+        $task->images()->save($image);
+
+        $actionInputName = ucfirst($action);
+
+        Image::saving(function () {
+            return false;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ "
+            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
+                ${action}Task(input: \$input) {
+                    id
+                    images {
+                        url
+                    }
+                }
+            }
+        ", [
+            'input' => [
+                'id' => $task->id,
+                'images' => [
+                    'disconnect' => [
+                        $image->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'images' => [
+                        [
+                            'url' => $image->url,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
