@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Mixin method `assertGraphQLErrorFree()` to `\Illuminate\Testing\TestResponse`
+
+### Fixed
+
+- Add missing types to `programmatic-types.graphql` in artisan command `lighthouse:ide-helper`
+
 ## v5.29.0
 
 ### Added
