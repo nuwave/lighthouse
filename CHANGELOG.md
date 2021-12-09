@@ -18,6 +18,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add missing types to `programmatic-types.graphql` in artisan command `lighthouse:ide-helper`
 
+## v5.29.0
+
+### Added
+
+- Add ability to provide custom handler for `@whereConditions` and `@whereHasConditions` https://github.com/nuwave/lighthouse/pull/2001
+
+## v5.28.1
+
+### Added
+
+- Improve error message when calling `TestResponse::assertGraphQLErrorMessage()` on successful response
+
 ## v5.28.0
 
 ### Added

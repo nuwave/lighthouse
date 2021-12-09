@@ -523,17 +523,17 @@ EOL
             'name' => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
             'types'
-                /**
-                 * @return list<\GraphQL\Type\Definition\Type>
-                 */ => function () use ($unionDefinition): array {
-                    $types = [];
+/**
+ * @return list<\GraphQL\Type\Definition\Type>
+ */ => function () use ($unionDefinition): array {
+    $types = [];
 
-                    foreach ($unionDefinition->types as $type) {
-                        $types[] = $this->get($type->name->value);
-                    }
+    foreach ($unionDefinition->types as $type) {
+        $types[] = $this->get($type->name->value);
+    }
 
-                    return $types;
-                },
+    return $types;
+},
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);
