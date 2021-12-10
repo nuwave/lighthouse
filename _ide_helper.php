@@ -18,7 +18,7 @@ namespace Illuminate\Foundation\Testing {
         /**
          * Assert that the returned result contains exactly the given validation keys.
          *
-         * @param  array  $keys  the validation keys the result should have
+         * @param  array<string>  $keys  the validation keys the result should have
          *
          * @return $this
          */
