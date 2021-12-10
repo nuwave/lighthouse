@@ -56,6 +56,18 @@ namespace Illuminate\Testing {
     class TestResponse
     {
         /**
+         * Assert the response contains an error with a matching message.
+         *
+         * @param  \Throwable  $error  the expected error
+         *
+         * @return $this
+         */
+        public function assertGraphQLError(\Throwable $error): self
+        {
+            return $this;
+        }
+
+        /**
          * Assert the response contains an error with the given message.
          *
          * @param  string  $message  the expected error message
