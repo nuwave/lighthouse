@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.31.0
+
+### Added
+
+- Add method `assertGraphQLError()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/2005
+
 ## v5.30.0
 
 ### Added

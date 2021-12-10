@@ -43,7 +43,7 @@ class MakesGraphQLRequestsTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage($error->getMessage());
+        ')->assertGraphQLError($error);
 
         $this->rethrowGraphQLErrors();
 

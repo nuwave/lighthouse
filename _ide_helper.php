@@ -18,7 +18,7 @@ namespace Illuminate\Foundation\Testing {
         /**
          * Assert that the returned result contains exactly the given validation keys.
          *
-         * @param  array  $keys  the validation keys the result should have
+         * @param  array<string>  $keys  the validation keys the result should have
          *
          * @return $this
          */
@@ -55,6 +55,18 @@ namespace Illuminate\Foundation\Testing {
 namespace Illuminate\Testing {
     class TestResponse
     {
+        /**
+         * Assert the response contains an error with a matching message.
+         *
+         * @param  \Throwable  $error  the expected error
+         *
+         * @return $this
+         */
+        public function assertGraphQLError(\Throwable $error): self
+        {
+            return $this;
+        }
+
         /**
          * Assert the response contains an error with the given message.
          *
