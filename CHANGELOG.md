@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add method `assertGraphQLError()` to `TestResponse` mixin
+- Add method `assertGraphQLError()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/2005
 
 ## v5.30.0
 
