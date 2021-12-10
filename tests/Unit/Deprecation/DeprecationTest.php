@@ -31,8 +31,8 @@ class DeprecationTest extends TestCase
         }
         ')->assertExactJson([
             'data' => [
-                'foo' => Foo::THE_ANSWER
-            ]
+                'foo' => Foo::THE_ANSWER,
+            ],
         ]);
     }
 
@@ -55,8 +55,8 @@ class DeprecationTest extends TestCase
         }
         ')->assertExactJson([
             'data' => [
-                'foo' => Foo::THE_ANSWER
-            ]
+                'foo' => Foo::THE_ANSWER,
+            ],
         ]);
     }
 }

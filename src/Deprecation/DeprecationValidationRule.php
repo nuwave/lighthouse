@@ -41,7 +41,7 @@ class DeprecationValidationRule extends ValidationRule
                 }
 
                 $value = $enum->getValue($node->value);
-                if ($value === null) {
+                if (null === $value) {
                     return;
                 }
 
@@ -52,8 +52,8 @@ class DeprecationValidationRule extends ValidationRule
             NodeKind::OPERATION_DEFINITION => [
                 'leave' => function () {
                     dump($this->deprecations);
-                }
-            ]
+                },
+            ],
         ];
     }
 }
