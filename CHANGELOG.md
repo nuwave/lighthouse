@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.31.1
+
+### Fixed
+
+- Ensure `_ide_helper.php` works as PHPStan stub file https://github.com/nuwave/lighthouse/pull/2006
+
 ## v5.31.0
 
 ### Added
