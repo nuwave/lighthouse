@@ -9,11 +9,9 @@
     <a href="https://www.worksome.com">
       <img src="./worksome.svg" alt="Worksome" title="Worksome - The Home for Your Freelance Workforce">
     </a>
-
     <a href="https://nightlands.app">
       <img src="./nightlands.png" alt="Nightlands" title="Nightlands - A massive mobile online strategy adventure">
     </a>
-
     <a href="https://arborxr.com">
       <img src="./arborxr.svg" alt="ArborXR" title="ArborXR - Discover a Better Way to Manage AR and VR Devices">
     </a>
