@@ -51,8 +51,8 @@ node: up ## Open an interactive shell into the Node container
 	docker-compose exec node bash
 
 .PHONY: release
-release: up ## Prepare the docs for a new release
-	docker-compose exec node yarn run release
+release: ## Prepare the docs for a new release
+	rm -rf docs/5 && cp -r docs/master docs/5
 
 .PHONY: docs
 docs: up ## Render the docs in a development server

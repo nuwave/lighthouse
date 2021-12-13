@@ -20,6 +20,40 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 
+## v5.31.1
+
+### Fixed
+
+- Ensure `_ide_helper.php` works as PHPStan stub file https://github.com/nuwave/lighthouse/pull/2006
+
+## v5.31.0
+
+### Added
+
+- Add method `assertGraphQLError()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/2005
+
+## v5.30.0
+
+### Added
+
+- Mixin method `assertGraphQLErrorFree()` to `\Illuminate\Testing\TestResponse`
+
+### Fixed
+
+- Add missing types to `programmatic-types.graphql` in artisan command `lighthouse:ide-helper`
+
+## v5.29.0
+
+### Added
+
+- Add ability to provide custom handler for `@whereConditions` and `@whereHasConditions` https://github.com/nuwave/lighthouse/pull/2001
+
+## v5.28.1
+
+### Added
+
+- Improve error message when calling `TestResponse::assertGraphQLErrorMessage()` on successful response
+
 ## v5.28.0
 
 ### Added
