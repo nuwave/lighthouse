@@ -34,7 +34,6 @@ trait RelationDirectiveHelpers
     {
         return function (object $builder) use ($resolveInfo): void {
             /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder */
-
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
