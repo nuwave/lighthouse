@@ -104,7 +104,7 @@ namespace Illuminate\Testing {
         /**
          * Assert the returned result contains exactly the given validation keys.
          *
-         * @param  array  $keys  the validation keys the result should have
+         * @param  array<string>  $keys  the validation keys the result should have
          *
          * @return $this
          */
@@ -139,13 +139,10 @@ namespace Illuminate\Testing {
 }
 
 namespace GraphQL\Type\Definition {
+    /**
+     * @property \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $argumentSet We monkey patch this onto here to pass it down the resolver chain.
+     */
     class ResolveInfo
     {
-        /**
-         * We monkey patch this onto here to pass it down the resolver chain.
-         *
-         * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-         */
-        public $argumentSet;
     }
 }

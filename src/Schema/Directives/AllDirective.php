@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -44,6 +44,7 @@ GRAPHQL;
                 if ($this->directiveHasArgument('builder')) {
                     $builderResolver = $this->getResolverFromArgument('builder');
 
+                    /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
                     $query = $builderResolver($root, $args, $context, $resolveInfo);
                 } else {
                     $query = $this->getModelClass()::query();
@@ -53,7 +54,7 @@ GRAPHQL;
                     ->argumentSet
                     ->enhanceBuilder(
                         $query,
-                        $this->directiveArgValue('scopes', [])
+                        $this->directiveArgValue('scopes') ?? []
                     )
                     ->get();
             }

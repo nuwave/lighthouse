@@ -28,11 +28,13 @@ trait RelationDirectiveHelpers
     }
 
     /**
-     * @return \Closure(object): void
+     * @return \Closure(\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation): void
      */
     protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
     {
-        return function (object $builder) use ($resolveInfo) {
+        return function (object $builder) use ($resolveInfo): void {
+            /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder */
+
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }

@@ -1,6 +1,6 @@
 # Testing with PHPUnit
 
-Lighthouse makes it easy to add automated tests through PHPUnit.
+Lighthouse makes it easy to add automated tests through [PHPUnit](https://phpunit.de).
 
 ## Setup
 
