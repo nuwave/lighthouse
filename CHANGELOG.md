@@ -9,6 +9,28 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.31.1
+
+### Fixed
+
+- Ensure `_ide_helper.php` works as PHPStan stub file https://github.com/nuwave/lighthouse/pull/2006
+
+## v5.31.0
+
+### Added
+
+- Add method `assertGraphQLError()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/2005
+
+## v5.30.0
+
+### Added
+
+- Mixin method `assertGraphQLErrorFree()` to `\Illuminate\Testing\TestResponse`
+
+### Fixed
+
+- Add missing types to `programmatic-types.graphql` in artisan command `lighthouse:ide-helper`
+
 ## v5.29.0
 
 ### Added

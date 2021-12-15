@@ -190,7 +190,7 @@ EOL
     /**
      * Get the types that are currently resolved.
      *
-     * Note that this does not all possible types, only those that
+     * This does not return all possible types, only those that
      * are programmatically registered or already resolved.
      *
      * @return array<string, \GraphQL\Type\Definition\Type>

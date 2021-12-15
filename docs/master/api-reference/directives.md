@@ -3108,6 +3108,7 @@ directive @where(
 
   """
   Use Laravel's where clauses upon the query builder.
+  This only works for clauses with the signature (string $column, string $operator, mixed $value).
   """
   clause: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION

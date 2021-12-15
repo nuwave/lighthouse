@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
 use PHPUnit\Framework\Assert;
+use Throwable;
 
 /**
  * @mixin \Illuminate\Testing\TestResponse
@@ -58,6 +59,13 @@ class TestResponseMixin
         };
     }
 
+    public function assertGraphQLError(): Closure
+    {
+        return function (Throwable $error) {
+            return $this->assertGraphQLErrorMessage($error->getMessage());
+        };
+    }
+
     public function assertGraphQLErrorMessage(): Closure
     {
         return function (string $message) {
@@ -68,6 +76,19 @@ class TestResponseMixin
                 $message,
                 $messages,
                 "Expected the GraphQL response to contain error message `{$message}`, got: " . \Safe\json_encode($messages)
+            );
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLErrorFree(): Closure
+    {
+        return function () {
+            $errors = $this->json('errors');
+            Assert::assertNull(
+                $errors,
+                'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors)
             );
 
             return $this;
