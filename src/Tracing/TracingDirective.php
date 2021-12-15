@@ -41,9 +41,9 @@ GRAPHQL;
         $previousResolver = $fieldValue->getResolver();
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-            $start = $this->tracing->getTime();
+            $start = $this->tracing->timestamp();
             $result = $previousResolver($root, $args, $context, $resolveInfo);
-            $end = $this->tracing->getTime();
+            $end = $this->tracing->timestamp();
 
             Resolved::handle($result, function () use ($resolveInfo, $start, $end): void {
                 $this->tracing->record($resolveInfo, $start, $end);
