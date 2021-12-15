@@ -369,9 +369,10 @@ GRAPHQL
      */
     public function testUpdateHasMany(string $action): void
     {
-        factory(User::class)
-            ->create()
-            ->tasks()
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        $user->tasks()
             ->save(
                 factory(Task::class)->create()
             );
@@ -400,7 +401,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
-                    'id' => '1',
+                    'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -418,9 +419,10 @@ GRAPHQL
      */
     public function testUpsertHasMany(string $action): void
     {
-        factory(User::class)
-            ->create()
-            ->tasks()
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        $user->tasks()
             ->save(
                 factory(Task::class)->create()
             );
@@ -449,7 +451,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
-                    'id' => '1',
+                    'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -467,9 +469,10 @@ GRAPHQL
      */
     public function testDeleteHasMany(string $action): void
     {
-        factory(User::class)
-            ->create()
-            ->tasks()
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        $user->tasks()
             ->save(
                 factory(Task::class)->create()
             );
@@ -495,7 +498,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
-                    'id' => '1',
+                    'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [],
                 ],
@@ -508,14 +511,16 @@ GRAPHQL
      */
     public function testConnectHasMany(string $action): void
     {
+        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+
         $task1 = factory(Task::class)->create();
         $task2 = factory(Task::class)->create();
 
         $actionInputName = ucfirst($action);
 
         $this->graphQL(/** @lang GraphQL */ "
-            mutation ${action}User(\$input: {$actionInputName}UserInput!){
+            mutation (\$input: {$actionInputName}UserInput!) {
                 ${action}User(input: \$input) {
                     id
                     name
@@ -541,15 +546,15 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "${action}User" => [
-                    'id' => '1',
+                    'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => (string) $task1->id,
+                            'id' => "$task1->id",
                             'name' => $task1->name,
                         ],
                         [
-                            'id' => (string) $task2->id,
+                            'id' => "$task2->id",
                             'name' => $task2->name,
                         ],
                     ],
@@ -578,7 +583,7 @@ GRAPHQL
         $actionInputName = ucfirst($action);
 
         $this->graphQL(/** @lang GraphQL */ "
-            mutation ${action}User(\$input: {$actionInputName}UserInput!){
+            mutation (\$input: {$actionInputName}UserInput!) {
                 ${action}User(input: \$input) {
                     id
                     name
@@ -601,11 +606,11 @@ GRAPHQL
         ])->assertJson([
             'data' => [
                 "${action}User" => [
-                    'id' => '1',
+                    'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => (string) $taskKeep->id,
+                            'id' => "$taskKeep->id",
                             'name' => $taskKeep->name,
                         ],
                     ],

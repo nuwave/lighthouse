@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.31.2
+
+### Fixed
+
+- Trigger model events on nested mutation disconnect of one to many relationships https://github.com/nuwave/lighthouse/pull/2008
+
 ## v5.31.1
 
 ### Fixed
