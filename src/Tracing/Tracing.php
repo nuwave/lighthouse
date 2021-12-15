@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 
 /**
- * See https://github.com/apollographql/apollo-tracing#response-format
+ * See https://github.com/apollographql/apollo-tracing#response-format.
  */
 class Tracing
 {
