@@ -43,7 +43,7 @@ class TracingExtensionTest extends TestCase
     public function testAddTracingExtensionMetaToBatchedResults(): void
     {
         $postData = [
-            'query' => /** @lang GraphQL */'
+            'query' => /** @lang GraphQL */ '
                 {
                     foo
                 }
