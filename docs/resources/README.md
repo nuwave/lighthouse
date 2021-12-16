@@ -18,6 +18,7 @@
 ## Example Projects
 
 - [nuwave/lighthouse-example](https://github.com/nuwave/lighthouse-example)
+- [aleksandertabor/flashcards](https://github.com/aleksandertabor/flashcards)
 
 ## Recommended Packages
 
