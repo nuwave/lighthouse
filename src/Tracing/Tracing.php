@@ -123,6 +123,6 @@ class Tracing
 
     protected function formatTimestamp(Carbon $timestamp): string
     {
-        return$timestamp->format(Carbon::RFC3339_EXTENDED);
+        return $timestamp->format(Carbon::RFC3339_EXTENDED);
     }
 }
