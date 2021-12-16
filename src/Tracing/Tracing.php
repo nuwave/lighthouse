@@ -14,13 +14,20 @@ use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 class Tracing
 {
     /**
+     * The point in time when the request was initially started.
+     *
+     * @var \Illuminate\Support\Carbon
+     */
+    protected $executionStartAbsolute;
+
+    /**
      * The precise point in time when the request was initially started.
      *
      * This is either in seconds with microsecond precision (float) or nanoseconds (int).
      *
      * @var float|int
      */
-    protected $executionStart;
+    protected $executionStartPrecise;
 
     /**
      * Trace entries for a single query execution.
@@ -31,21 +38,23 @@ class Tracing
 
     public function handleStartExecution(StartExecution $startExecution): void
     {
-        $this->executionStart = $this->timestamp();
+        $this->executionStartAbsolute = Carbon::now();
+        $this->executionStartPrecise = $this->timestamp();
         $this->resolverTraces = [];
     }
 
     public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ExtensionsResponse
     {
-        $requestEnd = $this->timestamp();
+        $requestEndAbsolute = Carbon::now();
+        $requestEndPrecise = $this->timestamp();
 
         return new ExtensionsResponse(
             'tracing',
             [
                 'version' => 1,
-                'startTime' => $this->formatTimestamp($this->executionStart),
-                'endTime' => $this->formatTimestamp($requestEnd),
-                'duration' => $this->diffTimeInNanoseconds($this->executionStart, $requestEnd),
+                'startTime' => $this->formatTimestamp($this->executionStartAbsolute),
+                'endTime' => $this->formatTimestamp($requestEndAbsolute),
+                'duration' => $this->diffTimeInNanoseconds($this->executionStartPrecise, $requestEndPrecise),
                 'execution' => [
                     'resolvers' => $this->resolverTraces,
                 ],
@@ -66,7 +75,7 @@ class Tracing
             'parentType' => $resolveInfo->parentType->name,
             'fieldName' => $resolveInfo->fieldName,
             'returnType' => $resolveInfo->returnType->toString(),
-            'startOffset' => $this->diffTimeInNanoseconds($this->executionStart, $start),
+            'startOffset' => $this->diffTimeInNanoseconds($this->executionStartPrecise, $start),
             'duration' => $this->diffTimeInNanoseconds($start, $end),
         ];
     }
@@ -112,12 +121,8 @@ class Tracing
         return function_exists('hrtime');
     }
 
-    /**
-     * @param  float|int  $timestamp
-     */
-    protected function formatTimestamp($timestamp): string
+    protected function formatTimestamp(Carbon $timestamp): string
     {
-        return Carbon::createFromTimestamp($timestamp)
-            ->format(Carbon::RFC3339_EXTENDED);
+        return$timestamp->format(Carbon::RFC3339_EXTENDED);
     }
 }
