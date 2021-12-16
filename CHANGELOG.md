@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.31.3
+
+### Fixed
+
+- Use `StartExecution` event to determine per-operation Tracing timestamps https://github.com/nuwave/lighthouse/pull/2009
+
 ## v5.31.2
 
 ### Fixed
