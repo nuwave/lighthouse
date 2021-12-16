@@ -76,8 +76,13 @@ class TracingExtensionTest extends TestCase
         $startTime2 = $result->json('1.extensions.tracing.startTime');
         $endTime2 = $result->json('1.extensions.tracing.endTime');
 
+        // Guaranteed by the usleep() in $this->resolve()
         $this->assertGreaterThan($startTime1, $endTime1);
-        $this->assertGreaterThan($endTime1, $startTime2);
+
+        // Might be the same timestamp if Lighthouse runs quickly in a given environment
+        $this->assertGreaterThanOrEqual($endTime1, $startTime2);
+
+        // Guaranteed by the usleep() in $this->resolve()
         $this->assertGreaterThan($startTime2, $endTime2);
 
         $this->assertCount(1, $result->json('0.extensions.tracing.execution.resolvers'));
@@ -86,7 +91,8 @@ class TracingExtensionTest extends TestCase
 
     public function resolve(): string
     {
-        usleep(20000); // 20 milliseconds
+        // Just enough to consistently change the resulting timestamp
+        usleep(1000);
 
         return 'bar';
     }
