@@ -27,13 +27,11 @@ class TracingServiceProvider extends ServiceProvider
             }
         );
 
+        $tracingDirective = Parser::constDirective('@tracing');
         $eventsDispatcher->listen(
             ManipulateAST::class,
-            static function (ManipulateAST $manipulateAST): void {
-                ASTHelper::attachDirectiveToObjectTypeFields(
-                    $manipulateAST->documentAST,
-                    Parser::constDirective('@tracing')
-                );
+            static function (ManipulateAST $manipulateAST) use ($tracingDirective): void {
+                ASTHelper::attachDirectiveToObjectTypeFields($manipulateAST->documentAST, $tracingDirective);
             }
         );
 
