@@ -48,7 +48,7 @@ class LazyLoadDirectiveTest extends DBTestCase
 
         type Task {
             id: ID!
-            user: User!
+            userLoaded: Boolean! @method
         }
 
         type Query {
@@ -59,15 +59,29 @@ class LazyLoadDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                tasks(first: 3) {
+                tasks(first: 1) {
                     edges {
                         node {
-                            id
+                            userLoaded
                         }
                     }
                 }
             }
         }
-        ');
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'userLoaded' => true,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

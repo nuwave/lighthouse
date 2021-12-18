@@ -103,4 +103,9 @@ class Task extends Model
             $query->whereIn('name', $tags);
         });
     }
+
+    public function userLoaded(): bool
+    {
+        return $this->relationLoaded('user');
+    }
 }
