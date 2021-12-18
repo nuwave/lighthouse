@@ -197,7 +197,7 @@ class SchemaBuilderTest extends TestCase
 
         /** @var \GraphQL\Type\Definition\ObjectType $objectType */
         $objectType = $schema->getType('Foo');
-        $fields = $objectType->config['fields']();
+        $fields = $objectType->getFields();
 
         $this->assertArrayHasKey('baz', $fields);
     }

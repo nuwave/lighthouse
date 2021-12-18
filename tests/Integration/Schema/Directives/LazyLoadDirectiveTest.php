@@ -36,7 +36,8 @@ class LazyLoadDirectiveTest extends DBTestCase
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
 
-        $user->tasks()->saveMany(factory(Task::class, 3)->make());
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
 
         $this->schema = /** @lang GraphQL */ '
         type User {

@@ -160,7 +160,7 @@ class TypeRegistryTest extends TestCase
 
         $this->assertInstanceOf(UnionType::class, $unionType);
         $this->assertSame('Foo', $unionType->name);
-        $this->assertInstanceOf(Closure::class, $unionType->config['resolveType']);
+        $this->assertInstanceOf(Closure::class, $unionType->config['resolveType'] ?? null);
     }
 
     public function testTransformObjectTypes(): void
@@ -204,14 +204,20 @@ class TypeRegistryTest extends TestCase
         $fooName = 'Foo';
         $this->assertFalse($this->typeRegistry->has($fooName));
 
-        $foo = new ObjectType(['name' => $fooName]);
+        $foo = new ObjectType([
+            'name' => $fooName,
+            'fields' => [],
+        ]);
         $this->typeRegistry->register($foo);
         $this->assertTrue($this->typeRegistry->has($fooName));
     }
 
     public function testThrowsWhenRegisteringExistingType(): void
     {
-        $foo = new ObjectType(['name' => 'Foo']);
+        $foo = new ObjectType([
+            'name' => 'Foo',
+            'fields' => [],
+        ]);
         $this->typeRegistry->register($foo);
 
         $this->expectException(DefinitionException::class);
