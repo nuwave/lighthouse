@@ -199,6 +199,11 @@ class TypeRegistryTest extends TestCase
         $this->typeRegistry->get('ThisTypeDoesNotExist');
     }
 
+    public function testSearchReturnsNullWhenMissingType(): void
+    {
+        $this->assertNull($this->typeRegistry->search('ThisTypeDoesNotExist'));
+    }
+
     public function testDeterminesIfHasType(): void
     {
         $fooName = 'Foo';

@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Return proper error for unknown types in variable definitions
+
+### Added
+
+- Add method `TypeRegistry::search()` that maybe finds a type with a given name
+
 ### Removed
 
 - Remove mixin `TestResponse::assertGraphQLErrorCategory()`

@@ -67,7 +67,10 @@ class TypeRegistry
     /**
      * Map from type names to resolved types.
      *
-     * @var array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
+     * May contain `null` if the type is known to not exist, this allows
+     * short-circuiting repeated lookups for the same type.
+     *
+     * @var array<string, (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null>
      */
     protected $types = [];
 
@@ -101,21 +104,37 @@ class TypeRegistry
     /**
      * Get the given GraphQL type by name.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException if the type is not found or invalid
      *
-     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)
      */
     public function get(string $name): Type
     {
-        if (! $this->has($name)) {
+        $type = $this->search($name);
+
+        if (null === $type) {
             throw new DefinitionException(
                 <<<EOL
-Lighthouse failed while trying to load a type: $name
+Lighthouse failed while trying to load type {$name}.
 
 Make sure the type is present in your schema definition.
 
 EOL
             );
+        }
+
+        return $type;
+    }
+
+    /**
+     * Search the given GraphQL type by name.
+     *
+     * @return (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null
+     */
+    public function search(string $name): ?Type
+    {
+        if (! array_key_exists($name, $this->types)) {
+            return $this->types[$name] = $this->fromAST($name);
         }
 
         return $this->types[$name];
@@ -126,8 +145,7 @@ EOL
      */
     public function has(string $name): bool
     {
-        return isset($this->types[$name])
-            || $this->fromAST($name) instanceof Type;
+        return $this->search($name) instanceof Type;
     }
 
     /**
@@ -191,7 +209,7 @@ EOL
             }
         }
 
-        return $this->types;
+        return array_filter($this->types);
     }
 
     /**
@@ -204,7 +222,7 @@ EOL
      */
     public function resolvedTypes(): array
     {
-        return $this->types;
+        return array_filter($this->types);
     }
 
     /**
