@@ -40,7 +40,7 @@
         "illuminate/validation": "^8",
         "laragraph/utils": "dev-graphql-php-15",
         "thecodingmachine/safe": "^1",
-        "webonyx/graphql-php": "dev-type-loader-null as dev-master"
+        "webonyx/graphql-php": "dev-master"
     },
     "require-dev": {
         "bensampo/laravel-enum": "^3 || ^4",
