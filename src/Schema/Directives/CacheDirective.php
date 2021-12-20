@@ -60,8 +60,12 @@ GRAPHQL;
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
+                $rootID = $root !== null && $rootCacheKey !== null
+                    ? data_get($root, $rootCacheKey)
+                    : null;
+
                 $cacheKeyAndTags = new CacheKeyAndTags(
-                    data_get($root, $rootCacheKey),
+                    $rootID,
                     $args,
                     $context,
                     $resolveInfo,
