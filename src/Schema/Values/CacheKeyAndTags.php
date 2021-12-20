@@ -85,7 +85,7 @@ class CacheKeyAndTags
             'graphql',
             $this->resolveInfo->parentType->name,
             $this->rootID,
-            $this->resolveInfo->fieldName
+            $this->resolveInfo->fieldName,
         ]);
 
         return [$parentTag, $fieldTag];
