@@ -26,6 +26,9 @@ class CacheKeyAndTags
     /** @var bool */
     protected $isPrivate;
 
+    /**
+     * @var mixed The key to use for caching this field.
+     */
     protected $fieldKey;
 
     /**
@@ -55,17 +58,17 @@ class CacheKeyAndTags
         $parts = [];
 
         $user = $this->context->user();
-        if ($this->isPrivate && $user !== null) {
-            $parts [] = 'auth';
-            $parts [] = $user->getAuthIdentifier();
+        if ($this->isPrivate && null !== $user) {
+            $parts[] = 'auth';
+            $parts[] = $user->getAuthIdentifier();
         }
 
-        $parts [] = strtolower($this->resolveInfo->parentType->name);
-        $parts [] = $this->fieldKey;
-        $parts [] = strtolower($this->resolveInfo->fieldName);
+        $parts[] = strtolower($this->resolveInfo->parentType->name);
+        $parts[] = $this->fieldKey;
+        $parts[] = strtolower($this->resolveInfo->fieldName);
 
         foreach ($this->convertInputArgumentsToKeys() as $argKey) {
-            $parts [] = $argKey;
+            $parts[] = $argKey;
         }
 
         return $this->implode($parts);
@@ -115,7 +118,7 @@ class CacheKeyAndTags
      */
     protected function fieldKey()
     {
-        if ($this->root === null) {
+        if (null === $this->root) {
             return null;
         }
 
@@ -127,7 +130,7 @@ class CacheKeyAndTags
     }
 
     /**
-     * @param  array<mixed|null> $items
+     * @param  array<mixed|null>  $items
      */
     protected function implode(array $items): string
     {

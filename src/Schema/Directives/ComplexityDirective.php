@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
-class ComplexityDirective extends BaseDirective implements FieldMiddleware
+class ComplexityDirective extends BaseDirective implements ComplexityResolverDirective
 {
     public static function definition(): string
     {
@@ -26,28 +27,41 @@ directive @complexity(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function complexityResolver(FieldValue $fieldValue): callable
     {
         if ($this->directiveHasArgument('resolver')) {
             [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
             $namespacedClassName = $this->namespaceClassName(
                 $className,
-                $fieldValue->defaultNamespacesForParent()
+                RootType::defaultNamespaces($fieldValue->getParentName())
             );
 
-            $resolver = Utils::constructResolver($namespacedClassName, $methodName);
-        } else {
-            $resolver = static function (int $childrenComplexity, array $args): int {
-                /** @var int $complexity */
-                $complexity = $args['first'] ?? 1;
-
-                return $childrenComplexity * $complexity;
-            };
+            return Utils::constructResolver($namespacedClassName, $methodName);
         }
 
-        $fieldValue->setComplexity($resolver);
+        return [static::class, 'defaultComplexityResolver'];
+    }
 
-        return $next($fieldValue);
+    /**
+     * @param  array<string, mixed>  $args
+     */
+    public static function defaultComplexityResolver(int $childrenComplexity, array $args): int
+    {
+        /**
+         * Assuming pagination, @see PaginationManipulator::countArgument().
+         */
+        $first = $args['first'] ?? null;
+
+        $expectedNumberOfChildren = is_int($first)
+            ? $first
+            : 1;
+
+        return
+            // Default complexity for this field itself
+            // TODO add this in v6
+            // 1 +
+            // Scale children complexity by the expected number of results
+            $childrenComplexity * $expectedNumberOfChildren;
     }
 }

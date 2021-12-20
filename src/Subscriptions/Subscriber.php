@@ -41,6 +41,7 @@ class Subscriber implements Serializable
      * The name of the queried field.
      *
      * Guaranteed be be unique because of
+     *
      * @see \GraphQL\Validator\Rules\SingleFieldSubscription
      *
      * @var string
@@ -50,7 +51,7 @@ class Subscriber implements Serializable
     /**
      * The root element of the query.
      *
-     * @var mixed Can be anything.
+     * @var mixed can be anything
      */
     public $root;
 
@@ -105,14 +106,36 @@ class Subscriber implements Serializable
     }
 
     /**
-     * Unserialize subscription from a JSON string.
-     *
-     * @param  string  $subscription
+     * @return array<string, mixed>
      */
-    public function unserialize($subscription): void
+    public function __serialize(): array
     {
-        $data = \Safe\json_decode($subscription, true);
+        return [
+            'channel' => $this->channel,
+            'topic' => $this->topic,
+            'query' => serialize(
+                AST::toArray($this->query)
+            ),
+            'field_name' => $this->fieldName,
+            'args' => $this->args,
+            'variables' => $this->variables,
+            'context' => $this->contextSerializer()->serialize($this->context),
+        ];
+    }
 
+    /**
+     * @deprecated TODO remove in v6
+     */
+    public function serialize(): string
+    {
+        return \Safe\json_encode($this->__serialize());
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function __unserialize(array $data): void
+    {
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
 
@@ -134,21 +157,11 @@ class Subscriber implements Serializable
     }
 
     /**
-     * Convert this into a JSON string.
+     * @deprecated TODO remove in v6
      */
-    public function serialize(): string
+    public function unserialize($subscription): void
     {
-        return \Safe\json_encode([
-            'channel' => $this->channel,
-            'topic' => $this->topic,
-            'query' => serialize(
-                AST::toArray($this->query)
-            ),
-            'field_name' => $this->fieldName,
-            'args' => $this->args,
-            'variables' => $this->variables,
-            'context' => $this->contextSerializer()->serialize($this->context),
-        ]);
+        $this->__unserialize(\Safe\json_decode($subscription, true));
     }
 
     /**
@@ -168,7 +181,7 @@ class Subscriber implements Serializable
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-lighthouse-'.Str::random(32).'-'.time();
+        return 'private-lighthouse-' . Str::random(32) . '-' . time();
     }
 
     protected function contextSerializer(): ContextSerializer

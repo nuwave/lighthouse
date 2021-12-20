@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
  */
 class LogGraphQLQueries
 {
-    const MESSAGE = 'Received GraphQL query';
+    public const MESSAGE = 'Received GraphQL query';
 
     /**
      * @var \Psr\Log\LoggerInterface

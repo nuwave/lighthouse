@@ -29,7 +29,7 @@ module.exports = [
   },
   {
     title: "Testing",
-    children: ["testing/phpunit", "testing/extensions"],
+    children: ["testing/phpunit", "testing/phpstan", "testing/extensions"],
   },
   {
     title: "Subscriptions",
@@ -52,6 +52,7 @@ module.exports = [
     title: "Digging Deeper",
     children: [
       "digging-deeper/schema-organisation",
+      "digging-deeper/ordering",
       "digging-deeper/relay",
       "digging-deeper/error-handling",
       "digging-deeper/adding-types-programmatically",

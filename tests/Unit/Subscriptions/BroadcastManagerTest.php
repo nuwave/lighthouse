@@ -42,8 +42,7 @@ class BroadcastManagerTest extends TestCase
     {
         $broadcasterConfig = [];
 
-        $broadcaster = new class implements Broadcaster
-        {
+        $broadcaster = new class() implements Broadcaster {
             public function authorized(Request $request)
             {
                 return new Response();
@@ -80,9 +79,7 @@ class BroadcastManagerTest extends TestCase
     public function testThrowsIfDriverDoesNotImplementInterface(): void
     {
         $this->broadcastManager->extend('foo', function () {
-            return new class
-            {
-                //
+            return new class() {
             };
         });
 

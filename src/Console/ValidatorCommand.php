@@ -35,6 +35,6 @@ class ValidatorCommand extends LighthouseGeneratorCommand
      */
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/validator.stub';
+        return __DIR__ . '/stubs/validator.stub';
     }
 }

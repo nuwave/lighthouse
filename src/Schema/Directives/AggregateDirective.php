@@ -89,8 +89,7 @@ GRAPHQL;
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                     /** @var Builder $query */
                     $query = $this
-                        ->namespaceModelClass($modelArg)
-                        ::query();
+                        ->namespaceModelClass($modelArg)::query();
 
                     $this->makeBuilderDecorator($resolveInfo)($query);
 

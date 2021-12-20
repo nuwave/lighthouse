@@ -41,10 +41,12 @@ class NodeRegistry
     }
 
     /**
-     * @param  string  $typeName The name of the ObjectType that can be resolved with the Node interface
+     * @param  string  $typeName  The name of the ObjectType that can be resolved with the Node interface
+     *
      * @example "User"
      *
-     * @param  \Closure  $resolve A function that returns the actual value by ID
+     * @param  \Closure  $resolve  A function that returns the actual value by ID
+     *
      * @example fn($id, GraphQLContext $context, ResolveInfo $resolveInfo) => $this->db->getUserById($id)
      */
     public function registerNode(string $typeName, Closure $resolve): self
@@ -58,9 +60,10 @@ class NodeRegistry
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
      * @param  array<string, mixed>  $args
-     * @return mixed The result of calling the resolver.
      *
      * @throws \GraphQL\Error\Error
+     *
+     * @return mixed the result of calling the resolver
      */
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {

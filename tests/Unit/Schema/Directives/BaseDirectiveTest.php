@@ -181,8 +181,7 @@ class BaseDirectiveTest extends TestCase
     {
         $fieldDefinition = Parser::fieldDefinition($definition);
 
-        $directive = new class extends BaseDirective
-        {
+        $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'directive @baseTest on FIELD_DEFINITION';
@@ -192,7 +191,8 @@ class BaseDirectiveTest extends TestCase
              * Allow to call protected methods from the test.
              *
              * @param  array<mixed>  $args
-             * @return mixed Whatever the method returns.
+             *
+             * @return mixed whatever the method returns
              */
             public function __call(string $method, array $args)
             {

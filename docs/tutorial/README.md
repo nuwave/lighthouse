@@ -89,10 +89,7 @@ You can use an existing project and skip ahead to [Installing Lighthouse](#insta
 but you may have to adapt a few things to fit your existing app as we go along.
 :::
 
-Assuming you are using the Laravel installer, create a new project
-(read more about [installing Laravel](https://laravel.com/docs/#installing-laravel)):
-
-    laravel new lighthouse-tutorial
+Create a new project by following [installing Laravel](https://laravel.com/docs/#installing-laravel).
 
 Consult the [Laravel docs on database configuration](https://laravel.com/docs/database#configuration)
 and ensure you have a working database set up.
@@ -264,36 +261,41 @@ Finally, add the `posts` relation to `app/Models/User.php`
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email',
+        'password',
     ];
 
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var array<string, string|\Illuminate\Contracts\Database\Eloquent\Castable>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',

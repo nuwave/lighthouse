@@ -129,9 +129,10 @@ GRAPHQL;
 
     /**
      * @param  array<string, mixed>  $args
-     * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      *
      * @throws \GraphQL\Error\Error
+     *
+     * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
     protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
@@ -146,7 +147,7 @@ GRAPHQL;
 
         if ($find = $this->directiveArgValue('find')) {
             $findValue = Arr::get($args, $find);
-            if ($findValue === null) {
+            if (null === $findValue) {
                 throw new Error(self::missingKeyToFindModel($find));
             }
 
@@ -173,6 +174,7 @@ GRAPHQL;
             try {
                 /**
                  * TODO use generics.
+                 *
                  * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
                  */
                 $enhancedBuilder = $argumentSet->enhanceBuilder(
@@ -238,6 +240,7 @@ GRAPHQL;
      * Additional arguments that are passed to @see Gate::check().
      *
      * @param  array<string, mixed>  $args
+     *
      * @return array<int, mixed>
      */
     protected function buildCheckArguments(array $args): array
@@ -246,11 +249,11 @@ GRAPHQL;
 
         // The injected args come before the static args
         if ($this->directiveArgValue('injectArgs')) {
-            $checkArguments [] = $args;
+            $checkArguments[] = $args;
         }
 
         if ($this->directiveHasArgument('args')) {
-            $checkArguments [] = $this->directiveArgValue('args');
+            $checkArguments[] = $this->directiveArgValue('args');
         }
 
         return $checkArguments;

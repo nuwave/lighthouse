@@ -20,7 +20,7 @@ class FederationServiceProvider extends ServiceProvider
         $eventsDispatcher->listen(
             RegisterDirectiveNamespaces::class,
             static function (): string {
-                return __NAMESPACE__.'\\Directives';
+                return __NAMESPACE__ . '\\Directives';
             }
         );
 

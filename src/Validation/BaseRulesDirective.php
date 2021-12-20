@@ -32,7 +32,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     public function messages(): array
     {
         $messages = $this->directiveArgValue('messages');
-        if ($messages === null) {
+        if (null === $messages) {
             return [];
         }
 
@@ -78,7 +78,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             $this->invalidApplyArgument($rules);
         }
 
-        if (count($rules) === 0) {
+        if (0 === count($rules)) {
             $this->invalidApplyArgument($rules);
         }
 
@@ -92,7 +92,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     protected function validateMessageArg(): void
     {
         $messages = $this->directiveArgValue('messages');
-        if ($messages === null) {
+        if (null === $messages) {
             return;
         }
 
@@ -130,7 +130,8 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param  mixed  $messages Whatever faulty value was given for messages
+     * @param  mixed  $messages  Whatever faulty value was given for messages
+     *
      * @throws DefinitionException
      */
     protected function invalidMessageArgument($messages): void
@@ -142,7 +143,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param  mixed  $apply Any invalid value
+     * @param  mixed  $apply  Any invalid value
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

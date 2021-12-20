@@ -29,7 +29,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespaces = config('lighthouse.namespaces.'.$this->namespaceConfigKey());
+        $namespaces = config('lighthouse.namespaces.' . $this->namespaceConfigKey());
 
         return static::commonNamespace((array) $namespaces);
     }
@@ -48,13 +48,13 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     public static function commonNamespace(array $namespaces): string
     {
-        if ($namespaces === []) {
+        if ([] === $namespaces) {
             throw new InvalidArgumentException(
                 'A default namespace is required for code generation.'
             );
         }
 
-        if (count($namespaces) === 1) {
+        if (1 === count($namespaces)) {
             return reset($namespaces);
         }
 
@@ -81,12 +81,12 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
                 break;
             }
 
-            $matching [] = $part;
+            $matching[] = $part;
         }
 
         // We could not determine a common part of the configured namespaces,
         // so we just assume the user will prefer the first one in the list.
-        if ($matching === []) {
+        if ([] === $matching) {
             return $preferredNamespaceFallback;
         }
 

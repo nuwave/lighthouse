@@ -79,7 +79,8 @@ GRAPHQL;
     }
 
     /**
-     * @param \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node $typeDefinition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
@@ -91,10 +92,10 @@ GRAPHQL;
         }
 
         /** @var \GraphQL\Language\AST\NamedTypeNode $namedTypeNode */
-        $namedTypeNode = Parser::parseType('Node', ['noLocation' => true]);
-        $typeDefinition->interfaces [] = $namedTypeNode;
+        $namedTypeNode = Parser::parseType(GlobalIdServiceProvider::NODE, ['noLocation' => true]);
+        $typeDefinition->interfaces[] = $namedTypeNode;
 
         $globalIdFieldName = config('lighthouse.global_id_field');
-        $typeDefinition->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
+        $typeDefinition->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
     }
 }

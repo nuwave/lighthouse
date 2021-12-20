@@ -9,6 +9,153 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.31.3
+
+### Fixed
+
+- Use `StartExecution` event to determine per-operation Tracing timestamps https://github.com/nuwave/lighthouse/pull/2009
+
+## v5.31.2
+
+### Fixed
+
+- Trigger model events on nested mutation disconnect of one to many relationships https://github.com/nuwave/lighthouse/pull/2008
+
+## v5.31.1
+
+### Fixed
+
+- Ensure `_ide_helper.php` works as PHPStan stub file https://github.com/nuwave/lighthouse/pull/2006
+
+## v5.31.0
+
+### Added
+
+- Add method `assertGraphQLError()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/2005
+
+## v5.30.0
+
+### Added
+
+- Mixin method `assertGraphQLErrorFree()` to `\Illuminate\Testing\TestResponse`
+
+### Fixed
+
+- Add missing types to `programmatic-types.graphql` in artisan command `lighthouse:ide-helper`
+
+## v5.29.0
+
+### Added
+
+- Add ability to provide custom handler for `@whereConditions` and `@whereHasConditions` https://github.com/nuwave/lighthouse/pull/2001
+
+## v5.28.1
+
+### Added
+
+- Improve error message when calling `TestResponse::assertGraphQLErrorMessage()` on successful response
+
+## v5.28.0
+
+### Added
+
+- Allow clients to order a list of models by an aggregated value of their relations with `@orderBy` https://github.com/nuwave/lighthouse/pull/1848
+
+## v5.27.3
+
+### Fixed
+
+- Prevent possible `Undefined array key 0` error when there's an interface implemented by two renamed models https://github.com/nuwave/lighthouse/pull/1997
+
+## v5.27.2
+
+### Fixed
+
+- Prevent `Undefined array key` error when using cache version 2 and not having all version 1 configuration present https://github.com/nuwave/lighthouse/pull/1994
+
+## v5.27.1
+
+### Changed
+
+- Regenerate cache when calling `php artisan lighthouse:cache` https://github.com/nuwave/lighthouse/pull/1990
+
+## v5.27.0
+
+### Fixed
+
+- Avoid PHP 8.1 deprecation warning by implementing `__serialize()` and `__unserialize()` https://github.com/nuwave/lighthouse/pull/1987 
+
+### Deprecated
+
+- Deprecate `Serializable` implementation in favor of magic methods https://github.com/nuwave/lighthouse/pull/1987
+
+## v5.26.1
+
+### Changed
+
+- Improve error message when failing to find classes in namespaces https://github.com/nuwave/lighthouse/pull/1983
+
+## v5.26.0
+
+### Added
+
+- Allow specifying headers in `MakesGraphQLRequests` and `MakesGraphQLRequestsLumen` test helpers
+- Render `GraphQL\Error\ClientAware` exceptions outside of GraphQL context with extensions content
+
+### Fixed
+
+- Do not batchload relations with different database connections
+
+## v5.25.1
+
+### Fixed
+
+- Consider renamed models in default type resolver https://github.com/nuwave/lighthouse/pull/1967
+
+## v5.25.0
+
+### Added
+
+- Add setting `unbox_bensampo_enum_enum_instances` to turn off `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
+
+### Deprecated
+
+- Deprecate `BenSampo\Enum\Enum` unboxing https://github.com/nuwave/lighthouse/pull/1971
+
+## v5.24.0
+
+### Added
+
+- Add `Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective` interface to allow
+  overwriting the default query complexity calculation https://github.com/nuwave/lighthouse/pull/1947
+- Allow omitting `name` in `@scope` by defaulting to the argument name https://github.com/nuwave/lighthouse/pull/1957
+
+### Changed
+
+- Lazily resolve field type https://github.com/nuwave/lighthouse/pull/1950
+
+### Fixed
+
+- Ensure non-pagination related arguments called `first` do not mistakenly increase `@complexity` https://github.com/nuwave/lighthouse/pull/1947
+
+### Deprecated
+
+- Deprecate methods to set a query complexity resolver through `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1947
+- Deprecate smart methods in `Nuwave\Lighthouse\Schema\Values\FieldValue` https://github.com/nuwave/lighthouse/pull/1951
+
+## v5.23.1
+
+### Fixed
+
+- Apply `@spread` to inputs nested within lists https://github.com/nuwave/lighthouse/pull/1944
+
+## v5.23.0
+
+### Added
+
+- Add `--federation` option to `lighthouse:print-schema` command to print the schema
+  with federation directives and without federation spec additions, like `_service.sdl` https://github.com/nuwave/lighthouse/pull/1932
+
 ## v5.22.5
 
 ### Fixed

@@ -38,6 +38,7 @@ class BroadcastManager extends DriverManager
 
     /**
      * @param  array<string, mixed>  $config
+     *
      * @throws \RuntimeException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
@@ -45,7 +46,7 @@ class BroadcastManager extends DriverManager
         $connection = $config['connection'] ?? 'pusher';
         $driverConfig = config("broadcasting.connections.{$connection}");
 
-        if (empty($driverConfig) || $driverConfig['driver'] !== 'pusher') {
+        if (empty($driverConfig) || 'pusher' !== $driverConfig['driver']) {
             throw new RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
         }
 

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes
@@ -19,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * Foreign keys
  * @property int|null $imageable_id
  * @property string|null $imageable_type
- *
  * @property-read \Tests\Utils\Models\Task|\Tests\Utils\Models\User|null $imageable
  */
 class Image extends Model

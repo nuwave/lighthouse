@@ -2006,6 +2006,12 @@ directive @orderBy(
   columnsEnum: String
 
   """
+  Allow clients to sort by aggregates on relations.
+  Only used when the directive is added on an argument.
+  """
+  relations: [OrderByRelation!]
+
+  """
   The database column for which the order by clause will be applied on.
   Only used when the directive is added on a field.
   """
@@ -2032,93 +2038,33 @@ enum OrderByDirection {
   """
   DESC
 }
-```
 
-### Client Controlled Ordering
+"""
+Options for the `relations` argument on `@orderBy`.
+"""
+input OrderByRelation {
+  """
+  TODO: description
+  """
+  relation: String!
 
-To enable clients to control the ordering, use this directive on an argument of
-a field that is backed by a database query.
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with the `columnsEnum` argument.
+  """
+  columns: [String!]
 
-```graphql
-type Query {
-  posts(orderBy: _ @orderBy(columns: ["posted_at", "title"])): [Post!]! @all
+  """
+  Use an existing enumeration type to restrict the allowed columns to a predefined list.
+  This allowes you to re-use the same enum for multiple fields.
+  Mutually exclusive with the `columns` argument.
+  """
+  columnsEnum: String
 }
 ```
 
-The type of the argument can be left blank as `_` ,
-as Lighthouse will automatically generate an input that takes enumerated column names,
-together with the `SortOrder` enum, and add that to your schema:
-
-```graphql
-"Allows ordering a list of records."
-input QueryPostsOrderByOrderByClause {
-  "The column that is used for ordering."
-  column: QueryPostsOrderByColumn!
-
-  "The direction that is used for ordering."
-  order: SortOrder!
-}
-
-"Order by clause for the `orderBy` argument on the query `posts`."
-enum QueryPostsOrderByColumn {
-  POSTED_AT @enum(value: "posted_at")
-  TITLE @enum(value: "title")
-}
-
-"The available directions for ordering a list of records."
-enum SortOrder {
-  "Sort records in ascending order."
-  ASC
-
-  "Sort records in descending order."
-  DESC
-}
-```
-
-To re-use a list of allowed columns, define your own enumeration type and use the `columnsEnum` argument instead of `columns`:
-
-```graphql
-type Query {
-  allPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]! @all
-  paginatedPosts(orderBy: _ @orderBy(columnsEnum: "PostColumn")): [Post!]!
-    @paginate
-}
-
-"A custom description for this custom enum."
-enum PostColumn {
-  # Another reason why you might want to have a custom enum is to
-  # correct typos or bad naming in column names.
-  POSTED_AT @enum(value: "postd_timestamp")
-  TITLE @enum(value: "title")
-}
-```
-
-Lighthouse will still automatically generate the necessary input types and the `SortOrder` enum.
-Instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
-
-Querying a field that has an `orderBy` argument looks like this:
-
-```graphql
-{
-  posts(orderBy: [{ column: POSTED_AT, order: ASC }]) {
-    title
-  }
-}
-```
-
-You may pass more than one sorting option to add a secondary ordering.
-
-### Predefined Ordering
-
-To predefine a default order for your field, use this directive on a field:
-
-```graphql
-type Query {
-  latestUsers: [User!]! @all @orderBy(column: "created_at", direction: DESC)
-}
-```
-
-Clients won't have to pass any arguments to the field and still receive ordered results by default.
+See [ordering](../digging-deeper/ordering.md).
 
 ## @paginate
 
@@ -2677,8 +2623,9 @@ The scope method will receive the client-given value of the argument as the seco
 directive @scope(
   """
   The name of the scope.
+  Defaults to the name of the argument.
   """
-  name: String!
+  name: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -2686,7 +2633,27 @@ You may use this in combination with field directives such as [@all](#all).
 
 ```graphql
 type Query {
-  posts(trending: Boolean @scope(name: "trending")): [Post!]! @all
+  posts(trending: Boolean @scope): [Post!]! @all
+}
+```
+
+The scope will be passed the value of the client-given argument:
+
+```php
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    public function scopeTrending(Builder $query, bool $trending): Builder { ... }
+}
+```
+
+You can use the `name` argument if your scope is named differently from your argument:
+
+```graphql
+type Query {
+  posts(isTrending: Boolean @scope(name: "trending")): [Post!] @all
 }
 ```
 
@@ -3112,8 +3079,8 @@ directive @validator(
   The name of the class to use.
 
   If defined on an input, this defaults to a class called `{$inputName}Validator` in the
-  default validator namespace. For fields, it uses the name of the parent type
-  and the field name: `{$parent}{$field}Validator`.
+  default validator namespace. For fields, it uses the namespace of the parent type
+  and the field name: `{$parent}\{$field}Validator`.
   """
   class: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
@@ -3141,6 +3108,7 @@ directive @where(
 
   """
   Use Laravel's where clauses upon the query builder.
+  This only works for clauses with the signature (string $column, string $operator, mixed $value).
   """
   clause: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION

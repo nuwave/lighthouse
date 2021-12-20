@@ -7,8 +7,9 @@ interface ArgTransformerDirective extends Directive
     /**
      * Apply transformations on the value of an argument given to a field.
      *
-     * @param  mixed  $argumentValue The client given value.
-     * @return mixed The transformed value.
+     * @param  mixed  $argumentValue  the client given value
+     *
+     * @return mixed the transformed value
      */
     public function transform($argumentValue);
 }

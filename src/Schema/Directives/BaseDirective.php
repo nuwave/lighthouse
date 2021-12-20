@@ -115,6 +115,7 @@ abstract class BaseDirective implements Directive
      * Get the value of an argument on the directive.
      *
      * @param  mixed|null  $default
+     *
      * @return mixed|null
      */
     protected function directiveArgValue(string $name, $default = null)
@@ -139,10 +140,11 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param  string  $argumentName The default argument name "model" may be overwritten
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @param  string  $argumentName  The default argument name "model" may be overwritten
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
@@ -151,7 +153,7 @@ abstract class BaseDirective implements Directive
 
         if (! $model) {
             throw new DefinitionException(
-                "A `model` argument must be assigned to the '@{$this->name()}' directive on '{$this->nodeName()}."
+                "Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}."
             );
         }
 
@@ -173,14 +175,15 @@ abstract class BaseDirective implements Directive
         array $namespacesToTry = [],
         callable $determineMatch = null
     ): string {
-        // Always try the explicitly set namespace first
-        array_unshift(
-            $namespacesToTry,
-            ASTHelper::getNamespaceForDirective(
-                $this->definitionNode,
-                $this->name()
-            )
+        $namespaceForDirective = ASTHelper::namespaceForDirective(
+            $this->definitionNode,
+            $this->name()
         );
+
+        if (is_string($namespaceForDirective)) {
+            // Always try the explicitly set namespace first
+            array_unshift($namespacesToTry, $namespaceForDirective);
+        }
 
         if (! $determineMatch) {
             $determineMatch = 'class_exists';
@@ -193,8 +196,9 @@ abstract class BaseDirective implements Directive
         );
 
         if (! $className) {
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No class `{$classCandidate}` was found for directive `@{$this->name()}`"
+                "Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}."
             );
         }
 

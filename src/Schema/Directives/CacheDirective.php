@@ -88,7 +88,7 @@ GRAPHQL;
                 // We found a matching value in the cache, so we can just return early
                 // without actually running the query
                 $value = $cache->get($cacheKey);
-                if ($value !== null) {
+                if (null !== $value) {
                     return $value;
                 }
                 // In Laravel cache, null is considered as "non-existant" value. As mentioned in laravel documentation,
@@ -128,7 +128,8 @@ GRAPHQL;
                 Resolved::handle($resolved, $storeInCache);
 
                 return $resolved;
-            });
+            }
+        );
 
         return $fieldValue;
     }
@@ -153,7 +154,7 @@ GRAPHQL;
             // The cache key was already set, so we do not have to look again
             $typeValue->getCacheKey()
             // The Query type is exempt from requiring a cache key
-            || $typeValue->getTypeDefinitionName() === RootType::QUERY
+            || RootType::QUERY === $typeValue->getTypeDefinitionName()
         ) {
             return;
         }
@@ -178,7 +179,7 @@ GRAPHQL;
             if (
                 $field->type instanceof NonNullTypeNode
                 && $field->type->type instanceof NamedTypeNode
-                && $field->type->type->name->value === 'ID'
+                && 'ID' === $field->type->type->name->value
             ) {
                 $typeValue->setCacheKey($field->name->value);
 

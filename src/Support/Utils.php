@@ -17,6 +17,7 @@ class Utils
      *
      * @param  array<string>  $namespacesToTry
      * @param  callable(string $className): bool  $determineMatch
+     *
      * @return class-string|null
      */
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
@@ -26,10 +27,8 @@ class Utils
             return $classCandidate;
         }
 
-        // Stop if the class is found or we are out of namespaces to try
-        while (! empty($namespacesToTry)) {
-            // Pop off the first namespace and try it
-            $className = array_shift($namespacesToTry).'\\'.$classCandidate;
+        foreach ($namespacesToTry as $namespace) {
+            $className = $namespace . '\\' . $classCandidate;
 
             if ($determineMatch($className)) {
                 /** @var class-string $className */
@@ -43,8 +42,8 @@ class Utils
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param  class-string  $className This class is resolved through the container.
-     * @param  string  $methodName The method that gets passed the arguments of the closure.
+     * @param  class-string  $className  this class is resolved through the container
+     * @param  string  $methodName  the method that gets passed the arguments of the closure
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -65,10 +64,11 @@ class Utils
      *
      * Returns a default value in case of error.
      *
-     * @param  mixed  $object  Object with protected member.
-     * @param  string  $memberName  Name of object's protected member.
-     * @param  mixed|null  $default  Default value to return in case of access error.
-     * @return mixed  Value of object's protected member.
+     * @param  mixed  $object  object with protected member
+     * @param  string  $memberName  name of object's protected member
+     * @param  mixed|null  $default  default value to return in case of access error
+     *
+     * @return mixed value of object's protected member
      */
     public static function accessProtected($object, string $memberName, $default = null)
     {
@@ -87,9 +87,10 @@ class Utils
      * Apply a callback to a value or each value in an array.
      *
      * @param  mixed|array<mixed>  $valueOrValues
+     *
      * @return mixed|array<mixed>
      */
-    public static function applyEach(\Closure $callback, $valueOrValues)
+    public static function applyEach(Closure $callback, $valueOrValues)
     {
         if (is_array($valueOrValues)) {
             return array_map($callback, $valueOrValues);
@@ -115,6 +116,7 @@ class Utils
      * Construct a callback that checks if its input is a given class.
      *
      * @param  class-string  $classLike
+     *
      * @return Closure(mixed): bool
      */
     public static function instanceofMatcher(string $classLike): Closure

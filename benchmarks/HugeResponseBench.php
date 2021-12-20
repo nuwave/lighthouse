@@ -26,6 +26,7 @@ GRAPHQL;
      * Resolves parent.
      *
      * @skip
+     *
      * @return array<string, mixed>
      */
     public function resolve(): array
@@ -37,7 +38,7 @@ GRAPHQL;
                 'children' => [],
             ];
 
-            for ($i = 0; $i < 100; $i++) {
+            for ($i = 0; $i < 100; ++$i) {
                 $parent['children'][] = [
                     'name' => "child {$i}",
                     'parent' => $parent,

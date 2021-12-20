@@ -32,12 +32,19 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
                 $paginationArgs = $this->paginationArgs($args);
 
-                if (config('lighthouse.batchload_relations')) {
+                /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+                $relation = $parent->{$relationName}();
+
+                if (
+                    config('lighthouse.batchload_relations')
+                    // Batch loading joins across both models, thus only works if they are on the same connection
+                    && $relation->getParent()->getConnectionName() === $relation->getRelated()->getConnectionName()
+                ) {
                     /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                     $relationBatchLoader = BatchLoaderRegistry::instance(
                         $this->qualifyPath($args, $resolveInfo),
                         function () use ($relationName, $decorateBuilder, $paginationArgs): RelationBatchLoader {
-                            $modelsLoader = $paginationArgs !== null
+                            $modelsLoader = null !== $paginationArgs
                                 ? new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
                                 : new SimpleModelsLoader($relationName, $decorateBuilder);
 
@@ -48,12 +55,9 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                     return $relationBatchLoader->load($parent);
                 }
 
-                /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-                $relation = $parent->{$relationName}();
-
                 $decorateBuilder($relation);
 
-                return $paginationArgs !== null
+                return null !== $paginationArgs
                     ? $paginationArgs->applyToBuilder($relation)
                     : $relation->getResults();
             }
@@ -71,7 +75,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
-        if ($paginationType === null) {
+        if (null === $paginationType) {
             return;
         }
 
@@ -112,7 +116,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         $paginationType = $this->paginationType();
 
-        return $paginationType !== null
+        return null !== $paginationType
             ? PaginationArgs::extractArgs($args, $paginationType, $this->paginationMaxCount())
             : null;
     }
@@ -121,7 +125,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         $type = $this->directiveArgValue('type');
 
-        return $type !== null
+        return null !== $type
             ? new PaginationType($type)
             : null;
     }

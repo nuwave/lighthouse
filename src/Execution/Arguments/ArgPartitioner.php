@@ -35,7 +35,7 @@ class ArgPartitioner
         return static::partition(
             $argumentSet,
             static function (string $name, Argument $argument): bool {
-                return $argument->resolver !== null;
+                return null !== $argument->resolver;
             }
         );
     }
@@ -151,7 +151,7 @@ class ArgPartitioner
      * - the first one contains all arguments for which the predicate matched
      * - the second one contains all arguments for which the predicate did not match
      *
-     * @return  array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
+     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
      */
     public static function partition(ArgumentSet $argumentSet, \Closure $predicate): array
     {
@@ -187,7 +187,7 @@ class ArgPartitioner
         $relationMethodCandidate = $modelReflection->getMethod($name);
 
         $returnType = $relationMethodCandidate->getReturnType();
-        if ($returnType === null) {
+        if (null === $returnType) {
             return false;
         }
 
@@ -196,7 +196,7 @@ class ArgPartitioner
         }
 
         if (! class_exists($returnType->getName())) {
-            throw new DefinitionException('Class '.$returnType->getName().' does not exist, did you forget to import the Eloquent relation class?');
+            throw new DefinitionException('Class ' . $returnType->getName() . ' does not exist, did you forget to import the Eloquent relation class?');
         }
 
         return is_a($returnType->getName(), $relationClass, true);
