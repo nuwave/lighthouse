@@ -3,13 +3,16 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CacheKeyAndTags
 {
-    /** @var mixed|null */
-    protected $root;
+    /**
+     * The ID of the fields root value, if present.
+     *
+     * @var int|string|null
+     */
+    protected $rootID;
 
     /** @var array<string, mixed> */
     protected $args;
@@ -20,41 +23,30 @@ class CacheKeyAndTags
     /** @var \GraphQL\Type\Definition\ResolveInfo */
     protected $resolveInfo;
 
-    /** @var \Nuwave\Lighthouse\Schema\Values\FieldValue */
-    protected $fieldValue;
-
     /** @var bool */
     protected $isPrivate;
 
     /**
-     * @var mixed The key to use for caching this field.
-     */
-    protected $fieldKey;
-
-    /**
-     * @param  mixed|null  $root
+     * @param  int|string|null  $rootID
      * @param  array<string, mixed>  $args
      */
     public function __construct(
-        $root,
+        $rootID,
         array $args,
         GraphQLContext $context,
         ResolveInfo $resolveInfo,
-        FieldValue $fieldValue,
         bool $isPrivate
     ) {
-        $this->root = $root;
+        $this->rootID = $rootID;
         $this->args = $args;
         $this->context = $context;
         $this->resolveInfo = $resolveInfo;
-        $this->fieldValue = $fieldValue;
         $this->isPrivate = $isPrivate;
-
-        $this->fieldKey = $this->fieldKey();
     }
 
     public function key(): string
     {
+        // TODO consider adding a prefix
         $parts = [];
 
         $user = $this->context->user();
@@ -63,15 +55,19 @@ class CacheKeyAndTags
             $parts[] = $user->getAuthIdentifier();
         }
 
-        $parts[] = strtolower($this->resolveInfo->parentType->name);
-        $parts[] = $this->fieldKey;
-        $parts[] = strtolower($this->resolveInfo->fieldName);
+        $parts[] = $this->resolveInfo->parentType->name;
+        $parts[] = $this->rootID;
+        $parts[] = $this->resolveInfo->fieldName;
 
-        foreach ($this->convertInputArgumentsToKeys() as $argKey) {
-            $parts[] = $argKey;
+        \Safe\ksort($this->args);
+        foreach ($this->args as $key => $value) {
+            $parts[] = $key;
+            $parts[] = is_array($value)
+                ? \Safe\json_encode($value)
+                : $value;
         }
 
-        return $this->implode($parts);
+        return implode(':', $parts);
     }
 
     /**
@@ -79,64 +75,19 @@ class CacheKeyAndTags
      */
     public function tags(): array
     {
-        $parent = strtolower($this->resolveInfo->parentType->name);
-
-        $typeTag = $this->implode([
+        $parentTag = implode(':', [
             'graphql',
-            $parent,
-            $this->fieldKey,
+            $this->resolveInfo->parentType->name,
+            $this->rootID,
         ]);
 
-        $fieldTag = $this->implode([
+        $fieldTag = implode(':', [
             'graphql',
-            $parent,
-            $this->fieldKey,
-            $this->resolveInfo->fieldName,
+            $this->resolveInfo->parentType->name,
+            $this->rootID,
+            $this->resolveInfo->fieldName
         ]);
 
-        return [$typeTag, $fieldTag];
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection<string>
-     */
-    protected function convertInputArgumentsToKeys(): Collection
-    {
-        return (new Collection($this->args))
-            ->sortKeys()
-            ->map(function ($value, $key): string {
-                $keyValue = is_array($value)
-                    ? \Safe\json_encode($value)
-                    : $value;
-
-                return "{$key}:{$keyValue}";
-            });
-    }
-
-    /**
-     * @return mixed Can be anything
-     */
-    protected function fieldKey()
-    {
-        if (null === $this->root) {
-            return null;
-        }
-
-        $cacheFieldKey = $this->fieldValue
-            ->getParent()
-            ->getCacheKey();
-
-        return data_get($this->root, $cacheFieldKey);
-    }
-
-    /**
-     * @param  array<mixed|null>  $items
-     */
-    protected function implode(array $items): string
-    {
-        return (new Collection($items))
-            ->filter()
-            ->values()
-            ->implode(':');
+        return [$parentTag, $fieldTag];
     }
 }

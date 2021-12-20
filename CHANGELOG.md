@@ -9,6 +9,15 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Do not change capitalization of types and fields in cache keys
+- Add hidden config option `lighthouse.cache.tags`
+
+### Changed
+
+- Include empty placeholder for parent cache key in root fields to ensure predictable cache key
+
 ## v5.31.3
 
 ### Fixed
