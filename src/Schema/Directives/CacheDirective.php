@@ -60,7 +60,7 @@ GRAPHQL;
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
-                $rootID = $root !== null && $rootCacheKey !== null
+                $rootID = null !== $root && null !== $rootCacheKey
                     ? data_get($root, $rootCacheKey)
                     : null;
 
