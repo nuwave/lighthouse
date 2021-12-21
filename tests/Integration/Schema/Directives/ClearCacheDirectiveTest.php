@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
 class ClearCacheDirectiveTest extends TestCase
@@ -11,12 +12,16 @@ class ClearCacheDirectiveTest extends TestCase
      */
     protected $cache;
 
-    protected function getEnvironmentSetUp($app): void
+    public function setUp(): void
     {
-        parent::getEnvironmentSetUp($app);
+        parent::setUp();
 
+        if (AppVersion::below(7.0)) {
+            self::markTestSkipped('Flushing tags does not work the same in older Laravel versions');
+        }
         config(['lighthouse.cache.tags' => true]);
-        $this->cache = $app->make('cache');
+
+        $this->cache = $this->app->make('cache');
     }
 
     public function testClearCacheForEntireType(): void
