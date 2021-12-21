@@ -60,24 +60,25 @@ GRAPHQL;
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
+                $parentName = $resolveInfo->parentType->name;
                 $rootID = null !== $root && null !== $rootCacheKey
                     ? data_get($root, $rootCacheKey)
                     : null;
-
-                $cacheKeyAndTags = new CacheKeyAndTags(
-                    $rootID,
-                    $args,
-                    $context,
-                    $resolveInfo,
-                    $isPrivate
-                );
-
-                $cacheKey = $cacheKeyAndTags->key();
+                $fieldName = $resolveInfo->fieldName;
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
-                    ? $this->cacheRepository->tags($cacheKeyAndTags->tags())
+                    ? $this->cacheRepository->tags(CacheKeyAndTags::tags($parentName, $rootID, $fieldName))
                     : $this->cacheRepository;
+
+                $cacheKey = CacheKeyAndTags::key(
+                    $context->user(),
+                    $isPrivate,
+                    $parentName,
+                    $rootID,
+                    $fieldName,
+                    $args,
+                );
 
                 // We found a matching value in the cache, so we can just return early
                 // without actually running the query

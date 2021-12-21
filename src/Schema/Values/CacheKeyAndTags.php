@@ -2,92 +2,89 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class CacheKeyAndTags
 {
-    /**
-     * The ID of the fields root value, if present.
-     *
-     * @var int|string|null
-     */
-    protected $rootID;
-
-    /** @var array<string, mixed> */
-    protected $args;
-
-    /** @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext */
-    protected $context;
-
-    /** @var \GraphQL\Type\Definition\ResolveInfo */
-    protected $resolveInfo;
-
-    /** @var bool */
-    protected $isPrivate;
+    public const PREFIX = 'lighthouse';
+    public const SEPARATOR = ':';
 
     /**
-     * @param  int|string|null  $rootID
+     * @param  int|string|null  $id
      * @param  array<string, mixed>  $args
      */
-    public function __construct(
-        $rootID,
-        array $args,
-        GraphQLContext $context,
-        ResolveInfo $resolveInfo,
-        bool $isPrivate
-    ) {
-        $this->rootID = $rootID;
-        $this->args = $args;
-        $this->context = $context;
-        $this->resolveInfo = $resolveInfo;
-        $this->isPrivate = $isPrivate;
-    }
+    public static function key(
+        ?Authenticatable $user,
+        bool $isPrivate,
+        string $parentName,
+        $id,
+        string $fieldName,
+        array $args
+    ): string {
+        $parts = [self::PREFIX];
 
-    public function key(): string
-    {
-        // TODO consider adding a prefix
-        $parts = [];
-
-        $user = $this->context->user();
-        if ($this->isPrivate && null !== $user) {
+        if ($isPrivate && null !== $user) {
             $parts[] = 'auth';
             $parts[] = $user->getAuthIdentifier();
         }
 
-        $parts[] = $this->resolveInfo->parentType->name;
-        $parts[] = $this->rootID;
-        $parts[] = $this->resolveInfo->fieldName;
+        $parts[] = $parentName;
+        $parts[] = $id;
+        $parts[] = $fieldName;
 
-        \Safe\ksort($this->args);
-        foreach ($this->args as $key => $value) {
+        \Safe\ksort($args);
+        foreach ($args as $key => $value) {
             $parts[] = $key;
             $parts[] = is_array($value)
                 ? \Safe\json_encode($value)
                 : $value;
         }
 
-        return implode(':', $parts);
+        return implode(self::SEPARATOR, $parts);
     }
 
     /**
+     * @param  int|string|null  $id
+     *
      * @return array{string, string}
      */
-    public function tags(): array
+    public static function tags(string $parentName, $id, string $fieldName): array
     {
-        $parentTag = implode(':', [
-            'graphql',
-            $this->resolveInfo->parentType->name,
-            $this->rootID,
-        ]);
+        return [
+            self::parentTag(
+                $parentName,
+                $id
+            ),
+            self::fieldTag(
+                $parentName,
+                $id,
+                $fieldName
+            ),
+        ];
+    }
 
-        $fieldTag = implode(':', [
-            'graphql',
-            $this->resolveInfo->parentType->name,
-            $this->rootID,
-            $this->resolveInfo->fieldName,
+    /**
+     * @param  int|string|null $id
+     */
+    public static function parentTag(string $parentName, $id): string
+    {
+        return implode(self::SEPARATOR, [
+            self::PREFIX,
+            $parentName,
+            $id,
         ]);
+    }
 
-        return [$parentTag, $fieldTag];
+    /**
+     * @param  int|string|null $id
+     */
+    public static function fieldTag(string $parentName, $id, string $fieldName): string
+    {
+        return implode(self::SEPARATOR, [
+            self::PREFIX,
+            $parentName,
+            $id,
+            $fieldName,
+        ]);
     }
 }

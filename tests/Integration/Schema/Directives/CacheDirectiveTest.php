@@ -13,7 +13,7 @@ use Tests\Utils\Models\User;
 class CacheDirectiveTest extends DBTestCase
 {
     /**
-     * @var \Illuminate\Cache\TaggedCache
+     * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
 
@@ -56,7 +56,7 @@ class CacheDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('foobar', $this->cache->get('User:1:name'));
+        $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
     }
 
     public function testPlaceCacheKeyOnAnyField(): void
@@ -93,14 +93,14 @@ class CacheDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('foobar', $this->cache->get('User:foo@bar.com:name'));
+        $this->assertSame('foobar', $this->cache->get('lighthouse:User:foo@bar.com:name'));
     }
 
     public function testStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
-        $cacheKey = "auth:{$user->getKey()}:User:1:name";
+        $cacheKey = "lighthouse:auth:{$user->getKey()}:User:1:name";
 
         $this->mockResolver([
             'id' => 1,
@@ -171,7 +171,7 @@ class CacheDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('foobar', $this->cache->get('User:1:name'));
+        $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
     }
 
     public function testFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
@@ -206,7 +206,7 @@ class CacheDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('foobar', $this->cache->get('User:1:name'));
+        $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
     }
 
     public function testStorePaginateResolverInCache(): void
@@ -235,7 +235,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         ');
 
-        $result = $this->cache->get('Query::users:first:5');
+        $result = $this->cache->get('lighthouse:Query::users:first:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
@@ -289,7 +289,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $firstResponse = $this->graphQL($query);
 
-        $posts = $this->cache->get("User:{$user->getKey()}:posts:first:3");
+        $posts = $this->cache->get("lighthouse:User:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
@@ -311,7 +311,7 @@ class CacheDirectiveTest extends DBTestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $tags = ['graphql:User:1', 'graphql:User:1:posts'];
+        $tags = ['lighthouse:User:1', 'lighthouse:User:1:posts'];
 
         $this->schema = /** @lang GraphQL */ '
         type Post {
@@ -355,7 +355,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $posts = $this->cache
             ->tags($tags)
-            ->get("User:{$user->getKey()}:posts:first:3");
+            ->get("lighthouse:User:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
@@ -393,9 +393,9 @@ class CacheDirectiveTest extends DBTestCase
         // TTL is required for laravel 5.7 and prior
         // @see https://laravel.com/docs/5.8/upgrade#psr-16-conformity
         $this->cache->setMultiple([
-            'User:1:field_boolean' => false,
-            'User:1:field_string' => '',
-            'User:1:field_integer' => 0,
+            'lighthouse:User:1:field_boolean' => false,
+            'lighthouse:User:1:field_string' => '',
+            'lighthouse:User:1:field_integer' => 0,
         ], 1);
 
         $this->graphQL(/** @lang GraphQL */ '
