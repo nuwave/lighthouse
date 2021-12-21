@@ -77,7 +77,7 @@ GRAPHQL;
                     $parentName,
                     $rootID,
                     $fieldName,
-                    $args,
+                    $args
                 );
 
                 // We found a matching value in the cache, so we can just return early
