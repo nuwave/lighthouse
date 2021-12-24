@@ -73,7 +73,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        $this->manipulateDefinition($documentAST,$fieldDefinition,$parentType);
+        $this->manipulateFieldTypeDefinition($documentAST,$fieldDefinition,$parentType);
     }
 
     public function manipulateInterfaceFieldDefinition(
@@ -82,10 +82,10 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         InterfaceTypeDefinitionNode &$parentType
     )
     {
-        $this->manipulateDefinition($documentAST,$fieldDefinition,$parentType);
+        $this->manipulateFieldTypeDefinition($documentAST,$fieldDefinition,$parentType);
     }
 
-    protected function manipulateDefinition(
+    protected function manipulateFieldTypeDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         TypeDefinitionNode &$parentType

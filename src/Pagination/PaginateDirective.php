@@ -84,12 +84,12 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $this->manipulateField($documentAST, $fieldDefinition, $parentType);
+        $this->manipulateFieldTypeDefinition($documentAST, $fieldDefinition, $parentType);
     }
 
     public function manipulateInterfaceFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, InterfaceTypeDefinitionNode &$parentType): void
     {
-        $this->manipulateField($documentAST, $fieldDefinition, $parentType);
+        $this->manipulateFieldTypeDefinition($documentAST, $fieldDefinition, $parentType);
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -118,7 +118,7 @@ GRAPHQL;
         );
     }
 
-    protected function manipulateField(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, TypeDefinitionNode &$parentType)
+    protected function manipulateFieldTypeDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, TypeDefinitionNode &$parentType)
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
 
