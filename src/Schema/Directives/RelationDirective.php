@@ -3,7 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -71,6 +73,24 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType
     ): void {
+        $this->manipulateDefinition($documentAST,$fieldDefinition,$parentType);
+    }
+
+    public function manipulateInterfaceFieldDefinition(
+        DocumentAST &$documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        InterfaceTypeDefinitionNode &$parentType
+    )
+    {
+        $this->manipulateDefinition($documentAST,$fieldDefinition,$parentType);
+    }
+
+    protected function manipulateDefinition(
+        DocumentAST &$documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        TypeDefinitionNode &$parentType
+    )
+    {
         $paginationType = $this->paginationType();
 
         // We default to not changing the field if no pagination type is set explicitly.

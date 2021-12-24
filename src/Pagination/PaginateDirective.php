@@ -3,7 +3,9 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -12,8 +14,9 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\InterfaceFieldManipulator;
 
-class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
+class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, InterfaceFieldManipulator
 {
     public static function definition(): string
     {
@@ -81,24 +84,12 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $paginationManipulator = new PaginationManipulator($documentAST);
+        $this->manipulateField($documentAST, $fieldDefinition, $parentType);
+    }
 
-        if ($this->directiveHasArgument('builder')) {
-            // This is done only for validation
-            $this->getResolverFromArgument('builder');
-        } else {
-            $paginationManipulator->setModelClass(
-                $this->getModelClass()
-            );
-        }
-
-        $paginationManipulator->transformToPaginatedField(
-            $this->paginationType(),
-            $fieldDefinition,
-            $parentType,
-            $this->defaultCount(),
-            $this->paginateMaxCount()
-        );
+    public function manipulateInterfaceFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, InterfaceTypeDefinitionNode &$parentType): void
+    {
+        $this->manipulateField($documentAST, $fieldDefinition, $parentType);
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -124,6 +115,28 @@ GRAPHQL;
                 return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
                     ->applyToBuilder($query);
             }
+        );
+    }
+
+    protected function manipulateField(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, TypeDefinitionNode &$parentType)
+    {
+        $paginationManipulator = new PaginationManipulator($documentAST);
+
+        if ($this->directiveHasArgument('builder')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('builder');
+        } else {
+            $paginationManipulator->setModelClass(
+                $this->getModelClass()
+            );
+        }
+
+        $paginationManipulator->transformToPaginatedField(
+            $this->paginationType(),
+            $fieldDefinition,
+            $parentType,
+            $this->defaultCount(),
+            $this->paginateMaxCount()
         );
     }
 

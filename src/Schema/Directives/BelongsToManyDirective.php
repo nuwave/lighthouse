@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InterfaceFieldManipulator;
 
-class BelongsToManyDirective extends RelationDirective implements FieldManipulator
+class BelongsToManyDirective extends RelationDirective implements FieldManipulator, InterfaceFieldManipulator
 {
     public static function definition(): string
     {
