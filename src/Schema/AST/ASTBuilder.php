@@ -23,6 +23,7 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InterfaceFieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
@@ -265,6 +266,18 @@ class ASTBuilder
                         as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
+                    }
+                }
+            }
+
+            if ($typeDefinition instanceof InterfaceTypeDefinitionNode) {
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    /** @var \Nuwave\Lighthouse\Support\Contracts\InterfaceFieldManipulator $fieldManipulator */
+                    foreach (
+                        $this->directiveLocator->associatedOfType($fieldDefinition, InterfaceFieldManipulator::class)
+                        as $fieldManipulator
+                    ) {
+                        $fieldManipulator->manipulateInterfaceFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
                     }
                 }
             }
