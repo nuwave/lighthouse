@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Apply paginated field type definition manipulation on interfaces https://github.com/nuwave/lighthouse/pull/2012
+
 ## v5.31.3
 
 ### Fixed
