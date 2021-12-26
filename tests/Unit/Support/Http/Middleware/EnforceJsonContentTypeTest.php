@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class EnforceJsonContentTypeTest extends TestCase
 {
-    public function testForbidGet()
+    public function testForbidGet(): void
     {
         $middleware = new EnforceJsonContentType();
 
@@ -24,7 +24,7 @@ class EnforceJsonContentTypeTest extends TestCase
         );
     }
 
-    public function testForbidNonXHR()
+    public function testForbidNonXHR(): void
     {
         $middleware = new EnforceJsonContentType();
 
@@ -39,7 +39,7 @@ class EnforceJsonContentTypeTest extends TestCase
         );
     }
 
-    public function testAllowXHR()
+    public function testAllowXHR(): void
     {
         $middleware = new EnforceJsonContentType();
 
