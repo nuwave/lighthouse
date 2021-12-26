@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Unit\Support\Http\Middleware;
-
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Http\Middleware\EnforceJsonContentType;
@@ -12,7 +10,8 @@ use Tests\TestCase;
 
 class EnforceJsonContentTypeTest extends TestCase
 {
-    public function testForbidGet(){
+    public function testForbidGet()
+    {
         $middleware = new EnforceJsonContentType();
 
         $request = new Request();
@@ -25,7 +24,8 @@ class EnforceJsonContentTypeTest extends TestCase
         );
     }
 
-    public function testForbidNonXHR(){
+    public function testForbidNonXHR()
+    {
         $middleware = new EnforceJsonContentType();
 
         $request = new Request();
@@ -39,7 +39,8 @@ class EnforceJsonContentTypeTest extends TestCase
         );
     }
 
-    public function testAllowXHR(){
+    public function testAllowXHR()
+    {
         $middleware = new EnforceJsonContentType();
 
         $request = new Request();
@@ -48,10 +49,9 @@ class EnforceJsonContentTypeTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            function () {return true;}
+            function () {return true; }
         );
 
         $this->assertTrue($result);
     }
-
 }
