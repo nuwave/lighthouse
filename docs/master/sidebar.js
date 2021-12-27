@@ -75,6 +75,7 @@ module.exports = [
     children: [
       "security/authentication",
       "security/authorization",
+      "security/csrf",
       "security/validation",
       "security/sanitization",
       "security/resource-exhaustion",
