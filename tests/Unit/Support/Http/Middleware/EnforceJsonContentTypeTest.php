@@ -49,7 +49,7 @@ class EnforceJsonContentTypeTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            function () {return true; }
+            static function (): bool { return true; }
         );
 
         $this->assertTrue($result);

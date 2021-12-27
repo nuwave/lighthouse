@@ -234,7 +234,7 @@ the Lighthouse route.
     ],
 ```
 
-It passes only POST-requests with the "application/json" content-type, and this request type can only be made via
+It passes only POST-requests with the `application/json` content-type, and this request type can only be made via
 XMLHttpRequest.
 
 Old browsers (IE 9, Opera 12) don't support these requests. Also, you won't be able to quickly test simple GraphQL queries

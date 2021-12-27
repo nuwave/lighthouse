@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Added middleware `Nuwave\Lighthouse\Support\Http\Middleware\EnforceJsonContentType` to easily mitigate CSRF attacks for users who don't use Laravel Sanctrum.
+- Added middleware `Nuwave\Lighthouse\Support\Http\Middleware\EnforceJsonContentType` to mitigate CSRF attacks without Laravel Sanctum https://github.com/nuwave/lighthouse/pull/2013
 
 ## v5.31.3
 
