@@ -49,7 +49,7 @@ Stateless guards are recommended for most use cases, such as the default `api` g
 ### Laravel Sanctum
 
 If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) for your API, set the guard
-to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first middleware for Lighthouse's route.
+to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as the first middleware for Lighthouse's route.
 
 ```php
     'route' => [
@@ -213,3 +213,29 @@ class Logout
     }
 }
 ```
+
+## CSRF protection for stateful guard
+
+Lighthouse doesn't have the built-in CSRF protection. The user should either use
+[standard Laravel mechanisms](https://laravel.com/docs/master/csrf) or pass a CSRF token manually to mutations.
+
+However, we implemented a way to easily mitigate CSRF attacks by using the
+`Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR` middleware. Just add it as the first middleware for
+the Lighthouse route.
+
+```php
+    'route' => [
+        // ...
+        'middleware' => [
+            Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR::class,
+
+            // ... other middleware
+        ],
+    ],
+```
+
+It forbids GET requests and those, which can be created using HTML forms. The most common POST-requests with
+the `application/json` content-type are passed along with other requests made via XMLHttpRequest.
+
+Old browsers (IE 9, Opera 12) don't support these requests. Also, you won't be able to quickly test simple GraphQL queries
+via GET-request if the middleware is on.
