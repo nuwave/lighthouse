@@ -219,23 +219,23 @@ class Logout
 Lighthouse doesn't have the built-in CSRF protection. The user should either use
 [standard Laravel mechanisms](https://laravel.com/docs/master/csrf) or pass a CSRF token manually to mutations.
 
-However, we implemented a tricky way to easily mitigate CSRF attacks by using the
-`Nuwave\Lighthouse\Support\Http\Middleware\EnforceJsonContentType` middleware. Just add it as the first middleware for
+However, we implemented a way to easily mitigate CSRF attacks by using the
+`Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR` middleware. Just add it as the first middleware for
 the Lighthouse route.
 
 ```php
     'route' => [
         // ...
         'middleware' => [
-            Nuwave\Lighthouse\Support\Http\Middleware\EnforceJsonContentType::class,
+            Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR::class,
 
             // ... other middleware
         ],
     ],
 ```
 
-It passes only POST-requests with the `application/json` content-type, and this request type can only be made via
-XMLHttpRequest.
+It forbids GET requests and those, which can be created using HTML forms. The most common POST-requests with
+the `application/json` content-type are passed along with other requests made via XMLHttpRequest.
 
 Old browsers (IE 9, Opera 12) don't support these requests. Also, you won't be able to quickly test simple GraphQL queries
 via GET-request if the middleware is on.
