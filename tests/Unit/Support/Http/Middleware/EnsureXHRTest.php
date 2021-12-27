@@ -82,7 +82,6 @@ class EnsureXHRTest extends TestCase
         );
     }
 
-
     public function testAllowXHR(): void
     {
         $middleware = new EnsureXHR();
