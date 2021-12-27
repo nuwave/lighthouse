@@ -235,7 +235,7 @@ function bar(){
 
 ## Code style
 
-We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer)
+We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer).
 
     make fix
 
