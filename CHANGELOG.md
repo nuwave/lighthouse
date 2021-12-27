@@ -28,6 +28,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 
+## v5.31.3
+
+### Fixed
+
+- Use `StartExecution` event to determine per-operation Tracing timestamps https://github.com/nuwave/lighthouse/pull/2009
+
+## v5.31.2
+
+### Fixed
+
+- Trigger model events on nested mutation disconnect of one to many relationships https://github.com/nuwave/lighthouse/pull/2008
+
 ## v5.31.1
 
 ### Fixed

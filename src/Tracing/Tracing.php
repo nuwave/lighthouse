@@ -2,86 +2,59 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
-use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
+/**
+ * See https://github.com/apollographql/apollo-tracing#response-format.
+ */
 class Tracing
 {
     /**
-     * The timestamp the request was initially started.
+     * The point in time when the request was initially started.
      *
      * @var \Illuminate\Support\Carbon
      */
-    protected $requestStart;
+    protected $executionStartAbsolute;
 
     /**
-     * The precise point in time where the request was initially started.
+     * The precise point in time when the request was initially started.
      *
      * This is either in seconds with microsecond precision (float) or nanoseconds (int).
      *
      * @var float|int
      */
-    protected $requestStartPrecise;
+    protected $executionStartPrecise;
 
     /**
      * Trace entries for a single query execution.
-     *
-     * Is reset between batches.
      *
      * @var array<int, array<string, mixed>>
      */
     protected $resolverTraces = [];
 
-    /**
-     * Set the tracing directive on all fields of the query to enable tracing them.
-     */
-    public function handleManipulateAST(ManipulateAST $manipulateAST): void
-    {
-        ASTHelper::attachDirectiveToObjectTypeFields(
-            $manipulateAST->documentAST,
-            Parser::constDirective('@tracing')
-        );
-    }
-
-    /**
-     * Handle request start.
-     */
-    public function handleStartRequest(StartRequest $startRequest): void
-    {
-        $this->requestStart = Carbon::now();
-        $this->requestStartPrecise = $this->getTime();
-    }
-
-    /**
-     * Handle batch request start.
-     */
     public function handleStartExecution(StartExecution $startExecution): void
     {
+        $this->executionStartAbsolute = Carbon::now();
+        $this->executionStartPrecise = $this->timestamp();
         $this->resolverTraces = [];
     }
 
-    /**
-     * Return additional information for the result.
-     */
     public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ExtensionsResponse
     {
-        $requestEnd = Carbon::now();
-        $requestEndPrecise = $this->getTime();
+        $requestEndAbsolute = Carbon::now();
+        $requestEndPrecise = $this->timestamp();
 
         return new ExtensionsResponse(
             'tracing',
             [
                 'version' => 1,
-                'startTime' => $this->requestStart->format(Carbon::RFC3339_EXTENDED),
-                'endTime' => $requestEnd->format(Carbon::RFC3339_EXTENDED),
-                'duration' => $this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise),
+                'startTime' => $this->formatTimestamp($this->executionStartAbsolute),
+                'endTime' => $this->formatTimestamp($requestEndAbsolute),
+                'duration' => $this->diffTimeInNanoseconds($this->executionStartPrecise, $requestEndPrecise),
                 'execution' => [
                     'resolvers' => $this->resolverTraces,
                 ],
@@ -100,9 +73,9 @@ class Tracing
         $this->resolverTraces[] = [
             'path' => $resolveInfo->path,
             'parentType' => $resolveInfo->parentType->name,
-            'returnType' => $resolveInfo->returnType->__toString(),
             'fieldName' => $resolveInfo->fieldName,
-            'startOffset' => $this->diffTimeInNanoseconds($this->requestStartPrecise, $start),
+            'returnType' => $resolveInfo->returnType->toString(),
+            'startOffset' => $this->diffTimeInNanoseconds($this->executionStartPrecise, $start),
             'duration' => $this->diffTimeInNanoseconds($start, $end),
         ];
     }
@@ -114,7 +87,7 @@ class Tracing
      *
      * @return float|int
      */
-    public function getTime()
+    public function timestamp()
     {
         return $this->platformSupportsNanoseconds()
             ? hrtime(true)
@@ -141,10 +114,15 @@ class Tracing
     }
 
     /**
-     * Test if the current PHP version has the `hrtime` function available to get a nanosecond precision point in time.
+     * Is the `hrtime` function available to get a nanosecond precision point in time?
      */
     protected function platformSupportsNanoseconds(): bool
     {
         return function_exists('hrtime');
+    }
+
+    protected function formatTimestamp(Carbon $timestamp): string
+    {
+        return $timestamp->format(Carbon::RFC3339_EXTENDED);
     }
 }

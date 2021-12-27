@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
+use GraphQL\Language\Parser;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 class TracingServiceProvider extends ServiceProvider
 {
@@ -26,14 +27,12 @@ class TracingServiceProvider extends ServiceProvider
             }
         );
 
+        $tracingDirective = Parser::constDirective('@tracing');
         $eventsDispatcher->listen(
             ManipulateAST::class,
-            Tracing::class . '@handleManipulateAST'
-        );
-
-        $eventsDispatcher->listen(
-            StartRequest::class,
-            Tracing::class . '@handleStartRequest'
+            static function (ManipulateAST $manipulateAST) use ($tracingDirective): void {
+                ASTHelper::attachDirectiveToObjectTypeFields($manipulateAST->documentAST, $tracingDirective);
+            }
         );
 
         $eventsDispatcher->listen(

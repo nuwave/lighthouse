@@ -85,13 +85,19 @@ class NestedOneToMany implements ArgResolver
 
         if ($args->has('disconnect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-            $relation
+            $children = $relation
                 ->make()
                 ->whereIn(
                     $relation->getLocalKeyName(),
                     $args->arguments['disconnect']->value
                 )
-                ->update([$relation->getForeignKeyName() => null]);
+                ->get();
+
+            /** @var \Illuminate\Database\Eloquent\Model $child */
+            foreach ($children as $child) {
+                $child->setAttribute($relation->getForeignKeyName(), null);
+                $child->save();
+            }
         }
     }
 }
