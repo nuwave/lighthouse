@@ -7,16 +7,17 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * The middleware ensures that request comes from Javascript XHR API:
- * The method must not be GET
- * If the method is POST, the content type must not equal to one set by form
- *  https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-enctype.
+ * Ensures the request is not vulnerable to cross-site request forgery.
  *
- * It creates an easy protection against CSRF.
+ * - The method must not be GET
+ * - If the method is POST, the content type must not equal one set by form
  */
 class EnsureXHR
 {
-    private const FORBIDDEN_CONTENT_TYPES = [
+    /**
+     * @see https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-enctype
+     */
+    public const FORM_CONTENT_TYPES = [
         'application/x-www-form-urlencoded',
         'multipart/form-data',
         'text/plain',
@@ -42,12 +43,12 @@ class EnsureXHR
             $contentType = $contentType[0];
         }
 
-        if (empty($contentType)) {
+        if ($contentType === null || $contentType === '') {
             throw new BadRequestHttpException('Content-Type header must be set');
         }
 
-        if (in_array($contentType, self::FORBIDDEN_CONTENT_TYPES)) {
-            throw new BadRequestHttpException("Content-Type $contentType is forbidden");
+        if (in_array($contentType, self::FORM_CONTENT_TYPES)) {
+            throw new BadRequestHttpException("Content-Type {$contentType} is forbidden");
         }
 
         return $next($request);

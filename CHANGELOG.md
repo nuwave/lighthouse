@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.32.0
+
 ### Added
 
 - Added middleware `Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR` to mitigate CSRF attacks without Laravel Sanctum https://github.com/nuwave/lighthouse/pull/2013

@@ -19,7 +19,7 @@ class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            function () {}
+            static function (): void {}
         );
     }
 
@@ -52,20 +52,18 @@ class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            function () {}
+            static function (): void {}
         );
     }
 
     /**
-     * @return array<int, array<int, string>>
+     * @return iterable<int, array{string}>
      */
-    public function formContentTypes(): array
+    public function formContentTypes(): iterable
     {
-        return [
-            ['application/x-www-form-urlencoded'],
-            ['multipart/form-data'],
-            ['text/plain'],
-        ];
+        foreach (EnsureXHR::FORM_CONTENT_TYPES as $contentType) {
+            yield [$contentType];
+        }
     }
 
     public function testForbidEmptyContentType(): void
@@ -78,7 +76,7 @@ class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            function () {}
+            static function (): void {}
         );
     }
 
