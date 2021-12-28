@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Set up correct authentication context for subscriptions with `@guard` fields https://github.com/nuwave/lighthouse/pull/1769
+
 ## v5.32.0
 
 ### Added
