@@ -237,18 +237,6 @@ GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>  $args
-     *
-     * @return array<string, string>
-     */
-    public function resolve($root, array $args): array
-    {
-        return [
-            'body' => $args['post'],
-        ];
-    }
-
-    /**
      * @return \Illuminate\Testing\TestResponse
      */
     protected function subscribe()
@@ -263,7 +251,7 @@ GRAPHQL;
     }
 
     /**
-     * Build the expectation for the first subscription reponse.
+     * Build the expectation for the first subscription response.
      *
      * @return array<string, array<string, mixed>>
      */
