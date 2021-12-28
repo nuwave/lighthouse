@@ -23,6 +23,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Include empty placeholder for parent cache key in root fields to ensure predictable cache key
 - Prefix all generate cache keys or tags with `lighthouse`
 
+## v5.32.0
+
+### Added
+
+- Added middleware `Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR` to mitigate CSRF attacks without Laravel Sanctum https://github.com/nuwave/lighthouse/pull/2013
+
 ## v5.31.3
 
 ### Fixed
