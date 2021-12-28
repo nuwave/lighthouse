@@ -80,7 +80,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         InterfaceTypeDefinitionNode &$parentType
-    )
+    ): void
     {
         $this->manipulateFieldTypeDefinition($documentAST,$fieldDefinition,$parentType);
     }
@@ -89,7 +89,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         TypeDefinitionNode &$parentType
-    )
+    ): void
     {
         $paginationType = $this->paginationType();
 

@@ -118,7 +118,7 @@ GRAPHQL;
         );
     }
 
-    protected function manipulateFieldTypeDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, TypeDefinitionNode &$parentType)
+    protected function manipulateFieldTypeDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, TypeDefinitionNode &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
 
