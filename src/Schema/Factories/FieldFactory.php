@@ -19,6 +19,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
+/**
+ * @phpstan-import-type FieldResolver from \GraphQL\Executor\Executor as FieldResolverFn
+ * @phpstan-import-type FieldDefinitionConfig from \GraphQL\Type\Definition\FieldDefinition
+ * @phpstan-import-type FieldType from \GraphQL\Type\Definition\FieldDefinition
+ * @phpstan-import-type ComplexityFn from \GraphQL\Type\Definition\FieldDefinition
+ */
 class FieldFactory
 {
     /**
@@ -56,7 +62,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @return array<string, mixed> Configuration array for @see \GraphQL\Type\Definition\FieldDefinition
+     * @return FieldDefinitionConfig
      */
     public function handle(FieldValue $fieldValue): array
     {
@@ -113,7 +119,7 @@ class FieldFactory
     }
 
     /**
-     * @return \Closure(): Type
+     * @return \Closure(): (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\OutputType)
      */
     protected function type(FieldDefinitionNode $fieldDefinition): \Closure
     {
@@ -125,6 +131,9 @@ class FieldFactory
         };
     }
 
+    /**
+     * @return ComplexityFn|null
+     */
     protected function complexity(FieldValue $fieldValue): ?callable
     {
         /** @var \Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective|null $complexityDirective */
@@ -140,6 +149,9 @@ class FieldFactory
         return $complexityDirective->complexityResolver($fieldValue);
     }
 
+    /**
+     * @return FieldResolverFn
+     */
     public static function defaultResolver(FieldValue $fieldValue): callable
     {
         if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {

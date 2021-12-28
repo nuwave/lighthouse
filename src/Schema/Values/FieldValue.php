@@ -11,8 +11,12 @@ use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
+/**
+ * @phpstan-import-type FieldResolver from \GraphQL\Executor\Executor as FieldResolverFn
+ */
 class FieldValue
 {
     /**
@@ -41,7 +45,7 @@ class FieldValue
      *
      * Lazily initialized through setResolver().
      *
-     * @var callable
+     * @var FieldResolverFn
      */
     protected $resolver;
 
@@ -85,6 +89,8 @@ class FieldValue
 
     /**
      * Get field resolver.
+     *
+     * @return FieldResolverFn
      */
     public function getResolver(): callable
     {
@@ -93,6 +99,8 @@ class FieldValue
 
     /**
      * Overwrite the current/default resolver.
+     *
+     * @param FieldResolverFn $resolver
      */
     public function setResolver(callable $resolver): self
     {
