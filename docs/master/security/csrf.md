@@ -21,5 +21,6 @@ Other request types and `POST` requests with a `Content-Type` that can not be se
 from HTML forms are passed along.
 
 Caveats:
+
 - Old browsers (IE 9, Opera 12) don't support XHR requests
 - You won't be able to use GraphQL queries through `GET` requests or HTML forms
