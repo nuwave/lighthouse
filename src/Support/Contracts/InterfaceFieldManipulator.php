@@ -6,7 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-interface InterfaceFieldManipulator
+interface InterfaceFieldManipulator extends Directive
 {
     /**
      * Manipulate the AST based on a field definition.
