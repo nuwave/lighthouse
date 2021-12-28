@@ -162,6 +162,54 @@ class ClearCacheDirectiveTest extends TestCase
         $this->assertFalse($taggedCache->has($key));
     }
 
+    public function testClearCacheForMultipleTypesWithIDByField(): void
+    {
+        $this->mockResolver(function (): array {
+            return [
+                [
+                    'bar' => 1,
+                ],
+                null,
+                [
+                    'bar' => 2,
+                ],
+            ];
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Foo {
+            bar: Int!
+        }
+
+        type Mutation {
+            foos: [Foo]!
+                @mock
+                @clearCache(type: "Foo", idSource: { field: "*.bar" })
+        }
+        ' . self::PLACEHOLDER_QUERY;
+
+        $taggedCache1 = $this->cache->tags(['lighthouse:Foo:1']);
+        $taggedCache2 = $this->cache->tags(['lighthouse:Foo:2']);
+
+        $key = 'foo';
+        $taggedCache1->set($key, 'some-value');
+        $taggedCache2->set($key, 'some-value');
+
+        $this->assertTrue($taggedCache1->has($key));
+        $this->assertTrue($taggedCache2->has($key));
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            foos {
+                bar
+            }
+        }
+        ')->assertGraphQLErrorFree();
+
+        $this->assertFalse($taggedCache1->has($key));
+        $this->assertFalse($taggedCache2->has($key));
+    }
+
     public function testClearCacheForTypeWithIDByFieldNestedPath(): void
     {
         $this->mockResolver(function (): array {

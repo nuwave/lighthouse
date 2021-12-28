@@ -60,7 +60,7 @@ input ClearCacheIdSource {
   """
   Path of a field in the result returned from the field `@clearCache` is applied to.
   """
-  field: String 
+  field: String
 }
 GRAPHQL;
     }
@@ -74,18 +74,20 @@ GRAPHQL;
                 $field = $this->directiveArgValue('field');
 
                 if (isset($idSource['argument'])) {
-                    $id = Arr::get($args, $idSource['argument']);
+                    $idOrIds = Arr::get($args, $idSource['argument']);
                 } elseif (isset($idSource['field'])) {
-                    $id = data_get($result, $idSource['field']);
+                    $idOrIds = data_get($result, $idSource['field']);
                 } else {
-                    $id = null;
+                    $idOrIds = [null];
                 }
 
-                $tag = is_string($field)
-                    ? CacheKeyAndTags::fieldTag($type, $id, $field)
-                    : CacheKeyAndTags::parentTag($type, $id);
+                foreach ((array) $idOrIds as $id) {
+                    $tag = is_string($field)
+                        ? CacheKeyAndTags::fieldTag($type, $id, $field)
+                        : CacheKeyAndTags::parentTag($type, $id);
 
-                $this->cacheRepository->tags([$tag])->flush();
+                    $this->cacheRepository->tags([$tag])->flush();
+                }
 
                 return $result;
             }

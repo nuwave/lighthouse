@@ -461,32 +461,7 @@ directive @cache(
 ) on FIELD_DEFINITION
 ```
 
-The cache is created on the first request and is cached forever by default.
-Use this for values that seldom change and take long to fetch/compute.
-
-```graphql
-type Query {
-  highestKnownPrimeNumber: Int! @cache
-}
-```
-
-You can set an expiration time in seconds
-if you want to invalidate the cache after a while.
-
-```graphql
-type Query {
-  temperature: Int! @cache(maxAge: 300)
-}
-```
-
-You can limit the cache to the logged in user making the request by marking it as private.
-This makes sense for data that is specific to a certain user.
-
-```graphql
-type Query {
-  todos: [ToDo!]! @cache(private: true)
-}
-```
+You can find usage examples of this directive in [the caching docs](../performance/caching.md).
 
 ## @cacheKey
 
@@ -497,17 +472,7 @@ Specify the field to use as a key when creating a cache.
 directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-When generating a cached result for a resolver, Lighthouse produces a unique key for each type.
-By default, Lighthouse will look for a field with the `ID` type to generate the key.
-
-This directive allows to use a different field (i.e., an external API id):
-
-```graphql
-type GithubProfile {
-  username: String @cacheKey
-  repos: [Repository] @cache
-}
-```
+You can find usage examples of this directive in [the caching docs](../performance/caching.md#cache-key).
 
 ## @can
 
@@ -594,6 +559,49 @@ type Query {
 ```
 
 You can find usage examples of this directive in [the authorization docs](../security/authorization.md#restrict-fields-through-policies).
+
+## @clearCache
+
+```graphql
+"""
+Clear a resolver cache by tags.
+"""
+directive @clearCache(
+  """
+  Name of the parent type of the field to clear.
+  """
+  type: String!
+
+  """
+  Source of the parent ID to clear.
+  """
+  idSource: ClearCacheId
+
+  """
+  Name of the field to clear.
+  """
+  field: String
+) on FIELD_DEFINITION
+
+"""
+Options for the `id` argument on `@clearCache`.
+
+Exactly one of the fields must be given.
+"""
+input ClearCacheIdSource {
+  """
+  Path of an argument the client passes to the field `@clearCache` is applied to.
+  """
+  argument: String
+
+  """
+  Path of a field in the result returned from the field `@clearCache` is applied to.
+  """
+  field: String 
+}
+```
+
+You can find usage examples of this directive in [the caching docs](../performance/caching.md#clear-cache).
 
 ## @complexity
 
@@ -2672,7 +2680,7 @@ directive @search(
 ```
 
 The `search()` method of the model is called with the value of the argument,
-using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
+using the driver you configured for [Laravel Scout](https://laravel.com/docs/scout).
 
 ```graphql
 type Query {
