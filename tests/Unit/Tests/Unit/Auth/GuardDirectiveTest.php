@@ -8,7 +8,7 @@ use Tests\Utils\Queries\Foo;
 
 class GuardDirectiveTest extends TestCase
 {
-    public function testGuardsWithDefault(): void
+    public function testGuardDefault(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -23,7 +23,7 @@ class GuardDirectiveTest extends TestCase
         ')->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
     }
 
-    public function testGuardsWithApi(): void
+    public function testGuardWith(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {

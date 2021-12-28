@@ -2401,7 +2401,7 @@ type Query {
 ```
 
 The `search()` method of the model is called with the value of the argument,
-using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
+using the driver you configured for [Laravel Scout](https://laravel.com/docs/scout).
 
 The [@search](#search) directive does not work in combination with other filter directives.
 The usual query builder `Eloquent\Builder` will be replaced by a `Scout\Builder`,
