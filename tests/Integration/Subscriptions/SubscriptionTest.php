@@ -27,7 +27,7 @@ class SubscriptionTest extends TestCase
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             title: String!
-            body: String @guard(with: "api")
+            body: String @guard
         }
 
         type Subscription {
@@ -208,15 +208,13 @@ GRAPHQL;
         ');
 
         /** @var SessionGuard $sessionGuard */
-        $sessionGuard = $this->app['auth']->guard();
+        $sessionGuard = $this->app->make('auth')->guard();
         $sessionGuard->logout();
-//        dd($sessionGuard);
 
-//        $this->be(new User());
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createPost(title: "foo", body: "bar") {
-                body
+                title
             }
         }
         ');
@@ -225,14 +223,17 @@ GRAPHQL;
         $log = app(BroadcastManager::class)->driver();
         $broadcasts = $log->broadcasts();
 
-        $this->assertNotNull($broadcasts);
-        /** @var array<mixed> $broadcasts */
+        $this->assertIsArray($broadcasts);
         $this->assertCount(1, $broadcasts);
-        dd($broadcasts);
 
-        $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);
-        $this->assertArrayHasKey('onPostCreated', $broadcasted);
-        $this->assertSame(['body' => 'bar'], $broadcasted['onPostCreated']);
+        $this->assertSame(
+            [
+                'onPostCreated' => [
+                    'body' => 'bar',
+                ],
+            ],
+            Arr::first($broadcasts)['data'] ?? null
+        );
     }
 
     /**
