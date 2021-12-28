@@ -50,11 +50,11 @@ a calculated tag. Depending on the effect of the mutation, you can clear differe
 
 Update the cache associated with a given type without a specific ID:
 
-> This does not invalidate cache entries related to the type *and* and ID.
+> This does not invalidate cache entries related to the type _and_ and ID.
 
 ```graphql
 type Mutation {
-    updateSiteStatistics(input: SiteInput!): Site @clearCache(type: "Site")
+  updateSiteStatistics(input: SiteInput!): Site @clearCache(type: "Site")
 }
 ```
 
@@ -62,7 +62,8 @@ If your mutation affects only a certain ID, specify the source for that ID:
 
 ```graphql
 type Mutation {
-    updatePost(input: UpdatePostInput!): Post! @clearCache(type: "Post", idSource: { argument: "input.id" })
+  updatePost(input: UpdatePostInput!): Post!
+    @clearCache(type: "Post", idSource: { argument: "input.id" })
 }
 ```
 
@@ -70,7 +71,8 @@ If your mutation affects multiple entities, you can use the result as the source
 
 ```graphql
 type Mutation {
-    updatePosts(search: String!, newValue: Int!): [Post!]! @clearCache(type: "Post", idSource: { field: "*.id" })
+  updatePosts(search: String!, newValue: Int!): [Post!]!
+    @clearCache(type: "Post", idSource: { field: "*.id" })
 }
 ```
 
@@ -78,7 +80,8 @@ If your mutation only affects a single field, you can clear tags that are specif
 
 ```graphql
 type Mutation {
-    updatePost(id: ID!, title: String!): Post! @clearCache(type: "Post", idSource: { argument: "id" }, field: "title")
+  updatePost(id: ID!, title: String!): Post!
+    @clearCache(type: "Post", idSource: { argument: "id" }, field: "title")
 }
 ```
 

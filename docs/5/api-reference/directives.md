@@ -597,7 +597,7 @@ input ClearCacheIdSource {
   """
   Path of a field in the result returned from the field `@clearCache` is applied to.
   """
-  field: String 
+  field: String
 }
 ```
 
