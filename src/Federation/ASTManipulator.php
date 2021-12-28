@@ -37,7 +37,7 @@ class ASTManipulator
     }
 
     /**
-     * Combine object types with `@key` into the _Entity union.
+     * Combine object types with @key into the _Entity union.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\FederationException
      */

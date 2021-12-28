@@ -1808,7 +1808,7 @@ type Query {
 ```
 
 The `search()` method of the model is called with the value of the argument,
-using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
+using the driver you configured for [Laravel Scout](https://laravel.com/docs/scout).
 
 ### Definition
 

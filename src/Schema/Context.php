@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -32,10 +33,8 @@ class Context implements GraphQLContext
      * Get instance of authenticated user.
      *
      * May be null since some fields may be accessible without authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function user()
+    public function user(): ?Authenticatable
     {
         return $this->user;
     }

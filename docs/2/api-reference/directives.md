@@ -798,7 +798,7 @@ scalar DateTime
 
 Creates a full-text search argument.
 
-This directive will make an argument use [Laravel Scout](https://laravel.com/docs/master/scout)
+This directive will make an argument use [Laravel Scout](https://laravel.com/docs/scout)
 to make a full-text search, what driver you use for Scout is up to you.
 
 The `search` method of the model is called with the value of the argument.
