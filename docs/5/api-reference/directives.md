@@ -1209,7 +1209,7 @@ Used upon an object, it applies to all fields within.
 """
 directive @guard(
   """
-  Specify which guards to use, e.g. ["api"].
+  Specify which guards to use, e.g. ["web"].
   When not defined, the default from `lighthouse.php` is used.
   """
   with: [String!]
