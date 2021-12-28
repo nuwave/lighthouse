@@ -12,7 +12,7 @@ use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
 /**
- * TODO extends TestCase when depending on Laravel 5.8+
+ * TODO extends TestCase when depending on Laravel 5.8+.
  */
 class SubscriptionTest extends DBTestCase
 {
