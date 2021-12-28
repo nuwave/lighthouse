@@ -7,11 +7,14 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\TestCase;
+use Tests\DBTestCase;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
-class SubscriptionTest extends TestCase
+/**
+ * TODO extends TestCase when depending on Laravel 5.8+
+ */
+class SubscriptionTest extends DBTestCase
 {
     use TestsSubscriptions;
 
