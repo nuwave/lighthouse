@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -24,6 +24,12 @@ directive @all(
   model: String
 
   """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
@@ -35,11 +41,20 @@ GRAPHQL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
+                if ($this->directiveHasArgument('builder')) {
+                    $builderResolver = $this->getResolverFromArgument('builder');
+
+                    /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
+                    $query = $builderResolver($root, $args, $context, $resolveInfo);
+                } else {
+                    $query = $this->getModelClass()::query();
+                }
+
                 return $resolveInfo
                     ->argumentSet
                     ->enhanceBuilder(
-                        $this->getModelClass()::query(),
-                        $this->directiveArgValue('scopes', [])
+                        $query,
+                        $this->directiveArgValue('scopes') ?? []
                     )
                     ->get();
             }

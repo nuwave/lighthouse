@@ -10,7 +10,6 @@ class GenericException extends Error
 
     /**
      * @param  array<string, mixed>  $extensions
-     * @return $this
      */
     public function setExtensions(array $extensions): self
     {
@@ -19,9 +18,6 @@ class GenericException extends Error
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function setCategory(string $category): self
     {
         $this->category = $category;

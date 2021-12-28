@@ -60,15 +60,15 @@ class DirectiveLocator
      */
     public function namespaces(): array
     {
-        if ($this->directiveNamespaces === null) {
-            $this->directiveNamespaces =
+        if (null === $this->directiveNamespaces) {
+            $this->directiveNamespaces
                 // When looking for a directive by name, the namespaces are tried in order
-                (new Collection([
+                = (new Collection([
                     // User defined directives (top priority)
                     config('lighthouse.namespaces.directives'),
 
                     // Plugin developers defined directives
-                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces),
+                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
 
                     // Lighthouse defined directives
                     'Nuwave\\Lighthouse\\Schema\\Directives',
@@ -103,7 +103,6 @@ class DirectiveLocator
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
-                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $class */
                 $name = self::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
@@ -121,14 +120,14 @@ class DirectiveLocator
     /**
      * Return the parsed definitions for all directive classes.
      *
-     * @return array<int, \GraphQL\Language\AST\DirectiveDefinitionNode>
+     * @return list<\GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public function definitions(): array
     {
         $definitions = [];
 
         foreach ($this->classes() as $directiveClass) {
-            $definitions [] = ASTHelper::extractDirectiveDefinition($directiveClass::definition());
+            $definitions[] = ASTHelper::extractDirectiveDefinition($directiveClass::definition());
         }
 
         return $definitions;
@@ -147,9 +146,9 @@ class DirectiveLocator
     /**
      * Resolve the class for a given directive name.
      *
-     * @return class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     *
+     * @return class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function resolve(string $directiveName): string
     {
@@ -159,13 +158,12 @@ class DirectiveLocator
         }
 
         foreach ($this->namespaces() as $baseNamespace) {
-            $directiveClass = $baseNamespace.'\\'.static::className($directiveName);
+            $directiveClass = $baseNamespace . '\\' . static::className($directiveName);
 
             if (class_exists($directiveClass)) {
                 if (! is_a($directiveClass, Directive::class, true)) {
-                    throw new DirectiveException("Class $directiveClass must implement the interface ".Directive::class);
+                    throw new DirectiveException("Class $directiveClass must implement the interface " . Directive::class);
                 }
-                /** @var class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass */
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;
@@ -180,7 +178,7 @@ class DirectiveLocator
      */
     protected static function className(string $directiveName): string
     {
-        return Str::studly($directiveName).'Directive';
+        return Str::studly($directiveName) . 'Directive';
     }
 
     /**
@@ -197,7 +195,6 @@ class DirectiveLocator
 
     /**
      * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
-     * @return $this
      */
     public function setResolved(string $directiveName, string $directiveClass): self
     {
@@ -214,7 +211,7 @@ class DirectiveLocator
     public function associated(Node $node): Collection
     {
         if (! property_exists($node, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: '.get_class($node));
+            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($node));
         }
 
         return (new Collection($node->directives))
@@ -233,13 +230,24 @@ class DirectiveLocator
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive> of type <$directiveClass>
+     * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
+     *
+     * @param  class-string<TDirective>  $directiveClass
+     *
+     * @return \Illuminate\Support\Collection<TDirective>
      */
     public function associatedOfType(Node $node, string $directiveClass): Collection
     {
-        return $this
+        /**
+         * Ensured by instanceofMatcher.
+         *
+         * @var \Illuminate\Support\Collection<TDirective> $associatedOfType
+         */
+        $associatedOfType = $this
             ->associated($node)
             ->filter(Utils::instanceofMatcher($directiveClass));
+
+        return $associatedOfType;
     }
 
     /**
@@ -248,9 +256,13 @@ class DirectiveLocator
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive> $directiveClass
+     * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
+     *
+     * @param  class-string<TDirective>  $directiveClass
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     *
+     * @return TDirective|null
      */
     public function exclusiveOfType(Node $node, string $directiveClass): ?Directive
     {
@@ -263,12 +275,12 @@ class DirectiveLocator
                         $directive::definition()
                     );
 
-                    return '@'.$definition->name->value;
+                    return '@' . $definition->name->value;
                 })
                 ->implode(', ');
 
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected Node class with property `name`, got: '.get_class($node));
+                throw new Exception('Expected Node class with property `name`, got: ' . get_class($node));
             }
 
             throw new DirectiveException(

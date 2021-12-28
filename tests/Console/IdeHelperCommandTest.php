@@ -86,7 +86,7 @@ class IdeHelperCommandTest extends TestCase
         $ideHelper = \Safe\file_get_contents(IdeHelperCommand::phpIdeHelperPath());
 
         $this->assertStringContainsString(
-            IdeHelperCommand::OPENING_PHP_TAG.IdeHelperCommand::GENERATED_NOTICE,
+            IdeHelperCommand::OPENING_PHP_TAG . IdeHelperCommand::GENERATED_NOTICE,
             $ideHelper
         );
     }

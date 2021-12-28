@@ -11,6 +11,7 @@ trait TestsRedis
     protected function tearDown(): void
     {
         Redis::flushall();
+
         parent::tearDown();
     }
 
@@ -40,7 +41,7 @@ trait TestsRedis
             'broadcasters' => [
                 'echo' => [
                     'driver' => 'echo',
-                    'routes' => SubscriptionRouter::class.'@echoRoutes',
+                    'routes' => SubscriptionRouter::class . '@echoRoutes',
                 ],
             ],
         ]);

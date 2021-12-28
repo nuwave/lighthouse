@@ -7,15 +7,14 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
-  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
+  LIGHTHOUSE_TEST_DB_USER: root
   LIGHTHOUSE_TEST_DB_PASSWORD: root
+  LIGHTHOUSE_TEST_DB_HOST: localhost
+  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
 
 # Using ubuntu-18.04 because it has MySQL 5.7.
-# MySQL 8.0 requires a new authentication method that is only supported in PHP 7.4+.defaults:
-# Once we drop support for older PHP versions, we can use ubuntu-20.04.
-# Also, default ordering semantics in MySQL 8 seem to have changed, so we will need
-# to change a bunch of assertJson() to assertSimilarJson().
+# TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784
 
 jobs:
   static-analysis:
@@ -28,6 +27,7 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
+          - 8.1
         laravel-version:
           - ^6
           - ^7
@@ -38,6 +38,10 @@ jobs:
           - php-version: 8.0
             laravel-version: ^6
           - php-version: 8.0
+            laravel-version: ^7
+          - php-version: 8.1
+            laravel-version: ^6
+          - php-version: 8.1
             laravel-version: ^7
 
     steps:
@@ -63,9 +67,15 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - name: "Workaround missing laminas/laminas-code release"
+        if: matrix.php-version == '8.1'
+        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
 
-      - run: vendor/bin/phpstan analyse
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+
+      - run: vendor/bin/phpstan
+
+      - run: vendor/bin/psalm
 
   tests:
     runs-on: ubuntu-18.04
@@ -77,6 +87,7 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
+          - 8.1
         laravel-version:
           - 5.6.*
           - 5.7.*
@@ -96,6 +107,16 @@ jobs:
           - php-version: 8.0
             laravel-version: ^6
           - php-version: 8.0
+            laravel-version: ^7
+          - php-version: 8.1
+            laravel-version: 5.6.*
+          - php-version: 8.1
+            laravel-version: 5.7.*
+          - php-version: 8.1
+            laravel-version: 5.8.*
+          - php-version: 8.1
+            laravel-version: ^6
+          - php-version: 8.1
             laravel-version: ^7
 
     steps:
@@ -120,11 +141,15 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
 
+      - name: "Workaround missing laminas/laminas-code release"
+        if: matrix.php-version == '8.1'
+        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
+
       - name: "Ensure compatibility with legacy factories"
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: |
           sudo systemctl start mysql.service
@@ -168,7 +193,7 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: |
           sudo systemctl start mysql.service
@@ -176,9 +201,8 @@ jobs:
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
-      - run: bash <(curl -s https://codecov.io/bash)
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: "Upload to Codecov"
+        uses: codecov/codecov-action@v2
 
   benchmarks:
     runs-on: ubuntu-18.04
@@ -209,6 +233,6 @@ jobs:
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction
+      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
-      - run: vendor/bin/phpbench run --progress=none --report=ast
+      - run: vendor/bin/phpbench run --progress=none --report=aggregate

@@ -78,7 +78,7 @@ class BelongsToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testCreateAndConnectWithBelongsTo(): void
     {
@@ -777,7 +777,7 @@ GRAPHQL
         input UpsertRoleInput {
             name: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -859,7 +859,7 @@ GRAPHQL
         input UpsertRoleUsersRelation {
             sync: [ID!]
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         // Create the first User with a Role.
         $this->graphQL(/** @lang GraphQL */ '
@@ -995,7 +995,7 @@ GRAPHQL
             id: ID!
             name: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -1092,7 +1092,7 @@ GRAPHQL
             id: ID
             name: String!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $query = /** @lang GraphQL */ '
         mutation {

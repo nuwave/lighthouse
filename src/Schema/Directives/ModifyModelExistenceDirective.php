@@ -37,7 +37,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     public static function couldNotModify(Model $user): string
     {
-        return 'Could not modify model '.get_class($user).' with ID '.$user->getKey().'.';
+        return 'Could not modify model ' . get_class($user) . ' with ID ' . $user->getKey() . '.';
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -47,6 +47,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 /** @var string|int|array<string>|array<int> $idOrIds */
                 $idOrIds = reset($args);
 
+                // TODO remove in v6
                 if ($this->directiveArgValue('globalId') ?? false) {
                     // @phpstan-ignore-next-line We know that global ids must be strings
                     $idOrIds = $this->decodeIdOrIds($idOrIds);
@@ -57,7 +58,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                     $idOrIds
                 );
 
-                if ($modelOrModels === null) {
+                if (null === $modelOrModels) {
                     return null;
                 }
 
@@ -109,21 +110,22 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         ObjectTypeDefinitionNode &$parentType
     ): void {
         // Ensure there is only a single argument defined on the field.
-        if (count($fieldDefinition->arguments) !== 1) {
+        if (1 !== count($fieldDefinition->arguments)) {
             throw new DefinitionException(
-                'The @'.$this->name()." directive requires the field {$this->nodeName()} to only contain a single argument."
+                'The @' . $this->name() . " directive requires the field {$this->nodeName()} to only contain a single argument."
             );
         }
 
         if (! $this->idArgument() instanceof NonNullTypeNode) {
             throw new DefinitionException(
-                'The @'.$this->name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
+                'The @' . $this->name() . " directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
             );
         }
     }
 
     /**
      * @param  string|array<string>  $idOrIds
+     *
      * @return string|array<string>
      */
     protected function decodeIdOrIds($idOrIds)
@@ -148,6 +150,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @param  string|int|array<string>|array<int>  $idOrIds
+     *
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
      */
     abstract protected function find(string $modelClass, $idOrIds);

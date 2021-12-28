@@ -47,7 +47,7 @@ Sets rate limit to access the field. Does the same as ThrottleRequests Laravel M
 """
 directive @throttle(
     """
-    Named preconfigured rate limiter. Requires Larave 8.x or later.
+    Named preconfigured rate limiter. Requires Laravel 8.x or later.
     """
     name: String
 
@@ -75,11 +75,14 @@ GRAPHQL;
         $limits = [];
 
         $name = $this->directiveArgValue('name');
-        if ($name !== null) {
+        if (null !== $name) {
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
+            /**
+             * @psalm-suppress UndefinedClass
+             */
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             if ($limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);
@@ -87,20 +90,20 @@ GRAPHQL;
 
             if ($limiterResponse instanceof Response) {
                 throw new DirectiveException(
-                    "Expected named limiter {$name} to return an array, got instance of ".get_class($limiterResponse)
+                    "Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse)
                 );
             }
 
             foreach (Arr::wrap($limiterResponse) as $limit) {
                 $limits[] = [
-                    'key' => sha1($name.$limit->key),
+                    'key' => sha1($name . $limit->key),
                     'maxAttempts' => $limit->maxAttempts,
                     'decayMinutes' => $limit->decayMinutes,
                 ];
             }
         } else {
             $limits[] = [
-                'key' => sha1($this->directiveArgValue('prefix', '').$this->request->ip()),
+                'key' => sha1($this->directiveArgValue('prefix', '') . $this->request->ip()),
                 'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
                 'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
             ];
@@ -128,7 +131,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $name = $this->directiveArgValue('name');
-        if ($name !== null) {
+        if (null !== $name) {
             if (AppVersion::below(8.0)) {
                 throw new DefinitionException('Named limiter requires Laravel 8.x or later');
             }

@@ -4,10 +4,14 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 
 class PaginationManipulator
 {
@@ -36,7 +40,6 @@ class PaginationManipulator
      * Set the model class to use for code generation.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @return $this
      */
     public function setModelClass(string $modelClass): self
     {
@@ -50,8 +53,6 @@ class PaginationManipulator
      *
      * This makes either an offset-based Paginator or a cursor-based Connection.
      * The types in between are automatically generated and applied to the schema.
-     *
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      */
     public function transformToPaginatedField(
         PaginationType $paginationType,
@@ -63,14 +64,13 @@ class PaginationManipulator
     ): void {
         if ($paginationType->isConnection()) {
             $this->registerConnection($fieldDefinition, $parentType, $defaultCount, $maxCount, $edgeType);
+        } elseif ($paginationType->isSimple()) {
+            $this->registerSimplePaginator($fieldDefinition, $parentType, $defaultCount, $maxCount);
         } else {
             $this->registerPaginator($fieldDefinition, $parentType, $defaultCount, $maxCount);
         }
     }
 
-    /**
-     * Register connection with schema.
-     */
     protected function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
@@ -80,7 +80,7 @@ class PaginationManipulator
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
-        if ($edgeType !== null) {
+        if (null !== $edgeType) {
             $connectionEdgeName = $edgeType->name->value;
             $connectionTypeName = "{$connectionEdgeName}Connection";
         } else {
@@ -91,13 +91,13 @@ class PaginationManipulator
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "A paginated list of $fieldTypeName edges."
-            type $connectionTypeName {
+            "A paginated list of {$fieldTypeName} edges."
+            type {$connectionTypeName} {
                 "Pagination information about the list of edges."
                 pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
                 "A list of $fieldTypeName edges."
-                edges: [$connectionEdgeName] @field(resolver: "{$connectionFieldName}@edgeResolver")
+                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
             }
 GRAPHQL
         );
@@ -109,7 +109,7 @@ GRAPHQL
                 "An edge that contains a node of type $fieldTypeName and a cursor."
                 type $connectionEdgeName {
                     "The $fieldTypeName node."
-                    node: $fieldTypeName
+                    node: $fieldTypeName!
 
                     "A unique cursor that can be used for pagination."
                     cursor: String!
@@ -118,31 +118,26 @@ GRAPHQL
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
-        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
+        $fieldDefinition->arguments[] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments [] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 "A cursor after which elements are returned."
 after: String
 GRAPHQL
         );
 
-        $fieldDefinition->type = Parser::namedType($connectionTypeName);
+        $fieldDefinition->type = $this->paginationResultType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
     }
 
-    /**
-     * Add the wrapping type for paginated results.
-     *
-     * This merges preexisting definitions to preserve maximum information.
-     */
     protected function addPaginationWrapperType(ObjectTypeDefinitionNode $objectType): void
     {
         $typeName = $objectType->name->value;
 
-        // If the type already exists, we use that instead
+        // Reuse existing types to preserve directives or other modifications made to it
         $existingType = $this->documentAST->types[$typeName] ?? null;
-        if ($existingType !== null) {
+        if (null !== $existingType) {
             if (! $existingType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException(
                     "Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead."
@@ -152,16 +147,16 @@ GRAPHQL
             $objectType = $existingType;
         }
 
-        if ($this->modelClass) {
-            $objectType->directives [] = Parser::constDirective('@model(class: "'.addslashes($this->modelClass).'")');
+        if (
+            $this->modelClass
+            && ! ASTHelper::hasDirective($objectType, ModelDirective::NAME)
+        ) {
+            $objectType->directives[] = Parser::constDirective(/** @lang GraphQL */ '@model(class: "' . addslashes($this->modelClass) . '")');
         }
 
         $this->documentAST->setTypeDefinition($objectType);
     }
 
-    /**
-     * Register paginator with schema.
-     */
     protected function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
@@ -173,24 +168,64 @@ GRAPHQL
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "A paginated list of $fieldTypeName items."
-            type $paginatorTypeName {
+            "A paginated list of {$fieldTypeName} items."
+            type {$paginatorTypeName} {
                 "Pagination information about the list of items."
                 paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
-                "A list of $fieldTypeName items."
-                data: [$fieldTypeName!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+                "A list of {$fieldTypeName} items."
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
             }
 GRAPHQL
         );
         $this->addPaginationWrapperType($paginatorType);
 
-        $fieldDefinition->arguments [] = Parser::inputValueDefinition(
+        $fieldDefinition->arguments[] = Parser::inputValueDefinition(
             self::countArgument($defaultCount, $maxCount)
         );
-        $fieldDefinition->arguments [] = Parser::inputValueDefinition("\"The offset from which elements are returned.\"\npage: Int");
+        $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"The offset from which items are returned."
+page: Int
+GRAPHQL
+        );
 
-        $fieldDefinition->type = Parser::namedType($paginatorTypeName);
+        $fieldDefinition->type = $this->paginationResultType($paginatorTypeName);
+        $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
+    }
+
+    protected function registerSimplePaginator(
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode &$parentType,
+        ?int $defaultCount = null,
+        ?int $maxCount = null
+    ): void {
+        $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
+        $paginatorTypeName = "{$fieldTypeName}SimplePaginator";
+        $paginatorFieldClassName = addslashes(SimplePaginatorField::class);
+
+        $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            "A paginated list of {$fieldTypeName} items."
+            type {$paginatorTypeName} {
+                "Pagination information about the list of items."
+                paginatorInfo: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+
+                "A list of {$fieldTypeName} items."
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+            }
+GRAPHQL
+        );
+        $this->addPaginationWrapperType($paginatorType);
+
+        $fieldDefinition->arguments[] = Parser::inputValueDefinition(
+            self::countArgument($defaultCount, $maxCount)
+        );
+        $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+"The offset from which items are returned."
+page: Int
+GRAPHQL
+        );
+
+        $fieldDefinition->type = $this->paginationResultType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
     }
 
@@ -199,18 +234,40 @@ GRAPHQL
      */
     protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
     {
-        $description = '"Limits number of fetched elements.';
+        $description = '"Limits number of fetched items.';
         if ($maxCount) {
-            $description .= ' Maximum allowed value: '.$maxCount.'.';
+            $description .= ' Maximum allowed value: ' . $maxCount . '.';
         }
         $description .= "\"\n";
 
         $definition = 'first: Int'
-            .($defaultCount
-                ? ' = '.$defaultCount
+            . (
+                $defaultCount
+                ? ' = ' . $defaultCount
                 : '!'
             );
 
-        return $description.$definition;
+        return $description . $definition;
+    }
+
+    /**
+     * @return \GraphQL\Language\AST\NamedTypeNode|\GraphQL\Language\AST\NonNullTypeNode
+     */
+    protected function paginationResultType(string $typeName): TypeNode
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        $nonNull = $config->get('lighthouse.non_null_pagination_results')
+            ? '!'
+            : '';
+
+        /**
+         * We do not wrap the typename in [], so this will never be a ListOfTypeNode.
+         *
+         * @var \GraphQL\Language\AST\NamedTypeNode|\GraphQL\Language\AST\NonNullTypeNode $nonNullTypeNode
+         */
+        $nonNullTypeNode = Parser::typeReference(/** @lang GraphQL */ "{$typeName}{$nonNull}");
+
+        return $nonNullTypeNode;
     }
 }

@@ -146,6 +146,56 @@ GRAPHQL;
         ]);
     }
 
+    public function testWithoutExcludeEmpty(): void
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $this->app->make('config');
+        $config->set('lighthouse.subscriptions.exclude_empty', false);
+        $config->set('lighthouse.subscriptions.version', 2);
+
+        $this->subscribe();
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        query foo {
+            foo
+        }
+        ');
+
+        $response->assertExactJson([
+            'data' => [
+                'foo' => '42',
+            ],
+            'extensions' => [
+                'lighthouse_subscriptions' => [
+                    'version' => 2,
+                    'channel' => null,
+                ],
+            ],
+        ]);
+    }
+
+    public function testWithExcludeEmpty(): void
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $this->app->make('config');
+        $config->set('lighthouse.subscriptions.exclude_empty', true);
+        $config->set('lighthouse.subscriptions.version', 2);
+
+        $this->subscribe();
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        query foo {
+            foo
+        }
+        ');
+
+        $response->assertExactJson([
+            'data' => [
+                'foo' => '42',
+            ],
+        ]);
+    }
+
     public function testWithGuard(): void
     {
         $this->be(new User());
@@ -183,6 +233,18 @@ GRAPHQL;
         $broadcasted = Arr::get(Arr::first($broadcasts), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
         $this->assertSame(['body' => 'bar'], $broadcasted['onPostCreated']);
+    }
+
+    /**
+     * @param  array<string, mixed>  $args
+     *
+     * @return array<string, string>
+     */
+    public function resolve($root, array $args): array
+    {
+        return [
+            'body' => $args['post'],
+        ];
     }
 
     /**

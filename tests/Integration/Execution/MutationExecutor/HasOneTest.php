@@ -76,7 +76,7 @@ class HasOneTest extends DBTestCase
         id: ID
         title: String
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewHasOne(): void
     {
@@ -288,18 +288,18 @@ GRAPHQL
             }
         }
 GRAPHQL
-            )->assertJson([
-                'data' => [
-                    "${action}Task" => [
+        )->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
                         'id' => '1',
-                        'name' => 'foo',
-                        'post' => [
-                            'id' => '1',
-                            'title' => 'bar',
-                        ],
+                        'title' => 'bar',
                     ],
                 ],
-            ]);
+            ],
+        ]);
     }
 
     /**

@@ -10,7 +10,8 @@ class MockResolver
 {
     /**
      * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector
-     * @return mixed|void Anything whatsoever.
+     *
+     * @return mixed|void anything whatsoever
      */
     public function __invoke()
     {

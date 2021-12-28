@@ -150,24 +150,21 @@ class ASTHelperTest extends TestCase
     {
         $object = Parser::objectTypeDefinition(/** @lang GraphQL */ '
         type Query {
-            foo: Int @guard(with: ["api"])
+            foo: Int @complexity(resolver: "Foo")
             bar: String
         }
         ');
 
         ASTHelper::addDirectiveToFields(
-            Parser::constDirective(/** @lang GraphQL */ '@guard'),
+            Parser::constDirective(/** @lang GraphQL */ '@complexity'),
             $object
         );
 
-        $guardOnFooArguments = $object->fields[0]->directives[0];
-        $fieldGuard = ASTHelper::directiveArgValue($guardOnFooArguments, 'with');
+        $onBar = $object->fields[1]->directives[0];
+        $this->assertSame('complexity', $onBar->name->value);
 
-        $this->assertSame(['api'], $fieldGuard);
-        $this->assertSame(
-            'guard',
-            $object->fields[1]->directives[0]->name->value
-        );
+        $onFoo = $object->fields[0]->directives[0];
+        $this->assertSame('Foo', ASTHelper::directiveArgValue($onFoo, 'resolver'));
     }
 
     public function testExtractDirectiveDefinition(): void
@@ -186,7 +183,7 @@ class ASTHelperTest extends TestCase
 directive @foo on OBJECT
 scalar Bar
 GRAPHQL
-)
+            )
         );
     }
 

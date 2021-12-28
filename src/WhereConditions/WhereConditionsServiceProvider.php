@@ -26,7 +26,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $_): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );
@@ -67,15 +67,14 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     public static function createWhereConditionsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
-        $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
+        $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
 
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = Parser
-            ::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
+        $operatorName = Parser::enumTypeDefinition(
+            $operator->enumDefinition()
+        )
             ->name
             ->value;
         $operatorDefault = $operator->default();
@@ -107,16 +106,15 @@ GRAPHQL
 
     public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
     {
-        $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
+        $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = Parser
-            ::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
+        $operatorName = Parser::enumTypeDefinition(
+            $operator->enumDefinition()
+        )
             ->name
             ->value;
         $operatorDefault = $operator->defaultHasOperator();

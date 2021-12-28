@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class CacheValue
 {
     /**
-     * @var mixed|null The root that was passed to the query.
+     * @var mixed|null the root that was passed to the query
      */
     protected $root;
 
@@ -45,14 +45,13 @@ class CacheValue
     protected $isPrivate;
 
     /**
-     * @var mixed The key to use for caching this field.
+     * @var mixed the key to use for caching this field
      */
     protected $fieldKey;
 
     /**
-     * @param  mixed|null  $root The root that was passed to the query.
+     * @param  mixed|null  $root  the root that was passed to the query
      * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      */
     public function __construct(
         $root,
@@ -77,29 +76,30 @@ class CacheValue
      */
     public function getKey(): string
     {
-        $argKeys = $this->argKeys();
-        $user = app('auth')->user();
+        $parts = [];
 
-        return $this->implode([
-            $this->isPrivate && $user
-                ? 'auth'
-                : null,
-            $this->isPrivate && $user
-                ? $user->getKey()
-                : null,
-            strtolower($this->resolveInfo->parentType->name),
-            $this->fieldKey,
-            strtolower($this->resolveInfo->fieldName),
-            $argKeys->isNotEmpty()
-                ? $argKeys->implode(':')
-                : null,
-        ]);
+        $user = $this->context->user();
+        if ($this->isPrivate && null !== $user) {
+            $parts[] = 'auth';
+            $parts[] = $user->getAuthIdentifier();
+        }
+
+        $parts[] = strtolower($this->resolveInfo->parentType->name);
+        $parts[] = $this->fieldKey;
+        $parts[] = strtolower($this->resolveInfo->fieldName);
+
+        $argKeys = $this->argKeys();
+        if ($argKeys->isNotEmpty()) {
+            $parts[] = $argKeys->implode(':');
+        }
+
+        return $this->implode($parts);
     }
 
     /**
      * Get cache tags.
      *
-     * @return array<string>
+     * @return array{0: string, 1: string}
      */
     public function getTags(): array
     {
@@ -144,7 +144,7 @@ class CacheValue
      */
     protected function fieldKey()
     {
-        if ($this->root === null) {
+        if (null === $this->root) {
             return;
         }
 
@@ -158,7 +158,7 @@ class CacheValue
     }
 
     /**
-     * @param  array<mixed|null> $items
+     * @param  array<mixed|null>  $items
      */
     protected function implode(array $items): string
     {

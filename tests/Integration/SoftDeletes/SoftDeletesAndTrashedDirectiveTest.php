@@ -35,7 +35,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'id'   => $taskToRemove->id,
+                        'id' => $taskToRemove->id,
                     ],
                 ],
             ],
@@ -95,7 +95,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'id'   => $leftoverTask->id,
+                        'id' => $leftoverTask->id,
                     ],
                 ],
             ],
@@ -127,7 +127,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'task' => [
-                    'id'   => $taskToRemove->id,
+                    'id' => $taskToRemove->id,
                 ],
             ],
         ]);
@@ -141,7 +141,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'task' => [
-                    'id'   => $taskToRemove->id,
+                    'id' => $taskToRemove->id,
                 ],
             ],
         ]);
@@ -178,7 +178,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         $taskToRemove = $tasks[2];
         $taskToRemove->delete();
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Task {
             id: ID!
         }
@@ -201,7 +201,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 'tasks' => [
                     'data' => [
                         [
-                            'id'   => $taskToRemove->id,
+                            'id' => $taskToRemove->id,
                         ],
                     ],
                 ],
@@ -285,7 +285,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                     [
                         'tasks' => [
                             [
-                                'id'   => $taskToRemove->id,
+                                'id' => $taskToRemove->id,
                             ],
                         ],
                     ],
@@ -310,7 +310,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                         [
                             'tasks' => [
                                 [
-                                    'id'   => $taskToRemove->id,
+                                    'id' => $taskToRemove->id,
                                 ],
                             ],
                         ],
@@ -332,7 +332,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 'user' => [
                     'tasks' => [
                         [
-                            'id'   => $taskToRemove->id,
+                            'id' => $taskToRemove->id,
                         ],
                     ],
                 ],

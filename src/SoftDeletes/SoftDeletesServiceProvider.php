@@ -14,10 +14,12 @@ use Nuwave\Lighthouse\Support\Utils;
 class SoftDeletesServiceProvider extends ServiceProvider
 {
     /**
-     * Ensure a model uses the SoftDeletes trait.
+     * Ensure the model uses the SoftDeletes trait.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
      * @see \Illuminate\Database\Eloquent\SoftDeletes
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
@@ -27,9 +29,6 @@ class SoftDeletesServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
@@ -56,7 +55,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );

@@ -184,6 +184,29 @@ class ValidatorDirectiveTest extends TestCase
             ->assertGraphQLValidationError('email', 'The email must be a valid email address.');
     }
 
+    public function testFieldValidatorConventionOnExtendedType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            bar: ID
+        }
+
+        extend type Query {
+            foo(email: String): ID @validator
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    email: "not an email"
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('email', 'The email must be a valid email address.');
+    }
+
     public function testExplicitValidatorOnField(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -201,5 +224,42 @@ class ValidatorDirectiveTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('email', 'The email must be a valid email address.');
+    }
+
+    public function testArgumentReferencesAreQualified(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: BarRequiredWithoutFoo): String
+        }
+
+        input BarRequiredWithoutFoo @validator {
+            foo: String
+            bar: String
+            baz: String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "whatever"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {}
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is not present.');
     }
 }

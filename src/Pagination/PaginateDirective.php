@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -67,6 +67,11 @@ enum PaginateType {
     PAGINATOR
 
     """
+    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+    """
+    SIMPLE
+
+    """
     Cursor-based pagination, compatible with the Relay specification.
     """
     CONNECTION
@@ -87,23 +92,23 @@ GRAPHQL;
             );
         }
 
-        $paginationManipulator
-            ->transformToPaginatedField(
-                $this->paginationType(),
-                $fieldDefinition,
-                $parentType,
-                $this->defaultCount(),
-                $this->paginateMaxCount()
-            );
+        $paginationManipulator->transformToPaginatedField(
+            $this->paginationType(),
+            $fieldDefinition,
+            $parentType,
+            $this->defaultCount(),
+            $this->paginateMaxCount()
+        );
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
                 if ($this->directiveHasArgument('builder')) {
                     $builderResolver = $this->getResolverFromArgument('builder');
 
+                    /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
                     $query = $builderResolver($root, $args, $context, $resolveInfo);
                 } else {
                     $query = $this->getModelClass()::query();
@@ -116,8 +121,7 @@ GRAPHQL;
                         $this->directiveArgValue('scopes', [])
                     );
 
-                return PaginationArgs
-                    ::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
+                return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
                     ->applyToBuilder($query);
             }
         );

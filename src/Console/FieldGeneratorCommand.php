@@ -12,11 +12,11 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
             ? 'field_full'
             : 'field_simple';
 
-        return __DIR__."/stubs/{$stub}.stub";
+        return __DIR__ . "/stubs/{$stub}.stub";
     }
 
     /**
-     * @return array<array<mixed>>
+     * @return array<int, array<int, mixed>>
      */
     protected function getOptions(): array
     {

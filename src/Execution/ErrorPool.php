@@ -10,7 +10,7 @@ class ErrorPool
     /**
      * The buffered errors.
      *
-     * @var array<\Throwable>
+     * @var array<int, \Throwable>
      */
     protected $throwables = [];
 
@@ -19,7 +19,7 @@ class ErrorPool
      */
     public function record(Throwable $throwable): void
     {
-        $this->throwables [] = $throwable;
+        $this->throwables[] = $throwable;
     }
 
     /**

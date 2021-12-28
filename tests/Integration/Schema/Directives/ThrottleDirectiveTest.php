@@ -97,18 +97,12 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => RateLimitException::MESSAGE,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
     }
 
     public function testInlineLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(maxAttempts: 1)
         }
@@ -128,12 +122,6 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => RateLimitException::MESSAGE,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
     }
 }

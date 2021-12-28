@@ -10,14 +10,15 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
 {
-    /**
-     * @var string
-     */
     public const EOL = "\r\n";
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
-        if (! empty($paths)) {
+        if (empty($paths)) {
+            $this->emit(
+                $this->chunk($data, $isFinalChunk)
+            );
+        } else {
             $chunk = [];
             $lastKey = count($paths) - 1;
 
@@ -42,10 +43,6 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $this->chunk($chunk, $terminating)
                 );
             }
-        } else {
-            $this->emit(
-                $this->chunk($data, $isFinalChunk)
-            );
         }
 
         if ($isFinalChunk) {
@@ -55,12 +52,12 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     protected function boundary(): string
     {
-        return self::EOL.'---'.self::EOL;
+        return self::EOL . '---' . self::EOL;
     }
 
     protected function terminatingBoundary(): string
     {
-        return self::EOL.'-----'.self::EOL;
+        return self::EOL . '-----' . self::EOL;
     }
 
     /**
@@ -74,17 +71,17 @@ class ResponseStream extends Stream implements CanStreamResponse
 
         $length = $terminating
             ? strlen($json)
-            : strlen($json.self::EOL);
+            : strlen($json . self::EOL);
 
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
-            'Content-Length: '.$length,
+            'Content-Length: ' . $length,
             '',
             $json,
             '',
         ]);
 
-        return $this->boundary().$chunk;
+        return $this->boundary() . $chunk;
     }
 
     /**

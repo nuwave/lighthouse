@@ -4,10 +4,9 @@ namespace Nuwave\Lighthouse\Console;
 
 use GraphQL\Type\Schema;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\ValidateSchema;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
@@ -21,17 +20,14 @@ class ValidateSchemaCommand extends Command
     protected $description = 'Validate the GraphQL schema definition.';
 
     public function handle(
-        CacheRepository $cache,
-        ConfigRepository $config,
+        ASTCache $cache,
         EventsDispatcher $eventsDispatcher,
         SchemaBuilder $schemaBuilder,
         DirectiveLocator $directiveLocator,
         TypeRegistry $typeRegistry
     ): void {
         // Clear the cache so this always validates the current schema
-        $cache->forget(
-            $config->get('lighthouse.cache.key')
-        );
+        $cache->clear();
 
         $originalSchema = $schemaBuilder->schema();
         $schemaConfig = $originalSchema->getConfig();
@@ -42,8 +38,8 @@ class ValidateSchemaCommand extends Command
         );
         foreach ($directiveLocator->definitions() as $directiveDefinition) {
             // TODO consider a solution that feels less hacky
-            if ($directiveDefinition->name->value !== 'deprecated') {
-                $schemaConfig->directives [] = $directiveFactory->handle($directiveDefinition);
+            if ('deprecated' !== $directiveDefinition->name->value) {
+                $schemaConfig->directives[] = $directiveFactory->handle($directiveDefinition);
             }
         }
 

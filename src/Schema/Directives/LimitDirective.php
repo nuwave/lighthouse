@@ -26,7 +26,7 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgManipulat
 """
 Allow clients to specify the maximum number of results to return.
 """
-directive @limit on ARGUMENT_DEFINITION
+directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
 GRAPHQL;
     }
 
@@ -37,20 +37,20 @@ GRAPHQL;
         ObjectTypeDefinitionNode &$parentType
     ): void {
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
-        if ($argType !== Type::INT) {
+        if (Type::INT !== $argType) {
             throw new DefinitionException(
-                "The {$this->name()} directive must only be used on arguments of type ".Type::INT
-                .", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
+                "The {$this->name()} directive must only be used on arguments of type " . Type::INT
+                . ", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
             );
         }
 
-        $parentField->directives [] = $this->directiveNode;
+        $parentField->directives[] = $this->directiveNode;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
         $fieldValue->resultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
-            if ($result === null) {
+            if (null === $result) {
                 return null;
             }
 
@@ -74,12 +74,12 @@ GRAPHQL;
             $limited = [];
 
             foreach ($result as $value) {
-                if ($limit === 0) {
+                if (0 === $limit) {
                     break;
                 }
-                $limit--;
+                --$limit;
 
-                $limited [] = $value;
+                $limited[] = $value;
             }
 
             return $limited;

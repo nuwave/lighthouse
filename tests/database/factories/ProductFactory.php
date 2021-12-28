@@ -7,7 +7,8 @@ use Tests\Utils\Models\Product;
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Product::class, function (Faker $faker): array {
     return [
-        'barcode' => $faker->ean13,
+        // @phpstan-ignore-next-line Call to an undefined method Faker\Generator::ean13().
+        'barcode' => $faker->ean13(),
         'uuid' => $faker->uuid,
         'color_id' => function () {
             return factory(Color::class)->create()->getKey();

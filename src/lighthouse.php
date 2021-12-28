@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Route Configuration
@@ -52,8 +51,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The guard to use for authenticating GraphQL requests, if needed.
-    | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
-    | such as `@guard` and when applying the `AttemptAuthentication` middleware.
+    | Used in directives such as `@guard` or the `AttemptAuthentication` middleware.
+    | Falls back to the Laravel default if the defined guard is either `null` or not found.
     |
     */
 
@@ -88,22 +87,38 @@ return [
         /*
          * Setting to true enables schema caching.
          */
-        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', 'local' !== env('APP_ENV')),
 
         /*
-         * The name of the cache item for the schema cache.
+         * Allowed values:
+         * - 1: uses the store, key and ttl config values to store the schema as a string in the given cache store.
+         * - 2: uses the path config value to store the schema in a PHP file allowing OPcache to pick it up.
          */
-        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+        'version' => env('LIGHTHOUSE_CACHE_VERSION', 1),
 
         /*
          * Allows using a specific cache store, uses the app's default if set to null.
+         * Only relevant if version is set to 1.
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
 
         /*
+         * The name of the cache item for the schema cache.
+         * Only relevant if version is set to 1.
+         */
+        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+
+        /*
          * Duration in seconds the schema should remain cached, null means forever.
+         * Only relevant if version is set to 1.
          */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
+
+        /*
+         * File path to store the lighthouse schema.
+         * Only relevant if version is set to 2.
+         */
+        'path' => env('LIGHTHOUSE_CACHE_PATH', base_path('bootstrap/cache/lighthouse-schema.php')),
     ],
 
     /*
@@ -211,6 +226,9 @@ return [
     */
 
     'error_handlers' => [
+        \Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
@@ -298,6 +316,39 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Non-Null Pagination Results
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, the generated result type of paginated lists will be marked
+    | as non-nullable. This is generally more convenient for clients, but will
+    | cause validation errors to bubble further up in the result.
+    |
+    | This setting will be removed and always behave as if it were true in v6.
+    |
+    */
+
+    'non_null_pagination_results' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Unbox BenSampo\Enum\Enum instances
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Lighthouse will extract the internal $value from instances of
+    | BenSampo\Enum\Enum before passing it to ArgBuilderDirective::handleBuilder().
+    |
+    | This setting will be removed and always behave as if it were false in v6.
+    |
+    | It is only here to preserve compatibility, e.g. when expecting the internal
+    | value to be passed to a scope when using @scope, but not needed due to Laravel
+    | calling the Enum's __toString() method automagically when used in a query.
+    |
+    */
+
+    'unbox_bensampo_enum_enum_instances' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
@@ -347,13 +398,13 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
                 'connection' => 'pusher',
             ],
             'echo' => [
                 'driver' => 'echo',
                 'connection' => env('LIGHTHOUSE_SUBSCRIPTION_REDIS_CONNECTION', 'default'),
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@echoRoutes',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@echoRoutes',
             ],
         ],
 
@@ -362,6 +413,13 @@ return [
          * Allowed values: 1, 2
          */
         'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
+
+        /*
+         * Should the subscriptions extension be excluded when the response has no subscription channel?
+         * This optimizes performance by sending less data, but clients must anticipate this appropriately.
+         * Will default to true in v6 and be removed in v7.
+         */
+        'exclude_empty' => env('LIGHTHOUSE_SUBSCRIPTION_EXCLUDE_EMPTY', false),
     ],
 
     /*
@@ -389,4 +447,19 @@ return [
         'max_execution_ms' => 0,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Apollo Federation
+    |--------------------------------------------------------------------------
+    |
+    | Lighthouse can act as a federated service: https://www.apollographql.com/docs/federation/federation-spec.
+    |
+    */
+
+    'federation' => [
+        /*
+         * Location of resolver classes when resolving the `_entities` field.
+         */
+        'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
+    ],
 ];

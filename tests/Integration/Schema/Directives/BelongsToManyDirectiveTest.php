@@ -102,7 +102,8 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            roles: [Role!]! @belongsToMany(type: PAGINATOR)
+            rolesPaginated: [Role!]! @belongsToMany(type: PAGINATOR, relation: "roles")
+            rolesSimplePaginated: [Role!]! @belongsToMany(type: SIMPLE, relation: "roles")
         }
 
         type Role {
@@ -118,11 +119,19 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                roles(first: 2) {
+                rolesPaginated(first: 2) {
                     paginatorInfo {
                         count
                         hasMorePages
                         total
+                    }
+                    data {
+                        id
+                    }
+                }
+                rolesSimplePaginated(first: 3) {
+                    paginatorInfo {
+                        count
                     }
                     data {
                         id
@@ -133,16 +142,23 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'roles' => [
+                    'rolesPaginated' => [
                         'paginatorInfo' => [
                             'count' => 2,
                             'hasMorePages' => true,
                             'total' => $this->rolesCount,
                         ],
                     ],
+
+                    'rolesSimplePaginated' => [
+                        'paginatorInfo' => [
+                            'count' => 3,
+                        ],
+                    ],
                 ],
             ],
-        ])->assertJsonCount(2, 'data.user.roles.data');
+        ])->assertJsonCount(2, 'data.user.rolesPaginated.data')
+            ->assertJsonCount(3, 'data.user.rolesSimplePaginated.data');
     }
 
     public function testQueryBelongsToManyRelayConnection(): void

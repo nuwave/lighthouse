@@ -57,7 +57,7 @@ class MorphToManyTest extends DBTestCase
         id: ID!
         name: String!
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testCreateATaskWithExistingTagsByUsingConnect(): void
     {

@@ -11,7 +11,7 @@ use Tests\Utils\Models\User;
 class MorphToDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */

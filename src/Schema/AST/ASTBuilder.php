@@ -13,8 +13,7 @@ use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -37,89 +36,65 @@ class ASTBuilder
     ];
 
     /**
-     * The directive factory.
-     *
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
-    protected $directiveFactory;
+    protected $directiveLocator;
 
     /**
-     * The schema source provider.
-     *
      * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
      */
     protected $schemaSourceProvider;
 
     /**
-     * The event dispatcher.
-     *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $eventDispatcher;
+    protected $eventsDispatcher;
 
     /**
-     * The config repository.
-     *
-     * @var ConfigRepository
+     * @var \Nuwave\Lighthouse\Schema\AST\ASTCache
      */
-    protected $configRepository;
+    protected $astCache;
 
     /**
-     * The document AST.
-     *
-     * Initialized lazily, is only set after documentAST() is called.
+     * Initialized lazily in $this->documentAST().
      *
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
     public function __construct(
-        DirectiveLocator $directiveFactory,
+        DirectiveLocator $directiveLocator,
         SchemaSourceProvider $schemaSourceProvider,
-        EventDispatcher $eventDispatcher,
-        ConfigRepository $configRepository
+        EventsDispatcher $eventsDispatcher,
+        ASTCache $astCache
     ) {
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveLocator = $directiveLocator;
         $this->schemaSourceProvider = $schemaSourceProvider;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->configRepository = $configRepository;
+        $this->eventsDispatcher = $eventsDispatcher;
+        $this->astCache = $astCache;
     }
 
-    /**
-     * Get the schema string and build an AST out of it.
-     *
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
     public function documentAST(): DocumentAST
     {
         if (! isset($this->documentAST)) {
-            $cacheConfig = $this->configRepository->get('lighthouse.cache');
-            if ($cacheConfig['enable']) {
-                /** @var \Illuminate\Contracts\Cache\Repository $cache */
-                $cache = app('cache')->store($cacheConfig['store'] ?? null);
-                $this->documentAST = $cache->remember(
-                    $cacheConfig['key'],
-                    $cacheConfig['ttl'],
-                    function (): DocumentAST {
-                        return $this->build();
-                    }
-                );
-            } else {
-                $this->documentAST = $this->build();
-            }
+            return $this->documentAST = $this->astCache->isEnabled()
+                ? $this->astCache->fromCacheOrBuild(function (): DocumentAST {
+                    return $this->build();
+                })
+                : $this->build();
         }
 
         return $this->documentAST;
     }
 
-    protected function build(): DocumentAST
+    public function build(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
-        // Allow to register listeners that add in additional schema definitions.
+        // Allow registering listeners that inject additional schema definitions.
         // This can be used by plugins to hook into the schema building process
-        // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = (array) $this->eventDispatcher->dispatch(
+        // while still allowing the user to define their schema as usual.
+        $additionalSchemas = (array) $this->eventsDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );
 
@@ -139,7 +114,7 @@ class ASTBuilder
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
         // that want to programmatically change the schema.
-        $this->eventDispatcher->dispatch(
+        $this->eventsDispatcher->dispatch(
             new ManipulateAST($this->documentAST)
         );
 
@@ -154,7 +129,7 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
-                $this->directiveFactory->associatedOfType($typeDefinition, TypeManipulator::class)
+                $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
                 as $typeDefinitionManipulator
             ) {
                 $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -173,7 +148,7 @@ class ASTBuilder
                 // that are defined on type extensions themselves
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
-                    $this->directiveFactory->associatedOfType($typeExtension, TypeExtensionManipulator::class)
+                    $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
@@ -201,7 +176,7 @@ class ASTBuilder
     {
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|null $extendedObjectLikeType */
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
-        if ($extendedObjectLikeType === null) {
+        if (null === $extendedObjectLikeType) {
             if (RootType::isRootType($typeName)) {
                 $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
@@ -239,7 +214,7 @@ class ASTBuilder
     {
         /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName] ?? null;
-        if ($extendedEnum === null) {
+        if (null === $extendedEnum) {
             throw new DefinitionException(
                 $this->missingBaseDefinition($typeName, $typeExtension)
             );
@@ -258,7 +233,7 @@ class ASTBuilder
      */
     protected function missingBaseDefinition(string $typeName, TypeExtensionNode $typeExtension): string
     {
-        return "Could not find a base definition $typeName of kind {$typeExtension->kind} to extend.";
+        return "Could not find a base definition {$typeName} of kind {$typeExtension->kind} to extend.";
     }
 
     /**
@@ -286,7 +261,7 @@ class ASTBuilder
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
-                        $this->directiveFactory->associatedOfType($fieldDefinition, FieldManipulator::class)
+                        $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -307,7 +282,7 @@ class ASTBuilder
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
-                            $this->directiveFactory->associatedOfType($argumentDefinition, ArgManipulator::class)
+                            $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
                             $argManipulator->manipulateArgDefinition(

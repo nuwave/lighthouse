@@ -6,7 +6,7 @@ sidebar: auto
 
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
-with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
+with [GraphQL](https://graphql.org) and [Laravel](https://laravel.com) first.
 
 The source code of the finished project is available at [nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial).
 
@@ -23,12 +23,12 @@ makes it easier to evolve APIs over time, and enables powerful developer tools.
   <small>GraphQL Playground</small>
 </div>
 
-GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql/).
+GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql).
 This means that GraphQL is in fact not more than a long document that describes in detail
 the behaviour of a GraphQL server.
 
 GraphQL has its own type system that’s used to define the schema of an API.
-The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51/) or short **SDL**.
+The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) or short **SDL**.
 
 Here is an example how we can use the SDL to define a type called `User` and its
 relation to another type `Post`.
@@ -89,10 +89,7 @@ You can use an existing project and skip ahead to [Installing Lighthouse](#insta
 but you may have to adapt a few things to fit your existing app as we go along.
 :::
 
-Assuming you are using the Laravel installer, create a new project
-(read more about [installing Laravel](https://laravel.com/docs/#installing-laravel)):
-
-    laravel new lighthouse-tutorial
+Create a new project by following [installing Laravel](https://laravel.com/docs/#installing-laravel).
 
 Consult the [Laravel docs on database configuration](https://laravel.com/docs/database#configuration)
 and ensure you have a working database set up.
@@ -104,7 +101,7 @@ Run database migrations to create the `users` table:
 Seed the database with some fake users:
 
     php artisan tinker
-    \App\User::factory(10)->create()
+    \App\Models\User::factory(10)->create()
 
 ### Installing Lighthouse
 
@@ -264,36 +261,41 @@ Finally, add the `posts` relation to `app/Models/User.php`
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email',
+        'password',
     ];
 
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var array<string, string|\Illuminate\Contracts\Database\Eloquent\Castable>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',

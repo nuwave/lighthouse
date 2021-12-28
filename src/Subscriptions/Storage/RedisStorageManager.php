@@ -40,7 +40,7 @@ class RedisStorageManager implements StoresSubscriptions
     public function __construct(ConfigRepository $config, RedisFactory $redis)
     {
         $this->connection = $redis->connection(
-            $config->get('lighthouse.broadcasters.echo.connection') ?? 'default'
+            $config->get('lighthouse.subscriptions.broadcasters.echo.connection') ?? 'default'
         );
         $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl');
     }
@@ -60,7 +60,7 @@ class RedisStorageManager implements StoresSubscriptions
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.
         // We can retrieve all members of a set using the command smembers.
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
-        if (count($subscriberIds) === 0) {
+        if (0 === count($subscriberIds)) {
             return new Collection();
         }
 
@@ -92,19 +92,21 @@ class RedisStorageManager implements StoresSubscriptions
             $subscriber->channel,
         ]);
         // ...and refresh the ttl of this set as well.
-        if ($this->ttl !== null) {
+        if (null !== $this->ttl) {
             $this->connection->command('expire', [$topicKey, $this->ttl]);
         }
 
         // Lastly, we store the subscriber as a serialized string...
+        $setCommand = 'set';
         $setArguments = [
             $this->channelKey($subscriber->channel),
             $this->serialize($subscriber),
         ];
-        if ($this->ttl !== null) {
-            $setArguments [] = $this->ttl;
+        if (null !== $this->ttl) {
+            $setCommand = 'setex';
+            array_splice($setArguments, 1, 0, [$this->ttl]);
         }
-        $this->connection->command('set', $setArguments);
+        $this->connection->command($setCommand, $setArguments);
     }
 
     public function deleteSubscriber(string $channel): ?Subscriber
@@ -112,7 +114,7 @@ class RedisStorageManager implements StoresSubscriptions
         $key = $this->channelKey($channel);
         $subscriber = $this->getSubscriber($key);
 
-        if ($subscriber !== null) {
+        if (null !== $subscriber) {
             // Like in storeSubscriber (but in reverse), we delete the subscriber...
             $this->connection->command('del', [$key]);
             // ...and remove it from the set of subscribers of this topic.
@@ -141,23 +143,25 @@ class RedisStorageManager implements StoresSubscriptions
 
     protected function channelKey(string $channel): string
     {
-        return self::SUBSCRIBER_KEY.'.'.$channel;
+        return self::SUBSCRIBER_KEY . '.' . $channel;
     }
 
     protected function topicKey(string $topic): string
     {
-        return self::TOPIC_KEY.'.'.$topic;
+        return self::TOPIC_KEY . '.' . $topic;
     }
 
     /**
-     * @param mixed $value Value to serialize.
-     * @return mixed Storable value.
+     * @param  mixed  $value  value to serialize
+     *
+     * @return mixed storable value
+     *
      * @see \Illuminate\Cache\RedisStore::serialize
      */
     protected function serialize($value)
     {
         $isProperNumber = is_numeric($value)
-            && ($value !== INF && $value !== -INF)
+            && (INF !== $value && $value !== -INF)
             && ! is_nan(floatval($value));
 
         return $isProperNumber
@@ -166,8 +170,9 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @param mixed $value Value to unserialize.
-     * @return mixed Unserialized value.
+     * @param  mixed  $value  value to unserialize
+     *
+     * @return mixed unserialized value
      */
     protected function unserialize($value)
     {

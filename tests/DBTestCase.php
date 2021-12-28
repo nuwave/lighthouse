@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    public const DEFAULT_CONNECTION = 'mysql';
+    public const ALTERNATE_CONNECTION = 'alternate';
+
     /**
      * Indicates if migrations ran.
      *
@@ -20,7 +23,7 @@ abstract class DBTestCase extends TestCase
 
         if (! static::$migrated) {
             $this->artisan('migrate:fresh', [
-                '--path' => __DIR__.'/database/migrations',
+                '--path' => __DIR__ . '/database/migrations',
                 '--realpath' => true,
             ]);
 
@@ -35,7 +38,7 @@ abstract class DBTestCase extends TestCase
             DB::table($table->{$columnName})->truncate();
         }
 
-        $this->withFactories(__DIR__.'/database/factories');
+        $this->withFactories(__DIR__ . '/database/factories');
     }
 
     protected function getEnvironmentSetUp($app): void
@@ -45,8 +48,9 @@ abstract class DBTestCase extends TestCase
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
 
-        $config->set('database.default', 'mysql');
-        $config->set('database.connections.mysql', $this->mysqlOptions());
+        $config->set('database.default', self::DEFAULT_CONNECTION);
+        $config->set('database.connections.' . self::DEFAULT_CONNECTION, $this->mysqlOptions());
+        $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $this->mysqlOptions());
     }
 
     /**
@@ -54,21 +58,14 @@ abstract class DBTestCase extends TestCase
      */
     protected function mysqlOptions(): array
     {
-        $mysqlOptions = [
+        return [
             'driver' => 'mysql',
             'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
             'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
             'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
+            'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
+            'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
+            'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
         ];
-
-        $socket = env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET') ?? null;
-        if (is_string($socket)) {
-            $mysqlOptions['unix_socket'] = $socket;
-        } else {
-            $mysqlOptions['host'] = env('LIGHTHOUSE_TEST_DB_HOST', 'mysql');
-            $mysqlOptions['port'] = env('LIGHTHOUSE_TEST_DB_PORT', '3306');
-        }
-
-        return $mysqlOptions;
     }
 }

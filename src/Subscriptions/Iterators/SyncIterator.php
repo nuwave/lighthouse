@@ -15,7 +15,7 @@ class SyncIterator implements SubscriptionIterator
             try {
                 $handleSubscriber($item);
             } catch (Exception $e) {
-                if ($handleError === null) {
+                if (null === $handleError) {
                     throw $e;
                 }
 

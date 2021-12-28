@@ -25,7 +25,7 @@ class TypeValue
      *
      * @var string|null
      */
-    protected $cacheKey;
+    protected $cacheKey = null;
 
     public function __construct(TypeDefinitionNode $typeDefinition)
     {
@@ -37,7 +37,7 @@ class TypeValue
      */
     public function getTypeDefinitionName(): string
     {
-        return data_get($this->getTypeDefinition(), 'name.value');
+        return $this->getTypeDefinition()->name->value;
     }
 
     /**
@@ -58,10 +58,8 @@ class TypeValue
 
     /**
      * Set node cache key.
-     *
-     * @return $this
      */
-    public function setCacheKey(string $key = null): self
+    public function setCacheKey(?string $key = null): self
     {
         $this->cacheKey = $key;
 

@@ -2,15 +2,20 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
+use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationRuleParser;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation;
 use Nuwave\Lighthouse\Support\Contracts\ArgumentValidation;
+use Nuwave\Lighthouse\Support\Contracts\WithReferenceRule;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentValue;
 use Nuwave\Lighthouse\Support\Utils;
+use Throwable;
 
 class RulesGatherer
 {
@@ -82,7 +87,11 @@ class RulesGatherer
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentSetValidation) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
-                    /** @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive */
+                    /**
+                     * @psalm-suppress UndefinedDocblockClass
+                     *
+                     * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
+                     */
                     // @phpstan-ignore-next-line using trait in typehint
                     $directive->setArgumentValue($argumentSet);
                 }
@@ -102,7 +111,11 @@ class RulesGatherer
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentValidation) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
-                    /** @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive */
+                    /**
+                     * @psalm-suppress UndefinedDocblockClass
+                     *
+                     * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
+                     */
                     // @phpstan-ignore-next-line using trait in typehint
                     $directive->setArgumentValue($value);
                 }
@@ -131,9 +144,16 @@ class RulesGatherer
      */
     public function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
+        $qualifiedRulesMap = array_map(
+            function (array $rules) use ($argumentPath): array {
+                return $this->qualifyArgumentReferences($rules, $argumentPath);
+            },
+            $directive->rules()
+        );
+
         $this->rules = array_merge_recursive(
             $this->rules,
-            $this->wrap($directive->rules(), $argumentPath)
+            $this->wrap($qualifiedRulesMap, $argumentPath)
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
@@ -149,9 +169,16 @@ class RulesGatherer
      */
     public function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
     {
+        $qualifiedRules = $this->qualifyArgumentReferences(
+            $directive->rules(),
+            // The last element is the name of the argument the rule is defined upon.
+            // We want the qualified path to start from the parent level.
+            array_slice($argumentPath, 0, -1)
+        );
+
         $this->rules = array_merge_recursive(
             $this->rules,
-            [$this->pathDotNotation($argumentPath) => $directive->rules()]
+            [implode('.', $argumentPath) => $qualifiedRules]
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
@@ -160,7 +187,7 @@ class RulesGatherer
         if (null !== $attribute) {
             $this->attributes = array_merge(
                 $this->attributes,
-                [$this->pathDotNotation($argumentPath) => $attribute]
+                [implode('.', $argumentPath) => $attribute]
             );
         }
     }
@@ -168,27 +195,135 @@ class RulesGatherer
     /**
      * @param  array<string, mixed>  $rulesOrMessages
      * @param  array<int|string>  $path
-     * @return  array<string, mixed>
+     *
+     * @return array<string, mixed>
      */
     protected function wrap(array $rulesOrMessages, array $path): array
     {
         $withPath = [];
 
         foreach ($rulesOrMessages as $key => $value) {
-            $combinedPath = array_merge($path, [$key]);
-            $pathDotNotation = $this->pathDotNotation($combinedPath);
+            $combinedPath = implode('.', array_merge($path, [$key]));
 
-            $withPath[$pathDotNotation] = $value;
+            $withPath[$combinedPath] = $value;
         }
 
         return $withPath;
     }
 
     /**
-     * @param  array<int|string>  $path
+     * Prepend rule arguments that refer to other arguments with the full path.
+     *
+     * This may be necessary to allow certain rules to be reusable when placed
+     * upon input arguments. For example, `required_with:foo` may be defined
+     * on an input value that is nested within the arguments under `input.0`.
+     * It is thus changed to the full reference `required_with:input.0.foo`.
+     *
+     * @param  array<int, mixed>  $rules
+     * @param  array<int|string>  $argumentPath
+     *
+     * @return array<int, array<int, mixed>|object>
      */
-    protected function pathDotNotation(array $path): string
+    protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
-        return implode('.', $path);
+        return array_map(
+            /**
+             * @return object|array<int, mixed>
+             */
+            static function ($rule) use ($argumentPath) {
+                if (is_object($rule)) {
+                    if ($rule instanceof WithReferenceRule) {
+                        $rule->setArgumentPath($argumentPath);
+                    }
+
+                    return $rule;
+                }
+
+                /**
+                 * @var array{
+                 *   0: string,
+                 *   1: array<int, mixed>,
+                 * } $parsed
+                 */
+                $parsed = ValidationRuleParser::parse($rule);
+
+                $name = $parsed[0];
+                $args = $parsed[1];
+
+                if ('WithReference' === $name) {
+                    $indexes = explode('_', $args[1]);
+                    array_splice($args, 1, 1);
+                    foreach ($indexes as $index) {
+                        // Skipping over the first index, which is the name
+                        $index = (int) $index + 1;
+                        $args[$index] = implode('.', array_merge($argumentPath, [$args[$index]]));
+                    }
+
+                    $parsed = ValidationRuleParser::parse($args);
+
+                    $name = $parsed[0];
+                    $args = $parsed[1];
+                }
+
+                // Those rule lists are a subset of https://github.com/illuminate/validation/blob/8079fd53dee983e7c52d1819ae3b98c71a64fbc0/Validator.php#L206-L236
+                // using the docs to know which ones reference other fields: https://laravel.com/docs/8.x/validation#available-validation-rules
+                // We do not handle the Exclude* rules, those mutate the input and are not supported.
+
+                // Rules where the first argument is a field reference
+                if (in_array($name, [
+                    'Different',
+                    'Gt',
+                    'Gte',
+                    'Lt',
+                    'Lte',
+                    'ProhibitedIf',
+                    'ProhibitedUnless',
+                    'RequiredIf',
+                    'RequiredUnless',
+                    'Same',
+                ])) {
+                    $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
+                }
+
+                // Rules where all arguments are field references
+                if (in_array($name, [
+                    'Prohibits',
+                    'RequiredWith',
+                    'RequiredWithAll',
+                    'RequiredWithout',
+                    'RequiredWithoutAll',
+                ])) {
+                    $args = array_map(
+                        static function (string $field) use ($argumentPath): string {
+                            return implode('.', array_merge($argumentPath, [$field]));
+                        },
+                        $args
+                    );
+                }
+
+                // Rules where the first argument is a date or a field reference
+                if (is_string($args[0] ?? null) && in_array($name, [
+                    'After',
+                    'AfterOrEqual',
+                    'Before',
+                    'BeforeOrEqual',
+                ])) {
+                    try {
+                        Carbon::parse($args[0]);
+                    } catch (Throwable $argumentIsNotADate) {
+                        $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
+                    }
+                }
+
+                // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
+                $flatArgs = [$name];
+                foreach ($args as $arg) {
+                    $flatArgs[] = $arg;
+                }
+
+                return $flatArgs;
+            },
+            $rules
+        );
     }
 }

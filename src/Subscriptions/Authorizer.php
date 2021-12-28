@@ -47,7 +47,7 @@ class Authorizer implements AuthorizesSubscriptions
             $channel = $this->sanitizeChannelName($channel);
 
             $subscriber = $this->storage->subscriberByChannel($channel);
-            if ($subscriber === null) {
+            if (null === $subscriber) {
                 return false;
             }
 
@@ -78,7 +78,7 @@ class Authorizer implements AuthorizesSubscriptions
      *
      * Laravel Echo prefixes channel names with "presence-", but we don't.
      */
-    private function sanitizeChannelName(string $channelName): string
+    protected function sanitizeChannelName(string $channelName): string
     {
         if (Str::startsWith($channelName, 'presence-')) {
             return Str::substr($channelName, 9);

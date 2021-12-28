@@ -7,9 +7,9 @@ use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
- * Fires right before resolving an individual query.
+ * Fires right before resolving a single operation.
  *
- * Might happen multiple times in a single request if query batching is used.
+ * Might happen multiple times in a single request if batching is used.
  */
 class StartExecution
 {
@@ -49,7 +49,7 @@ class StartExecution
     public $moment;
 
     /**
-     * @param array<string, mixed>|null $variables
+     * @param  array<string, mixed>|null  $variables
      */
     public function __construct(DocumentNode $query, ?array $variables, ?string $operationName, GraphQLContext $context)
     {

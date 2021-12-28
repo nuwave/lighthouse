@@ -26,7 +26,7 @@ class ReportingErrorHandlerTest extends TestCase
             ->expects($this->atLeastOnce())
             ->method('report')
             ->with($exception);
-        app()->singleton(ExceptionHandler::class, function () use ($handler) {
+        $this->app->singleton(ExceptionHandler::class, function () use ($handler) {
             return $handler;
         });
 
@@ -49,7 +49,7 @@ class ReportingErrorHandlerTest extends TestCase
             ->expects($this->never())
             ->method('report')
             ->with($error);
-        app()->singleton(ExceptionHandler::class, function () use ($handler) {
+        $this->app->singleton(ExceptionHandler::class, function () use ($handler) {
             return $handler;
         });
 

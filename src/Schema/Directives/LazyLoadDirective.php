@@ -6,6 +6,7 @@ use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -34,11 +35,18 @@ GRAPHQL;
     {
         $relations = $this->directiveArgValue('relations');
 
-        $fieldValue->resultHandler(static function (Collection $items) use ($relations): Collection {
-            $items->load($relations);
+        $fieldValue->resultHandler(
+            /**
+             * @param  Collection|LengthAwarePaginator  $items
+             *
+             * @return Collection|LengthAwarePaginator
+             */
+            static function ($items) use ($relations) {
+                $items->load($relations);
 
-            return $items;
-        });
+                return $items;
+            }
+        );
 
         return $next($fieldValue);
     }
@@ -46,7 +54,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
         $relations = $this->directiveArgValue('relations');
-        if (! is_array($relations) || count($relations) === 0) {
+        if (! is_array($relations) || 0 === count($relations)) {
             throw new DefinitionException(
                 "Must specify non-empty list of relations in `@{$this->name()}` directive on `{$parentType->name->value}.{$fieldDefinition->name->value}`."
             );
