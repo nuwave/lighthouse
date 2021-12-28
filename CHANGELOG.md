@@ -13,18 +13,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add `@clearCache` directive that clears a resolver cache by tags
+- Add `@clearCache` directive that clears a resolver cache by tags https://github.com/nuwave/lighthouse/pull/1931
 
 ### Fixed
 
-- Do not change capitalization of types and fields in cache keys
-- Add hidden config option `lighthouse.cache.tags` in `config/lighthouse.php`
+- Do not change capitalization of types and fields in cache keys https://github.com/nuwave/lighthouse/pull/1931
+- Add hidden config option `lighthouse.cache.tags` in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1931
 - Set up correct authentication context for subscriptions with `@guard` fields https://github.com/nuwave/lighthouse/pull/1769
 
 ### Changed
 
-- Include empty placeholder for parent cache key in root fields to ensure predictable cache key
-- Prefix all generate cache keys or tags with `lighthouse`
+- Include empty placeholder for parent cache key in root fields to ensure predictable cache key https://github.com/nuwave/lighthouse/pull/1931
+- Prefix all generate cache keys or tags with `lighthouse` https://github.com/nuwave/lighthouse/pull/1931
 
 ## v5.32.0
 
