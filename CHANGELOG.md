@@ -17,6 +17,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Do not change capitalization of types and fields in cache keys
 - Add hidden config option `lighthouse.cache.tags` in `config/lighthouse.php`
+- Set up correct authentication context for subscriptions with `@guard` fields https://github.com/nuwave/lighthouse/pull/1769
 
 ### Changed
 
