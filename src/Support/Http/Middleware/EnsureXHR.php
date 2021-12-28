@@ -43,7 +43,7 @@ class EnsureXHR
             $contentType = $contentType[0];
         }
 
-        if ($contentType === null || $contentType === '') {
+        if (null === $contentType || '' === $contentType) {
             throw new BadRequestHttpException('Content-Type header must be set');
         }
 
