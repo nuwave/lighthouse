@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Federation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumValueDefinition;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectField;
 use GraphQL\Type\Definition\NamedType;
@@ -84,7 +84,7 @@ class FederationPrinter
         ));
 
         $printDirectives = static function ($definition): string {
-            /** @var (Type&NamedType)|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
+            /** @var (Type&NamedType)|EnumValueDefinition|Argument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {

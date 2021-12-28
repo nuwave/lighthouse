@@ -6,6 +6,9 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
+/**
+ * @phpstan-import-type ArgumentConfig from \GraphQL\Type\Definition\Argument
+ */
 class ArgumentFactory
 {
     /**
@@ -13,7 +16,7 @@ class ArgumentFactory
      *
      * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $definitionNodes
      *
-     * @return array<string, array<string, mixed>>
+     * @return array<string, ArgumentConfig>
      */
     public function toTypeMap(iterable $definitionNodes): array
     {
@@ -31,10 +34,10 @@ class ArgumentFactory
      *
      * The returned array will be used to construct one of:
      *
-     * @see \GraphQL\Type\Definition\FieldArgument
+     * @see \GraphQL\Type\Definition\Argument
      * @see \GraphQL\Type\Definition\InputObjectField
      *
-     * @return array<string, mixed> The configuration to construct an \GraphQL\Type\Definition\InputObjectField|\GraphQL\Type\Definition\FieldArgument
+     * @return ArgumentConfig
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {

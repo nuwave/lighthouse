@@ -5,12 +5,12 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Utils\AST;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -186,15 +186,11 @@ class DocumentAST implements Arrayable
      */
     public function toArray(): array
     {
-        $nodeToArray = function (Node $node): array {
-            return $node->toArray(true);
-        };
-
         return [
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            self::TYPES => array_map($nodeToArray, $this->types),
+            self::TYPES => array_map([AST::class, 'toArray'], $this->types),
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            self::DIRECTIVES => array_map($nodeToArray, $this->directives),
+            self::DIRECTIVES => array_map([AST::class, 'toArray'], $this->directives),
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ];
     }

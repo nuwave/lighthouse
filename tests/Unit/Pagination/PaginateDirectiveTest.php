@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Pagination;
 
-use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Utils\SchemaPrinter;
@@ -387,8 +387,8 @@ GRAPHQL
             ->getField('defaultPaginated')
             ->getArg('first');
 
-        $this->assertInstanceOf(FieldArgument::class, $defaultPaginatedAmountArg);
-        /** @var \GraphQL\Type\Definition\FieldArgument $defaultPaginatedAmountArg */
+        $this->assertInstanceOf(Argument::class, $defaultPaginatedAmountArg);
+        /** @var \GraphQL\Type\Definition\Argument $defaultPaginatedAmountArg */
         $this->assertSame(
             'Limits number of fetched items. Maximum allowed value: 5.',
             $defaultPaginatedAmountArg->description
@@ -398,8 +398,8 @@ GRAPHQL
             ->getField('defaultRelay')
             ->getArg('first');
 
-        $this->assertInstanceOf(FieldArgument::class, $defaultRelayFirstArg);
-        /** @var \GraphQL\Type\Definition\FieldArgument $defaultRelayFirstArg */
+        $this->assertInstanceOf(Argument::class, $defaultRelayFirstArg);
+        /** @var \GraphQL\Type\Definition\Argument $defaultRelayFirstArg */
         $this->assertSame(
             'Limits number of fetched items. Maximum allowed value: 5.',
             $defaultRelayFirstArg->description
@@ -409,8 +409,8 @@ GRAPHQL
             ->getField('defaultSimple')
             ->getArg('first');
 
-        $this->assertInstanceOf(FieldArgument::class, $defaultSimpleFirstArg);
-        /** @var \GraphQL\Type\Definition\FieldArgument $defaultSimpleFirstArg */
+        $this->assertInstanceOf(Argument::class, $defaultSimpleFirstArg);
+        /** @var \GraphQL\Type\Definition\Argument $defaultSimpleFirstArg */
         $this->assertSame(
             'Limits number of fetched items. Maximum allowed value: 5.',
             $defaultSimpleFirstArg->description
@@ -420,8 +420,8 @@ GRAPHQL
             ->getField('customPaginated')
             ->getArg('first');
 
-        $this->assertInstanceOf(FieldArgument::class, $customPaginatedAmountArg);
-        /** @var \GraphQL\Type\Definition\FieldArgument $customPaginatedAmountArg */
+        $this->assertInstanceOf(Argument::class, $customPaginatedAmountArg);
+        /** @var \GraphQL\Type\Definition\Argument $customPaginatedAmountArg */
         $this->assertSame(
             'Limits number of fetched items. Maximum allowed value: 10.',
             $customPaginatedAmountArg->description
@@ -431,8 +431,8 @@ GRAPHQL
             ->getField('customRelay')
             ->getArg('first');
 
-        $this->assertInstanceOf(FieldArgument::class, $customRelayFirstArg);
-        /** @var \GraphQL\Type\Definition\FieldArgument $customRelayFirstArg */
+        $this->assertInstanceOf(Argument::class, $customRelayFirstArg);
+        /** @var \GraphQL\Type\Definition\Argument $customRelayFirstArg */
         $this->assertSame(
             'Limits number of fetched items. Maximum allowed value: 10.',
             $customRelayFirstArg->description
@@ -442,8 +442,8 @@ GRAPHQL
             ->getField('customSimple')
             ->getArg('first');
 
-        $this->assertInstanceOf(FieldArgument::class, $customSimpleFirstArg);
-        /** @var \GraphQL\Type\Definition\FieldArgument $customSimpleFirstArg */
+        $this->assertInstanceOf(Argument::class, $customSimpleFirstArg);
+        /** @var \GraphQL\Type\Definition\Argument $customSimpleFirstArg */
         $this->assertSame(
             'Limits number of fetched items. Maximum allowed value: 10.',
             $customSimpleFirstArg->description
