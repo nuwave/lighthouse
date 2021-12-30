@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Types;
 
+use GraphQL\Error\InvariantViolation;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 use PHPUnit\Framework\Constraint\Callback;
@@ -60,5 +61,25 @@ class LaravelEnumTypeTest extends TestCase
             foo(bar: A)
         }
         ');
+    }
+
+    public function testValidatesDuplicateDefinition(): void
+    {
+        $this->typeRegistry->register(
+            new LaravelEnumType(AOrB::class)
+        );
+
+        $this->expectException(InvariantViolation::class);
+        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            foo: ID
+        }
+
+        enum AOrB {
+            A
+            B
+        }
+        ');
+        $schema->assertValid();
     }
 }
