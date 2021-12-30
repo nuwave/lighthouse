@@ -7,11 +7,13 @@ use GraphQL\Error\Error;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
 use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Pipeline\Pipeline;
@@ -101,7 +103,7 @@ class GraphQL
     /**
      * Run one ore more GraphQL operations against the schema.
      *
-     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
+     * @param \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams> $operationOrOperations
      *
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
@@ -157,7 +159,7 @@ class GraphQL
             );
         }
         /** @var string $query Otherwise we would have bailed with an error */
-        $result = $this->executeQuery(
+        $result = $this->parseAndExecuteQuery(
             $query,
             $context,
             $params->variables,
@@ -169,14 +171,15 @@ class GraphQL
     }
 
     /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     * This method will be removed in the next major update. Please use executeParsedQuery or parseAndExecuteQuery.
      *
-     * To render the @see ExecutionResult, you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
+     * @param string|\GraphQL\Language\AST\DocumentNode $query
+     * @param array<string, mixed>|null $variables
+     * @param mixed|null $rootValue
      *
-     * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  array<string, mixed>|null  $variables
-     * @param  mixed|null  $rootValue
+     * @see executeParsedQuery
+     * @see parseAndExecuteQuery
+     * @deprecated
      */
     public function executeQuery(
         $query,
@@ -185,15 +188,67 @@ class GraphQL
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
-        // TODO make executeQuery require a DocumentNode and move this parsing out of here
         if (is_string($query)) {
-            try {
-                $query = Parser::parse($query);
-            } catch (SyntaxError $syntaxError) {
-                return new ExecutionResult(null, [$syntaxError]);
-            }
+            return $this->parseAndExecuteQuery($query, $context, $variables, $rootValue, $operationName);
         }
 
+        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
+    }
+
+    /**
+     * Parses query and executes it.
+     *
+     * @param array<string, mixed>|null $variables
+     * @param mixed|null $rootValue
+     */
+    public function parseAndExecuteQuery(
+        string $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        $rootValue = null,
+        ?string $operationName = null
+    ): ExecutionResult {
+        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
+
+        try {
+            if ($cacheConfig['enable']) {
+                /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
+                $cacheFactory = app(CacheFactory::class);
+                $store = $cacheFactory->store($cacheConfig['store']);
+
+                $query = $store->remember(
+                    'lighthouse:' . md5($query),
+                    $cacheConfig['ttl'],
+                    function () use ($query) {
+                        return Parser::parse($query);
+                    }
+                );
+            } else {
+                $query = Parser::parse($query);
+            }
+        } catch (SyntaxError $syntaxError) {
+            return new ExecutionResult(null, [$syntaxError]);
+        }
+
+        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
+    }
+
+    /**
+     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     *
+     * To render the @see ExecutionResult, you will probably want to call `->toArray($debug)` on it,
+     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
+     *
+     * @param array<string, mixed>|null $variables
+     * @param mixed|null $rootValue
+     */
+    public function executeParsedQuery(
+        DocumentNode $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        $rootValue = null,
+        ?string $operationName = null
+    ): ExecutionResult {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
         // This allows tracking the time for batched queries independently.

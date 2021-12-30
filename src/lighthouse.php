@@ -128,6 +128,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Query Cache
+    |--------------------------------------------------------------------------
+    |
+    | Caches user queries so we won't have to parse string queries on each request
+    |
+    */
+
+    'query_cache' => [
+        /*
+         * Setting to true enables query caching.
+         */
+        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', 'local' !== env('APP_ENV')),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
+
+        /*
+         * Duration in seconds the query should remain cached, null means forever.
+         */
+        'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', null),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Namespaces
     |--------------------------------------------------------------------------
     |
