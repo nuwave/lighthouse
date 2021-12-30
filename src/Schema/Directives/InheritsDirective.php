@@ -40,6 +40,13 @@ GRAPHQL;
                 "The {$typeDefinition->name->value} ({$typeDefinition->kind} found) kind must be the same as {$parentType->name->value} ({$parentType->kind} found)."
             );
         }
+        
+
+        if ($this->checkIfParentHasInheritedFromChild($parentType, $typeDefinition)) {
+            throw new DefinitionException(
+                "{$typeDefinition->name->value} can't inherit from {$parentType->name->value}"
+            );
+        }
 
         foreach (get_object_vars($parentType) as $type => $value) {
             if ($value instanceof NodeList) {
@@ -50,5 +57,20 @@ GRAPHQL;
         }
 
         $documentAST->setTypeDefinition($typeDefinition);
+    }
+
+    protected function checkIfParentHasInheritedFromChild($parentType, $typeDefinition)
+    {
+        $parentTypeDirective = ASTHelper::directiveDefinition($parentType, 'inherits');
+        $chilTypeDirective = ASTHelper::directiveDefinition($typeDefinition, 'inherits');
+
+        if (
+          $parentTypeDirective && $chilTypeDirective
+        ) {
+            return ASTHelper::directiveArgValue($parentTypeDirective, 'from') == $typeDefinition->name->value
+            && ASTHelper::directiveArgValue($chilTypeDirective, 'from') == $parentType->name->value;
+        }
+
+        return false;
     }
 }
