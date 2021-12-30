@@ -32,8 +32,6 @@ class QueryCachingTest extends TestCase
         Event::assertDispatchedTimes(KeyWritten::class, 1);
 
         // second request should be hit
-        Event::fake();
-
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo 
@@ -44,9 +42,9 @@ class QueryCachingTest extends TestCase
             ],
         ]);
 
-        Event::assertDispatchedTimes(CacheMissed::class, 0);
+        Event::assertDispatchedTimes(CacheMissed::class, 1);
         Event::assertDispatchedTimes(CacheHit::class, 1);
-        Event::assertDispatchedTimes(KeyWritten::class, 0);
+        Event::assertDispatchedTimes(KeyWritten::class, 1);
     }
 
     public function testDifferentQueriesHasDifferentKeys(): void
