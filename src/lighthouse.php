@@ -78,7 +78,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | A large part of schema generation consists of parsing and AST manipulation.
-    | This operation is very expensive, so it is highly recommended to enable
+    | This operation is very expensive, so it is highly recommended enabling
     | caching of the final schema to optimize performance of large schemas.
     |
     */
@@ -119,6 +119,11 @@ return [
          * Only relevant if version is set to 2.
          */
         'path' => env('LIGHTHOUSE_CACHE_PATH', base_path('bootstrap/cache/lighthouse-schema.php')),
+
+        /*
+         * Should the `@cache` directive use a tagged cache?
+         */
+        'tags' => false,
     ],
 
     /*
