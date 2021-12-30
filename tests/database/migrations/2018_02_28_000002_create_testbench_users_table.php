@@ -13,6 +13,7 @@ class CreateTestbenchUsersTable extends Migration
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
+            $table->string('remember_token')->nullable();
 
             $table->unsignedInteger('company_id')->nullable();
             $table->unsignedInteger('team_id')->nullable();
