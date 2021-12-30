@@ -29,13 +29,13 @@ GRAPHQL;
     public function handleBuilder($builder, $value): object
     {
         if (! $builder instanceof EloquentBuilder) {
-            throw new Exception('Can not get model from builder of class: '.get_class($builder));
+            throw new Exception('Can not get model from builder of class: ' . get_class($builder));
         }
         $model = $builder->getModel();
 
         $this->assertModelUsesSoftDeletes($model);
 
-        if ($value === null) {
+        if (null === $value) {
             return $builder;
         }
 
@@ -51,7 +51,7 @@ GRAPHQL;
                 // @phpstan-ignore-next-line because it involves mixins
                 return $builder->withoutTrashed();
             default:
-                throw new InvalidArgument('Unexpected value for Trashed filter: '.$value);
+                throw new InvalidArgument('Unexpected value for Trashed filter: ' . $value);
         }
     }
 
@@ -61,7 +61,7 @@ GRAPHQL;
 
         $this->assertModelUsesSoftDeletes($model);
 
-        if ($value === null) {
+        if (null === $value) {
             return $builder;
         }
 
@@ -71,7 +71,7 @@ GRAPHQL;
             case 'only':
                 return $builder->onlyTrashed();
             default:
-                throw new ScoutException('Unexpected value for Trashed filter: '.$value);
+                throw new ScoutException('Unexpected value for Trashed filter: ' . $value);
         }
     }
 

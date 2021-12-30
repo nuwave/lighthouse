@@ -454,7 +454,7 @@ GRAPHQL
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -619,7 +619,7 @@ GRAPHQL
     public function testThrowsIfBuilderIsNotPresent(): void
     {
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('No class `NonexistingClass` was found for directive `@paginate`');
+        $this->expectExceptionMessage('Failed to find class NonexistingClass in namespaces [] for directive @paginate.');
 
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {

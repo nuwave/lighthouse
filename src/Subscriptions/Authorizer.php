@@ -47,7 +47,7 @@ class Authorizer implements AuthorizesSubscriptions
             $channel = $this->sanitizeChannelName($channel);
 
             $subscriber = $this->storage->subscriberByChannel($channel);
-            if ($subscriber === null) {
+            if (null === $subscriber) {
                 return false;
             }
 

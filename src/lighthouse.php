@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Route Configuration
@@ -52,8 +51,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The guard to use for authenticating GraphQL requests, if needed.
-    | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
-    | such as `@guard` and when applying the `AttemptAuthentication` middleware.
+    | Used in directives such as `@guard` or the `AttemptAuthentication` middleware.
+    | Falls back to the Laravel default if the defined guard is either `null` or not found.
     |
     */
 
@@ -79,7 +78,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | A large part of schema generation consists of parsing and AST manipulation.
-    | This operation is very expensive, so it is highly recommended to enable
+    | This operation is very expensive, so it is highly recommended enabling
     | caching of the final schema to optimize performance of large schemas.
     |
     */
@@ -88,7 +87,7 @@ return [
         /*
          * Setting to true enables schema caching.
          */
-        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', 'local' !== env('APP_ENV')),
 
         /*
          * Allowed values:
@@ -98,16 +97,16 @@ return [
         'version' => env('LIGHTHOUSE_CACHE_VERSION', 1),
 
         /*
-         * The name of the cache item for the schema cache.
-         * Only relevant if version is set to 1.
-         */
-        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
-
-        /*
          * Allows using a specific cache store, uses the app's default if set to null.
          * Only relevant if version is set to 1.
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
+
+        /*
+         * The name of the cache item for the schema cache.
+         * Only relevant if version is set to 1.
+         */
+        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
 
         /*
          * Duration in seconds the schema should remain cached, null means forever.
@@ -120,6 +119,11 @@ return [
          * Only relevant if version is set to 2.
          */
         'path' => env('LIGHTHOUSE_CACHE_PATH', base_path('bootstrap/cache/lighthouse-schema.php')),
+
+        /*
+         * Should the `@cache` directive use a tagged cache?
+         */
+        'tags' => false,
     ],
 
     /*
@@ -227,6 +231,9 @@ return [
     */
 
     'error_handlers' => [
+        \Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
@@ -321,11 +328,29 @@ return [
     | as non-nullable. This is generally more convenient for clients, but will
     | cause validation errors to bubble further up in the result.
     |
-    | This setting will be removed and always true in v6.
+    | This setting will be removed and always behave as if it were true in v6.
     |
     */
 
     'non_null_pagination_results' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Unbox BenSampo\Enum\Enum instances
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Lighthouse will extract the internal $value from instances of
+    | BenSampo\Enum\Enum before passing it to ArgBuilderDirective::handleBuilder().
+    |
+    | This setting will be removed and always behave as if it were false in v6.
+    |
+    | It is only here to preserve compatibility, e.g. when expecting the internal
+    | value to be passed to a scope when using @scope, but not needed due to Laravel
+    | calling the Enum's __toString() method automagically when used in a query.
+    |
+    */
+
+    'unbox_bensampo_enum_enum_instances' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -378,13 +403,13 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
                 'connection' => 'pusher',
             ],
             'echo' => [
                 'driver' => 'echo',
                 'connection' => env('LIGHTHOUSE_SUBSCRIPTION_REDIS_CONNECTION', 'default'),
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@echoRoutes',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@echoRoutes',
             ],
         ],
 
@@ -442,5 +467,4 @@ return [
          */
         'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
     ],
-
 ];

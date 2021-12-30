@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
+use Tests\Utils\Models\AlternateConnection;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -103,7 +104,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this
@@ -121,6 +122,54 @@ class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount($tasksPerUser, 'data.users.1.tasks');
 
         $this->assertSame($expectedQueryCount, $queryCount);
+    }
+
+    public function testDoesNotBatchloadRelationsWithDifferentDatabaseConnections(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type AlternateConnection {
+            id: ID
+        }
+
+        type User {
+            alternateConnections: [AlternateConnection!]! @hasMany
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        ';
+
+        $userCount = 2;
+        $alternateConnectionsPerUser = 3;
+        factory(User::class, $userCount)
+            ->create()
+            ->each(function (User $user) use ($alternateConnectionsPerUser): void {
+                $user->alternateConnections()->saveMany(
+                    factory(AlternateConnection::class, $alternateConnectionsPerUser)->make()
+                );
+            });
+
+        $queryCount = 0;
+        DB::listen(function () use (&$queryCount): void {
+            ++$queryCount;
+        });
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    alternateConnections {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertJsonCount($userCount, 'data.users')
+            ->assertJsonCount($alternateConnectionsPerUser, 'data.users.0.alternateConnections')
+            ->assertJsonCount($alternateConnectionsPerUser, 'data.users.1.alternateConnections');
+
+        $this->assertSame(3, $queryCount);
     }
 
     /**
@@ -155,7 +204,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -216,7 +265,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -253,7 +302,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queryCount = 0;
         DB::listen(function () use (&$queryCount): void {
-            $queryCount++;
+            ++$queryCount;
         });
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -465,7 +514,7 @@ class RelationBatchLoaderTest extends DBTestCase
 
         $queries = 0;
         DB::listen(static function () use (&$queries): void {
-            $queries++;
+            ++$queries;
         });
 
         $this

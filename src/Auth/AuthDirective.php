@@ -1,9 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
@@ -40,7 +41,8 @@ GRAPHQL;
         return $fieldValue->setResolver(
             function (): ?Authenticatable {
                 /** @var string|null $guard */
-                $guard = $this->directiveArgValue('guard', config('lighthouse.guard'));
+                $guard = $this->directiveArgValue('guard')
+                    ?? AuthServiceProvider::guard();
 
                 // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
                 return $this

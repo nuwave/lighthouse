@@ -7,10 +7,10 @@ use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 
 class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
-    const ESCAPE = '\\';
-    const PERCENTAGE = '%';
-    const UNDERSCORE = '_';
-    const PLACEHOLDER = '{}';
+    public const ESCAPE = '\\';
+    public const PERCENTAGE = '%';
+    public const UNDERSCORE = '_';
+    public const PLACEHOLDER = '{}';
 
     public static function definition(): string
     {
@@ -49,7 +49,7 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $value): object
     {
-        if ($value === null) {
+        if (null === $value) {
             return $builder;
         }
 
@@ -86,7 +86,7 @@ GRAPHQL;
     {
         return str_replace(
             [self::ESCAPE, self::PERCENTAGE, self::UNDERSCORE],
-            [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::PERCENTAGE, self::ESCAPE.self::UNDERSCORE],
+            [self::ESCAPE . self::ESCAPE, self::ESCAPE . self::PERCENTAGE, self::ESCAPE . self::UNDERSCORE],
             $value
         );
     }

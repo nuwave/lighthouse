@@ -4,6 +4,7 @@ namespace Tests\Unit\Testing;
 
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Http\Request;
 use Tests\TestCase;
 
 class MakesGraphQLRequestsTest extends TestCase
@@ -42,7 +43,7 @@ class MakesGraphQLRequestsTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage($error->getMessage());
+        ')->assertGraphQLError($error);
 
         $this->rethrowGraphQLErrors();
 
@@ -52,5 +53,38 @@ class MakesGraphQLRequestsTest extends TestCase
             foo
         }
         ');
+    }
+
+    public function testGraphQLWithHeaders(): void
+    {
+        /** @var \Illuminate\Http\Request|null $request */
+        $request = null;
+        $this->mockResolver(static function () use (&$request): void {
+            $request = app(Request::class);
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $key = 'foo';
+        $value = 'bar';
+
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
+            {
+                foo
+            }
+            ',
+            [],
+            [],
+            [$key => $value]
+        );
+
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertSame($value, $request->header($key));
     }
 }

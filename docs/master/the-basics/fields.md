@@ -160,7 +160,7 @@ type User {
 }
 ```
 
-Let's play through what happens when the client send's the following query:
+Let's play through what happens when the client sends the following query:
 
 ```graphql
 {

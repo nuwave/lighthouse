@@ -28,11 +28,11 @@ mutation {
 ```json
 {
   "data": {
-    "foo": null
+    "createUser": null
   },
   "errors": [
     {
-      "message": "validation",
+      "message": "Validation failed for the field [createUser].",
       "locations": [
         {
           "line": 2,
@@ -40,7 +40,9 @@ mutation {
         }
       ],
       "extensions": {
-        "validation": ["The email field must be a valid email."]
+        "validation": {
+          "email": ["The email field must be a valid email."]
+        }
       }
     }
   ]

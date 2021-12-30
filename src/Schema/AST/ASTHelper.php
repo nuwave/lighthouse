@@ -10,9 +10,11 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
@@ -35,10 +37,12 @@ class ASTHelper
      * Merge two lists of AST nodes.
      *
      * @template TNode of \GraphQL\Language\AST\Node
+     *
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
      * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
+     *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
@@ -76,8 +80,10 @@ class ASTHelper
 
     /**
      * @template TNode of \GraphQL\Language\AST\Node
+     *
      * @param  \GraphQL\Language\AST\NodeList<TNode>  $nodeList
      * @param  TNode  $node
+     *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function prepend(NodeList $nodeList, Node $node): NodeList
@@ -111,29 +117,33 @@ class ASTHelper
             return $node;
         }
 
-        $type = data_get($node, 'type');
-
-        if (! $type) {
-            throw new DefinitionException(
-                "The node '$node->kind' does not have a type associated with it."
-            );
+        if (
+            $node instanceof NonNullTypeNode
+            || $node instanceof ListTypeNode
+            || $node instanceof FieldDefinitionNode
+            || $node instanceof InputValueDefinitionNode
+        ) {
+            return self::getUnderlyingNamedTypeNode($node->type);
         }
 
-        return self::getUnderlyingNamedTypeNode($type);
+        throw new DefinitionException(
+            "The node '$node->kind' does not have a type associated with it."
+        );
     }
 
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param  mixed  $default Is returned if the directive does not have the argument.
-     * @return mixed The value given to the directive.
+     * @param  mixed  $default  is returned if the directive does not have the argument
+     *
+     * @return mixed the value given to the directive
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
         /** @var \GraphQL\Language\AST\ArgumentNode|null $arg */
         $arg = self::firstByName($directive->arguments, $name);
 
-        return $arg !== null
+        return null !== $arg
             ? AST::valueFromASTUntyped($arg->value)
             : $default;
     }
@@ -143,7 +153,8 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
-     * @return mixed The plain PHP value.
+     *
+     * @return mixed the plain PHP value
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
@@ -170,7 +181,7 @@ class ASTHelper
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: '.get_class($definitionNode));
+            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
@@ -183,24 +194,27 @@ class ASTHelper
      */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
-        return self::directiveDefinition($definitionNode, $name) !== null;
+        return null !== self::directiveDefinition($definitionNode, $name);
     }
 
     /**
      * Out of a list of nodes, get the first that matches the given name.
      *
      * @template TNode of \GraphQL\Language\AST\Node
-     * @param  iterable<TNode> $nodes
+     *
+     * @param  iterable<TNode>  $nodes
+     *
      * @return TNode|null
      */
     public static function firstByName($nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected a Node with a name property, got: '.get_class($node));
+                throw new Exception('Expected a Node with a name property, got: ' . get_class($node));
             }
 
             if ($node->name->value === $name) {
+                // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Schema\AST\ASTHelper::firstByName() should return TNode of GraphQL\Language\AST\Node|null but returns TNode of GraphQL\Language\AST\Node.
                 return $node;
             }
         }
@@ -209,24 +223,19 @@ class ASTHelper
     }
 
     /**
-     * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
+     * Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective.
      */
-    public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
+    public static function namespaceForDirective(Node $definitionNode, string $directiveName): ?string
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
-        return $namespaceDirective !== null
-            // The namespace directive can contain an argument with the name of the
-            // current directive, in which case it applies here
-            ? static::directiveArgValue($namespaceDirective, $directiveName, '')
-            // Default to an empty namespace if the namespace directive does not exist
-            : '';
+        return null !== $namespaceDirective
+            ? static::directiveArgValue($namespaceDirective, $directiveName)
+            : null;
     }
 
     /**
      * Attach directive to all registered object type fields.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): void
     {
@@ -246,7 +255,7 @@ class ASTHelper
      */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        return self::firstByName($type->interfaces, $interfaceName) !== null;
+        return null !== self::firstByName($type->interfaces, $interfaceName);
     }
 
     /**
@@ -304,14 +313,15 @@ class ASTHelper
         ObjectTypeDefinitionNode &$parentType
     ): string {
         return Str::studly($parentType->name->value)
-            .Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value);
+            . Str::studly($parentField->name->value)
+            . Str::studly($argDefinition->name->value);
     }
 
     /**
      * Given a collection of directives, returns the string value for the deprecation reason.
      *
      * @param  \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $node
+     *
      * @return string
      */
     public static function deprecationReason(Node $node): ?string
@@ -343,7 +353,7 @@ class ASTHelper
         $directive = null;
         foreach ($document->definitions as $definitionNode) {
             if ($definitionNode instanceof DirectiveDefinitionNode) {
-                if ($directive !== null) {
+                if (null !== $directive) {
                     throw new DefinitionException(
                         "Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}"
                     );
@@ -353,7 +363,7 @@ class ASTHelper
             }
         }
 
-        if ($directive === null) {
+        if (null === $directive) {
             throw new DefinitionException(
                 "Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}"
             );
@@ -374,7 +384,7 @@ class ASTHelper
         $documentAST = $astBuilder->documentAST();
 
         $type = $documentAST->types[$typeName] ?? null;
-        if ($type === null) {
+        if (null === $type) {
             throw new DefinitionException(
                 "Type '$typeName' on '{$field->name->value}' can not be found in the schema.'"
             );

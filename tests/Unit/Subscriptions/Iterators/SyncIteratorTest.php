@@ -8,7 +8,7 @@ class SyncIteratorTest extends IteratorTest
 {
     public function testIsWellBehavedIterator(): void
     {
-        $iterator = new SyncIterator;
+        $iterator = new SyncIterator();
 
         $this->assertIteratesOverItemsWithCallback($iterator);
         $this->assertPassesExceptionToHandler($iterator);

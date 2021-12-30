@@ -41,19 +41,25 @@ trait MakesGraphQLRequests
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
+     * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
+     *
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function graphQL(string $query, array $variables = [], array $extraParams = [])
-    {
+    protected function graphQL(
+        string $query,
+        array $variables = [],
+        array $extraParams = [],
+        array $headers = []
+    ) {
         $params = ['query' => $query];
 
-        if ($variables !== []) {
+        if ([] !== $variables) {
             $params += ['variables' => $variables];
         }
 
         $params += $extraParams;
 
-        return $this->postGraphQL($params);
+        return $this->postGraphQL($params, $headers);
     }
 
     /**
@@ -62,8 +68,9 @@ trait MakesGraphQLRequests
      * Use this over graphQL() when you need more control or want to
      * test how your server behaves on incorrect inputs.
      *
-     * @param  array<mixed, mixed>  $data
-     * @param  array<string, string>  $headers
+     * @param  array<mixed, mixed>  $data  JSON-serializable payload
+     * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
+     *
      * @return \Illuminate\Testing\TestResponse
      */
     protected function postGraphQL(array $data, array $headers = [])
@@ -85,10 +92,15 @@ trait MakesGraphQLRequests
      * @param  array<int|string, array<int, string>>  $map
      * @param  array<int|string, \Illuminate\Http\Testing\File>|array<int|string, array>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
+     *
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function multipartGraphQL(array $operations, array $map, array $files, array $headers = [])
-    {
+    protected function multipartGraphQL(
+        array $operations,
+        array $map,
+        array $files,
+        array $headers = []
+    ) {
         $parameters = [
             'operations' => json_encode($operations),
             'map' => json_encode($map),
@@ -116,7 +128,7 @@ trait MakesGraphQLRequests
      */
     protected function introspect()
     {
-        if ($this->introspectionResult !== null) {
+        if (null !== $this->introspectionResult) {
             return $this->introspectionResult;
         }
 
@@ -150,7 +162,7 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if ($this->introspectionResult === null) {
+        if (null === $this->introspectionResult) {
             $this->introspect();
         }
 
@@ -181,15 +193,21 @@ trait MakesGraphQLRequests
      * @param  string  $query  The GraphQL query to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the HTTP payload
-     * @return array<int, mixed>  The chunked results
+     * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
+     *
+     * @return array<int, mixed> The chunked results
      */
-    protected function streamGraphQL(string $query, array $variables = [], array $extraParams = []): array
-    {
-        if ($this->deferStream === null) {
+    protected function streamGraphQL(
+        string $query,
+        array $variables = [],
+        array $extraParams = [],
+        array $headers = []
+    ): array {
+        if (null === $this->deferStream) {
             $this->setUpDeferStream();
         }
 
-        $response = $this->graphQL($query, $variables, $extraParams);
+        $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
         if (! $response->baseResponse instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
@@ -205,7 +223,7 @@ trait MakesGraphQLRequests
      */
     protected function setUpDeferStream(): void
     {
-        $this->deferStream = new MemoryStream;
+        $this->deferStream = new MemoryStream();
 
         Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->deferStream;

@@ -1,6 +1,6 @@
 # Testing with PHPUnit
 
-Lighthouse makes it easy to add automated tests through PHPUnit.
+Lighthouse makes it easy to add automated tests through [PHPUnit](https://phpunit.de).
 
 ## Setup
 
@@ -8,10 +8,6 @@ Lighthouse offers some useful test helpers that make it easy to call your API
 from within a PHPUnit test. Just add the `MakesGraphQLRequests` trait to your test class.
 
 ```diff
-<?php
-
-namespace Tests;
-
 +use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -19,6 +15,27 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 +   use MakesGraphQLRequests;
+}
+```
+
+Enabling the schema cache speeds up your tests. To ensure the schema is fresh
+before running tests, add the `ClearSchemaCache` trait to your test class and call it during set up.
+
+```diff
++use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+    use CreatesApplication;
++   use ClearsSchemaCache;
+
+
+    protected function setUp(): void
+    {
+        parent::setUp();
++       $this->bootClearsSchemaCache();
+     }
 }
 ```
 
@@ -48,7 +65,7 @@ If you want to use variables within your query, pass an associative array as the
 public function testCreatePost(): void
 {
     $response = $this->graphQL(/** @lang GraphQL */ '
-        mutation CreatePost($title: String!) {
+        mutation ($title: String!) {
             createPost(title: $title) {
                 id
             }
@@ -87,9 +104,9 @@ public function testQueriesPosts(): void
                 [
                     'id' => $post->id,
                     'title' => $post->title,
-                ]
-            ]
-        ]
+                ],
+            ],
+        ],
     ]);
 }
 ```
@@ -189,10 +206,11 @@ helper method.
 
 ```php
 $operations = [
-    'operationName' => 'upload',
-    'query' => 'mutation upload ($file: Upload!) {
-                    upload (file: $file)
-                }',
+    'query' => /** @lang GraphQL */ '
+        mutation ($file: Upload!) {
+            upload(file: $file)
+        }
+    ',
     'variables' => [
         'file' => null,
     ],
@@ -307,8 +325,8 @@ public function testHelloWorld(): void
     }
     ')->seeJson([
         'data' => [
-            'hello' => 'world'
-        ]
+            'hello' => 'world',
+        ],
     ])->seeHeader('SomeHeader', 'value');
 }
 ```

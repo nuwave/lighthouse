@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Subscriptions\Directives\SubscriptionDirective;
@@ -39,23 +40,26 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         $fieldName = $fieldValue->getFieldName();
 
         $directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME);
-        if ($directive !== null) {
+        if (null !== $directive) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
             $className = Str::studly($fieldName);
         }
 
+        $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
         $className = Utils::namespaceClassname(
             $className,
-            $fieldValue->defaultNamespacesForParent(),
+            $namespacesToTry,
             function (string $class): bool {
                 return is_subclass_of($class, GraphQLSubscription::class);
             }
         );
 
         if (! $className) {
+            $subscriptionClass = GraphQLSubscription::class;
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No class found for the subscription field {$fieldName}"
+                "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
         }
 

@@ -221,14 +221,14 @@ By default, the generated type will be named just like the given class.
 
 ```php
 $enum = new LaravelEnumType(UserType::class);
-var_dump($enum->name); // UserType
+echo $enum->name; // UserType
 ```
 
 You may overwrite the name if the default does not fit or you have a name conflict.
 
 ```php
 $enum = new LaravelEnumType(UserType::class, 'UserKind');
-var_dump($enum->name); // UserKind
+echo $enum->name; // UserKind
 ```
 
 ## Input

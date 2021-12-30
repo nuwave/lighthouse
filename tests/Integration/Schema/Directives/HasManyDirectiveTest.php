@@ -78,6 +78,33 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.tasks');
     }
 
+    public function testHasManyWithRenamedModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            foos: [Foo!]! @hasMany(relation: "tasks")
+        }
+
+        type Foo @model(class: "Task") {
+            id: Int
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                foos {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(3, 'data.user.foos');
+    }
+
     public function testQueryHasManyWithCondition(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -485,12 +512,12 @@ class HasManyDirectiveTest extends DBTestCase
         $tasks = Arr::first(
             $user['fields'],
             function (array $field): bool {
-                return $field['name'] === 'tasks';
+                return 'tasks' === $field['name'];
             }
         );
         $this->assertSame(
             $expectedConnectionName,
-            $tasks['type']/* TODO add back in in v6 ['ofType'] */['name']
+            $tasks['type']/* TODO add back in in v6 ['ofType'] */ ['name']
         );
     }
 
@@ -694,7 +721,7 @@ class HasManyDirectiveTest extends DBTestCase
             'parent_id' => $post1->getKey(),
         ]);
 
-        $post3 = factory(Post::class)->create([
+        factory(Post::class)->create([
             'id' => 3,
             'parent_id' => $post2->getKey(),
         ]);

@@ -28,11 +28,11 @@ mutation {
 ```json
 {
   "data": {
-    "foo": null
+    "createUser": null
   },
   "errors": [
     {
-      "message": "validation",
+      "message": "Validation failed for the field [createUser].",
       "locations": [
         {
           "line": 2,
@@ -40,7 +40,9 @@ mutation {
         }
       ],
       "extensions": {
-        "validation": ["The email field must be a valid email."]
+        "validation": {
+          "email": ["The email field must be a valid email."]
+        }
       }
     }
   ]
@@ -213,7 +215,7 @@ Validation rules that mutate the given input are _not_ supported:
 - `exclude_if`
 - `exclude_unless`
 
-### Field References
+### References
 
 References are resolved relative to the argument or input field that rules are defined upon:
 
@@ -236,6 +238,31 @@ mutation {
   foo(bar: 1, input: { bar: 2, notBar: 1 })
 }
 ```
+
+### Custom Rules With References
+
+When creating custom validation rules with references, you need to tell Lighthouse
+which parameters are references, so it can add the full argument path:
+
+```graphql
+input FooInput {
+  foo: Int
+  bar: Int @rules(apply: ["with_reference:equal_field,0,foo"])
+}
+```
+
+In this example, `equal_field` is a custom rule that checks if the argument
+is the same as the one referenced by the parameter.
+
+The parameters to `with_reference` are:
+
+1. Name of the custom rule
+2. Indexes of the custom rule parameter that should be treated as a reference.
+   Specify multiple indexes separated by `_`.
+3. The parameters for the custom rule
+
+If you are using custom rule classes, implement `WithReferenceRule::setArgumentPath()`.
+Lighthouse will call this method with the argument path leading up to the validated argument before validation runs.
 
 ### Comparisons
 

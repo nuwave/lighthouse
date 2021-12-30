@@ -61,7 +61,7 @@ class CountModelsLoader implements ModelsLoader
      * @deprecated Laravel 5.7 has native ->loadCount() on EloquentCollection
      * @see \Illuminate\Database\Eloquent\Collection::loadCount()
      *
-     * @param  array<string, \Closure> $relations
+     * @param  array<string, \Closure>  $relations
      */
     public static function loadCount(EloquentCollection $parents, array $relations): void
     {

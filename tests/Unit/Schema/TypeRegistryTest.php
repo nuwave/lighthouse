@@ -12,14 +12,13 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
 class TypeRegistryTest extends TestCase
 {
     /**
-     * The type registry.
-     *
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
     protected $typeRegistry;
@@ -29,6 +28,9 @@ class TypeRegistryTest extends TestCase
         parent::setUp();
 
         $this->typeRegistry = app(TypeRegistry::class);
+
+        $astBuilder = app(ASTBuilder::class);
+        $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
     }
 
     public function testSetsEnumValueThroughDirective(): void

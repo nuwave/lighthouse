@@ -71,8 +71,13 @@ abstract class DateScalar extends ScalarType
                 is_object($value)
                 // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
                 // @noRector Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector
-                && get_class($value) === \Carbon\Carbon::class
+                && (
+                    \Carbon\Carbon::class === get_class($value)
+                    || \Carbon\CarbonImmutable::class === get_class($value)
+                )
             ) {
+                /** @var \Carbon\Carbon|\Carbon\CarbonImmutable $value */
+
                 /**
                  * Given we had a valid \Carbon\Carbon before, this can not fail.
                  *
@@ -107,7 +112,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Try turning a client value into a Carbon instance.
      *
-     * @param  mixed  $value A possibly faulty client value.
+     * @param  mixed  $value  a possibly faulty client value
      */
     abstract protected function parse($value): Carbon;
 }

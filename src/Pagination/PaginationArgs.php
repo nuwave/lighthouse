@@ -28,8 +28,6 @@ class PaginationArgs
      * Create a new instance from user given args.
      *
      * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
-     * @return static
      *
      * @throws \GraphQL\Error\Error
      */
@@ -59,7 +57,7 @@ class PaginationArgs
 
         // Make sure the maximum pagination count is not exceeded
         if (
-            $paginateMaxCount !== null
+            null !== $paginateMaxCount
             && $instance->first > $paginateMaxCount
         ) {
             throw new Error(

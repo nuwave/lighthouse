@@ -187,7 +187,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(
-                createdBetween: ["'.$start.'", "'.$end.'"]
+                createdBetween: ["' . $start . '", "' . $end . '"]
             ) {
                 id
             }
@@ -222,8 +222,8 @@ class ArgBuilderDirectiveTest extends DBTestCase
         {
             users(
                 created: {
-                    start: "'.$start.'"
-                    end: "'.$end.'"
+                    start: "' . $start . '"
+                    end: "' . $end . '"
                 }
             ) {
                 id
@@ -253,7 +253,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(
-                notCreatedBetween: ["'.$start.'", "'.$end.'"]
+                notCreatedBetween: ["' . $start . '", "' . $end . '"]
             ) {
                 id
             }
@@ -280,7 +280,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users(created_at: "'.$year.'") {
+            users(created_at: "' . $year . '") {
                 id
             }
         }
@@ -302,7 +302,7 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users(name: "'.$users->first()->name.'") {
+            users(name: "' . $users->first()->name . '") {
                 id
             }
         }

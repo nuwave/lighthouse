@@ -20,13 +20,13 @@ class CustomStuff
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
+     * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
      */
     public function resolveType($rootValue): Type
     {
         return $this->typeRegistry->get(
             // Add prefix
-            'Custom'.class_basename($rootValue)
+            'Custom' . class_basename($rootValue)
         );
     }
 }

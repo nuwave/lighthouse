@@ -108,6 +108,7 @@ GRAPHQL;
                 if ($this->directiveHasArgument('builder')) {
                     $builderResolver = $this->getResolverFromArgument('builder');
 
+                    /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
                     $query = $builderResolver($root, $args, $context, $resolveInfo);
                 } else {
                     $query = $this->getModelClass()::query();
@@ -120,8 +121,7 @@ GRAPHQL;
                         $this->directiveArgValue('scopes', [])
                     );
 
-                return PaginationArgs
-                    ::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
+                return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
                     ->applyToBuilder($query);
             }
         );

@@ -7,7 +7,7 @@ use Exception;
 class UnknownCacheVersionException extends Exception
 {
     /**
-     * @param  mixed  $version Should be int, but could be something else
+     * @param  mixed  $version  Should be int, but could be something else
      */
     public function __construct($version)
     {

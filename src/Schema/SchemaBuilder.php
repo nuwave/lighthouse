@@ -36,7 +36,7 @@ class SchemaBuilder
     public function schema(): Schema
     {
         if (! isset($this->schema)) {
-            $this->schema = $this->build(
+            return $this->schema = $this->build(
                 $this->astBuilder->documentAST()
             );
         }
@@ -79,8 +79,7 @@ class SchemaBuilder
             }
         );
 
-        // This is just used for introspection, it is required
-        // to be able to retrieve all the types in the schema
+        // Enables introspection to list all types in the schema
         $config->setTypes(
             /**
              * @return array<string, \GraphQL\Type\Definition\Type>
@@ -97,7 +96,7 @@ class SchemaBuilder
 
         $directives = [];
         foreach ($documentAST->directives as $directiveDefinition) {
-            $directives [] = $directiveFactory->handle($directiveDefinition);
+            $directives[] = $directiveFactory->handle($directiveDefinition);
         }
 
         $config->setDirectives(

@@ -31,7 +31,7 @@ class Upload extends ScalarType
     {
         if (! $value instanceof UploadedFile) {
             throw new Error(
-                'Could not get uploaded file, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec Instead got: '.Utils::printSafe($value)
+                'Could not get uploaded file, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec Instead got: ' . Utils::printSafe($value)
             );
         }
 

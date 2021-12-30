@@ -38,8 +38,8 @@ directive @validator(
   The name of the class to use.
 
   If defined on an input, this defaults to a class called `{$inputName}Validator` in the
-  default validator namespace. For fields, it uses the name of the parent type
-  and the field name: `{$parent}{$field}Validator`.
+  default validator namespace. For fields, it uses the namespace of the parent type
+  and the field name: `{$parent}\{$field}Validator`.
   """
   class: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
@@ -63,7 +63,7 @@ GRAPHQL;
 
     protected function validator(): Validator
     {
-        if ($this->validator === null) {
+        if (null === $this->validator) {
             /** @var \Nuwave\Lighthouse\Validation\Validator $validator */
             $validator = app(
                 // We precomputed and validated the full class name at schema build time
@@ -89,7 +89,7 @@ GRAPHQL;
         if ($this->directiveHasArgument('class')) {
             $classCandidate = $this->directiveArgValue('class');
         } else {
-            $classCandidate = $typeDefinition->name->value.'Validator';
+            $classCandidate = $typeDefinition->name->value . 'Validator';
         }
 
         $this->setFullClassnameOnDirective($typeDefinition, $classCandidate);
@@ -104,9 +104,9 @@ GRAPHQL;
             $classCandidate = $this->directiveArgValue('class');
         } else {
             $classCandidate = $parentType->name->value
-                .'\\'
-                .ucfirst($fieldDefinition->name->value)
-                .'Validator';
+                . '\\'
+                . ucfirst($fieldDefinition->name->value)
+                . 'Validator';
         }
 
         $this->setFullClassnameOnDirective($fieldDefinition, $classCandidate);
@@ -128,7 +128,7 @@ GRAPHQL;
             if ($directive->name->value === $this->name()) {
                 $directive->arguments = ASTHelper::mergeUniqueNodeList(
                     $directive->arguments,
-                    [Parser::argument('class: "'.addslashes($validatorClass).'"')],
+                    [Parser::argument('class: "' . addslashes($validatorClass) . '"')],
                     true
                 );
             }

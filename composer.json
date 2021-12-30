@@ -1,14 +1,13 @@
 {
     "name": "nuwave/lighthouse",
-    "type": "library",
     "description": "A framework for serving GraphQL from Laravel",
+    "license": "MIT",
+    "type": "library",
     "keywords": [
         "graphql",
         "laravel",
         "laravel-graphql"
     ],
-    "homepage": "https://lighthouse-php.com",
-    "license": "MIT",
     "authors": [
         {
             "name": "Christopher Moore",
@@ -21,6 +20,11 @@
             "homepage": "https://franke.tech"
         }
     ],
+    "homepage": "https://lighthouse-php.com",
+    "support": {
+        "issues": "https://github.com/nuwave/lighthouse/issues",
+        "source": "https://github.com/nuwave/lighthouse"
+    },
     "require": {
         "php": ">= 7.2",
         "ext-json": "*",
@@ -39,25 +43,25 @@
         "webonyx/graphql-php": "^14.7"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3",
+        "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3 || ^4",
         "ergebnis/composer-normalize": "^2.2.2",
-        "finwe/phpstan-faker": "^0.1.0",
         "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laravel/legacy-factories": "^1",
         "laravel/lumen-framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laravel/scout": "^7 || ^8",
-        "mll-lab/graphql-php-scalars": "^4",
+        "mll-lab/graphql-php-scalars": "^4 || ^5",
+        "mll-lab/php-cs-fixer-config": "^4.4.1",
         "mockery/mockery": "^1",
-        "nunomaduro/larastan": "^0.6 || ^0.7",
+        "nunomaduro/larastan": "^0.6 || ^0.7 || ^1",
         "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || ^6",
-        "phpbench/phpbench": "1.0.0-alpha4",
-        "phpstan/phpstan": "0.12.89",
-        "phpstan/phpstan-mockery": "^0.12.5",
-        "phpstan/phpstan-phpunit": "^0.12.17",
+        "phpbench/phpbench": "^1",
+        "phpstan/phpstan": "~0.12 || 1.2.0",
+        "phpstan/phpstan-mockery": "~0.12 || ^1",
+        "phpstan/phpstan-phpunit": "~0.12 || ^1",
         "phpunit/phpunit": "^7.5 || ^8.4 || ^9",
         "predis/predis": "^1.1",
         "pusher/pusher-php-server": "^4 || ^5",
-        "rector/rector": "^0.9",
+        "rector/rector": "^0.12",
         "thecodingmachine/phpstan-safe-rule": "^1",
         "vimeo/psalm": "^4.7"
     },
@@ -67,25 +71,6 @@
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
         "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "aliases": {
-                "graphql": "Nuwave\\Lighthouse\\GraphQL"
-            },
-            "providers": [
-                "Nuwave\\Lighthouse\\LighthouseServiceProvider",
-                "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
-                "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
-                "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
-                "Nuwave\\Lighthouse\\Scout\\ScoutServiceProvider",
-                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
-                "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
-            ]
-        }
     },
     "autoload": {
         "psr-4": {
@@ -98,16 +83,35 @@
             "Benchmarks\\": "benchmarks"
         }
     },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "ergebnis/composer-normalize": true
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "aliases": {
+                "graphql": "Nuwave\\Lighthouse\\GraphQL"
+            },
+            "providers": [
+                "Nuwave\\Lighthouse\\LighthouseServiceProvider",
+                "Nuwave\\Lighthouse\\Auth\\AuthServiceProvider",
+                "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
+                "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
+                "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
+                "Nuwave\\Lighthouse\\Scout\\ScoutServiceProvider",
+                "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
+                "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
+            ]
+        }
+    },
     "scripts": {
-        "bench": "phpbench run",
         "rector": "rector process -v src/ tests/",
         "stan": "phpstan analyse --memory-limit 2048M",
         "test": "phpunit --colors=always",
         "test:integration": "phpunit --colors=always --testsuite Integration",
         "test:unit": "phpunit --colors=always --testsuite Unit"
-    },
-    "support": {
-        "issues": "https://github.com/nuwave/lighthouse/issues",
-        "source": "https://github.com/nuwave/lighthouse"
     }
 }

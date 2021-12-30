@@ -13,16 +13,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ValidateDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var \Illuminate\Contracts\Validation\Factory
-     */
-    protected $validationFactory;
-
-    public function __construct(ValidationFactory $validationFactory)
-    {
-        $this->validationFactory = $validationFactory;
-    }
-
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -43,13 +33,16 @@ GRAPHQL;
                     $argumentSet = $resolveInfo->argumentSet;
                     $rulesGatherer = new RulesGatherer($argumentSet);
 
-                    $validator = $this->validationFactory
-                        ->make(
-                            $args,
-                            $rulesGatherer->rules,
-                            $rulesGatherer->messages,
-                            $rulesGatherer->attributes
-                        );
+                    /**
+                     * @var \Illuminate\Contracts\Validation\Factory $validationFactory
+                     */
+                    $validationFactory = app(ValidationFactory::class);
+                    $validator = $validationFactory->make(
+                        $args,
+                        $rulesGatherer->rules,
+                        $rulesGatherer->messages,
+                        $rulesGatherer->attributes
+                    );
 
                     if ($validator->fails()) {
                         $path = implode('.', $resolveInfo->path);
