@@ -12,10 +12,12 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
+use Nuwave\Lighthouse\Support\Traits\GeneratesRelationsEnum;
 
 abstract class WhereConditionsBaseDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator
 {
     use GeneratesColumnsEnum;
+    use GeneratesRelationsEnum;
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  the builder used to resolve the field
@@ -36,24 +38,30 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        if ($this->hasAllowedColumns()) {
-            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
-            $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
-            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
+        $hasAllowedColumns = $this->hasAllowedColumns();
+        $hasAllowedRelations = $this->hasAllowedRelations();
+
+        if ($hasAllowedColumns || $hasAllowedRelations) {
+            $qualifiedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
+            $argDefinition->type = Parser::namedType($qualifiedWhereConditionsName);
 
             $documentAST->setTypeDefinition(
                 WhereConditionsServiceProvider::createWhereConditionsInputType(
-                    $restrictedWhereConditionsName,
+                    $qualifiedWhereConditionsName,
                     "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
-                    $allowedColumnsEnumName
+                    $hasAllowedColumns
+                        ? $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType)
+                        : 'String'
                 )
             );
 
             $documentAST->setTypeDefinition(
                 WhereConditionsServiceProvider::createHasConditionsInputType(
-                    $restrictedWhereConditionsName,
+                    $qualifiedWhereConditionsName,
                     "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
-                    $this->directiveArgValue('relations')
+                    $hasAllowedRelations
+                        ? $this->generateRelationsEnum($documentAST, $argDefinition, $parentField, $parentType)
+                        : 'String'
                 )
             );
         } else {

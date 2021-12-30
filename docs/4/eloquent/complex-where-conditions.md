@@ -41,8 +41,8 @@ directive @whereConditions(
   columns: [String!]
 
   """
-  Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
+  Use an existing enum type to restrict the allowed columns to a well-defined list.
+  This allows you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
@@ -220,8 +220,8 @@ directive @whereHasConditions(
   columns: [String!]
 
   """
-  Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
+  Use an existing enum type to restrict the allowed columns to a well-defined list.
+  This allows you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String

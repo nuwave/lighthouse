@@ -48,7 +48,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
                     ->setTypeDefinition(
                         static::createHasConditionsInputType(
                             static::DEFAULT_WHERE_CONDITIONS,
-                            'Dynamic HAS conditions for WHERE condition queries.'
+                            'Dynamic HAS conditions for WHERE condition queries.',
+                            'String'
                         )
                     )
                     ->setTypeDefinition(
@@ -102,22 +103,15 @@ GRAPHQL
         );
     }
 
-    /**
-     * @param  array<int, string>  $relations
-     */
-    public static function createHasConditionsInputType(string $name, string $description, array $relations): InputObjectTypeDefinitionNode
+    public static function createHasConditionsInputType(string $name, string $description, string $relationType): InputObjectTypeDefinitionNode
     {
-        // TODO turn $relations into scalar, perhaps like
-        // scalar {$name}Relation @scalar(regex: "^{implode('|', $relations)}$")
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = Parser::enumTypeDefinition(
-            $operator->enumDefinition()
-        )
+        $operatorName = Parser::enumTypeDefinition($operator->enumDefinition())
             ->name
             ->value;
         $operatorDefault = $operator->defaultHasOperator();
@@ -126,7 +120,7 @@ GRAPHQL
             "$description"
             input $hasRelationInputName {
                 "The relation that is checked."
-                relation: String!
+                relation: $relationType!
 
                 "The comparison operator to test against the amount."
                 operator: $operatorName = $operatorDefault

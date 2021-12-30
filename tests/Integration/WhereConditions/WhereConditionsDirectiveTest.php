@@ -25,7 +25,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testDefaultsToWhereEqual(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -53,7 +53,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOverwritesTheOperator(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -82,7 +82,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorIn(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -122,7 +122,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorIsNull(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
         }
@@ -163,7 +163,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorNotNull(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: ID!
         }
@@ -204,7 +204,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorNotBetween(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -244,7 +244,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testAddsNestedAnd(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -282,7 +282,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testAddsNestedOr(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -341,7 +341,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testAddsNestedAndOr(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -398,7 +398,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasMixed(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -492,7 +492,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRelation(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -546,7 +546,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasAmount(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -602,7 +602,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasOperator(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -659,7 +659,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasCondition(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -714,7 +714,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRecursive(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -770,7 +770,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasNested(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -836,7 +836,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testRejectsInvalidColumnName(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -866,7 +866,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testQueriesEmptyStrings(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -912,7 +912,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testQueryForNull(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -958,7 +958,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testRequiresAValueForAColumn(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -981,15 +981,15 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ')->assertGraphQLErrorMessage(SQLOperator::missingValueForColumn('no_value'));
     }
 
-    public function testOnlyAllowsWhitelistedColumns(): void
+    public function testWellDefinedColumns(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
-        
+
         type Query {
-            whitelistedColumns(
+            users(
                 where: _ @whereConditions(columns: ["id", "camelCase"])
             ): [User!]! @all
         }
@@ -999,7 +999,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            whitelistedColumns(
+            users(
                 where: {
                     column: ID
                     value: 1
@@ -1010,7 +1010,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'whitelistedColumns' => [
+                'users' => [
                     [
                         'id' => 1,
                     ],
@@ -1018,7 +1018,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $expectedEnumName = 'QueryWhitelistedColumnsWhereColumn';
+        $expectedEnumName = 'QueryUsersWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
         $this->assertNotNull($enum);
@@ -1029,7 +1029,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             [
                 'kind' => 'ENUM',
                 'name' => $expectedEnumName,
-                'description' => 'Allowed column names for Query.whitelistedColumns.where.',
+                'description' => 'Allowed column names for Query.users.where.',
                 'fields' => null,
                 'inputFields' => null,
                 'interfaces' => null,
@@ -1053,19 +1053,80 @@ class WhereConditionsDirectiveTest extends DBTestCase
         );
     }
 
+    public function testWellDefinedRelations(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users(
+                where: _ @whereConditions(relations: ["posts", "posts.comments", "alternateConnections.user", "alternate.connectionsUser"])
+            ): [User!]! @all
+        }
+        ';
+
+        $expectedEnumName = 'QueryUsersWhereRelation';
+        $enum = $this->introspectType($expectedEnumName);
+
+        $this->assertNotNull($enum);
+        /** @var array<string, mixed> $enum */
+
+        // TODO: Replace with dms/phpunit-arraysubset-asserts when we require PHPUnit 9 + PHP 7.3
+        $this->assertSame(
+            [
+                'kind' => 'ENUM',
+                'name' => $expectedEnumName,
+                'description' => 'Allowed relation names for Query.users.where.',
+                'fields' => null,
+                'inputFields' => null,
+                'interfaces' => null,
+                'enumValues' => [
+                    [
+                        'name' => 'POSTS',
+                        'description' => null,
+                        'isDeprecated' => false,
+                        'deprecationReason' => null,
+                    ],
+                    [
+                        'name' => 'POSTS__COMMENTS',
+                        'description' => null,
+                        'isDeprecated' => false,
+                        'deprecationReason' => null,
+                    ],
+                    [
+                        'name' => 'ALTERNATE_CONNECTIONS__USER',
+                        'description' => null,
+                        'isDeprecated' => false,
+                        'deprecationReason' => null,
+                    ],
+                    [
+                        'name' => 'ALTERNATE__CONNECTIONS_USER',
+                        'description' => null,
+                        'isDeprecated' => false,
+                        'deprecationReason' => null,
+                    ],
+                ],
+                'possibleTypes' => null,
+            ],
+            $enum
+        );
+    }
+
     public function testUseColumnEnumsArg(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
-        
+
         type Query {
             enumColumns(
                 where: _ @whereConditions(columnsEnum: "UserColumn")
             ): [User!]! @all
         }
-        
+
         enum UserColumn {
             ID @enum(value: "id")
             NAME @enum(value: "name")
@@ -1102,7 +1163,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         type User {
             id: ID!
         }
-        
+
         type Query {
             users(where: _ @whereConditions): [User!]! @all
         }
