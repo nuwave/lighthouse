@@ -6,42 +6,38 @@ use Tests\TestCase;
 
 class InheritsDirectiveTest extends TestCase
 {
-    public function testCanInheritsTypes()
+    public function testSimpleInheritance(): void
     {
         $schema = $this->buildSchema(/**@lang GraphQL */ '
             type ParentType {
                 attribute_1: String
             }
+
             type ChildType @inherits(from: ParentType) {
                 attribute_2: String
             }
-
-            type Query {
-                childtypeQuery: ChildType
-            }');
+        ' . self::PLACEHOLDER_QUERY);
 
         $childType = $schema->getType('ChildType');
 
         $this->assertNotNull($childType->getField('attribute_1'));
     }
 
-    public function testIfItcanInheritFromThatInherited()
+    public function testInheritTransitive(): void
     {
         $schema = $this->buildSchema(/**@lang GraphQL */ '
             type GrandParentType {
                 attribute_1: String
             }
+
             type ParentType @inherits(from: GrandParentType) {
                 attribute_2: String
             }
 
-            type ChildType @inherits(from: ParentType){
+            type ChildType @inherits(from: ParentType) {
                 attribute_3: String
             }
-
-            type Query {
-                childtypeQuery: ChildType
-            }');
+        ' . self::PLACEHOLDER_QUERY);
 
         $childType = $schema->getType('ChildType');
 
@@ -50,22 +46,42 @@ class InheritsDirectiveTest extends TestCase
         $this->assertNotNull($childType->getField('attribute_3'));
     }
 
-    public function testChildOverridesFields()
+    public function testSchemaOrderIsInsignificant(): void
     {
-        $schema = $this->buildSchema(/* @lang GraphQL */
-            '
+        $schema = $this->buildSchema(/**@lang GraphQL */ '
+            type ChildType @inherits(from: ParentType) {
+                attribute_3: String
+            }
+
+            type ParentType @inherits(from: GrandParentType) {
+                attribute_2: String
+            }
+
+            type GrandParentType {
+                attribute_1: String
+            }
+        ' . self::PLACEHOLDER_QUERY);
+
+        $childType = $schema->getType('ChildType');
+
+        $this->assertNotNull($childType->getField('attribute_1'));
+        $this->assertNotNull($childType->getField('attribute_2'));
+        $this->assertNotNull($childType->getField('attribute_3'));
+    }
+
+    public function testChildOverridesFields(): void
+    {
+        $schema = $this->buildSchema(/* @lang GraphQL */ '
             type ParentType {
                 attribute_1: String
                 attribute_2: Int
             }
+
             type ChildType @inherits(from: ParentType) {
                 attribute_1: Int
                 attribute_2: String
             }
-
-            type Query {
-                childtypeQuery: ChildType
-            }');
+        ' . self::PLACEHOLDER_QUERY);
 
         $childType = $schema->getType('ChildType');
 
@@ -76,7 +92,7 @@ class InheritsDirectiveTest extends TestCase
         $this->assertSame($stringType, $childType->getField('attribute_2')->getType());
     }
 
-    public function testChildAttributesShouldNotBeAddedParent()
+    public function testChildAttributesShouldNotBeAddedParent(): void
     {
         $this->expectException(\GraphQL\Error\InvariantViolation::class);
 
@@ -85,20 +101,17 @@ class InheritsDirectiveTest extends TestCase
                 attribute_1: String
                 another_attribute: String
             }
+            
             type ChildType @inherits(from: ParentType) {
                 new_attribute: String
             }
-
-            type Query {
-                parentypeQuery: ParentType
-                childtypeQuery: ChildType
-            }');
+        ' . self::PLACEHOLDER_QUERY);
 
         $parentType = $schema->getType('ParentType');
         $parentType->getField('new_attribute');
     }
 
-    public function testCanNotInheritsOtherTypes()
+    public function testInheritedTypeHasToMatch(): void
     {
         $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
 
@@ -106,16 +119,14 @@ class InheritsDirectiveTest extends TestCase
             input ParentType {
                 attribute_1: String
             }
+            
             type ChildType @inherits(from: ParentType) {
                 attribute_2: String
             }
-            type Query {
-                childtypeQuery: ChildType @mock
-            }
-        ');
+        ' . self::PLACEHOLDER_QUERY);
     }
 
-    public function testExceptionWhenTypeDoesntExist()
+    public function testInheritUndefinedType(): void
     {
         $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
 
@@ -123,9 +134,6 @@ class InheritsDirectiveTest extends TestCase
             type ChildType @inherits(from: UndefinedType) {
                 attribute_1: String
             }
-            type Query {
-                childTypeQuery: ChildType @mock
-            }
-        ');
+        ' . self::PLACEHOLDER_QUERY);
     }
 }
