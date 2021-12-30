@@ -2052,7 +2052,7 @@ Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
   """
-  TODO: description
+  Name of the relation.
   """
   relation: String!
 
