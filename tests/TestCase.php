@@ -10,6 +10,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
+use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
@@ -46,7 +47,9 @@ GRAPHQL;
     {
         parent::setUp();
 
-        if ($this->schema === null) {
+        // This default is only valid for testing Lighthouse itself and thus
+        // is not defined in the reusable test trait.
+        if (! isset($this->schema)) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
@@ -57,6 +60,7 @@ GRAPHQL;
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
+     *
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
@@ -68,6 +72,7 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            LighthouseAuthServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
@@ -124,7 +129,8 @@ GRAPHQL;
         ]);
 
         $config->set('app.debug', true);
-        $config->set('lighthouse.debug',
+        $config->set(
+            'lighthouse.debug',
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
@@ -159,6 +165,8 @@ GRAPHQL;
         ]);
 
         $config->set('lighthouse.cache.enable', false);
+
+        $config->set('lighthouse.unbox_bensampo_enum_enum_instances', true);
     }
 
     /**
@@ -186,7 +194,7 @@ GRAPHQL;
     protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
     {
         return $this->buildSchema(
-            $schema.self::PLACEHOLDER_QUERY
+            $schema . self::PLACEHOLDER_QUERY
         );
     }
 
@@ -208,7 +216,7 @@ GRAPHQL;
      */
     protected function qualifyTestResolver(string $method = 'resolve'): string
     {
-        return addslashes(static::class).'@'.$method;
+        return addslashes(static::class) . '@' . $method;
     }
 
     /**

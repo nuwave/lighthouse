@@ -11,13 +11,13 @@ class TaskPolicy
 
     public function adminOnly(User $user): bool
     {
-        return $user->name === self::ADMIN;
+        return self::ADMIN === $user->name;
     }
 
     public function delete(User $user, Task $task): bool
     {
         $taskUser = $task->user;
-        if ($taskUser === null) {
+        if (null === $taskUser) {
             return false;
         }
 

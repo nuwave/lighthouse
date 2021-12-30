@@ -30,8 +30,7 @@ class SearchDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->engineManager = Mockery::mock(EngineManager::class);
-        $this->engine = Mockery
-            ::mock(NullEngine::class)
+        $this->engine = Mockery::mock(NullEngine::class)
             ->makePartial();
 
         $this->app->singleton(EngineManager::class, function (): MockInterface {
@@ -160,7 +159,7 @@ class SearchDirectiveTest extends DBTestCase
 
         type Query {
             posts(
-                input: PostsInput! @builder(method: "'.$this->qualifyTestResolver('customBuilderMethod').'")
+                input: PostsInput! @builder(method: "' . $this->qualifyTestResolver('customBuilderMethod') . '")
                 search: String! @search
             ): [Post!]! @all
         }

@@ -32,7 +32,7 @@ class SimpleModelsLoader implements ModelsLoader
     /**
      * Extract the relation that was loaded.
      *
-     * @return mixed The model's relation.
+     * @return mixed the model's relation
      */
     public function extract(Model $model)
     {

@@ -6,7 +6,8 @@ namespace Illuminate\Foundation\Testing {
         /**
          * Asserts that the response contains an error from a given category.
          *
-         * @param  string  $category  The name of the expected error category.
+         * @param  string  $category  the name of the expected error category
+         *
          * @return $this
          */
         public function assertGraphQLErrorCategory(string $category): self
@@ -17,7 +18,8 @@ namespace Illuminate\Foundation\Testing {
         /**
          * Assert that the returned result contains exactly the given validation keys.
          *
-         * @param  array  $keys  The validation keys the result should have.
+         * @param  array<string>  $keys  the validation keys the result should have
+         *
          * @return $this
          */
         public function assertGraphQLValidationKeys(array $keys): self
@@ -28,8 +30,9 @@ namespace Illuminate\Foundation\Testing {
         /**
          * Assert that a given validation error is present in the response.
          *
-         * @param  string  $key  The validation key that should be present.
-         * @param  string  $message  The expected validation message.
+         * @param  string  $key  the validation key that should be present
+         * @param  string  $message  the expected validation message
+         *
          * @return $this
          */
         public function assertGraphQLValidationError(string $key, string $message): self
@@ -53,9 +56,22 @@ namespace Illuminate\Testing {
     class TestResponse
     {
         /**
+         * Assert the response contains an error with a matching message.
+         *
+         * @param  \Throwable  $error  the expected error
+         *
+         * @return $this
+         */
+        public function assertGraphQLError(\Throwable $error): self
+        {
+            return $this;
+        }
+
+        /**
          * Assert the response contains an error with the given message.
          *
-         * @param  string  $message  The expected error message.
+         * @param  string  $message  the expected error message
+         *
          * @return $this
          */
         public function assertGraphQLErrorMessage(string $message): self
@@ -64,9 +80,20 @@ namespace Illuminate\Testing {
         }
 
         /**
+         * Assert the response contains no errors.
+         *
+         * @return $this
+         */
+        public function assertGraphQLErrorFree(): self
+        {
+            return $this;
+        }
+
+        /**
          * Assert the response contains an error from the given category.
          *
-         * @param  string  $category  The name of the expected error category.
+         * @param  string  $category  the name of the expected error category
+         *
          * @return $this
          */
         public function assertGraphQLErrorCategory(string $category): self
@@ -77,7 +104,8 @@ namespace Illuminate\Testing {
         /**
          * Assert the returned result contains exactly the given validation keys.
          *
-         * @param  array  $keys  The validation keys the result should have.
+         * @param  array<string>  $keys  the validation keys the result should have
+         *
          * @return $this
          */
         public function assertGraphQLValidationKeys(array $keys): self
@@ -88,8 +116,9 @@ namespace Illuminate\Testing {
         /**
          * Assert a given validation error is present in the response.
          *
-         * @param  string  $key  The validation key that should be present.
-         * @param  string  $message  The expected validation message.
+         * @param  string  $key  the validation key that should be present
+         * @param  string  $message  the expected validation message
+         *
          * @return $this
          */
         public function assertGraphQLValidationError(string $key, string $message): self
@@ -110,13 +139,10 @@ namespace Illuminate\Testing {
 }
 
 namespace GraphQL\Type\Definition {
+    /**
+     * @property \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $argumentSet We monkey patch this onto here to pass it down the resolver chain.
+     */
     class ResolveInfo
     {
-        /**
-         * We monkey patch this onto here to pass it down the resolver chain.
-         *
-         * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-         */
-        public $argumentSet;
     }
 }

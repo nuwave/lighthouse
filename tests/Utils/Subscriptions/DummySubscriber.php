@@ -12,22 +12,17 @@ class DummySubscriber extends Subscriber
         $this->topic = $topic;
     }
 
-    public function serialize(): string
+    public function __serialize(): array
     {
-        return \Safe\json_encode([
+        return [
             'channel' => $this->channel,
             'topic' => $this->topic,
-        ]);
+        ];
     }
 
-    /**
-     * @param  string  $subscription
-     */
-    public function unserialize($subscription): void
+    public function __unserialize(array $data): void
     {
-        $data = \Safe\json_decode($subscription);
-
-        $this->channel = $data->channel;
-        $this->topic = $data->topic;
+        $this->channel = $data['channel'];
+        $this->topic = $data['topic'];
     }
 }

@@ -29,7 +29,7 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
 Redefine the default namespaces used in other directives.
 The arguments are a map from directive names to namespaces.
 """
-directive @namespace on FIELD_DEFINITION | OBJECT
+directive @namespace repeatable on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
@@ -43,11 +43,11 @@ GRAPHQL;
 
         foreach ($objectType->fields as $fieldDefinition) {
             $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);
-            if ($existingNamespaces !== null) {
+            if (null !== $existingNamespaces) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
-            $fieldDefinition->directives [] = $namespaceDirective;
+            $fieldDefinition->directives[] = $namespaceDirective;
         }
     }
 

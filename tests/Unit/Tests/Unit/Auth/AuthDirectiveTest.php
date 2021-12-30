@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Unit\Auth;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Tests\TestCase;
@@ -45,7 +45,7 @@ class AuthDirectiveTest extends TestCase
         $user->name = 'foo';
 
         $authFactory = $this->app->make(AuthFactory::class);
-        $authFactory->guard('api')->setUser($user);
+        $authFactory->guard('web')->setUser($user);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -53,7 +53,7 @@ class AuthDirectiveTest extends TestCase
         }
 
         type Query {
-            user: User! @auth(guard: "api")
+            user: User! @auth(guard: "web")
         }
         ';
 

@@ -21,22 +21,23 @@ use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
 use Nuwave\Lighthouse\Federation\Directives\ProvidesDirective;
 use Nuwave\Lighthouse\Federation\Directives\RequiresDirective;
+use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
 {
-    const FEDERATION_TYPES = [
+    public const FEDERATION_TYPES = [
         '_Any',
         '_Entity',
         '_FieldSet',
         '_Service',
     ];
 
-    const FEDERATION_FIELDS = [
+    public const FEDERATION_FIELDS = [
         '_service',
         '_entities',
     ];
 
-    const FEDERATION_DIRECTIVES = [
+    public const FEDERATION_DIRECTIVES = [
         ExtendsDirective::NAME,
         ExternalDirective::NAME,
         KeyDirective::NAME,
@@ -53,21 +54,26 @@ class FederationPrinter
             unset($types[$type]);
         }
 
-        $originalQueryType = Arr::pull($types, 'Query');
-        $config->setQuery(new ObjectType([
-            'name' => 'Query',
-            'fields' => array_filter(
-                $originalQueryType->getFields(),
-                static function (FieldDefinition $field): bool {
-                    return ! in_array($field->name, static::FEDERATION_FIELDS);
-                }
-            ),
-            'interfaces' => $originalQueryType->getInterfaces(),
-        ]));
+        /** @var \GraphQL\Type\Definition\ObjectType $originalQueryType */
+        $originalQueryType = Arr::pull($types, RootType::QUERY);
+        $queryFieldsWithoutFederation = array_filter(
+            $originalQueryType->getFields(),
+            static function (FieldDefinition $field): bool {
+                return ! in_array($field->name, static::FEDERATION_FIELDS);
+            }
+        );
+        $newQueryType = count($queryFieldsWithoutFederation) > 0
+            ? new ObjectType([
+                'name' => RootType::QUERY,
+                'fields' => $queryFieldsWithoutFederation,
+                'interfaces' => $originalQueryType->getInterfaces(),
+            ])
+            : null;
+        $config->setQuery($newQueryType);
 
-        $config->setMutation(Arr::pull($types, 'Mutation'));
+        $config->setMutation(Arr::pull($types, RootType::MUTATION));
 
-        $config->setSubscription(Arr::pull($types, 'Subscription'));
+        $config->setSubscription(Arr::pull($types, RootType::SUBSCRIPTION));
 
         $config->setTypes($types);
 
@@ -81,7 +87,7 @@ class FederationPrinter
         $printDirectives = static function ($definition): string {
             /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
-            if ($astNode === null) {
+            if (null === $astNode) {
                 return '';
             }
 
@@ -92,8 +98,8 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return $name === KeyDirective::NAME
-                                || $name === ExtendsDirective::NAME;
+                            return KeyDirective::NAME === $name
+                                || ExtendsDirective::NAME === $name;
                         }
                     )
                 );
@@ -104,9 +110,9 @@ class FederationPrinter
                         static function (DirectiveNode $directive): bool {
                             $name = $directive->name->value;
 
-                            return $name === ProvidesDirective::NAME
-                                || $name === RequiresDirective::NAME
-                                || $name === ExternalDirective::NAME;
+                            return ProvidesDirective::NAME === $name
+                                || RequiresDirective::NAME === $name
+                                || ExternalDirective::NAME === $name;
                         }
                     )
                 );

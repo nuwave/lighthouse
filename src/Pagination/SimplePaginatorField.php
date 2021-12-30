@@ -11,6 +11,7 @@ class SimplePaginatorField
      * Resolve simple paginator info for connection.
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     *
      * @return array<string, mixed>
      */
     public function paginatorInfoResolver(Paginator $root): array
@@ -28,11 +29,18 @@ class SimplePaginatorField
      * Resolve data for connection.
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     *
      * @return \Illuminate\Support\Collection<mixed>
      */
     public function dataResolver(Paginator $root): Collection
     {
-        // @phpstan-ignore-next-line static refers to the wrong class because it is a proxied method call
-        return $root->values();
+        /**
+         * The return type `static` refers to the wrong class because it is a proxied method call.
+         *
+         * @var \Illuminate\Support\Collection<mixed> $values
+         */
+        $values = $root->values();
+
+        return $values;
     }
 }

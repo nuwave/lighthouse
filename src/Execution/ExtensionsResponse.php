@@ -15,12 +15,12 @@ class ExtensionsResponse
     protected $key;
 
     /**
-     * @var mixed JSON-encodable content of the extension.
+     * @var mixed JSON-encodable content of the extension
      */
     protected $content;
 
     /**
-     * @param  mixed  $content JSON-encodable content
+     * @param  mixed  $content  JSON-encodable content
      */
     public function __construct(string $key, $content)
     {
@@ -37,7 +37,7 @@ class ExtensionsResponse
     }
 
     /**
-     * @return mixed JSON-encodable content of the extension.
+     * @return mixed JSON-encodable content of the extension
      */
     public function content()
     {

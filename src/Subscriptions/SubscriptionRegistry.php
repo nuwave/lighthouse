@@ -64,8 +64,6 @@ class SubscriptionRegistry
 
     /**
      * Add subscription to registry.
-     *
-     * @return $this
      */
     public function register(GraphQLSubscription $subscription, string $field): self
     {
@@ -91,7 +89,7 @@ class SubscriptionRegistry
      *
      * @return array<string>
      *
-     * @deprecated Use the `GraphQL\Type\Schema::subscriptionType()->getFieldNames()` method directly.
+     * @deprecated use the `GraphQL\Type\Schema::subscriptionType()->getFieldNames()` method directly
      */
     public function keys(): array
     {
@@ -106,6 +104,7 @@ class SubscriptionRegistry
         if (! isset($this->subscriptions[$key])) {
             /**
              * Loading the field has the side effect of triggering a call to.
+             *
              * @see \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver::provideSubscriptionResolver()
              * which is then expected to call @see register().
              *
@@ -119,9 +118,6 @@ class SubscriptionRegistry
 
     /**
      * Add subscription to registry.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @return $this
      */
     public function subscriber(Subscriber $subscriber, string $topic): self
     {
@@ -134,7 +130,6 @@ class SubscriptionRegistry
     /**
      * Get registered subscriptions.
      *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
      */
     public function subscriptions(Subscriber $subscriber): Collection
@@ -144,7 +139,7 @@ class SubscriptionRegistry
                 Utils::instanceofMatcher(OperationDefinitionNode::class)
             )
             ->filter(function (OperationDefinitionNode $node): bool {
-                return $node->operation === 'subscription';
+                return 'subscription' === $node->operation;
             })
             ->flatMap(function (OperationDefinitionNode $node): array {
                 return (new Collection($node->selectionSet->selections))
@@ -158,7 +153,7 @@ class SubscriptionRegistry
                     return $this->subscription($subscriptionField);
                 }
 
-                return new NotFoundSubscription;
+                return new NotFoundSubscription();
             });
     }
 
@@ -178,7 +173,7 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
-        if ($channel === null && ($subscriptionsConfig['exclude_empty'] ?? false)) {
+        if (null === $channel && ($subscriptionsConfig['exclude_empty'] ?? false)) {
             return null;
         }
 
@@ -208,7 +203,7 @@ class SubscriptionRegistry
     {
         $subscriptionType = $this->schemaBuilder->schema()->getSubscriptionType();
 
-        if ($subscriptionType === null) {
+        if (null === $subscriptionType) {
             throw new DefinitionException('Schema is missing subscription root type.');
         }
 

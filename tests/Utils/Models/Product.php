@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Primary key.
+ *
  * @property string $barcode
  * @property string $uuid
  *
@@ -28,6 +29,7 @@ class Product extends Model
     /**
      * @var array<string>
      */
+    // @phpstan-ignore-next-line PHPDoc type array<string> of property Tests\Utils\Models\Product::$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\Database\Eloquent\Model::$primaryKey.
     protected $primaryKey = ['barcode', 'uuid'];
 
     public $incrementing = false;

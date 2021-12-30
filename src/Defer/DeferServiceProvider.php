@@ -37,7 +37,7 @@ class DeferServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             StartExecution::class,
-            Defer::class.'@handleStartExecution'
+            Defer::class . '@handleStartExecution'
         );
     }
 

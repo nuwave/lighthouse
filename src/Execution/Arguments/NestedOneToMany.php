@@ -38,9 +38,6 @@ class NestedOneToMany implements ArgResolver
         }
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     */
     public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
     {
         if ($args->has('create')) {
@@ -89,13 +86,19 @@ class NestedOneToMany implements ArgResolver
 
         if ($args->has('disconnect')) {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-            $relation
+            $children = $relation
                 ->make()
                 ->whereIn(
                     self::getLocalKeyName($relation),
                     $args->arguments['disconnect']->value
                 )
-                ->update([$relation->getForeignKeyName() => null]);
+                ->get();
+
+            /** @var \Illuminate\Database\Eloquent\Model $child */
+            foreach ($children as $child) {
+                $child->setAttribute($relation->getForeignKeyName(), null);
+                $child->save();
+            }
         }
     }
 

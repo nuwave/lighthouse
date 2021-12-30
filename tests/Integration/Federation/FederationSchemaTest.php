@@ -33,12 +33,30 @@ type Query {
 
 GRAPHQL;
 
-        $this->schema = $foo.$query;
+        $this->schema = $foo . $query;
 
         $sdl = $this->_serviceSdl();
 
         $this->assertStringContainsString($foo, $sdl);
         $this->assertStringContainsString($query, $sdl);
+    }
+
+    public function testServiceQueryShouldReturnValidSdlWithoutQuery(): void
+    {
+        $foo = /** @lang GraphQL */ <<<'GRAPHQL'
+type Foo @key(fields: "id") {
+  id: ID! @external
+  foo: String!
+}
+
+GRAPHQL;
+
+        $this->schema = $foo;
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString($foo, $sdl);
+        $this->assertStringNotContainsString(/** @lang GraphQL */ 'type Query', $sdl);
     }
 
     public function testFederatedSchemaShouldContainCorrectEntityUnion(): void

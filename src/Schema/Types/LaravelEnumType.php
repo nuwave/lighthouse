@@ -12,7 +12,7 @@ use InvalidArgumentException;
 class LaravelEnumType extends EnumType
 {
     /**
-     * @var string|\BenSampo\Enum\Enum
+     * @var class-string<\BenSampo\Enum\Enum>
      */
     protected $enumClass;
 

@@ -7,6 +7,7 @@ use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\RootType;
 
 class ASTManipulator
 {
@@ -36,7 +37,7 @@ class ASTManipulator
     }
 
     /**
-     * Combine object types with `@key` into the _Entity union.
+     * Combine object types with @key into the _Entity union.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\FederationException
      */
@@ -52,14 +53,14 @@ class ASTManipulator
 
             /** @var \GraphQL\Language\AST\DirectiveNode $directive */
             foreach ($type->directives as $directive) {
-                if ($directive->name->value === 'key') {
+                if ('key' === $directive->name->value) {
                     $entities[] = $type->name->value;
                     break;
                 }
             }
         }
 
-        if (count($entities) === 0) {
+        if (0 === count($entities)) {
             throw new FederationException('There must be at least one type using the @key directive when federation is enabled.');
         }
 
@@ -73,16 +74,22 @@ class ASTManipulator
 
     protected function addRootFields(DocumentAST &$documentAST): void
     {
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types['Query'];
+        // In federation it is fine for a schema to not have a user-defined root query type,
+        // since we add two federation related fields to it here.
+        if (! isset($documentAST->types[RootType::QUERY])) {
+            $documentAST->types[RootType::QUERY] = Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
+        }
 
-        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
+        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
+        $queryType = $documentAST->types[RootType::QUERY];
+
+        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(
             representations: [_Any!]!
         ): [_Entity]! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Entities")
         ');
 
-        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
+        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _service: _Service! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Service")
         ');
     }

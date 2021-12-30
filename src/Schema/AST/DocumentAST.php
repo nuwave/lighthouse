@@ -7,11 +7,16 @@ use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
+use Nuwave\Lighthouse\Support\Utils;
 use Serializable;
 
 /**
@@ -23,6 +28,10 @@ use Serializable;
  */
 class DocumentAST implements Serializable, Arrayable
 {
+    public const TYPES = 'types';
+    public const DIRECTIVES = 'directives';
+    public const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
+
     /**
      * The types within the schema.
      *
@@ -52,9 +61,18 @@ class DocumentAST implements Serializable, Arrayable
     public $directives = [];
 
     /**
-     * Create a new DocumentAST instance from a schema.
+     * A map from class names to their respective object types.
      *
-     * @return static
+     * This is useful for the performant resolution of abstract types.
+     *
+     * @see \Nuwave\Lighthouse\Schema\TypeRegistry::typeResolverFallback()
+     *
+     * @var array<class-string, list<string>>
+     */
+    public $classNameToObjectTypeNames = [];
+
+    /**
+     * Create a new DocumentAST instance from a schema.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      */
@@ -72,21 +90,49 @@ class DocumentAST implements Serializable, Arrayable
             throw new ParseException($syntaxError);
         }
 
-        $instance = new static;
+        $instance = new static();
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
+                $name = $definition->name->value;
+
                 // Store the types in an associative array for quick lookup
-                $instance->types[$definition->name->value] = $definition;
+                $instance->types[$name] = $definition;
+
+                if ($definition instanceof ObjectTypeDefinitionNode) {
+                    $modelName = ModelDirective::modelClass($definition);
+                    if (null === $modelName) {
+                        continue;
+                    }
+
+                    $namespacesToTry = (array) config('lighthouse.namespaces.models');
+                    $modelClass = Utils::namespaceClassName(
+                        $modelName,
+                        $namespacesToTry,
+                        static function (string $classCandidate): bool {
+                            return is_subclass_of($classCandidate, Model::class);
+                        }
+                    );
+
+                    if (null === $modelClass) {
+                        $consideredNamespaces = implode(', ', $namespacesToTry);
+                        throw new DefinitionException(
+                            "Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}."
+                        );
+                    }
+
+                    // It might be valid to have multiple types that correspond to a single model
+                    // in order to hide some fields in some scenarios, so we cannot decide on a
+                    // single object type for a given class name unambiguously right here.
+                    $instance->classNameToObjectTypeNames[$modelClass][] = $name;
+                }
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
-                $instance->typeExtensions[$definition->name->value] [] = $definition;
+                $instance->typeExtensions[$definition->name->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new Exception(
-                    'Unknown definition type'
-                );
+                throw new Exception('Unknown definition type: ' . get_class($definition));
             }
         }
 
@@ -115,8 +161,6 @@ class DocumentAST implements Serializable, Arrayable
      * This operation will overwrite existing definitions with the same name.
      *
      * @param  \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node  $directive
-     *
-     * @return $this
      */
     public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self
     {
@@ -141,16 +185,17 @@ class DocumentAST implements Serializable, Arrayable
 
         return [
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            'types' => array_map($nodeToArray, $this->types),
+            self::TYPES => array_map($nodeToArray, $this->types),
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            'directives' => array_map($nodeToArray, $this->directives),
+            self::DIRECTIVES => array_map($nodeToArray, $this->directives),
+            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ];
     }
 
     /**
      * Instantiate from a serialized array.
      *
-     * @param array<string, mixed> $ast
+     * @param  array<string, mixed>  $ast
      */
     public static function fromArray(array $ast): DocumentAST
     {
@@ -160,24 +205,47 @@ class DocumentAST implements Serializable, Arrayable
         return $documentAST;
     }
 
-    public function serialize(): string
+    /**
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
     {
-        return serialize($this->toArray());
-    }
-
-    public function unserialize($data): void
-    {
-        $this->hydrateFromArray(unserialize($data));
+        return $this->toArray();
     }
 
     /**
-     * @param array<string, mixed> $ast
+     * @deprecated TODO remove in v6
+     */
+    public function serialize(): string
+    {
+        return serialize($this->__serialize());
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->hydrateFromArray($data);
+    }
+
+    /**
+     * @deprecated TODO remove in v6
+     */
+    public function unserialize($data): void
+    {
+        $this->__unserialize(unserialize($data));
+    }
+
+    /**
+     * @param  array<string, mixed>  $ast
      */
     protected function hydrateFromArray(array $ast): void
     {
         [
-            'types' => $types,
-            'directives' => $directives,
+            self::TYPES => $types,
+            self::DIRECTIVES => $directives,
+            self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ] = $ast;
 
         // Utilize the NodeList for lazy unserialization for performance gains.

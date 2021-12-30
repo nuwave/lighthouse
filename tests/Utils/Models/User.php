@@ -8,15 +8,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tests\DBTestCase;
+use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
 
 /**
  * Primary key.
+ *
  * @property int $id
  *
  * Attributes
  * @property string|null $name
  * @property string|null $email
  * @property string|null $password
+ * @property string|null $remember_token
  *
  * Timestamps
  * @property \Illuminate\Support\Carbon $created_at
@@ -29,6 +33,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $person_type
  *
  * Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\AlternateConnection> $alternateConnections
  * @property-read \Tests\Utils\Models\Company|null $company
  * @property-read \Tests\Utils\Models\Image|null $image
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
@@ -39,6 +44,18 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
+    /**
+     * Ensure that this is functionally equivalent to leaving this as null.
+     *
+     * @see RelationBatchLoaderTest::testDoesNotBatchloadRelationsWithDifferentDatabaseConnections()
+     */
+    protected $connection = DBTestCase::DEFAULT_CONNECTION;
+
+    public function alternateConnections(): HasMany
+    {
+        return $this->hasMany(AlternateConnection::class);
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -115,6 +132,21 @@ class User extends Authenticatable
     public function tasksAndPostsCommentsLoaded(): bool
     {
         return $this->tasksLoaded()
+            && $this->postsCommentsLoaded();
+    }
+
+    public function postsTaskLoaded(): bool
+    {
+        return $this->relationLoaded('posts')
+            && $this
+                ->posts
+                ->first()
+                ->relationLoaded('task');
+    }
+
+    public function postTasksAndPostsCommentsLoaded(): bool
+    {
+        return $this->postsTaskLoaded()
             && $this->postsCommentsLoaded();
     }
 }

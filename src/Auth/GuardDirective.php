@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Auth;
 
 use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -36,30 +37,34 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run authentication through one or more guards.
+
 This is run per field and may allow unauthenticated
 users to still receive partial results.
+
+Used upon an object, it applies to all fields within.
 """
 directive @guard(
   """
-  Specify which guards to use, e.g. ["api"].
+  Specify which guards to use, e.g. ["web"].
   When not defined, the default from `lighthouse.php` is used.
   """
   with: [String!]
-) on FIELD_DEFINITION | OBJECT
+) repeatable on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
-        // TODO remove cast in v6
-        $with = (array) (
-            $this->directiveArgValue('with')
-            ?? [config('lighthouse.guard')]
-        );
 
         $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($with, $previousResolver) {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+                // TODO remove cast in v6
+                $with = (array) (
+                    $this->directiveArgValue('with')
+                    ?? [AuthServiceProvider::guard()]
+                );
+
                 $this->authenticate($with);
 
                 return $previousResolver($root, $args, $context, $resolveInfo);
@@ -72,7 +77,7 @@ GRAPHQL;
     /**
      * Determine if the user is logged in to any of the given guards.
      *
-     * @param  array<string>  $guards
+     * @param  array<string|null>  $guards
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -80,6 +85,7 @@ GRAPHQL;
     {
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
+                // @phpstan-ignore-next-line passing null works fine here
                 $this->auth->shouldUse($guard);
 
                 return;

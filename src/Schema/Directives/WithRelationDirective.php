@@ -27,7 +27,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
                 return $this
                     ->loadRelation($parent, $args, $resolveInfo)
-                    ->then(function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
+                    ->then(static function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
                         return $previousResolver($parent, $args, $context, $resolveInfo);
                     });
             }

@@ -28,11 +28,12 @@ trait RelationDirectiveHelpers
     }
 
     /**
-     * @return \Closure(object): void
+     * @return \Closure(\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation): void
      */
     protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
     {
-        return function (object $builder) use ($resolveInfo) {
+        return function (object $builder) use ($resolveInfo): void {
+            /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder */
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
@@ -46,6 +47,7 @@ trait RelationDirectiveHelpers
 
     /**
      * @param  array<string, mixed>  $args
+     *
      * @return array<int, int|string>
      */
     protected function qualifyPath(array $args, ResolveInfo $resolveInfo): array
@@ -54,12 +56,12 @@ trait RelationDirectiveHelpers
         $path = $resolveInfo->path;
 
         // In case we have no args, we can combine eager loads that are the same
-        if ($args === []) {
+        if ([] === $args) {
             array_pop($path);
         }
 
         // Each relation must be loaded separately
-        $path [] = $this->relation();
+        $path[] = $this->relation();
 
         // Scopes influence the result of the query
         return array_merge($path, $this->scopes());

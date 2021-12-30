@@ -1,8 +1,10 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Unit\Auth;
 
+use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
@@ -12,7 +14,7 @@ class CanDirectiveTest extends TestCase
 {
     public function testThrowsIfNotAuthorized(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -42,7 +44,7 @@ class CanDirectiveTest extends TestCase
             $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
         }
 
-        $this->be(new User);
+        $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -75,7 +77,7 @@ class CanDirectiveTest extends TestCase
             $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
         }
 
-        $this->be(new User);
+        $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -103,7 +105,7 @@ class CanDirectiveTest extends TestCase
 
     public function testPassesAuthIfAuthorized(): void
     {
-        $user = new User;
+        $user = new User();
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
@@ -177,7 +179,7 @@ class CanDirectiveTest extends TestCase
 
     public function testPassesMultiplePolicies(): void
     {
-        $user = new User;
+        $user = new User();
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
@@ -237,7 +239,7 @@ class CanDirectiveTest extends TestCase
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->mockResolver(function (): User {
             return $this->resolveUser();
@@ -272,7 +274,7 @@ class CanDirectiveTest extends TestCase
 
     public function testInjectedArgsAndStaticArgs(): void
     {
-        $this->be(new User);
+        $this->be(new User());
 
         $this->mockResolver(function (): User {
             return $this->resolveUser();
@@ -309,9 +311,28 @@ class CanDirectiveTest extends TestCase
         ]);
     }
 
+    public function testFindAndQueryAreMutuallyExclusive(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage(CanDirective::findAndQueryAreMutuallyExclusive());
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            user(id: ID! @eq): User
+                @can(ability: "view", find: "id", query: true)
+                @first
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+        ');
+    }
+
     public function resolveUser(): User
     {
-        $user = new User;
+        $user = new User();
         $user->name = 'foo';
 
         return $user;
