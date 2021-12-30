@@ -20,6 +20,7 @@ use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
  * @property string|null $name
  * @property string|null $email
  * @property string|null $password
+ * @property string|null $remember_token
  *
  * Timestamps
  * @property \Illuminate\Support\Carbon $created_at
