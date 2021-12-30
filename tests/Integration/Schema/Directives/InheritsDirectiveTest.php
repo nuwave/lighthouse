@@ -141,6 +141,25 @@ class InheritsDirectiveTest extends TestCase
         ' . self::PLACEHOLDER_QUERY);
     }
 
+    public function testForbidsMultiLevelInheritanceCycle(): void
+    {
+        $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
+
+        $this->buildSchema(/*  @lang GraphQL */ '
+            type A @inherits(from: "B") {
+                a: String
+            }
+            
+            type B @inherits(from: "C") {
+                b: String
+            }
+            
+            type C @inherits(from: "A") {
+                c: String
+            }
+        ' . self::PLACEHOLDER_QUERY);
+    }
+
     public function testInheritUndefinedType(): void
     {
         $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
