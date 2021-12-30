@@ -217,7 +217,7 @@ class GraphQL
                 $store = $cacheFactory->store($cacheConfig['store']);
 
                 $query = $store->remember(
-                    'lighthouse:' . md5($query),
+                    'lighthouse:query:' . hash('sha256', $query),
                     $cacheConfig['ttl'],
                     function () use ($query) {
                         return Parser::parse($query);
