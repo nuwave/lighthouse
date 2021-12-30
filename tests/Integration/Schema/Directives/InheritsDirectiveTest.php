@@ -13,7 +13,7 @@ class InheritsDirectiveTest extends TestCase
                 attribute_1: String
             }
 
-            type ChildType @inherits(from: ParentType) {
+            type ChildType @inherits(from: "ParentType") {
                 attribute_2: String
             }
         ' . self::PLACEHOLDER_QUERY);
@@ -30,11 +30,11 @@ class InheritsDirectiveTest extends TestCase
                 attribute_1: String
             }
 
-            type ParentType @inherits(from: GrandParentType) {
+            type ParentType @inherits(from: "GrandParentType") {
                 attribute_2: String
             }
 
-            type ChildType @inherits(from: ParentType) {
+            type ChildType @inherits(from: "ParentType") {
                 attribute_3: String
             }
         ' . self::PLACEHOLDER_QUERY);
@@ -49,11 +49,11 @@ class InheritsDirectiveTest extends TestCase
     public function testSchemaOrderIsInsignificant(): void
     {
         $schema = $this->buildSchema(/**@lang GraphQL */ '
-            type ChildType @inherits(from: ParentType) {
+            type ChildType @inherits(from: "ParentType") {
                 attribute_3: String
             }
 
-            type ParentType @inherits(from: GrandParentType) {
+            type ParentType @inherits(from: "GrandParentType") {
                 attribute_2: String
             }
 
@@ -77,7 +77,7 @@ class InheritsDirectiveTest extends TestCase
                 attribute_2: Int
             }
 
-            type ChildType @inherits(from: ParentType) {
+            type ChildType @inherits(from: "ParentType") {
                 attribute_1: Int
                 attribute_2: String
             }
@@ -102,7 +102,7 @@ class InheritsDirectiveTest extends TestCase
                 another_attribute: String
             }
             
-            type ChildType @inherits(from: ParentType) {
+            type ChildType @inherits(from: "ParentType") {
                 new_attribute: String
             }
         ' . self::PLACEHOLDER_QUERY);
@@ -120,8 +120,23 @@ class InheritsDirectiveTest extends TestCase
                 attribute_1: String
             }
             
-            type ChildType @inherits(from: ParentType) {
+            type ChildType @inherits(from: "ParentType") {
                 attribute_2: String
+            }
+        ' . self::PLACEHOLDER_QUERY);
+    }
+
+    public function testForbidsInheritanceCycle(): void
+    {
+        $this->expectException(\Nuwave\Lighthouse\Exceptions\DefinitionException::class);
+
+        $this->buildSchema(/*  @lang GraphQL */ '
+            type A @inherits(from: "B") {
+                a: String
+            }
+            
+            type B @inherits(from: "A") {
+                b: String
             }
         ' . self::PLACEHOLDER_QUERY);
     }
