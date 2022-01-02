@@ -139,7 +139,7 @@ return [
         /*
          * Setting to true enables query caching.
          */
-        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', 'local' !== env('APP_ENV')),
+        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
 
         /*
          * Allows using a specific cache store, uses the app's default if set to null.
