@@ -103,7 +103,7 @@ class GraphQL
     /**
      * Run one ore more GraphQL operations against the schema.
      *
-     * @param \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams> $operationOrOperations
+     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
      *
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
