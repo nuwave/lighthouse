@@ -152,8 +152,8 @@ return [
         'ttl' => env(
             'LIGHTHOUSE_QUERY_CACHE_TTL',
             \Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
-            ? null
-            : 365 * 24 * 60 // For Laravel < 5.8 the exact value must be specified and it is counted in minutes
+                ? null
+                : 365 * 24 * 60 // For Laravel < 5.8 the exact value must be specified and it is counted in minutes
         ),
     ],
 

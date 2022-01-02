@@ -129,7 +129,7 @@ public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 ### Nuwave\Lighthouse\GraphQL::executeQuery() is deprecated
 
 Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
-executing already parsed `DocumentNode`
+executing already parsed `DocumentNode`.
 
 ## v4 to v5
 

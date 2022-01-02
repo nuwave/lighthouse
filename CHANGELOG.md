@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Added the query caching
+- Added query caching
 
 ## v5.33.0
 
