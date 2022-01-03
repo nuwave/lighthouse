@@ -48,7 +48,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $documentAST->setTypeDefinition(
                 WhereConditionsServiceProvider::createWhereConditionsInputType(
                     $qualifiedWhereConditionsName,
-                    "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                    "Dynamic WHERE conditions for Query.{$parentField->name->value}.{$argDefinition->name->value}.",
                     $hasAllowedColumns
                         ? $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType)
                         : 'String'
@@ -58,7 +58,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
             $documentAST->setTypeDefinition(
                 WhereConditionsServiceProvider::createHasConditionsInputType(
                     $qualifiedWhereConditionsName,
-                    "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                    "Dynamic HAS conditions for Query.{$parentField->name->value}.{$argDefinition->name->value}.",
                     $hasAllowedRelations
                         ? $this->generateRelationsEnum($documentAST, $argDefinition, $parentField, $parentType)
                         : 'String'

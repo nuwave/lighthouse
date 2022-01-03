@@ -2214,7 +2214,7 @@ type Query {
 ```
 
 This is how you can use it to construct a complex query
-that gets actors over age 37 who either have red hair or are at least 150cm.
+that gets actors over age 37 who either have red hair or are at least 150 cm.
 
 ```graphql
 {
@@ -2227,7 +2227,7 @@ that gets actors over age 37 who either have red hair or are at least 150cm.
             { column: "type", value: "Actor" }
             {
               OR: [
-                { column: "haircolour", value: "red" }
+                { column: "hair_color", value: "red" }
                 { column: "height", operator: GTE, value: 150 }
               ]
             }

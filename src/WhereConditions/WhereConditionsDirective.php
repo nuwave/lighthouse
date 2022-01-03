@@ -12,28 +12,28 @@ Add a dynamically client-controlled WHERE condition to a fields query.
 """
 directive @whereConditions(
     """
-    Restrict the allowed column names to a well-defined list.
+    Restrict the allowed column names to a well-defined enum.
     This improves introspection capabilities and security.
     Mutually exclusive with the `columnsEnum` argument.
     """
     columns: [String!]
 
     """
-    Use an existing enum type to restrict the allowed columns to a well-defined list.
+    Use an existing enum type to restrict the allowed columns to a well-defined enum.
     This allows you to re-use the same enum for multiple fields.
     Mutually exclusive with the `columns` argument.
     """
     columnsEnum: String
 
     """
-    Restrict the allowed relation names to a well-defined list.
+    Restrict the allowed relation names to a well-defined enum.
     This improves introspection capabilities and security.
     Mutually exclusive with the `relationsEnum` argument.
     """
     relations: [String!]
 
     """
-    Use an existing enum type to restrict the allowed relations to a well-defined list.
+    Use an existing enum type to restrict the allowed relations to a well-defined enum.
     This allows you to re-use the same enum for multiple fields.
     Mutually exclusive with the `relations` argument.
     """

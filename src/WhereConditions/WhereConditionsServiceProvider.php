@@ -116,6 +116,7 @@ GRAPHQL
             ->value;
         $operatorDefault = $operator->defaultHasOperator();
 
+        // TODO condition: $name makes no sense at all when columns/columnsEnum are used
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $hasRelationInputName {

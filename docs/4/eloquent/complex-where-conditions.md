@@ -34,14 +34,14 @@ Add a dynamically client-controlled WHERE condition to a fields query.
 """
 directive @whereConditions(
   """
-  Restrict the allowed column names to a well-defined list.
+  Restrict the allowed column names to a well-defined enum.
   This improves introspection capabilities and security.
   Mutually exclusive with the `columnsEnum` argument.
   """
   columns: [String!]
 
   """
-  Use an existing enum type to restrict the allowed columns to a well-defined list.
+  Use an existing enum type to restrict the allowed columns to a well-defined enum.
   This allows you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
   """
@@ -54,7 +54,7 @@ You can apply this directive on any field that performs an Eloquent query:
 ```graphql
 type Query {
   people(
-    where: _ @whereConditions(columns: ["age", "type", "haircolour", "height"])
+    where: _ @whereConditions(columns: ["age", "type", "hair_color", "height"])
   ): [Person!]! @all
 }
 
@@ -63,7 +63,7 @@ type Person {
   age: Int!
   height: Int!
   type: String!
-  hair_colour: String!
+  hair_color: String!
 }
 ```
 
@@ -95,7 +95,7 @@ input PeopleWhereWhereConditions {
 enum PeopleWhereColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
-  HAIRCOLOUR @enum(value: "haircolour")
+  hair_color @enum(value: "hair_color")
   HEIGHT @enum(value: "height")
 }
 ```
@@ -117,7 +117,7 @@ type Query {
 enum PersonColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
-  HAIRCOLOUR @enum(value: "haircolour")
+  hair_color @enum(value: "hair_color")
   HEIGHT @enum(value: "height")
 }
 ```
@@ -127,7 +127,7 @@ Instead of creating enums for the allowed columns, it will simply use the existi
 
 It is recommended to either use the `columns` or the `columnsEnum` argument.
 When you don't define any allowed columns, clients can specify arbitrary column names as a `String`.
-This approach should by taken with care, as it carries
+This approach should be taken with care, as it carries
 potential performance and security risks and offers little type safety.
 
 A simple query for a person who is exactly 42 years old would look like this:
@@ -143,7 +143,7 @@ A simple query for a person who is exactly 42 years old would look like this:
 Note that the operator defaults to `EQ` (`=`) if not given, so you could
 also omit it from the previous example and get the same result.
 
-The following query gets actors over age 37 who either have red hair or are at least 150cm:
+The following query gets actors over age 37 who either have red hair or are at least 150 cm:
 
 ```graphql
 {
@@ -154,7 +154,7 @@ The following query gets actors over age 37 who either have red hair or are at l
         { column: TYPE, value: "Actor" }
         {
           OR: [
-            { column: HAIRCOLOUR, value: "red" }
+            { column: hair_color, value: "red" }
             { column: HEIGHT, operator: GTE, value: 150 }
           ]
         }
@@ -174,7 +174,7 @@ query gets people that have no hair and blue-ish eyes:
   people(
     where: {
       AND: [
-        { column: HAIRCOLOUR, operator: IS_NULL }
+        { column: hair_color, operator: IS_NULL }
         { column: EYES, operator: IN, value: ["blue", "aqua", "turquoise"] }
       ]
     }
@@ -213,14 +213,14 @@ directive @whereHasConditions(
   relation: String
 
   """
-  Restrict the allowed column names to a well-defined list.
+  Restrict the allowed column names to a well-defined enum.
   This improves introspection capabilities and security.
   Mutually exclusive with the `columnsEnum` argument.
   """
   columns: [String!]
 
   """
-  Use an existing enum type to restrict the allowed columns to a well-defined list.
+  Use an existing enum type to restrict the allowed columns to a well-defined enum.
   This allows you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
   """

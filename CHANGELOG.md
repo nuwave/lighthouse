@@ -1189,7 +1189,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   a [whereJsonContains filter
 - Allow using callable classes with `__invoke` when referencing methods in directives
   and when looking for default resolvers or type resolvers https://github.com/nuwave/lighthouse/issues/882
-- Allow to restrict column names to a well-defined list in `@whereContraints`
+- Allow to restrict column names to a well-defined enum in `@whereContraints`
   and generate definitions for an `Enum` type and an `Input` type
   that are restricted to the defined columns https://github.com/nuwave/lighthouse/pull/916
 - Add test helpers for introspection queries to `MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/916
