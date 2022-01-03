@@ -67,7 +67,7 @@ You may pass more than one sorting option to add a secondary ordering.
 
 ### Reuse Columns Enum
 
-To re-use a list of allowed columns, define your own enumeration type and use the `columnsEnum` argument instead of `columns`:
+To re-use a list of allowed columns, define your own enum type and use the `columnsEnum` argument instead of `columns`:
 
 ```graphql
 type Query {

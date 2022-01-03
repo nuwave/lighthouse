@@ -1900,7 +1900,7 @@ Sort a result list by one or more given columns.
 """
 directive @orderBy(
   """
-  Restrict the allowed column names to a well-defined list.
+  Restrict the allowed column names to a well-defined enum.
   This improves introspection capabilities and security.
   If not given, the column names can be passed as a String by clients.
   Mutually exclusive with the `columnsEnum` argument.
@@ -1908,8 +1908,8 @@ directive @orderBy(
   columns: [String!]
 
   """
-  Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
+  Use an existing enum type to restrict the allowed columns to a well-defined enum.
+  This allows you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String
@@ -1956,7 +1956,7 @@ enum SortOrder {
 }
 ```
 
-If you want to re-use a list of allowed columns, you can define your own enumeration type and use the `columnsEnum` argument instead of `columns`.
+If you want to re-use a list of allowed columns, you can define your own enum type and use the `columnsEnum` argument instead of `columns`.
 Here's an example of how you could define it in your schema:
 
 ```graphql

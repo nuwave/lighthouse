@@ -1998,7 +1998,7 @@ Sort a result list by one or more given columns.
 """
 directive @orderBy(
   """
-  Restrict the allowed column names to a well-defined list.
+  Restrict the allowed column names to a well-defined enum.
   This improves introspection capabilities and security.
   Mutually exclusive with the `columnsEnum` argument.
   Only used when the directive is added on an argument.
@@ -2006,8 +2006,8 @@ directive @orderBy(
   columns: [String!]
 
   """
-  Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
+  Use an existing enum type to restrict the allowed columns to a well-defined enum.
+  This allows you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
   Only used when the directive is added on an argument.
   """
@@ -2052,20 +2052,20 @@ Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
   """
-  TODO: description
+  Name of the relation.
   """
   relation: String!
 
   """
-  Restrict the allowed column names to a well-defined list.
+  Restrict the allowed column names to a well-defined enum.
   This improves introspection capabilities and security.
   Mutually exclusive with the `columnsEnum` argument.
   """
   columns: [String!]
 
   """
-  Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
+  Use an existing enum type to restrict the allowed columns to a well-defined enum.
+  This allows you to re-use the same enum for multiple fields.
   Mutually exclusive with the `columns` argument.
   """
   columnsEnum: String

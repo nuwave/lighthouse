@@ -48,7 +48,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
                     ->setTypeDefinition(
                         static::createHasConditionsInputType(
                             static::DEFAULT_WHERE_CONDITIONS,
-                            'Dynamic HAS conditions for WHERE condition queries.'
+                            'Dynamic HAS conditions for WHERE condition queries.',
+                            'String'
                         )
                     )
                     ->setTypeDefinition(
@@ -72,9 +73,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = Parser::enumTypeDefinition(
-            $operator->enumDefinition()
-        )
+        $operatorName = Parser::enumTypeDefinition($operator->enumDefinition())
             ->name
             ->value;
         $operatorDefault = $operator->default();
@@ -104,7 +103,7 @@ GRAPHQL
         );
     }
 
-    public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
+    public static function createHasConditionsInputType(string $name, string $description, string $relationType): InputObjectTypeDefinitionNode
     {
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
@@ -112,18 +111,17 @@ GRAPHQL
         /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
         $operator = app(Operator::class);
 
-        $operatorName = Parser::enumTypeDefinition(
-            $operator->enumDefinition()
-        )
+        $operatorName = Parser::enumTypeDefinition($operator->enumDefinition())
             ->name
             ->value;
         $operatorDefault = $operator->defaultHasOperator();
 
+        // TODO condition: $name makes no sense at all when columns/columnsEnum are used
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "$description"
             input $hasRelationInputName {
                 "The relation that is checked."
-                relation: String!
+                relation: $relationType!
 
                 "The comparison operator to test against the amount."
                 operator: $operatorName = $operatorDefault

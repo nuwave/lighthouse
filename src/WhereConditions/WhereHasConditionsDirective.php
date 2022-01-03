@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
 
+// TODO remove once whereConditions has full type safety
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string
@@ -26,15 +27,15 @@ directive @whereHasConditions(
     relation: String
 
     """
-    Restrict the allowed column names to a well-defined list.
+    Restrict the allowed column names to a well-defined enum.
     This improves introspection capabilities and security.
     Mutually exclusive with the `columnsEnum` argument.
     """
     columns: [String!]
 
     """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
+    Use an existing enum type to restrict the allowed columns to a well-defined enum.
+    This allows you to re-use the same enum for multiple fields.
     Mutually exclusive with the `columns` argument.
     """
     columnsEnum: String
