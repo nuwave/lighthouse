@@ -337,4 +337,13 @@ class CanDirectiveTest extends TestCase
 
         return $user;
     }
+
+    public function testFailToDetermineModel(): void
+    {
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            foo: ID @can(ability: "bar")
+        }
+        ');
+    }
 }

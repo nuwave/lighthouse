@@ -264,6 +264,8 @@ GRAPHQL;
         if ($this->directiveHasArgument('find') && $this->directiveHasArgument('query')) {
             throw new DefinitionException(self::findAndQueryAreMutuallyExclusive());
         }
+
+        $this->getModelClass();
     }
 
     public static function findAndQueryAreMutuallyExclusive(): string
