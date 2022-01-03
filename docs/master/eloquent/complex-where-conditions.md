@@ -28,46 +28,46 @@ Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/
 Add a dynamically client-controlled WHERE condition to a fields query.
 """
 directive @whereConditions(
-    """
-    Restrict the allowed column names to a well-defined enum.
-    This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
-    """
-    columns: [String!]
+  """
+  Restrict the allowed column names to a well-defined enum.
+  This improves introspection capabilities and security.
+  Mutually exclusive with the `columnsEnum` argument.
+  """
+  columns: [String!]
 
-    """
-    Use an existing enum type to restrict the allowed columns to a well-defined enum.
-    This allows you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
-    """
-    columnsEnum: String
+  """
+  Use an existing enum type to restrict the allowed columns to a well-defined enum.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with the `columns` argument.
+  """
+  columnsEnum: String
 
-    """
-    Restrict the allowed relation names to a well-defined enum.
-    This improves introspection capabilities and security.
-    Mutually exclusive with the `relationsEnum` argument.
-    """
-    relations: [String!]
+  """
+  Restrict the allowed relation names to a well-defined enum.
+  This improves introspection capabilities and security.
+  Mutually exclusive with the `relationsEnum` argument.
+  """
+  relations: [String!]
 
-    """
-    Use an existing enum type to restrict the allowed relations to a well-defined enum.
-    This allows you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `relations` argument.
-    """
-    relationsEnum: String
+  """
+  Use an existing enum type to restrict the allowed relations to a well-defined enum.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with the `relations` argument.
+  """
+  relationsEnum: String
 
-    """
-    Reference a method that applies the client given conditions to the query builder.
+  """
+  Reference a method that applies the client given conditions to the query builder.
 
-    Expected signature: `(
-        \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
-        array<string, mixed> $whereConditions
-    ): void`
+  Expected signature: `(
+      \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
+      array<string, mixed> $whereConditions
+  ): void`
 
-    Consists of two parts: a class name and a method name, separated by an `@` symbol.
-    If you pass only a class name, the method name defaults to `__invoke`.
-    """
-    handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
+  Consists of two parts: a class name and a method name, separated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
 ) on ARGUMENT_DEFINITION
 ```
 
@@ -76,6 +76,7 @@ directive @whereConditions(
 You can apply this directive on any field that performs an Eloquent query.
 
 It is recommended to use both:
+
 - the `columns` or the `columnsEnum` argument
 - the `relations` or the `relationsEnum` argument.
 
@@ -85,9 +86,11 @@ which poses a risk to performance, security and type safety.
 ```graphql
 type Query {
   people(
-    where: _ @whereConditions(
+    where: _
+      @whereConditions(
         columns: ["age", "type", "hair_color", "height"]
-        relations: ["friends", "friends.friends"])
+        relations: ["friends", "friends.friends"]
+      )
   ): [Person!]! @all
 }
 
@@ -155,8 +158,8 @@ input QueryPeopleWhereWhereConditionsRelation {
 
 "Allowed relation names for Query.people.where."
 enum QueryPeopleWhereRelation {
-    FRIENDS @enum(value: "friends")
-    FRIENDS__FRIENDS @enum(value: "friends.friends")
+  FRIENDS @enum(value: "friends")
+  FRIENDS__FRIENDS @enum(value: "friends.friends")
 }
 ```
 
@@ -263,13 +266,7 @@ This query retrieves all persons that have at least 1 role.
 
 ```graphql
 {
-  people(where: {
-    HAS: {
-      relation: ROLE,
-      amount: 1,
-      operator: GTE
-    }
-  }) {
+  people(where: { HAS: { relation: ROLE, amount: 1, operator: GTE } }) {
     name
   }
 }
@@ -286,19 +283,21 @@ you can also omit them:
 }
 ```
 
-You can also add additional 
+You can also add additional
 This filters people who have an access level of at least 5 through one of their roles:
 
 ```graphql
 {
-  people(where: {
-    HAS: {
-      relation: ROLE,
-      amount: 1,
-      operator: GTE,
-      condition: { column: ACCESS_LEVEL, operator: GTE, value: 5 }
+  people(
+    where: {
+      HAS: {
+        relation: ROLE
+        amount: 1
+        operator: GTE
+        condition: { column: ACCESS_LEVEL, operator: GTE, value: 5 }
+      }
     }
-  }) {
+  ) {
     name
   }
 }
