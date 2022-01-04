@@ -193,9 +193,9 @@ class HasManyDirectiveTest extends DBTestCase
                             [
                                 'id' => $lastTask->id,
                             ],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
     }
 
