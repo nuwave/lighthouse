@@ -58,7 +58,7 @@ class PaginationManipulator
     public function transformToPaginatedField(
         PaginationType $paginationType,
         FieldDefinitionNode &$fieldDefinition,
-        TypeDefinitionNode &$parentType,
+        TypeDefinitionNode &$parentType,  // FIXME: after transitioning to php8 type should become ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
@@ -74,7 +74,7 @@ class PaginationManipulator
 
     protected function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
-        TypeDefinitionNode &$parentType,
+        &$parentType, // FIXME: after transitioning to php8 type should become ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
@@ -160,7 +160,7 @@ GRAPHQL
 
     protected function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
-        TypeDefinitionNode &$parentType,
+        &$parentType, // FIXME: after transitioning to php8 type should become ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): void {
@@ -196,7 +196,7 @@ GRAPHQL
 
     protected function registerSimplePaginator(
         FieldDefinitionNode &$fieldDefinition,
-        TypeDefinitionNode &$parentType,
+        &$parentType, // FIXME: after transitioning to php8 type should become ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): void {
