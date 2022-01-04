@@ -12,14 +12,14 @@ class DateTimeTest extends DateScalarTest
         return new DateTime();
     }
 
-    public function validDates(): array
+    public function validDates(): iterable
     {
         return [
             ['2020-04-20 23:51:15'],
         ];
     }
 
-    public function canonicalizeDates(): array
+    public function canonicalizeDates(): iterable
     {
         return [
             ['2020-4-20 23:51:15', '2020-04-20 23:51:15'],
