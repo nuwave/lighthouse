@@ -110,27 +110,25 @@ class HasManyDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             tasks(
-                id: ID @eq
+                id: ID! @eq
             ): [Task!]! @hasMany
         }
 
         type Task {
-            id: Int
-            foo: String
+            id: Int!
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
 
         /** @var Task $firstTask */
         $firstTask = $this->user->tasks->first();
 
-        // Ensure global scopes are respected here
         $this
             ->graphQL(/** @lang GraphQL */ '
-            query ($id: ID){
+            query ($id: ID!) {
                 user {
                     tasks(id: $id) {
                         id
@@ -141,6 +139,64 @@ class HasManyDirectiveTest extends DBTestCase
                 'id' => $firstTask->id,
             ])
             ->assertJsonCount(1, 'data.user.tasks');
+    }
+
+    public function testQueryHasManyWithConditionInDifferentAliases(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks(
+                id: ID! @eq
+            ): [Task!]! @hasMany
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            user: User! @auth
+        }
+        ';
+
+        /** @var Task $firstTask */
+        $firstTask = $this->user->tasks->first();
+
+        /** @var Task $lastTask */
+        $lastTask = $this->user->tasks->last();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($firstId: ID!, $lastId: ID!) {
+                user {
+                    firstTasks: tasks(id: $firstId) {
+                        id
+                    }
+                    lastTasks: tasks(id: $lastId) {
+                        id
+                    }
+                }
+            }
+            ', [
+                'firstId' => $firstTask->id,
+                'lastId' => $lastTask->id,
+            ])
+            ->assertExactJson([
+                'data' => [
+                    'user' => [
+                        'firstTasks' => [
+                            [
+                                'id' => $firstTask->id,
+                            ],
+                        ],
+                        'lastTasks' => [
+                            [
+                                'id' => $lastTask->id,
+                            ],
+                        ]
+                    ]
+                ]
+            ]);
     }
 
     public function testCallsScopeWithResolverArgs(): void
