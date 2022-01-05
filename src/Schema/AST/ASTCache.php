@@ -58,7 +58,7 @@ class ASTCache
 
         $this->enable = $cacheConfig['enable'];
 
-        $version = $cacheConfig['version'] ?? 1;
+        $version = (int) ($cacheConfig['version'] ?? 1);
 
         switch ($version) {
             case 1:
