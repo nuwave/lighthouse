@@ -10,18 +10,17 @@ env:
   LIGHTHOUSE_TEST_DB_USER: root
   LIGHTHOUSE_TEST_DB_PASSWORD: root
   LIGHTHOUSE_TEST_DB_HOST: 127.0.0.1
-  #LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
-
-# Using ubuntu-18.04 because it has MySQL 5.7.
-# TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784
+  LIGHTHOUSE_TEST_DB_PORT: 33060
+  LIGHTHOUSE_TEST_REDIS_PORT: 63790
 
 jobs:
   static-analysis:
-    name: ${{ matrix.actions.name }} on PHP ${{ matrix.php-vesrion }}, Laravel ${{ matrix.laravel-version }}
-    runs-on: ubuntu-18.04
+    name: ${{ matrix.actions.name }} on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }}
+    runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         php-version:
           - 7.2
@@ -60,31 +59,25 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
-
-      - name: "Remove conflicting dependencies that are not needed here"
-        run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
       - name: "Ensure compatibility with legacy factories"
         if: matrix.laravel-version != '^8'
         run: composer remove --dev laravel/legacy-factories --no-update
-
-      - name: "Workaround missing laminas/laminas-code release"
-        if: matrix.php-version == '8.1'
-        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: ${{ matrix.actions.run }}
 
   tests:
+    name: PHPUnit on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
         php-version:
           - 7.2
@@ -124,21 +117,26 @@ jobs:
             laravel-version: ^7
         os:
           - ubuntu-latest
+        composer:
+          - name: lowest
+            arg: "--prefer-lowest --prefer-stable"
+          - name: highest
+            # No args added as highest is default
+            arg: ""
+
     services:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: false
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
+          MYSQL_DATABASE: test
         ports:
-          - 3306
+          - 33060:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       redis:
         image: redis:6
         ports:
-          - 6379
+          - 63790:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -150,18 +148,13 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
-
-      - name: "Workaround missing laminas/laminas-code release"
-        if: matrix.php-version == '8.1'
-        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
 
       - name: "Ensure compatibility with legacy factories"
         if: matrix.laravel-version != '^8'
@@ -169,13 +162,12 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
+      - run: composer update ${{ matrix.composer.arg }}
+
       - run: vendor/bin/phpunit --colors=always --verbose
-        env:
-          LIGHTHOUSE_TEST_DB_PORT: ${{ job.services.mysql.ports[3306] }}
-          LIGHTHOUSE_TEST_REDIS_PORT: ${{ job.services.redis.ports[6379] }}
 
   coverage:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -184,12 +176,23 @@ jobs:
         laravel-version:
           - ^8
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        ports:
+          - 33060:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis:6
+        ports:
+          - 63790:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - uses: actions/checkout@v2
-
-      - uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -198,13 +201,10 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
-
-      - run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
       - name: "Ensure compatibility with legacy factories"
         if: matrix.laravel-version != '^8'
@@ -212,17 +212,13 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
-      - run: |
-          sudo systemctl start mysql.service
-          mysql --user=root --password=root --execute='CREATE DATABASE test;'
-
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
       - name: "Upload to Codecov"
         uses: codecov/codecov-action@v2
 
   benchmarks:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -240,11 +236,10 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
 
       - name: "Ensure compatibility with legacy factories"
         if: matrix.laravel-version != '^8'
