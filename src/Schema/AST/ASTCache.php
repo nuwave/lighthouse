@@ -58,7 +58,7 @@ class ASTCache
 
         $this->enable = $cacheConfig['enable'];
 
-        $version = (int) ($cacheConfig['version'] ?? 1);
+        $version = $cacheConfig['version'] ?? 1;
 
         switch ($version) {
             case 1:
@@ -73,7 +73,7 @@ class ASTCache
                 throw new UnknownCacheVersionException($version);
         }
 
-        $this->version = $version;
+        $this->version = (int) $version;
     }
 
     public function isEnabled(): bool
