@@ -131,7 +131,7 @@ return [
     | Query Cache
     |--------------------------------------------------------------------------
     |
-    | Caches user queries so we won't have to parse string queries on each request
+    | Caches the result of parsing incoming query strings to boost performance on subsequent requests.
     |
     */
 

@@ -218,7 +218,9 @@ class GraphQL
     }
 
     /**
-     * Parses string query to DocumentNode. Caches queries if required.
+     * Parse the given query string into a DocumentNode.
+     *
+     * Caches the parsed result if the query cache is enabled in the configuration.
      *
      * @throws SyntaxError
      */
@@ -237,7 +239,7 @@ class GraphQL
         return $store->remember(
             'lighthouse:query:' . hash('sha256', $query),
             $cacheConfig['ttl'],
-            function () use ($query) {
+            static function () use ($query): DocumentNode {
                 return Parser::parse($query);
             }
         );
