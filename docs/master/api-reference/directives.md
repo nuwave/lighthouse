@@ -1422,6 +1422,43 @@ type Query {
 }
 ```
 
+## @inherits
+
+```graphql
+"""
+All fields & properties of the parent type will be inherited by the child type.
+"""
+directive @inherits(
+    """
+    Specify the parent type to inherit from.
+    """
+    from: String!
+) on OBJECT | INPUT_OBJECT | ENUM | INTERFACE | UNION
+```
+
+```graphql
+type Human {
+    name: String
+}
+
+type Developer @inherits(parent: Human){
+    company: String
+}
+
+type Query {
+    developers: [Developer]
+}
+```
+
+```gql
+query GetDevs {
+    developers {
+        name
+        company
+    }
+}
+```
+
 ## @inject
 
 ```graphql

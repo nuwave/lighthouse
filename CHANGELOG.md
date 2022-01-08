@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added 
+
+- Add directive `@inherits` that enables types to inherit attributes from other types
+
 ## v5.33.0
 
 ### Added
