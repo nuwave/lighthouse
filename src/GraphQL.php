@@ -208,29 +208,39 @@ class GraphQL
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
-        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
-
         try {
-            if ($cacheConfig['enable']) {
-                /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-                $cacheFactory = app(CacheFactory::class);
-                $store = $cacheFactory->store($cacheConfig['store']);
-
-                $query = $store->remember(
-                    'lighthouse:query:' . hash('sha256', $query),
-                    $cacheConfig['ttl'],
-                    function () use ($query) {
-                        return Parser::parse($query);
-                    }
-                );
-            } else {
-                $query = Parser::parse($query);
-            }
+            $parsedQuery = $this->parse($query);
         } catch (SyntaxError $syntaxError) {
             return new ExecutionResult(null, [$syntaxError]);
         }
 
-        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
+        return $this->executeParsedQuery($parsedQuery, $context, $variables, $rootValue, $operationName);
+    }
+
+    /**
+     * Parses string query to DocumentNode. Caches queries if required.
+     *
+     * @throws SyntaxError
+     */
+    public function parse(string $query): DocumentNode
+    {
+        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
+
+        if (! $cacheConfig['enable']) {
+            return Parser::parse($query);
+        }
+
+        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
+        $cacheFactory = app(CacheFactory::class);
+        $store = $cacheFactory->store($cacheConfig['store']);
+
+        return $store->remember(
+            'lighthouse:query:' . hash('sha256', $query),
+            $cacheConfig['ttl'],
+            function () use ($query) {
+                return Parser::parse($query);
+            }
+        );
     }
 
     /**
