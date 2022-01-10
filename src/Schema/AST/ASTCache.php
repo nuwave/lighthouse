@@ -73,7 +73,7 @@ class ASTCache
                 throw new UnknownCacheVersionException($version);
         }
 
-        $this->version = $version;
+        $this->version = (int) $version;
     }
 
     public function isEnabled(): bool
