@@ -39,9 +39,9 @@
         "illuminate/support": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "illuminate/validation": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laragraph/utils": "^1",
+        "nesbot/carbon": "^1.37 || ^2",
         "thecodingmachine/safe": "^1 || ^2",
-        "webonyx/graphql-php": "^14.7",
-        "nesbot/carbon": "^1.37 || ^2"
+        "webonyx/graphql-php": "^14.7"
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3 || ^4",
