@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Added query caching
 
+## v5.33.1
+
+### Fixed
+
+- Fix ASTCache with `LIGHTHOUSE_CACHE_VERSION=1` in env https://github.com/nuwave/lighthouse/pull/2020
+
 ## v5.33.0
 
 ### Added
