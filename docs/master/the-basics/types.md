@@ -188,8 +188,8 @@ The generated enum will be named after the class and have values equivalent to t
 
 ```graphql
 enum Color {
-    WHITE
-    BLACK @deprecated(reason: "too dark")
+  WHITE
+  BLACK @deprecated(reason: "too dark")
 }
 ```
 
