@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.34.0
+
 ### Added
 
 - Allow marking `enum` values derived from `bensampo/laravel-enum` as `@deprecated` through PHPDoc https://github.com/nuwave/lighthouse/pull/2025
