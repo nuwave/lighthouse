@@ -44,7 +44,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                     && $relation instanceof BelongsTo
                     && $args === []
                 ) {
-                    $id = $parent->getAttribute($relation->getForeignKeyName());
+                    $foreignKeyName = method_exists($relation, 'getForeignKeyName')
+                        ? $relation->getForeignKeyName()
+                        // @phpstan-ignore-next-line TODO remove once we drop old Laravel
+                        : $relation->getForeignKey();
+                    $id = $parent->getAttribute($foreignKeyName);
 
                     return $id === null
                         ? null
