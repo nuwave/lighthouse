@@ -66,7 +66,7 @@ class DeprecationValidationRule extends ValidationRule
                 }
             },
             NodeKind::OPERATION_DEFINITION => [
-                'leave' => function () {
+                'leave' => function (): void {
                     ($this->deprecationHandler)($this->deprecations);
                 },
             ],
