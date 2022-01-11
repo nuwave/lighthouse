@@ -7,7 +7,6 @@ use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Deprecation\DeprecationValidationRule;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
 class ValidationRulesProvider implements ProvidesValidationRules

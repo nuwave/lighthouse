@@ -49,7 +49,7 @@ class DeprecationTest extends TestCase
 
     public function testDetectsDeprecatedEnumValueUsage(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         enum Foo {
             A
             B @deprecated
@@ -75,7 +75,7 @@ class DeprecationTest extends TestCase
 
     public function testDetectsDeprecatedEnumValueUsageInVariables(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         enum Foo {
             A
             B @deprecated
@@ -91,7 +91,7 @@ class DeprecationTest extends TestCase
             foo(foo: $foo)
         }
         ', [
-            'foo' => 'B'
+            'foo' => 'B',
         ])->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
