@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
@@ -273,5 +274,49 @@ class BelongsToDirectiveTest extends DBTestCase
                     ],
                 ],
             ]);
+    }
+
+    public function testShortcutsForeignKey(): void
+    {
+        $this->be($this->user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
+            ++$queries;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                company {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => [
+                        'id' => $this->company->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        self::assertSame(0, $queries);
     }
 }
