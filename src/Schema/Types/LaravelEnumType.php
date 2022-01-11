@@ -13,7 +13,8 @@ use function Safe\substr;
  */
 class LaravelEnumType extends EnumType
 {
-    const DEPRECATED_PHPDOC_TAG = '@deprecated';
+    public const DEPRECATED_PHPDOC_TAG = '@deprecated';
+
     /**
      * @var class-string<\BenSampo\Enum\Enum>
      */
@@ -77,7 +78,7 @@ class LaravelEnumType extends EnumType
         foreach ($lines as $line) {
             $parts = explode(self::DEPRECATED_PHPDOC_TAG, $line);
 
-            if (count($parts) === 1) {
+            if (1 === count($parts)) {
                 continue;
             }
 
