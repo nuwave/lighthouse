@@ -13,6 +13,7 @@ use function Safe\substr;
  */
 class LaravelEnumType extends EnumType
 {
+    const DEPRECATED_PHPDOC_TAG = '@deprecated';
     /**
      * @var class-string<\BenSampo\Enum\Enum>
      */
@@ -74,13 +75,13 @@ class LaravelEnumType extends EnumType
 
         $lines = explode("\n", $docComment);
         foreach ($lines as $line) {
-            $deprecatedPosition = strpos($line, '@' . Directive::DEPRECATED_NAME);
-            if (false === $deprecatedPosition) {
+            $parts = explode(self::DEPRECATED_PHPDOC_TAG, $line);
+
+            if (count($parts) === 1) {
                 continue;
             }
 
-            // @deprecated is 11 chars long, we want everything after it
-            $reason = trim(substr($line, $deprecatedPosition + 11));
+            $reason = trim($parts[1]);
 
             return '' === $reason
                 ? Directive::DEFAULT_DEPRECATION_REASON
