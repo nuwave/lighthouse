@@ -7,7 +7,6 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
@@ -42,7 +41,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 if (
                     ['id' => true] === $resolveInfo->getFieldSelection()
                     && $relation instanceof BelongsTo
-                    && $args === []
+                    && [] === $args
                 ) {
                     $foreignKeyName = method_exists($relation, 'getForeignKeyName')
                         ? $relation->getForeignKeyName()
@@ -50,7 +49,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                         : $relation->getForeignKey();
                     $id = $parent->getAttribute($foreignKeyName);
 
-                    return $id === null
+                    return null === $id
                         ? null
                         : ['id' => $id];
                 }
