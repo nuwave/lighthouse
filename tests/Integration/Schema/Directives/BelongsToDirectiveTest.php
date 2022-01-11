@@ -354,7 +354,7 @@ class BelongsToDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'name' => $company->name . ' no match'
+            'name' => $company->name . ' no match',
         ])->assertJson([
             'data' => [
                 'user' => [
