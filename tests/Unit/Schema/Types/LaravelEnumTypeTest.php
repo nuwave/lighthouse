@@ -55,7 +55,8 @@ enum PartiallyDeprecated {
   """Deprecated with reason"""
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
-GRAPHQL,
+GRAPHQL
+            ,
             SchemaPrinter::printType($enumType)
         );
     }
