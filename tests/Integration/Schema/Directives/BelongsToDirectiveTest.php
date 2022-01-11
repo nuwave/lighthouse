@@ -12,42 +12,16 @@ use Tests\Utils\Models\User;
 
 class BelongsToDirectiveTest extends DBTestCase
 {
-    /**
-     * The authenticated user.
-     *
-     * @var \Tests\Utils\Models\User
-     */
-    protected $user;
-
-    /**
-     * User's team.
-     *
-     * @var \Tests\Utils\Models\Team
-     */
-    protected $team;
-
-    /**
-     * User's company.
-     *
-     * @var \Tests\Utils\Models\Company
-     */
-    protected $company;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->company = factory(Company::class)->create();
-        $this->team = factory(Team::class)->create();
-        $this->user = factory(User::class)->create([
-            'company_id' => $this->company->getKey(),
-            'team_id' => $this->team->getKey(),
-        ]);
-    }
-
     public function testResolveBelongsToRelationship(): void
     {
-        $this->be($this->user);
+        $company = factory(Company::class)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -75,7 +49,7 @@ class BelongsToDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'company' => [
-                        'name' => $this->company->name,
+                        'name' => $company->name,
                     ],
                 ],
             ],
@@ -84,7 +58,14 @@ class BelongsToDirectiveTest extends DBTestCase
 
     public function testResolveBelongsToWithCustomName(): void
     {
-        $this->be($this->user);
+        $company = factory(Company::class)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -112,7 +93,7 @@ class BelongsToDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'account' => [
-                        'name' => $this->company->name,
+                        'name' => $company->name,
                     ],
                 ],
             ],
@@ -121,7 +102,16 @@ class BelongsToDirectiveTest extends DBTestCase
 
     public function testResolveBelongsToRelationshipWithTwoRelation(): void
     {
-        $this->be($this->user);
+        $company = factory(Company::class)->create();
+        $team = factory(Team::class)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->team()->associate($team);
+        $user->save();
+
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -157,10 +147,10 @@ class BelongsToDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'company' => [
-                        'name' => $this->company->name,
+                        'name' => $company->name,
                     ],
                     'team' => [
-                        'name' => $this->team->name,
+                        'name' => $team->name,
                     ],
                 ],
             ],
@@ -169,8 +159,6 @@ class BelongsToDirectiveTest extends DBTestCase
 
     public function testResolveBelongsToRelationshipWhenMainModelHasCompositePrimaryKey(): void
     {
-        $this->be($this->user);
-
         $products = factory(Product::class, 2)->create();
 
         $this->schema = /** @lang GraphQL */ '
@@ -278,7 +266,14 @@ class BelongsToDirectiveTest extends DBTestCase
 
     public function testShortcutsForeignKey(): void
     {
-        $this->be($this->user);
+        $company = factory(Company::class)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -311,12 +306,63 @@ class BelongsToDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'company' => [
-                        'id' => $this->company->id,
+                        'id' => $company->id,
                     ],
                 ],
             ],
         ]);
 
         self::assertSame(0, $queries);
+    }
+
+    public function testDoesNotShortcutForeignKeyIfQueryHasConditions(): void
+    {
+        $company = factory(Company::class)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+        }
+
+        type User {
+            company(name: String @eq): Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
+            ++$queries;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($name: String) {
+            user {
+                company(name: $name) {
+                    id
+                }
+            }
+        }
+        ', [
+            'name' => $company->name . ' no match'
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => null,
+                ],
+            ],
+        ]);
+
+        self::assertSame(1, $queries);
     }
 }

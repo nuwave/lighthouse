@@ -37,13 +37,18 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
                 $relation = $parent->{$relationName}();
 
+                // We can shortcut the resolution if the client only queries for a foreign key
+                // that we know to be present on the parent model.
                 if (
-                    ['id' => true] === $resolveInfo->getFieldSelection(1)
-                    && ($relation instanceof BelongsTo || $relation instanceof MorphTo)
+                    ['id' => true] === $resolveInfo->getFieldSelection()
+                    && $relation instanceof BelongsTo
+                    && $args === []
                 ) {
-                    return [
-                        'id' => $parent->getAttribute($relation->getForeignKeyName()),
-                    ];
+                    $id = $parent->getAttribute($relation->getForeignKeyName());
+
+                    return $id === null
+                        ? null
+                        : ['id' => $id];
                 }
 
                 if (

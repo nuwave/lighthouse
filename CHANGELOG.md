@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.35.0
+
 ### Added
 
 - Shortcut `@belongsTo` and `@morphTo` if the client only selects the ID of the relation
@@ -1442,7 +1444,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Make the error messages returned by `@can` more friendly https://github.com/nuwave/lighthouse/pull/515
 - Bump requirements for `webonyx/graphql-php` to `^0.13` and PHP to `>= 7.1` https://github.com/nuwave/lighthouse/pull/517
 - Replace `DirectiveRegistry` with `DirectiveFactory` to lazy load directives https://github.com/nuwave/lighthouse/pull/520
-- Extensions must registered through ServiceProviders instead of the config file https://github.com/nuwave/lighthouse/pull/645
+- Extensions must be registered through ServiceProviders instead of the config file https://github.com/nuwave/lighthouse/pull/645
 - Increase tracing precision when nanoseconds are available https://github.com/nuwave/lighthouse/pull/674
 
 ### Fixed
