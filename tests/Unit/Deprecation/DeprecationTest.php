@@ -2,8 +2,7 @@
 
 namespace Tests\Unit\Deprecation;
 
-use GraphQL\Validator\DocumentValidator;
-use Nuwave\Lighthouse\Deprecation\DeprecationValidationRule;
+use Nuwave\Lighthouse\Deprecation\DetectDeprecations;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
@@ -18,12 +17,11 @@ class DeprecationTest extends TestCase
     {
         parent::setUp();
 
-        // TODO @see ValidationRulesProvider
-        DocumentValidator::addRule(
-            new DeprecationValidationRule(function (array $deprecations): void {
-                $this->deprecations = $deprecations;
-            })
-        );
+        DetectDeprecations::handle(function (array $deprecations): void {
+            $this->deprecations = $deprecations;
+        });
+
+        // TODO remove rule once we have graphql-php 15
     }
 
     public function testDetectsDeprecatedFields(): void

@@ -6,13 +6,14 @@ use GraphQL\Language\AST\EnumValueNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\ValidationRule;
 use GraphQL\Validator\ValidationContext;
 
 /**
  * @phpstan-type DeprecationHandler callable(array<string, true>): void
  */
-class DeprecationValidationRule extends ValidationRule
+class DetectDeprecations extends ValidationRule
 {
     /**
      * @var array<string, true>
@@ -30,6 +31,11 @@ class DeprecationValidationRule extends ValidationRule
     public function __construct(callable $deprecationHandler)
     {
         $this->deprecationHandler = $deprecationHandler;
+    }
+
+    public static function handle(callable $deprecationHandler)
+    {
+        DocumentValidator::addRule(new static($deprecationHandler));
     }
 
     public function getVisitor(ValidationContext $context): array
