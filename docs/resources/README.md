@@ -8,6 +8,8 @@
 
 ## Tutorials
 
+- [Laravel GraphQL by Bitfumes](https://www.youtube.com/watch?v=iA3eFL8uq-c)
+- [Laracasts: GraphQL with Laravel and Vue](https://laracasts.com/series/graphql-with-laravel-and-vue)
 - [Building a GraphQL Server with Laravel](https://www.toptal.com/graphql/laravel-graphql-server-tutorial)
 - [Video Walkthrough by Christopher Moore](https://youtu.be/y19EaW2X7ac)
 - [GraphQL in Laravel done right](https://medium.com/@olivernybroe/graphql-in-laravel-done-right-9cf123d5601b)

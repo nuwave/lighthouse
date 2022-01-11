@@ -9,6 +9,69 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Shortcut `@belongsTo` and `@morphTo` if the client only selects the ID of the relation
+
+## v5.34.0
+
+### Added
+
+- Allow marking `enum` values derived from `bensampo/laravel-enum` as `@deprecated` through PHPDoc https://github.com/nuwave/lighthouse/pull/2025
+
+## v5.33.1
+
+### Fixed
+
+- Fix ASTCache with `LIGHTHOUSE_CACHE_VERSION=1` in env https://github.com/nuwave/lighthouse/pull/2020
+
+## v5.33.0
+
+### Added
+
+- Add `@clearCache` directive that clears a resolver cache by tags https://github.com/nuwave/lighthouse/pull/1931
+
+### Fixed
+
+- Do not change capitalization of types and fields in cache keys https://github.com/nuwave/lighthouse/pull/1931
+- Add hidden config option `lighthouse.cache.tags` in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1931
+- Set up correct authentication context for subscriptions with `@guard` fields https://github.com/nuwave/lighthouse/pull/1769
+
+### Changed
+
+- Include empty placeholder for parent cache key in root fields to ensure predictable cache key https://github.com/nuwave/lighthouse/pull/1931
+- Prefix all generate cache keys or tags with `lighthouse` https://github.com/nuwave/lighthouse/pull/1931
+
+## v5.32.0
+
+### Added
+
+- Added middleware `Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR` to mitigate CSRF attacks without Laravel Sanctum https://github.com/nuwave/lighthouse/pull/2013
+
+## v5.31.3
+
+### Fixed
+
+- Use `StartExecution` event to determine per-operation Tracing timestamps https://github.com/nuwave/lighthouse/pull/2009
+
+## v5.31.2
+
+### Fixed
+
+- Trigger model events on nested mutation disconnect of one to many relationships https://github.com/nuwave/lighthouse/pull/2008
+
+## v5.31.1
+
+### Fixed
+
+- Ensure `_ide_helper.php` works as PHPStan stub file https://github.com/nuwave/lighthouse/pull/2006
+
+## v5.31.0
+
+### Added
+
+- Add method `assertGraphQLError()` to `TestResponse` mixin https://github.com/nuwave/lighthouse/pull/2005
+
 ## v5.30.0
 
 ### Added

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
 use PHPUnit\Framework\Assert;
+use Throwable;
 
 /**
  * @mixin \Illuminate\Testing\TestResponse
@@ -55,6 +56,13 @@ class TestResponseMixin
             Assert::assertNull($validation, 'Expected the query to have no validation errors.');
 
             return $this;
+        };
+    }
+
+    public function assertGraphQLError(): Closure
+    {
+        return function (Throwable $error) {
+            return $this->assertGraphQLErrorMessage($error->getMessage());
         };
     }
 

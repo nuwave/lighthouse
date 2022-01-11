@@ -18,7 +18,7 @@ namespace Illuminate\Foundation\Testing {
         /**
          * Assert that the returned result contains exactly the given validation keys.
          *
-         * @param  array  $keys  the validation keys the result should have
+         * @param  array<string>  $keys  the validation keys the result should have
          *
          * @return $this
          */
@@ -56,6 +56,18 @@ namespace Illuminate\Testing {
     class TestResponse
     {
         /**
+         * Assert the response contains an error with a matching message.
+         *
+         * @param  \Throwable  $error  the expected error
+         *
+         * @return $this
+         */
+        public function assertGraphQLError(\Throwable $error): self
+        {
+            return $this;
+        }
+
+        /**
          * Assert the response contains an error with the given message.
          *
          * @param  string  $message  the expected error message
@@ -92,7 +104,7 @@ namespace Illuminate\Testing {
         /**
          * Assert the returned result contains exactly the given validation keys.
          *
-         * @param  array  $keys  the validation keys the result should have
+         * @param  array<string>  $keys  the validation keys the result should have
          *
          * @return $this
          */
@@ -127,13 +139,10 @@ namespace Illuminate\Testing {
 }
 
 namespace GraphQL\Type\Definition {
+    /**
+     * @property \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $argumentSet We monkey patch this onto here to pass it down the resolver chain.
+     */
     class ResolveInfo
     {
-        /**
-         * We monkey patch this onto here to pass it down the resolver chain.
-         *
-         * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-         */
-        public $argumentSet;
     }
 }

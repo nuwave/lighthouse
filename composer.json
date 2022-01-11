@@ -39,7 +39,7 @@
         "illuminate/support": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "illuminate/validation": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8",
         "laragraph/utils": "^1",
-        "thecodingmachine/safe": "^1",
+        "thecodingmachine/safe": "^1 || ^2",
         "webonyx/graphql-php": "^14.7"
     },
     "require-dev": {
@@ -84,6 +84,10 @@
         }
     },
     "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "ergebnis/composer-normalize": true
+        },
         "sort-packages": true
     },
     "extra": {
