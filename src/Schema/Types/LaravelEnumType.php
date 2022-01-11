@@ -3,8 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use BenSampo\Enum\Enum;
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use InvalidArgumentException;
+use function Safe\substr;
 
 /**
  * A convenience wrapper for registering enums programmatically.
@@ -15,6 +17,11 @@ class LaravelEnumType extends EnumType
      * @var class-string<\BenSampo\Enum\Enum>
      */
     protected $enumClass;
+
+    /**
+     * @var \ReflectionClass<\BenSampo\Enum\Enum>
+     */
+    protected $reflection;
 
     /**
      * Create a GraphQL enum from a Laravel enum type.
@@ -31,6 +38,7 @@ class LaravelEnumType extends EnumType
         }
 
         $this->enumClass = $enumClass;
+        $this->reflection = new \ReflectionClass($enumClass);
 
         parent::__construct([
             'name' => $name ?? class_basename($enumClass),
@@ -43,11 +51,43 @@ class LaravelEnumType extends EnumType
                         'name' => $enum->key,
                         'value' => $enum,
                         'description' => $enum->description,
+                        'deprecationReason' => $this->deprecationReason($enum),
                     ];
                 },
                 $enumClass::getInstances()
             ),
         ]);
+    }
+
+    protected function deprecationReason(Enum $enum): ?string
+    {
+        $constant = $this->reflection->getReflectionConstant($enum->key);
+        assert($constant instanceof \ReflectionClassConstant, 'Enum keys are derived from the constant names');
+
+        $docComment = $constant->getDocComment();
+        if (false === $docComment) {
+            return null;
+        }
+
+        $docComment = substr($docComment, 3); // strip leading /**
+        $docComment = substr($docComment, 0, -2); // strip trailing */
+
+        $lines = explode("\n", $docComment);
+        foreach ($lines as $line) {
+            $deprecatedPosition = strpos($line, '@' . Directive::DEPRECATED_NAME);
+            if (false === $deprecatedPosition) {
+                continue;
+            }
+
+            // @deprecated is 11 chars long, we want everything after it
+            $reason = trim(substr($line, $deprecatedPosition + 11));
+
+            return '' === $reason
+                ? Directive::DEFAULT_DEPRECATION_REASON
+                : $reason;
+        }
+
+        return null;
     }
 
     /**

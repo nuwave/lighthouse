@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Allow marking `enum` values derived from `bensampo/laravel-enum` as `@deprecated` through PHPDoc
+
 ## v5.33.1
 
 ### Fixed
