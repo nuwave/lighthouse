@@ -9,12 +9,28 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Validator\Rules\ValidationRule;
 use GraphQL\Validator\ValidationContext;
 
+/**
+ * @phpstan-type DeprecationHandler callable(array<string, true>): void
+ */
 class DeprecationValidationRule extends ValidationRule
 {
     /**
      * @var array<string, true>
      */
     protected $deprecations = [];
+
+    /**
+     * @var DeprecationHandler
+     */
+    protected $deprecationHandler;
+
+    /**
+     * @param DeprecationHandler $deprecationHandler
+     */
+    public function __construct(callable $deprecationHandler)
+    {
+        $this->deprecationHandler = $deprecationHandler;
+    }
 
     public function getVisitor(ValidationContext $context): array
     {
@@ -51,7 +67,7 @@ class DeprecationValidationRule extends ValidationRule
             },
             NodeKind::OPERATION_DEFINITION => [
                 'leave' => function () {
-                    dump($this->deprecations);
+                    ($this->deprecationHandler)($this->deprecations);
                 },
             ],
         ];
