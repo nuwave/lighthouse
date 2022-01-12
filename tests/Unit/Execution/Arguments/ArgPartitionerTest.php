@@ -74,9 +74,9 @@ class ArgPartitionerTest extends TestCase
     {
         $argumentSet = new ArgumentSet();
 
-        /** @see User::name() */
-        $name = new Argument();
-        $argumentSet->arguments['name'] = $name;
+        /** @see User::nonRelationPrimitive() */
+        $nonRelationPrimitive = new Argument();
+        $argumentSet->arguments['nonRelationPrimitive'] = $nonRelationPrimitive;
 
         [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
             $argumentSet,
@@ -85,7 +85,7 @@ class ArgPartitionerTest extends TestCase
         );
 
         $this->assertSame(
-            ['name' => $name],
+            ['nonRelationPrimitive' => $nonRelationPrimitive],
             $regularArgs->arguments
         );
 

@@ -150,8 +150,8 @@ class User extends Authenticatable
             && $this->postsCommentsLoaded();
     }
 
-    public function name(): ?string
+    public function nonRelationPrimitive(): string
     {
-        return $this->name;
+        return 'foo';
     }
 }
