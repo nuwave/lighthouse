@@ -28,6 +28,30 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 
+## v5.35.1
+
+### Fixed
+
+- Fix partitioning of arguments where the model has a non-relation method returning primitive https://github.com/nuwave/lighthouse/pull/2026
+
+## v5.35.0
+
+### Added
+
+- Shortcut `@belongsTo` and `@morphTo` if the client only selects the ID of the relation
+
+## v5.34.0
+
+### Added
+
+- Allow marking `enum` values derived from `bensampo/laravel-enum` as `@deprecated` through PHPDoc https://github.com/nuwave/lighthouse/pull/2025
+
+## v5.33.1
+
+### Fixed
+
+- Fix ASTCache with `LIGHTHOUSE_CACHE_VERSION=1` in env https://github.com/nuwave/lighthouse/pull/2020
+
 ## v5.33.0
 
 ### Added
@@ -1445,7 +1469,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Make the error messages returned by `@can` more friendly https://github.com/nuwave/lighthouse/pull/515
 - Bump requirements for `webonyx/graphql-php` to `^0.13` and PHP to `>= 7.1` https://github.com/nuwave/lighthouse/pull/517
 - Replace `DirectiveRegistry` with `DirectiveFactory` to lazy load directives https://github.com/nuwave/lighthouse/pull/520
-- Extensions must registered through ServiceProviders instead of the config file https://github.com/nuwave/lighthouse/pull/645
+- Extensions must be registered through ServiceProviders instead of the config file https://github.com/nuwave/lighthouse/pull/645
 - Increase tracing precision when nanoseconds are available https://github.com/nuwave/lighthouse/pull/674
 
 ### Fixed

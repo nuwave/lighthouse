@@ -2,12 +2,14 @@
 
 namespace Tests\Unit\Schema\Types;
 
+use GraphQL\Utils\SchemaPrinter;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\LaravelEnums\LocalizedUserType;
+use Tests\Utils\LaravelEnums\PartiallyDeprecated;
 
 class LaravelEnumTypeTest extends TestCase
 {
@@ -39,6 +41,27 @@ class LaravelEnumTypeTest extends TestCase
         $this->assertIsArray($values);
         $this->assertArrayHasKey('Moderator', $values);
         $this->assertSame('Localize Moderator', $values['Moderator']['description']);
+    }
+
+    public function testDeprecated(): void
+    {
+        $enumType = new LaravelEnumType(PartiallyDeprecated::class);
+
+        $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
+enum PartiallyDeprecated {
+  """Not"""
+  NOT
+
+  """Deprecated"""
+  DEPRECATED @deprecated
+
+  """Deprecated with reason"""
+  DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
+}
+GRAPHQL
+            ,
+            SchemaPrinter::printType($enumType)
+        );
     }
 
     public function testReceivesEnumInstanceInternally(): void

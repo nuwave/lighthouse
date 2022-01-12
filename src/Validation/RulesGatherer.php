@@ -88,8 +88,6 @@ class RulesGatherer
             if ($directive instanceof ArgumentSetValidation) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
                     /**
-                     * @psalm-suppress UndefinedDocblockClass
-                     *
                      * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
                      */
                     // @phpstan-ignore-next-line using trait in typehint
@@ -112,8 +110,6 @@ class RulesGatherer
             if ($directive instanceof ArgumentValidation) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
                     /**
-                     * @psalm-suppress UndefinedDocblockClass
-                     *
                      * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
                      */
                     // @phpstan-ignore-next-line using trait in typehint

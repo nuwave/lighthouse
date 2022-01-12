@@ -129,16 +129,16 @@ abstract class DateScalarTest extends TestCase
     /**
      * Data provider for valid date strings.
      *
-     * @return array<array<string>>
+     * @return iterable<array<string>>
      */
-    abstract public function validDates(): array;
+    abstract public function validDates(): iterable;
 
     /**
      * Data provider with pairs of dates:
      * 1. A valid representation of the date
-     * 1. The canonical representation of the date.
+     * 2. The canonical representation of the date.
      *
-     * @return array<array<string>>
+     * @return iterable<array{string, string}>
      */
-    abstract public function canonicalizeDates(): array;
+    abstract public function canonicalizeDates(): iterable;
 }
