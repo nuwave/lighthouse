@@ -33,7 +33,7 @@ class DetectDeprecatedUsage extends ValidationRule
         $this->deprecationHandler = $deprecationHandler;
     }
 
-    public static function handle(callable $deprecationHandler)
+    public static function handle(callable $deprecationHandler): void
     {
         DocumentValidator::addRule(new static($deprecationHandler));
     }
@@ -43,6 +43,7 @@ class DetectDeprecatedUsage extends ValidationRule
         return [
             NodeKind::FIELD => function (FieldNode $node) use ($context): void {
                 $field = $context->getFieldDef();
+                // @phpstan-ignore-next-line can be null, remove ignore with graphql-php 15
                 if (null === $field) {
                     return;
                 }
