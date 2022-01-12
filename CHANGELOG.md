@@ -9,9 +9,45 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+
 ### Added
 
 - Apply paginated field type definition manipulation on interfaces https://github.com/nuwave/lighthouse/pull/2012
+
+## v5.35.0
+
+### Added
+
+- Shortcut `@belongsTo` and `@morphTo` if the client only selects the ID of the relation
+
+## v5.34.0
+
+### Added
+
+- Allow marking `enum` values derived from `bensampo/laravel-enum` as `@deprecated` through PHPDoc https://github.com/nuwave/lighthouse/pull/2025
+
+## v5.33.1
+
+### Fixed
+
+- Fix ASTCache with `LIGHTHOUSE_CACHE_VERSION=1` in env https://github.com/nuwave/lighthouse/pull/2020
+
+## v5.33.0
+
+### Added
+
+- Add `@clearCache` directive that clears a resolver cache by tags https://github.com/nuwave/lighthouse/pull/1931
+
+### Fixed
+
+- Do not change capitalization of types and fields in cache keys https://github.com/nuwave/lighthouse/pull/1931
+- Add hidden config option `lighthouse.cache.tags` in `config/lighthouse.php` https://github.com/nuwave/lighthouse/pull/1931
+- Set up correct authentication context for subscriptions with `@guard` fields https://github.com/nuwave/lighthouse/pull/1769
+
+### Changed
+
+- Include empty placeholder for parent cache key in root fields to ensure predictable cache key https://github.com/nuwave/lighthouse/pull/1931
+- Prefix all generate cache keys or tags with `lighthouse` https://github.com/nuwave/lighthouse/pull/1931
 
 ## v5.32.0
 
@@ -1413,7 +1449,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Make the error messages returned by `@can` more friendly https://github.com/nuwave/lighthouse/pull/515
 - Bump requirements for `webonyx/graphql-php` to `^0.13` and PHP to `>= 7.1` https://github.com/nuwave/lighthouse/pull/517
 - Replace `DirectiveRegistry` with `DirectiveFactory` to lazy load directives https://github.com/nuwave/lighthouse/pull/520
-- Extensions must registered through ServiceProviders instead of the config file https://github.com/nuwave/lighthouse/pull/645
+- Extensions must be registered through ServiceProviders instead of the config file https://github.com/nuwave/lighthouse/pull/645
 - Increase tracing precision when nanoseconds are available https://github.com/nuwave/lighthouse/pull/674
 
 ### Fixed

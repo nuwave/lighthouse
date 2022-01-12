@@ -12,7 +12,7 @@ class DateTimeTzTest extends DateScalarTest
         return new DateTimeTz();
     }
 
-    public function validDates(): array
+    public function validDates(): iterable
     {
         return [
             ['2020-04-20T16:20:04+04:00'],
@@ -20,7 +20,7 @@ class DateTimeTzTest extends DateScalarTest
         ];
     }
 
-    public function canonicalizeDates(): array
+    public function canonicalizeDates(): iterable
     {
         return [
             ['2020-4-20T16:20:04+04:0', '2020-04-20T16:20:04+04:00'],

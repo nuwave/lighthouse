@@ -134,8 +134,7 @@ The PHP internal value of the field `ADMIN` will be `string('ADMIN')`.
 If you want to reuse enum definitions or constants from PHP, you can also
 register a native PHP enum type [through the TypeRegistry](../digging-deeper/adding-types-programmatically.md#native-php-types).
 
-Just define a [EnumType](https://webonyx.github.io/graphql-php/type-definitions/enums) and
-register it:
+Just define an [EnumType](https://webonyx.github.io/graphql-php/type-definitions/enums) and register it:
 
 ```php
 use GraphQL\Type\Definition\EnumType;
@@ -160,75 +159,45 @@ $episodeEnum = new EnumType([
     ]
 ]);
 
-// Resolve this through the container, as it is a singleton
+// This code should go in a service provider
+// Resolve TypeRegistry through the container, as it is a singleton
 $typeRegistry = app(TypeRegistry::class);
-
 $typeRegistry->register($episodeEnum);
 ```
 
 If you are using [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
 you can use `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` to construct an enum type from it.
 
-Given the following enum:
-
 ```php
-<?php
-
-namespace App\Enums;
-
 use BenSampo\Enum\Enum;
-
-final class UserType extends Enum
-{
-    public const Administrator = 0;
-    public const Moderator = 1;
-    public const Subscriber = 2;
-    public const SuperAdministrator = 3;
-}
-```
-
-This is how you can register it in a ServiceProvider. Make sure to wrap it
-in a `LaravelEnumType`.
-
-```php
-<?php
-
-namespace App\GraphQL;
-
-use App\Enums\UserType;
-use Illuminate\Support\ServiceProvider;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
-class GraphQLServiceProvider extends ServiceProvider
+final class Color extends Enum
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
-    public function boot(TypeRegistry $typeRegistry): void
-    {
-        $typeRegistry->register(
-             new LaravelEnumType(UserType::class)
-        );
-    }
+    public const WHITE = 0;
+
+    /** @deprecated too dark */
+    public const BLACK = 1;
+}
+
+// Register through TypeRegistry::register()
+$userType = new LaravelEnumType(Color::class);
+```
+
+The generated enum will be named after the class and have values equivalent to the keys:
+
+```graphql
+enum Color {
+  WHITE
+  BLACK @deprecated(reason: "too dark")
 }
 ```
 
-By default, the generated type will be named just like the given class.
+You may overwrite the name if the default does not fit, or you have a name conflict.
 
 ```php
-$enum = new LaravelEnumType(UserType::class);
-var_dump($enum->name); // UserType
-```
-
-You may overwrite the name if the default does not fit or you have a name conflict.
-
-```php
-$enum = new LaravelEnumType(UserType::class, 'UserKind');
-var_dump($enum->name); // UserKind
+// API uses british english
+new LaravelEnumType(Color::class, 'Colour');
 ```
 
 ## Input
