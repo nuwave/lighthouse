@@ -149,4 +149,9 @@ class User extends Authenticatable
         return $this->postsTaskLoaded()
             && $this->postsCommentsLoaded();
     }
+
+    public function name(): ?string
+    {
+        return $this->name;
+    }
 }
