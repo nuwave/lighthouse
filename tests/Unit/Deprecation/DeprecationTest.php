@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Deprecation;
 
-use Nuwave\Lighthouse\Deprecation\DetectDeprecations;
+use Nuwave\Lighthouse\Deprecation\DetectDeprecatedUsage;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
@@ -17,7 +17,7 @@ class DeprecationTest extends TestCase
     {
         parent::setUp();
 
-        DetectDeprecations::handle(function (array $deprecations): void {
+        DetectDeprecatedUsage::handle(function (array $deprecations): void {
             $this->deprecations = $deprecations;
         });
 

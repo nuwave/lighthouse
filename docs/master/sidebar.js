@@ -58,6 +58,7 @@ module.exports = [
       "digging-deeper/adding-types-programmatically",
       "digging-deeper/file-uploads",
       "digging-deeper/client-directives",
+      "digging-deeper/deprecation",
       "digging-deeper/extending-lighthouse",
     ],
   },

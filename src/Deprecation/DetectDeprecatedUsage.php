@@ -13,7 +13,7 @@ use GraphQL\Validator\ValidationContext;
 /**
  * @phpstan-type DeprecationHandler callable(array<string, true>): void
  */
-class DetectDeprecations extends ValidationRule
+class DetectDeprecatedUsage extends ValidationRule
 {
     /**
      * @var array<string, true>
