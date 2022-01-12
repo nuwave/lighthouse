@@ -7,7 +7,6 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
@@ -37,13 +36,22 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
                 $relation = $parent->{$relationName}();
 
+                // We can shortcut the resolution if the client only queries for a foreign key
+                // that we know to be present on the parent model.
                 if (
-                    ['id' => true] === $resolveInfo->getFieldSelection(1)
-                    && ($relation instanceof BelongsTo || $relation instanceof MorphTo)
+                    ['id' => true] === $resolveInfo->getFieldSelection()
+                    && $relation instanceof BelongsTo
+                    && [] === $args
                 ) {
-                    return [
-                        'id' => $parent->getAttribute($relation->getForeignKeyName()),
-                    ];
+                    $foreignKeyName = method_exists($relation, 'getForeignKeyName')
+                        ? $relation->getForeignKeyName()
+                        // @phpstan-ignore-next-line TODO remove once we drop old Laravel
+                        : $relation->getForeignKey();
+                    $id = $parent->getAttribute($foreignKeyName);
+
+                    return null === $id
+                        ? null
+                        : ['id' => $id];
                 }
 
                 if (
