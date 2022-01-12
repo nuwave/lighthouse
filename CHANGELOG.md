@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix partitioning of arguments where the model has a non-relation method returning primitive https://github.com/nuwave/lighthouse/issues/2024
+- Fix partitioning of arguments where the model has a non-relation method returning primitive https://github.com/nuwave/lighthouse/pull/2026
 
 ## v5.35.0
 
