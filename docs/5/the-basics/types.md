@@ -165,7 +165,7 @@ $typeRegistry = app(TypeRegistry::class);
 $typeRegistry->register($episodeEnum);
 ```
 
-If you are using [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
+If you are using [bensampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
 you can use `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` to construct an enum type from it.
 
 ```php
