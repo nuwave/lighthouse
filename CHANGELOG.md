@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.35.3
+
+- Fix `thecodingmachine/safe` version constraint
+
+### Fixed
+
 ## v5.35.2
 
 ### Fixed
