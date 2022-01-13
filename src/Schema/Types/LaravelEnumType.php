@@ -6,7 +6,6 @@ use BenSampo\Enum\Enum;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use InvalidArgumentException;
-use function Safe\substr;
 
 /**
  * A convenience wrapper for registering enums programmatically.
