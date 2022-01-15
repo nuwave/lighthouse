@@ -23,7 +23,6 @@ fix: up
 .PHONY: stan
 stan: up ## Runs static analysis
 	docker-compose exec php vendor/bin/phpstan
-	docker-compose exec php vendor/bin/psalm
 
 .PHONY: test
 test: up ## Runs tests with PHPUnit

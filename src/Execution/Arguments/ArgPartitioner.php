@@ -195,6 +195,10 @@ class ArgPartitioner
             return false;
         }
 
+        if ($returnType->isBuiltin()) {
+            return false;
+        }
+
         if (! class_exists($returnType->getName())) {
             throw new DefinitionException('Class ' . $returnType->getName() . ' does not exist, did you forget to import the Eloquent relation class?');
         }

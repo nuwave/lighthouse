@@ -70,6 +70,31 @@ class ArgPartitionerTest extends TestCase
         );
     }
 
+    public function testArgsMatchingNonRelationMethod(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        /** @see User::nonRelationPrimitive() */
+        $nonRelationPrimitive = new Argument();
+        $argumentSet->arguments['nonRelationPrimitive'] = $nonRelationPrimitive;
+
+        [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
+            $argumentSet,
+            new User(),
+            HasMany::class
+        );
+
+        $this->assertSame(
+            ['nonRelationPrimitive' => $nonRelationPrimitive],
+            $regularArgs->arguments
+        );
+
+        $this->assertSame(
+            [],
+            $hasManyArgs->arguments
+        );
+    }
+
     public function testPartitionArgsExceptionBadRelationType(): void
     {
         $argumentSet = new ArgumentSet();
