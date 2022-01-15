@@ -319,7 +319,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Apollo automatic persisted queries support.
-    | You may set this flag to either process or deny batched queries.
+    | You may set this flag to either process or deny these queries.
     |
     */
 
