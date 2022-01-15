@@ -21,14 +21,15 @@ class ApolloAPQTest extends TestCase
 
         $sha256 = hash('sha256', $query);
 
-        $this->graphQL('', [], [
+        $response = $this->graphQL('', [], [
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
                     'sha256Hash' => $sha256,
                 ],
             ],
-        ])->assertJsonPath('errors.0.extensions.code', 'PERSISTED_QUERY_NOT_FOUND');
+        ]);
+        $this->assertEquals('PERSISTED_QUERY_NOT_FOUND', $response->json('errors.0.extensions.code'));
 
         // run sending the query
         $this->graphQL($query, [], [
@@ -84,14 +85,15 @@ class ApolloAPQTest extends TestCase
         ]);
 
         // run without query, the query should not be cached as it is disabled in the config
-        $this->graphQL('', [], [
+        $response = $this->graphQL('', [], [
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
                     'sha256Hash' => $sha256,
                 ],
             ],
-        ])->assertJsonPath('errors.0.extensions.code', 'PERSISTED_QUERY_NOT_FOUND');
+        ]);
+        $this->assertEquals('PERSISTED_QUERY_NOT_FOUND', $response->json('errors.0.extensions.code'));
     }
 
     public function testCacheDisabled(): void
@@ -119,13 +121,14 @@ class ApolloAPQTest extends TestCase
         ]);
 
         // run without query, the query should not be cached as query cache is disabled in the config
-        $this->graphQL('', [], [
+        $response = $this->graphQL('', [], [
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
                     'sha256Hash' => $sha256,
                 ],
             ],
-        ])->assertJsonPath('errors.0.extensions.code', 'PERSISTED_QUERY_NOT_FOUND');
+        ]);
+        $this->assertEquals('PERSISTED_QUERY_NOT_FOUND', $response->json('errors.0.extensions.code'));
     }
 }
