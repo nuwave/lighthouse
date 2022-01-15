@@ -139,13 +139,6 @@ class GraphQL
     {
         $errors = $this->graphQLHelper->validateOperationParams($params);
 
-        $query = $params->query;
-        if (! is_string($query) || '' === $query) {
-            $errors[] = new RequestError(
-                'GraphQL Request parameter "query" is required and must not be empty.'
-            );
-        }
-
         if (count($errors) > 0) {
             $errors = array_map(
                 static function (RequestError $err): Error {
@@ -158,14 +151,40 @@ class GraphQL
                 new ExecutionResult(null, $errors)
             );
         }
-        /** @var string $query Otherwise we would have bailed with an error */
-        $result = $this->parseAndExecuteQuery(
-            $query,
-            $context,
-            $params->variables,
-            null,
-            $params->operation
-        );
+
+        if ($params->query) {
+            $result = $this->parseAndExecuteQuery(
+                $params->query,
+                $context,
+                $params->variables,
+                null,
+                $params->operation
+            );
+        } else {
+            $parsedQuery = $this->getPersistedQuery($params->queryId);
+            if (null === $parsedQuery) {
+                // Apollo-compatible response
+                $error = new Error(
+                    'PersistedQueryNotFound',
+                    null,
+                    null,
+                    [],
+                    null,
+                    null,
+                    ['code' => 'PERSISTED_QUERY_NOT_FOUND']
+                );
+
+                return $this->serializable(new ExecutionResult(null, [$error]));
+            }
+
+            $result = $this->executeParsedQuery(
+                $parsedQuery,
+                $context,
+                $params->variables,
+                null,
+                $params->operation
+            );
+        }
 
         return $this->serializable($result);
     }
@@ -243,6 +262,28 @@ class GraphQL
                 return Parser::parse($query);
             }
         );
+    }
+
+    /**
+     * Gets persisted query from the query cache. Returns null if this feature is disabled or no query found.
+     */
+    public function getPersistedQuery(string $sha256hash): ?DocumentNode
+    {
+        if (! $this->configRepository->get('lighthouse.persisted_queries')) {
+            return null;
+        }
+
+        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
+
+        if (! $cacheConfig['enable']) {
+            return null;
+        }
+
+        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
+        $cacheFactory = app(CacheFactory::class);
+        $store = $cacheFactory->store($cacheConfig['store']);
+
+        return $store->get('lighthouse:query:' . $sha256hash);
     }
 
     /**

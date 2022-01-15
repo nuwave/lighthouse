@@ -315,6 +315,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Persisted Queries
+    |--------------------------------------------------------------------------
+    |
+    | Apollo automatic persisted queries support.
+    | You may set this flag to either process or deny batched queries.
+    |
+    */
+
+    'persisted_queries' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |

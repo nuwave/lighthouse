@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Added query caching
+- Added Apollo Automatic persisted queries support
 
 ## v5.35.0
 
