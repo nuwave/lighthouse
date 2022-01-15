@@ -32,7 +32,7 @@ class CacheKeyAndTags
         $parts[] = $id;
         $parts[] = $fieldName;
 
-        \Safe\ksort($args);
+        ksort($args);
         foreach ($args as $key => $value) {
             $parts[] = $key;
             $parts[] = is_array($value)

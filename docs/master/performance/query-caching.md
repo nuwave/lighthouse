@@ -12,4 +12,4 @@ Make sure you flush the query cache when you deploy an upgraded version of the `
 
 Lighthouse supports [Apollo Automatic persisted queries](https://www.apollographql.com/docs/apollo-server/performance/apq/).
 
-It is enabled by default. You can disable it in the config file. The query caching must be enabled. 
+It is enabled by default. You can disable it in the config file. The query caching must be enabled.
