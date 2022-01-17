@@ -85,6 +85,7 @@ module.exports = [
     title: "Performance",
     children: [
       "performance/schema-caching",
+      "performance/query-caching",
       ["performance/n-plus-one", "The N+1 Query Problem"],
       "performance/caching",
       "performance/deferred",
