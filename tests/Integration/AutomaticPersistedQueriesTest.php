@@ -4,7 +4,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ApolloAPQTest extends TestCase
+class AutomaticPersistedQueriesTest extends TestCase
 {
     public function testEnabled(): void
     {
@@ -12,27 +12,35 @@ class ApolloAPQTest extends TestCase
         $config->set('lighthouse.query_cache.enable', true);
         $config->set('lighthouse.persisted_queries', true);
 
-        $query /** @lang GraphQL */
-            = '
+        $query = /** @lang GraphQL */ '
         {
-            foo 
+            foo
         }
         ';
 
         $sha256 = hash('sha256', $query);
 
-        $response = $this->graphQL('', [], [
+        $this->postGraphQL([
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
                     'sha256Hash' => $sha256,
                 ],
             ],
+        ])->assertJson([
+            'errors' => [
+                [
+                    'message' => 'PersistedQueryNotFound',
+                    'extensions' => [
+                        'code' => 'PERSISTED_QUERY_NOT_FOUND',
+                    ]
+                ]
+            ]
         ]);
-        $this->assertEquals('PERSISTED_QUERY_NOT_FOUND', $response->json('errors.0.extensions.code'));
 
         // run sending the query
-        $this->graphQL($query, [], [
+        $this->postGraphQL([
+            'query' => $query,
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
@@ -46,7 +54,7 @@ class ApolloAPQTest extends TestCase
         ]);
 
         // run without query, the query should be cached
-        $this->graphQL('', [], [
+        $this->postGraphQL([
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
@@ -66,10 +74,9 @@ class ApolloAPQTest extends TestCase
         $config->set('lighthouse.query_cache.enable', true);
         $config->set('lighthouse.persisted_queries', false);
 
-        $query /** @lang GraphQL */
-            = '
+        $query = /** @lang GraphQL */ '
         {
-            foo 
+            foo
         }
         ';
 
@@ -82,18 +89,26 @@ class ApolloAPQTest extends TestCase
                     'sha256Hash' => $sha256,
                 ],
             ],
-        ]);
+        ])->assertGraphQLErrorFree();
 
         // run without query, the query should not be cached as it is disabled in the config
-        $response = $this->graphQL('', [], [
+        $this->postGraphQL([
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
                     'sha256Hash' => $sha256,
                 ],
             ],
+        ])->assertJson([
+            'errors' => [
+                [
+                    'message' => 'PersistedQueryNotSupported',
+                    'extensions' => [
+                        'code' => 'PERSISTED_QUERY_NOT_SUPPORTED',
+                    ]
+                ]
+            ]
         ]);
-        $this->assertEquals('PERSISTED_QUERY_NOT_FOUND', $response->json('errors.0.extensions.code'));
     }
 
     public function testCacheDisabled(): void
@@ -105,7 +120,7 @@ class ApolloAPQTest extends TestCase
         $query /** @lang GraphQL */
             = '
         {
-            foo 
+            foo
         }
         ';
 
@@ -118,17 +133,25 @@ class ApolloAPQTest extends TestCase
                     'sha256Hash' => $sha256,
                 ],
             ],
-        ]);
+        ])->assertGraphQLErrorFree();
 
         // run without query, the query should not be cached as query cache is disabled in the config
-        $response = $this->graphQL('', [], [
+        $this->postGraphQL([
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
                     'sha256Hash' => $sha256,
                 ],
             ],
+        ])->assertJson([
+            'errors' => [
+                [
+                    'message' => 'PersistedQueryNotSupported',
+                    'extensions' => [
+                        'code' => 'PERSISTED_QUERY_NOT_SUPPORTED',
+                    ]
+                ]
+            ]
         ]);
-        $this->assertEquals('PERSISTED_QUERY_NOT_FOUND', $response->json('errors.0.extensions.code'));
     }
 }

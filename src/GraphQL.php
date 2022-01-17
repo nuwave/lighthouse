@@ -33,7 +33,7 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
 /**
- * The main entrypoint to start and end GraphQL execution.
+ * The main entrypoint to GraphQL execution.
  */
 class GraphQL
 {
@@ -101,7 +101,7 @@ class GraphQL
     }
 
     /**
-     * Run one ore more GraphQL operations against the schema.
+     * Run one or more GraphQL operations against the schema.
      *
      * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
      *
@@ -152,66 +152,32 @@ class GraphQL
             );
         }
 
-        if ($params->query) {
+        $queryString = $params->query;
+        if (is_string($queryString)) {
             $result = $this->parseAndExecuteQuery(
-                $params->query,
+                $queryString,
                 $context,
                 $params->variables,
                 null,
                 $params->operation
             );
         } else {
-            $parsedQuery = $this->getPersistedQuery($params->queryId);
-            if (null === $parsedQuery) {
-                // Apollo-compatible response
-                $error = new Error(
-                    'PersistedQueryNotFound',
+            try {
+                $result = $this->executeParsedQuery(
+                    $this->loadPersistedQuery($params->queryId),
+                    $context,
+                    $params->variables,
                     null,
-                    null,
-                    [],
-                    null,
-                    null,
-                    ['code' => 'PERSISTED_QUERY_NOT_FOUND']
+                    $params->operation
                 );
-
-                return $this->serializable(new ExecutionResult(null, [$error]));
+            } catch (Error $error) {
+                return $this->serializable(
+                    new ExecutionResult(null, [$error])
+                );
             }
-
-            $result = $this->executeParsedQuery(
-                $parsedQuery,
-                $context,
-                $params->variables,
-                null,
-                $params->operation
-            );
         }
 
         return $this->serializable($result);
-    }
-
-    /**
-     * This method will be removed in the next major update. Please use executeParsedQuery or parseAndExecuteQuery.
-     *
-     * @param string|\GraphQL\Language\AST\DocumentNode $query
-     * @param array<string, mixed>|null $variables
-     * @param mixed|null $rootValue
-     *
-     * @see executeParsedQuery
-     * @see parseAndExecuteQuery
-     * @deprecated
-     */
-    public function executeQuery(
-        $query,
-        GraphQLContext $context,
-        ?array $variables = [],
-        $rootValue = null,
-        ?string $operationName = null
-    ): ExecutionResult {
-        if (is_string($query)) {
-            return $this->parseAndExecuteQuery($query, $context, $variables, $rootValue, $operationName);
-        }
-
-        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
     }
 
     /**
@@ -265,31 +231,56 @@ class GraphQL
     }
 
     /**
-     * Gets persisted query from the query cache. Returns null if this feature is disabled or no query found.
+     * Loads persisted query from the query cache.
+     *
+     * @throws Error if this feature is disabled or no query is found
      */
-    public function getPersistedQuery(string $sha256hash): ?DocumentNode
+    public function loadPersistedQuery(string $sha256hash): DocumentNode
     {
-        if (! $this->configRepository->get('lighthouse.persisted_queries')) {
-            return null;
-        }
-
-        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
-
-        if (! $cacheConfig['enable']) {
-            return null;
+        $lighthouseConfig = $this->configRepository->get('lighthouse');
+        $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
+        if (
+            ! ($lighthouseConfig['persisted_queries'] ?? false)
+            || ! ($cacheConfig['enable'] ?? false)
+        ) {
+            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
+            throw new Error(
+                'PersistedQueryNotSupported',
+                null,
+                null,
+                [],
+                null,
+                null,
+                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']
+            );
         }
 
         /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
         $cacheFactory = app(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
 
-        return $store->get('lighthouse:query:' . $sha256hash);
+        $document = $store->get('lighthouse:query:' . $sha256hash);
+        if ($document === null) {
+            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
+            throw new Error(
+                'PersistedQueryNotFound',
+                null,
+                null,
+                [],
+                null,
+                null,
+                ['code' => 'PERSISTED_QUERY_NOT_FOUND']
+            );
+        }
+
+        return $document;
     }
 
     /**
      * Execute a GraphQL query on the Lighthouse schema and return the raw result.
      *
-     * To render the @see ExecutionResult, you will probably want to call `->toArray($debug)` on it,
+     * To render the @see \GraphQL\Executor\ExecutionResult
+     * you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
      *
      * @param array<string, mixed>|null $variables
@@ -418,6 +409,31 @@ class GraphQL
         return $this->configRepository->get('app.debug')
             ? (int) $this->configRepository->get('lighthouse.debug')
             : DebugFlag::NONE;
+    }
+
+    /**
+     * This method will be removed in the next major update. Please use executeParsedQuery or parseAndExecuteQuery.
+     *
+     * @param string|\GraphQL\Language\AST\DocumentNode $query
+     * @param array<string, mixed>|null $variables
+     * @param mixed|null $rootValue
+     *
+     * @see executeParsedQuery
+     * @see parseAndExecuteQuery
+     * @deprecated
+     */
+    public function executeQuery(
+        $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        $rootValue = null,
+        ?string $operationName = null
+    ): ExecutionResult {
+        if (is_string($query)) {
+            return $this->parseAndExecuteQuery($query, $context, $variables, $rootValue, $operationName);
+        }
+
+        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
     }
 
     /**
