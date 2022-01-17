@@ -161,6 +161,7 @@ class GraphQL
                 null,
                 $params->operation
             );
+        // @phpstan-ignore-next-line TODO remove when graphql-php 15 correctly types OperationParams::$query as nullable
         } else {
             try {
                 $result = $this->executeParsedQuery(
