@@ -11,8 +11,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Added query caching
-- Added Apollo Automatic persisted queries support
+- Allow caching parsed query strings https://github.com/nuwave/lighthouse/pull/2017
+- Support Automatic Persisted Queries https://github.com/nuwave/lighthouse/pull/2017
+
+### Deprecated
+
+- Deprecate `Nuwave\Lighthouse\GraphQL::executeQuery()` https://github.com/nuwave/lighthouse/pull/2017
 
 ## v5.35.3
 

@@ -126,7 +126,7 @@ the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instance
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 ```
 
-### Nuwave\Lighthouse\GraphQL::executeQuery() is deprecated
+### Replace Nuwave\Lighthouse\GraphQL::executeQuery() usage
 
 Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
 executing already parsed `DocumentNode`.

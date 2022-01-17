@@ -8,8 +8,9 @@ Make sure you flush the query cache when you deploy an upgraded version of the `
 
     php artisan cache:clear
 
-## Automated persisted queries
+## Automated Persisted Queries
 
-Lighthouse supports [Apollo Automatic persisted queries](https://www.apollographql.com/docs/apollo-server/performance/apq/).
+Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
+[Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
 
-It is enabled by default. You can disable it in the config file. The query caching must be enabled.
+APQ is enabled by default, but depends on query caching being enabled.
