@@ -231,52 +231,6 @@ class GraphQL
     }
 
     /**
-     * Loads persisted query from the query cache.
-     *
-     * @throws Error if this feature is disabled or no query is found
-     */
-    public function loadPersistedQuery(string $sha256hash): DocumentNode
-    {
-        $lighthouseConfig = $this->configRepository->get('lighthouse');
-        $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
-        if (
-            ! ($lighthouseConfig['persisted_queries'] ?? false)
-            || ! ($cacheConfig['enable'] ?? false)
-        ) {
-            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
-            throw new Error(
-                'PersistedQueryNotSupported',
-                null,
-                null,
-                [],
-                null,
-                null,
-                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']
-            );
-        }
-
-        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-        $cacheFactory = app(CacheFactory::class);
-        $store = $cacheFactory->store($cacheConfig['store']);
-
-        $document = $store->get('lighthouse:query:' . $sha256hash);
-        if (null === $document) {
-            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
-            throw new Error(
-                'PersistedQueryNotFound',
-                null,
-                null,
-                [],
-                null,
-                null,
-                ['code' => 'PERSISTED_QUERY_NOT_FOUND']
-            );
-        }
-
-        return $document;
-    }
-
-    /**
      * Execute a GraphQL query on the Lighthouse schema and return the raw result.
      *
      * To render the @see \GraphQL\Executor\ExecutionResult
@@ -342,15 +296,6 @@ class GraphQL
         return $result;
     }
 
-    protected function cleanUpAfterExecution(): void
-    {
-        BatchLoaderRegistry::forgetInstances();
-        $this->errorPool->clear();
-
-        // TODO remove in v6
-        BatchLoader::forgetInstances();
-    }
-
     /**
      * Convert the result to a serializable array.
      *
@@ -361,6 +306,61 @@ class GraphQL
         $result->setErrorsHandler($this->errorsHandler());
 
         return $result->toArray($this->debugFlag());
+    }
+
+    /**
+     * Loads persisted query from the query cache.
+     *
+     * @throws Error if this feature is disabled or no query is found
+     */
+    protected function loadPersistedQuery(string $sha256hash): DocumentNode
+    {
+        $lighthouseConfig = $this->configRepository->get('lighthouse');
+        $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
+        if (
+            ! ($lighthouseConfig['persisted_queries'] ?? false)
+            || ! ($cacheConfig['enable'] ?? false)
+        ) {
+            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
+            throw new Error(
+                'PersistedQueryNotSupported',
+                null,
+                null,
+                [],
+                null,
+                null,
+                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']
+            );
+        }
+
+        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
+        $cacheFactory = app(CacheFactory::class);
+        $store = $cacheFactory->store($cacheConfig['store']);
+
+        $document = $store->get('lighthouse:query:' . $sha256hash);
+        if (null === $document) {
+            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
+            throw new Error(
+                'PersistedQueryNotFound',
+                null,
+                null,
+                [],
+                null,
+                null,
+                ['code' => 'PERSISTED_QUERY_NOT_FOUND']
+            );
+        }
+
+        return $document;
+    }
+
+    protected function cleanUpAfterExecution(): void
+    {
+        BatchLoaderRegistry::forgetInstances();
+        $this->errorPool->clear();
+
+        // TODO remove in v6
+        BatchLoader::forgetInstances();
     }
 
     /**
