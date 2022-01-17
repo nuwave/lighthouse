@@ -318,7 +318,8 @@ return [
     | Persisted Queries
     |--------------------------------------------------------------------------
     |
-    | Apollo automatic persisted queries support.
+    | Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
+    | [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
     | You may set this flag to either process or deny these queries.
     |
     */
