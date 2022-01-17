@@ -33,9 +33,9 @@ class AutomaticPersistedQueriesTest extends TestCase
                     'message' => 'PersistedQueryNotFound',
                     'extensions' => [
                         'code' => 'PERSISTED_QUERY_NOT_FOUND',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
 
         // run sending the query
@@ -105,9 +105,9 @@ class AutomaticPersistedQueriesTest extends TestCase
                     'message' => 'PersistedQueryNotSupported',
                     'extensions' => [
                         'code' => 'PERSISTED_QUERY_NOT_SUPPORTED',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -149,9 +149,9 @@ class AutomaticPersistedQueriesTest extends TestCase
                     'message' => 'PersistedQueryNotSupported',
                     'extensions' => [
                         'code' => 'PERSISTED_QUERY_NOT_SUPPORTED',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }

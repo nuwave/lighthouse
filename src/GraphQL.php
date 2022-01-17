@@ -260,7 +260,7 @@ class GraphQL
         $store = $cacheFactory->store($cacheConfig['store']);
 
         $document = $store->get('lighthouse:query:' . $sha256hash);
-        if ($document === null) {
+        if (null === $document) {
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
             throw new Error(
                 'PersistedQueryNotFound',
