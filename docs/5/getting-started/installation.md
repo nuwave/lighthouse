@@ -23,7 +23,7 @@ To use the included lighthouse config, copy it over to your config folder.
 
 ```bash
 mkdir -p config
-cp vendor/nuwave/lighthouse/src/lighthouse config/
+cp vendor/nuwave/lighthouse/src/lighthouse.php config/
 ```
 
 Register the config file within your `bootstrap/app.php` file:
