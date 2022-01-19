@@ -5,6 +5,7 @@ namespace Tests\Integration;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
@@ -44,6 +45,10 @@ class DefaultSchemaTest extends DBTestCase
 
     public function testFindRequiresExactlyOneArgument(): void
     {
+        if (AppVersion::below(8.0)) {
+            $this->markTestSkipped('Missing validation rule prohibits');
+        }
+
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
@@ -69,6 +74,10 @@ class DefaultSchemaTest extends DBTestCase
 
     public function testFindById(): void
     {
+        if (AppVersion::below(8.0)) {
+            $this->markTestSkipped('Missing validation rule prohibits');
+        }
+
         factory(User::class)->create();
         $user = factory(User::class)->create();
 
@@ -85,9 +94,9 @@ class DefaultSchemaTest extends DBTestCase
             ->assertExactJson([
                 'data' => [
                     'user' => [
-                        'id' => "{$user->id}"
-                    ]
-                ]
+                        'id' => "{$user->id}",
+                    ],
+                ],
             ]);
     }
 
@@ -106,7 +115,7 @@ class DefaultSchemaTest extends DBTestCase
             ->assertExactJson([
                 'data' => [
                     'users' => [
-                        'data' => []
+                        'data' => [],
                     ],
                 ],
             ]);
@@ -164,8 +173,9 @@ class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ', [
-                'name' => $name
+            ',
+            [
+                'name' => $name,
             ]
         );
     }
