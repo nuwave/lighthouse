@@ -10,7 +10,7 @@ class DefaultSchemaTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->schema = file_get_contents(__DIR__ . '/../../src/default-schema.graphql');
+        $this->schema = \Safe\file_get_contents(__DIR__ . '/../../src/default-schema.graphql');
     }
 
     public function testEmptyUsers(): void
