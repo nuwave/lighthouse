@@ -377,9 +377,9 @@ class ArgBuilderDirectiveTest extends DBTestCase
                     'posts' => [
                         [
                             'id' => $titleAndBody->id,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
     }
 }
