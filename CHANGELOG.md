@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Improve default schema https://github.com/nuwave/lighthouse/pull/2032
+
 ## v5.36.0
 
 ### Added
