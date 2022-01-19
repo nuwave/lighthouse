@@ -85,9 +85,9 @@ class DefaultSchemaTest extends DBTestCase
             ->assertExactJson([
                 'data' => [
                     'user' => [
-                        'id' => "{$user->id}"
-                    ]
-                ]
+                        'id' => "{$user->id}",
+                    ],
+                ],
             ]);
     }
 
@@ -106,7 +106,7 @@ class DefaultSchemaTest extends DBTestCase
             ->assertExactJson([
                 'data' => [
                     'users' => [
-                        'data' => []
+                        'data' => [],
                     ],
                 ],
             ]);
@@ -164,8 +164,9 @@ class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ', [
-                'name' => $name
+            ',
+            [
+                'name' => $name,
             ]
         );
     }
