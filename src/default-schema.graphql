@@ -6,17 +6,17 @@ type Query {
     "Find a single user by an identifying attribute."
     user(
       "Search by primary key."
-      id: ID @eq
+      id: ID @eq @rules(apply: ["prohibits:email", "required_without:email"])
 
       "Search by email address."
-      email: String @eq
+      email: String @eq @rules(apply: ["prohibits:id", "required_without:id", "email"])
     ): User @find
 
     "List multiple users."
     users(
-      "Filters users whose name contains the given value."
-      nameLike: String @where(operator: "like")
-    ): [User!]! @all
+      "Filters by name. Accepts SQL LIKE wildcards `%` and `_`."
+      name: String @where(operator: "like")
+    ): [User!]! @paginate(defaultCount: 10)
 }
 
 "Account of a person who utilizes this application."
