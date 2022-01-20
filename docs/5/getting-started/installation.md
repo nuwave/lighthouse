@@ -19,10 +19,31 @@ php artisan vendor:publish --tag=lighthouse-schema
 
 ## Lumen
 
-Register the service provider in your `bootstrap/app.php` file:
+To use the included lighthouse config, copy it over to your config folder.
+
+```bash
+mkdir -p config
+cp vendor/nuwave/lighthouse/src/lighthouse.php config/
+```
+
+Register the config file within your `bootstrap/app.php` file:
+
+```php
+$app->configure('lighthouse');
+```
+
+To get you going right away in Lumen, copy over the included default schema.
+
+```bash
+mkdir -p graphql
+cp vendor/nuwave/lighthouse/src/default-schema.graphql graphql/schema.graphql
+```
+
+Register these service providers in your `bootstrap/app.php` file:
 
 ```php
 $app->register(\Nuwave\Lighthouse\LighthouseServiceProvider::class);
+$app->register(\Nuwave\Lighthouse\Pagination\PaginationServiceProvider::class);
 ```
 
 The many features Lighthouse provides are split across multiple service providers.
