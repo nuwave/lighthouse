@@ -8,7 +8,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Execution\BatchLoader\SideEffectingRelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
