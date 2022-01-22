@@ -12,13 +12,16 @@ use Tests\DBTestCase;
 use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
 
 /**
- * Primary key.
+ * Account of a person who utilizes this application.
+ *
+ * Primary key
  *
  * @property int $id
  *
  * Attributes
  * @property string|null $name
  * @property string|null $email
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string|null $password
  * @property string|null $remember_token
  *
@@ -50,6 +53,10 @@ class User extends Authenticatable
      * @see RelationBatchLoaderTest::testDoesNotBatchloadRelationsWithDifferentDatabaseConnections()
      */
     protected $connection = DBTestCase::DEFAULT_CONNECTION;
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
     public function alternateConnections(): HasMany
     {
@@ -148,5 +155,10 @@ class User extends Authenticatable
     {
         return $this->postsTaskLoaded()
             && $this->postsCommentsLoaded();
+    }
+
+    public function nonRelationPrimitive(): string
+    {
+        return 'foo';
     }
 }

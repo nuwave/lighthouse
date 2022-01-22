@@ -128,6 +128,37 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Query Cache
+    |--------------------------------------------------------------------------
+    |
+    | Caches the result of parsing incoming query strings to boost performance on subsequent requests.
+    |
+    */
+
+    'query_cache' => [
+        /*
+         * Setting to true enables query caching.
+         */
+        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
+
+        /*
+         * Duration in seconds the query should remain cached, null means forever.
+         */
+        'ttl' => env(
+            'LIGHTHOUSE_QUERY_CACHE_TTL',
+            \Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
+                ? null
+                : 365 * 24 * 60 // For Laravel < 5.8 the exact value must be specified and it is counted in minutes
+        ),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Namespaces
     |--------------------------------------------------------------------------
     |
@@ -281,6 +312,19 @@ return [
     */
 
     'batched_queries' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Persisted Queries
+    |--------------------------------------------------------------------------
+    |
+    | Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
+    | [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
+    | You may set this flag to either process or deny these queries.
+    |
+    */
+
+    'persisted_queries' => true,
 
     /*
     |--------------------------------------------------------------------------

@@ -80,9 +80,6 @@ GRAPHQL;
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
-            /**
-             * @psalm-suppress UndefinedClass
-             */
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             if ($limiterResponse instanceof Unlimited) {
                 return $next($fieldValue);
