@@ -207,6 +207,94 @@ class HasManyDirectiveTest extends DBTestCase
             ]);
     }
 
+    public function testQueryPaginatedHasManyWithConditionInDifferentAliases(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks(
+                id: ID! @eq
+            ): [Task!]! @hasMany(type: PAGINATOR, defaultCount: 10)
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = factory(User::class)->create();
+
+        $tasks1 = factory(Task::class, 3)->make();
+        $user1->tasks()->saveMany($tasks1);
+
+        /** @var \Tests\Utils\Models\User $user2 */
+        $user2 = factory(User::class)->create();
+
+        $tasks2 = factory(Task::class, 3)->make();
+        $user2->tasks()->saveMany($tasks2);
+
+        /** @var \Tests\Utils\Models\Task $firstTask */
+        $firstTask = $tasks1->first();
+
+        /** @var Task $lastTask */
+        $lastTask = $tasks2->last();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($firstId: ID!, $lastId: ID!) {
+                users {
+                    firstTasks: tasks(id: $firstId) {
+                        data {
+                            id
+                        }
+                    }
+                    lastTasks: tasks(id: $lastId) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ', [
+                'firstId' => $firstTask->id,
+                'lastId' => $lastTask->id,
+            ])
+            ->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'firstTasks' => [
+                                'data' => [
+                                    [
+                                        'id' => $firstTask->id,
+                                    ],
+                                ]
+                            ],
+                            'lastTasks' => [
+                                'data' => []
+                            ],
+                        ],
+                        [
+                            'firstTasks' => [
+                                'data' => []
+                            ],
+                            'lastTasks' => [
+                                'data' => [
+                                    [
+                                        'id' => $lastTask->id,
+                                    ],
+                                ]
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
     public function testCallsScopeWithResolverArgs(): void
     {
         $this->schema = /** @lang GraphQL */ '

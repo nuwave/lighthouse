@@ -6,9 +6,11 @@ use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
-use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
-class RelationBatchLoader
+/**
+ * Simplified version of @see RelationBatchLoader that does not keep track of results.
+ */
+class SideEffectingRelationBatchLoader
 {
     /**
      * @var \Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader
@@ -16,18 +18,9 @@ class RelationBatchLoader
     protected $modelsLoader;
 
     /**
-     * Map from unique model keys to model instances.
-     *
-     * @var array<string, \Illuminate\Database\Eloquent\Model>
+     * @var \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
-    protected $parents = [];
-
-    /**
-     * Map from unique model keys to the results of batch loading.
-     *
-     * @var array<string, mixed>
-     */
-    protected $results = [];
+    protected $parents;
 
     /**
      * Marks when the actual batch loading happened.
@@ -39,36 +32,29 @@ class RelationBatchLoader
     public function __construct(ModelsLoader $modelsLoader)
     {
         $this->modelsLoader = $modelsLoader;
+        $this->parents = new EloquentCollection();
     }
 
     /**
      * Schedule loading a relation off of a concrete model.
      *
-     * This returns effectively a promise that will resolve to
-     * the result of loading the relation.
-     *
      * As a side effect, the model will then hold the relation.
      */
     public function load(Model $model): Deferred
     {
-        $modelKey = ModelKey::build($model);
-        $this->parents[$modelKey] = $model;
+        $this->parents->push($model);
 
-        return new Deferred(function () use ($modelKey) {
+        return new Deferred(function (): void {
             if (! $this->hasResolved) {
                 $this->resolve();
             }
-
-            return $this->results[$modelKey];
         });
     }
 
-    public function resolve(): void
+    protected function resolve(): void
     {
-        $parentModels = new EloquentCollection($this->parents);
-
         // Monomorphize the models to simplify eager loading relations onto them
-        $parentsGroupedByClass = $parentModels->groupBy(
+        $parentsGroupedByClass = $this->parents->groupBy(
             /**
              * @return class-string<\Illuminate\Database\Eloquent\Model>
              */
@@ -82,11 +68,6 @@ class RelationBatchLoader
             // TODO remove when we update to Laravel 9 which has correct stubs
             // @phpstan-ignore-next-line Parameter #1 $parents of method Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader::load() expects Illuminate\Database\Eloquent\Collection, Illuminate\Support\Collection<(int|string), mixed> given.
             $this->modelsLoader->load($parentsOfSameClass);
-        }
-
-        foreach ($parentModels as $model) {
-            $modelKey = ModelKey::build($model);
-            $this->results[$modelKey] = $this->modelsLoader->extract($model);
         }
 
         $this->hasResolved = true;

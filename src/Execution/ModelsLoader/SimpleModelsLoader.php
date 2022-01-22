@@ -35,19 +35,7 @@ class SimpleModelsLoader implements ModelsLoader
 
     public function load(EloquentCollection $parents): void
     {
-        // Dot notation may be used to eager load nested relations
-        $parts = explode('.', $this->relation);
-
-        // We just return the first level of relations for now.
-        // They hold the nested relations in case they are needed.
-        $firstRelation = $parts[0];
-
         $parents->load([$this->relation => $this->decorateBuilder]);
-
-        foreach ($parents as $model) {
-            $relation = $model->getRelation($firstRelation);
-            $model->setRelation($this->key, $relation);
-        }
     }
 
     /**
@@ -57,6 +45,13 @@ class SimpleModelsLoader implements ModelsLoader
      */
     public function extract(Model $model)
     {
-        return $model->getRelation($this->key);
+        // Dot notation may be used to eager load nested relations
+        $parts = explode('.', $this->relation);
+
+        // We just return the first level of relations for now.
+        // They hold the nested relations in case they are needed.
+        $firstRelation = $parts[0];
+
+        return $model->getRelation($firstRelation);
     }
 }

@@ -7,7 +7,7 @@ use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
-use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\BatchLoader\SideEffectingRelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -44,8 +44,8 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
         /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
-            function () use ($resolveInfo): RelationBatchLoader {
-                return new RelationBatchLoader($this->relationLoader($resolveInfo));
+            function () use ($resolveInfo): SideEffectingRelationBatchLoader {
+                return new SideEffectingRelationBatchLoader($this->relationLoader($resolveInfo));
             }
         );
 
