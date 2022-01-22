@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class SimpleModelsLoader implements ModelsLoader
 {
@@ -19,18 +18,10 @@ class SimpleModelsLoader implements ModelsLoader
      */
     protected $decorateBuilder;
 
-    /**
-     * Unique key under which to store the relation to eliminate duplicates.
-     *
-     * @var string
-     */
-    protected $key;
-
     public function __construct(string $relation, Closure $decorateBuilder)
     {
         $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
-        $this->key = Str::uuid()->toString();
     }
 
     public function load(EloquentCollection $parents): void
