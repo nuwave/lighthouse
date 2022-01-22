@@ -272,22 +272,22 @@ class HasManyDirectiveTest extends DBTestCase
                                     [
                                         'id' => $firstTask->id,
                                     ],
-                                ]
+                                ],
                             ],
                             'lastTasks' => [
-                                'data' => []
+                                'data' => [],
                             ],
                         ],
                         [
                             'firstTasks' => [
-                                'data' => []
+                                'data' => [],
                             ],
                             'lastTasks' => [
                                 'data' => [
                                     [
                                         'id' => $lastTask->id,
                                     ],
-                                ]
+                                ],
                             ],
                         ],
                     ],
