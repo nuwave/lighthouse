@@ -28,7 +28,7 @@ class EnsureXHR
      */
     public function handle(Request $request, Closure $next)
     {
-        $method = $request->getMethod();
+        $method = $request->getRealMethod();
 
         if ('GET' === $method) {
             throw new BadRequestHttpException('GET requests are forbidden');
@@ -47,8 +47,10 @@ class EnsureXHR
             throw new BadRequestHttpException('Content-Type header must be set');
         }
 
-        if (in_array($contentType, self::FORM_CONTENT_TYPES)) {
-            throw new BadRequestHttpException("Content-Type {$contentType} is forbidden");
+        foreach (self::FORM_CONTENT_TYPES as $formContentType) {
+            if ('' !== $formContentType && 0 === strncmp($contentType, $formContentType, strlen($formContentType))) {
+                throw new BadRequestHttpException("Content-Type $contentType is forbidden");
+            }
         }
 
         return $next($request);

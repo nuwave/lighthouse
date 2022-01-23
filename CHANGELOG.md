@@ -9,6 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Fix `EnsureXHR` middleware to handle additional fields in the `Content-type` header
+- Fix `EnsureXHR` middleware to handle method override via `_method` parameter
+
 ## v5.37.0
 
 ### Changed
