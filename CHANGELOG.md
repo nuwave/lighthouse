@@ -9,6 +9,50 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.37.2
+
+### Fixed
+
+- Fix `EnsureXHR` middleware to handle additional fields in the `Content-Type` header https://github.com/nuwave/lighthouse/pull/2036
+- Fix `EnsureXHR` middleware to handle method override via `_method` parameter https://github.com/nuwave/lighthouse/pull/2036
+
+## v5.37.1
+
+### Fixed
+
+- Separate eager loaded relations for fields with aliases https://github.com/nuwave/lighthouse/pull/2019
+
+## v5.37.0
+
+### Changed
+
+- Improve default schema https://github.com/nuwave/lighthouse/pull/2032
+
+## v5.36.0
+
+### Added
+
+- Allow caching parsed query strings https://github.com/nuwave/lighthouse/pull/2017
+- Support Automatic Persisted Queries https://github.com/nuwave/lighthouse/pull/2017
+
+### Deprecated
+
+- Deprecate `Nuwave\Lighthouse\GraphQL::executeQuery()` https://github.com/nuwave/lighthouse/pull/2017
+
+## v5.35.3
+
+### Fixed
+
+- Fix `thecodingmachine/safe` version constraint
+
+### Fixed
+
+## v5.35.2
+
+### Fixed
+
+- Ensure compatibility with `thecodingmachine/safe:2` https://github.com/nuwave/lighthouse/pull/2028
+
 ## v5.35.1
 
 ### Fixed
