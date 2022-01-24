@@ -13,14 +13,21 @@ class RelationBatchLoader
     /**
      * @var \Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader
      */
-    protected $relationLoader;
+    protected $modelsLoader;
 
     /**
-     * A map from unique keys to parent model instances.
+     * Map from unique model keys to model instances.
      *
      * @var array<string, \Illuminate\Database\Eloquent\Model>
      */
     protected $parents = [];
+
+    /**
+     * Map from unique model keys to the results of batch loading.
+     *
+     * @var array<string, mixed>
+     */
+    protected $results = [];
 
     /**
      * Marks when the actual batch loading happened.
@@ -29,9 +36,9 @@ class RelationBatchLoader
      */
     protected $hasResolved = false;
 
-    public function __construct(ModelsLoader $relationLoader)
+    public function __construct(ModelsLoader $modelsLoader)
     {
-        $this->relationLoader = $relationLoader;
+        $this->modelsLoader = $modelsLoader;
     }
 
     /**
@@ -52,12 +59,7 @@ class RelationBatchLoader
                 $this->resolve();
             }
 
-            // When we are deep inside a nested query, we can come across the
-            // same model in two different paths, so this might be another
-            // model instance then $model.
-            $parent = $this->parents[$modelKey];
-
-            return $this->relationLoader->extract($parent);
+            return $this->results[$modelKey];
         });
     }
 
@@ -77,9 +79,14 @@ class RelationBatchLoader
         );
 
         foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-            // TODO remove when Larastan fixes their inference https://github.com/nunomaduro/larastan/pull/1054
+            // TODO remove when we update to Laravel 9 which has correct stubs
             // @phpstan-ignore-next-line Parameter #1 $parents of method Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader::load() expects Illuminate\Database\Eloquent\Collection, Illuminate\Support\Collection<(int|string), mixed> given.
-            $this->relationLoader->load($parentsOfSameClass);
+            $this->modelsLoader->load($parentsOfSameClass);
+        }
+
+        foreach ($parentModels as $model) {
+            $modelKey = ModelKey::build($model);
+            $this->results[$modelKey] = $this->modelsLoader->extract($model);
         }
 
         $this->hasResolved = true;

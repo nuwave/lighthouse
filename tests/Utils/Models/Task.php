@@ -41,13 +41,15 @@ class Task extends Model
 {
     use SoftDeletes;
 
+    public const CLEANING = 'cleaning';
+
     protected static function boot(): void
     {
         parent::boot();
 
         // This is used to test that this scope works in all kinds of queries
         static::addGlobalScope('no_cleaning', function (Builder $builder): void {
-            $builder->where('name', '!=', 'cleaning');
+            $builder->where('name', '!=', self::CLEANING);
         });
     }
 
