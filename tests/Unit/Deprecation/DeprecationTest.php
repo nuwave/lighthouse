@@ -96,6 +96,40 @@ class DeprecationTest extends TestCase
             ],
         ]);
 
+        $this->markTestIncomplete('Not implemented yet');
+
+        // @phpstan-ignore-next-line unreachable
+        $this->assertSame(['Foo.B' => true], $this->deprecations);
+    }
+
+    public function testDetectsDeprecatedEnumValueUsageInResults(): void
+    {
+        $this->mockResolver('B');
+
+        $this->schema = /** @lang GraphQL */ '
+        enum Foo {
+            A
+            B @deprecated
+        }
+
+        type Query {
+            foo: Foo @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => 'B',
+            ],
+        ]);
+
+        $this->markTestIncomplete('Not implemented yet');
+
+        // @phpstan-ignore-next-line unreachable
         $this->assertSame(['Foo.B' => true], $this->deprecations);
     }
 }
