@@ -14,7 +14,6 @@ class Any extends ScalarType
 {
     public const MESSAGE = 'Expected an input with a field `__typename` and matching fields, got: ';
 
-    // @phpstan-ignore-next-line Can't declare as string for PHP < 7.4
     public $name = '_Any';
 
     public $description = /** @lang Markdown */ <<<'DESCRIPTION'
