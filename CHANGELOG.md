@@ -9,6 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Fix `EnsureXHR` middleware to handle additional fields in the `Content-Type` header https://github.com/nuwave/lighthouse/pull/2036
+- Fix `EnsureXHR` middleware to handle method override via `_method` parameter https://github.com/nuwave/lighthouse/pull/2036
+
 ## v5.37.1
 
 ### Fixed
