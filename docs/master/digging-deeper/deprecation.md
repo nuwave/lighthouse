@@ -28,9 +28,11 @@ DetectDeprecatedUsage::handle(function (array $deprecations): void {
 ```
 
 Lighthouse can currently detect the following deprecated elements:
+
 - requested fields
 - enum values provided as literals in the GraphQL query string
 
 It does not recognize or warn about:
+
 - enum values provided as variables
 - enum values returned as results
