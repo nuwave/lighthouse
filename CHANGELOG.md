@@ -14,6 +14,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix `EnsureXHR` middleware to handle additional fields in the `Content-Type` header https://github.com/nuwave/lighthouse/pull/2036
 - Fix `EnsureXHR` middleware to handle method override via `_method` parameter https://github.com/nuwave/lighthouse/pull/2036
 
+## v5.37.1
+
+### Fixed
+
+- Separate eager loaded relations for fields with aliases https://github.com/nuwave/lighthouse/pull/2019
+
 ## v5.37.0
 
 ### Changed
