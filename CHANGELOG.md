@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.38.0
+
 ### Added
 
 - Detect usage of deprecated elements in queries https://github.com/nuwave/lighthouse/pull/2004
