@@ -11,6 +11,8 @@ use GraphQL\Validator\Rules\ValidationRule;
 use GraphQL\Validator\ValidationContext;
 
 /**
+ * @experimental not enabled by default, not guaranteed to be stable
+ *
  * @phpstan-type DeprecationHandler callable(array<string, true>): void
  */
 class DetectDeprecatedUsage extends ValidationRule
