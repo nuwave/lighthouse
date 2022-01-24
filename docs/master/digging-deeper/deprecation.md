@@ -24,7 +24,7 @@ DetectDeprecatedUsage::handle(function (array $deprecations): void {
             someMethodToReportDeprecations("Deprecated GraphQL element used: {$element}.");
         }
     });
-})
+});
 ```
 
 Lighthouse can currently detect the following deprecated elements:
