@@ -64,7 +64,7 @@ class NestedOneToMany implements ArgResolver
             }
 
             $models = $model->newModelQuery()
-                ->where($model->getKeyName(), array_keys($ids))
+                ->whereIn($model->getKeyName(), array_keys($ids))
                 ->get();
 
             foreach ($models as $instance) {
@@ -73,6 +73,7 @@ class NestedOneToMany implements ArgResolver
             }
 
             foreach($updateArgs as $childArgs) {
+                dump($ids);
                 $instance = $ids[UpdateModel::pullId($childArgs, $model)];
                 $updateModel($instance, $childArgs);
             }
