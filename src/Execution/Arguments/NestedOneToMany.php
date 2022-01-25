@@ -72,7 +72,7 @@ class NestedOneToMany implements ArgResolver
                 $ids[$id] = $instance;
             }
 
-            foreach($updateArgs as $childArgs) {
+            foreach ($updateArgs as $childArgs) {
                 $instance = $ids[UpdateModel::pullId($childArgs, $model)];
                 $updateModel($instance, $childArgs);
             }
