@@ -95,7 +95,7 @@ input PeopleWhereWhereConditions {
 enum PeopleWhereColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
-  hair_color @enum(value: "hair_color")
+  HAIR_COLOR @enum(value: "hair_color")
   HEIGHT @enum(value: "height")
 }
 ```
@@ -117,7 +117,7 @@ type Query {
 enum PersonColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
-  hair_color @enum(value: "hair_color")
+  HAIR_COLOR @enum(value: "hair_color")
   HEIGHT @enum(value: "height")
 }
 ```
