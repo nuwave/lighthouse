@@ -54,7 +54,7 @@ class Entities
                 }
             }
         }
-   
+
         return $results;
     }
 }
