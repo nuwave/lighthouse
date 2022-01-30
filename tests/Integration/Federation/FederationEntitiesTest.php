@@ -47,10 +47,119 @@ class FederationEntitiesTest extends TestCase
             '_representations' => [
                 $foo,
             ],
-        ])->assertJson([
+        ])->assertExactJson([
             'data' => [
                 '_entities' => [
                     $foo,
+                ],
+            ],
+        ]);
+    }
+
+    public function testCallsBatchedEntityResolverClass(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type BatchedFoo @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+
+        type Query {
+          foo: Int!
+        }
+        ';
+
+        $foo1 = [
+            '__typename' => 'BatchedFoo',
+            'id' => 42,
+        ];
+
+        $foo2 = [
+            '__typename' => 'BatchedFoo',
+            'id' => 69,
+        ];
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($_representations: [_Any!]!) {
+            _entities(representations: $_representations) {
+                __typename
+                ... on BatchedFoo {
+                    id
+                }
+            }
+        }
+        ', [
+            '_representations' => [
+                $foo1,
+                $foo2,
+            ],
+        ])->assertExactJson([
+            'data' => [
+                '_entities' => [
+                    $foo1,
+                    $foo2,
+                ],
+            ],
+        ]);
+    }
+
+    public function testMaintainsOrderBetweenOfRepresentationsInResult(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Foo @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+
+        type BatchedFoo @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+
+        type Query {
+          foo: Int!
+        }
+        ';
+
+        $foo1 = [
+            '__typename' => 'BatchedFoo',
+            'id' => 42,
+        ];
+
+        $foo2 = [
+            '__typename' => 'Foo',
+            'id' => 69,
+        ];
+
+        $foo3 = [
+            '__typename' => 'BatchedFoo',
+            'id' => 9001,
+        ];
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($_representations: [_Any!]!) {
+            _entities(representations: $_representations) {
+                __typename
+                ... on Foo {
+                    id
+                }
+                ... on BatchedFoo {
+                    id
+                }
+            }
+        }
+        ', [
+            '_representations' => [
+                $foo1,
+                $foo2,
+                $foo3,
+            ],
+        ])->assertExactJson([
+            'data' => [
+                '_entities' => [
+                    $foo1,
+                    $foo2,
+                    $foo3,
                 ],
             ],
         ]);

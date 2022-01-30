@@ -18,6 +18,10 @@ use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * @phpstan-type SingleEntityResolverFn \Closure(array<string, mixed>): mixed
+ * @phpstan-type EntityResolver SingleEntityResolverFn|BatchedEntityResolver
+ */
 class EntityResolverProvider
 {
     /**
@@ -38,14 +42,14 @@ class EntityResolverProvider
     /**
      * Maps from __typename to definitions.
      *
-     * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
+     * @var array<string, EntityResolver>
      */
     protected $definitions;
 
     /**
      * Maps from __typename to resolver.
      *
-     * @var array<string, \Closure(array<string, mixed>): mixed>
+     * @var array<string, SingleEntityResolverFn|BatchedEntityResolver>
      */
     protected $resolvers;
 
@@ -67,9 +71,9 @@ class EntityResolverProvider
     }
 
     /**
-     * @return \Closure(array<string, mixed> $representations): mixed
+     * @return EntityResolver
      */
-    public function resolver(string $typename): Closure
+    public function resolver(string $typename): callable
     {
         if (isset($this->resolvers[$typename])) {
             return $this->resolvers[$typename];
@@ -123,7 +127,10 @@ class EntityResolverProvider
         return $definition;
     }
 
-    protected function resolverFromClass(string $typename): ?Closure
+    /**
+     * @return EntityResolver|null
+     */
+    protected function resolverFromClass(string $typename): ?callable
     {
         $resolverClass = Utils::namespaceClassname(
             $typename,
@@ -135,9 +142,16 @@ class EntityResolverProvider
             return null;
         }
 
+        if (is_a($resolverClass, BatchedEntityResolver::class, true)) {
+            return app($resolverClass);
+        }
+
         return Utils::constructResolver($resolverClass, '__invoke');
     }
 
+    /**
+     * @return SingleEntityResolverFn|null
+     */
     protected function resolverFromModel(string $typeName): ?Closure
     {
         $definition = $this->typeDefinition($typeName);
