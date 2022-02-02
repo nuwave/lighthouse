@@ -365,4 +365,48 @@ class BelongsToDirectiveTest extends DBTestCase
 
         self::assertSame(1, $queries);
     }
+
+    public function testDoesNotShortcutForeignKeyIfIdIsRenamed(): void
+    {
+        $company = factory(Company::class)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID! @rename(attribute: "uuid")
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                company {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => [
+                        'id' => $company->uuid,
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

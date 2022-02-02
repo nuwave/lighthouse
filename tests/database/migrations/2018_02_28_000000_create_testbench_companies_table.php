@@ -10,6 +10,7 @@ class CreateTestbenchCompaniesTable extends Migration
     {
         Schema::create('companies', function (Blueprint $table): void {
             $table->increments('id');
+            $table->uuid('uuid');
             $table->string('name');
 
             $table->timestamps();
