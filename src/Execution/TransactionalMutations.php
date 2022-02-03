@@ -26,7 +26,9 @@ class TransactionalMutations
 
     /**
      * @template TResult
+     *
      * @param  \Closure(): TResult $mutation
+     *
      * @return TResult
      */
     public function execute(Closure $mutation, ?string $connectionName)
