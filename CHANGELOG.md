@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Consider `transactional_mutations` in `@delete`, `@forceDelete` and `@restore`
+
 ## v5.38.0
 
 ### Added

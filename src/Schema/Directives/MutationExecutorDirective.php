@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
+use Nuwave\Lighthouse\Execution\TransactionalMutations;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -17,13 +17,13 @@ use Nuwave\Lighthouse\Support\Utils;
 abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
     /**
-     * @var \Illuminate\Database\DatabaseManager
+     * @var \Nuwave\Lighthouse\Execution\TransactionalMutations
      */
-    protected $databaseManager;
+    protected $transactionalMutations;
 
-    public function __construct(DatabaseManager $databaseManager)
+    public function __construct(TransactionalMutations $transactionalMutations)
     {
-        $this->databaseManager = $databaseManager;
+        $this->transactionalMutations = $transactionalMutations;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -43,14 +43,10 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
                     return $mutated->refresh();
                 };
 
-                return config('lighthouse.transactional_mutations', true)
-                    ? $this
-                        ->databaseManager
-                        ->connection(
-                            $model->getConnectionName()
-                        )
-                        ->transaction($executeMutation)
-                    : $executeMutation();
+                return $this->transactionalMutations->execute(
+                    $executeMutation,
+                    $model->getConnectionName()
+                );
             }
         );
     }
