@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Consider `transactional_mutations` in `@delete`, `@forceDelete` and `@restore`
+- Consider `transactional_mutations` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2050
 
 ## v5.38.0
 
