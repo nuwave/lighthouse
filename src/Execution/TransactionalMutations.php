@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\DatabaseManager;
 
@@ -24,9 +25,11 @@ class TransactionalMutations
     }
 
     /**
-     * @return mixed anything is possible
+     * @template TResult
+     * @param  \Closure(): TResult $mutation
+     * @return TResult
      */
-    public function execute(callable $mutation, ?string $connectionName)
+    public function execute(Closure $mutation, ?string $connectionName)
     {
         return $this->shouldTransact
             ? $this->databaseManager
