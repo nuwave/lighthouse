@@ -32,9 +32,16 @@ jobs:
           - ^6
           - ^7
           - ^8
+          - ^9
         exclude:
           - php-version: 7.2
             laravel-version: ^8
+          - php-version: 7.2
+            laravel-version: ^9
+          - php-version: 7.3
+            laravel-version: ^9
+          - php-version: 7.4
+            laravel-version: ^9
           - php-version: 8.0
             laravel-version: ^6
           - php-version: 8.0
@@ -64,7 +71,7 @@ jobs:
         run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
+        if: contains(['^6', '^7'], matrix.laravel-version)
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - name: "Workaround missing laminas/laminas-code release"
@@ -93,9 +100,16 @@ jobs:
           - ^6
           - ^7
           - ^8
+          - ^9
         exclude:
           - php-version: 7.2
             laravel-version: ^8
+          - php-version: 7.2
+            laravel-version: ^9
+          - php-version: 7.3
+            laravel-version: ^9
+          - php-version: 7.4
+            laravel-version: ^9
           - php-version: 8.0
             laravel-version: 5.6.*
           - php-version: 8.0
@@ -144,7 +158,7 @@ jobs:
         run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
+        if: contains(['^6', '^7'], matrix.laravel-version)
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
@@ -188,7 +202,7 @@ jobs:
       - run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
+        if: contains(['^6', '^7'], matrix.laravel-version)
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
@@ -228,7 +242,7 @@ jobs:
           restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version != '^8'
+        if: contains(['^6', '^7'], matrix.laravel-version)
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
