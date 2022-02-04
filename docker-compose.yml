@@ -1,0 +1,40 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: php.dockerfile
+      args:
+        USER: $USER
+    volumes:
+      - ./:/workdir
+    security_opt:
+      - label:disable
+    depends_on:
+      - mysql
+    tty: true
+
+  mysql:
+    # TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784
+    image: mysql:5.7
+    tmpfs: /var/lib/mysql
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+  redis:
+    image: redis:6
+
+  node:
+    build:
+      context: .
+      dockerfile: node.dockerfile
+    volumes:
+      - ./docs:/app
+    security_opt:
+      - label:disable
+    working_dir: /app
+    environment:
+      - NODE_OPTIONS="--max-old-space-size=8192"
+    ports:
+      - 8081:8080
+    tty: true

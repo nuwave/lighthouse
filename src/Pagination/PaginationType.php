@@ -36,7 +36,6 @@ class PaginationType
             case 'simple':
                 $this->type = self::SIMPLE;
                 break;
-
             default:
                 throw new DefinitionException(
                     "Found invalid pagination type: {$paginationType}"

@@ -75,11 +75,6 @@ enum PaginateType {
     Cursor-based pagination, compatible with the Relay specification.
     """
     CONNECTION
-
-    """
-    Paginated-based pagination.
-    """
-    PAGER
 }
 GRAPHQL;
     }

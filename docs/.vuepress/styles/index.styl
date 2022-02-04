@@ -1,0 +1,152 @@
+:root
+    --bgColor #fbfbfb
+    --accentColor #a74ff4
+    --darken10AccentColor darken(#a74ff4, 10)
+    --preTextColor white
+    @media (prefers-color-scheme: dark)
+        --bgColor: #25272a;
+
+body
+  font-family $secondaryFont !important
+
+h1, h2, h3, h4, h5, h6
+  font-family: $primaryFont, sans-serif
+
+h1, h2, h3
+  font-weight: 400 !important
+
+/******************************
+  HOME
+*******************************/
+
+.hero img
+    height: 10em
+    width: 10em
+
+/******************************
+  CODE
+*******************************/
+
+div[class~="language-graphql"]:before {
+    content: "graphql";
+}
+
+pre,
+pre[class*="language-"],
+pre code[class*="language-"]
+  color: #EFEFEF
+  background-color: $backgroundColor !important
+  border-radius: 0 !important
+
+pre[class*="language-"] .token.attr-name,
+pre code[class*="language-"] .token.attr-name
+  color: #b2b7ff
+
+pre[class*="language-"] .token.function,
+pre code[class*="language-"] .token.function
+  color: #d6bbfc
+
+pre[class*="language-"] .token.string,
+pre code[class*="language-"] .token.string
+  color: #FFF
+
+pre[class*="language-"] .token.comment,
+pre code[class*="language-"] .token.comment
+  color: slategray
+
+/******************************
+  PAGE
+*******************************/
+
+@media (min-width 719px)
+  .page
+    padding-left 17rem
+
+/******************************
+  NAVBAR
+*******************************/
+
+.navbar
+  border-bottom none !important
+  box-shadow 0 2px 4px 0 rgba(0,0,0,.05) !important
+
+.navbar .site-name
+  font-weight 400 !important
+  font-family: $primaryFont
+
+.nav-link, .repo-link , .nav-links .dropdown-title
+  font-weight 800 !important
+
+@media (max-width: 719px)
+  .navbar .home-link .can-hide
+    display: inline-block !important
+
+/******************************
+  SIDEBAR
+*******************************/
+
+#app .sidebar
+  width  17rem !important
+  border-right none !important
+  background-color $backgroundColor !important
+
+ .sidebar-group:not(.collapsable) .sidebar-heading,
+  .sidebar-heading
+    text-transform uppercase !important
+    letter-spacing 0.13rem !important
+    font-size 12px !important
+    font-weight 800 !important
+    color #C1CDDB !important
+
+  a.sidebar-link
+    color #fff !important
+    border-left 0.125rem solid transparent !important
+
+  a.sidebar-link:hover
+    color #fff !important
+    opacity 0.5 !important
+    border-left-color rgba(255, 255, 255, 0.7) !important
+
+  a.sidebar-link:active
+    color #fff !important
+    opacity 0.7 !important
+    border-left-color $accentColor !important
+
+  a.sidebar-link.active
+    color #fff !important
+    border-left-color $accentColor !important
+
+  @media (max-width 959px)
+    .sidebar .nav-links
+      border-bottom 2px solid rgba(255, 255, 255, 0.1)
+
+  @media (max-width 719px)
+    .nav-links a.nav-link, .nav-links a.repo-link, .nav-links .dropdown-title
+      color #fff
+
+/******************************
+  Sponsors
+*******************************/
+
+.showcase
+  margin: 0 auto
+  max-width: 900px
+  text-align: center
+
+.showcase .logos
+  align-items: center
+  display: flex
+  flex-flow: row wrap
+  justify-content: center
+
+.showcase .logos img
+  max-height: 128px
+  padding: 20px
+  width: 128px
+  border: none !important
+
+@media only screen and (max-width: 735px)
+  .showcase .logos img
+    max-height: 64px
+    padding: 20px
+    width: 64px

@@ -98,9 +98,11 @@ class PaginatorField
      *
      * @return array<string, mixed>
      */
+
     public function paginatorInfoLastPageResolver(LengthAwarePaginator $root)
     {
         return $root->lastPage();
+
     }
 
     /**

@@ -1,0 +1,24 @@
+* text=auto
+
+/.github export-ignore
+/benchmarks export-ignore
+/docs export-ignore
+/tests export-ignore
+/.codecov.yml export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.php-cs-fixer.php
+/CHANGELOG.md export-ignore
+/CONTRIBUTING.md export-ignore
+/docker-compose.yml export-ignore
+/logo.png export-ignore
+/Makefile export-ignore
+/netlify.toml export-ignore
+/node.dockerfile export-ignore
+/php.dockerfile export-ignore
+/phpbench.json export-ignore
+/phpstan.neon export-ignore
+/phpunit.xml.dist export-ignore
+/rector.php
+/UPGRADE.md export-ignore

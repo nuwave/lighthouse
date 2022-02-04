@@ -1,0 +1,18 @@
+# File system cruft
+.DS_Store
+
+# Individual per developer
+.env
+.idea
+.vscode
+phpunit.xml
+
+# Generated files
+.phpunit.result.cache
+.php-cs-fixer.cache
+build
+
+# composer
+composer.phar
+composer.lock
+vendor

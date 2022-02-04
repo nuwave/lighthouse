@@ -193,7 +193,6 @@ GRAPHQL
 
                   "Number of total available items."
                   total: Int! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoTotalResolver")
-
                 "A list of {$fieldTypeName} items."
                 data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
             }
