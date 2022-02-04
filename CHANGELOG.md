@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Support Laravel 9
 
+## v5.39.1
+
+### Fixed
+
+- Remove unused configuration option `batched_queries`
+
 ## v5.39.0
 
 ### Added

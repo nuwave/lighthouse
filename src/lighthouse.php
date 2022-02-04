@@ -303,18 +303,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Batched Queries
-    |--------------------------------------------------------------------------
-    |
-    | GraphQL query batching means sending multiple queries to the server in one request,
-    | You may set this flag to either process or deny batched queries.
-    |
-    */
-
-    'batched_queries' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | Persisted Queries
     |--------------------------------------------------------------------------
     |
