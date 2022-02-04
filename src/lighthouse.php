@@ -365,6 +365,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Shortcut Foreign Key Selection
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Lighthouse will shortcut queries where the client selects only the
+    | foreign key pointing to a related model. Only works if the related model's primary
+    | key field is called exactly `id` for every type in your schema.
+    |
+    */
+
+    'shortcut_foreign_key_selection' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Non-Null Pagination Results
     |--------------------------------------------------------------------------
     |
