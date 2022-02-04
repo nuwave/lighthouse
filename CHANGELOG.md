@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Handle expired subscriber keys in `RedisStorageManager::subscribersByTopic()`
+
 ## v5.39.1
 
 ### Fixed
