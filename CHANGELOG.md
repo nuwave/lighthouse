@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.38.1
+
+### Fixed
+
+- Consider `transactional_mutations` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2050
+
 ## v5.38.0
 
 ### Added
