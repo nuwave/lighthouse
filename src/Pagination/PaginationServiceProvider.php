@@ -82,6 +82,9 @@ class PaginationServiceProvider extends ServiceProvider
 
               "Number of items per page."
               perPage: Int!
+
+              "Are there more pages after this one?"
+              hasMorePages: Boolean!
             }
         ');
     }
