@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Only shortcut foreign key selection if `shortcut_foreign_key_selection` is enabled in `lighthouse.php`
+- Only shortcut foreign key selection if `shortcut_foreign_key_selection` is enabled in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/2049
 
 ## v5.38.1
 
