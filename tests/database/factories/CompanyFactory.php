@@ -7,5 +7,6 @@ use Tests\Utils\Models\Company;
 $factory->define(Company::class, function (Faker $faker): array {
     return [
         'name' => $faker->sentence,
+        'uuid' => $faker->uuid,
     ];
 });

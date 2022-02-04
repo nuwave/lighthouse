@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.38.2
+
+### Fixed
+
+- Only shortcut foreign key selection if `shortcut_foreign_key_selection` is enabled in `lighthouse.php`
+
 ## v5.38.1
 
 ### Fixed

@@ -264,8 +264,54 @@ class BelongsToDirectiveTest extends DBTestCase
             ]);
     }
 
+    public function testDoesNotShortcutForeignKeySelectionByDefault(): void
+    {
+        $company = factory(Company::class)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID! @rename(attribute: "uuid")
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                company {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => [
+                        'id' => $company->uuid,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testShortcutsForeignKey(): void
     {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
         $company = factory(Company::class)->create();
 
         /** @var \Tests\Utils\Models\User $user */
@@ -317,6 +363,8 @@ class BelongsToDirectiveTest extends DBTestCase
 
     public function testDoesNotShortcutForeignKeyIfQueryHasConditions(): void
     {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
         $company = factory(Company::class)->create();
 
         /** @var \Tests\Utils\Models\User $user */
