@@ -50,12 +50,12 @@ class BroadcastManager extends DriverManager
             throw new RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
         }
 
-        $appKey = Arr::get($driverConfig, 'key');
-        $appSecret = Arr::get($driverConfig, 'secret');
-        $appId = Arr::get($driverConfig, 'app_id');
-        $options = Arr::get($driverConfig, 'options', []);
-
-        $pusher = new Pusher($appKey, $appSecret, $appId, $options);
+        $pusher = new Pusher(
+            $driverConfig['key'],
+            $driverConfig['secret'],
+            $driverConfig['app_id'],
+            $driverConfig['options'] ?? []
+        );
 
         if ($driverConfig['log'] ?? false) {
             $pusher->setLogger($this->app->make(LoggerInterface::class));
