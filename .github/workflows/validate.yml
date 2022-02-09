@@ -74,10 +74,6 @@ jobs:
         if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
         run: composer remove --dev laravel/legacy-factories --no-update
 
-      - name: "Workaround missing laminas/laminas-code release"
-        if: matrix.php-version == '8.1'
-        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
-
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpstan
@@ -152,10 +148,6 @@ jobs:
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
-
-      - name: "Workaround missing laminas/laminas-code release"
-        if: matrix.php-version == '8.1'
-        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
 
       - name: "Ensure compatibility with legacy factories"
         if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
