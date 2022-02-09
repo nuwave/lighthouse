@@ -71,7 +71,7 @@ jobs:
         run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version == '^6' || matrix.laravel-version == '^7'
+        if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - name: "Workaround missing laminas/laminas-code release"
@@ -158,7 +158,7 @@ jobs:
         run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version == '^6' || matrix.laravel-version == '^7'
+        if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
@@ -202,7 +202,7 @@ jobs:
       - run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version == '^6' || matrix.laravel-version == '^7'
+        if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
@@ -242,7 +242,7 @@ jobs:
           restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
 
       - name: "Ensure compatibility with legacy factories"
-        if: matrix.laravel-version == '^6' || matrix.laravel-version == '^7'
+        if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
         run: composer remove --dev laravel/legacy-factories --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
