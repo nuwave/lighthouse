@@ -138,29 +138,41 @@ class RedisStorageManagerTest extends TestCase
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $topic = 'bar';
+
+        $subscriber1 = new DummySubscriber('foo1', $topic);
+        $subscriber2 = new DummySubscriber('foo2', $topic);
+
         $subscribers = [
-            new DummySubscriber('foo1', $topic),
-            new DummySubscriber('foo2', $topic),
+            $subscriber1,
+            $subscriber2,
         ];
 
         $redisConnection->expects($this->exactly(2))
             ->method('command')
             ->withConsecutive(
-                ['smembers', ['graphql.topic.' . $topic]],
+                ['smembers', ["graphql.topic.{$topic}"]],
                 ['mget', [[
                     'graphql.subscriber.foo1',
                     'graphql.subscriber.foo2',
+                    'graphql.subscriber.foo3',
                 ]]]
             )
             ->willReturnOnConsecutiveCalls(
-                ['foo1', 'foo2'],
-                array_map('serialize', $subscribers)
+                ['foo1', 'foo2', 'foo3'],
+                [
+                    serialize($subscriber1),
+                    serialize($subscriber2),
+                    // Simulate an expired key, see https://github.com/nuwave/lighthouse/issues/2035
+                    null,
+                ]
             );
 
-        $manager = new RedisStorageManager($config, $redisFactory);
         $this->assertEquals(
             $subscribers,
-            $manager->subscribersByTopic($topic)->all()
+            (new RedisStorageManager($config, $redisFactory))
+                ->subscribersByTopic($topic)
+                ->values()
+                ->all()
         );
     }
 
