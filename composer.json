@@ -44,7 +44,6 @@
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3 || ^4 || ^5",
-        "composer/composer": "dev-main as v2.3.0",
         "ergebnis/composer-normalize": "^2.2.2",
         "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8 || ^9",
         "laravel/legacy-factories": "^1",

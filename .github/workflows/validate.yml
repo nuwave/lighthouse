@@ -74,6 +74,10 @@ jobs:
         if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
         run: composer remove --dev laravel/legacy-factories --no-update
 
+      - name: "Fix https://github.com/BenSampo/laravel-enum/issues/249"
+        if: matrix.laravel-version == '^9'
+        run: composer require --dev composer/composer:'dev-main as v2.3.0' --no-install
+
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpstan
@@ -152,6 +156,10 @@ jobs:
       - name: "Ensure compatibility with legacy factories"
         if: matrix.laravel-version != '^8' || matrix.laravel-version != '^9'
         run: composer remove --dev laravel/legacy-factories --no-update
+
+      - name: "Fix https://github.com/BenSampo/laravel-enum/issues/249"
+        if: matrix.laravel-version == '^9'
+        run: composer require --dev composer/composer:'dev-main as v2.3.0' --no-install
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
