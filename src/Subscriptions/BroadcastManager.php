@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
