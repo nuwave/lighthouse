@@ -6,7 +6,6 @@ use Composer\Autoload\ClassMapGenerator;
 use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
-use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
