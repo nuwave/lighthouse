@@ -115,4 +115,49 @@ class LimitDirectiveTest extends DBTestCase
             ->assertJsonCount($limit, 'data.users.0.tasks')
             ->assertJsonCount($limit, 'data.users.1.tasks');
     }
+
+    public function testLimitsWithCache(): void
+    {
+        $users = factory(User::class, 2)->create();
+
+        /** @var \Tests\Utils\Models\User $user */
+        foreach ($users as $user) {
+            $user->tasks()->saveMany(
+                factory(Task::class, 2)->make()
+            );
+        }
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID! @cacheKey
+            tasks(limit: Int @limit): [Task!]! @hasMany @cache
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            user: [User!]! @all
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query {
+                user {
+                    id
+                    tasks {
+                        id
+                    }
+                }
+            }');
+
+        $cache = $this->app->make('cache');
+
+        $this->assertInstanceOf(
+            \Illuminate\Database\Eloquent\Collection::class,
+            $cache->get('lighthouse:User:1:tasks')
+        );
+    }
 }
