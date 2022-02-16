@@ -14,6 +14,8 @@ class PreLaravel9WithEnum extends Model
 {
     use CastsEnums;
 
+    protected $table = 'with_enums';
+
     public $timestamps = false;
 
     /**
