@@ -35,7 +35,9 @@ parameters:
 
   # Breaking changes in bensampo/laravel-enum
   - tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
+  - tests/Integration/Schema/Types/PreLaravel9LaravelEnumTypeDBTest.php
   - tests/Utils/Models/WithEnum.php
+  - tests/Utils/Models/PreLaravel9WithEnum.php
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false

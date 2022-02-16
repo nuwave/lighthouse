@@ -7,9 +7,12 @@ use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\AOrB;
-use Tests\Utils\Models\WithEnum;
+use Tests\Utils\Models\PreLaravel9WithEnum;
 
-class LaravelEnumTypeDBTest extends DBTestCase
+/**
+ * TODO remove when requiring Laravel 9+
+ */
+class PreLaravel9LaravelEnumTypeDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
@@ -20,8 +23,8 @@ class LaravelEnumTypeDBTest extends DBTestCase
     {
         parent::setUp();
 
-        if (AppVersion::below(9.0)) {
-            $this->markTestSkipped('Uses Laravel 9 style enums');
+        if (AppVersion::atLeast(9.0)) {
+            $this->markTestSkipped('Uses pre-Laravel 9 style enums');
         } else {
             $this->typeRegistry = $this->app->make(TypeRegistry::class);
         }
@@ -31,14 +34,14 @@ class LaravelEnumTypeDBTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            withEnum(type: AOrB @eq): WithEnum @find
+            withEnum(type: AOrB @eq): PreLaravel9WithEnum @find
         }
 
         type Mutation {
-            createWithEnum(type: AOrB): WithEnum @create
+            createWithEnum(type: AOrB): PreLaravel9WithEnum @create
         }
 
-        type WithEnum {
+        type PreLaravel9WithEnum {
             type: AOrB
         }
         ';
@@ -75,10 +78,10 @@ class LaravelEnumTypeDBTest extends DBTestCase
         type Query {
             withEnum(
                 type: AOrB @whereJsonContains(key: "name")
-            ): WithEnum @find
+            ): PreLaravel9WithEnum @find
         }
 
-        type WithEnum {
+        type PreLaravel9WithEnum {
             name: String
         }
         ';
@@ -89,7 +92,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
         $encodedType = \Safe\json_encode([AOrB::A]);
 
-        $withEnum = new WithEnum();
+        $withEnum = new PreLaravel9WithEnum();
         $withEnum->name = $encodedType;
         $withEnum->save();
 
@@ -115,10 +118,10 @@ class LaravelEnumTypeDBTest extends DBTestCase
             withEnum(
                 byType: AOrB @scope
                 byTypeInternal: AOrB @scope # TODO remove in v6
-            ): WithEnum @find
+            ): PreLaravel9WithEnum @find
         }
 
-        type WithEnum {
+        type PreLaravel9WithEnum {
             type: AOrB
         }
         ';
@@ -129,7 +132,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
         $a = AOrB::A();
 
-        $withEnum = new WithEnum();
+        $withEnum = new PreLaravel9WithEnum();
         $withEnum->type = $a;
         $withEnum->save();
 

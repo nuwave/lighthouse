@@ -2,26 +2,18 @@
 
 namespace Tests\Utils\Models;
 
+use BenSampo\Enum\Traits\CastsEnums;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
 
 /**
- * Primary key.
- *
- * @property int $id
- *
- * Attributes
- * @property string|null $name
- * @property AOrB|null $type
- *
- * Scopes
- *
- * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
- * @method static \Illuminate\Database\Eloquent\Builder&static byTypeInternal(string $aOrB) TODO remove in v6
+ * TODO remove when requiring Laravel 9+
  */
-class WithEnum extends Model
+class PreLaravel9WithEnum extends Model
 {
+    use CastsEnums;
+
     public $timestamps = false;
 
     /**
