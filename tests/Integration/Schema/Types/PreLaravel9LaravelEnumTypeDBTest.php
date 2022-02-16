@@ -10,7 +10,7 @@ use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\Models\PreLaravel9WithEnum;
 
 /**
- * TODO remove when requiring Laravel 9+
+ * TODO remove when requiring Laravel 9+.
  */
 class PreLaravel9LaravelEnumTypeDBTest extends DBTestCase
 {

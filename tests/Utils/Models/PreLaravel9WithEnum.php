@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
 
 /**
- * TODO remove when requiring Laravel 9+
+ * TODO remove when requiring Laravel 9+.
  */
 class PreLaravel9WithEnum extends Model
 {
