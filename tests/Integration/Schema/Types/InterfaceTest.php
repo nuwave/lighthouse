@@ -297,12 +297,17 @@ GRAPHQL;
         $this->assertCount(2, $interface['possibleTypes']);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team>
+     */
     public function fetchResults(): EloquentCollection
     {
-        $users = User::all();
-        $teams = Team::all();
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
+        $results = new EloquentCollection();
 
-        return $users->concat($teams);
+        return $results
+            ->concat(User::all())
+            ->concat(Team::all());
     }
 
     public function resolveType(): Type

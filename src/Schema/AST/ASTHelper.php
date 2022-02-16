@@ -53,7 +53,10 @@ class ASTHelper
             ->all();
 
         $remainingDefinitions = (new Collection($original))
-            ->reject(function ($definition) use ($newNames, $overwriteDuplicates): bool {
+            ->reject(function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
+                // TODO remove with next graphql-php version
+                assert(property_exists($definition, 'name'));
+
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
 
