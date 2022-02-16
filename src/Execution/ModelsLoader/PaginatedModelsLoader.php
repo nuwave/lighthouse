@@ -166,8 +166,9 @@ class PaginatedModelsLoader implements ModelsLoader
         $withProperty = $reflection->getProperty('with');
         $withProperty->setAccessible(true);
 
+        /** @var array<int, string> $unloadedWiths */
         $unloadedWiths = array_filter(
-            (array) $withProperty->getValue($model),
+            $withProperty->getValue($model),
             static function (string $relation) use ($model): bool {
                 return ! $model->relationLoaded($relation);
             }

@@ -52,28 +52,26 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->taskImages = Collection::times(10)
-            ->map(function (): Image {
-                $image = $this->task
-                    ->images()
-                    ->save(
-                        factory(Image::class)->create()
-                    );
+        $this->taskImages = Collection::times(10, function (): Image {
+            $image = $this->task
+                ->images()
+                ->save(
+                    factory(Image::class)->create()
+                );
 
-                if (false === $image) {
-                    throw new Exception('Failed to save Image');
-                }
+            if (false === $image) {
+                throw new Exception('Failed to save Image');
+            }
 
-                return $image;
-            });
+            return $image;
+        });
 
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
         $this->postImages = Collection::times(
-            $this->faker()->numberBetween(1, 10)
-        )
-            ->map(function () {
+            $this->faker()->numberBetween(1, 10),
+            function () {
                 $image = $this->post
                     ->images()
                     ->save(
@@ -85,7 +83,8 @@ class MorphManyDirectiveTest extends DBTestCase
                 }
 
                 return $image;
-            });
+            }
+        );
     }
 
     public function testQueryMorphManyRelationship(): void
