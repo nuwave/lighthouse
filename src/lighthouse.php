@@ -303,18 +303,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Batched Queries
-    |--------------------------------------------------------------------------
-    |
-    | GraphQL query batching means sending multiple queries to the server in one request,
-    | You may set this flag to either process or deny batched queries.
-    |
-    */
-
-    'batched_queries' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | Persisted Queries
     |--------------------------------------------------------------------------
     |
@@ -331,7 +319,7 @@ return [
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | If set to true, mutations such as @create or @update will be
+    | If set to true, built-in directives that mutate models will be
     | wrapped in a transaction to ensure atomicity.
     |
     */
@@ -362,6 +350,19 @@ return [
     */
 
     'batchload_relations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Shortcut Foreign Key Selection
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Lighthouse will shortcut queries where the client selects only the
+    | foreign key pointing to a related model. Only works if the related model's primary
+    | key field is called exactly `id` for every type in your schema.
+    |
+    */
+
+    'shortcut_foreign_key_selection' => false,
 
     /*
     |--------------------------------------------------------------------------

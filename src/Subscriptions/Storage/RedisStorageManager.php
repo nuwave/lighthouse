@@ -73,8 +73,10 @@ class RedisStorageManager implements StoresSubscriptions
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
         return (new Collection($subscribers))
-            ->map(function (string $subscriber) {
-                return $this->unserialize($subscriber);
+            ->map(function (?string $subscriber): ?Subscriber {
+                return is_string($subscriber)
+                    ? unserialize($subscriber)
+                    : null;
             })
             ->filter();
     }
@@ -100,7 +102,7 @@ class RedisStorageManager implements StoresSubscriptions
         $setCommand = 'set';
         $setArguments = [
             $this->channelKey($subscriber->channel),
-            $this->serialize($subscriber),
+            serialize($subscriber),
         ];
         if (null !== $this->ttl) {
             $setCommand = 'setex';
@@ -129,16 +131,11 @@ class RedisStorageManager implements StoresSubscriptions
 
     protected function getSubscriber(string $channelKey): ?Subscriber
     {
-        $subscriber = $this->unserialize(
-            $this->connection->command('get', [$channelKey])
-        );
+        $subscriber = $this->connection->command('get', [$channelKey]);
 
-        // unserialize could return false, so we make sure to only return a Subscriber or null
-        if ($subscriber instanceof Subscriber) {
-            return $subscriber;
-        }
-
-        return null;
+        return is_string($subscriber)
+            ? unserialize($subscriber)
+            : null;
     }
 
     protected function channelKey(string $channel): string
@@ -149,39 +146,5 @@ class RedisStorageManager implements StoresSubscriptions
     protected function topicKey(string $topic): string
     {
         return self::TOPIC_KEY . '.' . $topic;
-    }
-
-    /**
-     * @param  mixed  $value  value to serialize
-     *
-     * @return mixed storable value
-     *
-     * @see \Illuminate\Cache\RedisStore::serialize
-     */
-    protected function serialize($value)
-    {
-        $isProperNumber = is_numeric($value)
-            && (INF !== $value && $value !== -INF)
-            && ! is_nan(floatval($value));
-
-        return $isProperNumber
-            ? $value
-            : serialize($value);
-    }
-
-    /**
-     * @param  mixed  $value  value to unserialize
-     *
-     * @return mixed unserialized value
-     */
-    protected function unserialize($value)
-    {
-        if (false === $value) {
-            return null;
-        }
-
-        return is_numeric($value)
-            ? $value
-            : unserialize($value);
     }
 }

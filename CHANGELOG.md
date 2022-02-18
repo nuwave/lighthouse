@@ -13,6 +13,42 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Batched federation entity resolvers
 
+## v5.40.0
+
+### Added
+
+- Support Laravel 9
+
+## v5.39.2
+
+### Fixed
+
+- Handle expired subscriber keys in `RedisStorageManager::subscribersByTopic()` https://github.com/nuwave/lighthouse/issues/2035
+
+## v5.39.1
+
+### Fixed
+
+- Remove unused configuration option `batched_queries` https://github.com/nuwave/lighthouse/issues/2046
+
+## v5.39.0
+
+### Added
+
+- Add field `hasMorePages` for pagination type `SIMPLE` https://github.com/nuwave/lighthouse/pull/2051
+
+## v5.38.2
+
+### Fixed
+
+- Only shortcut foreign key selection if `shortcut_foreign_key_selection` is enabled in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/2049
+
+## v5.38.1
+
+### Fixed
+
+- Consider `transactional_mutations` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2050
+
 ## v5.38.0
 
 ### Added

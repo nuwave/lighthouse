@@ -33,9 +33,9 @@ class PrintSchemaCommandTest extends TestCase
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--write' => true]);
 
-        $this->assertStringContainsString(
-            $this->schema,
-            Storage::get(PrintSchemaCommand::GRAPHQL_FILENAME)
-        );
+        $printed = Storage::get(PrintSchemaCommand::GRAPHQL_FILENAME);
+
+        $this->assertIsString($printed);
+        $this->assertStringContainsString($this->schema, $printed);
     }
 }

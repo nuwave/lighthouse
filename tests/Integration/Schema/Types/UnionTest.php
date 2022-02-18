@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\Schema\Types;
 
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -171,14 +171,16 @@ GRAPHQL;
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post>
      */
-    public function fetchResults(): Collection
+    public function fetchResults(): EloquentCollection
     {
-        $users = User::all();
-        $posts = Post::all();
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
+        $results = new EloquentCollection();
 
-        return $users->concat($posts);
+        return $results
+            ->concat(User::all())
+            ->concat(Post::all());
     }
 
     /**

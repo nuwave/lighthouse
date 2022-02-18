@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\Execution\TransactionalMutations;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -29,10 +30,16 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      */
     protected $errorPool;
 
-    public function __construct(GlobalId $globalId, ErrorPool $errorPool)
+    /**
+     * @var \Nuwave\Lighthouse\Execution\TransactionalMutations
+     */
+    protected $transactionalMutations;
+
+    public function __construct(GlobalId $globalId, ErrorPool $errorPool, TransactionalMutations $transactionalMutations)
     {
         $this->globalId = $globalId;
         $this->errorPool = $errorPool;
+        $this->transactionalMutations = $transactionalMutations;
     }
 
     public static function couldNotModify(Model $user): string
@@ -63,7 +70,14 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 }
 
                 $modifyModelExistence = function (Model $model): void {
-                    if (! $this->modifyExistence($model)) {
+                    $success = $this->transactionalMutations->execute(
+                        function () use ($model): bool {
+                            return $this->modifyExistence($model);
+                        },
+                        $model->getConnectionName()
+                    );
+
+                    if (! $success) {
                         $this->errorPool->record(
                             new Error(
                                 self::couldNotModify($model)

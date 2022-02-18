@@ -196,24 +196,26 @@ class DeferDBTest extends DBTestCase
 
         $deferredCompanies = $chunks[0];
 
-        /** @var \Tests\Utils\Models\Company $company0 */
         $company0 = $companies[0];
+        $this->assertInstanceOf(Company::class, $company0);
         $this->assertSame($company0->name, Arr::get($deferredCompanies, 'data.companies.0.name'));
 
-        /** @var \Tests\Utils\Models\Company $company1 */
         $company1 = $companies[1];
+        $this->assertInstanceOf(Company::class, $company1);
         $this->assertSame($company1->name, Arr::get($deferredCompanies, 'data.companies.1.name'));
 
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.0.users'));
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.1.users'));
 
         $deferredUsers = $chunks[1];
+        // @phpstan-ignore-next-line type of model is known
         $companies->each(function (Company $company, int $i) use ($deferredUsers): void {
             $key = "companies.{$i}.users";
             $this->assertArrayHasKey($key, $deferredUsers);
 
             $this->assertSame(
                 $company->users
+                    // @phpstan-ignore-next-line type of model is known
                     ->map(function (User $user): array {
                         return [
                             'email' => $user->email,
