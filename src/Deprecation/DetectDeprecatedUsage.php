@@ -6,6 +6,7 @@ use GraphQL\Language\AST\EnumValueNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\EnumValueDefinition;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\ValidationRule;
 use GraphQL\Validator\ValidationContext;
@@ -69,7 +70,7 @@ class DetectDeprecatedUsage extends ValidationRule
                 }
 
                 $value = $enum->getValue($node->value);
-                if (null === $value) {
+                if (! $value instanceof EnumValueDefinition) {
                     return;
                 }
 
