@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -24,6 +25,16 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 {
     use RelationDirectiveHelpers;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $lighthouseConfig;
+
+    public function __construct(ConfigRepository $configRepository)
+    {
+        $this->lighthouseConfig = $configRepository->get('lighthouse');
+    }
+
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(
@@ -39,7 +50,8 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 // We can shortcut the resolution if the client only queries for a foreign key
                 // that we know to be present on the parent model.
                 if (
-                    ['id' => true] === $resolveInfo->getFieldSelection()
+                    $this->lighthouseConfig['shortcut_foreign_key_selection']
+                    && ['id' => true] === $resolveInfo->getFieldSelection()
                     && $relation instanceof BelongsTo
                     && [] === $args
                 ) {
@@ -55,7 +67,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 }
 
                 if (
-                    config('lighthouse.batchload_relations')
+                    $this->lighthouseConfig['batchload_relations']
                     // Batch loading joins across both models, thus only works if they are on the same connection
                     && $relation->getParent()->getConnectionName() === $relation->getRelated()->getConnectionName()
                 ) {
@@ -152,12 +164,12 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected function paginationMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount')
-            ?? config('lighthouse.pagination.max_count');
+            ?? $this->lighthouseConfig['pagination']['max_count'];
     }
 
     protected function paginationDefaultCount(): ?int
     {
         return $this->directiveArgValue('defaultCount')
-            ?? config('lighthouse.pagination.default_count');
+            ?? $this->lighthouseConfig['pagination']['default_count'];
     }
 }

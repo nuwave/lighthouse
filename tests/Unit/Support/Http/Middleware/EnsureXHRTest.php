@@ -23,6 +23,23 @@ class EnsureXHRTest extends TestCase
         );
     }
 
+    public function testHandleMethodOverride(): void
+    {
+        $middleware = new EnsureXHR();
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->headers->set('content-type', 'multipart/form-data');
+        $request->request->set('_method', 'PUT');
+        $request->enableHttpMethodParameterOverride();
+
+        $this->expectException(BadRequestHttpException::class);
+        $middleware->handle(
+            $request,
+            static function (): void {}
+        );
+    }
+
     public function testAllowNonStandardMethod(): void
     {
         $middleware = new EnsureXHR();
@@ -57,13 +74,17 @@ class EnsureXHRTest extends TestCase
     }
 
     /**
-     * @return iterable<int, array{string}>
+     * @return array{array{string}}
      */
-    public function formContentTypes(): iterable
+    public function formContentTypes(): array
     {
-        foreach (EnsureXHR::FORM_CONTENT_TYPES as $contentType) {
-            yield [$contentType];
-        }
+        return [
+            ['application/x-www-form-urlencoded'],
+            ['multipart/form-data'],
+            ['text/plain'],
+            ['multipart/form-data; boundary=-------12345'],
+            ['text/plain; encoding=utf-8'],
+        ];
     }
 
     public function testForbidEmptyContentType(): void

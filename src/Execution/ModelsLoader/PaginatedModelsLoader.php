@@ -44,7 +44,9 @@ class PaginatedModelsLoader implements ModelsLoader
 
         $relatedModels = $this->loadRelatedModels($parents);
 
-        $this->hydratePivotRelation($parents, $relatedModels);
+        $relation = $this->relationInstance($parents);
+
+        $this->hydratePivotRelation($relation, $relatedModels);
         $this->loadDefaultWith($relatedModels);
         $this->associateRelationModels($parents, $relatedModels);
         $this->convertRelationToPaginator($parents);
@@ -84,17 +86,13 @@ class PaginatedModelsLoader implements ModelsLoader
         // Merge all the relation queries into a single query with UNION ALL.
 
         /**
-         * Use the first query as the initial starting point.
-         *
-         * We can assume this to be non-null because only non-empty lists of parents
-         * are passed into this loader.
+         * Non-null because only non-empty lists of parents are passed into this loader.
          *
          * @var \Illuminate\Database\Eloquent\Relations\Relation $firstRelation
          */
         $firstRelation = $relations->shift();
 
-        // We have to make sure to use ->getQuery() in order to respect
-        // model scopes, such as soft deletes
+        // Use ->getQuery() to respect model scopes, such as soft deletes
         $mergedRelationQuery = $relations->reduce(
             static function (EloquentBuilder $builder, Relation $relation): EloquentBuilder {
                 return $builder->unionAll(
@@ -137,21 +135,29 @@ class PaginatedModelsLoader implements ModelsLoader
      *
      * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relatedModels
      */
-    protected function hydratePivotRelation(EloquentCollection $parents, EloquentCollection $relatedModels): void
+    protected function hydratePivotRelation(Relation $relation, EloquentCollection $relatedModels): void
     {
-        $relation = $this->relationInstance($parents);
-
-        if ($relatedModels->isNotEmpty() && method_exists($relation, 'hydratePivotRelation')) {
-            $hydrationMethod = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
+        /**
+         * @see BelongsToMany::hydratePivotRelation()
+         */
+        if ($relation instanceof BelongsToMany) {
+            $hydrationMethod = new ReflectionMethod($relation, 'hydratePivotRelation');
             $hydrationMethod->setAccessible(true);
             $hydrationMethod->invoke($relation, $relatedModels->all());
         }
     }
 
-    protected function loadDefaultWith(EloquentCollection $collection): void
+    /**
+     * Ensure the models default relations are loaded.
+     *
+     * This is necessary because we load models in a non-standard way in @see loadRelatedModels()
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
+     */
+    protected function loadDefaultWith(EloquentCollection $models): void
     {
         /** @var \Illuminate\Database\Eloquent\Model|null $model */
-        $model = $collection->first();
+        $model = $models->first();
         if (null === $model) {
             return;
         }
@@ -160,15 +166,16 @@ class PaginatedModelsLoader implements ModelsLoader
         $withProperty = $reflection->getProperty('with');
         $withProperty->setAccessible(true);
 
+        /** @var array<int, string> $unloadedWiths */
         $unloadedWiths = array_filter(
-            (array) $withProperty->getValue($model),
+            $withProperty->getValue($model),
             static function (string $relation) use ($model): bool {
                 return ! $model->relationLoaded($relation);
             }
         );
 
         if (count($unloadedWiths) > 0) {
-            $collection->load($unloadedWiths);
+            $models->load($unloadedWiths);
         }
     }
 
@@ -189,20 +196,15 @@ class PaginatedModelsLoader implements ModelsLoader
     protected function convertRelationToPaginator(EloquentCollection $parents): void
     {
         foreach ($parents as $model) {
-            $total = CountModelsLoader::extractCount($model, $this->relation);
-
-            $paginator = app()->makeWith(
-                LengthAwarePaginator::class,
-                [
-                    'items' => $model->getRelation($this->relation),
-                    'total' => $total,
-                    'perPage' => $this->paginationArgs->first,
-                    'currentPage' => $this->paginationArgs->page,
-                    'options' => [],
-                ]
+            $model->setRelation(
+                $this->relation,
+                new LengthAwarePaginator(
+                    $model->getRelation($this->relation),
+                    CountModelsLoader::extractCount($model, $this->relation),
+                    $this->paginationArgs->first,
+                    $this->paginationArgs->page
+                )
             );
-
-            $model->setRelation($this->relation, $paginator);
         }
     }
 }

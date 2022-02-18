@@ -58,6 +58,7 @@ module.exports = [
       "digging-deeper/adding-types-programmatically",
       "digging-deeper/file-uploads",
       "digging-deeper/client-directives",
+      "digging-deeper/deprecation",
       "digging-deeper/extending-lighthouse",
     ],
   },
@@ -85,6 +86,7 @@ module.exports = [
     title: "Performance",
     children: [
       "performance/schema-caching",
+      "performance/query-caching",
       ["performance/n-plus-one", "The N+1 Query Problem"],
       "performance/caching",
       "performance/deferred",

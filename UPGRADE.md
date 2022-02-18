@@ -126,6 +126,11 @@ the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instance
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 ```
 
+### Replace Nuwave\Lighthouse\GraphQL::executeQuery() usage
+
+Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
+executing already parsed `DocumentNode`.
+
 ### Removed error extension field `category`
 
 See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category

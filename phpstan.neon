@@ -17,6 +17,8 @@ parameters:
   - src
   - tests
   checkOctaneCompatibility: true
+  # TODO reenable once we require Laravel 9+
+  checkGenericClassInNonGenericObjectType: false
   excludePaths:
   - tests/database/migrations/*
 
@@ -25,6 +27,12 @@ parameters:
 
   # Intentionally wrong
   - tests/Utils/Models/WithoutRelationClassImport.php
+
+  # Breaking changes in bensampo/laravel-enum
+  - tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
+  - tests/Integration/Schema/Types/PreLaravel9LaravelEnumTypeDBTest.php
+  - tests/Utils/Models/WithEnum.php
+  - tests/Utils/Models/PreLaravel9WithEnum.php
 
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false
@@ -58,3 +66,9 @@ parameters:
 
   # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
   - '#Property .* in isset\(\) is not nullable\.#'
+
+  # Unavailable in thecodingmachine/safe:1
+  - '#Function (hrtime) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
+
+  # Unavailable in thecodingmachine/safe:2
+  - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'

@@ -28,6 +28,10 @@ jobs:
           - 8.1
         laravel-version:
           - ^8
+          - ^9
+        exclude:
+          - php-version: 7.4
+            laravel-version: ^9
 
     steps:
       - uses: actions/checkout@v2
@@ -48,9 +52,9 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
-      - name: "Workaround missing laminas/laminas-code release"
-        if: matrix.php-version == '8.1'
-        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
+      - name: "Fix https://github.com/BenSampo/laravel-enum/issues/249"
+        if: matrix.laravel-version == '^9'
+        run: composer require --dev composer/composer:'dev-main as v2.3.0' --no-install
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
@@ -67,6 +71,10 @@ jobs:
           - 8.1
         laravel-version:
           - ^8
+          - ^9
+        exclude:
+          - php-version: 7.4
+            laravel-version: ^9
 
     steps:
       - uses: actions/checkout@v2
@@ -90,9 +98,9 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
 
-      - name: "Workaround missing laminas/laminas-code release"
-        if: matrix.php-version == '8.1'
-        run: composer require --dev laminas/laminas-code:4.5.x-dev --no-update
+      - name: "Fix https://github.com/BenSampo/laravel-enum/issues/249"
+        if: matrix.laravel-version == '^9'
+        run: composer require --dev composer/composer:'dev-main as v2.3.0' --no-install
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 

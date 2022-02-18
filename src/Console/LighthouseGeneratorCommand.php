@@ -64,7 +64,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         // If the strings are sorted, any prefix common to all strings
         // will be common to the sorted first and last strings.
         // All the strings in the middle can be ignored.
-        \Safe\sort($namespaces);
+        sort($namespaces);
 
         $firstParts = explode('\\', reset($namespaces));
         $lastParts = explode('\\', end($namespaces));

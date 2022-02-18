@@ -3,6 +3,7 @@
 namespace Tests\Integration\Execution;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 class ArgBuilderDirectiveTest extends DBTestCase
@@ -332,38 +333,53 @@ class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testAttachMultipleWhereFiltersToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
-            users(
-                name: String
-                    @where(operator: "=")
-                    @where(operator: "=", key: "email")
-            ): [User!]! @all
+            posts(
+                content: String
+                    @where(operator: "=", key: "title")
+                    @where(operator: "=", key: "body")
+            ): [Post!]! @all
+        }
+
+        type Post {
+            id: Int!
         }
         ';
 
-        $username = 'foo@bar.baz';
-        factory(User::class)->create([
-            'name' => $username,
-        ]);
-        factory(User::class)->create([
-            'email' => $username,
-        ]);
-        factory(User::class)->create([
-            'name' => $username,
-            'email' => $username,
-        ]);
+        $content = 'foo';
+
+        $onlyTitle = factory(Post::class)->make();
+        $onlyTitle->title = $content;
+        $onlyTitle->save();
+
+        $onlyBody = factory(Post::class)->make();
+        $onlyBody->body = $content;
+        $onlyBody->save();
+
+        $titleAndBody = factory(Post::class)->make();
+        $titleAndBody->title = $content;
+        $titleAndBody->body = $content;
+        $titleAndBody->save();
 
         $this
             ->graphQL(/** @lang GraphQL */ '
-            query ($name: String) {
-                users(name: $name) {
+            query ($content: String) {
+                posts(content: $content) {
                     id
                 }
             }
             ', [
-                'name' => $username,
+                'content' => $content,
             ])
-            ->assertJsonCount(1, 'data.users');
+            ->assertExactJson([
+                'data' => [
+                    'posts' => [
+                        [
+                            'id' => $titleAndBody->id,
+                        ],
+                    ],
+                ],
+            ]);
     }
 }
