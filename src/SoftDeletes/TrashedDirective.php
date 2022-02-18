@@ -3,13 +3,12 @@
 namespace Nuwave\Lighthouse\SoftDeletes;
 
 use Exception;
-use GraphQL\Exception\InvalidArgument;
+use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Scout\ScoutBuilderDirective;
-use Nuwave\Lighthouse\Scout\ScoutException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class TrashedDirective extends BaseDirective implements ArgBuilderDirective, ScoutBuilderDirective
@@ -29,10 +28,11 @@ GRAPHQL;
     public function handleBuilder($builder, $value): object
     {
         if (! $builder instanceof EloquentBuilder) {
-            throw new Exception('Can not get model from builder of class: ' . get_class($builder));
+            $notEloquentBuilder = get_class($builder);
+            throw new Exception("Can not get model from builder of class: {$notEloquentBuilder}");
         }
-        $model = $builder->getModel();
 
+        $model = $builder->getModel();
         $this->assertModelUsesSoftDeletes($model);
 
         if (null === $value) {
@@ -51,14 +51,13 @@ GRAPHQL;
                 // @phpstan-ignore-next-line because it involves mixins
                 return $builder->withoutTrashed();
             default:
-                throw new InvalidArgument('Unexpected value for Trashed filter: ' . $value);
+                throw new Error('Unexpected value for Trashed filter: ' . $value);
         }
     }
 
     public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
     {
         $model = $builder->model;
-
         $this->assertModelUsesSoftDeletes($model);
 
         if (null === $value) {
@@ -71,7 +70,7 @@ GRAPHQL;
             case 'only':
                 return $builder->onlyTrashed();
             default:
-                throw new ScoutException('Unexpected value for Trashed filter: ' . $value);
+                throw new Error('Unexpected value for Trashed filter: ' . $value);
         }
     }
 

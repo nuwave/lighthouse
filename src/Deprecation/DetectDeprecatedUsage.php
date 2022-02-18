@@ -6,9 +6,10 @@ use GraphQL\Language\AST\EnumValueNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\NamedType;
 use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\QueryValidationContext;
 use GraphQL\Validator\Rules\ValidationRule;
-use GraphQL\Validator\ValidationContext;
 
 /**
  * @experimental not enabled by default, not guaranteed to be stable
@@ -43,19 +44,18 @@ class DetectDeprecatedUsage extends ValidationRule
         DocumentValidator::addRule(new static($deprecationHandler));
     }
 
-    public function getVisitor(ValidationContext $context): array
+    public function getVisitor(QueryValidationContext $context): array
     {
         return [
             NodeKind::FIELD => function (FieldNode $node) use ($context): void {
                 $field = $context->getFieldDef();
-                // @phpstan-ignore-next-line can be null, remove ignore with graphql-php 15
                 if (null === $field) {
                     return;
                 }
 
                 if ($field->isDeprecated()) {
                     $parent = $context->getParentType();
-                    if (null === $parent) {
+                    if (! $parent instanceof NamedType) {
                         return;
                     }
 

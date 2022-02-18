@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Console;
 
 use GraphQL\Type\Introspection;
-use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -44,7 +43,7 @@ SIGNATURE;
         } else {
             if ($this->option('json')) {
                 $filename = self::JSON_FILENAME;
-                $schemaString = $this->toJson($schema);
+                $schemaString = \Safe\json_encode(Introspection::fromSchema($schema));
             } else {
                 $filename = self::GRAPHQL_FILENAME;
                 $schemaString = SchemaPrinter::doPrint($schema);
@@ -53,27 +52,9 @@ SIGNATURE;
 
         if ($this->option('write')) {
             $storage->put($filename, $schemaString);
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "' . $filename . '".');
+            $this->info("Wrote schema to the default file storage (usually storage/app) as {$filename}.");
         } else {
             $this->info($schemaString);
         }
-    }
-
-    protected function toJson(Schema $schema): string
-    {
-        $introspectionResult = Introspection::fromSchema($schema);
-        if (null === $introspectionResult) {
-            throw new \Exception(
-                <<<'MESSAGE'
-Did not receive a valid introspection result.
-Check if your schema is correct with:
-
-    php artisan lighthouse:validate-schema
-
-MESSAGE
-            );
-        }
-
-        return \Safe\json_encode($introspectionResult);
     }
 }
