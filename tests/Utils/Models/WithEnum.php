@@ -2,7 +2,6 @@
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
@@ -23,8 +22,6 @@ use Tests\Utils\LaravelEnums\AOrB;
  */
 class WithEnum extends Model
 {
-    use CastsEnums;
-
     public $timestamps = false;
 
     /**

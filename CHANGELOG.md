@@ -2,12 +2,92 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
+
+## v5.40.0
+
+### Added
+
+- Support Laravel 9
+
+## v5.39.2
+
+### Fixed
+
+- Handle expired subscriber keys in `RedisStorageManager::subscribersByTopic()` https://github.com/nuwave/lighthouse/issues/2035
+
+## v5.39.1
+
+### Fixed
+
+- Remove unused configuration option `batched_queries` https://github.com/nuwave/lighthouse/issues/2046
+
+## v5.39.0
+
+### Added
+
+- Add field `hasMorePages` for pagination type `SIMPLE` https://github.com/nuwave/lighthouse/pull/2051
+
+## v5.38.2
+
+### Fixed
+
+- Only shortcut foreign key selection if `shortcut_foreign_key_selection` is enabled in `lighthouse.php` https://github.com/nuwave/lighthouse/pull/2049
+
+## v5.38.1
+
+### Fixed
+
+- Consider `transactional_mutations` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2050
+
+## v5.38.0
+
+### Added
+
+- Detect usage of deprecated elements in queries https://github.com/nuwave/lighthouse/pull/2004
+
+## v5.37.2
+
+### Fixed
+
+- Fix `EnsureXHR` middleware to handle additional fields in the `Content-Type` header https://github.com/nuwave/lighthouse/pull/2036
+- Fix `EnsureXHR` middleware to handle method override via `_method` parameter https://github.com/nuwave/lighthouse/pull/2036
+
+## v5.37.1
+
+### Fixed
+
+- Separate eager loaded relations for fields with aliases https://github.com/nuwave/lighthouse/pull/2019
+
+## v5.37.0
+
+### Changed
+
+- Improve default schema https://github.com/nuwave/lighthouse/pull/2032
+
+## v5.36.0
+
+### Added
+
+- Allow caching parsed query strings https://github.com/nuwave/lighthouse/pull/2017
+- Support Automatic Persisted Queries https://github.com/nuwave/lighthouse/pull/2017
+
+### Deprecated
+
+- Deprecate `Nuwave\Lighthouse\GraphQL::executeQuery()` https://github.com/nuwave/lighthouse/pull/2017
+
+## v5.35.3
+
+### Fixed
+
+- Fix `thecodingmachine/safe` version constraint
+
+### Fixed
 
 ## v5.35.2
 

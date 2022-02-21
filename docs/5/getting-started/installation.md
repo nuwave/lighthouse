@@ -19,6 +19,19 @@ php artisan vendor:publish --tag=lighthouse-schema
 
 ## Lumen
 
+To use the included lighthouse config, copy it over to your config folder.
+
+```bash
+mkdir -p config
+cp vendor/nuwave/lighthouse/src/lighthouse.php config/
+```
+
+Register the config file within your `bootstrap/app.php` file:
+
+```php
+$app->configure('lighthouse');
+```
+
 Register the service provider in your `bootstrap/app.php` file:
 
 ```php
@@ -29,6 +42,19 @@ The many features Lighthouse provides are split across multiple service provider
 Since Lumen does not support auto-discovery, you will have to register them individually
 depending on which features you want to use. Check [Lighthouse's composer.json](https://github.com/nuwave/lighthouse/blob/master/composer.json),
 the section `extra.laravel.providers` contains the default service providers.
+
+To get you going right away in Lumen, copy over the included default schema.
+It uses pagination and validation, so you need to register the service providers.
+
+```bash
+mkdir -p graphql
+cp vendor/nuwave/lighthouse/src/default-schema.graphql graphql/schema.graphql
+```
+
+```php
+$app->register(\Nuwave\Lighthouse\Pagination\PaginationServiceProvider::class);
+$app->register(\Nuwave\Lighthouse\Validation\ValidationServiceProvider::class);
+```
 
 ## IDE Support
 

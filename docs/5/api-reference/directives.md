@@ -850,23 +850,26 @@ Marks an element of a GraphQL schema as no longer supported.
 directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
-  suggestion for how to access supported similar data. Formatted
-  in [Markdown](https://daringfireball.net/projects/markdown).
+  suggestion for how to access supported similar data.
+  Formatted in [Markdown](https://commonmark.org).
   """
   reason: String = "No longer supported"
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | ENUM_VALUE
 ```
 
-You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive and providing a
-`reason`. Deprecated fields are not included in introspection queries unless
-requested and they can still be queried by clients.
+You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive.
+It is recommended to provide a `reason` for the deprecation, as well as a suggestion on
+how to move forward.
 
 ```graphql
 type Query {
-  users: [User] @deprecated(reason: "Use the `allUsers` field")
-  allUsers: [User]
+  allUsers: [User!]! @deprecated(reason: "Use `users`")
+  users: [User!]!
 }
 ```
+
+Deprecated elements are not included in introspection queries by default,
+but they can still be queried by clients.
 
 ## @field
 
@@ -2273,7 +2276,7 @@ hold information about the total number of items.
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
 > Please note that the `SIMPLE` paginator does not have the attributes
-> `hasMorePages`, `lastPage` and `total`.
+> `lastPage` and `total`.
 >
 > If you need those fields, you should use the default `PAGINATOR`.
 
@@ -2321,6 +2324,9 @@ type SimplePaginatorInfo {
 
   "Number of items per page."
   perPage: Int!
+
+  "Are there more pages after this one?"
+  hasMorePages: Boolean!
 }
 ```
 

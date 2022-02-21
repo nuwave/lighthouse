@@ -133,8 +133,6 @@ class ArgPartitioner
                 || $isRelation(MorphToMany::class)
             ) {
                 $argument->resolver = new ResolveNested(new NestedManyToMany($name));
-
-                return;
             }
         }
     }
@@ -187,10 +185,6 @@ class ArgPartitioner
         $relationMethodCandidate = $modelReflection->getMethod($name);
 
         $returnType = $relationMethodCandidate->getReturnType();
-        if (null === $returnType) {
-            return false;
-        }
-
         if (! $returnType instanceof ReflectionNamedType) {
             return false;
         }

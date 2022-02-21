@@ -128,6 +128,37 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Query Cache
+    |--------------------------------------------------------------------------
+    |
+    | Caches the result of parsing incoming query strings to boost performance on subsequent requests.
+    |
+    */
+
+    'query_cache' => [
+        /*
+         * Setting to true enables query caching.
+         */
+        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
+
+        /*
+         * Duration in seconds the query should remain cached, null means forever.
+         */
+        'ttl' => env(
+            'LIGHTHOUSE_QUERY_CACHE_TTL',
+            \Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
+                ? null
+                : 365 * 24 * 60 // For Laravel < 5.8 the exact value must be specified and it is counted in minutes
+        ),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Namespaces
     |--------------------------------------------------------------------------
     |
@@ -272,22 +303,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Batched Queries
+    | Persisted Queries
     |--------------------------------------------------------------------------
     |
-    | GraphQL query batching means sending multiple queries to the server in one request,
-    | You may set this flag to either process or deny batched queries.
+    | Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
+    | [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
+    | You may set this flag to either process or deny these queries.
     |
     */
 
-    'batched_queries' => true,
+    'persisted_queries' => true,
 
     /*
     |--------------------------------------------------------------------------
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | If set to true, mutations such as @create or @update will be
+    | If set to true, built-in directives that mutate models will be
     | wrapped in a transaction to ensure atomicity.
     |
     */
@@ -318,6 +350,19 @@ return [
     */
 
     'batchload_relations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Shortcut Foreign Key Selection
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Lighthouse will shortcut queries where the client selects only the
+    | foreign key pointing to a related model. Only works if the related model's primary
+    | key field is called exactly `id` for every type in your schema.
+    |
+    */
+
+    'shortcut_foreign_key_selection' => false,
 
     /*
     |--------------------------------------------------------------------------

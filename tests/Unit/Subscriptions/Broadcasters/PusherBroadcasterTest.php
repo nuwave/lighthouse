@@ -17,12 +17,12 @@ class PusherBroadcasterTest extends TestCase
     {
         $logger = $this->createMock(LoggerInterface::class);
 
-        // Minimum cases: "create_curl", "trigger POST", "exec_curl response"
+        // Minimum cases: "trigger POST"
         $logger
-            ->expects($this->atLeast(3))
+            ->expects($this->atLeast(1))
             ->method('log');
 
-        $this->app->bind(LoggerInterface::class, function () use ($logger) {
+        $this->app->bind(LoggerInterface::class, static function () use ($logger): LoggerInterface {
             return $logger;
         });
 
@@ -45,7 +45,7 @@ class PusherBroadcasterTest extends TestCase
             ->expects($this->never())
             ->method('log');
 
-        $this->app->bind(LoggerInterface::class, function () use ($logger) {
+        $this->app->bind(LoggerInterface::class, static function () use ($logger): LoggerInterface {
             return $logger;
         });
 

@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Types;
 
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\Models\WithEnum;
@@ -19,7 +20,11 @@ class LaravelEnumTypeDBTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->typeRegistry = $this->app->make(TypeRegistry::class);
+        if (AppVersion::below(9.0)) {
+            $this->markTestSkipped('Uses Laravel 9 style enums');
+        } else {
+            $this->typeRegistry = $this->app->make(TypeRegistry::class);
+        }
     }
 
     public function testUseLaravelEnumType(): void

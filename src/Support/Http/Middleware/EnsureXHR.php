@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -28,7 +29,7 @@ class EnsureXHR
      */
     public function handle(Request $request, Closure $next)
     {
-        $method = $request->getMethod();
+        $method = $request->getRealMethod();
 
         if ('GET' === $method) {
             throw new BadRequestHttpException('GET requests are forbidden');
@@ -47,8 +48,8 @@ class EnsureXHR
             throw new BadRequestHttpException('Content-Type header must be set');
         }
 
-        if (in_array($contentType, self::FORM_CONTENT_TYPES)) {
-            throw new BadRequestHttpException("Content-Type {$contentType} is forbidden");
+        if (Str::startsWith($contentType, self::FORM_CONTENT_TYPES)) {
+            throw new BadRequestHttpException("Content-Type $contentType is forbidden");
         }
 
         return $next($request);

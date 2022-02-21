@@ -29,7 +29,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->post = factory(Post::class)->create();
-        $this->postTags = Collection::times($this->faker->numberBetween(3, 7))->map(function () {
+        $this->postTags = Collection::times($this->faker->numberBetween(3, 7), function () {
             $tag = factory(Tag::class)->create();
             $this->post->tags()->attach($tag);
 
@@ -149,7 +149,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         $post = factory(Post::class)->create([
             'user_id' => $user->id,
         ]);
-        /** @var \Illuminate\Database\Eloquent\Collection $postTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $postTags */
         $postTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($post) {
             $post->tags()->attach($tag);
 
@@ -159,7 +159,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         $task = factory(Task::class)->create([
             'user_id' => $user->id,
         ]);
-        /** @var \Illuminate\Database\Eloquent\Collection $taskTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $taskTags */
         $taskTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($task) {
             $task->tags()->attach($tag);
 
@@ -247,23 +247,29 @@ class MorphToManyDirectiveTest extends DBTestCase
                     'posts' => [
                         [
                             'id' => $post->id,
-                            'tags' => $postTags->map(function (Tag $tag) {
-                                return [
-                                    'id' => $tag->id,
-                                    'name' => $tag->name,
-                                ];
-                            })->toArray(),
+                            'tags' => $postTags
+                                // @phpstan-ignore-next-line model type is known
+                                ->map(function (Tag $tag): array {
+                                    return [
+                                        'id' => $tag->id,
+                                        'name' => $tag->name,
+                                    ];
+                                })
+                                ->all(),
                         ],
                     ],
                     'tasks' => [
                         [
                             'id' => $task->id,
-                            'tags' => $taskTags->map(function (Tag $tag) {
-                                return [
-                                    'id' => $tag->id,
-                                    'title' => $tag->name,
-                                ];
-                            })->toArray(),
+                            'tags' => $taskTags
+                                // @phpstan-ignore-next-line model type is known
+                                ->map(function (Tag $tag): array {
+                                    return [
+                                        'id' => $tag->id,
+                                        'title' => $tag->name,
+                                    ];
+                                })
+                                ->toArray(),
                         ],
                     ],
                 ],
