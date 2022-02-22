@@ -154,34 +154,37 @@ class LimitDirectiveTest extends DBTestCase
 
         $this
             ->graphQL(/** @lang GraphQL */ '
-            query {
+            {
                 user {
                     id
                     tasks(limit: 1) {
                         id
                     }
                 }
-            }');
+            }
+            ');
 
         $cache = $this->app->make('cache');
-
         $data = $cache->get('lighthouse:User:2:tasks:limit:1');
 
         $this->assertIsArray($data);
-        $this->assertInstanceOf(Task::class, $data[0]);
-        $this->assertSame(3, $data[0]->id);
 
-        // get values from cache
+        $task = $data[0];
+        $this->assertInstanceOf(Task::class, $task);
+        $this->assertSame(3, $task->id);
+
         $this
             ->graphQL(/** @lang GraphQL */ '
-            query {
+            {
                 user {
                     id
                     tasks(limit: 1) {
                         id
                     }
                 }
-            }')->assertJson([
+            }
+            ')
+            ->assertJson([
                 'data' => [
                     'user' => [
                         [
