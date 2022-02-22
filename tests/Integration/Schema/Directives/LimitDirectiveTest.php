@@ -8,6 +8,30 @@ use Tests\Utils\Models\User;
 
 class LimitDirectiveTest extends DBTestCase
 {
+    /**
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
+    protected $cache;
+
+    protected function getEnvironmentSetUp($app): void
+    {
+        parent::getEnvironmentSetUp($app);
+
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $app->make('config');
+
+        $config->set('cache.default', 'file');
+
+        $this->cache = $app->make('cache');
+    }
+
+    protected function tearDown(): void
+    {
+        $this->cache->clear();
+
+        parent::tearDown();
+    }
+
     public function testLimitsResults(): void
     {
         factory(User::class, 2)->create();
@@ -147,17 +171,49 @@ class LimitDirectiveTest extends DBTestCase
             query {
                 user {
                     id
-                    tasks {
+                    tasks(limit: 1) {
                         id
                     }
                 }
             }');
 
-        $cache = $this->app->make('cache');
+        $data = $this->cache->get('lighthouse:User:2:tasks:limit:1');
 
-        $this->assertInstanceOf(
-            \Illuminate\Database\Eloquent\Collection::class,
-            $cache->get('lighthouse:User:1:tasks')
-        );
+        $this->assertIsArray($data);
+        $this->assertInstanceOf(Task::class, $data[0]);
+        $this->assertSame(3, $data[0]->id);
+
+        // get values from cache
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query {
+                user {
+                    id
+                    tasks(limit: 1) {
+                        id
+                    }
+                }
+            }')->assertJson([
+                'data' => [
+                    'user' => [
+                        [
+                            'id' => 1,
+                            'tasks' => [
+                                [
+                                    'id' => 1,
+                                ]
+                            ],
+                        ],
+                        [
+                            'id' => 2,
+                            'tasks' => [
+                                [
+                                    'id' => 3,
+                                ]
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 }
