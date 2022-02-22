@@ -3,33 +3,19 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Tests\TestsSerialization;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class LimitDirectiveTest extends DBTestCase
 {
-    /**
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cache;
+    use TestsSerialization;
 
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app->make('config');
-
-        $config->set('cache.default', 'file');
-
-        $this->cache = $app->make('cache');
-    }
-
-    protected function tearDown(): void
-    {
-        $this->cache->clear();
-
-        parent::tearDown();
+        $this->useSerializingArrayStore($app);
     }
 
     public function testLimitsResults(): void
@@ -177,7 +163,9 @@ class LimitDirectiveTest extends DBTestCase
                 }
             }');
 
-        $data = $this->cache->get('lighthouse:User:2:tasks:limit:1');
+        $cache = $this->app->make('cache');
+
+        $data = $cache->get('lighthouse:User:2:tasks:limit:1');
 
         $this->assertIsArray($data);
         $this->assertInstanceOf(Task::class, $data[0]);
