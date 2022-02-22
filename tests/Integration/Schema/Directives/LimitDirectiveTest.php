@@ -201,7 +201,7 @@ class LimitDirectiveTest extends DBTestCase
                             'tasks' => [
                                 [
                                     'id' => 1,
-                                ]
+                                ],
                             ],
                         ],
                         [
@@ -209,7 +209,7 @@ class LimitDirectiveTest extends DBTestCase
                             'tasks' => [
                                 [
                                     'id' => 3,
-                                ]
+                                ],
                             ],
                         ],
                     ],
