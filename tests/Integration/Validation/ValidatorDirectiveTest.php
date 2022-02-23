@@ -100,7 +100,7 @@ class ValidatorDirectiveTest extends TestCase
         }
         ';
 
-        $response = $this
+        $this
             ->graphQL(/** @lang GraphQL */ '
             {
                 foo(
