@@ -40,13 +40,10 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         $fieldValue->setResolver(
             function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationName = $this->relation();
-
                 $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
                 $paginationArgs = $this->paginationArgs($args);
-
                 /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
                 $relation = $parent->{$relationName}();
-
                 // We can shortcut the resolution if the client only queries for a foreign key
                 // that we know to be present on the parent model.
                 if (
@@ -87,7 +84,6 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 }
 
                 $decorateBuilder($relation);
-
                 return null !== $paginationArgs
                     ? $paginationArgs->applyToBuilder($relation)
                     : $relation->getResults();
@@ -111,6 +107,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         }
 
         $paginationManipulator = new PaginationManipulator($documentAST);
+
         $paginationManipulator->transformToPaginatedField(
             $paginationType,
             $fieldDefinition,
@@ -146,7 +143,6 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected function paginationArgs(array $args): ?PaginationArgs
     {
         $paginationType = $this->paginationType();
-
         return null !== $paginationType
             ? PaginationArgs::extractArgs($args, $paginationType, $this->paginationMaxCount())
             : null;

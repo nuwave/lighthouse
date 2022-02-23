@@ -98,7 +98,6 @@ class PaginationArgs
         $methodName = $this->type->isSimple()
             ? 'simplePaginate'
             : 'paginate';
-
         if ($builder instanceof ScoutBuilder) {
             return $builder->{$methodName}($this->first, 'page', $this->page);
         }

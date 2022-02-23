@@ -8,6 +8,7 @@ use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -164,7 +165,7 @@ GRAPHQL
         ?int $maxCount = null
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
-        $paginatorTypeName = "Paginated{$fieldTypeName}s";
+        $paginatorTypeName = "Paginated".Str::plural($fieldTypeName);
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
