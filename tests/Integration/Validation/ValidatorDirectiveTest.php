@@ -84,7 +84,7 @@ class ValidatorDirectiveTest extends TestCase
             ->assertGraphQLValidationError('input.rules', 'The input.rules must be a valid email address.');
     }
 
-    public function testNestedInputsRulesReceiveParameters()
+    public function testNestedInputsRulesReceiveParameters(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
