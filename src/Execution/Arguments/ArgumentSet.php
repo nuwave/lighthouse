@@ -59,7 +59,7 @@ class ArgumentSet
     {
         $argument = $this->arguments[$key] ?? null;
 
-        if (null === $argument) {
+        if (! $argument instanceof Argument) {
             return false;
         }
 

@@ -70,7 +70,7 @@ class ClientDirective
         $schema = $schemaBuilder->schema();
 
         $definition = $schema->getDirective($this->name);
-        if (null === $definition) {
+        if (! $definition instanceof Directive) {
             throw new DefinitionException("Missing a schema definition for the client directive $this->name");
         }
 

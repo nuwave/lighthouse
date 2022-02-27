@@ -16,7 +16,7 @@ directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
   suggestion for how to access supported similar data. Formatted
-  in [Markdown](https://daringfireball.net/projects/markdown/).
+  in [Markdown](https://daringfireball.net/projects/markdown).
   """
   reason: String = "No longer supported"
 ) on FIELD_DEFINITION | ENUM_VALUE

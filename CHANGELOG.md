@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
@@ -11,7 +11,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Batched federation entity resolvers
+- Batched federation entity resolvers https://github.com/nuwave/lighthouse/pull/2043
+
+## v5.40.1
+
+### Fixed
+
+- Properly handle any kind of deferred resolved value https://github.com/nuwave/lighthouse/pull/2064
 
 ## v5.40.0
 

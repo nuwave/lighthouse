@@ -209,7 +209,7 @@ class Defer implements CreatesResponse
 
     protected function hasRemainingDeferred(): bool
     {
-        return count($this->deferred) > 0;
+        return [] !== $this->deferred;
     }
 
     protected function stream(): void
