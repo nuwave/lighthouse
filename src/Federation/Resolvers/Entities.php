@@ -35,15 +35,14 @@ class Entities
 
         /** @var array<string, array<int, array<string, mixed>>> $groupedRepresentations */
         $groupedRepresentations = [];
-
         foreach ($args['representations'] as $representation) {
-            $typename = $representation['__typename'];
-            $groupedRepresentations[$typename][] = $representation;
+            $groupedRepresentations[$representation['__typename']][] = $representation;
         }
 
         foreach ($groupedRepresentations as $typename => $representations) {
-            $resolver = $this->entityResolverProvider->resolver($typename);
+            assert(is_string($typename), 'Never numeric due to GraphQL\Utils::isValidNameError()');
 
+            $resolver = $this->entityResolverProvider->resolver($typename);
             if ($resolver instanceof BatchedEntityResolver) {
                 foreach ($resolver($representations) as $result) {
                     $results[] = $result;

@@ -42,7 +42,7 @@ class EntityResolverProvider
     /**
      * Maps from __typename to definitions.
      *
-     * @var array<string, EntityResolver>
+     * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
      */
     protected $definitions;
 

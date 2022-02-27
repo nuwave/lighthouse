@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Federation\BatchedEntityResolver;
 
 class BatchedFoo implements BatchedEntityResolver
 {
-    public function __invoke(array $representations): array
+    public function __invoke(array $representations): iterable
     {
         return $representations;
     }
