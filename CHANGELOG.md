@@ -9,6 +9,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add testing trait `RefreshesSchemaCache` https://github.com/nuwave/lighthouse/pull/2076
+
+### Fixed
+
+- Add proper error handling for invalid schema cache file contents https://github.com/nuwave/lighthouse/pull/2076
+
+### Deprecated
+
+- Deprecate testing trait `ClearsSchemaCache` https://github.com/nuwave/lighthouse/pull/2076
+
 ## v5.40.1
 
 ### Fixed
