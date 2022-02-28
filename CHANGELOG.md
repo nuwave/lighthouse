@@ -9,6 +9,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add testing trait `RefreshesSchemaCache`
+
+### Fixed
+
+- Add proper error handling for invalid schema cache file contents
+
+### Deprecated
+
+- Deprecate testing trait `ClearsSchemaCache`
+
 ## v5.40.1
 
 ### Fixed
