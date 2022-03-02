@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.42.0
+
 ### Added
 
 - Batched federation entity resolvers https://github.com/nuwave/lighthouse/pull/2043
