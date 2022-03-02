@@ -7,6 +7,7 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -40,6 +41,11 @@ class EntityResolverProvider
     protected $configRepository;
 
     /**
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * Maps from __typename to definitions.
      *
      * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
@@ -53,11 +59,16 @@ class EntityResolverProvider
      */
     protected $resolvers;
 
-    public function __construct(SchemaBuilder $schemaBuilder, DirectiveLocator $directiveLocator, ConfigRepository $configRepository)
-    {
+    public function __construct(
+        SchemaBuilder $schemaBuilder,
+        DirectiveLocator $directiveLocator,
+        ConfigRepository $configRepository,
+        Container $container
+    ) {
         $this->schema = $schemaBuilder->schema();
         $this->directiveLocator = $directiveLocator;
         $this->configRepository = $configRepository;
+        $this->container = $container;
     }
 
     public static function missingResolver(string $typename): string
@@ -143,7 +154,7 @@ class EntityResolverProvider
         }
 
         if (is_a($resolverClass, BatchedEntityResolver::class, true)) {
-            return app($resolverClass);
+            return $this->container->make($resolverClass);
         }
 
         return Utils::constructResolver($resolverClass, '__invoke');
