@@ -25,11 +25,11 @@ class RootType
         return self::getType(static::SUBSCRIPTION);
     }
 
-    private static function getType(string $nativeName): string
+    private static function getType(string $typeName): string
     {
         return config(
-            'lighthouse.root_types.' . Str::lower($nativeName),
-            $nativeName
+            'lighthouse.root_types.' . Str::lower($typeName),
+            $typeName
         );
     }
 
