@@ -75,9 +75,15 @@ class PaginatedModelsLoader implements ModelsLoader
 
                     // @phpstan-ignore-next-line Builder mixin is not understood
                     $relation->addSelect($select);
+
+                    
                 }
 
                 $relation->initRelation([$model], $this->relation);
+                //This is for enabling the all models fetching
+                if($this->paginationArgs->first<0){
+                        return $relation;
+                }
 
                 // @phpstan-ignore-next-line Builder mixin is not understood
                 return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
