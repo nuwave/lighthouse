@@ -6,6 +6,10 @@ use GraphQL\Error\Error;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Illuminate\Pagination\Paginator as BuilderPaginator;
+use Illuminate\Container\Container;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 class PaginationArgs
 {
@@ -49,11 +53,11 @@ class PaginationArgs
             $instance->page = Arr::get($args, 'page', 1);
         }
 
-        if ($instance->first <= 0) {
-            throw new Error(
-                self::requestedZeroOrLessItems($instance->first)
-            );
-        }
+        // if ($instance->first <= 0) {
+        //     throw new Error(
+        //         self::requestedZeroOrLessItems($instance->first)
+        //     );
+        // }
 
         // Make sure the maximum pagination count is not exceeded
         if (
@@ -101,8 +105,38 @@ class PaginationArgs
         if ($builder instanceof ScoutBuilder) {
             return $builder->{$methodName}($this->first, 'page', $this->page);
         }
+        if($methodName=='paginate' && $this->first<0){
+            $page = 1 ;
+            $total = $builder->toBase()->getCountForPagination();
+            $results=$builder->getModel()->newCollection();
+            if($total)
+                $results=$builder->forPage($page,$total)->get(['*']);
+            return $this->paginator($results, $total, $total, $page, [
+                'path' => BuilderPaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]);
+        }
+
 
         // @phpstan-ignore-next-line Relation&Builder mixin not recognized
         return $builder->{$methodName}($this->first, ['*'], 'page', $this->page);
+    }
+
+    /**
+     * Create a new length-aware paginator instance.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @param  int  $total
+     * @param  int  $perPage
+     * @param  int  $currentPage
+     * @param  array  $options
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+
+    protected function paginator($items, $total, $perPage, $currentPage, $options)
+    {
+        return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
+            'items', 'total', 'perPage', 'currentPage', 'options'
+        ));
     }
 }
