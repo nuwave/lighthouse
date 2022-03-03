@@ -146,7 +146,7 @@ class FieldFactory
 
     public static function defaultResolver(FieldValue $fieldValue): callable
     {
-        if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
+        if (RootType::Subscription() === $fieldValue->getParentName()) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
             $providesSubscriptionResolver = app(ProvidesSubscriptionResolver::class);
 

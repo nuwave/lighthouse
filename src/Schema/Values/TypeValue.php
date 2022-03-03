@@ -54,7 +54,7 @@ class TypeValue
             $typeName = $this->getTypeDefinitionName();
 
             // The Query type is exempt from requiring a cache key
-            if (RootType::QUERY === $typeName) {
+            if (RootType::Query() === $typeName) {
                 return null;
             }
 

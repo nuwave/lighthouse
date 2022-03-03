@@ -64,8 +64,12 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
+    protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = null): FieldValue
     {
+        if (is_null($parentTypeName)) {
+            $parentTypeName = RootType::Query();
+        }
+
         $queryType = Parser::objectTypeDefinition(/** @lang GraphQL */ "
         type {$parentTypeName} {
             {$fieldDefinition}

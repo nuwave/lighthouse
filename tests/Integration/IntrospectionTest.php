@@ -38,7 +38,7 @@ class IntrospectionTest extends TestCase
             $this->introspectType('Foo')
         );
         $this->assertNotNull(
-            $this->introspectType(RootType::QUERY)
+            $this->introspectType(RootType::Query())
         );
 
         $this->assertNull(

@@ -52,7 +52,7 @@ class SchemaBuilderTest extends TestCase
         ');
 
         /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
-        $mutationObjectType = $schema->getType(RootType::MUTATION);
+        $mutationObjectType = $schema->getType(RootType::Mutation());
         $foo = $mutationObjectType->getField('foo');
 
         $this->assertSame('foo', $foo->name);
@@ -166,7 +166,7 @@ class SchemaBuilderTest extends TestCase
         ');
 
         /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
-        $mutationObjectType = $schema->getType(RootType::MUTATION);
+        $mutationObjectType = $schema->getType(RootType::Mutation());
         $foo = $mutationObjectType->getField('foo');
 
         $this->assertSame('foo', $foo->name);
@@ -177,7 +177,7 @@ class SchemaBuilderTest extends TestCase
         $schema = $this->buildSchemaWithPlaceholderQuery();
 
         /** @var \GraphQL\Type\Definition\ObjectType $queryObjectType */
-        $queryObjectType = $schema->getType(RootType::QUERY);
+        $queryObjectType = $schema->getType(RootType::Query());
         $field = $queryObjectType->getField('foo');
 
         $this->assertSame('foo', $field->name);

@@ -55,20 +55,20 @@ class SchemaBuilder
 
         // Always set Query since it is required
         /** @var \GraphQL\Type\Definition\ObjectType $query */
-        $query = $this->typeRegistry->get(RootType::QUERY);
+        $query = $this->typeRegistry->get(RootType::Query());
         $config->setQuery($query);
 
         // Mutation and Subscription are optional, so only add them
         // if they are present in the schema
-        if (isset($documentAST->types[RootType::MUTATION])) {
+        if (isset($documentAST->types[RootType::Mutation()])) {
             /** @var \GraphQL\Type\Definition\ObjectType $mutation */
-            $mutation = $this->typeRegistry->get(RootType::MUTATION);
+            $mutation = $this->typeRegistry->get(RootType::Mutation());
             $config->setMutation($mutation);
         }
 
-        if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
+        if (isset($documentAST->types[RootType::Subscription()])) {
             /** @var \GraphQL\Type\Definition\ObjectType $subscription */
-            $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
+            $subscription = $this->typeRegistry->get(RootType::Subscription());
             $config->setSubscription($subscription);
         }
 

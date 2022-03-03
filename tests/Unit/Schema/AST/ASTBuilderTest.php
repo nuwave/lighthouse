@@ -42,7 +42,7 @@ class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types[RootType::QUERY];
+        $queryType = $documentAST->types[RootType::Query()];
 
         $fields = $queryType->fields;
         $this->assertNotNull($fields);
@@ -68,7 +68,7 @@ class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types[RootType::QUERY];
+        $queryType = $documentAST->types[RootType::Query()];
 
         $queryFields = $queryType->fields;
         $this->assertNotNull($queryFields);
@@ -76,7 +76,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(1, $queryFields);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $mutationType */
-        $mutationType = $documentAST->types[RootType::MUTATION];
+        $mutationType = $documentAST->types[RootType::Mutation()];
 
         $mutationFields = $mutationType->fields;
         $this->assertNotNull($mutationFields);
@@ -84,7 +84,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(1, $mutationFields);
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $subscriptionType */
-        $subscriptionType = $documentAST->types[RootType::SUBSCRIPTION];
+        $subscriptionType = $documentAST->types[RootType::Subscription()];
 
         $subscriptionFields = $subscriptionType->fields;
         $this->assertNotNull($subscriptionFields);

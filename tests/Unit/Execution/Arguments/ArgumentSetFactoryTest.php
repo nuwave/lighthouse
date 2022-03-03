@@ -184,7 +184,7 @@ class ArgumentSetFactoryTest extends TestCase
         $documentAST = $astBuilder->documentAST();
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types[RootType::QUERY];
+        $queryType = $documentAST->types[RootType::Query()];
 
         /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
         $fields = $queryType->fields;
