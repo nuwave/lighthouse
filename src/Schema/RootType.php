@@ -33,7 +33,7 @@ class RootType
 
     private static function getType(string $nativeName): string
     {
-        return config(sprintf('lighthouse.root_types.%s', Str::lower($nativeName)));
+        return config('lighthouse.root_types.' . Str::lower($nativeName));
     }
 
     public static function isRootType(string $typeName): bool
@@ -50,6 +50,6 @@ class RootType
             return [];
         }
 
-        return (array) config(sprintf('lighthouse.namespaces.%s', Str::of($typeName)->plural()->lower()));
+        return (array) config('lighthouse.namespaces.' . Str::plural(Str::lower($typeName)));
     }
 }
