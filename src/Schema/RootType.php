@@ -38,7 +38,14 @@ class RootType
 
     public static function isRootType(string $typeName): bool
     {
-        return in_array($typeName, static::NATIVE_TYPES);
+        return in_array(
+            $typeName,
+            [
+                static::QUERY,
+                static::MUTATION,
+                static::SUBSCRIPTION,
+            ]
+        );
     }
 
     /**
