@@ -10,30 +10,27 @@ class RootType
     public const MUTATION = 'Mutation';
     public const SUBSCRIPTION = 'Subscription';
 
-    public const NATIVE_TYPES = [
-        'Query',
-        'Mutation',
-        'Subscription',
-    ];
-
     public static function Query(): string
     {
-        return self::getType('Query');
+        return self::getType(static::QUERY);
     }
 
     public static function Mutation(): string
     {
-        return self::getType('Mutation');
+        return self::getType(static::MUTATION);
     }
 
     public static function Subscription(): string
     {
-        return self::getType('Subscription');
+        return self::getType(static::SUBSCRIPTION);
     }
 
     private static function getType(string $nativeName): string
     {
-        return config('lighthouse.root_types.' . Str::lower($nativeName));
+        return config(
+            'lighthouse.root_types.' . Str::lower($nativeName),
+            $nativeName
+        );
     }
 
     public static function isRootType(string $typeName): bool
