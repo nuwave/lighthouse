@@ -54,18 +54,19 @@ in the query tree, but nested under different indices. For example, we are resol
 
 ```graphql
 {
-    users {
-        id
-        posts {
-            title
-        }
+  users {
+    id
+    posts {
+      title
     }
+  }
 }
 ```
 
 Imagine we want to have a batch loader for `User.posts`, since it loads posts from a third party and the
 call to fetch them is slow when run sequentially. Since we have multiple users, this field
 would be resolved multiple times. When looking at the query path from `posts`, they may look like:
+
 - `users.0.posts`
 - `users.1.posts`
 
