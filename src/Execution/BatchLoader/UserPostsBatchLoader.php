@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\BatchLoader;
 
-use GraphQL\Deferred;
 use App\Models\User;
 use App\Posts\PostsService;
-use App\Posts\Post;
+use GraphQL\Deferred;
 
 class UserPostsBatchLoader
 {
