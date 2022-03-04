@@ -107,10 +107,9 @@ class PaginationArgs
         }
         if($methodName=='paginate' && $this->first<0){
             $page = 1 ;
-            $total = $builder->toBase()->getCountForPagination();
-            $results=$builder->getModel()->newCollection();
-            if($total)
-                $results=$builder->forPage($page,$total)->get(['*']);
+            
+                $results=$builder->get(['*']);
+                $total=$results->count();
             return $this->paginator($results, $total, $total, $page, [
                 'path' => BuilderPaginator::resolveCurrentPath(),
                 'pageName' => 'page',
