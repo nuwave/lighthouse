@@ -320,7 +320,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
     {
         $this->expectExceptionObject(new DefinitionException(
-            "The edgeType argument on roles must reference an existing object type definition."
+            'The edgeType argument on roles must reference an existing object type definition.'
         ));
         $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
