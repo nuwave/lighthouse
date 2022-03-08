@@ -298,8 +298,6 @@ type User {
 ```
 
 ```php
-namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -333,6 +331,32 @@ Even though this attribute is always present when querying the model through the
 it may not be present when reaching the node through another path in the schema, so it is
 recommended to define the field as nullable (no `!`).
 
+The following example assumes the intermediate table between `User` and `Role` defines
+a column `meta`.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class User extends Model
+{
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)
+            ->withPivot('meta');
+    }
+}
+
+class Role extends Model
+{
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('meta');
+    }
+}
+```
+
 ```graphql
 type User {
   id: ID!
@@ -352,7 +376,7 @@ type RoleUserPivot {
 ```
 
 When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types)
-that contains the attributes of the pivot table.
+that contains the attributes of the intermediate table.
 
 The custom edge type must contain at least the following two fields:
 
