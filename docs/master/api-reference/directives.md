@@ -335,19 +335,19 @@ recommended to define the field as nullable (no `!`).
 
 ```graphql
 type User {
-    id: ID!
-    roles: [Role!]! @belongsToMany
-    pivot: RoleUserPivot
+  id: ID!
+  roles: [Role!]! @belongsToMany
+  pivot: RoleUserPivot
 }
 
 type Role {
-    id: ID!
-    users: [Users!]! @belongsToMany
-    pivot: RoleUserPivot
+  id: ID!
+  users: [Users!]! @belongsToMany
+  pivot: RoleUserPivot
 }
 
 type RoleUserPivot {
-    meta: String
+  meta: String
 }
 ```
 
@@ -355,6 +355,7 @@ When using the `type` argument with pagination style `CONNECTION`, you may creat
 that contains the attributes of the pivot table.
 
 The custom edge type must contain at least the following two fields:
+
 - `cursor: String!`
 - `node: <RelatedModel>!` (in this case `node: Role!`)
 
