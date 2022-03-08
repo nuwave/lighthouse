@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
@@ -11,37 +10,6 @@ use Tests\Utils\Models\User;
 
 class BelongsToManyDirectiveTest extends DBTestCase
 {
-    /**
-     * The authenticated user.
-     *
-     * @var \Tests\Utils\Models\User
-     */
-    protected $user;
-
-    /**
-     * Roles of the authenticated user.
-     *
-     * @var \Illuminate\Support\Collection
-     */
-    protected $roles;
-
-    /**
-     * @var int
-     */
-    protected $rolesCount = 4;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->roles = factory(Role::class, $this->rolesCount)->create();
-
-        $this->user->roles()->attach($this->roles, ['meta' => 'new']);
-
-        $this->be($this->user);
-    }
-
     public function testQueryBelongsToManyRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -50,14 +18,20 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
 
         type Role {
-            id: Int!
-            name: String!
+            id: ID!
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $rolesCount = 2;
+        $roles = factory(Role::class, $rolesCount)->create();
+        $user->roles()->attach($roles);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -67,7 +41,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount($this->rolesCount, 'data.user.roles');
+        ')->assertJsonCount($rolesCount, 'data.user.roles');
     }
 
     public function testNameRelationExplicitly(): void
@@ -78,14 +52,20 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
 
         type Role {
-            id: Int!
-            name: String!
+            id: ID!
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $rolesCount = 2;
+        $roles = factory(Role::class, $rolesCount)->create();
+        $user->roles()->attach($roles);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -95,7 +75,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount($this->rolesCount, 'data.user.foo');
+        ')->assertJsonCount($rolesCount, 'data.user.foo');
     }
 
     public function testQueryBelongsToManyPaginator(): void
@@ -107,57 +87,65 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
 
         type Role {
-            id: Int!
-            name: String!
+            id: ID!
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                rolesPaginated(first: 2) {
-                    paginatorInfo {
-                        count
-                        hasMorePages
-                        total
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $rolesCount = 4;
+        $roles = factory(Role::class, $rolesCount)->create();
+        $user->roles()->attach($roles);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    rolesPaginated(first: 2) {
+                        paginatorInfo {
+                            count
+                            hasMorePages
+                            total
+                        }
+                        data {
+                            id
+                        }
                     }
-                    data {
-                        id
-                    }
-                }
-                rolesSimplePaginated(first: 3) {
-                    paginatorInfo {
-                        count
-                    }
-                    data {
-                        id
+                    rolesSimplePaginated(first: 3) {
+                        paginatorInfo {
+                            count
+                        }
+                        data {
+                            id
+                        }
                     }
                 }
             }
-        }
-        ')->assertJson([
-            'data' => [
-                'user' => [
-                    'rolesPaginated' => [
-                        'paginatorInfo' => [
-                            'count' => 2,
-                            'hasMorePages' => true,
-                            'total' => $this->rolesCount,
+            ')
+            ->assertJson([
+                'data' => [
+                    'user' => [
+                        'rolesPaginated' => [
+                            'paginatorInfo' => [
+                                'count' => 2,
+                                'hasMorePages' => true,
+                                'total' => $rolesCount,
+                            ],
                         ],
-                    ],
-
-                    'rolesSimplePaginated' => [
-                        'paginatorInfo' => [
-                            'count' => 3,
+                        'rolesSimplePaginated' => [
+                            'paginatorInfo' => [
+                                'count' => 3,
+                            ],
                         ],
                     ],
                 ],
-            ],
-        ])->assertJsonCount(2, 'data.user.rolesPaginated.data')
+            ])
+            ->assertJsonCount(2, 'data.user.rolesPaginated.data')
             ->assertJsonCount(3, 'data.user.rolesSimplePaginated.data');
     }
 
@@ -169,14 +157,19 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
 
         type Role {
-            id: Int!
-            name: String!
+            id: ID!
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $roles = factory(Role::class, 3)->create();
+        $user->roles()->attach($roles);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -214,20 +207,29 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
 
         type Role {
-            id: Int!
-            name: String!
+            id: ID!
         }
 
         type CustomRoleEdge {
-            node: Role
+            node: Role!
             cursor: String!
             meta: String
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $roles = factory(Role::class, 3)->create();
+        $meta = 'new';
+        $user->roles()->attach(
+            $roles,
+            ['meta' => $meta]
+        );
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -248,7 +250,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                     'roles' => [
                         'edges' => [
                             [
-                                'meta' => 'new',
+                                'meta' => $meta,
                             ],
                         ],
                     ],
@@ -257,37 +259,76 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
+    public function testQueryBelongsToManyPivot(): void
     {
         $this->schema = /** @lang GraphQL */ '
+        type User {
+            roles: [Role!]! @belongsToMany
+        }
+
+        type Role {
+            id: ID!
+            pivot: RoleUserPivot
+        }
+
+        type RoleUserPivot {
+            meta: String
+        }
+
+        type Query {
+            user: User! @auth
+        }
+        ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $rolesCount = 2;
+        $roles = factory(Role::class, $rolesCount)->create();
+        $meta = 'new';
+        $user->roles()->attach(
+            $roles,
+            ['meta' => $meta]
+        );
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                roles {
+                    id
+                    pivot {
+                        meta
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        [
+                            'pivot' => [
+                                'meta' => $meta,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount($rolesCount, 'data.user.roles');
+    }
+
+    public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
+    {
+        $this->expectExceptionObject(new DefinitionException(
+            'The edgeType argument on roles must reference an existing object type definition.'
+        ));
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
             roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
         }
 
         type Role {
-            id: Int!
-            name: String!
-        }
-
-        type Query {
-            user: User @auth
-        }
-        ';
-
-        $this->expectException(DefinitionException::class);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                roles(first: 2) {
-                    edges {
-                        meta
-                        node {
-                            id
-                        }
-                    }
-                }
-            }
+            id: ID!
         }
         ');
     }
@@ -300,21 +341,29 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
 
         type Role {
-            id: Int!
-            name: String!
+            id: ID!
         }
 
         type RoleEdge {
-            node: Role
+            node: Role!
             cursor: String!
             meta: String
-            nofield: String
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $roles = factory(Role::class, 3)->create();
+        $meta = 'new';
+        $user->roles()->attach(
+            $roles,
+            ['meta' => $meta]
+        );
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -322,7 +371,6 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 roles(first: 2) {
                     edges {
                         meta
-                        nofield
                         node {
                             id
                         }
@@ -336,8 +384,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                     'roles' => [
                         'edges' => [
                             [
-                                'meta' => 'new',
-                                'nofield' => null,
+                                'meta' => $meta,
                             ],
                         ],
                     ],
@@ -350,29 +397,30 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            id: Int!
+            id: ID!
             roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
 
-        type ACL {
-            id: Int!
-            create_post: Boolean!
-            read_post: Boolean!
-            update_post: Boolean!
-            delete_post: Boolean!
+        type Role {
+            id: ID!
+            acl: ACL @belongsTo
+            users: [User!]! @belongsToMany
         }
 
-        type Role {
-            id: Int!
-            name: String!
-            acl: ACL @belongsTo
-            users: [User]! @belongsToMany
+        type ACL {
+            id: ID!
         }
 
         type Query {
-            user: User @auth
+            user: User! @auth
         }
         ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $roles = factory(Role::class, 3)->create();
+        $user->roles()->attach($roles);
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -419,22 +467,15 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessage('Found invalid pagination type: foo');
-
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $this->expectExceptionObject(new DefinitionException('Found invalid pagination type: foo'));
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
             roles(first: Int! after: Int): [Role!]! @belongsToMany(type: "foo")
         }
 
         type Role {
-            foo: String
+            id: ID!
         }
         ');
-
-        $type = $schema->getType('User');
-
-        $this->assertInstanceOf(Type::class, $type);
-        /** @var \GraphQL\Type\Definition\Type $type */
-        $type->config['fields']();
     }
 }

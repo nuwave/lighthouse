@@ -86,7 +86,7 @@ class FieldFactory
             ->through(array_merge($fieldMiddleware, $globalFieldMiddleware))
             ->via('handleField')
             // TODO replace when we cut support for Laravel 5.6
-            //->thenReturn()
+            // ->thenReturn()
             ->then(static function (FieldValue $fieldValue): FieldValue {
                 return $fieldValue;
             })

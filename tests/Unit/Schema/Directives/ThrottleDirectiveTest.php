@@ -35,7 +35,7 @@ class ThrottleDirectiveTest extends TestCase
                     Limit::perMinute(1),
                     // @phpstan-ignore-next-line phpstan ignores markTestSkipped
                     Limit::perMinute(2)->by('another_key'),
-                    /// @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                    // / @phpstan-ignore-next-line phpstan ignores markTestSkipped
                     Limit::perMinute(3),
                 ];
             });
