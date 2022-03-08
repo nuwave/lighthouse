@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  *
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
- * @property-read \Tests\Utils\Models\ACL $acl
+ * @property-read \Tests\Utils\Models\ACL|null $acl
  */
 class Role extends Model
 {
@@ -29,7 +29,7 @@ class Role extends Model
     {
         return $this
             ->belongsToMany(User::class)
-            ->withPivot(['meta']);
+            ->withPivot('meta');
     }
 
     public function acl(): BelongsTo

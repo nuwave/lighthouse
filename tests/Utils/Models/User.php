@@ -82,7 +82,7 @@ class User extends Authenticatable
     {
         return $this
             ->belongsToMany(Role::class)
-            ->withPivot(['meta']);
+            ->withPivot('meta');
     }
 
     public function rolesPivot(): HasMany
