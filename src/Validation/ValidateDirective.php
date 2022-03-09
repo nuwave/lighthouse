@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Validation;
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -33,10 +34,8 @@ GRAPHQL;
                     $argumentSet = $resolveInfo->argumentSet;
                     $rulesGatherer = new RulesGatherer($argumentSet);
 
-                    /**
-                     * @var \Illuminate\Contracts\Validation\Factory $validationFactory
-                     */
                     $validationFactory = app(ValidationFactory::class);
+                    assert($validationFactory instanceof ValidationFactory);
                     $validator = $validationFactory->make(
                         $args,
                         self::normalizeRules($rulesGatherer->rules),
@@ -57,29 +56,25 @@ GRAPHQL;
     }
 
     /**
-     * @param array<string, array<int, array<int, string>|object>> $rules
+     * Ensure rules follow the standard definition format that Laravel expects.
+     *
+     * @param  array<string, array<int, array<int, string>|object>>  $rulesMap
+     *
      * @return array<string, array<int, string|object>>
      */
-    private static function normalizeRules(array $rules): array
+    private static function normalizeRules(array $rulesMap): array
     {
-        $transformed = [];
-        foreach ($rules as $key => $value) {
-            $transformed[$key] = array_map(function ($rule) {
+        foreach ($rulesMap as &$rulesForField) {
+            foreach ($rulesForField as &$rule) {
                 if (is_array($rule)) {
-                    $name = $rule[0];
-                    $parameters = array_slice($rule, 1, 100);
-
-                    if ($parameters) {
-                        return $name . ':' . implode(',', $parameters);
-                    }
-
-                    return $name;
+                    $name = Arr::pull($rule, 0);
+                    $rule = count($rule) > 0
+                        ? $name . ':' . implode(',', $rule)
+                        : $name;
                 }
-
-                return $rule;
-            }, $value);
+            }
         }
 
-        return $transformed;
+        return $rulesMap;
     }
 }
