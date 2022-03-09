@@ -106,12 +106,13 @@ class ValidatorDirectiveTest extends TestCase
                 foo(
                     input: {
                         foo: {
-                            bar: ["input"]
+                            bar: ["only 1 item"]
                         }
                     }
                 )
             }
-            ')->assertSuccessful();
+            ')
+            ->assertGraphQLValidationError('input.foo.0.bar', 'The input.foo.0.bar must contain 2 items.');
     }
 
     public function testCustomMessage(): void

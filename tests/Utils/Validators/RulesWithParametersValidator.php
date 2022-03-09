@@ -11,7 +11,7 @@ class RulesWithParametersValidator extends Validator
         return [
             'foo.*.bar' => [
                 'array',
-                'size:1',
+                'size:2',
             ],
         ];
     }
