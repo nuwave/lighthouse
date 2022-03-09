@@ -16,6 +16,8 @@ services:
   mysql:
     # TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784
     image: mysql:5.7
+    # Ensures compatibility with Apple M1
+    platform: linux/amd64
     tmpfs: /var/lib/mysql
     environment:
       MYSQL_DATABASE: test

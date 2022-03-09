@@ -131,6 +131,30 @@ public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
 executing already parsed `DocumentNode`.
 
+### Use `RefreshesSchemaCache` over `ClearsSchemaCache`
+
+The `ClearsSchemaCache` testing trait was prone to race conditions when running tests in parallel.
+
+```diff
+-use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
++use Nuwave\Lighthouse\Testing\RefreshesSchemaCache;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+    use CreatesApplication;
+-   use ClearsSchemaCache;
++   use RefreshesSchemaCache;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+-       $this->bootClearsSchemaCache();
++       $this->bootRefreshesSchemaCache();
+     }
+}
+```
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit
