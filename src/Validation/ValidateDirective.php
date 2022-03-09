@@ -39,7 +39,7 @@ GRAPHQL;
                     $validationFactory = app(ValidationFactory::class);
                     $validator = $validationFactory->make(
                         $args,
-                        $rulesGatherer->rules,
+                        self::normalizeRules($rulesGatherer->rules),
                         $rulesGatherer->messages,
                         $rulesGatherer->attributes
                     );
@@ -54,5 +54,32 @@ GRAPHQL;
                 }
             )
         );
+    }
+
+    /**
+     * @param array<string, array<int, array<int, string>|object>> $rules
+     * @return array<string, array<int, string|object>>
+     */
+    private static function normalizeRules(array $rules): array
+    {
+        $transformed = [];
+        foreach ($rules as $key => $value) {
+            $transformed[$key] = array_map(function ($rule) {
+                if (is_array($rule)) {
+                    $name = $rule[0];
+                    $parameters = array_slice($rule, 1, 100);
+
+                    if ($parameters) {
+                        return $name . ':' . implode(',', $parameters);
+                    }
+
+                    return $name;
+                }
+
+                return $rule;
+            }, $value);
+        }
+
+        return $transformed;
     }
 }
