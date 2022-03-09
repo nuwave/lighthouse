@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Validation;
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -33,10 +34,8 @@ GRAPHQL;
                     $argumentSet = $resolveInfo->argumentSet;
                     $rulesGatherer = new RulesGatherer($argumentSet);
 
-                    /**
-                     * @var \Illuminate\Contracts\Validation\Factory $validationFactory
-                     */
                     $validationFactory = app(ValidationFactory::class);
+                    assert($validationFactory instanceof ValidationFactory);
                     $validator = $validationFactory->make(
                         $args,
                         $rulesGatherer->rules,

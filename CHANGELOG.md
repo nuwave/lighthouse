@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Normalize rules input to ensure Laravel 9 support https://github.com/nuwave/lighthouse/pull/2070
+
 ## v5.42.0
 
 ### Added

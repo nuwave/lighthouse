@@ -84,6 +84,37 @@ class ValidatorDirectiveTest extends TestCase
             ->assertGraphQLValidationError('input.rules', 'The input.rules must be a valid email address.');
     }
 
+    public function testNestedInputsRulesReceiveParameters(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: RulesWithParameters): ID
+        }
+
+        input RuleWithParameter {
+            bar: [String!]!
+        }
+
+        input RulesWithParameters @validator {
+            foo: [RuleWithParameter]!
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: {
+                            bar: ["only 1 item"]
+                        }
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.foo.0.bar', 'The input.foo.0.bar must contain 2 items.');
+    }
+
     public function testCustomMessage(): void
     {
         $this->schema = /** @lang GraphQL */ '
