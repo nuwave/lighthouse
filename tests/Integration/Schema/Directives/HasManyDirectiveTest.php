@@ -1059,6 +1059,72 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.tasks.data');
     }
 
+    public function testHasManyWithRenamedModelAndPaginatedRelation(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            foos: [Foo!]! @hasMany(type: PAGINATOR)
+        }
+
+        type Foo @model(class: "Task") {
+            id: Int
+        }
+
+        type Query {
+            user: User @first
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                foos {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(3, 'data.user.foos');
+    }
+
+    public function testHasManyWithModelAndPaginatedRelation(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
+        }
+
+        type Task @model {
+            id: Int
+        }
+
+        type Query {
+            user: User @first
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                tasks {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(3, 'data.user.tasks');
+    }
+
     /**
      * @return array<int, array{0: bool}>
      */
