@@ -74,14 +74,17 @@ class RedisStorageManager implements StoresSubscriptions
 
         return (new Collection($subscribers))
             ->map(function (?string $subscriber): ?Subscriber {
-                if (!is_string($subscriber)) {
+                // Some entries may be expired
+                if ($subscriber === null) {
                     return null;
                 }
-                $deserializedSubscriber = unserialize($subscriber);
-                if($deserializedSubscriber === false){
+
+                // Other entries may contain invalid values
+                try {
+                    return unserialize($subscriber);
+                } catch (\ErrorException $e) {
                     return null;
                 }
-                return $deserializedSubscriber;
             })
             ->filter();
     }
