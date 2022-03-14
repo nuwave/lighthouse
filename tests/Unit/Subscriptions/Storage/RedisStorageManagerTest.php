@@ -164,7 +164,7 @@ class RedisStorageManagerTest extends TestCase
                     serialize($subscriber2),
                     // Simulate an expired key, see https://github.com/nuwave/lighthouse/issues/2035
                     null,
-                    false
+                    'foobar'
                 ]
             );
 
