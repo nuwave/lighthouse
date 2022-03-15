@@ -12,7 +12,7 @@ event and return additional schema definitions as a string:
 $dispatcher = app(\Illuminate\Contracts\Events\Dispatcher::class);
 $dispatcher->listen(
     \Nuwave\Lighthouse\Events\BuildSchemaString::class,
-    function(): string {
+    function (): string {
         // You can get your schema from anywhere you want, e.g. a database, hardcoded
     }
 );
@@ -51,10 +51,6 @@ Lighthouse provides a type registry out of the box for you to register your type
 You can get an instance of it through the Laravel Container.
 
 ```php
-<?php
-
-namespace App\Providers;
-
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ObjectType;
@@ -62,32 +58,52 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class GraphQLServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @param TypeRegistry $typeRegistry
-     *
-     * @return void
-     */
     public function boot(TypeRegistry $typeRegistry): void
     {
         $typeRegistry->register(
              new ObjectType([
                  'name' => 'User',
-                 'fields' => function() use ($typeRegistry): array {
+                 'fields' => function () use ($typeRegistry): array {
                      return [
                          'email' => [
-                             'type' => Type::string()
+                             'type' => Type::string(),
                          ],
                          'friends' => [
                              'type' => Type::listOf(
                                  $typeRegistry->get('User')
-                             )
-                         ]
+                             ),
+                         ],
                      ];
                  }
              ])
         );
     }
 }
+```
+
+If you register a lot of types, it can be beneficial for performance to register them lazily.
+Make sure the name you use to register matches the name of the built type.
+
+```php
+$name = 'User';
+$typeRegistry->registerLazy(
+    $name,
+    static function () use ($name, $typeRegistry): ObjectType {
+        return new ObjectType([
+            'name' => $name,
+            'fields' => function () use ($typeRegistry): array {
+                return [
+                    'email' => [
+                        'type' => Type::string(),
+                    ],
+                    'friends' => [
+                        'type' => Type::listOf(
+                            $typeRegistry->get('User')
+                        ),
+                    ],
+                ];
+            },
+        ]);
+    }
+);
 ```
