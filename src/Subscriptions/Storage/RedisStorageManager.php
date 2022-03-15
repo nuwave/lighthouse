@@ -75,7 +75,7 @@ class RedisStorageManager implements StoresSubscriptions
         return (new Collection($subscribers))
             ->map(function (?string $subscriber): ?Subscriber {
                 // Some entries may be expired
-                if ($subscriber === null) {
+                if (null === $subscriber) {
                     return null;
                 }
 

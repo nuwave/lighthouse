@@ -32,10 +32,12 @@ class LaravelEnumType extends EnumType
      */
     public function __construct(string $enumClass, ?string $name = null)
     {
+        if (! class_exists($enumClass)) {
+            throw self::classDoesNotExist($enumClass);
+        }
+
         if (! is_subclass_of($enumClass, Enum::class)) {
-            throw new InvalidArgumentException(
-                "Must pass an instance of \BenSampo\Enum\Enum, got {$enumClass}."
-            );
+            throw self::classMustExtendBenSampoEnumEnum($enumClass);
         }
 
         $this->enumClass = $enumClass;
@@ -58,6 +60,18 @@ class LaravelEnumType extends EnumType
                 $enumClass::getInstances()
             ),
         ]);
+    }
+
+    public static function classDoesNotExist(string $enumClass): InvalidArgumentException
+    {
+        return new InvalidArgumentException("Class {$enumClass} does not exist.");
+    }
+
+    public static function classMustExtendBenSampoEnumEnum(string $enumClass): InvalidArgumentException
+    {
+        $baseClass = Enum::class;
+
+        return new InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
     }
 
     protected function deprecationReason(Enum $enum): ?string
