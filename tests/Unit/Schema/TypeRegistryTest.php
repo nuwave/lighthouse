@@ -195,8 +195,11 @@ class TypeRegistryTest extends TestCase
 
     public function testGetThrowsWhenMissingType(): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->typeRegistry->get('ThisTypeDoesNotExist');
+        $nonExistingTypeName = 'ThisTypeDoesNotExist';
+        $this->expectExceptionObject(
+            TypeRegistry::failedToLoadType($nonExistingTypeName)
+        );
+        $this->typeRegistry->get($nonExistingTypeName);
     }
 
     public function testDeterminesIfHasType(): void
@@ -216,5 +219,17 @@ class TypeRegistryTest extends TestCase
 
         $this->expectException(DefinitionException::class);
         $this->typeRegistry->register($foo);
+    }
+
+    public function testRegisterLazy(): void
+    {
+        $name = 'Foo';
+        $foo = new ObjectType(['name' => $name]);
+        $this->typeRegistry->registerLazy(
+            $name,
+            static function () use ($foo): ObjectType { return $foo; }
+        );
+
+        $this->assertSame($foo, $this->typeRegistry->get($name));
     }
 }

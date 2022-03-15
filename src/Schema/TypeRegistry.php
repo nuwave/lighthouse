@@ -7,6 +7,7 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -71,6 +72,13 @@ class TypeRegistry
      */
     protected $types = [];
 
+    /**
+     * Map from type names to lazily resolved types.
+     *
+     * @var array<string, callable(): \GraphQL\Type\Definition\Type>
+     */
+    protected $lazyTypes = [];
+
     public function __construct(
         Pipeline $pipeline,
         DirectiveLocator $directiveLocator,
@@ -81,14 +89,19 @@ class TypeRegistry
         $this->argumentFactory = $argumentFactory;
     }
 
+    public static function failedToLoadType(string $name): DefinitionException
+    {
+        return new DefinitionException("Failed to load type: {$name}. Make sure the type is present in your schema definition.");
+    }
+
     /**
      * @param  array<string>  $possibleTypes
      */
-    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): string
+    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): DefinitionException
     {
         $ambiguousMapping = implode(', ', $possibleTypes);
 
-        return "Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].";
+        return new DefinitionException("Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].");
     }
 
     public function setDocumentAST(DocumentAST $documentAST): self
@@ -106,14 +119,7 @@ class TypeRegistry
     public function get(string $name): Type
     {
         if (! $this->has($name)) {
-            throw new DefinitionException(
-                <<<EOL
-Lighthouse failed while trying to load a type: $name
-
-Make sure the type is present in your schema definition.
-
-EOL
-            );
+            throw self::failedToLoadType($name);
         }
 
         return $this->types[$name];
@@ -124,8 +130,23 @@ EOL
      */
     public function has(string $name): bool
     {
-        return isset($this->types[$name])
-            || $this->fromAST($name) instanceof Type;
+        if (isset($this->types[$name])) {
+            return true;
+        }
+
+        if (isset($this->documentAST->types[$name])) {
+            $this->types[$name] = $this->handle($this->documentAST->types[$name]);
+
+            return true;
+        }
+
+        if (isset($this->lazyTypes[$name])) {
+            $this->types[$name] = $this->lazyTypes[$name]();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -144,6 +165,20 @@ EOL
     }
 
     /**
+     * Register an executable GraphQL type.
+     */
+    public function registerLazy(string $name, callable $type): self
+    {
+        if ($this->has($name)) {
+            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+        }
+
+        $this->lazyTypes[$name] = $type;
+
+        return $this;
+    }
+
+    /**
      * Register a type, overwriting if it exists already.
      */
     public function overwrite(Type $type): self
@@ -151,19 +186,6 @@ EOL
         $this->types[$type->name] = $type;
 
         return $this;
-    }
-
-    /**
-     * Attempt to make a type of the given name from the AST.
-     */
-    protected function fromAST(string $name): ?Type
-    {
-        $typeDefinition = $this->documentAST->types[$name] ?? null;
-        if (null === $typeDefinition) {
-            return null;
-        }
-
-        return $this->types[$name] = $this->handle($typeDefinition);
     }
 
     /**
@@ -175,13 +197,17 @@ EOL
     {
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
-        // ever used through its association to an interface
+        // ever used through its association to an interface.
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
             if (! isset($this->types[$name])) {
                 $this->types[$name] = $this->handle($typeDefinition);
             }
+        }
+
+        foreach ($this->lazyTypes as $name => $lazyType) {
+            $this->types[$name] = $lazyType();
         }
 
         return $this->types;
@@ -485,9 +511,7 @@ EOL
                     $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
 
                     if (1 !== count($actuallyPossibleTypes)) {
-                        throw new DefinitionException(
-                            self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes)
-                        );
+                        throw self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes);
                     }
 
                     return $this->get(end($actuallyPossibleTypes));
