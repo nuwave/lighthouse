@@ -207,7 +207,9 @@ class TypeRegistry
         }
 
         foreach ($this->lazyTypes as $name => $lazyType) {
-            $this->types[$name] = $lazyType();
+            if (! isset($this->types[$name])) {
+                $this->types[$name] = $lazyType();
+            }
         }
 
         return $this->types;

@@ -248,11 +248,13 @@ class TypeRegistryTest extends TestCase
 
     public function testPossibleTypes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Foo {
+        $documentTypeName = 'Foo';
+
+        $this->schema = /** @lang GraphQL */ "
+        type {$documentTypeName} {
             foo: ID
         }
-        ' . self::PLACEHOLDER_QUERY;
+        " . self::PLACEHOLDER_QUERY;
 
         app()->forgetInstance(ASTBuilder::class);
         $astBuilder = app(ASTBuilder::class);
@@ -264,8 +266,44 @@ class TypeRegistryTest extends TestCase
             static function () use ($lazyTypeName): ObjectType { return new ObjectType(['name' => $lazyTypeName]); }
         );
 
+        $resolvedTypes = $this->typeRegistry->resolvedTypes();
+        $this->assertArrayNotHasKey($documentTypeName, $resolvedTypes);
+        $this->assertArrayNotHasKey($lazyTypeName, $resolvedTypes);
+
         $possibleTypes = $this->typeRegistry->possibleTypes();
-        $this->assertArrayHasKey('Foo', $possibleTypes);
+        $this->assertArrayHasKey($documentTypeName, $possibleTypes);
         $this->assertArrayHasKey($lazyTypeName, $possibleTypes);
+
+        $resolvedTypes = $this->typeRegistry->resolvedTypes();
+        $this->assertArrayHasKey($documentTypeName, $resolvedTypes);
+        $this->assertArrayHasKey($lazyTypeName, $resolvedTypes);
+    }
+
+    public function testPossibleTypesMaintainsSingletons(): void
+    {
+        $documentTypeName = 'Foo';
+
+        $this->schema = /** @lang GraphQL */ "
+        type {$documentTypeName} {
+            foo: ID
+        }
+        " . self::PLACEHOLDER_QUERY;
+
+        app()->forgetInstance(ASTBuilder::class);
+        $astBuilder = app(ASTBuilder::class);
+        $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
+
+        $lazyTypeName = 'Bar';
+        $this->typeRegistry->registerLazy(
+            $lazyTypeName,
+            static function () use ($lazyTypeName): ObjectType { return new ObjectType(['name' => $lazyTypeName]); }
+        );
+
+        $documentType = $this->typeRegistry->get($documentTypeName);
+        $lazyType = $this->typeRegistry->get($lazyTypeName);
+        $possibleTypes = $this->typeRegistry->possibleTypes();
+
+        $this->assertSame($documentType, $possibleTypes[$documentTypeName]);
+        $this->assertSame($lazyType, $possibleTypes[$lazyTypeName]);
     }
 }
