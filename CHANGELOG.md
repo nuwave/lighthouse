@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.43.0
+
+### Added
+
+- Allow lazy registration of types https://github.com/nuwave/lighthouse/pull/2086
+
 ## v5.42.3
 
 ### Fixed
