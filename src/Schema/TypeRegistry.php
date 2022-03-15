@@ -7,7 +7,6 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -94,6 +93,11 @@ class TypeRegistry
         return new DefinitionException("Failed to load type: {$name}. Make sure the type is present in your schema definition.");
     }
 
+    public static function triedToRegisterPresentType(string $name): DefinitionException
+    {
+        return new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+    }
+
     /**
      * @param  array<string>  $possibleTypes
      */
@@ -156,7 +160,7 @@ class TypeRegistry
     {
         $name = $type->name;
         if ($this->has($name)) {
-            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+            throw self::triedToRegisterPresentType($name);
         }
 
         $this->types[$name] = $type;
@@ -165,12 +169,12 @@ class TypeRegistry
     }
 
     /**
-     * Register an executable GraphQL type.
+     * Register an executable GraphQL type lazily.
      */
     public function registerLazy(string $name, callable $type): self
     {
         if ($this->has($name)) {
-            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+            throw self::triedToRegisterPresentType($name);
         }
 
         $this->lazyTypes[$name] = $type;
@@ -184,6 +188,19 @@ class TypeRegistry
     public function overwrite(Type $type): self
     {
         $this->types[$type->name] = $type;
+
+        return $this;
+    }
+
+    /**
+     * Register a type lazily, overwriting if it exists already.
+     */
+    public function overwriteLazy(string $name, callable $type): self
+    {
+        // The lazy type might have been resolved already
+        unset($this->types[$name]);
+
+        $this->lazyTypes[$name] = $type;
 
         return $this;
     }
@@ -535,11 +552,10 @@ class TypeRegistry
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
-            $typeResolver
-                = $this->typeResolverFromClass(
-                    $nodeName,
-                    (array) config('lighthouse.namespaces.unions')
-                )
+            $typeResolver = $this->typeResolverFromClass(
+                $nodeName,
+                (array) config('lighthouse.namespaces.unions')
+            )
                 ?: $this->typeResolverFallback(
                     $this->possibleUnionTypes($unionDefinition)
                 );
@@ -580,7 +596,6 @@ class TypeRegistry
     protected function possibleUnionTypes(UnionTypeDefinitionNode $unionDefinition): array
     {
         $types = [];
-
         foreach ($unionDefinition->types as $type) {
             $types[] = $type->name->value;
         }

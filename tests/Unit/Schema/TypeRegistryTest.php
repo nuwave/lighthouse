@@ -11,7 +11,6 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\UnionType;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
@@ -196,6 +195,7 @@ class TypeRegistryTest extends TestCase
     public function testGetThrowsWhenMissingType(): void
     {
         $nonExistingTypeName = 'ThisTypeDoesNotExist';
+
         $this->expectExceptionObject(
             TypeRegistry::failedToLoadType($nonExistingTypeName)
         );
@@ -204,21 +204,40 @@ class TypeRegistryTest extends TestCase
 
     public function testDeterminesIfHasType(): void
     {
-        $fooName = 'Foo';
-        $this->assertFalse($this->typeRegistry->has($fooName));
+        $name = 'Foo';
 
-        $foo = new ObjectType(['name' => $fooName]);
-        $this->typeRegistry->register($foo);
-        $this->assertTrue($this->typeRegistry->has($fooName));
+        $this->assertFalse($this->typeRegistry->has($name));
+
+        $type = new ObjectType(['name' => $name]);
+        $this->typeRegistry->register($type);
+
+        $this->assertTrue($this->typeRegistry->has($name));
     }
 
     public function testThrowsWhenRegisteringExistingType(): void
     {
-        $foo = new ObjectType(['name' => 'Foo']);
-        $this->typeRegistry->register($foo);
+        $name = 'Foo';
+        $type = new ObjectType(['name' => $name]);
+        $this->typeRegistry->register($type);
 
-        $this->expectException(DefinitionException::class);
-        $this->typeRegistry->register($foo);
+        $this->expectExceptionObject(
+            TypeRegistry::triedToRegisterPresentType($name)
+        );
+        $this->typeRegistry->register($type);
+    }
+
+    public function testThrowsWhenRegisteringExistingTypeLazily(): void
+    {
+        $name = 'Foo';
+        $makeType = static function () use ($name): ObjectType {
+            return new ObjectType(['name' => $name]);
+        };
+        $this->typeRegistry->registerLazy($name, $makeType);
+
+        $this->expectExceptionObject(
+            TypeRegistry::triedToRegisterPresentType($name)
+        );
+        $this->typeRegistry->registerLazy($name, $makeType);
     }
 
     public function testOverwrite(): void
@@ -232,6 +251,27 @@ class TypeRegistryTest extends TestCase
         $this->typeRegistry->overwrite($foo2);
 
         $this->assertSame($foo2, $this->typeRegistry->get($name));
+    }
+
+    public function testOverwriteLazy(): void
+    {
+        $name = 'Foo';
+
+        $type = new ObjectType(['name' => $name]);
+        $makeType = static function () use ($type): ObjectType {
+            return $type;
+        };
+        $this->typeRegistry->registerLazy($name, $makeType);
+
+        $this->assertSame($type, $this->typeRegistry->get($name));
+
+        $type2 = new ObjectType(['name' => $name]);
+        $makeType2 = static function () use ($type2): ObjectType {
+            return $type2;
+        };
+        $this->typeRegistry->overwriteLazy($name, $makeType2);
+
+        $this->assertSame($type2, $this->typeRegistry->get($name));
     }
 
     public function testRegisterLazy(): void
