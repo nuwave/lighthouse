@@ -221,6 +221,19 @@ class TypeRegistryTest extends TestCase
         $this->typeRegistry->register($foo);
     }
 
+    public function testOverwrite(): void
+    {
+        $name = 'Foo';
+
+        $foo = new ObjectType(['name' => $name]);
+        $this->typeRegistry->register($foo);
+
+        $foo2 = new ObjectType(['name' => $name]);
+        $this->typeRegistry->overwrite($foo2);
+
+        $this->assertSame($foo2, $this->typeRegistry->get($name));
+    }
+
     public function testRegisterLazy(): void
     {
         $name = 'Foo';
@@ -231,5 +244,28 @@ class TypeRegistryTest extends TestCase
         );
 
         $this->assertSame($foo, $this->typeRegistry->get($name));
+    }
+
+    public function testPossibleTypes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Foo {
+            foo: ID
+        }
+        ' . self::PLACEHOLDER_QUERY;
+
+        app()->forgetInstance(ASTBuilder::class);
+        $astBuilder = app(ASTBuilder::class);
+        $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
+
+        $lazyTypeName = 'Bar';
+        $this->typeRegistry->registerLazy(
+            $lazyTypeName,
+            static function () use ($lazyTypeName): ObjectType { return new ObjectType(['name' => $lazyTypeName]); }
+        );
+
+        $possibleTypes = $this->typeRegistry->possibleTypes();
+        $this->assertArrayHasKey('Foo', $possibleTypes);
+        $this->assertArrayHasKey($lazyTypeName, $possibleTypes);
     }
 }
