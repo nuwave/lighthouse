@@ -6,6 +6,7 @@ use BenSampo\Enum\Enum;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use InvalidArgumentException;
+use ReflectionClassConstant;
 
 /**
  * A convenience wrapper for registering enums programmatically.
@@ -77,7 +78,7 @@ class LaravelEnumType extends EnumType
     protected function deprecationReason(Enum $enum): ?string
     {
         $constant = $this->reflection->getReflectionConstant($enum->key);
-        assert($constant instanceof \ReflectionClassConstant, 'Enum keys are derived from the constant names');
+        assert($constant instanceof ReflectionClassConstant, 'Enum keys are derived from the constant names');
 
         $docComment = $constant->getDocComment();
         if (false === $docComment) {
