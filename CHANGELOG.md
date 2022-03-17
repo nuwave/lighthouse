@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.44.0
+
+### Changed
+
+- Register artisan commands not only when running in console https://github.com/nuwave/lighthouse/pull/2088
+
 ## v5.43.0
 
 ### Added
