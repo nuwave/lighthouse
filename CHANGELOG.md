@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.45.0
+
+### Added
+
+- Add `@drop` directive to ignore incoming values
+
 ## v5.44.1
 
 ### Changed

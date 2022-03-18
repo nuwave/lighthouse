@@ -928,6 +928,32 @@ type Query {
 Deprecated elements are not included in introspection queries by default,
 but they can still be queried by clients.
 
+## @drop
+
+```graphql
+"""
+Ignore the user given value, don't pass it to the resolver.
+"""
+directive @drop on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This is useful when you want to deprecate a field, but avoid breaking changes
+for clients that still pass the value.
+
+```graphql
+type User {
+  email: String!
+  foo: String @deprecated
+}
+
+type Mutation {
+    createUser(
+        email: String!
+        foo: String @drop
+    ): User @create
+}
+```
+
 ## @field
 
 ```graphql

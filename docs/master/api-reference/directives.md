@@ -937,18 +937,19 @@ Ignore the user given value, don't pass it to the resolver.
 directive @drop on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-This can often be useful when wanting to confirm an input but don't want
-to use it as a column when creating a row in the database.
+This is useful when you want to deprecate a field, but avoid breaking changes
+for clients that still pass the value.
 
 ```graphql
 type User {
   email: String!
+  foo: String @deprecated
 }
 
 type Mutation {
     createUser(
         email: String!
-        email_confirmation: String! @drop
+        foo: String @drop
     ): User @create
 }
 ```
