@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add `@drop` directive to ignore incoming values
+- Add `@drop` directive to ignore incoming values https://github.com/nuwave/lighthouse/pull/2092
 
 ## v5.44.1
 
