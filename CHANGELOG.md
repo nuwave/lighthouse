@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.44.1
+
+### Changed
+
+- Expire query cache after one day by default https://github.com/nuwave/lighthouse/pull/2089
+
 ## v5.44.0
 
 ### Changed
