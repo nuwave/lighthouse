@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class DropDirective extends BaseDirective implements FieldResolver
+class DropDirective extends BaseDirective
 {
     public static function definition(): string
     {
