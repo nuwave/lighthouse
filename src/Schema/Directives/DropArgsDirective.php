@@ -23,11 +23,6 @@ directive @dropArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * @param FieldValue $fieldValue
-     * @param Closure $next
-     * @return mixed
-     */
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
         $resolver = $fieldValue->getResolver();
@@ -49,19 +44,15 @@ GRAPHQL;
         );
     }
 
-    /**
-     * @param ArgumentSet $old
-     * @return void
-     */
-    protected function drop(ArgumentSet &$old): void
+    protected function drop(ArgumentSet &$argumentSet): void
     {
-        foreach ($old->arguments as $name => $argument) {
+        foreach ($argumentSet->arguments as $name => $argument) {
             $maybeDropDirective = $argument->directives->first(function (Directive $directive): bool {
                 return $directive instanceof DropDirective;
             });
 
             if ($maybeDropDirective instanceof DropDirective) {
-                unset($old->arguments[$name]);
+                unset($argumentSet->arguments[$name]);
             } else {
                 // Recursively remove nested inputs using @drop directive.
                 // We look for further ArgumentSet instances, they

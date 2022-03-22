@@ -932,7 +932,7 @@ but they can still be queried by clients.
 
 ```graphql
 """
-Drop and remove an argument or input field from being passed to the resolver.
+Ignore the user given value, don't pass it to the resolver.
 """
 directive @drop on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
