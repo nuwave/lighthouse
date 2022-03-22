@@ -928,6 +928,31 @@ type Query {
 Deprecated elements are not included in introspection queries by default,
 but they can still be queried by clients.
 
+## @drop
+
+```graphql
+"""
+Ignore the user given value, don't pass it to the resolver.
+"""
+directive @drop on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This can often be useful when wanting to confirm an input but don't want
+to use it as a column when creating a row in the database.
+
+```graphql
+type User {
+  email: String!
+}
+
+type Mutation {
+    createUser(
+        email: String!
+        email_confirmation: String! @drop
+    ): User @create
+}
+```
+
 ## @field
 
 ```graphql

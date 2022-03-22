@@ -287,6 +287,7 @@ return [
         \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\DropArgsDirective::class,
     ],
 
     /*
