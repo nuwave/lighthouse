@@ -56,24 +56,24 @@ GRAPHQL;
     protected function drop(ArgumentSet &$old): void
     {
         foreach ($old->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs.
-            // We look for further ArgumentSet instances, they
-            // might be contained within an array.
-            Utils::applyEach(
-                function ($value) {
-                    if ($value instanceof ArgumentSet) {
-                        $this->drop($value);
-                    }
-                },
-                $argument->value
-            );
-
             $maybeDropDirective = $argument->directives->first(function (Directive $directive): bool {
                 return $directive instanceof DropDirective;
             });
 
             if ($maybeDropDirective instanceof DropDirective) {
                 unset($old->arguments[$name]);
+            } else {
+                // Recursively remove nested inputs using @drop directive.
+                // We look for further ArgumentSet instances, they
+                // might be contained within an array.
+                Utils::applyEach(
+                    function ($value) {
+                        if ($value instanceof ArgumentSet) {
+                            $this->drop($value);
+                        }
+                    },
+                    $argument->value
+                );
             }
         }
     }
