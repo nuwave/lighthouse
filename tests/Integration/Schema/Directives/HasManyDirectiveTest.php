@@ -2,11 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Tests\Utils\Policies\UserPolicy;
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 
 class HasManyDirectiveTest extends DBTestCase
 {
@@ -1063,7 +1064,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            foos: [Foo!]! @hasMany(type: PAGINATOR)
+            foos: [Foo!]! @hasMany(type: PAGINATOR) @can(ability: "adminOnly")
         }
 
         type Foo @model(class: "Task") {
@@ -1077,6 +1078,9 @@ class HasManyDirectiveTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        $user->name = UserPolicy::ADMIN;
+
+        $this->be($user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -1084,19 +1088,21 @@ class HasManyDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                foos {
-                    id
+                foos(first:3) {
+                    data {
+                        id
+                    }
                 }
             }
         }
-        ')->assertJsonCount(3, 'data.user.foos');
+        ')->assertJsonCount(3, 'data.user.foos.data');
     }
 
     public function testHasManyWithModelAndPaginatedRelation(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
-            tasks: [Task!]! @hasMany(type: PAGINATOR)
+            tasks: [Task!]! @hasMany(type: PAGINATOR) @can(ability: "adminOnly")
         }
 
         type Task @model {
@@ -1110,6 +1116,9 @@ class HasManyDirectiveTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        $user->name = UserPolicy::ADMIN;
+
+        $this->be($user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -1117,12 +1126,14 @@ class HasManyDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                tasks {
-                    id
+                tasks(first:3) {
+                    data {
+                        id
+                    }
                 }
             }
         }
-        ')->assertJsonCount(3, 'data.user.tasks');
+        ')->assertJsonCount(3, 'data.user.tasks.data');
     }
 
     /**
