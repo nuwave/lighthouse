@@ -4,7 +4,7 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
-class DropDirectiveTest extends TestCase
+final class DropDirectiveTest extends TestCase
 {
     public function testDropArgument(): void
     {
