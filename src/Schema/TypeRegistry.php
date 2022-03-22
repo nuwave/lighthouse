@@ -71,6 +71,13 @@ class TypeRegistry
      */
     protected $types = [];
 
+    /**
+     * Map from type names to lazily resolved types.
+     *
+     * @var array<string, callable(): \GraphQL\Type\Definition\Type>
+     */
+    protected $lazyTypes = [];
+
     public function __construct(
         Pipeline $pipeline,
         DirectiveLocator $directiveLocator,
@@ -81,14 +88,24 @@ class TypeRegistry
         $this->argumentFactory = $argumentFactory;
     }
 
+    public static function failedToLoadType(string $name): DefinitionException
+    {
+        return new DefinitionException("Failed to load type: {$name}. Make sure the type is present in your schema definition.");
+    }
+
+    public static function triedToRegisterPresentType(string $name): DefinitionException
+    {
+        return new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+    }
+
     /**
      * @param  array<string>  $possibleTypes
      */
-    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): string
+    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): DefinitionException
     {
         $ambiguousMapping = implode(', ', $possibleTypes);
 
-        return "Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].";
+        return new DefinitionException("Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].");
     }
 
     public function setDocumentAST(DocumentAST $documentAST): self
@@ -106,14 +123,7 @@ class TypeRegistry
     public function get(string $name): Type
     {
         if (! $this->has($name)) {
-            throw new DefinitionException(
-                <<<EOL
-Lighthouse failed while trying to load a type: $name
-
-Make sure the type is present in your schema definition.
-
-EOL
-            );
+            throw self::failedToLoadType($name);
         }
 
         return $this->types[$name];
@@ -124,8 +134,23 @@ EOL
      */
     public function has(string $name): bool
     {
-        return isset($this->types[$name])
-            || $this->fromAST($name) instanceof Type;
+        if (isset($this->types[$name])) {
+            return true;
+        }
+
+        if (isset($this->documentAST->types[$name])) {
+            $this->types[$name] = $this->handle($this->documentAST->types[$name]);
+
+            return true;
+        }
+
+        if (isset($this->lazyTypes[$name])) {
+            $this->types[$name] = $this->lazyTypes[$name]();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -135,10 +160,24 @@ EOL
     {
         $name = $type->name;
         if ($this->has($name)) {
-            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+            throw self::triedToRegisterPresentType($name);
         }
 
         $this->types[$name] = $type;
+
+        return $this;
+    }
+
+    /**
+     * Register an executable GraphQL type lazily.
+     */
+    public function registerLazy(string $name, callable $type): self
+    {
+        if ($this->has($name)) {
+            throw self::triedToRegisterPresentType($name);
+        }
+
+        $this->lazyTypes[$name] = $type;
 
         return $this;
     }
@@ -154,16 +193,16 @@ EOL
     }
 
     /**
-     * Attempt to make a type of the given name from the AST.
+     * Register a type lazily, overwriting if it exists already.
      */
-    protected function fromAST(string $name): ?Type
+    public function overwriteLazy(string $name, callable $type): self
     {
-        $typeDefinition = $this->documentAST->types[$name] ?? null;
-        if (null === $typeDefinition) {
-            return null;
-        }
+        // The lazy type might have been resolved already
+        unset($this->types[$name]);
 
-        return $this->types[$name] = $this->handle($typeDefinition);
+        $this->lazyTypes[$name] = $type;
+
+        return $this;
     }
 
     /**
@@ -175,12 +214,18 @@ EOL
     {
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
-        // ever used through its association to an interface
+        // ever used through its association to an interface.
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
             if (! isset($this->types[$name])) {
                 $this->types[$name] = $this->handle($typeDefinition);
+            }
+        }
+
+        foreach ($this->lazyTypes as $name => $lazyType) {
+            if (! isset($this->types[$name])) {
+                $this->types[$name] = $lazyType();
             }
         }
 
@@ -485,9 +530,7 @@ EOL
                     $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
 
                     if (1 !== count($actuallyPossibleTypes)) {
-                        throw new DefinitionException(
-                            self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes)
-                        );
+                        throw self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes);
                     }
 
                     return $this->get(end($actuallyPossibleTypes));
@@ -509,11 +552,10 @@ EOL
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
-            $typeResolver
-                = $this->typeResolverFromClass(
-                    $nodeName,
-                    (array) config('lighthouse.namespaces.unions')
-                )
+            $typeResolver = $this->typeResolverFromClass(
+                $nodeName,
+                (array) config('lighthouse.namespaces.unions')
+            )
                 ?: $this->typeResolverFallback(
                     $this->possibleUnionTypes($unionDefinition)
                 );
@@ -554,7 +596,6 @@ EOL
     protected function possibleUnionTypes(UnionTypeDefinitionNode $unionDefinition): array
     {
         $types = [];
-
         foreach ($unionDefinition->types as $type) {
             $types[] = $type->name->value;
         }

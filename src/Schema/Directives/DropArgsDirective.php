@@ -11,15 +11,15 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-class RenameArgsDirective extends BaseDirective implements FieldMiddleware
+class DropArgsDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Apply the @rename directives on the incoming arguments.
+Apply the @drop directives on the incoming arguments.
 """
-directive @renameArgs on FIELD_DEFINITION
+directive @dropArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
@@ -31,7 +31,7 @@ GRAPHQL;
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
                     $argumentSet = $resolveInfo->argumentSet;
-                    $this->rename($argumentSet);
+                    $this->drop($argumentSet);
 
                     return $resolver(
                         $root,
@@ -44,28 +44,27 @@ GRAPHQL;
         );
     }
 
-    protected function rename(ArgumentSet &$argumentSet): void
+    protected function drop(ArgumentSet &$argumentSet): void
     {
         foreach ($argumentSet->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs.
-            // We look for further ArgumentSet instances, they
-            // might be contained within an array.
-            Utils::applyEach(
-                function ($value) {
-                    if ($value instanceof ArgumentSet) {
-                        $this->rename($value);
-                    }
-                },
-                $argument->value
-            );
-
-            $maybeRenameDirective = $argument->directives->first(function (Directive $directive): bool {
-                return $directive instanceof RenameDirective;
+            $maybeDropDirective = $argument->directives->first(function (Directive $directive): bool {
+                return $directive instanceof DropDirective;
             });
 
-            if ($maybeRenameDirective instanceof RenameDirective) {
-                $argumentSet->arguments[$maybeRenameDirective->attributeArgValue()] = $argument;
+            if ($maybeDropDirective instanceof DropDirective) {
                 unset($argumentSet->arguments[$name]);
+            } else {
+                // Recursively remove nested inputs using @drop directive.
+                // We look for further ArgumentSet instances, they
+                // might be contained within an array.
+                Utils::applyEach(
+                    function ($value) {
+                        if ($value instanceof ArgumentSet) {
+                            $this->drop($value);
+                        }
+                    },
+                    $argument->value
+                );
             }
         }
     }

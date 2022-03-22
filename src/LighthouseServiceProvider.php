@@ -128,9 +128,7 @@ class LighthouseServiceProvider extends ServiceProvider
             );
         });
 
-        if ($this->app->runningInConsole()) {
-            $this->commands(self::COMMANDS);
-        }
+        $this->commands(self::COMMANDS);
 
         if ($this->app->runningUnitTests()) {
             $this->app->register(TestingServiceProvider::class);
