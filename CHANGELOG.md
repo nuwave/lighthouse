@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.45.1
+
+### Fixed
+
+- Fix `mget` returning false for entries https://github.com/nuwave/lighthouse/pull/2095
+
 ## v5.45.0
 
 ### Added
