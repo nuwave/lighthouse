@@ -166,7 +166,7 @@ class RedisStorageManagerTest extends TestCase
                     null,
                     // Depending on the setup, redis can also return this invalid result https://github.com/nuwave/lighthouse/issues/2085
                     '(nil)',
-                    //mget non-existing-entry returns [false]
+                    // mget non-existing-entry
                     false
                 ]
             );
