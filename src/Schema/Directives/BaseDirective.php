@@ -209,6 +209,7 @@ abstract class BaseDirective implements Directive
      * Split a single method argument into its parts.
      *
      * A method argument is expected to contain a class and a method name, separated by an @ symbol.
+     *
      * @example "App\My\Class@methodName"
      *
      * This validates that exactly two non-empty parts are given, not that the method exists.

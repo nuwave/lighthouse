@@ -117,7 +117,6 @@ GRAPHQL
                     cursor: String!
                 }
 GRAPHQL
-
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 

@@ -2,12 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
-use Nuwave\Lighthouse\Pagination\PaginationArgs;
 
 final class HasManyDirectiveTest extends DBTestCase
 {
