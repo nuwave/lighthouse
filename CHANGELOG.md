@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.45.2
+
+### Fixed
+
+- Fix definition of `@clearCache` argument `idSource`
+
 ## v5.45.1
 
 ### Fixed
