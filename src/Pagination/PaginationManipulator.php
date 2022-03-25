@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
@@ -96,7 +98,7 @@ class PaginationManipulator
                 "Pagination information about the list of edges."
                 pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
-                "A list of $fieldTypeName edges."
+                "A list of {$fieldTypeName} edges."
                 edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
             }
 GRAPHQL
@@ -106,15 +108,16 @@ GRAPHQL
         $connectionEdge = $edgeType
             ?? $this->documentAST->types[$connectionEdgeName]
             ?? Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-                "An edge that contains a node of type $fieldTypeName and a cursor."
-                type $connectionEdgeName {
-                    "The $fieldTypeName node."
-                    node: $fieldTypeName!
+                "An edge that contains a node of type {$fieldTypeName} and a cursor."
+                type {$connectionEdgeName} {
+                    "The {$fieldTypeName} node."
+                    node: {$fieldTypeName}!
 
                     "A unique cursor that can be used for pagination."
                     cursor: String!
                 }
 GRAPHQL
+
             );
         $this->documentAST->setTypeDefinition($connectionEdge);
 
@@ -236,16 +239,14 @@ GRAPHQL
     {
         $description = '"Limits number of fetched items.';
         if ($maxCount) {
-            $description .= ' Maximum allowed value: ' . $maxCount . '.';
+            $description .= " Maximum allowed value: {$maxCount}.";
         }
         $description .= "\"\n";
 
-        $definition = 'first: Int'
-            . (
-                $defaultCount
-                ? ' = ' . $defaultCount
-                : '!'
-            );
+        $definition = 'first: Int!';
+        if ($defaultCount) {
+            $definition .= " =  {$defaultCount}";
+        }
 
         return $description . $definition;
     }
@@ -255,19 +256,18 @@ GRAPHQL
      */
     protected function paginationResultType(string $typeName): TypeNode
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = Container::getInstance()->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
         $nonNull = $config->get('lighthouse.non_null_pagination_results')
             ? '!'
             : '';
 
-        /**
-         * We do not wrap the typename in [], so this will never be a ListOfTypeNode.
-         *
-         * @var \GraphQL\Language\AST\NamedTypeNode|\GraphQL\Language\AST\NonNullTypeNode $nonNullTypeNode
-         */
-        $nonNullTypeNode = Parser::typeReference(/** @lang GraphQL */ "{$typeName}{$nonNull}");
+        $typeNode = Parser::typeReference(/** @lang GraphQL */ "{$typeName}{$nonNull}");
+        assert(
+            $typeNode instanceof NamedTypeNode || $typeNode instanceof NonNullTypeNode,
+            'We do not wrap the typename in [], so this will never be a ListOfTypeNode.'
+        );
 
-        return $nonNullTypeNode;
+        return $typeNode;
     }
 }
