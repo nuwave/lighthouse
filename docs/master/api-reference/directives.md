@@ -632,7 +632,7 @@ directive @clearCache(
   """
   Source of the parent ID to clear.
   """
-  idSource: ClearCacheId
+  idSource: ClearCacheIdSource
 
   """
   Name of the field to clear.
@@ -947,10 +947,7 @@ type User {
 }
 
 type Mutation {
-    createUser(
-        email: String!
-        foo: String @drop
-    ): User @create
+  createUser(email: String!, foo: String @drop): User @create
 }
 ```
 
