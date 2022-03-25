@@ -16,6 +16,7 @@ use Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -111,6 +112,17 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         }
 
         $paginationManipulator = new PaginationManipulator($documentAST);
+
+        $relatedModelName = ASTHelper::modelName($fieldDefinition);
+        if (is_string($relatedModelName)) {
+            try {
+                $modelClass = $this->namespaceModelClass($relatedModelName);
+                $paginationManipulator->setModelClass($modelClass);
+            } catch (DefinitionException $e) {
+                /** @see \Tests\Integration\Schema\Directives\HasManyDirectiveTest::testDoesNotRequireModelClassForPaginatedHasMany() */
+            }
+        }
+
         $paginationManipulator->transformToPaginatedField(
             $paginationType,
             $fieldDefinition,
