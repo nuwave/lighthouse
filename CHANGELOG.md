@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Annotate generated schema with correct model in paginated relations https://github.com/nuwave/lighthouse/pull/2093
+
 ## v5.45.0
 
 ### Added
