@@ -947,10 +947,7 @@ type User {
 }
 
 type Mutation {
-    createUser(
-        email: String!
-        foo: String @drop
-    ): User @create
+  createUser(email: String!, foo: String @drop): User @create
 }
 ```
 
