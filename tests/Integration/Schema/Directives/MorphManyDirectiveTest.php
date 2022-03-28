@@ -350,10 +350,10 @@ class MorphManyDirectiveTest extends DBTestCase
                             'data' => [],
                             'paginatorInfo' => [
                                 'count' => 0,
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ]);
     }
 
