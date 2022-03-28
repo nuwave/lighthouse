@@ -55,12 +55,12 @@ are part of an external service.
 
 ```graphql
 type User {
-    id: ID!
-    posts: [Post!]! # Not a relation, so we can not use @hasMany
+  id: ID!
+  posts: [Post!]! # Not a relation, so we can not use @hasMany
 }
 
 type Post { # Not a model
-    title: String!
+  title: String!
 }
 ```
 
@@ -68,11 +68,11 @@ Since we have multiple users, `User.posts` would be resolved multiple times in t
 
 ```graphql
 {
-    users {
-        posts {
-            title
-        }
+  users {
+    posts {
+      title
     }
+  }
 }
 ```
 
