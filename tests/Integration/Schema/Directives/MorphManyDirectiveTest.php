@@ -334,13 +334,27 @@ class MorphManyDirectiveTest extends DBTestCase
                         data {
                             id
                         }
+                        paginatorInfo {
+                            count
+                        }
                     }
                 }
             }
             ', [
                 'id' => $this->post->id,
             ])
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertExactJson([
+                'data' => [
+                    'post' => [
+                        'images' => [
+                            'data' => [],
+                            'paginatorInfo' => [
+                                'count' => 0,
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
     }
 
     public function testQueryMorphManyPaginatorWithADefaultCount(): void

@@ -580,7 +580,7 @@ GRAPHQL
                 }
             }
             ')
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(0));
 
         if (! $nonNullPaginationResults) {
             $result->assertJson([

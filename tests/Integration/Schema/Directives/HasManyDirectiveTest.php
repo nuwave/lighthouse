@@ -540,7 +540,7 @@ final class HasManyDirectiveTest extends DBTestCase
                 }
             }
             ')
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(0));
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
