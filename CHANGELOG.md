@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.45.4
+
+### Fixed
+
+- Revert breaking schema change in generate pagination types
+
 ## v5.45.3
 
 ### Fixed
