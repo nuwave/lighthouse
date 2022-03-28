@@ -28,7 +28,8 @@ When dealing with Laravel relationships, [eager loading](https://laravel.com/doc
 is commonly used to alleviate the N+1 query problem.
 
 You can leverage eager loading by informing Lighthouse of the relationships between your models,
-using directives such as [@belongsTo](../api-reference/directives.md#belongsto) and [@hasMany](../api-reference/directives.md#hasmany).
+using directives such as [@belongsTo](../api-reference/directives.md#belongsto), [@hasMany](../api-reference/directives.md#hasmany)
+and [@with](../api-reference/directives.md#with).
 
 ```graphql
 type Post {
@@ -47,40 +48,56 @@ Under the hood, Lighthouse will batch the relationship queries together in a sin
 If you require a relation to be loaded for some field, but do not wish to return the relationship itself,
 you can use the [@with](../api-reference/directives.md#with) directive.
 
-## Resolving Batch Loader Instances
+## Custom Batch Loaders
 
-In order for Lighthouse to perform batch loading, it needs to group fields that are on the same level
-in the query tree, but nested under different indices. For example, we are resolving the following query:
+In the following example, the `User` model is associated with multiple posts, but the posts
+are part of an external service.
 
 ```graphql
-{
-  users {
-    id
-    posts {
-      title
-    }
-  }
+type User {
+    id: ID!
+    posts: [Post!]! # Not a relation, so we can not use @hasMany
+}
+
+type Post { # Not a model
+    title: String!
 }
 ```
 
-Imagine we want to have a batch loader for `User.posts`, since it loads posts from a third party and the
-call to fetch them is slow when run sequentially. Since we have multiple users, this field
-would be resolved multiple times. When looking at the query path from `posts`, they may look like:
+Since we have multiple users, `User.posts` would be resolved multiple times in the following example query:
+
+```graphql
+{
+    users {
+        posts {
+            title
+        }
+    }
+}
+```
+
+We want to have a batch loader for `User.posts`, since it loads posts from a third party and the
+call to fetch them is slow when run sequentially. This is assuming the posts service offers a method
+to query posts for multiple users in one call.
+
+In order for Lighthouse to perform batch loading, it needs to group fields that are on the same level
+in the query tree, but nested under different indices. When looking at the query path from `posts`, they may look like:
 
 - `users.0.posts`
 - `users.1.posts`
 
 In order to combine them, you need to have a single stateful batch loader instance for `users.posts`.
-Use `\Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry` to resolve such instances.
+Use `Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry` to resolve such instances.
 The following code is the resolver for `User.posts` - it could point to it with [@field](../api-reference/directives.md#field),
 or be implemented in a custom directive.
 
 ```php
+use GraphQL\Deferred;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 
-function (User $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \GraphQL\Deferred {
+function (User $user, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
     // Will always return the same instance, stored under the path users.posts
-    $postsBatchLoader = BatchLoaderRegistry::instance(
+    $userPostsBatchLoader = BatchLoaderRegistry::instance(
         $resolveInfo->path,
         function (): UserPostsBatchLoader {
             return new UserPostsBatchLoader();
@@ -88,14 +105,71 @@ function (User $root, array $args, GraphQLContext $context, ResolveInfo $resolve
     );
 
     // Promise to return the posts for the root resource and defer resolving them
-    return $postsBatchLoader->load($root);
+    return $userPostsBatchLoader->load($user);
 }
 ```
 
 The implementation of `UserPostsBatchLoader` is up to you, the only important thing is that the resolver
-returns an instance of `GraphQL\Deferred`.
+returns an instance of `GraphQL\Deferred`, see [webonyx/graphql-php docs](https://webonyx.github.io/graphql-php/data-fetching/#solving-n1-problem).
+The following example illustrates some common patterns that may be found in a batch loader implementation:
 
-## Batch Loader
+```php
+use GraphQL\Deferred;
 
-`webonyx/graphql-php` allows deferring the actual resolution of a field until it is actually needed,
-read more [in their documentation](https://webonyx.github.io/graphql-php/data-fetching/#solving-n1-problem).
+class UserPostsBatchLoader
+{
+    /**
+     * Map from user ids to users.
+     *
+     * @var array<int, \App\Models\User>
+     */
+    protected $users = [];
+
+    /**
+     * Map from user ids to posts.
+     *
+     * @var array<int, array<int, \App\Posts\Post>>
+     */
+    protected $results = [];
+
+    /**
+     * Marks when the actual batch loading happened.
+     *
+     * @var bool
+     */
+    protected $hasResolved = false;
+
+    /**
+     * Queue loading of posts for the given user.
+     */
+    public function load(User $user): Deferred
+    {
+        $this->users[$user->id] = $user;
+
+        // The wrapped callable will run after load() has been called
+        // with all users in the current query.
+        return new Deferred(function () use ($user): array {
+            // Ensure we only perform the actual loading exactly once.
+            if (! $this->hasResolved) {
+                $this->resolve();
+            }
+
+            return $this->results[$user->id];
+        });
+    }
+
+    /**
+     * Actually call out to the posts service and resolve them all at once.
+     */
+    protected function resolve(): void
+    {
+        $posts = PostsService::forUsers(array_keys($this->users));
+
+        foreach ($posts as $post) {
+            $this->results[$post->user_id][] = $post;
+        }
+
+        $this->hasResolved = true;
+    }
+}
+```
