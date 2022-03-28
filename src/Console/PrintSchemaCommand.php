@@ -38,16 +38,15 @@ SIGNATURE;
 
                 return;
             }
+
             $filename = self::GRAPHQL_FEDERATION_FILENAME;
             $schemaString = FederationPrinter::print($schema);
+        } elseif ($this->option('json')) {
+            $filename = self::JSON_FILENAME;
+            $schemaString = \Safe\json_encode(Introspection::fromSchema($schema));
         } else {
-            if ($this->option('json')) {
-                $filename = self::JSON_FILENAME;
-                $schemaString = \Safe\json_encode(Introspection::fromSchema($schema));
-            } else {
-                $filename = self::GRAPHQL_FILENAME;
-                $schemaString = SchemaPrinter::doPrint($schema);
-            }
+            $filename = self::GRAPHQL_FILENAME;
+            $schemaString = SchemaPrinter::doPrint($schema);
         }
 
         if ($this->option('write')) {

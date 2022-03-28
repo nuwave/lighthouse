@@ -4,12 +4,12 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 ## The process
 
-If this is your first time contributing to any project on GitHub, try [First Contributions](https://github.com/firstcontributions/first-contributions/blob/master/README.md).
+If this is your first time contributing to any project on GitHub, see [First Contributions](https://github.com/firstcontributions/first-contributions/blob/master/README.md).
 For this project specifically, follow these steps:
 
 1. Fork the project
 1. Clone the repository
-1. [Setup the project](#setup)
+1. [Set up the project](#setup)
 1. Create a branch
 1. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
 1. [Test your changes](#testing)
@@ -25,8 +25,8 @@ and other quality tools.
 
 A reproducible environment with minimal dependencies:
 
-- [docker-compose](https://docs.docker.com/compose/install/)
-- [GNU Make](https://www.gnu.org/software/make/) (optional)
+- [docker-compose](https://docs.docker.com/compose/install)
+- [GNU Make](https://www.gnu.org/software/make) (optional)
 
 For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
 To see the available commands, run:

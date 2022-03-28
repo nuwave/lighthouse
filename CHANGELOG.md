@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
@@ -27,6 +27,92 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for PHP 7.2, 7.3
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
+
+## v5.45.3
+
+### Fixed
+
+- Annotate generated schema with correct model in paginated relations https://github.com/nuwave/lighthouse/pull/2093
+
+## v5.45.2
+
+### Fixed
+
+- Fix definition of `@clearCache` argument `idSource` https://github.com/nuwave/lighthouse/pull/2100
+
+## v5.45.1
+
+### Fixed
+
+- Fix `mget` returning false for entries https://github.com/nuwave/lighthouse/pull/2095
+
+## v5.45.0
+
+### Added
+
+- Add `@drop` directive to ignore incoming values https://github.com/nuwave/lighthouse/pull/2092
+
+## v5.44.1
+
+### Changed
+
+- Expire query cache after one day by default https://github.com/nuwave/lighthouse/pull/2089
+
+## v5.44.0
+
+### Changed
+
+- Register artisan commands not only when running in console https://github.com/nuwave/lighthouse/pull/2088
+
+## v5.43.0
+
+### Added
+
+- Allow lazy registration of types https://github.com/nuwave/lighthouse/pull/2086
+
+## v5.42.3
+
+### Fixed
+
+- Improve error message when passing non-existing class-string to `LaravelEnumType`
+
+## v5.42.2
+
+### Fixed
+
+- Handle invalid subscriber cache entries from redis https://github.com/nuwave/lighthouse/pull/2084
+
+## v5.42.1
+
+### Fixed
+
+- Normalize rules input to ensure Laravel 9 support https://github.com/nuwave/lighthouse/pull/2070
+
+## v5.42.0
+
+### Added
+
+- Batched federation entity resolvers https://github.com/nuwave/lighthouse/pull/2043
+
+## v5.41.0
+
+### Added
+
+- Add testing trait `RefreshesSchemaCache` https://github.com/nuwave/lighthouse/pull/2076
+
+### Fixed
+
+- Add proper error handling for invalid schema cache file contents https://github.com/nuwave/lighthouse/pull/2076
+
+### Deprecated
+
+- Deprecate testing trait `ClearsSchemaCache` https://github.com/nuwave/lighthouse/pull/2076
+
+## v5.40.1
+
+### Fixed
+
+- Properly handle any kind of deferred resolved value https://github.com/nuwave/lighthouse/pull/2064
 
 ## v5.40.0
 

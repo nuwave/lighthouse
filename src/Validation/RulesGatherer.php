@@ -218,13 +218,13 @@ class RulesGatherer
      * @param  array<int, mixed>  $rules
      * @param  array<int|string>  $argumentPath
      *
-     * @return array<int, array<int, mixed>|object>
+     * @return array<int, object|string>
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
         return array_map(
             /**
-             * @return object|array<int, mixed>
+             * @return object|string
              */
             static function ($rule) use ($argumentPath) {
                 if (is_object($rule)) {
@@ -311,13 +311,10 @@ class RulesGatherer
                     }
                 }
 
-                // Laravel expects the rule to be a flat array of name, arg1, arg2, ...
-                $flatArgs = [$name];
-                foreach ($args as $arg) {
-                    $flatArgs[] = $arg;
-                }
-
-                return $flatArgs;
+                // Convert back to the Laravel rule definition style rule:arg1,arg2
+                return count($args) > 0
+                    ? $name . ':' . implode(',', $args)
+                    : $name;
             },
             $rules
         );

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 
 /**
@@ -118,7 +119,12 @@ class ASTCache
         }
 
         if ($this->filesystem()->exists($this->path)) {
-            return DocumentAST::fromArray(require $this->path);
+            $ast = require $this->path;
+            if (! is_array($ast)) {
+                throw new InvalidSchemaCacheContentsException($this->path, $ast);
+            }
+
+            return DocumentAST::fromArray($ast);
         }
 
         $documentAST = $build();

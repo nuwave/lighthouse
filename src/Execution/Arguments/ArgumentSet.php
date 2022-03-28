@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
-use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -59,51 +58,11 @@ class ArgumentSet
     {
         $argument = $this->arguments[$key] ?? null;
 
-        if (null === $argument) {
+        if (! $argument instanceof Argument) {
             return false;
         }
 
         return null !== $argument->value;
-    }
-
-    /**
-     * Apply the @rename directive and return a new, modified instance.
-     *
-     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
-     */
-    public function rename(): self
-    {
-        $argumentSet = new self();
-        $argumentSet->directives = $this->directives;
-
-        foreach ($this->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs.
-            // We look for further ArgumentSet instances, they
-            // might be contained within an array.
-            $argument->value = Utils::applyEach(
-                function ($value) {
-                    if ($value instanceof self) {
-                        return $value->rename();
-                    }
-
-                    return $value;
-                },
-                $argument->value
-            );
-
-            /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
-            $renameDirective = $argument->directives->first(function ($directive) {
-                return $directive instanceof RenameDirective;
-            });
-
-            if (null !== $renameDirective) {
-                $argumentSet->arguments[$renameDirective->attributeArgValue()] = $argument;
-            } else {
-                $argumentSet->arguments[$name] = $argument;
-            }
-        }
-
-        return $argumentSet;
     }
 
     /**
