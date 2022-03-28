@@ -9,6 +9,66 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.45.3
+
+### Fixed
+
+- Annotate generated schema with correct model in paginated relations https://github.com/nuwave/lighthouse/pull/2093
+
+## v5.45.2
+
+### Fixed
+
+- Fix definition of `@clearCache` argument `idSource` https://github.com/nuwave/lighthouse/pull/2100
+
+## v5.45.1
+
+### Fixed
+
+- Fix `mget` returning false for entries https://github.com/nuwave/lighthouse/pull/2095
+
+## v5.45.0
+
+### Added
+
+- Add `@drop` directive to ignore incoming values https://github.com/nuwave/lighthouse/pull/2092
+
+## v5.44.1
+
+### Changed
+
+- Expire query cache after one day by default https://github.com/nuwave/lighthouse/pull/2089
+
+## v5.44.0
+
+### Changed
+
+- Register artisan commands not only when running in console https://github.com/nuwave/lighthouse/pull/2088
+
+## v5.43.0
+
+### Added
+
+- Allow lazy registration of types https://github.com/nuwave/lighthouse/pull/2086
+
+## v5.42.3
+
+### Fixed
+
+- Improve error message when passing non-existing class-string to `LaravelEnumType`
+
+## v5.42.2
+
+### Fixed
+
+- Handle invalid subscriber cache entries from redis https://github.com/nuwave/lighthouse/pull/2084
+
+## v5.42.1
+
+### Fixed
+
+- Normalize rules input to ensure Laravel 9 support https://github.com/nuwave/lighthouse/pull/2070
+
 ## v5.42.0
 
 ### Added

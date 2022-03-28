@@ -50,7 +50,7 @@ a calculated tag. Depending on the effect of the mutation, you can clear differe
 
 Update the cache associated with a given type without a specific ID:
 
-> This does not invalidate cache entries related to the type _and_ and ID.
+> This does not invalidate cache entries related to the type _and_ ID.
 
 ```graphql
 type Mutation {

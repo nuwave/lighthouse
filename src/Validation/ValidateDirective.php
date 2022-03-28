@@ -33,10 +33,8 @@ GRAPHQL;
                     $argumentSet = $resolveInfo->argumentSet;
                     $rulesGatherer = new RulesGatherer($argumentSet);
 
-                    /**
-                     * @var \Illuminate\Contracts\Validation\Factory $validationFactory
-                     */
                     $validationFactory = app(ValidationFactory::class);
+                    assert($validationFactory instanceof ValidationFactory);
                     $validator = $validationFactory->make(
                         $args,
                         $rulesGatherer->rules,

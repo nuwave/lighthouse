@@ -38,7 +38,7 @@ directive @clearCache(
   """
   Source of the parent ID to clear.
   """
-  idSource: ClearCacheId
+  idSource: ClearCacheIdSource
 
   """
   Name of the field to clear.
