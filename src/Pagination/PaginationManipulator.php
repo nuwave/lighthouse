@@ -244,9 +244,9 @@ GRAPHQL
 
         // TODO always add ! in v6
         $definition = 'first: Int'
-            . $defaultCount
+            . ($defaultCount
                 ? " =  {$defaultCount}"
-                : '!';
+                : '!');
 
         return $description . $definition;
     }

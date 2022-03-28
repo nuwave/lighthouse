@@ -9,16 +9,15 @@ use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class PaginateDirectiveDBTest extends DBTestCase
+final class PaginateDirectiveDBTest extends DBTestCase
 {
-    public function testCreateQueryPaginators(): void
+    public function testPaginate(): void
     {
         factory(User::class, 3)->create();
 
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -36,7 +35,6 @@ class PaginateDirectiveDBTest extends DBTestCase
                 }
                 data {
                     id
-                    name
                 }
             }
         }
@@ -61,7 +59,6 @@ class PaginateDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -93,18 +90,18 @@ class PaginateDirectiveDBTest extends DBTestCase
 
     public function testPaginateWithScopes(): void
     {
-        $namedUserName = 'A named user';
-        factory(User::class)->create([
-            'name' => $namedUserName,
+        $namedUser = factory(User::class)->create([
+            'name' => 'A named user',
         ]);
+        assert($namedUser instanceof User);
+
         factory(User::class)->create([
             'name' => null,
         ]);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            id: ID!
-            name: String!
+            id: String!
         }
 
         type Query {
@@ -121,7 +118,7 @@ class PaginateDirectiveDBTest extends DBTestCase
                     currentPage
                 }
                 data {
-                    name
+                    id
                 }
             }
         }
@@ -135,7 +132,7 @@ class PaginateDirectiveDBTest extends DBTestCase
                     ],
                     'data' => [
                         [
-                            'name' => $namedUserName,
+                            'id' => "$namedUser->id",
                         ],
                     ],
                 ],
@@ -160,13 +157,10 @@ class PaginateDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type User {
-            id: ID!
-            name: String!
             posts: [Post!]! @paginate
         }
 
         type Post {
-            id: ID!
             comments: [Comment!]! @paginate
         }
 
@@ -243,7 +237,6 @@ class PaginateDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -260,7 +253,6 @@ class PaginateDirectiveDBTest extends DBTestCase
                 edges {
                     node {
                         id
-                        name
                     }
                 }
             }
@@ -281,7 +273,6 @@ class PaginateDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -305,7 +296,6 @@ class PaginateDirectiveDBTest extends DBTestCase
                 edges {
                     node {
                         id
-                        name
                     }
                 }
             }
@@ -383,7 +373,6 @@ class PaginateDirectiveDBTest extends DBTestCase
         $this->schema .= /** @lang GraphQL */ '
         type User {
             id: ID!
-            name: String!
         }
 
         extend type Query {
@@ -396,21 +385,19 @@ class PaginateDirectiveDBTest extends DBTestCase
             users(first: 1) {
                 data {
                     id
-                    name
                 }
             }
         }
         ')->assertJsonCount(1, 'data.users.data');
     }
 
-    public function testHaveADefaultPaginationCount(): void
+    public function testDefaultPaginationCount(): void
     {
         factory(User::class, 3)->create();
 
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
-            name: String!
         }
 
         type Query {
@@ -428,7 +415,6 @@ class PaginateDirectiveDBTest extends DBTestCase
                 }
                 data {
                     id
-                    name
                 }
             }
         }
