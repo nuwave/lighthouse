@@ -173,3 +173,5 @@ class UserPostsBatchLoader
     }
 }
 ```
+
+You can also use a generic utility such as [DataLoaderPHP](https://github.com/overblog/dataloader-php) to build batch loaders.
