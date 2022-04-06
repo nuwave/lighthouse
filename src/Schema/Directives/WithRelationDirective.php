@@ -17,7 +17,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
 {
     use RelationDirectiveHelpers;
 
-    abstract protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader;
+    abstract protected function modelsLoader(ResolveInfo $resolveInfo): ModelsLoader;
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
@@ -45,7 +45,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
             function () use ($resolveInfo): RelationBatchLoader {
-                return new RelationBatchLoader($this->relationLoader($resolveInfo));
+                return new RelationBatchLoader($this->modelsLoader($resolveInfo));
             }
         );
 

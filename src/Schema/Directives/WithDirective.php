@@ -45,7 +45,7 @@ GRAPHQL;
     /**
      * @return \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader
      */
-    protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader
+    protected function modelsLoader(ResolveInfo $resolveInfo): ModelsLoader
     {
         return new SimpleModelsLoader(
             $this->relation(),

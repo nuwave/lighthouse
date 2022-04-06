@@ -63,7 +63,7 @@ class RelationBatchLoader
         });
     }
 
-    public function resolve(): void
+    protected function resolve(): void
     {
         $parentModels = new EloquentCollection($this->parents);
 
