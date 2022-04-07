@@ -47,7 +47,7 @@ GRAPHQL;
 
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
                 assert(
-                    $query instanceof QueryBuilder | $query instanceof EloquentBuilder,
+                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
                 );
             } else {
