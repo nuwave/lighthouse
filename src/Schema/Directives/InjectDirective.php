@@ -56,21 +56,19 @@ GRAPHQL;
 
         $previousResolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolver) {
-                    $valueFromContext = data_get($context, $contextAttributeName);
+        $fieldValue->setResolver(function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolver) {
+            $valueFromContext = data_get($context, $contextAttributeName);
 
-                    $resolveInfo->argumentSet->addValue($argumentName, $valueFromContext);
+            $resolveInfo->argumentSet->addValue($argumentName, $valueFromContext);
 
-                    return $previousResolver(
-                        $rootValue,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+            return $previousResolver(
+                $rootValue,
+                $resolveInfo->argumentSet->toArray(),
+                $context,
+                $resolveInfo
+            );
+        });
+
+        return $next($fieldValue);
     }
 }

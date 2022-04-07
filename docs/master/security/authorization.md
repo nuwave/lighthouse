@@ -208,29 +208,27 @@ GRAPHQL;
     {
         $originalResolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
-                    $requiredRole = $this->directiveArgValue('requiredRole');
-                    // Throw in case of an invalid schema definition to remind the developer
-                    if ($requiredRole === null) {
-                        throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
-                    }
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
+            $requiredRole = $this->directiveArgValue('requiredRole');
+            // Throw in case of an invalid schema definition to remind the developer
+            if ($requiredRole === null) {
+                throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
+            }
 
-                    $user = $context->user();
-                    if (
-                        // Unauthenticated users don't get to see anything
-                        ! $user
-                        // The user's role has to match have the required role
-                        || $user->role !== $requiredRole
-                    ) {
-                        return null;
-                    }
+            $user = $context->user();
+            if (
+                // Unauthenticated users don't get to see anything
+                ! $user
+                // The user's role has to match have the required role
+                || $user->role !== $requiredRole
+            ) {
+                return null;
+            }
 
-                    return $originalResolver($root, $args, $context, $resolveInfo);
-                }
-            )
-        );
+            return $originalResolver($root, $args, $context, $resolveInfo);
+        });
+
+        return $next($fieldValue);
     }
 }
 ```

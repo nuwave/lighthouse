@@ -103,28 +103,28 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
-                if ($this->directiveHasArgument('builder')) {
-                    $builderResolver = $this->getResolverFromArgument('builder');
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+            if ($this->directiveHasArgument('builder')) {
+                $builderResolver = $this->getResolverFromArgument('builder');
 
-                    /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
-                    $query = $builderResolver($root, $args, $context, $resolveInfo);
-                } else {
-                    $query = $this->getModelClass()::query();
-                }
-
-                $query = $resolveInfo
-                    ->argumentSet
-                    ->enhanceBuilder(
-                        $query,
-                        $this->directiveArgValue('scopes', [])
-                    );
-
-                return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
-                    ->applyToBuilder($query);
+                /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
+                $query = $builderResolver($root, $args, $context, $resolveInfo);
+            } else {
+                $query = $this->getModelClass()::query();
             }
-        );
+
+            $query = $resolveInfo
+                ->argumentSet
+                ->enhanceBuilder(
+                    $query,
+                    $this->directiveArgValue('scopes', [])
+                );
+
+            return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
+                ->applyToBuilder($query);
+        });
+
+        return $fieldValue;
     }
 
     protected function paginationType(): PaginationType
