@@ -108,19 +108,17 @@ GRAPHQL;
 
         $resolver = $fieldValue->getResolver();
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
-                foreach ($limits as $limit) {
-                    $this->handleLimit(
-                        $limit['key'],
-                        $limit['maxAttempts'],
-                        $limit['decayMinutes']
-                    );
-                }
-
-                return $resolver($root, $args, $context, $resolveInfo);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
+            foreach ($limits as $limit) {
+                $this->handleLimit(
+                    $limit['key'],
+                    $limit['maxAttempts'],
+                    $limit['decayMinutes']
+                );
             }
-        );
+
+            return $resolver($root, $args, $context, $resolveInfo);
+        });
 
         return $next($fieldValue);
     }

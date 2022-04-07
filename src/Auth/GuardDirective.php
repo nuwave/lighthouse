@@ -57,19 +57,17 @@ GRAPHQL;
     {
         $previousResolver = $fieldValue->getResolver();
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                // TODO remove cast in v6
-                $with = (array) (
-                    $this->directiveArgValue('with')
-                    ?? [AuthServiceProvider::guard()]
-                );
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+            // TODO remove cast in v6
+            $with = (array) (
+                $this->directiveArgValue('with')
+                ?? [AuthServiceProvider::guard()]
+            );
 
-                $this->authenticate($with);
+            $this->authenticate($with);
 
-                return $previousResolver($root, $args, $context, $resolveInfo);
-            }
-        );
+            return $previousResolver($root, $args, $context, $resolveInfo);
+        });
 
         return $next($fieldValue);
     }

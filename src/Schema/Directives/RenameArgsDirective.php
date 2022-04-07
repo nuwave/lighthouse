@@ -27,21 +27,19 @@ GRAPHQL;
     {
         $resolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $argumentSet = $resolveInfo->argumentSet;
-                    $this->rename($argumentSet);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $argumentSet = $resolveInfo->argumentSet;
+            $this->rename($argumentSet);
 
-                    return $resolver(
-                        $root,
-                        $argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+            return $resolver(
+                $root,
+                $argumentSet->toArray(),
+                $context,
+                $resolveInfo
+            );
+        });
+
+        return $next($fieldValue);
     }
 
     protected function rename(ArgumentSet &$argumentSet): void

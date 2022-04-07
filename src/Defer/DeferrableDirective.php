@@ -47,20 +47,18 @@ GRAPHQL;
         $previousResolver = $fieldValue->getResolver();
         $fieldType = $fieldValue->getField()->type;
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
-                $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
-                    return $previousResolver($root, $args, $context, $resolveInfo);
-                };
-                $path = implode('.', $resolveInfo->path);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
+            $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
+                return $previousResolver($root, $args, $context, $resolveInfo);
+            };
+            $path = implode('.', $resolveInfo->path);
 
-                if ($this->shouldDefer($fieldType, $resolveInfo)) {
-                    return $this->defer->defer($wrappedResolver, $path);
-                }
-
-                return $this->defer->findOrResolve($wrappedResolver, $path);
+            if ($this->shouldDefer($fieldType, $resolveInfo)) {
+                return $this->defer->defer($wrappedResolver, $path);
             }
-        );
+
+            return $this->defer->findOrResolve($wrappedResolver, $path);
+        });
 
         return $next($fieldValue);
     }
