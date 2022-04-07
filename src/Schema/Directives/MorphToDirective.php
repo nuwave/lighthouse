@@ -89,9 +89,9 @@ GRAPHQL;
 
         $scopes = [];
         foreach ($this->directiveArgValue('scopes') ?? [] as $scopesForModel) {
-            $scopes []= $scopesForModel['model'];
+            $scopes[] = $scopesForModel['model'];
             foreach ($scopesForModel['scopes'] as $scope) {
-                $scopes[]= $scope;
+                $scopes[] = $scope;
             }
         }
 

@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
