@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
@@ -44,8 +45,8 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
             $paginationArgs = $this->paginationArgs($args);
 
-            /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
             $relation = $parent->{$relationName}();
+            assert($relation instanceof Relation);
 
             // We can shortcut the resolution if the client only queries for a foreign key
             // that we know to be present on the parent model.
@@ -71,7 +72,6 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 // Batch loading joins across both models, thus only works if they are on the same connection
                 && $relation->getParent()->getConnectionName() === $relation->getRelated()->getConnectionName()
             ) {
-                /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     $this->qualifyPath($args, $resolveInfo),
                     function () use ($relationName, $decorateBuilder, $paginationArgs): RelationBatchLoader {
@@ -82,6 +82,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                         return new RelationBatchLoader($modelsLoader);
                     }
                 );
+                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
             }
