@@ -142,17 +142,36 @@ final class MorphToDirectiveTest extends DBTestCase
         $image->imageable()->associate($task);
         $image->save();
 
+        $post = factory(Post::class)->make();
+        assert($post instanceof Post);
+        $post->user()->associate($user->id);
+        $post->save();
+
+        $postImage = factory(Image::class)->make();
+        assert($postImage instanceof Image);
+        $postImage->imageable()->associate($post);
+        $postImage->save();
+
         $this->schema = /** @lang GraphQL */ '
-        type Image {
+        interface Imageable {
             id: ID!
-            imageable: Task @morphTo(scopes: [
-                { model: "Task", scopes: ["completed"] }
-            ])
         }
 
-        type Task {
+        type Task implements Imageable {
             id: ID!
             name: String!
+        }
+
+        type Post implements Imageable {
+            id: ID!
+            title: String!
+        }
+
+        type Image {
+            id: ID!
+            imageable: Imageable @morphTo(scopes: [
+                { model: "Task", scopes: ["completed"] }
+            ])
         }
 
         type Query {
@@ -163,21 +182,49 @@ final class MorphToDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($id: ID!) {
-            image(id: $id) {
+        query ($taskImage: ID!, $postImage: ID!){
+            taskImage: image(id: $taskImage) {
                 id
                 imageable {
-                    id
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
+                }
+            }
+            postImage: image(id: $postImage) {
+                id
+                imageable {
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
                 }
             }
         }
         ', [
-            'id' => $image->id,
+            'taskImage' => $image->id,
+            'postImage' => $postImage->id,
         ])->assertJson([
             'data' => [
-                'image' => [
+                'taskImage' => [
                     'id' => $image->id,
                     'imageable' => null,
+                ],
+                'postImage' => [
+                    'id' => $postImage->id,
+                    'imageable' => [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                    ],
                 ],
             ],
         ]);
@@ -186,22 +233,51 @@ final class MorphToDirectiveTest extends DBTestCase
         $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($id: ID!) {
-            image(id: $id) {
+        query ($taskImage: ID!, $postImage: ID!){
+            taskImage: image(id: $taskImage) {
                 id
                 imageable {
-                    id
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
+                }
+            }
+            postImage: image(id: $postImage) {
+                id
+                imageable {
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
                 }
             }
         }
         ', [
-            'id' => $image->id,
+            'taskImage' => $image->id,
+            'postImage' => $postImage->id,
         ])->assertJson([
             'data' => [
-                'image' => [
+                'taskImage' => [
                     'id' => $image->id,
                     'imageable' => [
                         'id' => $task->id,
+                        'name' => $task->name,
+                    ],
+                ],
+                'postImage' => [
+                    'id' => $postImage->id,
+                    'imageable' => [
+                        'id' => $post->id,
+                        'title' => $post->title,
                     ],
                 ],
             ],
