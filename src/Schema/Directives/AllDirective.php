@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -43,8 +45,11 @@ GRAPHQL;
             if ($this->directiveHasArgument('builder')) {
                 $builderResolver = $this->getResolverFromArgument('builder');
 
-                /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
+                assert(
+                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder,
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
+                );
             } else {
                 $query = $this->getModelClass()::query();
             }

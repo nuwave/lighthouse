@@ -8,6 +8,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
@@ -138,7 +139,7 @@ GRAPHQL;
             return $argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes', [])
+                    $this->directiveArgValue('scopes') ?? []
                 )
                 ->get();
         }
@@ -170,16 +171,12 @@ GRAPHQL;
             }
 
             try {
-                /**
-                 * TODO use generics.
-                 *
-                 * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
-                 */
                 $enhancedBuilder = $argumentSet->enhanceBuilder(
                     $queryBuilder,
-                    $this->directiveArgValue('scopes', []),
+                    $this->directiveArgValue('scopes') ?? [],
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
+                assert($enhancedBuilder instanceof Builder);
 
                 $modelOrModels = $enhancedBuilder->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {

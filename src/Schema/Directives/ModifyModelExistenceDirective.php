@@ -54,7 +54,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
             $idOrIds = reset($args);
 
             // TODO remove in v6
-            if ($this->directiveArgValue('globalId') ?? false) {
+            if ($this->directiveArgValue('globalId')) {
                 // @phpstan-ignore-next-line We know that global ids must be strings
                 $idOrIds = $this->decodeIdOrIds($idOrIds);
             }
