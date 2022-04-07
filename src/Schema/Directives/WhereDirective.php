@@ -36,11 +36,11 @@ GRAPHQL;
     public function handleBuilder($builder, $value): object
     {
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
-        $clause = $this->directiveArgValue('clause', 'where');
+        $clause = $this->directiveArgValue('clause') ?? 'where';
 
         return $builder->{$clause}(
-            $this->directiveArgValue('key', $this->nodeName()),
-            $this->directiveArgValue('operator', '='),
+            $this->directiveArgValue('key') ?? $this->nodeName(),
+            $this->directiveArgValue('operator') ?? '=',
             $value
         );
     }

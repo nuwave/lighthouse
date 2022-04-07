@@ -100,7 +100,7 @@ GRAPHQL;
             }
         } else {
             $limits[] = [
-                'key' => sha1($this->directiveArgValue('prefix', '') . $this->request->ip()),
+                'key' => sha1($this->directiveArgValue('prefix') . $this->request->ip()),
                 'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
                 'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
             ];

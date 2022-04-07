@@ -6,6 +6,8 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -107,8 +109,11 @@ GRAPHQL;
             if ($this->directiveHasArgument('builder')) {
                 $builderResolver = $this->getResolverFromArgument('builder');
 
-                /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query we assume the user did the right thing */
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
+                assert(
+                    $query instanceof QueryBuilder | $query instanceof EloquentBuilder,
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
+                );
             } else {
                 $query = $this->getModelClass()::query();
             }
@@ -117,7 +122,7 @@ GRAPHQL;
                 ->argumentSet
                 ->enhanceBuilder(
                     $query,
-                    $this->directiveArgValue('scopes', [])
+                    $this->directiveArgValue('scopes') ?? []
                 );
 
             return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
@@ -130,7 +135,7 @@ GRAPHQL;
     protected function paginationType(): PaginationType
     {
         return new PaginationType(
-            $this->directiveArgValue('type', PaginationType::PAGINATOR)
+            $this->directiveArgValue('type') ?? PaginationType::PAGINATOR
         );
     }
 

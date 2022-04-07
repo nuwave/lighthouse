@@ -44,7 +44,7 @@ GRAPHQL;
         // @phpstan-ignore-next-line Mixins are magic
         return $builder->whereHas(
             $this->directiveArgValue('relation'),
-            function ($query): void {
+            function (object $query): void {
                 $guard = $this->directiveArgValue('guard')
                     ?? AuthServiceProvider::guard();
 

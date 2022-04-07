@@ -59,7 +59,7 @@ GRAPHQL;
         }
 
         return $builder->where(
-            $this->directiveArgValue('key', $this->nodeName()),
+            $this->directiveArgValue('key') ?? $this->nodeName(),
             'LIKE',
             $value
         );

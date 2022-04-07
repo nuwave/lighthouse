@@ -28,7 +28,7 @@ GRAPHQL;
     public function handleBuilder($builder, $value): object
     {
         return $builder->whereNotBetween(
-            $this->directiveArgValue('key', $this->nodeName()),
+            $this->directiveArgValue('key') ?? $this->nodeName(),
             $value
         );
     }

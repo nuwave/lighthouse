@@ -29,7 +29,7 @@ trait GeneratesColumnsEnum
 
         if ($hasColumns && $hasColumnsEnum) {
             throw new DefinitionException(
-                'The @' . $this->name() . ' directive can only have one of the following arguments: `columns`, `columnsEnum`.'
+                "The @{$this->name()} directive can only have one of the following arguments: `columns`, `columnsEnum`."
             );
         }
 

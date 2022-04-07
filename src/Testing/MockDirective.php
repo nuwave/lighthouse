@@ -39,7 +39,7 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function () {
-            $key = $this->directiveArgValue('key', 'default');
+            $key = $this->directiveArgValue('key') ?? 'default';
             $resolver = $this->mockResolverService->get($key);
 
             return $resolver(...func_get_args());
