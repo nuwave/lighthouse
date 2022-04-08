@@ -590,9 +590,9 @@ class ValidationTest extends TestCase
 
     public function testNestedClosureRulesAreUsed(): void
     {
-        $this->schema =
+        $this->schema
             /** @lang GraphQL */
-            '
+            = '
         type Query {
             foo(input: Custom @spread): String @validator(class: "Tests\\\\Utils\\\\Validators\\\\FooNestedClosureValidator")
         }
@@ -631,6 +631,7 @@ class ValidationTest extends TestCase
         );
         $call->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
     }
+
     public function testReturnsMultipleValidationErrorsPerField(): void
     {
         $this->schema = /** @lang GraphQL */ '
