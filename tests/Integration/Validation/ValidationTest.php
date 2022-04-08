@@ -588,6 +588,49 @@ class ValidationTest extends TestCase
             ->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
     }
 
+    public function testNestedClosureRulesAreUsed(): void
+    {
+        $this->schema =
+            /** @lang GraphQL */
+            '
+        type Query {
+            foo(input: Custom @spread): String @validator(class: "Tests\\\\Utils\\\\Validators\\\\FooNestedClosureValidator")
+        }
+
+        input Custom {
+            foo: String!
+        }
+        ';
+
+        $this
+            ->graphQL(
+                /** @lang GraphQL */
+                '
+            {
+                foo(
+                    input: {
+                        foo: "foo"
+                    }
+                )
+            }
+            '
+            )
+            ->assertGraphQLValidationPasses();
+
+        $call = $this->graphQL(
+            /** @lang GraphQL */
+            '
+            {
+                foo(
+                    input: {
+                        foo: "bar"
+                    }
+                )
+            }
+            '
+        );
+        $call->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
+    }
     public function testReturnsMultipleValidationErrorsPerField(): void
     {
         $this->schema = /** @lang GraphQL */ '
