@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
+use GraphQL\Server\RequestError;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
 use Laragraph\Utils\RequestParser;
@@ -10,7 +11,9 @@ use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Safe\Exceptions\JsonException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class GraphQLController
 {
@@ -26,7 +29,12 @@ class GraphQLController
             new StartRequest($request)
         );
 
-        $operationOrOperations = $requestParser->parseRequest($request);
+        try {
+            $operationOrOperations = $requestParser->parseRequest($request);
+        } catch (JsonException|RequestError $e) {
+            throw new BadRequestHttpException('Error parsing GraphQL request', $e);
+        }
+
         $context = $createsContext->generate($request);
 
         $result = $graphQL->executeOperationOrOperations($operationOrOperations, $context);
