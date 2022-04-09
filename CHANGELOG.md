@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Send http error 400 instead of 500 on malformed JSON request https://github.com/nuwave/lighthouse/pull/2114
+
 ## v5.45.4
 
 ### Fixed
