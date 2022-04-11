@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Validators\FooClosureValidator;
+use Tests\Utils\Validators\FooNestedValidator;
 
 /**
  * Covers fundamentals of the validation process.
@@ -586,6 +587,44 @@ class ValidationTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
+    }
+
+    public function testClosureRulesForNestedInput(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: Custom): String @validator(class: "Tests\\\\Utils\\\\Validators\\\\FooNestedValidator")
+        }
+
+        input Custom {
+            foo: String!
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "foo"
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationPasses();
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        foo: "bar"
+                    }
+                )
+            }
+            ')
+            ->dump()
+            ->assertGraphQLValidationError('input.foo', FooNestedValidator::notFoo('input.foo'));
     }
 
     public function testReturnsMultipleValidationErrorsPerField(): void

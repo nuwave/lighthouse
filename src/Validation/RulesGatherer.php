@@ -222,101 +222,101 @@ class RulesGatherer
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
-        return array_map(
-            /**
-             * @return object|string
-             */
-            static function ($rule) use ($argumentPath) {
-                if (is_object($rule)) {
-                    if ($rule instanceof WithReferenceRule) {
-                        $rule->setArgumentPath($argumentPath);
-                    }
+        foreach ($rules as $index => &$rule) {
+            if (is_string($index)) {
+                $rule = $this->qualifyArgumentReferences($rule, array_merge($argumentPath, [$index]));
+                continue;
+            }
 
-                    return $rule;
+            if (is_object($rule)) {
+                if ($rule instanceof WithReferenceRule) {
+                    $rule->setArgumentPath($argumentPath);
+                }
+                continue;
+            }
+
+            /**
+             * @var array{
+             *   0: string,
+             *   1: array<int, mixed>,
+             * } $parsed
+             */
+            $parsed = ValidationRuleParser::parse($rule);
+
+            $name = $parsed[0];
+            $args = $parsed[1];
+
+            if ('WithReference' === $name) {
+                $indexes = explode('_', $args[1]);
+                array_splice($args, 1, 1);
+                foreach ($indexes as $index) {
+                    // Skipping over the first index, which is the name
+                    $index = (int) $index + 1;
+                    $args[$index] = implode('.', array_merge($argumentPath, [$args[$index]]));
                 }
 
-                /**
-                 * @var array{
-                 *   0: string,
-                 *   1: array<int, mixed>,
-                 * } $parsed
-                 */
-                $parsed = ValidationRuleParser::parse($rule);
+                $parsed = ValidationRuleParser::parse($args);
 
                 $name = $parsed[0];
                 $args = $parsed[1];
+            }
 
-                if ('WithReference' === $name) {
-                    $indexes = explode('_', $args[1]);
-                    array_splice($args, 1, 1);
-                    foreach ($indexes as $index) {
-                        // Skipping over the first index, which is the name
-                        $index = (int) $index + 1;
-                        $args[$index] = implode('.', array_merge($argumentPath, [$args[$index]]));
-                    }
+            // Those rule lists are a subset of https://github.com/illuminate/validation/blob/8079fd53dee983e7c52d1819ae3b98c71a64fbc0/Validator.php#L206-L236
+            // using the docs to know which ones reference other fields: https://laravel.com/docs/8.x/validation#available-validation-rules
+            // We do not handle the Exclude* rules, those mutate the input and are not supported.
 
-                    $parsed = ValidationRuleParser::parse($args);
+            // Rules where the first argument is a field reference
+            if (in_array($name, [
+                'Different',
+                'Gt',
+                'Gte',
+                'Lt',
+                'Lte',
+                'ProhibitedIf',
+                'ProhibitedUnless',
+                'RequiredIf',
+                'RequiredUnless',
+                'Same',
+            ])) {
+                $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
+            }
 
-                    $name = $parsed[0];
-                    $args = $parsed[1];
-                }
+            // Rules where all arguments are field references
+            if (in_array($name, [
+                'Prohibits',
+                'RequiredWith',
+                'RequiredWithAll',
+                'RequiredWithout',
+                'RequiredWithoutAll',
+            ])) {
+                $args = array_map(
+                    static function (string $field) use ($argumentPath): string {
+                        return implode('.', array_merge($argumentPath, [$field]));
+                    },
+                    $args
+                );
+            }
 
-                // Those rule lists are a subset of https://github.com/illuminate/validation/blob/8079fd53dee983e7c52d1819ae3b98c71a64fbc0/Validator.php#L206-L236
-                // using the docs to know which ones reference other fields: https://laravel.com/docs/8.x/validation#available-validation-rules
-                // We do not handle the Exclude* rules, those mutate the input and are not supported.
-
-                // Rules where the first argument is a field reference
-                if (in_array($name, [
-                    'Different',
-                    'Gt',
-                    'Gte',
-                    'Lt',
-                    'Lte',
-                    'ProhibitedIf',
-                    'ProhibitedUnless',
-                    'RequiredIf',
-                    'RequiredUnless',
-                    'Same',
-                ])) {
+            // Rules where the first argument is a date or a field reference
+            if (is_string($args[0] ?? null) && in_array($name, [
+                'After',
+                'AfterOrEqual',
+                'Before',
+                'BeforeOrEqual',
+            ])) {
+                try {
+                    Carbon::parse($args[0]);
+                } catch (Throwable $argumentIsNotADate) {
                     $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                 }
+            }
 
-                // Rules where all arguments are field references
-                if (in_array($name, [
-                    'Prohibits',
-                    'RequiredWith',
-                    'RequiredWithAll',
-                    'RequiredWithout',
-                    'RequiredWithoutAll',
-                ])) {
-                    $args = array_map(
-                        static function (string $field) use ($argumentPath): string {
-                            return implode('.', array_merge($argumentPath, [$field]));
-                        },
-                        $args
-                    );
-                }
+            // Convert back to the Laravel rule definition style rule:arg1,arg2
+            $rule = count($args) > 0
+                ? $name . ':' . implode(',', $args)
+                : $name;
+        }
 
-                // Rules where the first argument is a date or a field reference
-                if (is_string($args[0] ?? null) && in_array($name, [
-                    'After',
-                    'AfterOrEqual',
-                    'Before',
-                    'BeforeOrEqual',
-                ])) {
-                    try {
-                        Carbon::parse($args[0]);
-                    } catch (Throwable $argumentIsNotADate) {
-                        $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
-                    }
-                }
-
-                // Convert back to the Laravel rule definition style rule:arg1,arg2
-                return count($args) > 0
-                    ? $name . ':' . implode(',', $args)
-                    : $name;
-            },
-            $rules
-        );
+        return $rules;
     }
 }
