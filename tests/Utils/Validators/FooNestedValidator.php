@@ -23,7 +23,7 @@ class FooNestedValidator extends Validator
                         }
                     },
                 ],
-            ]
+            ],
         ];
     }
 }
