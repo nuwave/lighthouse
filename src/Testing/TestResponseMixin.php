@@ -7,6 +7,8 @@ use PHPUnit\Framework\Assert;
 use Throwable;
 
 /**
+ * TODO add stronger type hints once support for Illuminate\Foundation\Testing\TestResponse is no longer needed.
+ *
  * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
@@ -76,6 +78,22 @@ class TestResponseMixin
                 $message,
                 $messages,
                 "Expected the GraphQL response to contain error message `{$message}`, got: " . \Safe\json_encode($messages)
+            );
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLDebugMessage(): Closure
+    {
+        return function (string $message) {
+            $messages = $this->json('errors.*.debugMessage');
+
+            Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
+            Assert::assertContains(
+                $message,
+                $messages,
+                "Expected the GraphQL response to contain debug message `{$message}`, got: " . \Safe\json_encode($messages)
             );
 
             return $this;
