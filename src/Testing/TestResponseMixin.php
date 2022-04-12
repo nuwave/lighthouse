@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
+use GraphQL\Error\ClientAware;
 use PHPUnit\Framework\Assert;
 use Throwable;
 
@@ -64,7 +65,11 @@ class TestResponseMixin
     public function assertGraphQLError(): Closure
     {
         return function (Throwable $error) {
-            return $this->assertGraphQLErrorMessage($error->getMessage());
+            $message = $error->getMessage();
+
+            return $error instanceof ClientAware && $error->isClientSafe()
+                ? $this->assertGraphQLErrorMessage($message)
+                : $this->assertGraphQLDebugMessage($message);
         };
     }
 

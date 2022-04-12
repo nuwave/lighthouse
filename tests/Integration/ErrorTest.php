@@ -7,7 +7,6 @@ use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Tests\TestCase;
 
 final class ErrorTest extends TestCase
@@ -164,10 +163,10 @@ final class ErrorTest extends TestCase
         assert($config instanceof ConfigRepository);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
-        $debugMessage = 'foo';
+        $message = 'foo';
 
         $this->mockResolver()
-            ->willThrowException(new ModelNotFoundException($debugMessage));
+            ->willThrowException(new Exception($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -184,6 +183,58 @@ final class ErrorTest extends TestCase
             ->assertStatus(200)
             /** @see FormattedError::$internalErrorMessage */
             ->assertGraphQLErrorMessage('Internal server error')
-            ->assertGraphQLDebugMessage($debugMessage);
+            ->assertGraphQLDebugMessage($message);
+    }
+
+    public function testAssertGraphQLErrorClientSafe(): void
+    {
+        $error = new Error('foo');
+
+        $this->mockResolver()
+            ->willThrowException($error);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertStatus(200)
+            ->assertGraphQLError($error);
+    }
+
+    public function testAssertGraphQLErrorNonClientSafe(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
+
+        $exception = new Exception('foo');
+
+        $this->mockResolver()
+            ->willThrowException($exception);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertStatus(200)
+            /** @see FormattedError::$internalErrorMessage */
+            ->assertGraphQLErrorMessage('Internal server error')
+            ->assertGraphQLError($exception);
     }
 }
