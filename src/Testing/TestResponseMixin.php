@@ -92,7 +92,7 @@ class TestResponseMixin
     public function assertGraphQLDebugMessage(): Closure
     {
         return function (string $message) {
-            $messages = $this->json('errors.*.debugMessage');
+            $messages = $this->json('errors.*.extensions.debugMessage');
 
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
             Assert::assertContains(

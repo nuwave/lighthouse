@@ -77,7 +77,7 @@ class TypeRegistry
     /**
      * Map from type names to lazily resolved types.
      *
-     * @var array<string, callable(): \GraphQL\Type\Definition\Type>
+     * @var array<string, callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     protected $lazyTypes = [];
 
@@ -185,6 +185,8 @@ class TypeRegistry
 
     /**
      * Register an executable GraphQL type lazily.
+     *
+     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
     public function registerLazy(string $name, callable $type): self
     {
@@ -212,7 +214,7 @@ class TypeRegistry
     /**
      * Register a type lazily, overwriting if it exists already.
      *
-     * @return (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null
+     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
     public function overwriteLazy(string $name, callable $type): self
     {

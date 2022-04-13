@@ -27,7 +27,7 @@ use Nuwave\Lighthouse\Support\Utils;
  *
  * @phpstan-type ClassNameToObjectTypeName array<class-string, list<string>>
  *
- * @phpstan-type SerializableArray array{
+ * @phpstan-type SerializableDocumentAST array{
  *     types: array<int, array<string, mixed>>,
  *     directives: array<int, array<string, mixed>>,
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
@@ -182,7 +182,7 @@ class DocumentAST implements Arrayable
      * We exclude the type extensions stored in $typeExtensions,
      * as they are merged with the actual types at this point.
      *
-     * @return SerializableArray
+     * @return SerializableDocumentAST
      */
     public function toArray(): array
     {
@@ -198,7 +198,7 @@ class DocumentAST implements Arrayable
     /**
      * Instantiate from a serialized array.
      *
-     * @param  SerializableArray  $ast
+     * @param  SerializableDocumentAST  $ast
      */
     public static function fromArray(array $ast): DocumentAST
     {
@@ -209,7 +209,7 @@ class DocumentAST implements Arrayable
     }
 
     /**
-     * @return SerializableArray
+     * @return SerializableDocumentAST
      */
     public function __serialize(): array
     {
@@ -217,7 +217,7 @@ class DocumentAST implements Arrayable
     }
 
     /**
-     * @param  SerializableArray  $data
+     * @param  SerializableDocumentAST  $data
      */
     public function __unserialize(array $data): void
     {
@@ -225,7 +225,7 @@ class DocumentAST implements Arrayable
     }
 
     /**
-     * @param  SerializableArray  $ast
+     * @param  SerializableDocumentAST  $ast
      */
     protected function hydrateFromArray(array $ast): void
     {

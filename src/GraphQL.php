@@ -34,6 +34,8 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
 /**
  * The main entrypoint to GraphQL execution.
+ *
+ * @phpstan-import-type ErrorsHandler from \GraphQL\Executor\ExecutionResult
  */
 class GraphQL
 {
@@ -75,10 +77,7 @@ class GraphQL
     /**
      * Lazily initialized.
      *
-     * @var \Closure(
-     *   array<\GraphQL\Error\Error> $errors,
-     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
-     * ): array<string, mixed>
+     * @var ErrorsHandler
      */
     protected $errorsHandler;
 
@@ -365,15 +364,12 @@ class GraphQL
     }
 
     /**
-     * @return \Closure(
-     *   array<\GraphQL\Error\Error> $errors,
-     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
-     * ): array<string, mixed>
+     * @return ErrorsHandler
      */
-    protected function errorsHandler(): \Closure
+    protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {
-            $this->errorsHandler = function (array $errors, callable $formatter): array {
+            return $this->errorsHandler = function (array $errors, callable $formatter): array {
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];

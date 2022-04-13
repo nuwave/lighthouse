@@ -41,11 +41,14 @@ parameters:
   # Some parts of Laravel are just really magical
   - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
-  - '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLErrorMessage\(\) invoked with 1 parameter, 0 required\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
+
+  # Mixins are magical
+  - '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLErrorMessage\(\) invoked with 1 parameter, 0 required\.#'
+  - '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLDebugMessage\(\) invoked with 1 parameter, 0 required\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -72,3 +75,6 @@ parameters:
 
   # Unavailable in thecodingmachine/safe:2
   - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
+
+  # Seems like a bug in PHPStan
+  - '#Parameter \#2 \$type of method Nuwave\\Lighthouse\\Schema\\TypeRegistry::.+Lazy\(\) expects callable\(\): GraphQL\\Type\\Definition\\Type&GraphQL\\Type\\Definition\\NamedType, Closure\(\): GraphQL\\Type\\Definition\\ObjectType given\.#'

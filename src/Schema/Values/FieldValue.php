@@ -11,7 +11,6 @@ use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
