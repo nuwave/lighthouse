@@ -18,17 +18,10 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
-        return $next(
-            $fieldValue->setResolver(
-                /**
-                 * @param  array<string, mixed>  $args
-                 *
-                 * @return array<string, mixed>
-                 */
-                static function ($root, array $args): array {
-                    return $args;
-                }
-            )
-        );
+        $fieldValue->setResolver(static function ($root, array $args): array {
+            return $args;
+        });
+
+        return $next($fieldValue);
     }
 }

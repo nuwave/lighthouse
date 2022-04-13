@@ -99,7 +99,7 @@ GRAPHQL;
             }
         } else {
             $limits[] = [
-                'key' => sha1($this->directiveArgValue('prefix', '') . $this->request->ip()),
+                'key' => sha1($this->directiveArgValue('prefix') . $this->request->ip()),
                 'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
                 'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
             ];
@@ -107,19 +107,17 @@ GRAPHQL;
 
         $resolver = $fieldValue->getResolver();
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
-                foreach ($limits as $limit) {
-                    $this->handleLimit(
-                        $limit['key'],
-                        $limit['maxAttempts'],
-                        $limit['decayMinutes']
-                    );
-                }
-
-                return $resolver($root, $args, $context, $resolveInfo);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
+            foreach ($limits as $limit) {
+                $this->handleLimit(
+                    $limit['key'],
+                    $limit['maxAttempts'],
+                    $limit['decayMinutes']
+                );
             }
-        );
+
+            return $resolver($root, $args, $context, $resolveInfo);
+        });
 
         return $next($fieldValue);
     }

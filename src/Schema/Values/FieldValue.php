@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
- * @phpstan-import-type FieldResolver from \GraphQL\Executor\Executor as FieldResolverFn
+ * @phpstan-type Resolver callable(mixed, array<string, mixed>, GraphQLContext, ResolveInfo): mixed
  */
 class FieldValue
 {
@@ -45,7 +45,7 @@ class FieldValue
      *
      * Lazily initialized through setResolver().
      *
-     * @var FieldResolverFn
+     * @var Resolver
      */
     protected $resolver;
 
@@ -90,7 +90,7 @@ class FieldValue
     /**
      * Get field resolver.
      *
-     * @return FieldResolverFn
+     * @return Resolver
      */
     public function getResolver(): callable
     {
@@ -100,7 +100,7 @@ class FieldValue
     /**
      * Overwrite the current/default resolver.
      *
-     * @param FieldResolverFn $resolver
+     * @param  Resolver  $resolver
      */
     public function setResolver(callable $resolver): self
     {
@@ -133,7 +133,7 @@ class FieldValue
      *     return $result;
      * }
      *
-     * @param callable(mixed $result, array<string, mixed> $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
+     * @param Resolver $handle
      */
     public function resultHandler(callable $handle): void
     {

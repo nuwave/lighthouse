@@ -28,6 +28,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 
+## v5.46.1
+
+### Fixed
+
+- Distinguish between client-safe and non-client-safe errors in `TestResponse::assertGraphQLError()` 
+
+## v5.46.0
+
+### Added
+
+- Add method `TestResponse::assertGraphQLDebugMessage()` to test internal errors https://github.com/nuwave/lighthouse/pull/2117
+
+## v5.45.4
+
+### Fixed
+
+- Revert breaking schema change in generate pagination types https://github.com/nuwave/lighthouse/pull/2104
+
 ## v5.45.3
 
 ### Fixed

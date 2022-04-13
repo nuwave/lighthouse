@@ -260,7 +260,7 @@ GRAPHQL;
     {
         return $builder->orderBy(
             $this->directiveArgValue('column'),
-            $this->directiveArgValue('direction', 'ASC')
+            $this->directiveArgValue('direction') ?? 'ASC'
         );
     }
 

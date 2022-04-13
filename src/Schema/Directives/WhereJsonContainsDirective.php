@@ -25,7 +25,7 @@ GRAPHQL;
     public function handleBuilder($builder, $value): object
     {
         return $builder->whereJsonContains(
-            $this->directiveArgValue('key', $this->nodeName()),
+            $this->directiveArgValue('key') ?? $this->nodeName(),
             $value
         );
     }

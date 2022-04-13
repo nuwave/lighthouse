@@ -31,26 +31,19 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            /**
-             * @param  array<string, mixed>  $args
-             *
-             * @return mixed Really anything
-             */
-            function ($root, array $args) {
-                /** @var string $method */
-                $method = $this->directiveArgValue(
-                    'name',
-                    $this->nodeName()
-                );
+        $fieldValue->setResolver(function ($root, array $args) {
+            $method = $this->directiveArgValue('name')
+                ?? $this->nodeName();
+            assert(is_string($method));
 
-                $orderedArgs = [];
-                foreach ($this->definitionNode->arguments as $argDefinition) {
-                    $orderedArgs[] = $args[$argDefinition->name->value] ?? null;
-                }
-
-                return $root->{$method}(...$orderedArgs);
+            $orderedArgs = [];
+            foreach ($this->definitionNode->arguments as $argDefinition) {
+                $orderedArgs[] = $args[$argDefinition->name->value] ?? null;
             }
-        );
+
+            return $root->{$method}(...$orderedArgs);
+        });
+
+        return $fieldValue;
     }
 }

@@ -33,16 +33,16 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
-                return $resolveInfo
-                    ->argumentSet
-                    ->enhanceBuilder(
-                        $this->getModelClass()::query(),
-                        $this->directiveArgValue('scopes', [])
-                    )
-                    ->first();
-            }
-        );
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+            return $resolveInfo
+                ->argumentSet
+                ->enhanceBuilder(
+                    $this->getModelClass()::query(),
+                    $this->directiveArgValue('scopes') ?? []
+                )
+                ->first();
+        });
+
+        return $fieldValue;
     }
 }

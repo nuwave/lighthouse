@@ -85,6 +85,14 @@ The setting `non_null_pagination_results` was removed and now always behaves as 
 This is generally more convenient for clients, but will
 cause validation errors to bubble further up in the result.
 
+### Nullability of pagination `first`
+
+Previously, the pagination argument `first` was either marked as non-nullable,
+or non-nullable with a default value.
+
+Now, it will always be marked as non-nullable, regardless if it has a default or not.
+This prevents clients from passing an invalid explicit `null`.
+
 ### Include field cost in `@complexity` calculation
 
 Previous to `v6`, the default query complexity calculation of fields with `@complexity`

@@ -49,54 +49,54 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args) {
-                /** @var string|int|array<string>|array<int> $idOrIds */
-                $idOrIds = reset($args);
+        $fieldValue->setResolver(function ($root, array $args) {
+            /** @var string|int|array<string>|array<int> $idOrIds */
+            $idOrIds = reset($args);
 
-                // TODO remove in v6
-                if ($this->directiveArgValue('globalId') ?? false) {
-                    // @phpstan-ignore-next-line We know that global ids must be strings
-                    $idOrIds = $this->decodeIdOrIds($idOrIds);
-                }
+            // TODO remove in v6
+            if ($this->directiveArgValue('globalId')) {
+                // @phpstan-ignore-next-line We know that global ids must be strings
+                $idOrIds = $this->decodeIdOrIds($idOrIds);
+            }
 
-                $modelOrModels = $this->find(
-                    $this->getModelClass(),
-                    $idOrIds
+            $modelOrModels = $this->find(
+                $this->getModelClass(),
+                $idOrIds
+            );
+
+            if (null === $modelOrModels) {
+                return null;
+            }
+
+            $modifyModelExistence = function (Model $model): void {
+                $success = $this->transactionalMutations->execute(
+                    function () use ($model): bool {
+                        return $this->modifyExistence($model);
+                    },
+                    $model->getConnectionName()
                 );
 
-                if (null === $modelOrModels) {
-                    return null;
-                }
-
-                $modifyModelExistence = function (Model $model): void {
-                    $success = $this->transactionalMutations->execute(
-                        function () use ($model): bool {
-                            return $this->modifyExistence($model);
-                        },
-                        $model->getConnectionName()
+                if (! $success) {
+                    $this->errorPool->record(
+                        new Error(
+                            self::couldNotModify($model)
+                        )
                     );
-
-                    if (! $success) {
-                        $this->errorPool->record(
-                            new Error(
-                                self::couldNotModify($model)
-                            )
-                        );
-                    }
-                };
-
-                if ($modelOrModels instanceof Model) {
-                    $modifyModelExistence($modelOrModels);
-                } elseif ($modelOrModels instanceof Collection) {
-                    foreach ($modelOrModels as $model) {
-                        $modifyModelExistence($model);
-                    }
                 }
+            };
 
-                return $modelOrModels;
+            if ($modelOrModels instanceof Model) {
+                $modifyModelExistence($modelOrModels);
+            } elseif ($modelOrModels instanceof Collection) {
+                foreach ($modelOrModels as $model) {
+                    $modifyModelExistence($model);
+                }
             }
-        );
+
+            return $modelOrModels;
+        });
+
+        return $fieldValue;
     }
 
     /**

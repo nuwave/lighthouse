@@ -34,22 +34,22 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
-                $results = $resolveInfo
-                    ->argumentSet
-                    ->enhanceBuilder(
-                        $this->getModelClass()::query(),
-                        $this->directiveArgValue('scopes', [])
-                    )
-                    ->get();
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+            $results = $resolveInfo
+                ->argumentSet
+                ->enhanceBuilder(
+                    $this->getModelClass()::query(),
+                    $this->directiveArgValue('scopes') ?? []
+                )
+                ->get();
 
-                if ($results->count() > 1) {
-                    throw new Error('The query returned more than one result.');
-                }
-
-                return $results->first();
+            if ($results->count() > 1) {
+                throw new Error('The query returned more than one result.');
             }
-        );
+
+            return $results->first();
+        });
+
+        return $fieldValue;
     }
 }

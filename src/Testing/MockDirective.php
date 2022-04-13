@@ -38,13 +38,13 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function () {
-                $key = $this->directiveArgValue('key', 'default');
-                $resolver = $this->mockResolverService->get($key);
+        $fieldValue->setResolver(function () {
+            $key = $this->directiveArgValue('key') ?? 'default';
+            $resolver = $this->mockResolverService->get($key);
 
-                return $resolver(...func_get_args());
-            }
-        );
+            return $resolver(...func_get_args());
+        });
+
+        return $fieldValue;
     }
 }

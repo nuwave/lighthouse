@@ -27,30 +27,28 @@ GRAPHQL;
     {
         $resolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $argumentSet = $resolveInfo->argumentSet;
-                    $rulesGatherer = new RulesGatherer($argumentSet);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $argumentSet = $resolveInfo->argumentSet;
+            $rulesGatherer = new RulesGatherer($argumentSet);
 
-                    $validationFactory = app(ValidationFactory::class);
-                    assert($validationFactory instanceof ValidationFactory);
-                    $validator = $validationFactory->make(
-                        $args,
-                        $rulesGatherer->rules,
-                        $rulesGatherer->messages,
-                        $rulesGatherer->attributes
-                    );
+            $validationFactory = app(ValidationFactory::class);
+            assert($validationFactory instanceof ValidationFactory);
+            $validator = $validationFactory->make(
+                $args,
+                $rulesGatherer->rules,
+                $rulesGatherer->messages,
+                $rulesGatherer->attributes
+            );
 
-                    if ($validator->fails()) {
-                        $path = implode('.', $resolveInfo->path);
+            if ($validator->fails()) {
+                $path = implode('.', $resolveInfo->path);
 
-                        throw new ValidationException("Validation failed for the field [$path].", $validator);
-                    }
+                throw new ValidationException("Validation failed for the field [$path].", $validator);
+            }
 
-                    return $resolver($root, $args, $context, $resolveInfo);
-                }
-            )
-        );
+            return $resolver($root, $args, $context, $resolveInfo);
+        });
+
+        return $next($fieldValue);
     }
 }

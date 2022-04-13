@@ -56,7 +56,7 @@ GRAPHQL;
         $shouldUseTags = $this->shouldUseTags();
         $resolver = $fieldValue->getResolver();
         $maxAge = $this->directiveArgValue('maxAge');
-        $isPrivate = $this->directiveArgValue('private', false);
+        $isPrivate = $this->directiveArgValue('private') ?? false;
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {

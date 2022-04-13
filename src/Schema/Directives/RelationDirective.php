@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
@@ -38,62 +39,60 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $fieldValue->setResolver(
-            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                $relationName = $this->relation();
+        $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            $relationName = $this->relation();
 
-                $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
-                $paginationArgs = $this->paginationArgs($args);
+            $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
+            $paginationArgs = $this->paginationArgs($args);
 
-                /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-                $relation = $parent->{$relationName}();
+            $relation = $parent->{$relationName}();
+            assert($relation instanceof Relation);
 
-                // We can shortcut the resolution if the client only queries for a foreign key
-                // that we know to be present on the parent model.
-                if (
-                    $this->lighthouseConfig['shortcut_foreign_key_selection']
-                    && ['id' => true] === $resolveInfo->getFieldSelection()
-                    && $relation instanceof BelongsTo
-                    && [] === $args
-                ) {
-                    $foreignKeyName = method_exists($relation, 'getForeignKeyName')
-                        ? $relation->getForeignKeyName()
-                        // @phpstan-ignore-next-line TODO remove once we drop old Laravel
-                        : $relation->getForeignKey();
-                    $id = $parent->getAttribute($foreignKeyName);
+            // We can shortcut the resolution if the client only queries for a foreign key
+            // that we know to be present on the parent model.
+            if (
+                $this->lighthouseConfig['shortcut_foreign_key_selection']
+                && ['id' => true] === $resolveInfo->getFieldSelection()
+                && $relation instanceof BelongsTo
+                && [] === $args
+            ) {
+                $foreignKeyName = method_exists($relation, 'getForeignKeyName')
+                    ? $relation->getForeignKeyName()
+                    // @phpstan-ignore-next-line TODO remove once we drop old Laravel
+                    : $relation->getForeignKey();
+                $id = $parent->getAttribute($foreignKeyName);
 
-                    return null === $id
-                        ? null
-                        : ['id' => $id];
-                }
-
-                if (
-                    $this->lighthouseConfig['batchload_relations']
-                    // Batch loading joins across both models, thus only works if they are on the same connection
-                    && $relation->getParent()->getConnectionName() === $relation->getRelated()->getConnectionName()
-                ) {
-                    /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
-                    $relationBatchLoader = BatchLoaderRegistry::instance(
-                        $this->qualifyPath($args, $resolveInfo),
-                        function () use ($relationName, $decorateBuilder, $paginationArgs): RelationBatchLoader {
-                            $modelsLoader = null !== $paginationArgs
-                                ? new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
-                                : new SimpleModelsLoader($relationName, $decorateBuilder);
-
-                            return new RelationBatchLoader($modelsLoader);
-                        }
-                    );
-
-                    return $relationBatchLoader->load($parent);
-                }
-
-                $decorateBuilder($relation);
-
-                return null !== $paginationArgs
-                    ? $paginationArgs->applyToBuilder($relation)
-                    : $relation->getResults();
+                return null === $id
+                    ? null
+                    : ['id' => $id];
             }
-        );
+
+            if (
+                $this->lighthouseConfig['batchload_relations']
+                // Batch loading joins across both models, thus only works if they are on the same connection
+                && $relation->getParent()->getConnectionName() === $relation->getRelated()->getConnectionName()
+            ) {
+                $relationBatchLoader = BatchLoaderRegistry::instance(
+                    $this->qualifyPath($args, $resolveInfo),
+                    function () use ($relationName, $decorateBuilder, $paginationArgs): RelationBatchLoader {
+                        $modelsLoader = null !== $paginationArgs
+                            ? new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
+                            : new SimpleModelsLoader($relationName, $decorateBuilder);
+
+                        return new RelationBatchLoader($modelsLoader);
+                    }
+                );
+                assert($relationBatchLoader instanceof RelationBatchLoader);
+
+                return $relationBatchLoader->load($parent);
+            }
+
+            $decorateBuilder($relation);
+
+            return null !== $paginationArgs
+                ? $paginationArgs->applyToBuilder($relation)
+                : $relation->getResults();
+        });
 
         return $fieldValue;
     }
