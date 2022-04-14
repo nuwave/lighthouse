@@ -383,7 +383,8 @@ class GraphQL
                         return $this->pipeline
                             ->send($error)
                             ->through($handlers)
-                            ->then(fn(?Error $error): ?array => null === $error
+                            ->then(
+                                fn (?Error $error): ?array => null === $error
                                 ? null
                                 : $formatter($error)
                             );
