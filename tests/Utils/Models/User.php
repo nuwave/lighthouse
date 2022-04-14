@@ -100,7 +100,7 @@ class User extends Authenticatable
         return $this->belongsTo(Team::class);
     }
 
-    public function customPrimaryKeys(): hasMany
+    public function customPrimaryKeys(): HasMany
     {
         return $this->hasMany(CustomPrimaryKey::class, 'user_id');
     }
