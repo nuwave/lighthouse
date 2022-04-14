@@ -839,7 +839,7 @@ GRAPHQL
                     'customPrimaryKeys' => [
                         [
                             'custom_primary_key_id' => '3',
-                        ]
+                        ],
                     ],
                 ],
             ],
