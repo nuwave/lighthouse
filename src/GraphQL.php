@@ -369,6 +369,7 @@ class GraphQL
     protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {
+            // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
             return $this->errorsHandler = function (array $errors, callable $formatter): array {
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
@@ -382,13 +383,10 @@ class GraphQL
                         return $this->pipeline
                             ->send($error)
                             ->through($handlers)
-                            ->then(function (?Error $error) use ($formatter): ?array {
-                                if (null === $error) {
-                                    return null;
-                                }
-
-                                return $formatter($error);
-                            });
+                            ->then(fn(?Error $error): ?array => null === $error
+                                ? null
+                                : $formatter($error)
+                            );
                     })
                     ->filter()
                     ->all();
