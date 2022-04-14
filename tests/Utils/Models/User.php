@@ -100,6 +100,11 @@ class User extends Authenticatable
         return $this->belongsTo(Team::class);
     }
 
+    public function customPrimaryKeys(): HasMany
+    {
+        return $this->hasMany(CustomPrimaryKey::class, 'user_id');
+    }
+
     public function scopeCompanyName(Builder $query, array $args): Builder
     {
         return $query->whereHas('company', function (Builder $q) use ($args): void {
