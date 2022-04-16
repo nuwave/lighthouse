@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -200,8 +201,54 @@ class AllDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testSpecifyCustomBuilderForRelation(): void
+    {
+        $post = factory(Post::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: ID!
+        }
+
+        type User {
+            id: ID!
+            posts: [Post!]! @all(builder: "' . $this->qualifyTestResolver('builderForRelation') . '")
+        }
+
+        type Query {
+            user(id: ID!): User @find
+        }
+        ';
+
+        // The custom builder is supposed to change the sort order
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(id: {$post->user_id}) {
+                posts {
+                    id
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'posts' => [
+                        [
+                            'id' => '1',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function builder(): Builder
     {
         return User::orderBy('id', 'DESC');
+    }
+
+    public function builderForRelation(User $parent): Relation
+    {
+        return $parent->posts()->orderBy('id', 'DESC');
     }
 }
