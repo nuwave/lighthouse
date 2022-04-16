@@ -17,7 +17,7 @@ class SchemaStitcherTest extends TestCase
         parent::setUp();
 
         // @phpstan-ignore-next-line using the Safe variant crashes PHPStan
-        exec('mkdir --parents ' . self::SCHEMA_PATH);
+        exec('mkdir -p ' . self::SCHEMA_PATH);
     }
 
     protected function tearDown(): void
