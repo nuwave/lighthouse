@@ -3,6 +3,7 @@
 namespace Tests\Integration\Pagination;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
@@ -88,6 +89,51 @@ final class PaginateDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testSpecifyCustomBuilderForRelation(): void
+    {
+        $post = factory(Post::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: ID!
+        }
+
+        type User {
+            id: ID!
+            posts: [Post!]! @paginate(builder: "' . $this->qualifyTestResolver('builderForRelation') . '")
+        }
+
+        type Query {
+            user(id: ID!): User @find
+        }
+        ';
+
+        // The custom builder is supposed to change the sort order
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            user(id: {$post->user_id}) {
+                posts(first: 1) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'posts' => [
+                        'data' => [
+                            [
+                                'id' => '1',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testPaginateWithScopes(): void
     {
         $namedUser = factory(User::class)->create([
@@ -143,6 +189,11 @@ final class PaginateDirectiveDBTest extends DBTestCase
     public function builder(): Builder
     {
         return User::orderBy('id', 'DESC');
+    }
+
+    public function builderForRelation(User $parent): Relation
+    {
+        return $parent->posts()->orderBy('id', 'DESC');
     }
 
     public function testCreateQueryPaginatorsWithDifferentPages(): void
