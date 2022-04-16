@@ -7,6 +7,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation as EloquentRelation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -111,8 +112,8 @@ GRAPHQL;
 
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
                 assert(
-                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder,
-                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
+                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof EloquentRelation,
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."
                 );
             } else {
                 $query = $this->getModelClass()::query();
