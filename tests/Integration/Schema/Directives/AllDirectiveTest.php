@@ -203,7 +203,11 @@ class AllDirectiveTest extends DBTestCase
 
     public function testSpecifyCustomBuilderForRelation(): void
     {
-        $post = factory(Post::class)->create();
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $posts = factory(Post::class, 2)->make();
+        $user->posts()->saveMany($posts);
 
         $this->schema = /** @lang GraphQL */ '
         type Post {
@@ -216,14 +220,14 @@ class AllDirectiveTest extends DBTestCase
         }
 
         type Query {
-            user(id: ID!): User @find
+            user(id: ID! @eq): User @find
         }
         ';
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ "
         {
-            user(id: {$post->user_id}) {
+            user(id: {$user->id}) {
                 posts {
                     id
                 }
@@ -233,6 +237,9 @@ class AllDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'posts' => [
+                        [
+                            'id' => '2',
+                        ],
                         [
                             'id' => '1',
                         ],

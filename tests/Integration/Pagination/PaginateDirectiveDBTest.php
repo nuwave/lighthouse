@@ -91,7 +91,11 @@ final class PaginateDirectiveDBTest extends DBTestCase
 
     public function testSpecifyCustomBuilderForRelation(): void
     {
-        $post = factory(Post::class)->create();
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $posts = factory(Post::class, 2)->create();
+        $user->posts()->saveMany($posts);
 
         $this->schema = /** @lang GraphQL */ '
         type Post {
@@ -104,15 +108,15 @@ final class PaginateDirectiveDBTest extends DBTestCase
         }
 
         type Query {
-            user(id: ID!): User @find
+            user(id: ID! @eq): User @find
         }
         ';
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ "
         {
-            user(id: {$post->user_id}) {
-                posts(first: 1) {
+            user(id: {$user->id}) {
+                posts(first: 10) {
                     data {
                         id
                     }
@@ -124,6 +128,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
                 'user' => [
                     'posts' => [
                         'data' => [
+                            [
+                                'id' => '2',
+                            ],
                             [
                                 'id' => '1',
                             ],
