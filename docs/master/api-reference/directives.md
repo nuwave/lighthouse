@@ -711,6 +711,41 @@ class ComplexityAnalyzer {
     }
 ```
 
+## @convertEmptyStringsToNull
+
+```graphql
+"""
+Replaces `""` with `null`.
+"""
+directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+```
+
+Whitespace around the passed in string will be removed.
+
+```graphql
+type Mutation {
+  createPost(title: String @convertEmptyStringsToNull): Post!
+}
+```
+
+Usage on a field applies the conversion recursively to all inputs.
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput!): Post! @trim
+}
+```
+
+If you want this for all your fields, consider adding this directive to your
+global field middleware in `lighthouse.php`:
+
+```php
+    'field_middleware' => [
+        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
+        ...
+    ],
+```
+
 ## @count
 
 ```graphql
