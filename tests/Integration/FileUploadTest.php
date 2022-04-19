@@ -6,13 +6,13 @@ use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class FileUploadTest extends TestCase
+final class FileUploadTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
 
     type Mutation {
-        upload(file: Upload!): Boolean
+        upload(file: Upload): Boolean
     }
     ' . self::PLACEHOLDER_QUERY;
 
@@ -45,6 +45,32 @@ class FileUploadTest extends TestCase
             ->assertJson([
                 'data' => [
                     'upload' => true,
+                ],
+            ]);
+    }
+
+    public function testUploadNull(): void
+    {
+        $operations = [
+            'query' => /** @lang GraphQL */ '
+                mutation ($file: Upload) {
+                    upload(file: $file)
+                }
+            ',
+            'variables' => [
+                'file' => null,
+            ],
+        ];
+
+        $map = [];
+
+        $file = [];
+
+        $this
+            ->multipartGraphQL($operations, $map, $file)
+            ->assertJson([
+                'data' => [
+                    'upload' => null,
                 ],
             ]);
     }
