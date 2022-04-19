@@ -720,7 +720,7 @@ Replaces `""` with `null`.
 directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-Whitespace around the passed in string will be removed.
+Use this when there is no meaningful distinction between an empty string and null.
 
 ```graphql
 type Mutation {
