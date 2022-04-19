@@ -70,7 +70,7 @@ GRAPHQL;
      */
     protected function transformLeaf($value)
     {
-        if ($value === '') {
+        if ('' === $value) {
             return null;
         }
 
