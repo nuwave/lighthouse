@@ -9,13 +9,15 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.47.0
+
 ### Added
 
 - Add `@convertEmptyStringsToNull` directive https://github.com/nuwave/lighthouse/pull/2123
 
 ### Fixed
 
-- Allow returning a Eloquent Relation from custom builder on `@all` and `@paginate` directive https://github.com/nuwave/lighthouse/pull/2120
+- Allow returning `Relation` from custom builder on `@all` and `@paginate` directive https://github.com/nuwave/lighthouse/pull/2120
 
 ## v5.46.2
 
