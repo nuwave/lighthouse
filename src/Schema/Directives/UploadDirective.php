@@ -67,7 +67,7 @@ GRAPHQL;
     public function pathArgValue(): string
     {
         return rtrim(
-            $this->directiveArgValue('path', ''),
+            $this->directiveArgValue('path') ?? '/',
             '\\/'
         );
     }
