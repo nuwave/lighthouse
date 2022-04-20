@@ -59,9 +59,6 @@ GRAPHQL;
         return $filepathInStorage;
     }
 
-    /**
-     * @throws Exception
-     */
     public function diskArgValue(): string
     {
         return $this->directiveArgValue('disk', config('filesystems.default'));
