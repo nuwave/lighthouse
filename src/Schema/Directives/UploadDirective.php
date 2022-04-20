@@ -61,7 +61,7 @@ GRAPHQL;
 
     public function diskArgValue(): string
     {
-        return $this->directiveArgValue('disk', config('filesystems.default'));
+        return $this->directiveArgValue('disk') ?? config('filesystems.default');
     }
 
     public function pathArgValue(): string
