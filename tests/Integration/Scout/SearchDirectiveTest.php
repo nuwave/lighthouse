@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Scout\ScoutException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 
-class SearchDirectiveTest extends DBTestCase
+final class SearchDirectiveTest extends DBTestCase
 {
     /**
      * @var \Mockery\MockInterface&\Laravel\Scout\EngineManager

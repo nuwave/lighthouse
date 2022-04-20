@@ -9,7 +9,7 @@ use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\Models\WithEnum;
 
-class LaravelEnumTypeDBTest extends DBTestCase
+final class LaravelEnumTypeDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry

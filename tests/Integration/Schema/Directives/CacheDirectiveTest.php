@@ -10,7 +10,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class CacheDirectiveTest extends DBTestCase
+final class CacheDirectiveTest extends DBTestCase
 {
     /**
      * @var \Illuminate\Contracts\Cache\Repository

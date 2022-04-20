@@ -10,7 +10,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 
-class DeferDBTest extends DBTestCase
+final class DeferDBTest extends DBTestCase
 {
     protected function getPackageProviders($app): array
     {

@@ -8,12 +8,12 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class Nameable
+final class Nameable
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
-    protected $typeRegistry;
+    private $typeRegistry;
 
     public function __construct(TypeRegistry $typeRegistry)
     {

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\DBTestCase;
 use Tests\Integration\Schema\Directives\Fixtures\CompanyWasCreatedEvent;
 
-class EventDirectiveTest extends DBTestCase
+final class EventDirectiveTest extends DBTestCase
 {
     public function testDispatchesAnEvent(): void
     {

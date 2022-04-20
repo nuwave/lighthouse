@@ -5,7 +5,7 @@ namespace Tests\Utils\Policies;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class TaskPolicy
+final class TaskPolicy
 {
     public const ADMIN = 'admin';
 

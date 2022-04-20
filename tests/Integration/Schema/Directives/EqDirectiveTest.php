@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class EqDirectiveTest extends DBTestCase
+final class EqDirectiveTest extends DBTestCase
 {
     public function testAttachEqFilterFromFieldArgument(): void
     {

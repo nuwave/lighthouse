@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class FirstDirectiveTest extends DBTestCase
+final class FirstDirectiveTest extends DBTestCase
 {
     public function testReturnsASingleUser(): void
     {
@@ -14,7 +14,7 @@ class FirstDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             user(id: ID @eq): User @first(model: "User")
         }
@@ -46,7 +46,7 @@ class FirstDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             user(name: String @eq): User @first(model: "User")
         }

@@ -13,7 +13,7 @@ use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class SchemaBuilderTest extends TestCase
+final class SchemaBuilderTest extends TestCase
 {
     public function testGeneratesValidSchema(): void
     {

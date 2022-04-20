@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Execution\ValidationErrorHandler;
 use Tests\TestCase;
 
-class ValidationErrorHandlerTest extends TestCase
+final class ValidationErrorHandlerTest extends TestCase
 {
     public function testWrapsLaravelValidation(): void
     {

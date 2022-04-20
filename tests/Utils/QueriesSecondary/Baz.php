@@ -2,7 +2,7 @@
 
 namespace Tests\Utils\QueriesSecondary;
 
-class Baz
+final class Baz
 {
     /**
      * The answer to life, the universe and everything.

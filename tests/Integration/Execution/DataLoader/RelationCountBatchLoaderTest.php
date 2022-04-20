@@ -10,7 +10,7 @@ use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class RelationCountBatchLoaderTest extends DBTestCase
+final class RelationCountBatchLoaderTest extends DBTestCase
 {
     public function testResolveBatchedCountsFromBatchedRequests(): void
     {

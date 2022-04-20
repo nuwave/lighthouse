@@ -7,7 +7,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ComplexityDirectiveTest extends TestCase
+final class ComplexityDirectiveTest extends TestCase
 {
     public const CUSTOM_COMPLEXITY = 123;
 

@@ -5,7 +5,7 @@ namespace Tests\Console;
 use Nuwave\Lighthouse\Console\LighthouseGeneratorCommand;
 use Tests\TestCase;
 
-class LighthouseGeneratorCommandTest extends TestCase
+final class LighthouseGeneratorCommandTest extends TestCase
 {
     public function testCommonNamespaceSingle(): void
     {

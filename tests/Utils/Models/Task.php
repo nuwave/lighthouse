@@ -37,7 +37,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\User|null $user
  */
-class Task extends Model
+final class Task extends Model
 {
     use SoftDeletes;
 

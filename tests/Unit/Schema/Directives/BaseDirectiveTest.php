@@ -21,7 +21,7 @@ use Tests\Utils\ModelsSecondary\OnlyHere;
  * are commonly used in directives. As users may also extend it to create
  * custom directives, its behaviour should be stable and well-defined.
  */
-class BaseDirectiveTest extends TestCase
+final class BaseDirectiveTest extends TestCase
 {
     public function testGetsModelClassFromDirective(): void
     {

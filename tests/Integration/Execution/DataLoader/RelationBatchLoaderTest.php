@@ -13,7 +13,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class RelationBatchLoaderTest extends DBTestCase
+final class RelationBatchLoaderTest extends DBTestCase
 {
     public function testResolveBatchedFieldsFromBatchedRequests(): void
     {

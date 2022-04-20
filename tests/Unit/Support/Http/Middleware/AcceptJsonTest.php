@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson;
 use Tests\TestCase;
 
-class AcceptJsonTest extends TestCase
+final class AcceptJsonTest extends TestCase
 {
     public function testSetsHeader(): void
     {

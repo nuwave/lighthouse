@@ -10,7 +10,7 @@ use Tests\Utils\Models\Product;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class BelongsToDirectiveTest extends DBTestCase
+final class BelongsToDirectiveTest extends DBTestCase
 {
     public function testResolveBelongsToRelationship(): void
     {

@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Relations
  * @property-read \Tests\Utils\Models\Color $color
  */
-class Product extends Model
+final class Product extends Model
 {
     /**
      * @var array<string>

@@ -9,7 +9,7 @@ use Tests\DBTestCase;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Models\Task;
 
-class BroadcastDBTest extends DBTestCase
+final class BroadcastDBTest extends DBTestCase
 {
     use TestsSubscriptions;
 

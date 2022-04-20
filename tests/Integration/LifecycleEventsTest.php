@@ -17,7 +17,7 @@ use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Tests\TestCase;
 
-class LifecycleEventsTest extends TestCase
+final class LifecycleEventsTest extends TestCase
 {
     public function testDispatchesProperLifecycleEvents(): void
     {

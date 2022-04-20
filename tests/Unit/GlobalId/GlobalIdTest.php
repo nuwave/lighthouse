@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdException;
 use Tests\TestCase;
 
-class GlobalIdTest extends TestCase
+final class GlobalIdTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\GlobalId\GlobalId

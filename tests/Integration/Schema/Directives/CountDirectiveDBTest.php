@@ -12,7 +12,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class CountDirectiveDBTest extends DBTestCase
+final class CountDirectiveDBTest extends DBTestCase
 {
     public function testRequiresARelationOrModelArgument(): void
     {

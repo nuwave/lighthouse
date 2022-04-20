@@ -8,7 +8,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class WithCountDirectiveTest extends DBTestCase
+final class WithCountDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelationCount(): void
     {

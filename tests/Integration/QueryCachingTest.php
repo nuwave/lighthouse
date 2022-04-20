@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class QueryCachingTest extends TestCase
+final class QueryCachingTest extends TestCase
 {
     public function testEnabled(): void
     {
@@ -19,7 +19,7 @@ class QueryCachingTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            foo 
+            foo
         }
         ')->assertExactJson([
             'data' => [
@@ -34,7 +34,7 @@ class QueryCachingTest extends TestCase
         // second request should be hit
         $this->graphQL(/** @lang GraphQL */ '
         {
-            foo 
+            foo
         }
         ')->assertExactJson([
             'data' => [
@@ -56,7 +56,7 @@ class QueryCachingTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            foo 
+            foo
         }
         ')->assertExactJson([
             'data' => [
@@ -89,7 +89,7 @@ class QueryCachingTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            foo 
+            foo
         }
         ')->assertExactJson([
             'data' => [

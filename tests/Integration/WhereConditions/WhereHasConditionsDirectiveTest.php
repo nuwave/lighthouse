@@ -10,7 +10,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
-class WhereHasConditionsDirectiveTest extends DBTestCase
+final class WhereHasConditionsDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type User {

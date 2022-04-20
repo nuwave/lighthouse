@@ -7,7 +7,7 @@ use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class BelongsToTest extends DBTestCase
+final class BelongsToTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {

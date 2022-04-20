@@ -5,7 +5,7 @@ namespace Tests\Integration\Validation;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class ExistsRuleTest extends DBTestCase
+final class ExistsRuleTest extends DBTestCase
 {
     public function testExistsRule(): void
     {

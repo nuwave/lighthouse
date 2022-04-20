@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class BuilderDirectiveTest extends DBTestCase
+final class BuilderDirectiveTest extends DBTestCase
 {
     public function testCallsCustomBuilderMethod(): void
     {

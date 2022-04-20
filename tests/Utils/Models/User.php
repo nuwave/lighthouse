@@ -45,7 +45,7 @@ use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  * @property-read \Tests\Utils\Models\Team|null $team
  */
-class User extends Authenticatable
+final class User extends Authenticatable
 {
     /**
      * Ensure that this is functionally equivalent to leaving this as null.

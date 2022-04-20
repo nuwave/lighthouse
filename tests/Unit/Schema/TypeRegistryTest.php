@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
-class TypeRegistryTest extends TestCase
+final class TypeRegistryTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry

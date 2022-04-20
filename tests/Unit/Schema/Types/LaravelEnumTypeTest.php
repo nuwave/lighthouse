@@ -12,7 +12,7 @@ use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\LaravelEnums\LocalizedUserType;
 use Tests\Utils\LaravelEnums\PartiallyDeprecated;
 
-class LaravelEnumTypeTest extends TestCase
+final class LaravelEnumTypeTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry

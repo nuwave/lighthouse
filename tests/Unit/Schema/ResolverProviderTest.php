@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
 
-class ResolverProviderTest extends TestCase
+final class ResolverProviderTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\ResolverProvider

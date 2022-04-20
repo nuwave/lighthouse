@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries;
 use Psr\Log\LoggerInterface;
 use Tests\TestCase;
 
-class LogGraphQLQueriesTest extends TestCase
+final class LogGraphQLQueriesTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&\Psr\Log\LoggerInterface

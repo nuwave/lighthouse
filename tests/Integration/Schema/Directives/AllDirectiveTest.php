@@ -8,7 +8,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class AllDirectiveTest extends DBTestCase
+final class AllDirectiveTest extends DBTestCase
 {
     public function testGetAllModelsAsRootField(): void
     {

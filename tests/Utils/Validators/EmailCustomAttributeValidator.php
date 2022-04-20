@@ -4,7 +4,7 @@ namespace Tests\Utils\Validators;
 
 use Nuwave\Lighthouse\Validation\Validator;
 
-class EmailCustomAttributeValidator extends Validator
+final class EmailCustomAttributeValidator extends Validator
 {
     public const MESSAGE = 'The email address must be a valid email address.';
 

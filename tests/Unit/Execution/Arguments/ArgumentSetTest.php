@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Tests\TestCase;
 
-class ArgumentSetTest extends TestCase
+final class ArgumentSetTest extends TestCase
 {
     public function testHasArgument(): void
     {
