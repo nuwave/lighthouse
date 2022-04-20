@@ -24,9 +24,9 @@ directive @upload(
   """
   disk: String
   """
-  The path where the file should be stored, defaults to `/`.
+  The path where the file should be stored.
   """
-  path: String
+  path: String! = "/"
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
