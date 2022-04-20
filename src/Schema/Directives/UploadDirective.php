@@ -52,7 +52,7 @@ GRAPHQL;
             $this->diskArgValue()
         );
 
-        if ($filepathInStorage === null) {
+        if ($filepathInStorage === false) {
             throw new Exception("Unable to upload `{$this->name()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`");
         }
 
@@ -66,9 +66,6 @@ GRAPHQL;
 
     public function pathArgValue(): string
     {
-        return rtrim(
-            $this->directiveArgValue('path') ?? '/',
-            '\\/'
-        );
+        return $this->directiveArgValue('path', '');
     }
 }
