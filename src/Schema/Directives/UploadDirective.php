@@ -46,7 +46,13 @@ GRAPHQL;
 
         $filename = $argumentValue->hashName();
 
-        if (!$filepathInStorage = $argumentValue->storeAs($this->pathArgValue(), $filename, $this->diskArgValue())) {
+        $filepathInStorage = $argumentValue->storeAs(
+            $this->pathArgValue(),
+            $filename,
+            $this->diskArgValue()
+        );
+
+        if ($filepathInStorage === null) {
             throw new Exception("Unable to upload `{$this->name()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`");
         }
 
