@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
  */
-class Team extends Model
+final class Team extends Model
 {
     public function users(): HasMany
     {

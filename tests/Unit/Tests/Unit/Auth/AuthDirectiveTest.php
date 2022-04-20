@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
-class AuthDirectiveTest extends TestCase
+final class AuthDirectiveTest extends TestCase
 {
     public function testResolveAuthenticatedUser(): void
     {

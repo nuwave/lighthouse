@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class LazyLoadDirectiveTest extends DBTestCase
+final class LazyLoadDirectiveTest extends DBTestCase
 {
     public function testLazyLoadRequiresRelationArgument(): void
     {

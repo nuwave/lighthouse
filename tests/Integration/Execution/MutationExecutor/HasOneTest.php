@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 
-class HasOneTest extends DBTestCase
+final class HasOneTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {

@@ -20,7 +20,7 @@ use Tests\Utils\LaravelEnums\AOrB;
  * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
  * @method static \Illuminate\Database\Eloquent\Builder&static byTypeInternal(string $aOrB) TODO remove in v6
  */
-class WithEnum extends Model
+final class WithEnum extends Model
 {
     public $timestamps = false;
 

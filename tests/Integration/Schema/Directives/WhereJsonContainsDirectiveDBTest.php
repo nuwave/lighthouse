@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class WhereJsonContainsDirectiveDBTest extends DBTestCase
+final class WhereJsonContainsDirectiveDBTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {

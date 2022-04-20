@@ -10,7 +10,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class InterfaceTest extends DBTestCase
+final class InterfaceTest extends DBTestCase
 {
     public function testResolveInterfaceTypes(): void
     {

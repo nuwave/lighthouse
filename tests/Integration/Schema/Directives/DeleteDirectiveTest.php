@@ -9,7 +9,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class DeleteDirectiveTest extends DBTestCase
+final class DeleteDirectiveTest extends DBTestCase
 {
     public function testDeletesUserAndReturnsIt(): void
     {

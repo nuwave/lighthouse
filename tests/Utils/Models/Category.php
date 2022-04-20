@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property \lluminate\Support\Carbon $created_at
  * @property \lluminate\Support\Carbon $updated_at
  */
-class Category extends Model
+final class Category extends Model
 {
     protected $primaryKey = 'category_id';
 

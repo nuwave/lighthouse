@@ -6,7 +6,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Tests\TestCase;
 
-class SchemaStitcherTest extends TestCase
+final class SchemaStitcherTest extends TestCase
 {
     public const SCHEMA_PATH = __DIR__ . '/schema/';
     public const ROOT_SCHEMA_FILENAME = 'root-schema';

@@ -8,7 +8,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class UnionTest extends DBTestCase
+final class UnionTest extends DBTestCase
 {
     /**
      * @dataProvider withAndWithoutCustomTypeResolver

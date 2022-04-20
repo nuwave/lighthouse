@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Tests\Utils\Queries\Bar;
 use Tests\Utils\Queries\Foo;
 
-class GraphQLTest extends TestCase
+final class GraphQLTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {

@@ -7,7 +7,7 @@ use Tests\TestsSerialization;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class LimitDirectiveTest extends DBTestCase
+final class LimitDirectiveTest extends DBTestCase
 {
     use TestsSerialization;
 

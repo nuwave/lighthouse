@@ -8,7 +8,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class CreateDirectiveTest extends DBTestCase
+final class CreateDirectiveTest extends DBTestCase
 {
     public function testCreateFromFieldArguments(): void
     {

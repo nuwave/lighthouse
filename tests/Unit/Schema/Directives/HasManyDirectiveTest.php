@@ -6,7 +6,7 @@ use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 
-class HasManyDirectiveTest extends DBTestCase
+final class HasManyDirectiveTest extends DBTestCase
 {
     public function testUsesEdgeTypeForRelayConnections(): void
     {

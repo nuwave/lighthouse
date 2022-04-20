@@ -4,7 +4,7 @@ namespace Tests\Utils\Validators;
 
 use Nuwave\Lighthouse\Validation\Validator;
 
-class RulesWithParametersValidator extends Validator
+final class RulesWithParametersValidator extends Validator
 {
     public function rules(): array
     {

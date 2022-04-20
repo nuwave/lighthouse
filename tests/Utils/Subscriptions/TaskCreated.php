@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
-class TaskCreated extends GraphQLSubscription
+final class TaskCreated extends GraphQLSubscription
 {
     /**
      * Check if subscriber is allowed to listen to the subscription.

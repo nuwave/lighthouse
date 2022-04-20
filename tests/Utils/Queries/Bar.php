@@ -2,7 +2,7 @@
 
 namespace Tests\Utils\Queries;
 
-class Bar
+final class Bar
 {
     public const RESULT = 'foobaz';
 

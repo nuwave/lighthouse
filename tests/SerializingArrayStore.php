@@ -13,7 +13,7 @@ use Illuminate\Support\InteractsWithTime;
  *
  * TODO remove once we only support Laravel 7.x plus https://github.com/laravel/framework/pull/31295
  */
-class SerializingArrayStore extends ArrayStore
+final class SerializingArrayStore extends ArrayStore
 {
     use InteractsWithTime;
 

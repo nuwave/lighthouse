@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\TestCase;
 
-class EnsureXHRTest extends TestCase
+final class EnsureXHRTest extends TestCase
 {
     public function testForbidGet(): void
     {

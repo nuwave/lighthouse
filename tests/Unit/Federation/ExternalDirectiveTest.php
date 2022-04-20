@@ -5,7 +5,7 @@ namespace Tests\Unit\Federation;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
-class ExternalDirectiveTest extends TestCase
+final class ExternalDirectiveTest extends TestCase
 {
     protected function getPackageProviders($app): array
     {
