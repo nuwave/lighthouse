@@ -192,6 +192,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected function isSameConnection(Relation $relation): bool
     {
         $default = $this->database->getDefaultConnection();
+
         $parent = $relation->getParent()->getConnectionName() ?? $default;
         $related = $relation->getRelated()->getConnectionName() ?? $default;
 
