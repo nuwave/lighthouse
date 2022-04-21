@@ -6,7 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -34,11 +34,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected $lighthouseConfig;
 
     /**
-     * @var \Illuminate\Database\ConnectionResolverInterface
+     * @var \Illuminate\Database\DatabaseManager
      */
     protected $database;
 
-    public function __construct(ConfigRepository $configRepository, ConnectionResolverInterface $database)
+    public function __construct(ConfigRepository $configRepository, DatabaseManager $database)
     {
         $this->lighthouseConfig = $configRepository->get('lighthouse');
         $this->database = $database;
