@@ -6,6 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -32,9 +33,16 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
      */
     protected $lighthouseConfig;
 
-    public function __construct(ConfigRepository $configRepository)
+    /**
+     * TODO use Illuminate\Database\ConnectionResolverInterface when we drop support for Laravel < 6
+     * @var \Illuminate\Database\DatabaseManager
+     */
+    protected $database;
+
+    public function __construct(ConfigRepository $configRepository, DatabaseManager $database)
     {
         $this->lighthouseConfig = $configRepository->get('lighthouse');
+        $this->database = $database;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -70,7 +78,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             if (
                 $this->lighthouseConfig['batchload_relations']
                 // Batch loading joins across both models, thus only works if they are on the same connection
-                && $relation->getParent()->getConnectionName() === $relation->getRelated()->getConnectionName()
+                && $this->isSameConnection($relation)
             ) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     $this->qualifyPath($args, $resolveInfo),
@@ -180,5 +188,15 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         return $this->directiveArgValue('defaultCount')
             ?? $this->lighthouseConfig['pagination']['default_count'];
+    }
+
+    protected function isSameConnection(Relation $relation): bool
+    {
+        $default = $this->database->getDefaultConnection();
+
+        $parent = $relation->getParent()->getConnectionName() ?? $default;
+        $related = $relation->getRelated()->getConnectionName() ?? $default;
+
+        return $parent === $related;
     }
 }
