@@ -5,22 +5,18 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-use Tests\DBTestCase;
-
-use function var_dump;
-
 /**
  * Primary key.
  * @property int $id
  *
  * Relations
- * @property-read \Tests\Utils\Models\User|null $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
  */
 final class NullConnection extends Model
 {
     public $timestamps = false;
 
-    public function getConnectionName()
+    public function getConnectionName(): ?string
     {
         return null;
     }

@@ -11,7 +11,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- `RelationDirective`/`batchload_relations` will consider `null` and default connection name as the same connection.
+- `RelationDirective`/`batchload_relations` will consider `null` and default connection name the same connection https://github.com/nuwave/lighthouse/pull/2125
+
 
 ## v5.47.0
 
