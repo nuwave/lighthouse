@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- `RelationDirective`/`batchload_relations` will consider `null` and default connection name as the same connection.
+
 ## v5.47.0
 
 ### Added
