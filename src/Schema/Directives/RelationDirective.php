@@ -34,7 +34,8 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected $lighthouseConfig;
 
     /**
-     * TODO use Illuminate\Database\ConnectionResolverInterface when we drop support for Laravel < 6
+     * TODO use Illuminate\Database\ConnectionResolverInterface when we drop support for Laravel < 6.
+     *
      * @var \Illuminate\Database\DatabaseManager
      */
     protected $database;
