@@ -59,7 +59,7 @@ GRAPHQL;
     {
         foreach ($argumentSet->arguments as $argument) {
             $namedType = $argument->namedType();
-            if ($namedType !== null && $namedType->name === ScalarType::STRING) {
+            if (null !== $namedType && ScalarType::STRING === $namedType->name) {
                 continue;
             }
 

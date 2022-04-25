@@ -47,7 +47,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => [[[null, null, "baz"]]],
+                'foo' => [[[null, null, 'baz']]],
             ],
         ]);
     }
