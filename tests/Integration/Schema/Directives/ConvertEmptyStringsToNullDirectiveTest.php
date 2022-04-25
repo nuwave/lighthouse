@@ -113,12 +113,14 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         type Foo {
             foo: String!
             bar: [String!]!
+            baz: [[[String!]]]!
         }
 
         type Query {
             foo(
                 foo: String!
                 bar: [String!]
+                baz: [[[String!]]]
             ): Foo! @convertEmptyStringsToNull @mock
         }
         ';
@@ -128,9 +130,11 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             foo(
                 foo: ""
                 bar: [""]
+                baz: [[[""]]]
             ) {
                 foo
                 bar
+                baz
             }
         }
         ')->assertJson([
@@ -138,6 +142,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 'foo' => [
                     'foo' => '',
                     'bar' => [''],
+                    'baz' => [[['']]],
                 ],
             ],
         ]);
