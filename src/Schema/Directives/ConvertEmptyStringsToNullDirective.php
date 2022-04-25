@@ -4,7 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Arguments\NamedType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
@@ -57,6 +59,11 @@ GRAPHQL;
     protected function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $argument) {
+            $namedType = $argument->namedType();
+            if ($namedType !== null && $namedType->name === ScalarType::STRING) {
+                continue;
+            }
+
             $argument->value = $this->sanitize($argument->value);
         }
 

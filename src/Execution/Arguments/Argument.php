@@ -49,6 +49,23 @@ class Argument
         return static::toPlainRecursive($this->value);
     }
 
+    public function namedType(): ?NamedType
+    {
+        return static::namedTypeRecursive($this->type);
+    }
+
+    /**
+     * @param \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null $type
+     */
+    protected static function namedTypeRecursive($type): ?NamedType
+    {
+        if ($type instanceof ListType) {
+            return static::namedTypeRecursive($type->type);
+        }
+
+        return $type;
+    }
+
     /**
      * Convert the given value to plain PHP values recursively.
      *

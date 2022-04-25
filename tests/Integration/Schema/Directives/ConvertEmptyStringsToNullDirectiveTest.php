@@ -108,7 +108,6 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             ) {
                 foo
                 bar
-                baz
             }
         }
         ')->assertJson([
