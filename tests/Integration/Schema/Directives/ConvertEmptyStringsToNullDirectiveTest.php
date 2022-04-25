@@ -29,6 +29,29 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ]);
     }
 
+    public function testMatrix(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: [[[String]]] @convertEmptyStringsToNull): [[[String]]] @mock
+        }
+        ';
+
+        $this->mockResolver(function ($_, array $args): ?array {
+            return $args['bar'];
+        });
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: [[["", null, "baz"]]])
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => [[[null, null, "baz"]]],
+            ],
+        ]);
+    }
+
     public function testFieldInputs(): void
     {
         $this->mockResolver(static function ($root, array $args): array {
