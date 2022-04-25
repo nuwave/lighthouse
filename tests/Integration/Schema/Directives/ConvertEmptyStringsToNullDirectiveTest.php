@@ -49,17 +49,21 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
 
         type Query {
-            foo(input: FooInput! @spread): Foo! @trim @mock
+            foo(
+                foo: String
+                bar: [String]!
+                baz: Int!
+            ): Foo! @convertEmptyStringsToNull @mock
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            foo(input: {
+            foo(
                 foo: ""
                 bar: [""]
                 baz: 3
-            }) {
+            ) {
                 foo
                 bar
                 baz
@@ -71,6 +75,47 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                     'foo' => null,
                     'bar' => [null],
                     'baz' => 3,
+                ],
+            ],
+        ]);
+    }
+
+    public function testDoesNotConvertNonNullableArguments(): void
+    {
+        $this->mockResolver(static function ($root, array $args): array {
+            return $args;
+        });
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Foo {
+            foo: String!
+            bar: [String!]!
+        }
+
+        type Query {
+            foo(
+                foo: String!
+                bar: [String!]
+            ): Foo! @convertEmptyStringsToNull @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(
+                foo: ""
+                bar: [""]
+            ) {
+                foo
+                bar
+                baz
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => [
+                    'foo' => '',
+                    'bar' => [''],
                 ],
             ],
         ]);
