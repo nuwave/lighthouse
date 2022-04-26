@@ -48,7 +48,7 @@ class RulesGatherer
     /**
      * @param  array<int|string>  $argumentPath
      */
-    public function gatherRulesRecursively(ArgumentSet $argumentSet, array $argumentPath): void
+    protected function gatherRulesRecursively(ArgumentSet $argumentSet, array $argumentPath): void
     {
         $this->gatherRulesForArgumentSet($argumentSet, $argumentSet->directives, $argumentPath);
 
@@ -82,7 +82,7 @@ class RulesGatherer
      * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
-    public function gatherRulesForArgumentSet(ArgumentSet $argumentSet, Collection $directives, array $path): void
+    protected function gatherRulesForArgumentSet(ArgumentSet $argumentSet, Collection $directives, array $path): void
     {
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentSetValidation) {
@@ -104,7 +104,7 @@ class RulesGatherer
      * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
-    public function gatherRulesForArgument($value, Collection $directives, array $path): void
+    protected function gatherRulesForArgument($value, Collection $directives, array $path): void
     {
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentValidation) {
@@ -138,9 +138,9 @@ class RulesGatherer
     /**
      * @param  array<int|string>  $argumentPath
      */
-    public function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
+    protected function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
-        $qualifiedRulesMap = array_map(
+        $qualifiedRulesList = array_map(
             function (array $rules) use ($argumentPath): array {
                 return $this->qualifyArgumentReferences($rules, $argumentPath);
             },
@@ -149,7 +149,7 @@ class RulesGatherer
 
         $this->rules = array_merge_recursive(
             $this->rules,
-            $this->wrap($qualifiedRulesMap, $argumentPath)
+            $this->wrap($qualifiedRulesList, $argumentPath)
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
@@ -163,7 +163,7 @@ class RulesGatherer
     /**
      * @param  array<int|string>  $argumentPath
      */
-    public function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
+    protected function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
     {
         $qualifiedRules = $this->qualifyArgumentReferences(
             $directive->rules(),
@@ -222,12 +222,7 @@ class RulesGatherer
      */
     protected function qualifyArgumentReferences(array $rules, array $argumentPath): array
     {
-        foreach ($rules as $index => &$rule) {
-            if (is_string($index)) {
-                $rule = $this->qualifyArgumentReferences($rule, array_merge($argumentPath, [$index]));
-                continue;
-            }
-
+        foreach ($rules as &$rule) {
             if (is_object($rule)) {
                 if ($rule instanceof WithReferenceRule) {
                     $rule->setArgumentPath($argumentPath);

@@ -184,6 +184,8 @@ class UpdateUserInputValidator extends Validator
 Note that this gives you access to all kinds of programmatic validation rules that Laravel
 provides. This can give you additional flexibility when you need it.
 
+### Custom Validator Messages
+
 You can customize the messages for the given rules by implementing the `messages` function:
 
 ```php
@@ -195,6 +197,8 @@ public function messages(): array
 }
 ```
 
+### Validator For Fields
+
 The `@validator` directive can also be used upon fields:
 
 ```graphql
@@ -205,6 +209,11 @@ type Mutation {
 
 In that case, Lighthouse will look for a validator class in a sub-namespace matching the parent type, in this case
 that would be `Mutation`, so the default FQCN would be `App\GraphQL\Validators\Mutation\UpdateUserValidator`.
+
+### Validator For Nested Inputs
+
+Use multiple validators for complex inputs that include nested input objects. This ensures
+they do not grow too complex and can be composed freely.
 
 ## Caveats
 
