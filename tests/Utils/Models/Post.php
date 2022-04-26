@@ -37,7 +37,7 @@ use Laravel\Scout\Searchable;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
  */
-class Post extends Model
+final class Post extends Model
 {
     use Searchable;
     use SoftDeletes;

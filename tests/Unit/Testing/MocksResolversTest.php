@@ -4,7 +4,7 @@ namespace Tests\Unit\Testing;
 
 use Tests\TestCase;
 
-class MocksResolversTest extends TestCase
+final class MocksResolversTest extends TestCase
 {
     public function testCallsMock(): void
     {

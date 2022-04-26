@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class GlobalIdDirectiveTest extends TestCase
+final class GlobalIdDirectiveTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\GlobalId\GlobalId

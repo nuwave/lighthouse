@@ -3,11 +3,12 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\CustomPrimaryKey;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class HasManyTest extends DBTestCase
+final class HasManyTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {
@@ -735,5 +736,113 @@ GRAPHQL
         ]);
 
         $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
+    }
+
+    public function testConnectModelWithCustomKey(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User @first
+        }
+
+        type CustomPrimaryKey {
+            custom_primary_key_id: ID!
+            users: [User!] @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String
+            customPrimaryKeys: [CustomPrimaryKey!] @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        input CreateUserInput {
+            name: String
+            customPrimaryKeys: UpdateCustomPrimaryKeyHasMany
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            name: String
+            customPrimaryKeys: UpdateCustomPrimaryKeyHasMany
+        }
+
+        input UpdateCustomPrimaryKeyHasMany {
+            connect: [ID!]
+            disconnect: [ID!]
+        }
+        ';
+
+        factory(CustomPrimaryKey::class, 3)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation {
+                createUser(input: {
+                    name: "foo"
+                    customPrimaryKeys: {
+                        connect: [1, 2, 3]
+                    }
+                }) {
+                    id
+                    name
+                    customPrimaryKeys {
+                        custom_primary_key_id
+                    }
+                }
+            }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'customPrimaryKeys' => [
+                        [
+                            'custom_primary_key_id' => '1',
+                        ],
+                        [
+                            'custom_primary_key_id' => '2',
+                        ],
+                        [
+                            'custom_primary_key_id' => '3',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation {
+                updateUser(input: {
+                    id: "1"
+                    name: "bar"
+                    customPrimaryKeys: {
+                        disconnect: [1, 2]
+                    }
+                }) {
+                    id
+                    name
+                    customPrimaryKeys {
+                        custom_primary_key_id
+                    }
+                }
+            }
+        ')->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                    'customPrimaryKeys' => [
+                        [
+                            'custom_primary_key_id' => '3',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema\Directives\Fixtures;
 
 use Tests\Utils\Models\Company;
 
-class CompanyWasCreatedEvent
+final class CompanyWasCreatedEvent
 {
     /**
      * @var \Tests\Utils\Models\Company

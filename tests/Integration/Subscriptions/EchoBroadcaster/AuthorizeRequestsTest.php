@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Tests\TestsRedis;
 use Tests\TestsSubscriptions;
 
-class AuthorizeRequestsTest extends TestCase
+final class AuthorizeRequestsTest extends TestCase
 {
     use TestsRedis;
     use TestsSubscriptions;

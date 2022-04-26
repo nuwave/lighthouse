@@ -9,7 +9,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class AggregateDirectiveTest extends DBTestCase
+final class AggregateDirectiveTest extends DBTestCase
 {
     public function setUp(): void
     {

@@ -5,7 +5,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 
-class MorphToManyTest extends DBTestCase
+final class MorphToManyTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Mutation {

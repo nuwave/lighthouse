@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class NodeDirectiveDBTest extends DBTestCase
+final class NodeDirectiveDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId

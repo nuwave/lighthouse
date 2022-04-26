@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Tests\Utils\Validators\EmailCustomAttributeValidator;
 use Tests\Utils\Validators\EmailCustomMessageValidator;
 
-class ValidatorDirectiveTest extends TestCase
+final class ValidatorDirectiveTest extends TestCase
 {
     public function testUsesValidatorByNamingConvention(): void
     {

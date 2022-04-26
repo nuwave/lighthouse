@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $imageable_type
  * @property-read \Tests\Utils\Models\Task|\Tests\Utils\Models\User|null $imageable
  */
-class Image extends Model
+final class Image extends Model
 {
     public function imageable(): MorphTo
     {

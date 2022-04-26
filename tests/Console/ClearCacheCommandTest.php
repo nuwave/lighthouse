@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
 
-class ClearCacheCommandTest extends TestCase
+final class ClearCacheCommandTest extends TestCase
 {
     use TestsSchemaCache;
 

@@ -9,7 +9,7 @@ use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-class ForceDeleteDirectiveTest extends DBTestCase
+final class ForceDeleteDirectiveTest extends DBTestCase
 {
     public function testForceDeletesTaskAndReturnsIt(): void
     {

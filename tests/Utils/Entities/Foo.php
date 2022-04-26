@@ -2,7 +2,7 @@
 
 namespace Tests\Utils\Entities;
 
-class Foo
+final class Foo
 {
     /**
      * @param  array<string, mixed>  $representation

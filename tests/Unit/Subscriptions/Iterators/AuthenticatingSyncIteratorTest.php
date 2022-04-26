@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionGuard;
 
-class AuthenticatingSyncIteratorTest extends IteratorTest
+final class AuthenticatingSyncIteratorTest extends IteratorTest
 {
     public function testIsWellBehavedIterator(): void
     {
@@ -81,12 +81,12 @@ class AuthenticatingSyncIteratorTest extends IteratorTest
     }
 }
 
-class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
+final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 {
     /**
      * @var int
      */
-    protected $id;
+    private $id;
 
     public function __construct(int $id)
     {

@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class SpreadDirectiveDBTest extends DBTestCase
+final class SpreadDirectiveDBTest extends DBTestCase
 {
     public function testSpreadsTheInputIntoTheQuery(): void
     {

@@ -4,7 +4,7 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
-class HashDirectiveTest extends TestCase
+final class HashDirectiveTest extends TestCase
 {
     public function testHashAnArgument(): void
     {

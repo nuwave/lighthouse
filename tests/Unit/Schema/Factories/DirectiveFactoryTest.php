@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
-class DirectiveFactoryTest extends TestCase
+final class DirectiveFactoryTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory

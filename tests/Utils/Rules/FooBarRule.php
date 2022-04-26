@@ -4,7 +4,7 @@ namespace Tests\Utils\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class FooBarRule implements Rule
+final class FooBarRule implements Rule
 {
     public const MESSAGE = 'This rule was triggered.';
 

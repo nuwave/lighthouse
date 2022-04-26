@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class SubscriptionTest extends TestCase
+final class SubscriptionTest extends TestCase
 {
     use TestsSubscriptions;
 

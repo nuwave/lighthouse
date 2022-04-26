@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Deprecation\DetectDeprecatedUsage;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class DeprecationTest extends TestCase
+final class DeprecationTest extends TestCase
 {
     /**
      * @var array<string, true>

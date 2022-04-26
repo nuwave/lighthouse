@@ -6,7 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\Rule;
 use Nuwave\Lighthouse\Validation\Validator;
 
-class CallbackUserValidator extends Validator
+final class CallbackUserValidator extends Validator
 {
     public function rules(): array
     {

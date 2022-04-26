@@ -9,11 +9,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\AlternateConnection;
+use Tests\Utils\Models\NullConnection;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class RelationBatchLoaderTest extends DBTestCase
+final class RelationBatchLoaderTest extends DBTestCase
 {
     public function testResolveBatchedFieldsFromBatchedRequests(): void
     {
@@ -170,6 +171,56 @@ class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount($alternateConnectionsPerUser, 'data.users.1.alternateConnections');
 
         $this->assertSame(3, $queryCount);
+    }
+
+    public function testDoesNotBatchloadRelationsWithNullDatabaseConnections(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type NullConnection {
+            users: [User!]! @hasMany
+        }
+        
+        type User {
+            id: ID
+        }
+
+        type Query {
+            nullConnections: [NullConnection!]! @all
+        }
+        ';
+
+        $nullConnectionsCount = 2;
+        $usersPerNullConnection = 3;
+        factory(NullConnection::class, $nullConnectionsCount)
+            ->create()
+            ->each(function (NullConnection $nullConnection) use ($usersPerNullConnection): void {
+                $nullConnection->users()->saveMany(
+                    factory(User::class, $usersPerNullConnection)->make()
+                );
+            });
+
+        config(['lighthouse.batchload_relations' => true]);
+
+        $queryCount = 0;
+        DB::listen(function () use (&$queryCount): void {
+            ++$queryCount;
+        });
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                nullConnections {
+                    users {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertJsonCount($nullConnectionsCount, 'data.nullConnections')
+            ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.0.users')
+            ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.1.users');
+
+        $this->assertSame(2, $queryCount);
     }
 
     /**

@@ -10,7 +10,7 @@ use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-class CanDirectiveTest extends TestCase
+final class CanDirectiveTest extends TestCase
 {
     public function testThrowsIfNotAuthorized(): void
     {

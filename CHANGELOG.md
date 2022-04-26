@@ -9,6 +9,52 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.48.1
+
+### Fixed
+
+- Omit non-nullable arguments in `@convertEmptyStringsToNull` https://github.com/nuwave/lighthouse/pull/2130
+
+## v5.48.0
+
+### Changed
+
+- Generate classes as `final` through artisan commands https://github.com/nuwave/lighthouse/pull/2127
+
+## v5.47.1
+
+### Fixed
+
+- `RelationDirective`/`batchload_relations` will consider `null` and default connection name the same connection https://github.com/nuwave/lighthouse/pull/2125
+
+## v5.47.0
+
+### Added
+
+- Add `@convertEmptyStringsToNull` directive https://github.com/nuwave/lighthouse/pull/2123
+
+### Fixed
+
+- Allow returning `Relation` from custom builder on `@all` and `@paginate` directive https://github.com/nuwave/lighthouse/pull/2120
+
+## v5.46.2
+
+### Fixed
+
+- Respect non-default primary key in nested one-to-many relations https://github.com/nuwave/lighthouse/pull/2119
+
+## v5.46.1
+
+### Fixed
+
+- Distinguish between client-safe and non-client-safe errors in `TestResponse::assertGraphQLError()` 
+
+## v5.46.0
+
+### Added
+
+- Add method `TestResponse::assertGraphQLDebugMessage()` to test internal errors https://github.com/nuwave/lighthouse/pull/2117
+
 ## v5.45.4
 
 ### Fixed

@@ -7,7 +7,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class AuthServiceProvider extends LaravelAuthServiceProvider
+final class AuthServiceProvider extends LaravelAuthServiceProvider
 {
     /**
      * @var array<class-string<\Illuminate\Database\Eloquent\Model>, class-string>

@@ -4,7 +4,7 @@ namespace Tests\Integration\Events;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class FieldDirective extends BaseDirective
+final class FieldDirective extends BaseDirective
 {
     public static function definition(): string
     {

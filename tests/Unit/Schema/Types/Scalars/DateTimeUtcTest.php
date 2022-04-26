@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateTimeUtc;
 use Nuwave\Lighthouse\Support\AppVersion;
 
-class DateTimeUtcTest extends DateScalarTest
+final class DateTimeUtcTest extends DateScalarTest
 {
     public function setUp(): void
     {

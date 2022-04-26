@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
-class MorphOneTest extends DBTestCase
+final class MorphOneTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {

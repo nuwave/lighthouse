@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
-class ClearCacheDirectiveTest extends TestCase
+final class ClearCacheDirectiveTest extends TestCase
 {
     /**
      * @var \Illuminate\Contracts\Cache\Repository
