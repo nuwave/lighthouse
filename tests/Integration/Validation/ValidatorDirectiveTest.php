@@ -34,6 +34,36 @@ final class ValidatorDirectiveTest extends TestCase
             ->assertGraphQLValidationError('input.rules', 'The input.rules must be a valid email address.');
     }
 
+    public function testUsesValidatorTwiceNested(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: FooInput): ID
+        }
+
+        input FooInput @validator {
+            email: String
+            self: FooInput
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    input: {
+                        email: "invalid"
+                        self: {
+                            email: "also-invalid"
+                        }
+                    }
+                )
+            }
+            ')
+            ->assertGraphQLValidationError('input.email', 'The input.email must be a valid email address.')
+            ->assertGraphQLValidationError('input.self.email', 'The input.self.email must be a valid email address.');
+    }
+
     public function testUsesSpecifiedValidatorClassWithoutNamespace(): void
     {
         $this->schema = /** @lang GraphQL */ '
