@@ -75,7 +75,7 @@ final class CacheDirectiveTest extends DBTestCase
         '
         )->validate();
 
-        $this->assertEmpty($errors);
+        $this->assertCount(0, $errors);
     }
 
     public function testPlaceCacheKeyOnAnyField(): void
