@@ -70,7 +70,7 @@ final class CacheDirectiveTest extends DBTestCase
             }
 
             type Query {
-                user: User
+                user: User @first
             }
         '
         )->validate();
