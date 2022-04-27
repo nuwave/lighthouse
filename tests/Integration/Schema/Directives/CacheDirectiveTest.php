@@ -59,6 +59,25 @@ final class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
     }
 
+    public function testCacheKeyIsValidOnFieldDefinition(): void
+    {
+        $errors = $this->buildSchema(
+        /** @lang GraphQL */ '
+            type User {
+                id: ID!
+                name: String @cache
+                email: String @cacheKey
+            }
+
+            type Query {
+                user: User
+            }
+        '
+        )->validate();
+
+        $this->assertEmpty($errors);
+    }
+
     public function testPlaceCacheKeyOnAnyField(): void
     {
         $this->mockResolver([
