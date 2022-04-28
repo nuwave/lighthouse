@@ -5,13 +5,6 @@ namespace Nuwave\Lighthouse\CacheControl;
 final class CacheControl
 {
     /**
-     * Singleton CacheControl instance.
-     *
-     * @var CacheControl|null
-     */
-    private static $instance = null;
-
-    /**
      * List of maxAges.
      *
      * @var array<int>
@@ -24,30 +17,6 @@ final class CacheControl
      * @var array<string>
      */
     private $scopeList = [];
-
-    /**
-     * Return the CacheControl instance.
-     *
-     * @return CacheControl
-     */
-    public static function getInstance(): self
-    {
-        if (null === self::$instance) {
-            self::$instance = new CacheControl();
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * Remove the CacheControl instance.
-     *
-     * This is called after Lighthouse EndRequest event dispatched.
-     */
-    public function forgetInstance(): void
-    {
-        self::$instance = null;
-    }
 
     public function addToMaxAgeList(int $maxAge): void
     {
