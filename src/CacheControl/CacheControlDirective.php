@@ -14,13 +14,11 @@ class CacheControlDirective extends BaseDirective implements FieldMiddleware
      */
     protected $cacheControl;
 
-    public function __construct(CacheControl $cacheControl)
-    {
+    public function __construct(CacheControl $cacheControl) {
         $this->cacheControl = $cacheControl;
     }
 
-    public static function definition(): string
-    {
+    public static function definition(): string {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Set the HTTP Cache-Control headers of the response.
@@ -28,7 +26,7 @@ Set the HTTP Cache-Control headers of the response.
 directive @cacheControl(
   """
   The maximum amount of time the field's cached value is valid, in seconds. 
-  The default value is 0(no-cache), but you can set a different default from config.
+  The default value is 0(no-cache).
   """
   maxAge: Int = 0
 
@@ -56,10 +54,9 @@ enum CacheControlScope {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
-    {
+    public function handleField(FieldValue $fieldValue, Closure $next) {
         $maxAge = $this->directiveArgValue('maxAge') ?? 0;
-        $scope = $this->directiveArgValue('scope') ?? 'public';
+        $scope = $this->directiveArgValue('scope') ?? 'PUBLIC';
 
         $this->cacheControl->addToMaxAgeList($maxAge);
         $this->cacheControl->addToScopeList($scope);

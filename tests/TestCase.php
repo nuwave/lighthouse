@@ -74,13 +74,13 @@ GRAPHQL;
             // Lighthouse's own
             LighthouseServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
             SoftDeletesServiceProvider::class,
             ValidationServiceProvider::class,
-            CacheControlServiceProvider::class,
         ];
     }
 

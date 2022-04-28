@@ -9,8 +9,7 @@ use Tests\Utils\Models\User;
 
 final class CacheControlDirectiveTest extends DBTestCase
 {
-    public function testDefaultAppResponseHeader(): void
-    {
+    public function testDefaultAppResponseHeader(): void {
         $this->mockResolver([
             'id' => 1,
             'name' => 'foobar',
@@ -40,8 +39,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @dataProvider argumentsDataProvider
      */
-    public function testDirectiveArguments(string $directive, string $expectedHeaderString): void
-    {
+    public function testDirectiveArguments(string $directive, string $expectedHeaderString): void {
         $this->mockResolver([
             'id' => 1,
             'name' => 'foobar',
@@ -69,10 +67,9 @@ final class CacheControlDirectiveTest extends DBTestCase
     }
 
     /**
-     * @return string[][]
+     * @return array<string, array{string, string}>
      */
-    public function argumentsDataProvider(): array
-    {
+    public function argumentsDataProvider(): array {
         return [
             'noArguments' => ['@cacheControl', 'no-cache, public'],
             'onlyMaxAge' => ['@cacheControl(maxAge: 10)', 'max-age=10, public'],
@@ -84,8 +81,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @dataProvider nestedQueryDataProvider
      */
-    public function testUseDirectiveNested(string $query, string $expectedHeaderString): void
-    {
+    public function testUseDirectiveNested(string $query, string $expectedHeaderString): void {
         $this->schema /** @lang GraphQL */
             = '
         type User {
@@ -125,8 +121,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @return string[][]
      */
-    public function nestedQueryDataProvider(): array
-    {
+    public function nestedQueryDataProvider(): array {
         return [
             [/** @lang GraphQL */ '
                 {   
