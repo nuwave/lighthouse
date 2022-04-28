@@ -15,7 +15,7 @@ class CacheControlDirective extends BaseDirective implements FieldMiddleware
 """
 Set the HTTP Cache-Control headers of the response.
 """
-directive @cache(
+directive @cacheControl(
   """
   The maximum amount of time the field's cached value is valid, in seconds. 
   The default value is 0(no-cache), but you can set a different default from config.
