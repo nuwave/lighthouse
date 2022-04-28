@@ -9,6 +9,16 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class CacheControlDirective extends BaseDirective implements FieldMiddleware
 {
+    /**
+     * @var \Nuwave\Lighthouse\CacheControl\CacheControl
+     */
+    protected $cacheControl;
+
+    public function __construct(CacheControl $cacheControl)
+    {
+        $this->cacheControl = $cacheControl;
+    }
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -51,8 +61,8 @@ GRAPHQL;
         $maxAge = $this->directiveArgValue('maxAge') ?? 0;
         $scope = $this->directiveArgValue('scope') ?? 'public';
 
-        app(CacheControl::class)->addToMaxAgeList($maxAge);
-        app(CacheControl::class)->addToScopeList($scope);
+        $this->cacheControl->addToMaxAgeList($maxAge);
+        $this->cacheControl->addToScopeList($scope);
 
         return $next($fieldValue);
     }

@@ -21,7 +21,8 @@ class GraphQLController
         EventsDispatcher $eventsDispatcher,
         RequestParser $requestParser,
         CreatesResponse $createsResponse,
-        CreatesContext $createsContext
+        CreatesContext $createsContext,
+        CacheControl $cacheControl
     ): Response {
         $eventsDispatcher->dispatch(
             new StartRequest($request)
@@ -33,7 +34,7 @@ class GraphQLController
         $result = $graphQL->executeOperationOrOperations($operationOrOperations, $context);
 
         $response = $createsResponse->createResponse($result);
-        $response = $response->setCache(app(CacheControl::class)->makeHeaderOptions());
+        $response = $response->setCache($cacheControl->makeHeaderOptions());
 
         $eventsDispatcher->dispatch(
             new EndRequest($response)
