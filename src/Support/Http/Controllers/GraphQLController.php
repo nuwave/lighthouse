@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
 use Laragraph\Utils\RequestParser;
+use Nuwave\Lighthouse\CacheControl\CacheControl;
 use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\GraphQL;
@@ -32,10 +33,13 @@ class GraphQLController
         $result = $graphQL->executeOperationOrOperations($operationOrOperations, $context);
 
         $response = $createsResponse->createResponse($result);
+        $response = $response->setCache(app(CacheControl::class)->makeHeaderOptions());
 
         $eventsDispatcher->dispatch(
             new EndRequest($response)
         );
+
+        app()->forgetInstance(CacheControl::class);
 
         return $response;
     }
