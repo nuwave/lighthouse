@@ -9,11 +9,13 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class CacheControlServiceProvider extends ServiceProvider
 {
-    public function register(): void {
+    public function register(): void
+    {
         $this->app->singleton(CacheControl::class);
     }
 
-    public function boot(Dispatcher $dispatcher, CacheControl $cacheControl): void {
+    public function boot(Dispatcher $dispatcher, CacheControl $cacheControl): void
+    {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
             static function (): string {
