@@ -18,11 +18,13 @@ class CacheControl
      */
     protected $scopeList = [];
 
-    public function addToMaxAgeList(int $maxAge): void {
+    public function addToMaxAgeList(int $maxAge): void
+    {
         $this->maxAgeList[] = $maxAge;
     }
 
-    public function addToScopeList(string $scope): void {
+    public function addToScopeList(string $scope): void
+    {
         $this->scopeList[] = strtolower($scope);
     }
 
@@ -31,7 +33,8 @@ class CacheControl
      *
      * @return array<string, bool|int>
      */
-    public function makeHeaderOptions(): array {
+    public function makeHeaderOptions(): array
+    {
         // Early return if @cacheControl not used.
         if (empty($this->scopeList) && empty($this->maxAgeList)) {
             $headerOptions['no_cache'] = true;

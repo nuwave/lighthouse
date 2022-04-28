@@ -14,11 +14,13 @@ class CacheControlDirective extends BaseDirective implements FieldMiddleware
      */
     protected $cacheControl;
 
-    public function __construct(CacheControl $cacheControl) {
+    public function __construct(CacheControl $cacheControl)
+    {
         $this->cacheControl = $cacheControl;
     }
 
-    public static function definition(): string {
+    public static function definition(): string
+    {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Set the HTTP Cache-Control headers of the response.
@@ -54,7 +56,8 @@ enum CacheControlScope {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next) {
+    public function handleField(FieldValue $fieldValue, Closure $next)
+    {
         $maxAge = $this->directiveArgValue('maxAge') ?? 0;
         $scope = $this->directiveArgValue('scope') ?? 'PUBLIC';
 
