@@ -526,7 +526,7 @@ You can find usage examples of this directive in [the caching docs](../performan
 """
 Specify the field to use as a key when creating a cache.
 """
-directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
 You can find usage examples of this directive in [the caching docs](../performance/caching.md#cache-key).

@@ -88,9 +88,7 @@ class TypeValue
                 }
             }
 
-            throw new DefinitionException(
-                "No @cacheKey or ID field defined on {$typeName}"
-            );
+            throw new DefinitionException("No @cacheKey or ID field defined on {$typeName}");
         }
 
         return $this->cacheKey;
