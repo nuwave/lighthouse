@@ -4,6 +4,7 @@ namespace Tests\Unit\Support\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\TestCase;
 
@@ -47,12 +48,14 @@ final class EnsureXHRTest extends TestCase
         $request = new Request();
         $request->setMethod('PUT');
 
+        $response = new Response();
+
         $result = $middleware->handle(
             $request,
-            static function (): bool { return true; }
+            static function () use ($response): Response { return $response; }
         );
 
-        $this->assertTrue($result);
+        $this->assertSame($response, $result);
     }
 
     /**
@@ -109,11 +112,13 @@ final class EnsureXHRTest extends TestCase
         $request->setMethod('POST');
         $request->headers->set('content-type', 'application/json');
 
+        $response = new Response();
+
         $result = $middleware->handle(
             $request,
-            static function (): bool { return true; }
+            static function () use ($response): Response { return $response; }
         );
 
-        $this->assertTrue($result);
+        $this->assertSame($response, $result);
     }
 }

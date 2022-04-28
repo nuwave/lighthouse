@@ -21,8 +21,8 @@ final class LifecycleEventsTest extends TestCase
 {
     public function testDispatchesProperLifecycleEvents(): void
     {
-        /** @var \Illuminate\Contracts\Events\Dispatcher $eventsDispatcher */
         $eventsDispatcher = app(EventsDispatcher::class);
+        assert($eventsDispatcher instanceof EventsDispatcher);
 
         /** @var array<int, object> $events */
         $events = [];
@@ -49,16 +49,30 @@ final class LifecycleEventsTest extends TestCase
         }
         ');
 
-        $this->assertInstanceOf(StartRequest::class, array_shift($events));
-        $this->assertInstanceOf(StartOperationOrOperations::class, array_shift($events));
-        $this->assertInstanceOf(BuildSchemaString::class, array_shift($events));
-        $this->assertInstanceOf(RegisterDirectiveNamespaces::class, array_shift($events));
-        $this->assertInstanceOf(ManipulateAST::class, array_shift($events));
-        $this->assertInstanceOf(StartExecution::class, array_shift($events));
-        $this->assertInstanceOf(BuildExtensionsResponse::class, array_shift($events));
-        $this->assertInstanceOf(ManipulateResult::class, array_shift($events));
-        $this->assertInstanceOf(EndExecution::class, array_shift($events));
-        $this->assertInstanceOf(EndOperationOrOperations::class, array_shift($events));
-        $this->assertInstanceOf(EndRequest::class, array_shift($events));
+        [
+            $startRequest,
+            $startOperationOrOperations,
+            $buildSchemaString,
+            $registerDirectiveNamespaces,
+            $manipulateAST,
+            $startExecution,
+            $buildExtensionsResponse,
+            $manipulateResult,
+            $endExecution,
+            $endOperationOrOperations,
+            $endRequest,
+        ] = $events;
+
+        $this->assertInstanceOf(StartRequest::class, $startRequest);
+        $this->assertInstanceOf(StartOperationOrOperations::class, $startOperationOrOperations);
+        $this->assertInstanceOf(BuildSchemaString::class, $buildSchemaString);
+        $this->assertInstanceOf(RegisterDirectiveNamespaces::class, $registerDirectiveNamespaces);
+        $this->assertInstanceOf(ManipulateAST::class, $manipulateAST);
+        $this->assertInstanceOf(StartExecution::class, $startExecution);
+        $this->assertInstanceOf(BuildExtensionsResponse::class, $buildExtensionsResponse);
+        $this->assertInstanceOf(ManipulateResult::class, $manipulateResult);
+        $this->assertInstanceOf(EndExecution::class, $endExecution);
+        $this->assertInstanceOf(EndOperationOrOperations::class, $endOperationOrOperations);
+        $this->assertInstanceOf(EndRequest::class, $endRequest);
     }
 }
