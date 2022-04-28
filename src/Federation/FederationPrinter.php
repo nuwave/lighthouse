@@ -55,7 +55,7 @@ class FederationPrinter
         }
 
         /** @var \GraphQL\Type\Definition\ObjectType $originalQueryType */
-        $originalQueryType = Arr::pull($types, RootType::QUERY);
+        $originalQueryType = Arr::pull($types, RootType::Query());
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
             static function (FieldDefinition $field): bool {
@@ -64,16 +64,16 @@ class FederationPrinter
         );
         $newQueryType = count($queryFieldsWithoutFederation) > 0
             ? new ObjectType([
-                'name' => RootType::QUERY,
+                'name' => RootType::Query(),
                 'fields' => $queryFieldsWithoutFederation,
                 'interfaces' => $originalQueryType->getInterfaces(),
             ])
             : null;
         $config->setQuery($newQueryType);
 
-        $config->setMutation(Arr::pull($types, RootType::MUTATION));
+        $config->setMutation(Arr::pull($types, RootType::Mutation()));
 
-        $config->setSubscription(Arr::pull($types, RootType::SUBSCRIPTION));
+        $config->setSubscription(Arr::pull($types, RootType::Subscription()));
 
         $config->setTypes($types);
 

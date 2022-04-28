@@ -73,7 +73,7 @@ GRAPHQL;
         $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
 
         if ($this->anyFieldHasDefer($defers)) {
-            if (RootType::MUTATION === $resolveInfo->parentType->name) {
+            if (RootType::Mutation() === $resolveInfo->parentType->name) {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
             if ($fieldType instanceof NonNullTypeNode) {

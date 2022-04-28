@@ -65,7 +65,7 @@ GRAPHQL
         );
 
         /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
-        $queryType = $documentAST->types[RootType::QUERY];
+        $queryType = $documentAST->types[RootType::Query()];
         $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
   node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
 GRAPHQL

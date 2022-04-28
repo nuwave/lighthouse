@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Schema\RootType;
 
 class MutationCommand extends FieldGeneratorCommand
@@ -10,7 +11,14 @@ class MutationCommand extends FieldGeneratorCommand
 
     protected $description = 'Create a class for a single field on the root Mutation type.';
 
-    protected $type = RootType::MUTATION;
+    protected $type;
+
+    public function __construct(Filesystem $files)
+    {
+        $this->type = RootType::Mutation();
+
+        parent::__construct($files);
+    }
 
     protected function namespaceConfigKey(): string
     {
