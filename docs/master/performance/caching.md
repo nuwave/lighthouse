@@ -101,3 +101,56 @@ type GithubProfile {
   repos: [Repository] @cache
 }
 ```
+
+## HTTP Cache-Control header
+
+You can change the Cache-Control header of your response regardless of [@cache](../api-reference/directives.md#cache),
+by adding [@cache](../api-reference/directives.md#cache) directive to each field of the schema. The final header settings
+calculated based on these rules:
+
+- The response's maxAge equals the lowest maxAge among all fields. If that value is 0, the entire result is not cached.
+- The response's scope is PRIVATE if any field's scope is PRIVATE.
+
+For more details check [Apollo](https://www.apollographql.com/docs/apollo-server/performance/caching/#calculating-cache-behavior).
+
+Now let see some examples, consider this as your schema:
+```graphql
+type User {
+    tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
+}
+
+type Team {
+    users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
+}
+
+type Task {
+    id: Int @cacheControl(maxAge: 10, scope: PUBLIC)
+    ToDo: String @cacheControl
+}
+
+type Query {
+    user: User @first @cacheControl(maxAge: 5, scope: PRIVATE)
+    team: Team @first
+}
+```
+
+The Cache-Control headers for some queries will be: 
+
+```graphql 
+# Cache-Control header: no-cache, PRIVATE
+query user {    # 5, PRIVATE
+    tasks {     # 50, PUBLIC
+        id      # 10, PUBLIC
+        ToDo    # no-cache, PUBLIC
+    }
+}
+
+# Cache-Control header: max-age=10, public
+query team {
+    users {         # 25, PUBLIC
+        tasks  {    # 50, PUBLIC
+            id      # 10, PUBLIC
+        }
+    }
+}
+```
