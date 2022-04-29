@@ -119,45 +119,49 @@ Given the following example schema:
 
 ```graphql
 type User {
-    tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
+  tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
 }
 
 type Company {
-    users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
+  users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
 }
 
 type Task {
-    id: ID @cacheControl(maxAge: 10, scope: PUBLIC)
-    description: String @cacheControl
+  id: ID @cacheControl(maxAge: 10, scope: PUBLIC)
+  description: String @cacheControl
 }
 
 type Query {
-    me: User! @auth @cacheControl(maxAge: 5, scope: PRIVATE)
-    company: Company!
+  me: User! @auth @cacheControl(maxAge: 5, scope: PRIVATE)
+  company: Company!
 }
 ```
 
-The Cache-Control headers for some queries will be: 
+The Cache-Control headers for some queries will be:
 
 ```graphql
 # Cache-Control header: no-cache, PRIVATE
-{        
-    me { # 5, PRIVATE
-        tasks { # 50, PUBLIC
-            id # 10, PUBLIC
-            description # no-cache, PUBLIC
-        }
+{
+  me {
+    # 5, PRIVATE
+    tasks {
+      # 50, PUBLIC
+      id # 10, PUBLIC
+      description # no-cache, PUBLIC
     }
+  }
 }
 
 # Cache-Control header: no-cache, public
 {
-    company {
-        users { # 25, PUBLIC
-            tasks { # 50, PUBLIC
-                id # 10, PUBLIC
-            }
-        }
+  company {
+    users {
+      # 25, PUBLIC
+      tasks {
+        # 50, PUBLIC
+        id # 10, PUBLIC
+      }
     }
+  }
 }
 ```
