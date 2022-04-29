@@ -113,10 +113,17 @@ Then, add a short description of your change and close it off with a link to you
 
 ## Code guidelines
 
-### `protected` over `private`
+### Extensibility
 
-Always use class member visibility `protected` over `private`. We cannot foresee every
-possible use case in advance, extending the code should remain possible. 
+We cannot foresee every possible use case in advance, extending the code should remain possible.
+
+#### `protected` over `private`
+
+Always use class member visibility `protected` over `private`.
+
+#### `final` classes
+
+Prefer `final` classes in [tests](tests), but never use them in [src](src).
 
 ### Laravel feature usage
 

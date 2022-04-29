@@ -214,8 +214,8 @@ GRAPHQL;
     {
         $this->schema = $schema;
 
-        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
         $schemaBuilder = $this->app->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
 
         return $schemaBuilder->schema();
     }

@@ -6,6 +6,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\Validator as SchemaValidator;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -57,6 +58,28 @@ final class CacheDirectiveTest extends DBTestCase
         ]);
 
         $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
+    }
+
+    public function testCacheKeyIsValidOnFieldDefinition(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+            type User {
+                id: ID!
+                name: String @cache
+                email: String @cacheKey
+            }
+
+            type Query {
+                user: User @first
+            }
+        ';
+
+        $schemaValidator = $this->app->make(SchemaValidator::class);
+        assert($schemaValidator instanceof SchemaValidator);
+
+        $schemaValidator->validate();
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPlaceCacheKeyOnAnyField(): void

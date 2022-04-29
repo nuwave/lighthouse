@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add `@cacheControl` directive https://github.com/nuwave/lighthouse/pull/2132
 
+## v5.48.2
+
+### Fixed
+
+- Allow `@cacheKey` on field definition https://github.com/nuwave/lighthouse/pull/2131
+
 ## v5.48.1
 
 ### Fixed
