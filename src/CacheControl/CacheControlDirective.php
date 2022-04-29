@@ -34,7 +34,6 @@ directive @cacheControl(
 
   """
   If PRIVATE, the field's value is specific to a single user. 
-  The default value is PUBLIC.
   """
   scope: CacheControlScope = PUBLIC  
 ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION

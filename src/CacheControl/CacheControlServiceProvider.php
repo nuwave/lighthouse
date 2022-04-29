@@ -27,7 +27,7 @@ class CacheControlServiceProvider extends ServiceProvider
             EndRequest::class,
             function (EndRequest $request) use ($cacheControl): void {
                 $request->response->setCache($cacheControl->makeHeaderOptions());
-                app()->forgetInstance(CacheControl::class);
+                $this->app->forgetInstance(CacheControl::class);
             }
         );
     }

@@ -25,7 +25,7 @@ class CacheControl
 
     public function addToScopeList(string $scope): void
     {
-        $this->scopeList[] = strtolower($scope);
+        $this->scopeList[] = $scope;
     }
 
     /**
@@ -50,7 +50,7 @@ class CacheControl
             $headerOptions['max_age'] = $maxAge;
         }
 
-        if (in_array('private', $this->scopeList)) {
+        if (in_array('PRIVATE', $this->scopeList)) {
             $headerOptions['private'] = true;
         } else {
             $headerOptions['public'] = true;
