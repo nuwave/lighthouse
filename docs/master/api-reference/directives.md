@@ -520,6 +520,43 @@ directive @cache(
 
 You can find usage examples of this directive in [the caching docs](../performance/caching.md).
 
+## @cacheControl
+
+```graphql
+"""
+Set the HTTP Cache-Control headers of the response.
+"""
+directive @cacheControl(
+    """
+    The maximum amount of time the field's cached value is valid, in seconds.
+    The default value is 0(no-cache).
+    """
+    maxAge: Int = 0
+
+    """
+    If PRIVATE, the field's value is specific to a single user.
+    """
+    scope: CacheControlScope = PUBLIC
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+"""
+Options for the `scope` argument of `@cacheControl`.
+"""
+enum CacheControlScope {
+    """
+    The HTTP Cache-Control header set to public.
+    """
+    PUBLIC
+
+    """
+    The HTTP Cache-Control header set to private.
+    """
+    PRIVATE
+}
+```
+
+You can find usage examples of this directive in [the caching docs](../performance/caching.md#http-cache-control-header).
+
 ## @cacheKey
 
 ```graphql
