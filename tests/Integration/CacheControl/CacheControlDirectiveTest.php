@@ -123,7 +123,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     }
 
     /**
-     * @return array<string, array{string, string}>
+     * @return array<int, array{string, string}>
      */
     public function nestedQueryDataProvider(): array
     {
