@@ -105,7 +105,7 @@ type GithubProfile {
 ## HTTP Cache-Control header
 
 You can change the Cache-Control header of your response regardless of [@cache](../api-reference/directives.md#cache),
-by adding [@cache](../api-reference/directives.md#cache) directive to each field of the schema. The final header settings
+by adding [@cacheControl](../api-reference/directives.md#cachecontrol) directive to each field of the schema. The final header settings
 calculated based on these rules:
 
 - The response's maxAge equals the lowest maxAge among all fields. If that value is 0, the entire result is not cached.
